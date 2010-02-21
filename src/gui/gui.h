@@ -23,6 +23,10 @@
 #include <wx/sizer.h>
 #include <wx/frame.h>
 #include <wx/dialog.h>
+#include <wx/stattext.h>
+#include <wx/textctrl.h>
+#include <wx/radiobox.h>
+#include <wx/slider.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -49,6 +53,7 @@ class GUIMainFrame : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnQuit( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnAbout( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSelectMachine( wxCommandEvent& event ){ event.Skip(); }
 		
 	
@@ -59,9 +64,9 @@ class GUIMainFrame : public wxFrame
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class GUIAbout
+/// Class GUIAboutDialog
 ///////////////////////////////////////////////////////////////////////////////
-class GUIAbout : public wxDialog 
+class GUIAboutDialog : public wxDialog 
 {
 	private:
 	
@@ -74,8 +79,70 @@ class GUIAbout : public wxDialog
 		
 	
 	public:
-		GUIAbout( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 414,229 ), long style = wxDEFAULT_DIALOG_STYLE );
-		~GUIAbout();
+		GUIAboutDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 414,229 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~GUIAboutDialog();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class GUIMachineFrame
+///////////////////////////////////////////////////////////////////////////////
+class GUIMachineFrame : public wxFrame 
+{
+	private:
+	
+	protected:
+		wxMenuBar* m_menubar2;
+		wxMenu* m_menu3;
+	
+	public:
+		GUIMachineFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine View"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		~GUIMachineFrame();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class GUIControl6DOFDialog
+///////////////////////////////////////////////////////////////////////////////
+class GUIControl6DOFDialog : public wxDialog 
+{
+	private:
+	
+	protected:
+		enum
+		{
+			ID_BUTTONCONNECT = 1000,
+			ID_BUTTONDISCONNECT,
+		};
+		
+		wxStaticText* m_staticText;
+		wxTextCtrl* textPort;
+		wxRadioBox* radioDeviceSelect;
+		wxStaticText* m_staticTextTx;
+		wxSlider* m_sliderTx;
+		wxStaticText* m_staticTextTy;
+		wxSlider* m_sliderTy;
+		wxStaticText* m_staticTextTz;
+		wxSlider* m_sliderTz;
+		wxStaticText* m_staticTextRx;
+		wxSlider* m_sliderRx;
+		wxStaticText* m_staticTextRy;
+		wxSlider* m_sliderRy;
+		wxStaticText* m_staticTextRz;
+		wxSlider* m_sliderRz;
+		wxButton* buttonConnect;
+		wxButton* buttonDisconnect;
+		wxButton* buttonClose;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnConnect( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnDisconnect( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ){ event.Skip(); }
+		
+	
+	public:
+		GUIControl6DOFDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup 6DOF Controller"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 400,-1 ), long style = wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
+		~GUIControl6DOFDialog();
 	
 };
 

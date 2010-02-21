@@ -1,8 +1,8 @@
 /*
  * GenericCAM.h
  *
- *  Created on: 18.09.2009
- *      Author: toby
+ *  Created on: 21.2.2010
+ *      Author: Tobias Schaefer
  */
 
 #ifndef GENERICCAM_H_
