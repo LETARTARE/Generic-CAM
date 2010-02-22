@@ -23,6 +23,7 @@
 #include <wx/sizer.h>
 #include <wx/frame.h>
 #include <wx/dialog.h>
+#include "../OpenGLCanvas.h"
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/radiobox.h>
@@ -40,12 +41,12 @@ class GUIMainFrame : public wxFrame
 	protected:
 		enum
 		{
-			wxID_QUIT = 1000,
-			wxID_SELECTMACHINE,
+			wxID_SELECTMACHINE = 1000,
 		};
 		
 		wxMenuBar* m_menubar;
 		wxMenu* m_menu1;
+		wxMenu* m_menu2;
 		wxMenu* m_menu3;
 		wxButton* m_button1;
 		wxButton* m_button2;
@@ -53,6 +54,7 @@ class GUIMainFrame : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnQuit( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnSetupController( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnAbout( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSelectMachine( wxCommandEvent& event ){ event.Skip(); }
 		
@@ -93,7 +95,14 @@ class GUIMachineFrame : public wxFrame
 	
 	protected:
 		wxMenuBar* m_menubar2;
-		wxMenu* m_menu3;
+		wxMenu* m_menu1;
+		OpenGLCanvas* m_canvas;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnLoadMachine( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnReloadMachine( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ){ event.Skip(); }
+		
 	
 	public:
 		GUIMachineFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine View"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );

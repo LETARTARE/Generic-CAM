@@ -45,6 +45,10 @@ private:
 
 public:
 	void SetController(Control3D *control);
+
+	void MakeTest(void);
+
+
 protected:
 	void OnPaint(wxPaintEvent& event);
 	void OnSize(wxSizeEvent& event);

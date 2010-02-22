@@ -9,11 +9,27 @@
 
 MachineFrame::MachineFrame(wxWindow* parent):GUIMachineFrame(parent)
 {
-	// TODO Auto-generated constructor stub
 
+//	canvas = new OpenGLCanvas(this, wxID_ANY, wxDefaultPosition,
+//			wxDefaultSize);
+	//If we have a parentframe with a OpenGL-Canvas use this:
+	//canvas = new OpenGLCanvas( this, parent->canvas, wxID_ANY, wxDefaultPosition, wxDefaultSize );;
+
+//	m_canvas->MakeTest();
+
+
+//	this->Layout();
+
+//	logWindow = new wxLogWindow(this, _("MachineFrame log"), false, true);
 }
 
 MachineFrame::~MachineFrame()
 {
-	// TODO Auto-generated destructor stub
+
+}
+
+
+void MachineFrame::OnClose(wxCommandEvent &event)
+{
+	Close();
 }
