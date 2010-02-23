@@ -125,7 +125,7 @@ GUIMachineFrame::GUIMachineFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer( wxVERTICAL );
 	
-	m_canvas = new OpenGLCanvas(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
+	m_canvas = new MachineCanvas(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
 	bSizer4->Add( m_canvas, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	this->SetSizer( bSizer4 );

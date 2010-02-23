@@ -46,7 +46,14 @@ private:
 public:
 	void SetController(Control3D *control);
 
-	void MakeTest(void);
+	virtual void Render();
+	virtual void InitGL();
+	virtual void SetupLighting();
+
+	// ?
+	//void prepare3DViewport(int topleft_x, int topleft_y, int bottomrigth_x, int bottomrigth_y);
+	//void prepare2DViewport(int topleft_x, int topleft_y, int bottomrigth_x, int bottomrigth_y);
+
 
 
 protected:
@@ -56,12 +63,6 @@ protected:
 	void OnEnterWindow(wxMouseEvent& event);
     void OnMouseEvent(wxMouseEvent& event);
     void OnTimer(wxTimerEvent& event);
-
-	virtual void Render();
-	virtual void InitGL();
-	void SetupLighting();
-
-
 
 	DECLARE_EVENT_TABLE()
 };

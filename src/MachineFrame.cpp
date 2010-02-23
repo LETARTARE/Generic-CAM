@@ -28,6 +28,9 @@ MachineFrame::~MachineFrame()
 
 }
 
+void MachineFrame::SetController(Control3D* control){
+	m_canvas->SetController(control);
+}
 
 void MachineFrame::OnClose(wxCommandEvent &event)
 {

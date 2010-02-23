@@ -44,6 +44,8 @@ void MainFrame::OnSelectMachine(wxCommandEvent& event)
 {
 	MachineFrame* machineFrame = new MachineFrame(this);
 
+	machineFrame->SetController(&control);
+
 	machineFrame->Show(true);
 }
 

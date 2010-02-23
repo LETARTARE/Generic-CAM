@@ -23,7 +23,7 @@
 #include <wx/sizer.h>
 #include <wx/frame.h>
 #include <wx/dialog.h>
-#include "../OpenGLCanvas.h"
+#include "../MachineCanvas.h"
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/radiobox.h>
@@ -96,7 +96,7 @@ class GUIMachineFrame : public wxFrame
 	protected:
 		wxMenuBar* m_menubar2;
 		wxMenu* m_menu1;
-		OpenGLCanvas* m_canvas;
+		MachineCanvas* m_canvas;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnLoadMachine( wxCommandEvent& event ){ event.Skip(); }

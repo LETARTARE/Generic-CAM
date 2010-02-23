@@ -7,11 +7,10 @@
 #include "Control6DOFDialog.h"
 #include <wx/debug.h>
 
-
 //TODO: There must be a way to get the timer IDs dynamically.
-#define TIMER_DIALOGCONTROL6DOF 900
+#define TIMER_DIALOGCONTROL6DOF 1900
 
-Control6DOFDialog::Control6DOFDialog(wxWindow* parent):
+Control6DOFDialog::Control6DOFDialog(wxWindow* parent) :
 	GUIControl6DOFDialog(parent)
 {
 
@@ -23,11 +22,15 @@ Control6DOFDialog::Control6DOFDialog(wxWindow* parent):
 	control = NULL;
 
 	timer.SetOwner(this, TIMER_DIALOGCONTROL6DOF);
+
+	this->Connect(wxEVT_TIMER, wxTimerEventHandler(Control6DOFDialog::OnTimer), NULL,
+			this);
+
 	timer.Start(100);
-	timer.Connect( wxEVT_TIMER, wxTimerEventHandler(Control6DOFDialog::OnTimer ), NULL, this );
 
-//	EVT_TIMER(RINGELWOLF_TIMER_DIALOGCONTROL6DOF, Control6DOFDialog::OnTimer)
+	//	timer.Connect( wxEVT_TIMER, wxCommandEventHandler(Control6DOFDialog::OnTimer ), NULL, this );
 
+	//	EVT_TIMER(RINGELWOLF_TIMER_DIALOGCONTROL6DOF, Control6DOFDialog::OnTimer)
 
 
 }
@@ -41,6 +44,7 @@ void Control6DOFDialog::SetupWith(Control3D *control)
 	if(control != NULL){
 		this->control = control;
 	}
+
 
 	wxASSERT(this->control!=NULL);
 
@@ -119,6 +123,7 @@ void Control6DOFDialog::OnTimer(wxTimerEvent& event)
 	if(control == NULL) return;
 	if(!control->IsOpen()) return;
 
+	control->Pump();
 	m_sliderTx->SetValue(control->GetAxis(0));
 	m_sliderTy->SetValue(control->GetAxis(1));
 	m_sliderTz->SetValue(control->GetAxis(2));

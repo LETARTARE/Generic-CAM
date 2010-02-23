@@ -620,16 +620,16 @@
                     <property name="proportion">1</property>
                     <object class="CustomControl" expanded="1">
                         <property name="bg"></property>
-                        <property name="class">OpenGLCanvas</property>
-                        <property name="construction">m_canvas = new OpenGLCanvas(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);</property>
+                        <property name="class">MachineCanvas</property>
+                        <property name="construction">m_canvas = new MachineCanvas(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);</property>
                         <property name="context_help"></property>
-                        <property name="declaration">OpenGLCanvas* m_canvas;</property>
+                        <property name="declaration">MachineCanvas* m_canvas;</property>
                         <property name="enabled">1</property>
                         <property name="fg"></property>
                         <property name="font"></property>
                         <property name="hidden">0</property>
                         <property name="id">wxID_ANY</property>
-                        <property name="include">#include &quot;../OpenGLCanvas.h&quot;&#x0A;</property>
+                        <property name="include">#include &quot;../MachineCanvas.h&quot;</property>
                         <property name="maximum_size"></property>
                         <property name="minimum_size"></property>
                         <property name="name">m_canvas</property>
