@@ -13,6 +13,7 @@
 #include "gui/gui.h"
 #include "controller/Control3D.h"
 #include <wx/config.h>
+#include <wx/log.h>
 
 class MainFrame:public GUIMainFrame {
 	// Constructor/ Destructor
@@ -24,7 +25,7 @@ public:
 private:
 	wxConfig *config;
 	Control3D control;
-
+	wxLogWindow* logWindow;
 	// Methods
 private:
 

@@ -17,12 +17,8 @@ MainFrame::MainFrame(wxWindow* parent) :
 	config = new wxConfig(_T("GenericCAM"));
 	control.GetConfigFrom(config);
 
-
-//	//TODO: Next 2 Lines for debugging. Delete!
-//	MachineFrame* machineFrame = new MachineFrame(this);
-//	machineFrame->Show();
-
-
+	logWindow = new wxLogWindow(this, _("Generic CAM - log window"), false, true);
+	logWindow->Show();
 
 }
 

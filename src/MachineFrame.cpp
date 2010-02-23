@@ -20,7 +20,7 @@ MachineFrame::MachineFrame(wxWindow* parent):GUIMachineFrame(parent)
 
 //	this->Layout();
 
-//	logWindow = new wxLogWindow(this, _("MachineFrame log"), false, true);
+//
 }
 
 MachineFrame::~MachineFrame()

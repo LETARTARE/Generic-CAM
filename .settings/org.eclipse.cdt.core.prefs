@@ -1,7 +1,13 @@
-#Sun Feb 21 16:45:47 CET 2010
+#Tue Feb 23 17:43:53 CET 2010
 eclipse.preferences.version=1
 environment/project/cdt.managedbuild.config.gnu.exe.debug.1074777317=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<environment append\="true" appendContributed\="true">\n<variable delimiter\=";" name\="LANG" operation\="replace" value\="C"/>\n</environment>\n
 environment/project/cdt.managedbuild.config.gnu.exe.release.937675282=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<environment append\="true" appendContributed\="true">\n<variable delimiter\=";" name\="LANG" operation\="append" value\="C"/>\n</environment>\n
+indexer/filesToParseUpFront=stdarg.h, stddef.h, sys/types.h
+indexer/indexAllFiles=false
+indexer/indexerId=org.eclipse.cdt.core.domsourceindexer
+indexer/skipMacroReferences=false
+indexer/skipReferences=false
+indexer/skipTypeReferences=false
 org.eclipse.cdt.core.formatter.alignment_for_arguments_in_method_invocation=16
 org.eclipse.cdt.core.formatter.alignment_for_base_clause_in_type_declaration=16
 org.eclipse.cdt.core.formatter.alignment_for_compact_if=0

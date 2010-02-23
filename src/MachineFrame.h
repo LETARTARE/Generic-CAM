@@ -9,7 +9,7 @@
 #define MACHINEFRAME_H_
 
 #include "gui/gui.h"
-#include <wx/log.h>
+
 //#include "OpenGLCanvas.h"
 #include <wx/splitter.h>
 
@@ -20,7 +20,7 @@ public:
 	virtual ~MachineFrame();
 
 	// Member Variables
-	wxLogWindow* logWindow;
+
 
 	void SetController(Control3D *control);
 
