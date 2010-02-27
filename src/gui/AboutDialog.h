@@ -8,8 +8,8 @@
 #ifndef ABOUTDIALOG_H_
 #define ABOUTDIALOG_H_
 
-#include "StdInclude.h"
-#include "gui/gui.h"
+#include "../StdInclude.h"
+#include "gui.h"
 
 class AboutDialog:public GUIAboutDialog {
 	// Constructor/ Destructor

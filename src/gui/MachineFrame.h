@@ -8,8 +8,8 @@
 #ifndef MACHINEFRAME_H_
 #define MACHINEFRAME_H_
 
-#include "gui/gui.h"
-#include "Machine.h"
+#include "gui.h"
+#include "../simulator/Machine.h"
 
 //#include "OpenGLCanvas.h"
 #include <wx/splitter.h>

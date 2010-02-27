@@ -13,7 +13,7 @@
 
 #include <wx/docview.h>
 
-#include "MainFrame.h"
+#include "gui/MainFrame.h"
 
 class GenericCAMApp: public wxApp
 {

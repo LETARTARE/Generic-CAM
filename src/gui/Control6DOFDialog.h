@@ -8,10 +8,10 @@
 #ifndef CONTROL6DOFDIALOG_H_
 #define CONTROL6DOFDIALOG_H_
 
-#include "StdInclude.h"
-#include "Config.h"
-#include "controller/Control3D.h"
-#include "gui/gui.h"
+#include "../StdInclude.h"
+#include "../Config.h"
+#include "../controller/Control3D.h"
+#include "gui.h"
 
 class Control6DOFDialog:public GUIControl6DOFDialog {
 	// Constructor / Destructor

@@ -8,10 +8,10 @@
 #ifndef MAINFRAME_H_
 #define MAINFRAME_H_
 
-#include "Config.h"
-#include "StdInclude.h"
-#include "gui/gui.h"
-#include "controller/Control3D.h"
+#include "../Config.h"
+#include "../StdInclude.h"
+#include "gui.h"
+#include "../controller/Control3D.h"
 #include <wx/config.h>
 #include <wx/log.h>
 

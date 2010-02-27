@@ -23,7 +23,7 @@
 #include <wx/sizer.h>
 #include <wx/frame.h>
 #include <wx/dialog.h>
-#include "../MachineCanvas.h"
+#include "../simulator/MachineCanvas.h"
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/radiobox.h>
