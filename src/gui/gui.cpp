@@ -147,7 +147,7 @@ GUIMachineFrame::~GUIMachineFrame()
 
 GUIControl6DOFDialog::GUIControl6DOFDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-	this->SetSizeHints( wxSize( 400,-1 ), wxSize( -1,-1 ) );
+	this->SetSizeHints( wxSize( -1,-1 ), wxSize( -1,-1 ) );
 	
 	wxBoxSizer* bSizer1;
 	bSizer1 = new wxBoxSizer( wxVERTICAL );
@@ -267,6 +267,7 @@ GUIControl6DOFDialog::GUIControl6DOFDialog( wxWindow* parent, wxWindowID id, con
 	
 	this->SetSizer( bSizer1 );
 	this->Layout();
+	bSizer1->Fit( this );
 	
 	// Connect Events
 	buttonConnect->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIControl6DOFDialog::OnConnect ), NULL, this );

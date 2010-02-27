@@ -22,6 +22,14 @@ MachinePart::~MachinePart()
 {
 }
 
+void MachinePart::InsertBox(AffineTransformMatrix matrix, float x, float y,
+		float z)
+{
+}
+void MachinePart::InsertCylinder(AffineTransformMatrix matrix, float h, float r)
+{
+}
+
 void MachinePart::Paint(void)
 {
 

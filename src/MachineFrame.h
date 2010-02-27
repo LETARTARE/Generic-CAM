@@ -9,6 +9,7 @@
 #define MACHINEFRAME_H_
 
 #include "gui/gui.h"
+#include "Machine.h"
 
 //#include "OpenGLCanvas.h"
 #include <wx/splitter.h>
@@ -21,6 +22,7 @@ public:
 
 	// Member Variables
 
+	Machine* machine;
 
 	void SetController(Control3D *control);
 
@@ -28,6 +30,8 @@ public:
 	// Methods
 public:
 	void OnClose(wxCommandEvent &event);
+	void OnLoadMachine(wxCommandEvent &event);
+
 };
 
 #endif /* MACHINEFRAME_H_ */

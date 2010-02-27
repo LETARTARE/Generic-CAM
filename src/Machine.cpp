@@ -7,6 +7,9 @@
 
 #include "Machine.h"
 
+#include <wx/log.h>
+#include "LUACodeEvaluator.h"
+
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfMachineParts)
 
@@ -18,6 +21,17 @@ Machine::Machine()
 Machine::~Machine()
 {
 
+}
+
+void Machine::InsertMachineDescription(wxString text)
+{
+	machineDescription = text;
+	wxLogMessage(_T("Machine::InsertMachineDescription"));
+	LUACodeEvaluator eval(wxTHREAD_JOINABLE);
+	eval.Create();
+	eval.LinkToMachine(this);
+	eval.Run();
+	eval.Wait();
 }
 
 void Machine::ClearParts(void)
@@ -34,6 +48,6 @@ bool Machine::AddPart(wxString name)
 	}
 	MachinePart* temp = new MachinePart(name);
 	parts.Add(temp);
-	matrixToManipulate = &(temp->matrix);
+	partToManipulate = temp;
 	return true;
 }

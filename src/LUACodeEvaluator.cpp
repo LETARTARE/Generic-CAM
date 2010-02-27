@@ -63,6 +63,8 @@ void *LUACodeEvaluator::Entry()
 
 	programOutput.Empty();
 
+	matrix.Identity();
+
 	error = luaL_loadstring(L, program.ToAscii());
 	if(error){
 		programOutput += _("\n---------- error while parsing ----------\n");
@@ -98,8 +100,6 @@ void LUACodeEvaluator::StopEvaluation()
 	lua_sethook(L, HookRoutine, LUA_MASKLINE, 0);
 }
 
-
-
 void LUACodeEvaluator::HookRoutine(lua_State * L, lua_Debug * ar)
 {
 	// Only listen to "Hook Lines" events
@@ -109,7 +109,6 @@ void LUACodeEvaluator::HookRoutine(lua_State * L, lua_Debug * ar)
 		lua_error(L);
 	}
 }
-
 
 // The next function is megaugly!
 LUACodeEvaluator* LUACodeEvaluator::FindCallingClass(lua_State * L)
@@ -121,7 +120,6 @@ LUACodeEvaluator* LUACodeEvaluator::FindCallingClass(lua_State * L)
 	}
 	return NULL;
 }
-
 
 // ++++++++++ Glue functions ++++++++++
 
@@ -191,7 +189,7 @@ int LUACodeEvaluator::translate_glue(lua_State * L)
 	float y = luaL_checknumber(L, 2);
 	float z = luaL_checknumber(L, 3);
 
-	CC->linkedMachine->matrixToManipulate->TranslateByTrackball(x, y, z);
+	CC->matrix.TranslateByTrackball(x, y, z);
 	return 0;
 }
 int LUACodeEvaluator::rotate_glue(lua_State * L)
@@ -206,16 +204,39 @@ int LUACodeEvaluator::rotate_glue(lua_State * L)
 	float x = luaL_checknumber(L, 1);
 	float y = luaL_checknumber(L, 2);
 	float z = luaL_checknumber(L, 3);
-	CC->linkedMachine->matrixToManipulate->RotateByTrackball(x, y, z);
+	CC->matrix.RotateByTrackball(x, y, z);
 	return 0;
 }
 
 int LUACodeEvaluator::box_glue(lua_State * L)
 {
+	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
+	wxASSERT(CC==NULL);
+	if(lua_gettop(L) != 3){
+		lua_pushstring(L, "box: parameter mismatch");
+		lua_error(L);
+		return 0;
+	}
+	float x = luaL_checknumber(L, 1);
+	float y = luaL_checknumber(L, 2);
+	float z = luaL_checknumber(L, 3);
+
+	CC->linkedMachine->partToManipulate->InsertBox(CC->matrix, x, y, z);
 	return 0;
 }
 int LUACodeEvaluator::cylinder_glue(lua_State * L)
 {
+	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
+	wxASSERT(CC==NULL);
+	if(lua_gettop(L) != 2){
+		lua_pushstring(L, "cylinder: parameter mismatch");
+		lua_error(L);
+		return 0;
+	}
+	float h = luaL_checknumber(L, 1);
+	float r = luaL_checknumber(L, 2);
+
+	CC->linkedMachine->partToManipulate->InsertCylinder(CC->matrix, h, r);
 	return 0;
 }
 int LUACodeEvaluator::setstyle_glue(lua_State * L)
@@ -234,6 +255,4 @@ int LUACodeEvaluator::placepart_glue(lua_State * L)
 {
 	return 0;
 }
-
-
 

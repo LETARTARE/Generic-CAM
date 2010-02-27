@@ -680,10 +680,10 @@
             <property name="hidden">0</property>
             <property name="id">wxID_ANY</property>
             <property name="maximum_size">-1,-1</property>
-            <property name="minimum_size">400,-1</property>
+            <property name="minimum_size">-1,-1</property>
             <property name="name">GUIControl6DOFDialog</property>
             <property name="pos"></property>
-            <property name="size">400,-1</property>
+            <property name="size">-1,-1</property>
             <property name="style">wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP</property>
             <property name="subclass"></property>
             <property name="title">Setup 6DOF Controller</property>

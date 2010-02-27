@@ -22,6 +22,11 @@ MachineCanvas::~MachineCanvas()
 }
 
 
+void MachineCanvas::Render()
+{
+
+}
+
 
 // This should happen in a derived class:
 //void OpenGLCanvas::InsertGeometry(Document* doc)

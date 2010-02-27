@@ -12,13 +12,18 @@
 
 class MachineCanvas:public OpenGLCanvas {
 public:
-	MachineCanvas(wxWindow *parent,
-			wxWindowID id = wxID_ANY,
-			const wxPoint& pos = wxDefaultPosition,
-			const wxSize& size = wxDefaultSize,
-			long style = 0,
-			const wxString& name = _T("Machine Display"));
+	// Constructor / Destructor
+	MachineCanvas(wxWindow *parent, wxWindowID id = wxID_ANY,
+			const wxPoint& pos = wxDefaultPosition, const wxSize& size =
+					wxDefaultSize, long style = 0, const wxString& name =
+					_T("Machine Display"));
 	virtual ~MachineCanvas();
+
+	// Member Variables
+
+
+	// Methods
+	void Render();
 };
 
 #endif /* MACHINECANVAS_H_ */

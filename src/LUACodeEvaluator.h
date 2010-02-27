@@ -41,6 +41,7 @@
 #include <list>
 #include <wx/thread.h>
 #include "Machine.h"
+#include "AffineTransformMatrix.h"
 
 class LUACodeEvaluator:public wxThread {
 
@@ -60,6 +61,8 @@ protected:
 	wxString programOutput;
 
 	Machine* linkedMachine;
+
+	AffineTransformMatrix matrix;
 
 	// Methods
 public:

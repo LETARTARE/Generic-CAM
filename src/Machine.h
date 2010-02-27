@@ -25,13 +25,13 @@ public:
 public:
 	wxString machineDescription;
 	ArrayOfMachineParts parts;
-	AffineTransformMatrix* matrixToManipulate;
+	MachinePart* partToManipulate;
 
 	// Methods
 public:
 	void ClearParts(void);
 	bool AddPart(wxString name);
-
+	void InsertMachineDescription(wxString text);
 };
 
 #endif /* MACHINE_H_ */

@@ -39,7 +39,7 @@ OpenGLCanvas::OpenGLCanvas(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 
 	control = NULL;
 
-	stereoMode = 1;
+	stereoMode = 0;
 
 
 	//TODO: Rewrite this to support multiple instances!

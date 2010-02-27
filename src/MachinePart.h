@@ -23,11 +23,14 @@ public:
 public:
 
 	wxString partname;
+private:
 	AffineTransformMatrix matrix;
 
 	// Methods
 public:
 	void Paint(void);
+	void InsertBox(AffineTransformMatrix matrix,float x,float y,float z);
+	void InsertCylinder(AffineTransformMatrix matrix,float h,float r);
 
 };
 
