@@ -21,17 +21,17 @@ public:
 	virtual ~MachineFrame();
 
 	// Member Variables
-
+private:
 	Machine* machine;
-
-	void SetController(Control3D *control);
-
+	wxString fileName;
 
 	// Methods
 public:
+	void SetController(Control3D *control);
+	void OnChangeStereo3D(wxCommandEvent &event);
 	void OnClose(wxCommandEvent &event);
 	void OnLoadMachine(wxCommandEvent &event);
-
+	void OnReloadMachine(wxCommandEvent &event);
 };
 
 #endif /* MACHINEFRAME_H_ */

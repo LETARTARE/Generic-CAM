@@ -4,7 +4,7 @@
  *  Takes care of precompiled header issues.
  *
  *  Created on: 21.05.2009
- *  Author: Tobias Schäfer
+ *  Author: Tobias Schaefer
  *
  */
 

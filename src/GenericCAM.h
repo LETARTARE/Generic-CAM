@@ -1,29 +1,24 @@
-/*
- * GenericCAM.h
- *
- *  Created on: 21.2.2010
- *      Author: Tobias Schaefer
- */
+//============================================================================
+// Name        : GenericCAM.h
+// Author      : Tobias Schaefer
+// Version     : 0.1
+// Copyright   : (c) 2010
+// Description : CAM Software
+//============================================================================
 
 #ifndef GENERICCAM_H_
 #define GENERICCAM_H_
 
 #include "StdInclude.h"
 #include "Config.h"
-
-#include <wx/docview.h>
-
 #include "gui/MainFrame.h"
 
-class GenericCAMApp: public wxApp
-{
+class GenericCAMApp:public wxApp {
 	// Constructor
 public:
 	GenericCAMApp(void);
 
 	// Member variables
-protected:
-
 public:
 	MainFrame* frame;
 
@@ -32,6 +27,5 @@ public:
 	virtual bool OnInit();
 
 };
-
 DECLARE_APP(GenericCAMApp)
 #endif /* GENERICCAM_H_ */

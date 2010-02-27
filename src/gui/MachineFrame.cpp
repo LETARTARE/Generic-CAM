@@ -6,6 +6,7 @@
  */
 
 #include "MachineFrame.h"
+#include <wx/log.h>
 
 MachineFrame::MachineFrame(wxWindow* parent) :
 	GUIMachineFrame(parent)
@@ -22,7 +23,11 @@ MachineFrame::MachineFrame(wxWindow* parent) :
 
 	//	this->Layout();
 
+
+	m_menuView->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
+
 	machine = new Machine;
+	m_canvas->InsertMachine(machine);
 }
 
 MachineFrame::~MachineFrame()
@@ -33,6 +38,16 @@ MachineFrame::~MachineFrame()
 void MachineFrame::SetController(Control3D* control)
 {
 	m_canvas->SetController(control);
+}
+
+void MachineFrame::OnChangeStereo3D(wxCommandEvent &event)
+{
+	if(m_canvas->stereoMode == 1){
+		m_canvas->stereoMode = 0;
+	}else{
+		m_canvas->stereoMode = 1;
+	}
+	m_menuView->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
 }
 
 void MachineFrame::OnClose(wxCommandEvent &event)
@@ -52,20 +67,9 @@ void MachineFrame::OnLoadMachine(wxCommandEvent &event)
 					wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if(dialog.ShowModal() == wxID_OK){
-		wxTextFile file(dialog.GetPath());
-		if(!file.Open(wxConvLocal)){
-			if(!file.Open(wxConvFile)){
-				wxLogError(_T("Opening of the file failed!"));
-				return;
-			}
-		}
-		wxString temp, str;
+		fileName = dialog.GetPath();
 
-		for(str = file.GetFirstLine(); !file.Eof(); str = file.GetNextLine()){
-			temp += str + _T("\n");
-		}
-
-		machine->InsertMachineDescription(temp);
+		OnReloadMachine(event);
 
 
 		//ctrlTextEdit->SetValue(temp);
@@ -74,4 +78,25 @@ void MachineFrame::OnLoadMachine(wxCommandEvent &event)
 		//SetWindowTitle();
 
 	}
+}
+
+void MachineFrame::OnReloadMachine(wxCommandEvent &event)
+{
+	if(fileName.empty()) return;
+
+	wxTextFile file(fileName);
+	if(!file.Open(wxConvLocal)){
+		if(!file.Open(wxConvFile)){
+			wxLogError(_T("Opening of the file failed!"));
+			return;
+		}
+	}
+	wxString temp, str;
+
+	for(str = file.GetFirstLine(); !file.Eof(); str = file.GetNextLine()){
+		temp += str + _T("\n");
+	}
+
+	machine->SetMachineDescription(temp);
+
 }

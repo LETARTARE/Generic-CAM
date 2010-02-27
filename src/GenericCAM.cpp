@@ -2,10 +2,9 @@
 // Name        : GenericCAM.cpp
 // Author      : Tobias Schaefer
 // Version     : 0.1
-// Copyright   : (c) 2009
+// Copyright   : (c) 2010
 // Description : CAM Software
 //============================================================================
-
 
 #include "GenericCAM.h"
 
@@ -14,9 +13,6 @@ IMPLEMENT_APP(GenericCAMApp)
 
 GenericCAMApp::GenericCAMApp()
 {
-
-
-
 }
 
 bool GenericCAMApp::OnInit()

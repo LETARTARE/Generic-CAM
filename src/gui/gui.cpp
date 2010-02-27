@@ -102,25 +102,32 @@ GUIMachineFrame::GUIMachineFrame( wxWindow* parent, wxWindowID id, const wxStrin
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
-	m_menubar2 = new wxMenuBar( 0 );
-	m_menu1 = new wxMenu();
+	m_menubar = new wxMenuBar( 0 );
+	m_menuMachine = new wxMenu();
 	wxMenuItem* m_menuItem11;
-	m_menuItem11 = new wxMenuItem( m_menu1, wxID_OPEN, wxString( _("&Load Machine") ) , wxEmptyString, wxITEM_NORMAL );
-	m_menu1->Append( m_menuItem11 );
+	m_menuItem11 = new wxMenuItem( m_menuMachine, wxID_OPEN, wxString( _("&Load Machine") ) + wxT('\t') + wxT("CTRL+L"), wxEmptyString, wxITEM_NORMAL );
+	m_menuMachine->Append( m_menuItem11 );
 	
 	wxMenuItem* m_menuItem12;
-	m_menuItem12 = new wxMenuItem( m_menu1, wxID_ANY, wxString( _("&Reload machine") ) + wxT('\t') + wxT("CTRL+R"), wxEmptyString, wxITEM_NORMAL );
-	m_menu1->Append( m_menuItem12 );
+	m_menuItem12 = new wxMenuItem( m_menuMachine, wxID_ANY, wxString( _("&Reload machine") ) + wxT('\t') + wxT("CTRL+R"), wxEmptyString, wxITEM_NORMAL );
+	m_menuMachine->Append( m_menuItem12 );
 	
-	m_menu1->AppendSeparator();
+	m_menuMachine->AppendSeparator();
 	
 	wxMenuItem* m_menuItem19;
-	m_menuItem19 = new wxMenuItem( m_menu1, wxID_CLOSE, wxString( _("&Close") ) + wxT('\t') + wxT("CTRL+Q"), wxEmptyString, wxITEM_NORMAL );
-	m_menu1->Append( m_menuItem19 );
+	m_menuItem19 = new wxMenuItem( m_menuMachine, wxID_CLOSE, wxString( _("&Close") ) + wxT('\t') + wxT("CTRL+Q"), wxEmptyString, wxITEM_NORMAL );
+	m_menuMachine->Append( m_menuItem19 );
 	
-	m_menubar2->Append( m_menu1, _("Machine") );
+	m_menubar->Append( m_menuMachine, _("&Machine") );
 	
-	this->SetMenuBar( m_menubar2 );
+	m_menuView = new wxMenu();
+	wxMenuItem* m_menuItem25;
+	m_menuItem25 = new wxMenuItem( m_menuView, wxID_VIEWSTEREO3D, wxString( _("&Stereo 3D") ) , wxEmptyString, wxITEM_CHECK );
+	m_menuView->Append( m_menuItem25 );
+	
+	m_menubar->Append( m_menuView, _("&View") );
+	
+	this->SetMenuBar( m_menubar );
 	
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer( wxVERTICAL );
@@ -135,6 +142,7 @@ GUIMachineFrame::GUIMachineFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	this->Connect( m_menuItem11->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineFrame::OnLoadMachine ) );
 	this->Connect( m_menuItem12->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineFrame::OnReloadMachine ) );
 	this->Connect( m_menuItem19->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineFrame::OnClose ) );
+	this->Connect( m_menuItem25->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineFrame::OnChangeStereo3D ) );
 }
 
 GUIMachineFrame::~GUIMachineFrame()
@@ -143,6 +151,7 @@ GUIMachineFrame::~GUIMachineFrame()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineFrame::OnLoadMachine ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineFrame::OnReloadMachine ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineFrame::OnClose ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineFrame::OnChangeStereo3D ) );
 }
 
 GUIControl6DOFDialog::GUIControl6DOFDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -281,4 +290,42 @@ GUIControl6DOFDialog::~GUIControl6DOFDialog()
 	buttonConnect->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIControl6DOFDialog::OnConnect ), NULL, this );
 	buttonDisconnect->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIControl6DOFDialog::OnDisconnect ), NULL, this );
 	buttonClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIControl6DOFDialog::OnClose ), NULL, this );
+}
+
+GUIErrorFrame::GUIErrorFrame( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer;
+	bSizer = new wxBoxSizer( wxVERTICAL );
+	
+	m_textCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxTE_AUTO_URL|wxTE_MULTILINE|wxTE_NOHIDESEL|wxTE_READONLY );
+	bSizer->Add( m_textCtrl, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_button = new wxButton( this, wxID_CLOSE, _("&Close"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer->Add( m_button, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	this->SetSizer( bSizer );
+	this->Layout();
+	m_menubar = new wxMenuBar( 0 );
+	m_menu = new wxMenu();
+	wxMenuItem* m_menuItem9;
+	m_menuItem9 = new wxMenuItem( m_menu, wxID_CLOSE, wxString( _("&Close Window") ) + wxT('\t') + wxT("CTRL+Q"), wxEmptyString, wxITEM_NORMAL );
+	m_menu->Append( m_menuItem9 );
+	
+	m_menubar->Append( m_menu, _("Error") );
+	
+	this->SetMenuBar( m_menubar );
+	
+	
+	// Connect Events
+	m_button->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIErrorFrame::OnClose ), NULL, this );
+	this->Connect( m_menuItem9->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIErrorFrame::OnClose ) );
+}
+
+GUIErrorFrame::~GUIErrorFrame()
+{
+	// Disconnect Events
+	m_button->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIErrorFrame::OnClose ), NULL, this );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIErrorFrame::OnClose ) );
 }

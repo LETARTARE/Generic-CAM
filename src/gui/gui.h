@@ -94,14 +94,21 @@ class GUIMachineFrame : public wxFrame
 	private:
 	
 	protected:
-		wxMenuBar* m_menubar2;
-		wxMenu* m_menu1;
+		enum
+		{
+			wxID_VIEWSTEREO3D = 1000,
+		};
+		
+		wxMenuBar* m_menubar;
+		wxMenu* m_menuMachine;
+		wxMenu* m_menuView;
 		MachineCanvas* m_canvas;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnLoadMachine( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnReloadMachine( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnChangeStereo3D( wxCommandEvent& event ){ event.Skip(); }
 		
 	
 	public:
@@ -152,6 +159,29 @@ class GUIControl6DOFDialog : public wxDialog
 	public:
 		GUIControl6DOFDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup 6DOF Controller"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
 		~GUIControl6DOFDialog();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class GUIErrorFrame
+///////////////////////////////////////////////////////////////////////////////
+class GUIErrorFrame : public wxFrame 
+{
+	private:
+	
+	protected:
+		wxTextCtrl* m_textCtrl;
+		wxButton* m_button;
+		wxMenuBar* m_menubar;
+		wxMenu* m_menu;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCommandEvent& event ){ event.Skip(); }
+		
+	
+	public:
+		GUIErrorFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("An error occured"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,370 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		~GUIErrorFrame();
 	
 };
 

@@ -13,9 +13,9 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#define _GENERICCAM_VERSION "1.0"
+#define _GENERICCAM_VERSION "0.2"
 #define _GENERICCAM_AUTHORS "Tobias Schaefer"
 
-#define _DEBUGMODE	false
+#define _DEBUGMODE	true
 
 #endif /* CONFIG_H_ */
