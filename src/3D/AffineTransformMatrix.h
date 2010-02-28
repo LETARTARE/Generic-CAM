@@ -59,7 +59,7 @@ public:
 	void RotateByTrackball(double x, double y, double z);
 	void TranslateByTrackball(double x, double y, double z);
 
-	void RotateAroundVector(CVector3 vector, double phi);
+	void RotateAroundVector(Vector3 vector, double phi);
 
 
 //private:

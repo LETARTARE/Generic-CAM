@@ -24,6 +24,7 @@
 #include <wx/frame.h>
 #include <wx/dialog.h>
 #include "../simulator/MachineCanvas.h"
+#include "../simulator/DataCanvas.h"
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/radiobox.h>
@@ -57,6 +58,7 @@ class GUIMainFrame : public wxFrame
 		virtual void OnSetupController( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnAbout( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSelectMachine( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnSelectData( wxCommandEvent& event ){ event.Skip(); }
 		
 	
 	public:
@@ -114,6 +116,37 @@ class GUIMachineFrame : public wxFrame
 	public:
 		GUIMachineFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine View"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		~GUIMachineFrame();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class GUIDataFrame
+///////////////////////////////////////////////////////////////////////////////
+class GUIDataFrame : public wxFrame 
+{
+	private:
+	
+	protected:
+		enum
+		{
+			wxID_VIEWSTEREO3D = 1000,
+		};
+		
+		wxMenuBar* m_menubar;
+		wxMenu* m_menuMachine;
+		wxMenu* m_menuView;
+		DataCanvas* m_canvas;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnLoadSTLData( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnSaveData( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnChangeStereo3D( wxCommandEvent& event ){ event.Skip(); }
+		
+	
+	public:
+		GUIDataFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("3D data view"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		~GUIDataFrame();
 	
 };
 

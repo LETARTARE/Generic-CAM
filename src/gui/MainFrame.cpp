@@ -8,6 +8,7 @@
 #include "AboutDialog.h"
 #include "MachineFrame.h"
 #include "Control6DOFDialog.h"
+#include "DataFrame.h"
 
 MainFrame::MainFrame(wxWindow* parent) :
 	GUIMainFrame(parent)
@@ -48,6 +49,16 @@ void MainFrame::OnSelectMachine(wxCommandEvent& event)
 
 	machineFrame->Show(true);
 }
+
+void MainFrame::OnSelectData(wxCommandEvent& event)
+{
+	DataFrame* dataFrame = new DataFrame(this);
+
+	dataFrame->SetController(&control);
+
+	dataFrame->Show(true);
+}
+
 
 void MainFrame::OnSetupController(wxCommandEvent &event)
 {

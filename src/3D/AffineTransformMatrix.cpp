@@ -285,7 +285,7 @@ void AffineTransformMatrix::TranslateByTrackball(double x, double y, double z)
 
 }
 
-void AffineTransformMatrix::RotateAroundVector(CVector3 vector, double phi)
+void AffineTransformMatrix::RotateAroundVector(Vector3 vector, double phi)
 {
 	double c = cos(phi);
 	double s = sin(phi);

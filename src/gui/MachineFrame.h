@@ -15,7 +15,7 @@
 #include <wx/splitter.h>
 
 class MachineFrame:public GUIMachineFrame {
-	// Constructor / Destructor
+	// Constructor/ Destructor
 public:
 	MachineFrame(wxWindow* parent);
 	virtual ~MachineFrame();

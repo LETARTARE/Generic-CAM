@@ -32,6 +32,7 @@ private:
 	void OnQuit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
 	void OnSelectMachine(wxCommandEvent& event);
+	void OnSelectData(wxCommandEvent& event);
 	void OnSetupController(wxCommandEvent &event);
 
 };

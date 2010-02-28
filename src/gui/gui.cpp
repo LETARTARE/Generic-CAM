@@ -44,8 +44,6 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	bSizer1->Add( m_button1, 0, wxALL|wxEXPAND, 5 );
 	
 	m_button2 = new wxButton( this, wxID_ANY, _("Select data"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_button2->Enable( false );
-	
 	bSizer1->Add( m_button2, 0, wxALL|wxEXPAND, 5 );
 	
 	m_button3 = new wxButton( this, wxID_ANY, _("Select raw material"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -61,6 +59,7 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	this->Connect( m_menuItem21->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSetupController ) );
 	this->Connect( m_menuItem39->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnAbout ) );
 	m_button1->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIMainFrame::OnSelectMachine ), NULL, this );
+	m_button2->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIMainFrame::OnSelectData ), NULL, this );
 }
 
 GUIMainFrame::~GUIMainFrame()
@@ -70,6 +69,7 @@ GUIMainFrame::~GUIMainFrame()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSetupController ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnAbout ) );
 	m_button1->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIMainFrame::OnSelectMachine ), NULL, this );
+	m_button2->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIMainFrame::OnSelectData ), NULL, this );
 }
 
 GUIAboutDialog::GUIAboutDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -152,6 +152,62 @@ GUIMachineFrame::~GUIMachineFrame()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineFrame::OnReloadMachine ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineFrame::OnClose ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineFrame::OnChangeStereo3D ) );
+}
+
+GUIDataFrame::GUIDataFrame( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	m_menubar = new wxMenuBar( 0 );
+	m_menuMachine = new wxMenu();
+	wxMenuItem* m_menuItem11;
+	m_menuItem11 = new wxMenuItem( m_menuMachine, wxID_OPEN, wxString( _("&Load STL data") ) + wxT('\t') + wxT("CTRL+L"), wxEmptyString, wxITEM_NORMAL );
+	m_menuMachine->Append( m_menuItem11 );
+	
+	wxMenuItem* m_menuItem12;
+	m_menuItem12 = new wxMenuItem( m_menuMachine, wxID_SAVE, wxString( _("&Save STL data") ) + wxT('\t') + wxT("CTRL+S"), wxEmptyString, wxITEM_NORMAL );
+	m_menuMachine->Append( m_menuItem12 );
+	
+	m_menuMachine->AppendSeparator();
+	
+	wxMenuItem* m_menuItem19;
+	m_menuItem19 = new wxMenuItem( m_menuMachine, wxID_CLOSE, wxString( _("&Close") ) + wxT('\t') + wxT("CTRL+Q"), wxEmptyString, wxITEM_NORMAL );
+	m_menuMachine->Append( m_menuItem19 );
+	
+	m_menubar->Append( m_menuMachine, _("&Data") );
+	
+	m_menuView = new wxMenu();
+	wxMenuItem* m_menuItem25;
+	m_menuItem25 = new wxMenuItem( m_menuView, wxID_VIEWSTEREO3D, wxString( _("&Stereo 3D") ) , wxEmptyString, wxITEM_CHECK );
+	m_menuView->Append( m_menuItem25 );
+	
+	m_menubar->Append( m_menuView, _("&View") );
+	
+	this->SetMenuBar( m_menubar );
+	
+	wxBoxSizer* bSizer4;
+	bSizer4 = new wxBoxSizer( wxVERTICAL );
+	
+	m_canvas = new DataCanvas(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
+	bSizer4->Add( m_canvas, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	this->SetSizer( bSizer4 );
+	this->Layout();
+	
+	// Connect Events
+	this->Connect( m_menuItem11->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIDataFrame::OnLoadSTLData ) );
+	this->Connect( m_menuItem12->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIDataFrame::OnSaveData ) );
+	this->Connect( m_menuItem19->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIDataFrame::OnClose ) );
+	this->Connect( m_menuItem25->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIDataFrame::OnChangeStereo3D ) );
+}
+
+GUIDataFrame::~GUIDataFrame()
+{
+	// Disconnect Events
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIDataFrame::OnLoadSTLData ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIDataFrame::OnSaveData ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIDataFrame::OnClose ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIDataFrame::OnChangeStereo3D ) );
 }
 
 GUIControl6DOFDialog::GUIControl6DOFDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
