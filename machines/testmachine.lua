@@ -1,10 +1,20 @@
 -- This is the description for a simple machine.
 
--- Parameters
+-- a little bit similar to emc.ini
+AXIS_X_MAX_VELOCITY = 0.100 --m/s
+AXIS_Y_MAX_VELOCITY = 0.100 --m/s
+AXIS_Z_MAX_VELOCITY = 0.100 --m/s
+
+  TRAJ_MAX_VELOCITY = 0.300 --m/s
+
+-- Dimensions of the machine
+
 -- Size of machinebed
 sizeX = 0.74; --m
 sizeY = 0.43; --m
 heightOfBed = 0.1; --m
+
+
 
 -- Base of the machine
 

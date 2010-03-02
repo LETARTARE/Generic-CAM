@@ -51,13 +51,19 @@ void DataFrame::OnLoadSTLData(wxCommandEvent &event)
 					_("Open..."),
 					_T(""),
 					_T(""),
-					_("Stereolithography files (STL files)  (*.stl)|*.stl|Text files  (*.txt)|*.txt|All files|*.*"),
+					_("Stereolithography files (STL files)  (*.stl)|*.stl|GTS files (*.gts)|*.gts|All files|*.*"),
 					wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
+	if(fileName.IsOk())dialog.SetFilename(fileName.GetFullPath());
 	if(dialog.ShowModal() == wxID_OK){
 		fileName = dialog.GetPath();
 
-		geometry.ReadSTL(fileName);
+		if(fileName.GetExt().CmpNoCase(_T("gts")==0))
+		{
+			geometry.ReadGTS(fileName.GetFullPath());
+		}else{
+			geometry.ReadSTL(fileName.GetFullPath());
+		}
 		Refresh();
 	}
 }

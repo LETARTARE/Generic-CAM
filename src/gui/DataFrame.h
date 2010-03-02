@@ -13,6 +13,7 @@
 
 #include "gui.h"
 #include "../3D/Geometry.h"
+#include <wx/filename.h>
 
 class DataFrame:public GUIDataFrame {
 	// Constructor/ Destructor
@@ -22,7 +23,7 @@ public:
 
 	// Member Variables
 private:
-	wxString fileName;
+	wxFileName fileName;
 	Geometry geometry;
 
 	// Methods

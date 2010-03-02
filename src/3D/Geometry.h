@@ -27,7 +27,7 @@ public:
 };
 
 WX_DECLARE_OBJARRAY(Triangle, ArrayOfTriangles);
-
+WX_DECLARE_OBJARRAY(Vector3, ArrayOfVectors);
 
 class Geometry {
 	// Constructor/ Destructor
@@ -43,6 +43,7 @@ public:
 public:
 	void Paint(void);
 	bool ReadSTL(wxString fileName);
+	bool ReadGTS(wxString fileName);
 };
 
 #endif /* GEOMETRY_H_ */

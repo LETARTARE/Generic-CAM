@@ -13,9 +13,11 @@
 #include <wx/file.h>
 #include <wx/textfile.h>
 #include <wx/log.h>
+#include <wx/tokenzr.h>
 
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfTriangles)
+WX_DEFINE_OBJARRAY(ArrayOfVectors)
 
 Triangle::Triangle()
 {
@@ -125,16 +127,167 @@ bool Geometry::ReadSTL(wxString fileName)
 			}
 			tri->CalculateNormal();
 			triangles.Add(tri);
-//			if(i <= 1){
-//				wxLogMessage(wxString::Format(_T("n: %.1f %.1f %.1f"),
-//						tri->n.x, tri->n.y, tri->n.z));
-//				for(j = 0; j < 3; j++)
-//
-//					wxLogMessage(wxString::Format(_T("p: %.1f %.1f %.1f"),
-//							tri->p[j].x, tri->p[j].y, tri->p[j].z));
-//			}
+			//			if(i <= 1){
+			//				wxLogMessage(wxString::Format(_T("n: %.1f %.1f %.1f"),
+			//						tri->n.x, tri->n.y, tri->n.z));
+			//				for(j = 0; j < 3; j++)
+			//
+			//					wxLogMessage(wxString::Format(_T("p: %.1f %.1f %.1f"),
+			//							tri->p[j].x, tri->p[j].y, tri->p[j].z));
+			//			}
 		}
 		file.Close();
 	}
+	return true;
+}
+
+bool Geometry::ReadGTS(wxString fileName)
+{
+	wxTextFile file;
+
+	if(!file.Open(fileName)){
+		wxLogError(_T("Can't open ") + fileName + _T(" !"));
+		return false;
+	}
+
+	wxString temp;
+	wxStringTokenizer tokenizer;
+	if(file.Eof()){
+		wxLogError(_T("File is empty!"));
+		return false;
+	}
+	temp = file.GetFirstLine();
+	if(temp.IsEmpty()){
+		wxLogError(_T("File is empty!"));
+		return false;
+	}
+	tokenizer.SetString(temp);
+	if(tokenizer.CountTokens() < 3){
+		wxLogError(_T("File is not a valid GTS file!"));
+		return false;
+	}
+	long nv;
+	long ne;
+	long nf;
+	tokenizer.GetNextToken().ToLong(&nv);
+	tokenizer.GetNextToken().ToLong(&ne);
+	tokenizer.GetNextToken().ToLong(&nf);
+
+	long i;
+	double x, y, z;
+	ArrayOfVectors vectors;
+	Vector3* vec;
+	Triangle* tri;
+
+	for(i = 0; i < nv; i++){
+		if(file.Eof()){
+			wxLogError(_T("File is empty!"));
+			return false;
+		}
+		temp = file.GetNextLine();
+		temp.Replace(_T("."), _T(","));
+		tokenizer.SetString(temp);
+		if(tokenizer.CountTokens() < 3){
+			wxLogError(
+					_T("File is not a valid GTS file (too little vertices)!"));
+			return false;
+		}
+
+		tokenizer.GetNextToken().ToDouble(&x);
+		tokenizer.GetNextToken().ToDouble(&y);
+		tokenizer.GetNextToken().ToDouble(&z);
+		vec = new Vector3(x * 20, y * 20, z * 20);
+		//		vec->x = x;
+		//		vec->y = y;
+		//		vec->z = z;
+		vectors.Add(vec);
+	}
+
+	wxArrayLong e1, e2;
+	long u1, u2;
+
+	for(i = 0; i < ne; i++){
+		if(file.Eof()){
+			wxLogError(_T("File is empty!"));
+			return false;
+		}
+		temp = file.GetNextLine();
+		tokenizer.SetString(temp);
+		if(tokenizer.CountTokens() < 2){
+			wxLogError(_T("File is not a valid GTS file (too little edges)!"));
+			return false;
+		}
+		tokenizer.GetNextToken().ToLong(&u1);
+		tokenizer.GetNextToken().ToLong(&u2);
+		e1.Add(u1);
+		e2.Add(u2);
+	}
+
+	unsigned long v1, v2, v3;
+
+	wxLogMessage(wxString::Format(_T("vectors.Count() = %lu"), vectors.Count()));
+
+	unsigned long u[6];
+	unsigned long t;
+	unsigned char j;
+	bool flag;
+	for(i = 0; i < nf; i++){
+		if(file.Eof()){
+			wxLogError(_T("File is empty!"));
+			return false;
+		}
+		temp = file.GetNextLine();
+		tokenizer.SetString(temp);
+		if(tokenizer.CountTokens() < 3){
+			wxLogError(
+					_T("File is not a valid GTS file (too little triangles)!"));
+			return false;
+		}
+		tri = new Triangle;
+		tokenizer.GetNextToken().ToULong(&v1);
+		tokenizer.GetNextToken().ToULong(&v2);
+		tokenizer.GetNextToken().ToULong(&v3);
+		u[0] = e1[v1 - 1] - 1;
+		u[1] = e2[v1 - 1] - 1;
+		u[2] = e1[v2 - 1] - 1;
+		u[3] = e2[v2 - 1] - 1;
+		u[4] = e1[v3 - 1] - 1;
+		u[5] = e2[v3 - 1] - 1;
+
+		if(u[1] != u[2] && u[1] != u[3]){
+			t = u[0];
+			u[0] = u[1];
+			u[1] = t;
+		}
+		if(u[2] != u[1]){
+			t = u[2];
+			u[2] = u[3];
+			u[3] = t;
+		}
+		if(u[5] != u[0]){
+			t = u[4];
+			u[4] = u[5];
+			u[5] = t;
+		}
+
+		tri->p[0] = vectors[u[0]];
+		tri->p[1] = vectors[u[2]];
+		tri->p[2] = vectors[u[4]];
+		tri->CalculateNormal();
+		triangles.Add(tri);
+
+		if(i <= 10){
+			wxLogMessage(wxString::Format(_T("n: %.3f %.3f %.3f"), tri->n.x,
+					tri->n.y, tri->n.z));
+			for(j = 0; j < 3; j++)
+				wxLogMessage(wxString::Format(_T("p: %.3f %.3f %.3f"),
+						tri->p[j].x, tri->p[j].y, tri->p[j].z));
+		}
+
+	}
+
+	//http://gts.sourceforge.net/reference/gts-surfaces.html#GTS-SURFACE-WRITE
+
+	file.Close();
 	return true;
 }
