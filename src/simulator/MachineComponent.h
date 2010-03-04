@@ -26,8 +26,9 @@ public:
 
 	wxString nameOfComponent;
 	ArrayOfMachineElement elements;
-private:
 	AffineTransformMatrix matrix;
+private:
+
 
 	// Methods
 public:

@@ -24,6 +24,7 @@ LUACodeEvaluator::LUACodeEvaluator(wxThreadKind kind) :
 	luaopen_string(L);
 	lua_register(L,"print",print_glue);
 
+	lua_register(L,"identity",identity_glue);
 	lua_register(L,"box",box_glue);
 	lua_register(L,"cylinder",cylinder_glue);
 	lua_register(L,"setstyle",setstyle_glue);
@@ -34,7 +35,7 @@ LUACodeEvaluator::LUACodeEvaluator(wxThreadKind kind) :
 	lua_register(L,"translate",translate_glue);
 	lua_register(L,"rotate",rotate_glue);
 
-	lua_register(L,"placepart",placepart_glue);
+	lua_register(L,"placecomponent",placecomponent_glue);
 
 }
 
@@ -190,6 +191,18 @@ int LUACodeEvaluator::addcomponent_glue(lua_State * L)
 	CC->matrix.Identity();
 	return 0;
 }
+int LUACodeEvaluator::identity_glue(lua_State * L)
+{
+	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
+	wxASSERT(CC==NULL);
+	if(lua_gettop(L) != 0){
+		lua_pushstring(L, "identity: parameter mismatch");
+		lua_error(L);
+		return 0;
+	}
+	CC->matrix.Identity();
+	return 0;
+}
 
 int LUACodeEvaluator::translate_glue(lua_State * L)
 {
@@ -277,8 +290,31 @@ int LUACodeEvaluator::tableorigin_glue(lua_State * L)
 {
 	return 0;
 }
-int LUACodeEvaluator::placepart_glue(lua_State * L)
+int LUACodeEvaluator::placecomponent_glue(lua_State * L)
 {
+	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
+	wxASSERT(CC==NULL);
+	if(lua_gettop(L) != 1){
+		lua_pushstring(L, "placecomponent: parameter mismatch");
+		lua_error(L);
+		return 0;
+	}
+	// Generate a new part for the machine.
+	int n = lua_gettop(L); /* number of arguments */
+	if(n != 1) return luaL_error(L, "placecomponent needs exactly one string");
+
+	lua_getglobal(L, "tostring");
+	const char *s;
+	lua_pushvalue(L, -1); /* function to be called */
+	lua_pushvalue(L, 1); /* value to print */
+	lua_call(L, 1, 1);
+	s = lua_tostring(L, -1); /* get result */
+	if(s == NULL) return luaL_error(L,
+			LUA_QL("tostring") " must return a string to " LUA_QL("print"));
+
+	if(!CC->linkedMachine->PlaceComponent(wxString::FromAscii(s), CC->matrix)){
+		return luaL_error(L, "placecomponent: part does not exist!");
+	}
 	return 0;
 }
 

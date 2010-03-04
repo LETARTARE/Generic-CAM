@@ -53,12 +53,12 @@ public:
 
 	// Member Variables
 public:
+	wxString programOutput;
 protected:
 
 	lua_State *L;
 
 	wxString program;
-	wxString programOutput;
 
 	Machine* linkedMachine;
 	MachineComponent* componentToManipulate;
@@ -77,6 +77,7 @@ public:
 	static void HookRoutine(lua_State * L, lua_Debug * ar);
 	static int print_glue(lua_State * L);
 
+	static int identity_glue(lua_State * L);
 	static int box_glue(lua_State * L);
 	static int cylinder_glue(lua_State * L);
 	static int setstyle_glue(lua_State * L);
@@ -86,7 +87,7 @@ public:
 
 	static int translate_glue(lua_State * L);
 	static int rotate_glue(lua_State * L);
-	static int placepart_glue(lua_State * L);
+	static int placecomponent_glue(lua_State * L);
 
 };
 

@@ -27,8 +27,7 @@ Machine::~Machine()
 void Machine::Paint(void)
 {
 	unsigned int i;
-	for(i=0;i<components.Count();i++)
-	{
+	for(i = 0; i < components.Count(); i++){
 		components[i].Paint();
 	}
 }
@@ -43,6 +42,12 @@ void Machine::SetMachineDescription(wxString text)
 	eval.LinkToMachine(this);
 	eval.Run();
 	eval.Wait();
+
+
+	//wxLogMessage(eval.programOutput);
+
+	textOut = eval.programOutput;
+
 }
 
 void Machine::ClearComponents(void)
@@ -60,4 +65,18 @@ bool Machine::AddComponent(wxString nameOfComponent)
 	MachineComponent* temp = new MachineComponent(nameOfComponent);
 	components.Add(temp);
 	return true;
+}
+
+bool Machine::PlaceComponent(wxString nameOfComponent,
+		const AffineTransformMatrix &matrix)
+{
+	unsigned int i;
+	bool flag = false;
+	for(i = 0; i < components.Count(); i++){
+		if(components[i].nameOfComponent.Cmp(nameOfComponent) == 0){
+			flag = true;
+			components[i].matrix.Set(matrix);
+		}
+	}
+	return flag;
 }

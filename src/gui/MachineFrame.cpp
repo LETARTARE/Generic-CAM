@@ -6,6 +6,7 @@
  */
 
 #include "MachineFrame.h"
+#include "ErrorFrame.h"
 #include <wx/log.h>
 
 MachineFrame::MachineFrame(wxWindow* parent) :
@@ -98,5 +99,10 @@ void MachineFrame::OnReloadMachine(wxCommandEvent &event)
 	}
 
 	machine->SetMachineDescription(temp);
-
+	if(!machine->textOut.IsEmpty()){
+		//wxLogMessage(_T("Displaying some text in ErrorFrame!"));
+		ErrorFrame* error = new ErrorFrame(this);
+		error->SetText(machine->textOut);
+		error->Show();
+	}
 }

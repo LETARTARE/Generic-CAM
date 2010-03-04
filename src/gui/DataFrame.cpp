@@ -9,6 +9,7 @@
 
 
 #include "DataFrame.h"
+#include <wx/log.h>
 
 DataFrame::DataFrame(wxWindow* parent) :
 	GUIDataFrame(parent)
@@ -51,15 +52,15 @@ void DataFrame::OnLoadSTLData(wxCommandEvent &event)
 					_("Open..."),
 					_T(""),
 					_T(""),
-					_("Stereolithography files (STL files)  (*.stl)|*.stl|GTS files (*.gts)|*.gts|All files|*.*"),
+					_("All supported files (*.stl; *.gts)|*.stl;*.gts|Stereolithography files (STL files) (*.stl)|*.stl|GTS files (*.gts)|*.gts|All files|*.*"),
 					wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
-	if(fileName.IsOk())dialog.SetFilename(fileName.GetFullPath());
+	if(fileName.IsOk()) dialog.SetFilename(fileName.GetFullPath());
 	if(dialog.ShowModal() == wxID_OK){
 		fileName = dialog.GetPath();
+		//wxLogMessage(_T("File Extension: ")+fileName.GetExt());
 
-		if(fileName.GetExt().CmpNoCase(_T("gts")==0))
-		{
+		if(fileName.GetExt().CmpNoCase(_T("gts")) == 0){
 			geometry.ReadGTS(fileName.GetFullPath());
 		}else{
 			geometry.ReadSTL(fileName.GetFullPath());

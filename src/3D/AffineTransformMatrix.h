@@ -46,6 +46,9 @@ public:
 	void FromString(wxString string);
 
 	// Methods
+
+	void Set(const AffineTransformMatrix &matrix);
+
 	void Identity();
 
 

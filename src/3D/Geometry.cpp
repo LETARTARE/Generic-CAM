@@ -59,7 +59,7 @@ bool Geometry::ReadSTL(wxString fileName)
 	wxFile file;
 
 	if(!file.Open(fileName)){
-		wxLogError(_T("Can't open ") + fileName + _T(" !"));
+		wxLogError(_T("STL: Can't open ") + fileName + _T(" as binary!"));
 		return false;
 	}
 
@@ -79,7 +79,7 @@ bool Geometry::ReadSTL(wxString fileName)
 		file.Close();
 		wxTextFile tfile;
 		if(!tfile.Open(fileName)){
-			wxLogError(_T("Can't open ") + fileName + _T(" !"));
+			wxLogError(_T("STL: Can't open ") + fileName + _T(" as ascii!"));
 			return false;
 		}
 		wxLogMessage(_T("STL text file found!"));
@@ -146,7 +146,7 @@ bool Geometry::ReadGTS(wxString fileName)
 	wxTextFile file;
 
 	if(!file.Open(fileName)){
-		wxLogError(_T("Can't open ") + fileName + _T(" !"));
+		wxLogError(_T("GTS: Can't open ") + fileName + _T(" !"));
 		return false;
 	}
 
@@ -196,7 +196,7 @@ bool Geometry::ReadGTS(wxString fileName)
 		tokenizer.GetNextToken().ToDouble(&x);
 		tokenizer.GetNextToken().ToDouble(&y);
 		tokenizer.GetNextToken().ToDouble(&z);
-		vec = new Vector3(x * 20, y * 20, z * 20);
+		vec = new Vector3(x, y, z);
 		//		vec->x = x;
 		//		vec->y = y;
 		//		vec->z = z;
@@ -230,7 +230,6 @@ bool Geometry::ReadGTS(wxString fileName)
 	unsigned long u[6];
 	unsigned long t;
 	unsigned char j;
-	bool flag;
 	for(i = 0; i < nf; i++){
 		if(file.Eof()){
 			wxLogError(_T("File is empty!"));

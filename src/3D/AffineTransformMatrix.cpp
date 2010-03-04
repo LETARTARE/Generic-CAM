@@ -21,6 +21,14 @@ AffineTransformMatrix::~AffineTransformMatrix()
 {
 }
 
+void AffineTransformMatrix::Set(const AffineTransformMatrix &matrix)
+{
+	unsigned char i;
+	for(i = 0; i < 16; i++)
+		a[i] = matrix.a[i];
+	TakeMatrixApart();
+}
+
 void AffineTransformMatrix::Identity()
 {
 	rx = ry = rz = 0.0;

@@ -41,9 +41,22 @@ cylinder(0.2,0.04);
 translate(0,0,-0.1-0.03);
 cylinder(0.06,0.04,0.005);
 
-print("FooBar");
+
+X=-0.20;
+Y=-0.10;
+Z=-0.05;
+
+identity();
+translate(X,0,0);
+placecomponent("Bridge");
+identity();
+translate(X,Y,Z);
+placecomponent("Head");
+
 
 function AssembleMachine()
+
+print("Bar");
 	
 
 end

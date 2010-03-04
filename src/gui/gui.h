@@ -141,6 +141,7 @@ class GUIDataFrame : public wxFrame
 		virtual void OnLoadSTLData( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSaveData( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnSetScale( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnChangeStereo3D( wxCommandEvent& event ){ event.Skip(); }
 		
 	
