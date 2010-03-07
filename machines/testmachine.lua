@@ -42,23 +42,19 @@ translate(0,0,-0.1-0.03);
 cylinder(0.06,0.04,0.005);
 
 
-X=-0.20;
-Y=-0.10;
-Z=-0.05;
-
-identity();
-translate(X,0,0);
-placecomponent("Bridge");
-identity();
-translate(X,Y,Z);
-placecomponent("Head");
-
-
 function AssembleMachine()
 
-print("Bar");
+--print("Bar");
+
+identity();
+translate(AXIS_X,0,0);
+placecomponent("Bridge");
+identity();
+translate(AXIS_X,AXIS_Y,AXIS_Z);
+placecomponent("Head");
 	
 
 end
 
+AssembleMachine();
 

@@ -39,26 +39,25 @@
 #include <wx/string.h>
 #include <lua.hpp>
 #include <list>
-#include <wx/thread.h>
-#include "Machine.h"
+#include "MachineComponent.h"
+
 #include "../3D/AffineTransformMatrix.h"
 
-class LUACodeEvaluator:public wxThread {
+class Machine;
+
+class LUACodeEvaluator{
 
 
 	// Constructor / Destructor
 public:
-	LUACodeEvaluator(wxThreadKind kind = wxTHREAD_JOINABLE);
+	LUACodeEvaluator();
 	virtual ~LUACodeEvaluator();
 
 	// Member Variables
-public:
-	wxString programOutput;
 protected:
 
 	lua_State *L;
-
-	wxString program;
+	wxString programOutput;
 
 	Machine* linkedMachine;
 	MachineComponent* componentToManipulate;
@@ -68,9 +67,14 @@ protected:
 public:
 
 	void LinkToMachine(Machine* machine);
+	void InsertVariable(wxString vName, float vValue);
 
-	virtual void* Entry();
+
+	void EvaluateProgram();
+	void EvaluateAssembly();
+
 	void StopEvaluation();
+
 	wxString GetOutput();
 
 	static LUACodeEvaluator* FindCallingClass(lua_State * L);

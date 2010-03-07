@@ -7,11 +7,11 @@
 
 #include "LUACodeEvaluator.h"
 #include "../Config.h"
+#include "Machine.h"
 #include <wx/debug.h>
 #include <wx/log.h>
 
-LUACodeEvaluator::LUACodeEvaluator(wxThreadKind kind) :
-	wxThread(kind)
+LUACodeEvaluator::LUACodeEvaluator()
 {
 	linkedMachine = NULL;
 
@@ -49,7 +49,13 @@ LUACodeEvaluator::~LUACodeEvaluator()
 void LUACodeEvaluator::LinkToMachine(Machine* machine)
 {
 	linkedMachine = machine;
-	program = linkedMachine->machineDescription;
+}
+
+void LUACodeEvaluator::InsertVariable(wxString vName, float vValue)
+{
+	wxASSERT(L!=NULL);
+	lua_pushnumber(L, vValue);
+	lua_setglobal(L, vName.ToAscii());
 }
 
 wxString LUACodeEvaluator::GetOutput()
@@ -57,9 +63,9 @@ wxString LUACodeEvaluator::GetOutput()
 	return programOutput;
 }
 
-void *LUACodeEvaluator::Entry()
+void LUACodeEvaluator::EvaluateProgram()
 {
-	if(linkedMachine == NULL) return NULL;
+	if(linkedMachine == NULL) return;
 	int error;
 
 	linkedMachine->ClearComponents();
@@ -68,14 +74,13 @@ void *LUACodeEvaluator::Entry()
 	//	wxLogMessage(wxString::Format(_T("Blip: %u"),linkedMachine->components.Count()));
 	//		return NULL;
 
-
 	componentToManipulate = &(linkedMachine->components[0]);
 
 	programOutput.Empty();
 
 	matrix.Identity();
 
-	error = luaL_loadstring(L, program.ToAscii());
+	error = luaL_loadstring(L, linkedMachine->machineDescription.ToAscii());
 	if(error){
 		programOutput += _("\n---------- error while parsing ----------\n");
 		programOutput += wxString::FromAscii(lua_tostring(L, -1));
@@ -103,7 +108,37 @@ void *LUACodeEvaluator::Entry()
 
 	}
 
-	return NULL;
+}
+
+void LUACodeEvaluator::EvaluateAssembly()
+{
+	if(linkedMachine == NULL) return;
+	int error;
+
+	componentToManipulate = &(linkedMachine->components[0]);
+
+	programOutput.Empty();
+	matrix.Identity();
+
+	InsertVariable(_T("AXIS_A"), linkedMachine->axisA);
+	InsertVariable(_T("AXIS_B"), linkedMachine->axisB);
+	InsertVariable(_T("AXIS_C"), linkedMachine->axisC);
+	InsertVariable(_T("AXIS_U"), linkedMachine->axisU);
+	InsertVariable(_T("AXIS_V"), linkedMachine->axisV);
+	InsertVariable(_T("AXIS_W"), linkedMachine->axisW);
+	InsertVariable(_T("AXIS_X"), linkedMachine->axisX);
+	InsertVariable(_T("AXIS_Y"), linkedMachine->axisY);
+	InsertVariable(_T("AXIS_Z"), linkedMachine->axisZ);
+
+	lua_getglobal(L, "AssembleMachine");
+
+	error = lua_pcall(L, 0, 0, 0);
+	if(error){
+		programOutput += _("\n---------- error while running ----------\n");
+
+		programOutput += wxString::FromAscii(lua_tostring(L, -1));
+	}
+
 }
 
 void LUACodeEvaluator::StopEvaluation()

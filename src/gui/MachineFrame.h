@@ -13,6 +13,7 @@
 
 //#include "OpenGLCanvas.h"
 #include <wx/splitter.h>
+#include <wx/timer.h>
 
 class MachineFrame:public GUIMachineFrame {
 	// Constructor/ Destructor
@@ -25,6 +26,9 @@ private:
 	Machine* machine;
 	wxString fileName;
 
+	wxTimer timer;
+
+
 	// Methods
 public:
 	void SetController(Control3D *control);
@@ -32,6 +36,8 @@ public:
 	void OnClose(wxCommandEvent &event);
 	void OnLoadMachine(wxCommandEvent &event);
 	void OnReloadMachine(wxCommandEvent &event);
+    void OnTimer(wxTimerEvent& event);
+
 };
 
 #endif /* MACHINEFRAME_H_ */

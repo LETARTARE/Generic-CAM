@@ -9,20 +9,29 @@
 
 #include <wx/log.h>
 #include <GL/gl.h>
-#include "LUACodeEvaluator.h"
+
 
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfMachineComponent)
 
 Machine::Machine()
 {
+	axisA = 0.0;
+	axisB = 0.0;
+	axisC = 0.0;
+	axisU = 0.0;
+	axisV = 0.0;
+	axisW = 0.0;
+	axisX = 0.0;
+	axisY = 0.0;
+	axisZ = 0.0;
+
 	ClearComponents();
 }
 
 Machine::~Machine()
 {
-
-}
+	}
 
 void Machine::Paint(void)
 {
@@ -37,17 +46,12 @@ void Machine::SetMachineDescription(wxString text)
 	machineDescription = text;
 	wxLogMessage(_T("Machine::InsertMachineDescription"));
 
-	LUACodeEvaluator eval(wxTHREAD_JOINABLE);
-	eval.Create();
-	eval.LinkToMachine(this);
-	eval.Run();
-	eval.Wait();
+	evaluator.LinkToMachine(this);
+	evaluator.EvaluateProgram();
 
+	evaluator.EvaluateAssembly();
 
-	//wxLogMessage(eval.programOutput);
-
-	textOut = eval.programOutput;
-
+	textOut = evaluator.GetOutput();
 }
 
 void Machine::ClearComponents(void)
@@ -79,4 +83,9 @@ bool Machine::PlaceComponent(wxString nameOfComponent,
 		}
 	}
 	return flag;
+}
+
+bool Machine::Assemble()
+{
+	evaluator.EvaluateAssembly();
 }

@@ -27,6 +27,12 @@ MachineFrame::MachineFrame(wxWindow* parent) :
 
 	m_menuView->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
 
+	timer.SetOwner(this);
+	this->Connect(wxEVT_TIMER, wxTimerEventHandler(MachineFrame::OnTimer),
+			NULL, this);
+
+	timer.Start(300);
+
 	machine = new Machine;
 	m_canvas->InsertMachine(machine);
 }
@@ -106,3 +112,14 @@ void MachineFrame::OnReloadMachine(wxCommandEvent &event)
 		error->Show();
 	}
 }
+
+void MachineFrame::OnTimer(wxTimerEvent& event)
+{
+	machine->axisX+=0.001;
+	machine->axisY+=0.002;
+
+	machine->Assemble();
+	this->Refresh();
+
+}
+

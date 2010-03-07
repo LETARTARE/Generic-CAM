@@ -10,8 +10,7 @@
 #include "MachineElement.h"
 #include <wx/string.h>
 #include <wx/dynarray.h>
-WX_DECLARE_OBJARRAY(MachineElement, ArrayOfMachineElement)
-;
+WX_DECLARE_OBJARRAY(MachineElement, ArrayOfMachineElement);
 
 class MachineComponent {
 	// Constructor / Destructor
