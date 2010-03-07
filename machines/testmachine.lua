@@ -1,26 +1,35 @@
--- This is the description for a simple machine.
+-- This is the description file for a simple machine.
+-- The machine represented by this file is a standard
+-- 3-Axis CNC machine.
+
+-- Parameters of the machine
 
 -- a little bit similar to emc.ini
 AXIS_X_MAX_VELOCITY = 0.100 --m/s
 AXIS_Y_MAX_VELOCITY = 0.100 --m/s
 AXIS_Z_MAX_VELOCITY = 0.100 --m/s
-
   TRAJ_MAX_VELOCITY = 0.300 --m/s
 
--- Dimensions of the machine
+sizeX = 0.74; --m  Length of machinebed
+sizeY = 0.43; --m  Width of machinebed
+heightOfBed = 0.1; --m  Height of machinebed
+heightOfBridge = 0.3; --m  Height of bridge
+thicknessOfBridge = 0.1; --m 
 
--- Size of machinebed
-sizeX = 0.74; --m
-sizeY = 0.43; --m
-heightOfBed = 0.1; --m
 
-
+-- Definition of the geometry
 
 -- Base of the machine
+translate(0, 0, 0); -- Actually this line does nothing at all.
+box(sizeX, sizeY, heightOfBed);
+translate(0, 0, heightOfBed/2);
 
-translate(0,0,0);
-box(sizeX,sizeY,heightOfBed);
 
+tableorigin(); -- sets the origin of the machine.
+-- The tableorigin is the position, where the part to be milled is placed.
+-- This command has to be in every machine description exactly once.
+
+-- Bridge of the machine
 addcomponent("Bridge");
 
 translate(0,sizeY/2+0.01,0.25);
@@ -32,29 +41,41 @@ box(0.1,0.02,0.5);
 translate(0,sizeY/2+0.01,0.25-0.05);
 box(0.1,sizeY,0.1);
 
-
+-- The machinehead
 addcomponent("Head");
+
 translate(-0.05-0.005,0.0,0.4);
 box(0.01,0.15,0.4);
+
 translate(-0.05,0,-0.1);
 cylinder(0.2,0.04);
+
 translate(0,0,-0.1-0.03);
 cylinder(0.06,0.04,0.005);
 
+toolholder(); -- This is the place where the milling tool is placed.
+-- This command has to be in every machine description exactly once.
 
+
+-- The next function is called for assembling
+-- the parts of the machine. 
 function AssembleMachine()
 
---print("Bar");
+    -- The base of the machine is placed automatically.
+    -- So only the moving part have to be placed here.
+    -- Variables for the axis positions are provided as
+    -- global variables ( AXIS_X, AXIS_Y, AXIS_Z,
+    -- AXIS_A, AXIS_B, AXIS_C, AXIS_U, AXIS_V, AXIS_W).
+    -- The following code puts all the parts of the
+    -- machine in their positions using the above
+    -- mentioned variables.
+     
+	identity();
+	translate(AXIS_X, 0, 0);
+	placecomponent("Bridge");
 
-identity();
-translate(AXIS_X,0,0);
-placecomponent("Bridge");
-identity();
-translate(AXIS_X,AXIS_Y,AXIS_Z);
-placecomponent("Head");
-	
+	identity();
+	translate(AXIS_X, AXIS_Y, AXIS_Z);
+	placecomponent("Head");
 
 end
-
-AssembleMachine();
-
