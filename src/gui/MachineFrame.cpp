@@ -7,6 +7,7 @@
 
 #include "MachineFrame.h"
 #include "ErrorFrame.h"
+#include <wx/textfile.h>
 #include <wx/log.h>
 
 MachineFrame::MachineFrame(wxWindow* parent) :
