@@ -10,28 +10,18 @@
 #include <wx/log.h>
 #include <GL/gl.h>
 
-
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfMachineComponent)
 
 Machine::Machine()
 {
-	axisA = 0.0;
-	axisB = 0.0;
-	axisC = 0.0;
-	axisU = 0.0;
-	axisV = 0.0;
-	axisW = 0.0;
-	axisX = 0.0;
-	axisY = 0.0;
-	axisZ = 0.0;
-
+	position.Zero();
 	ClearComponents();
 }
 
 Machine::~Machine()
 {
-	}
+}
 
 void Machine::Paint(void)
 {
@@ -85,7 +75,7 @@ bool Machine::PlaceComponent(wxString nameOfComponent,
 	return flag;
 }
 
-bool Machine::Assemble()
+void Machine::Assemble()
 {
 	evaluator.EvaluateAssembly();
 }

@@ -12,10 +12,10 @@
 #define MACHINESIMULATOR_H_
 
 #include "Machine.h"
-#include "MachineMotion.h"
+#include "MachinePosition.h"
 
 #include <wx/dynarray.h>
-WX_DECLARE_OBJARRAY(MachineMotion, ArrayOfMachineMotion);
+WX_DECLARE_OBJARRAY(MachinePosition, ArrayOfMachinePosition);
 
 class MachineSimulator {
 	// Constructor/ Destructor

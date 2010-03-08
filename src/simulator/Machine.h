@@ -8,6 +8,7 @@
 #define MACHINE_H_
 #include "LUACodeEvaluator.h"
 #include "MachineComponent.h"
+#include "MachinePosition.h"
 #include <wx/string.h>
 #include <wx/dynarray.h>
 WX_DECLARE_OBJARRAY(MachineComponent, ArrayOfMachineComponent)
@@ -25,15 +26,7 @@ public:
 	ArrayOfMachineComponent components;
 	wxString textOut;
 
-	float axisA;
-	float axisB;
-	float axisC;
-	float axisU;
-	float axisV;
-	float axisW;
-	float axisX;
-	float axisY;
-	float axisZ;
+	MachinePosition position;
 
 	// Methods
 public:
@@ -44,7 +37,7 @@ public:
 	bool PlaceComponent(wxString nameOfComponent,
 			const AffineTransformMatrix &matrix);
 
-	bool Assemble(void);
+	void Assemble(void);
 	void Paint(void);
 
 };

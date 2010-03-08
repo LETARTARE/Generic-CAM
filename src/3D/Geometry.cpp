@@ -92,7 +92,7 @@ bool Geometry::ReadSTL(wxString fileName)
 		// Binary STL File
 		wxLogMessage(_T("STL binary file found!"));
 
-		int32_t nrOfTriangles;
+		uint32_t nrOfTriangles;
 
 		if(file.Read(&nrOfTriangles, 4) != 4){
 			wxLogError(_T("File to short!"));

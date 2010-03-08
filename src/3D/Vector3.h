@@ -31,7 +31,6 @@ public:
 		z += a.z;
 		return Vector3(x, y, z);
 	}
-
 	Vector3 operator-(const Vector3& a)
 	{
 		return Vector3(x - a.x, y - a.y, z - a.z);
@@ -43,12 +42,10 @@ public:
 		z -= a.z;
 		return Vector3(x, y, z);
 	}
-
 	Vector3 operator-()
 	{
 		return Vector3(-x, -y, -z);
 	}
-
 	Vector3 operator*(const Vector3& b)
 	{
 		return Vector3(y * b.z - z * b.y, z * b.x - x * b.z, x * b.y - y * b.x);
@@ -56,6 +53,21 @@ public:
 	Vector3 operator*(const float &b)
 	{
 		return Vector3(x * b, y * b, z * b);
+	}
+	Vector3 operator*=(const Vector3& b)
+	{
+		Vector3 a = *(this);
+		x = a.y * b.z - a.z * b.y;
+		y = a.z * b.x - a.x * b.z;
+		z = a.x * b.y - a.y * b.x;
+		return Vector3(x, y, z);
+	}
+	Vector3 operator*=(const float &b)
+	{
+		x *= b;
+		y *= b;
+		z *= b;
+		return Vector3(x, y, z);
 	}
 	Vector3 operator/(const float &b)
 	{
@@ -68,7 +80,6 @@ public:
 		z /= b;
 		return Vector3(x, y, z);
 	}
-
 	void Zero(void);
 	void Set(float x, float y, float z)
 	{

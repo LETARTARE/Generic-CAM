@@ -120,15 +120,15 @@ void LUACodeEvaluator::EvaluateAssembly()
 	programOutput.Empty();
 	matrix.Identity();
 
-	InsertVariable(_T("AXIS_A"), linkedMachine->axisA);
-	InsertVariable(_T("AXIS_B"), linkedMachine->axisB);
-	InsertVariable(_T("AXIS_C"), linkedMachine->axisC);
-	InsertVariable(_T("AXIS_U"), linkedMachine->axisU);
-	InsertVariable(_T("AXIS_V"), linkedMachine->axisV);
-	InsertVariable(_T("AXIS_W"), linkedMachine->axisW);
-	InsertVariable(_T("AXIS_X"), linkedMachine->axisX);
-	InsertVariable(_T("AXIS_Y"), linkedMachine->axisY);
-	InsertVariable(_T("AXIS_Z"), linkedMachine->axisZ);
+	InsertVariable(_T("AXIS_X"), linkedMachine->position.axisX);
+	InsertVariable(_T("AXIS_Y"), linkedMachine->position.axisY);
+	InsertVariable(_T("AXIS_Z"), linkedMachine->position.axisZ);
+	InsertVariable(_T("AXIS_A"), linkedMachine->position.axisA);
+	InsertVariable(_T("AXIS_B"), linkedMachine->position.axisB);
+	InsertVariable(_T("AXIS_C"), linkedMachine->position.axisC);
+	InsertVariable(_T("AXIS_U"), linkedMachine->position.axisU);
+	InsertVariable(_T("AXIS_V"), linkedMachine->position.axisV);
+	InsertVariable(_T("AXIS_W"), linkedMachine->position.axisW);
 
 	lua_getglobal(L, "AssembleMachine");
 

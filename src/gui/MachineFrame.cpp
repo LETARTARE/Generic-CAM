@@ -107,6 +107,7 @@ void MachineFrame::OnReloadMachine(wxCommandEvent &event)
 	machine->SetMachineDescription(temp);
 	if(!machine->textOut.IsEmpty()){
 		//wxLogMessage(_T("Displaying some text in ErrorFrame!"));
+		//TODO: Don't open a new errorframe, if the old one is not closed.
 		ErrorFrame* error = new ErrorFrame(this);
 		error->SetText(machine->textOut);
 		error->Show();
@@ -115,8 +116,7 @@ void MachineFrame::OnReloadMachine(wxCommandEvent &event)
 
 void MachineFrame::OnTimer(wxTimerEvent& event)
 {
-	machine->axisX+=0.001;
-	machine->axisY+=0.002;
+	//TODO: Do some animation...
 
 	machine->Assemble();
 	this->Refresh();

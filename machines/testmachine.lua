@@ -10,12 +10,12 @@ AXIS_Y_MAX_VELOCITY = 0.100 --m/s
 AXIS_Z_MAX_VELOCITY = 0.100 --m/s
   TRAJ_MAX_VELOCITY = 0.300 --m/s
 
-sizeX = 0.74; --m  Length of machinebed
-sizeY = 0.43; --m  Width of machinebed
-heightOfBed = 0.1; --m  Height of machinebed
-heightOfBridge = 0.3; --m  Height of bridge
-thicknessOfBridge = 0.1; --m 
-
+sizeX = 0.74 --m  Length of machinebed
+sizeY = 0.43 --m  Width of machinebed
+heightOfBed = 0.1 --m  Height of machinebed
+heightOfBridge = 0.3 --m  Height of bridge
+thicknessOfBridge = 0.05 --m 
+offset = 0.05 --m Toolhead offset from edge of machine
 
 -- Definition of the geometry
 
@@ -32,19 +32,19 @@ tableorigin(); -- sets the origin of the machine.
 -- Bridge of the machine
 addcomponent("Bridge");
 
-translate(0,sizeY/2+0.01,0.25);
-box(0.1,0.02,0.5);
+translate(0,sizeY/2+0.01,heightOfBridge/2);
+box(thicknessOfBridge, 0.02, heightOfBridge);
 
-translate(0,-sizeY-0.02,0.0);
-box(0.1,0.02,0.5);
+translate(0, -sizeY-0.02, 0.0);
+box(thicknessOfBridge, 0.02, heightOfBridge);
 
-translate(0,sizeY/2+0.01,0.25-0.05);
-box(0.1,sizeY,0.1);
+translate(0, sizeY/2+0.01, heightOfBridge/2-thicknessOfBridge/2);
+box(thicknessOfBridge, sizeY, thicknessOfBridge);
 
 -- The machinehead
 addcomponent("Head");
 
-translate(-0.05-0.005,0.0,0.4);
+translate(-thicknessOfBridge/2-0.005,0.0,0.4);
 box(0.01,0.15,0.4);
 
 translate(-0.05,0,-0.1);
@@ -71,11 +71,12 @@ function AssembleMachine()
     -- mentioned variables.
      
 	identity();
-	translate(AXIS_X, 0, 0);
+	translate(AXIS_X+thicknessOfBridge/2+0.01+0.045-sizeX/2+offset, 0, 0);
 	placecomponent("Bridge");
 
-	identity();
-	translate(AXIS_X, AXIS_Y, AXIS_Z);
+	translate(0, AXIS_Y-sizeY/2+offset, 0);
+	
+	translate(0, 0, AXIS_Z-0.4+0.1+0.1+0.06+heightOfBed/2);
 	placecomponent("Head");
 
 end

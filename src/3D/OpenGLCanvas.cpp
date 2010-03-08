@@ -188,8 +188,8 @@ void OpenGLCanvas::InitGL()
 	//	glFrustum( -0.5f, 0.5f, -0.5f, 0.5f, 1.0f, 3.0f);
 	// Is done in OnSize(...)
 
-	GLfloat attenuation[] =
-		{1.0f, -0.01f, -.000001f};
+	//	GLfloat attenuation[] =
+	//		{1.0f, -0.01f, -.000001f};
 	//::glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, attenuation, 0);
 
 	::glEnable(GL_POINT_SMOOTH);
