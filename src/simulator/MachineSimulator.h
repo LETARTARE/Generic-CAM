@@ -6,16 +6,13 @@
 // Copyright   : (c) 2010
 // Description : CAM Software
 //============================================================================
-
-
 #ifndef MACHINESIMULATOR_H_
 #define MACHINESIMULATOR_H_
-
 #include "Machine.h"
 #include "MachinePosition.h"
-
 #include <wx/dynarray.h>
-WX_DECLARE_OBJARRAY(MachinePosition, ArrayOfMachinePosition);
+WX_DECLARE_OBJARRAY(MachinePosition, ArrayOfMachinePosition)
+;
 
 class MachineSimulator {
 	// Constructor/ Destructor
@@ -26,11 +23,17 @@ public:
 	//Member variables
 public:
 
+	Machine* machine;
+	ArrayOfMachinePosition position;
 
+	float tStep;
+	unsigned long step;
 
 	//Methods
 public:
-
+	void InsertMachine(Machine* machine);
+	void Reset(void);
+	void Step(float tTarget);
 
 };
 

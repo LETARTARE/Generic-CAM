@@ -23,7 +23,7 @@ MachinePosition::MachinePosition(float x, float y, float z, float a, float b,
 	axisV = v;
 	axisW = w;
 
-	duration = 0.0;
+	duration = 5.0;
 }
 
 MachinePosition::~MachinePosition()

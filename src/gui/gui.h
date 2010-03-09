@@ -19,11 +19,11 @@
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
-#include <wx/button.h>
+#include "../simulator/MachineCanvas.h"
 #include <wx/sizer.h>
 #include <wx/frame.h>
+#include <wx/button.h>
 #include <wx/dialog.h>
-#include "../simulator/MachineCanvas.h"
 #include "../simulator/DataCanvas.h"
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
@@ -42,27 +42,28 @@ class GUIMainFrame : public wxFrame
 	protected:
 		enum
 		{
-			wxID_SELECTMACHINE = 1000,
+			wxID_VIEWSTEREO3D = 1000,
 		};
 		
 		wxMenuBar* m_menubar;
-		wxMenu* m_menu1;
-		wxMenu* m_menu2;
-		wxMenu* m_menu3;
-		wxButton* m_button1;
-		wxButton* m_button2;
-		wxButton* m_button3;
+		wxMenu* m_menuProject;
+		wxMenu* m_menuSettings;
+		wxMenu* m_menuView;
+		wxMenu* m_menuHelp;
+		MachineCanvas* m_canvas;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnLoadMachine( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnReloadMachine( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnSelectDataFrame( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnQuit( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSetupController( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnChangeStereo3D( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnAbout( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnSelectMachine( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnSelectData( wxCommandEvent& event ){ event.Skip(); }
 		
 	
 	public:
-		GUIMainFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Generic CAM"), const wxPoint& pos = wxPoint( -1,300 ), const wxSize& size = wxSize( 500,189 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		GUIMainFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Generic CAM"), const wxPoint& pos = wxPoint( -1,300 ), const wxSize& size = wxSize( 500,448 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		~GUIMainFrame();
 	
 };
@@ -85,37 +86,6 @@ class GUIAboutDialog : public wxDialog
 	public:
 		GUIAboutDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 414,229 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~GUIAboutDialog();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class GUIMachineFrame
-///////////////////////////////////////////////////////////////////////////////
-class GUIMachineFrame : public wxFrame 
-{
-	private:
-	
-	protected:
-		enum
-		{
-			wxID_VIEWSTEREO3D = 1000,
-		};
-		
-		wxMenuBar* m_menubar;
-		wxMenu* m_menuMachine;
-		wxMenu* m_menuView;
-		MachineCanvas* m_canvas;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnLoadMachine( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnReloadMachine( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnChangeStereo3D( wxCommandEvent& event ){ event.Skip(); }
-		
-	
-	public:
-		GUIMachineFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine View"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
-		~GUIMachineFrame();
 	
 };
 
@@ -146,7 +116,7 @@ class GUIDataFrame : public wxFrame
 		
 	
 	public:
-		GUIDataFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("3D data view"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		GUIDataFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("3D data view"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 507,452 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		~GUIDataFrame();
 	
 };

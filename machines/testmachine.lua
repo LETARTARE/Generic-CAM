@@ -13,7 +13,7 @@ AXIS_Z_MAX_VELOCITY = 0.100 --m/s
 sizeX = 0.74 --m  Length of machinebed
 sizeY = 0.43 --m  Width of machinebed
 heightOfBed = 0.1 --m  Height of machinebed
-heightOfBridge = 0.3 --m  Height of bridge
+heightOfBridge = 0.4 --m  Height of bridge
 thicknessOfBridge = 0.05 --m 
 offset = 0.05 --m Toolhead offset from edge of machine
 
@@ -76,7 +76,7 @@ function AssembleMachine()
 
 	translate(0, AXIS_Y-sizeY/2+offset, 0);
 	
-	translate(0, 0, AXIS_Z-0.4+0.1+0.1+0.06+heightOfBed/2);
+	translate(0, 0, AXIS_Z+0.20-0.4+0.1+0.1+0.06+heightOfBed/2);
 	placecomponent("Head");
 
 end
