@@ -35,6 +35,9 @@ public:
 	void Reset(void);
 	void Step(float tTarget);
 
+	bool ReadGCodeFile(wxString fileName);
+	bool WriteGCodeFile(wxString fileName);
+
 };
 
 #endif /* MACHINESIMULATOR_H_ */

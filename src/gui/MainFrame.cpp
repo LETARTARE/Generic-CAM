@@ -87,10 +87,10 @@ void MainFrame::OnLoadMachine(wxCommandEvent &event)
 	wxFileDialog
 			dialog(
 					this,
-					_("Open..."),
+					_("Open machine description..."),
 					_T(""),
 					_T(""),
-					_("Machine Descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
+					_("Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
 					wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if(dialog.ShowModal() == wxID_OK){
@@ -133,6 +133,22 @@ void MainFrame::OnReloadMachine(wxCommandEvent &event)
 		error->Show();
 	}
 	t = 0;
+}
+
+void MainFrame::OnLoadGCodes(wxCommandEvent &event)
+{
+	wxFileDialog
+			dialog(
+					this,
+					_("Open G-Code file..."),
+					_T(""),
+					_T(""),
+					_("G-Code File (*.tap *.cnc *.nc *.ncd *.txt)|*.tap;*.cnc;*.nc;*.ncd;*.txt|Text files (*.txt)|*.txt|All files|*.*"),
+					wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+	if(dialog.ShowModal() == wxID_OK){
+		simulator.ReadGCodeFile(dialog.GetPath());
+	}
 }
 
 void MainFrame::OnTimer(wxTimerEvent& event)

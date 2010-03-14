@@ -11,6 +11,11 @@
 #ifndef MACHINEPOSITION_H_
 #define MACHINEPOSITION_H_
 
+// C++ Operator Overloading Guidelines
+// http://www.cs.caltech.edu/courses/cs11/material/cpp/donnie/cpp-ops.html
+
+#include <wx/string.h>
+
 class MachinePosition {
 	// Constructor/ Destructor
 public:
@@ -32,16 +37,40 @@ public:
 	float axisV;
 	float axisW;
 
+	float radiusI;
+	float radiusJ;
+	float radiusK;
+
+
 	float duration;
 
+	float feed;
+
+	wxString code;
+
 	// Methods
-	MachinePosition operator+(const MachinePosition& a)
+
+	//TODO: Cleanup all the operator stuff.
+
+	// This may be useful, if the class gets a pointer as a member variable.
+	//	MachinePosition & operator=(const MachinePostion &a)
+	//	{
+	//		ASSERT(this != a); // Self assignment = error in program.
+	//		// 1.  Deallocate any memory that MyClass is using internally
+	//		// 2.  Allocate some memory to hold the contents of rhs
+	//		// 3.  Copy the values from rhs into this instance
+	//		// 4.  Return *this
+	//		return *this;
+	//	}
+
+
+	const MachinePosition operator+(const MachinePosition& a) const
 	{
 		return MachinePosition(axisX + a.axisX, axisY + a.axisY, axisZ
 				+ a.axisZ, axisA + a.axisA, axisB + a.axisB, axisC + a.axisC,
 				axisU + a.axisU, axisV + a.axisV, axisW + a.axisW);
 	}
-	MachinePosition operator+=(const MachinePosition& a)
+	MachinePosition & operator+=(const MachinePosition& a)
 	{
 		axisX += a.axisX;
 		axisY += a.axisY;
@@ -52,16 +81,17 @@ public:
 		axisU += a.axisU;
 		axisV += a.axisV;
 		axisW += a.axisW;
-		return MachinePosition(axisX, axisY, axisZ, axisA, axisB, axisC, axisU,
-				axisV, axisW);
+		return *this;
+		//MachinePosition(axisX, axisY, axisZ, axisA, axisB, axisC, axisU,
+		//	axisV, axisW);
 	}
-		MachinePosition operator-(const MachinePosition& a)
+	MachinePosition operator-(const MachinePosition& a)
 	{
 		return MachinePosition(axisX - a.axisX, axisY - a.axisY, axisZ
 				- a.axisZ, axisA - a.axisA, axisB - a.axisB, axisC - a.axisC,
 				axisU - a.axisU, axisV - a.axisV, axisW - a.axisW);
 	}
-	MachinePosition operator-=(const MachinePosition& a)
+	MachinePosition & operator-=(const MachinePosition& a)
 	{
 		axisX -= a.axisX;
 		axisY -= a.axisY;
@@ -72,15 +102,16 @@ public:
 		axisU -= a.axisU;
 		axisV -= a.axisV;
 		axisW -= a.axisW;
-		return MachinePosition(axisX, axisY, axisZ, axisA, axisB, axisC, axisU,
-				axisV, axisW);
+		return *this;
+		//return MachinePosition(axisX, axisY, axisZ, axisA, axisB, axisC, axisU,
+		//	axisV, axisW);
 	}
-		MachinePosition operator-()
+	MachinePosition operator-()
 	{
 		return MachinePosition(-axisX, -axisY, -axisZ, -axisA, -axisB, -axisC,
 				-axisU, -axisV, -axisW);
 	}
-		MachinePosition operator*(const float &b)
+	MachinePosition operator*(const float &b)
 	{
 		return MachinePosition(axisX * b, axisY * b, axisZ * b, axisA * b,
 				axisB * b, axisC * b, axisU * b, axisV * b, axisW * b);
@@ -99,7 +130,7 @@ public:
 		return MachinePosition(axisX, axisY, axisZ, axisA, axisB, axisC, axisU,
 				axisV, axisW);
 	}
-		MachinePosition operator/(const float &b)
+	MachinePosition operator/(const float &b)
 	{
 		return MachinePosition(axisX / b, axisY / b, axisZ / b, axisA / b,
 				axisB / b, axisC / b, axisU / b, axisV / b, axisW / b);
@@ -119,6 +150,12 @@ public:
 				axisV, axisW);
 	}
 	void Zero(void);
+	float AbsXYZ();
+	float AbsUVW();
+	float AbsXYZUVW();
+
+	bool ParseGCodeLine(wxString lineOfText);
+
 };
 
 #endif /* MACHINEPOSITION_H_ */

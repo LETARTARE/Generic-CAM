@@ -13,6 +13,8 @@
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfMachinePosition)
 
+#include <wx/textfile.h>
+
 MachineSimulator::MachineSimulator()
 {
 	machine = NULL;
@@ -67,3 +69,55 @@ void MachineSimulator::Step(float tTarget)
 				- position[step]) / position[step].duration * (tTarget - tStep);
 	}
 }
+
+bool MachineSimulator::ReadGCodeFile(wxString fileName)
+{
+	wxTextFile file;
+
+	if(!file.Open(fileName)){
+		wxLogError(_T("ReadGCodeFile: Can't open ") + fileName + _T(" !"));
+		return false;
+	}
+
+	wxString temp;
+	if(file.Eof()){
+		wxLogError(_T("ReadGCodeFile: File is empty! (a)"));
+		return false;
+	}
+	temp = file.GetFirstLine();
+	if(temp.IsEmpty()){
+		wxLogError(_T("ReadGCodeFile: File is empty! (b)"));
+		return false;
+	}
+
+	MachinePosition* pos = new MachinePosition;
+	position.Clear();
+
+	if(pos->ParseGCodeLine(temp)){
+		position.Add(pos);
+		pos = new MachinePosition;
+		*pos = position[position.Count() - 1];
+	}
+	while(!file.Eof()){
+		temp = file.GetNextLine();
+		if(pos->ParseGCodeLine(temp)){
+			position.Add(pos);
+			pos = new MachinePosition;
+			//TODO: Check if there is a command like position.End()
+			*pos = position[position.Count() - 1];
+		}
+	}
+	position.Add(pos);
+	file.Close();
+	step = 0;
+	tStep=0;
+
+	return true;
+}
+
+bool MachineSimulator::WriteGCodeFile(wxString fileName)
+{
+	//TODO: Writing G-Code Files
+	return false;
+}
+

@@ -47,6 +47,8 @@ private:
 	void OnChangeStereo3D(wxCommandEvent &event);
 	void OnLoadMachine(wxCommandEvent &event);
 	void OnReloadMachine(wxCommandEvent &event);
+	void OnLoadGCodes(wxCommandEvent &event);
+
 	void OnTimer(wxTimerEvent& event);
 
 };

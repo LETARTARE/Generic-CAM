@@ -29,6 +29,12 @@
 #include <wx/textctrl.h>
 #include <wx/radiobox.h>
 #include <wx/slider.h>
+#include <wx/combobox.h>
+#include <wx/statbox.h>
+#include <wx/panel.h>
+#include <wx/choice.h>
+#include <wx/checkbox.h>
+#include <wx/listctrl.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -55,6 +61,7 @@ class GUIMainFrame : public wxFrame
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnLoadMachine( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnReloadMachine( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnLoadGCodes( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSelectDataFrame( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnQuit( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSetupController( wxCommandEvent& event ){ event.Skip(); }
@@ -186,6 +193,68 @@ class GUIErrorFrame : public wxFrame
 	public:
 		GUIErrorFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("An error occured"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,370 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		~GUIErrorFrame();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class GUIToolboxFrame
+///////////////////////////////////////////////////////////////////////////////
+class GUIToolboxFrame : public wxFrame 
+{
+	private:
+	
+	protected:
+		wxMenuBar* m_menubar;
+		wxMenu* m_menuTools;
+		wxMenu* m_menu9;
+		wxComboBox* m_comboBox1;
+		wxButton* m_button6;
+		wxButton* m_button7;
+		wxButton* m_button8;
+		wxStaticText* m_staticText8;
+		wxTextCtrl* m_textCtrl4;
+		wxStaticText* m_staticText9;
+		wxStaticText* m_staticText10;
+		wxTextCtrl* m_textCtrl5;
+		wxStaticText* m_staticText11;
+		wxStaticText* m_staticText13;
+		wxTextCtrl* m_textCtrl6;
+		wxStaticText* m_staticText12;
+		wxStaticText* m_staticText14;
+		wxTextCtrl* m_textCtrl7;
+		wxStaticText* m_staticText15;
+		wxStaticText* m_staticText16;
+		wxTextCtrl* m_textCtrl8;
+		wxStaticText* m_staticText17;
+		wxStaticText* m_staticText26;
+		wxTextCtrl* m_textCtrl12;
+		wxPanel* m_panel2;
+		wxButton* m_button11;
+		wxButton* m_button10;
+		wxButton* m_button9;
+		wxChoice* m_choice1;
+		wxStaticText* m_staticText18;
+		wxTextCtrl* m_textCtrl9;
+		wxStaticText* m_staticText19;
+		wxStaticText* m_staticText20;
+		wxTextCtrl* m_textCtrl10;
+		wxStaticText* m_staticText21;
+		wxStaticText* m_staticText22;
+		wxTextCtrl* m_textCtrl11;
+		wxStaticText* m_staticText23;
+		wxStaticText* m_staticText24;
+		wxCheckBox* m_checkBox1;
+		wxStaticText* m_staticText25;
+		wxListCtrl* m_listCtrl1;
+		wxPanel* m_panel1;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCommandEvent& event ){ event.Skip(); }
+		
+	
+	public:
+		GUIToolboxFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolbox"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 611,790 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		~GUIToolboxFrame();
 	
 };
 
