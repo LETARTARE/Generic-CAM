@@ -11,7 +11,7 @@
 #define MACHINECANVAS_H_
 
 #include "../3D/OpenGLCanvas.h"
-#include "Machine.h"
+#include "../simulator/Machine.h"
 
 class MachineCanvas:public OpenGLCanvas {
 

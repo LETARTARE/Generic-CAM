@@ -15,6 +15,7 @@ WX_DEFINE_OBJARRAY(ArrayOfMachineComponent)
 
 Machine::Machine()
 {
+	activeTool=0;
 	position.Zero();
 	ClearComponents();
 }

@@ -18,8 +18,12 @@ public:
 	virtual ~ToolElement();
 
 	// Member variables
-private:
-
+public:
+	float d;
+	float h;
+	float r;
+	unsigned char t;
+	bool cutting;
 
 	// Methods
 public:

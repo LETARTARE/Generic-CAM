@@ -16,6 +16,7 @@
 #include "../controller/Control3D.h"
 #include <wx/config.h>
 #include <wx/log.h>
+#include <wx/filename.h>
 
 class MainFrame:public GUIMainFrame {
 	// Constructor/ Destructor
@@ -31,8 +32,8 @@ private:
 
 	Machine machine;
 	MachineSimulator simulator;
-	wxString machineFileName;
-
+	wxFileName machineFileName;
+	wxFileName toolboxFileName;
 	wxTimer timer;
 	float t;
 
@@ -47,6 +48,10 @@ private:
 	void OnChangeStereo3D(wxCommandEvent &event);
 	void OnLoadMachine(wxCommandEvent &event);
 	void OnReloadMachine(wxCommandEvent &event);
+	void OnLoadToolbox(wxCommandEvent &event);
+	void OnSaveToolbox(wxCommandEvent &event);
+	void OnEditToolbox(wxCommandEvent& event);
+
 	void OnLoadGCodes(wxCommandEvent &event);
 
 	void OnTimer(wxTimerEvent& event);

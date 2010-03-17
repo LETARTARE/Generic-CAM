@@ -17,9 +17,20 @@ Tool::Tool()
 {
 	// TODO Auto-generated constructor stub
 
+
+
 }
 
 Tool::~Tool()
 {
 	// TODO Auto-generated destructor stub
+}
+
+
+void Tool::Paint(void)
+{
+	unsigned int i;
+//	for(i = 0; i < elements.Count(); i++){
+//		elements[i].Paint();
+//	}
 }

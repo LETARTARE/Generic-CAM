@@ -16,7 +16,7 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menubar = new wxMenuBar( 0 );
 	m_menuProject = new wxMenu();
 	wxMenuItem* m_menuItem11;
-	m_menuItem11 = new wxMenuItem( m_menuProject, wxID_OPEN, wxString( _("&Load Machine") ) + wxT('\t') + wxT("CTRL+L"), wxEmptyString, wxITEM_NORMAL );
+	m_menuItem11 = new wxMenuItem( m_menuProject, wxID_OPEN, wxString( _("&Load Machine...") ) + wxT('\t') + wxT("CTRL+L"), wxEmptyString, wxITEM_NORMAL );
 	m_menuProject->Append( m_menuItem11 );
 	
 	wxMenuItem* m_menuItem12;
@@ -26,14 +26,28 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menuProject->AppendSeparator();
 	
 	wxMenuItem* m_menuItem13;
-	m_menuItem13 = new wxMenuItem( m_menuProject, wxID_ANY, wxString( _("L&oad G-Codes") ) + wxT('\t') + wxT("CTRL+O"), wxEmptyString, wxITEM_NORMAL );
+	m_menuItem13 = new wxMenuItem( m_menuProject, wxID_ANY, wxString( _("Load Toolbox...") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuProject->Append( m_menuItem13 );
+	
+	wxMenuItem* m_menuItem14;
+	m_menuItem14 = new wxMenuItem( m_menuProject, wxID_ANY, wxString( _("Save Toolbox...") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuProject->Append( m_menuItem14 );
+	
+	wxMenuItem* m_menuItem15;
+	m_menuItem15 = new wxMenuItem( m_menuProject, wxID_ANY, wxString( _("Edit Toolbox") ) + wxT('\t') + wxT("CTRL+T"), wxEmptyString, wxITEM_NORMAL );
+	m_menuProject->Append( m_menuItem15 );
 	
 	m_menuProject->AppendSeparator();
 	
-	wxMenuItem* m_menuItem15;
-	m_menuItem15 = new wxMenuItem( m_menuProject, wxID_ANY, wxString( _("&Show DataFrame") ) , wxEmptyString, wxITEM_NORMAL );
-	m_menuProject->Append( m_menuItem15 );
+	wxMenuItem* m_menuItem16;
+	m_menuItem16 = new wxMenuItem( m_menuProject, wxID_ANY, wxString( _("L&oad G-Codes") ) + wxT('\t') + wxT("CTRL+G"), wxEmptyString, wxITEM_NORMAL );
+	m_menuProject->Append( m_menuItem16 );
+	
+	m_menuProject->AppendSeparator();
+	
+	wxMenuItem* m_menuItem17;
+	m_menuItem17 = new wxMenuItem( m_menuProject, wxID_ANY, wxString( _("&Show DataFrame") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuProject->Append( m_menuItem17 );
 	
 	m_menuProject->AppendSeparator();
 	
@@ -80,8 +94,11 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	// Connect Events
 	this->Connect( m_menuItem11->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnLoadMachine ) );
 	this->Connect( m_menuItem12->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnReloadMachine ) );
-	this->Connect( m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnLoadGCodes ) );
-	this->Connect( m_menuItem15->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSelectDataFrame ) );
+	this->Connect( m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnLoadToolbox ) );
+	this->Connect( m_menuItem14->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSaveToolbox ) );
+	this->Connect( m_menuItem15->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnEditToolbox ) );
+	this->Connect( m_menuItem16->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnLoadGCodes ) );
+	this->Connect( m_menuItem17->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSelectDataFrame ) );
 	this->Connect( m_menuItem19->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnQuit ) );
 	this->Connect( m_menuItem21->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSetupController ) );
 	this->Connect( m_menuItem31->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnChangeStereo3D ) );
@@ -93,6 +110,9 @@ GUIMainFrame::~GUIMainFrame()
 	// Disconnect Events
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnLoadMachine ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnReloadMachine ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnLoadToolbox ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSaveToolbox ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnEditToolbox ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnLoadGCodes ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSelectDataFrame ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnQuit ) );
@@ -388,12 +408,16 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	
 	m_menubar->Append( m_menuTools, _("&Tools") );
 	
-	m_menu9 = new wxMenu();
+	m_menuSettings = new wxMenu();
 	wxMenuItem* m_menuItem18;
-	m_menuItem18 = new wxMenuItem( m_menu9, wxID_ANY, wxString( _("&Units") ) , wxEmptyString, wxITEM_NORMAL );
-	m_menu9->Append( m_menuItem18 );
+	m_menuItem18 = new wxMenuItem( m_menuSettings, wxID_ANY, wxString( _("&Units") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuSettings->Append( m_menuItem18 );
 	
-	m_menubar->Append( m_menu9, _("&Settings") );
+	wxMenuItem* m_menuItem25;
+	m_menuItem25 = new wxMenuItem( m_menuSettings, wxID_VIEWSTEREO3D, wxString( _("&Stereo 3D") ) , wxEmptyString, wxITEM_CHECK );
+	m_menuSettings->Append( m_menuItem25 );
+	
+	m_menubar->Append( m_menuSettings, _("&Settings") );
 	
 	this->SetMenuBar( m_menubar );
 	
@@ -403,11 +427,8 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	wxBoxSizer* bSizer14;
 	bSizer14 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_comboBox1 = new wxComboBox( this, wxID_ANY, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
-	m_comboBox1->Append( _("Cylindrical Drill") );
-	m_comboBox1->Append( _("Sphere") );
-	m_comboBox1->Append( _("Cone") );
-	bSizer14->Add( m_comboBox1, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	m_comboBoxToolSelector = new wxComboBox( this, wxID_ANY, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
+	bSizer14->Add( m_comboBoxToolSelector, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
 	m_button6 = new wxButton( this, wxID_ANY, _("New"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer14->Add( m_button6, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
@@ -440,10 +461,10 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	m_staticText8->Wrap( -1 );
 	fgSizer1->Add( m_staticText8, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrl4 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrl4->SetToolTip( _("Diameter of the part that disappears inside the chuck.") );
+	m_textCtrlShaftDiameter = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlShaftDiameter->SetToolTip( _("Diameter of the part that disappears inside the chuck.") );
 	
-	fgSizer1->Add( m_textCtrl4, 0, wxALL, 5 );
+	fgSizer1->Add( m_textCtrlShaftDiameter, 0, wxALL, 5 );
 	
 	m_staticText9 = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText9->Wrap( -1 );
@@ -453,10 +474,10 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	m_staticText10->Wrap( -1 );
 	fgSizer1->Add( m_staticText10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrl5 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrl5->SetToolTip( _("This is the length of the that disappears inside the chuck.") );
+	m_textCtrlShaftLength = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlShaftLength->SetToolTip( _("This is the length of the that disappears inside the chuck.") );
 	
-	fgSizer1->Add( m_textCtrl5, 0, wxALL, 5 );
+	fgSizer1->Add( m_textCtrlShaftLength, 0, wxALL, 5 );
 	
 	m_staticText11 = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText11->Wrap( -1 );
@@ -466,10 +487,10 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	m_staticText13->Wrap( -1 );
 	fgSizer1->Add( m_staticText13, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrl6 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrl6->SetToolTip( _("Max. speed: Look at label on box you got the tools shipped in.") );
+	m_textCtrlMaxSpeed = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlMaxSpeed->SetToolTip( _("Max. speed: Look at label on box you got the tools shipped in.") );
 	
-	fgSizer1->Add( m_textCtrl6, 0, wxALL, 5 );
+	fgSizer1->Add( m_textCtrlMaxSpeed, 0, wxALL, 5 );
 	
 	m_staticText12 = new wxStaticText( this, wxID_ANY, _("rpm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText12->Wrap( -1 );
@@ -479,10 +500,10 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	m_staticText14->Wrap( -1 );
 	fgSizer1->Add( m_staticText14, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrl7 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrl7->SetToolTip( _("Feed per tooth: How deep can a tooth cut per revolution. Usually in the range of 0.02 mm to 0.05 mm.") );
+	m_textCtrlFeedCoefficient = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlFeedCoefficient->SetToolTip( _("Feed per tooth: How deep can a tooth cut per revolution. Usually in the range of 0.02 mm to 0.05 mm.") );
 	
-	fgSizer1->Add( m_textCtrl7, 0, wxALL, 5 );
+	fgSizer1->Add( m_textCtrlFeedCoefficient, 0, wxALL, 5 );
 	
 	m_staticText15 = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText15->Wrap( -1 );
@@ -492,10 +513,10 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	m_staticText16->Wrap( -1 );
 	fgSizer1->Add( m_staticText16, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrl8->SetToolTip( _("Number of teeth around the cutter.") );
+	m_textCtrlNrOfTeeth = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlNrOfTeeth->SetToolTip( _("Number of teeth around the cutter.") );
 	
-	fgSizer1->Add( m_textCtrl8, 0, wxALL, 5 );
+	fgSizer1->Add( m_textCtrlNrOfTeeth, 0, wxALL, 5 );
 	
 	m_staticText17 = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText17->Wrap( -1 );
@@ -507,13 +528,13 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	m_staticText26->Wrap( -1 );
 	sbSizer1->Add( m_staticText26, 0, wxALL, 5 );
 	
-	m_textCtrl12 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_WORDWRAP );
-	sbSizer1->Add( m_textCtrl12, 1, wxALL|wxEXPAND, 5 );
+	m_textCtrlComment = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_WORDWRAP );
+	sbSizer1->Add( m_textCtrlComment, 1, wxALL|wxEXPAND, 5 );
 	
 	fgSizer3->Add( sbSizer1, 0, wxEXPAND, 5 );
 	
-	m_panel2 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	fgSizer3->Add( m_panel2, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxALL, 5 );
+	m_panel=new ToolPanel(this);
+	fgSizer3->Add( m_panel, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxStaticBoxSizer* sbSizer2;
 	sbSizer2 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Tool shape") ), wxVERTICAL );
@@ -538,11 +559,11 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	
 	bSizer16->Add( bSizer17, 0, 0, 5 );
 	
-	wxString m_choice1Choices[] = { _("Linear or bend line"), _("Corner: first diameter change, then height change"), _("Corner: first height change, then diameter change"), _("Sphere: radius at upper limit, calculate height"), _("Sphere: radius at lower limit, calculate height") };
-	int m_choice1NChoices = sizeof( m_choice1Choices ) / sizeof( wxString );
-	m_choice1 = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choice1NChoices, m_choice1Choices, 0 );
-	m_choice1->SetSelection( 0 );
-	bSizer16->Add( m_choice1, 0, wxALL, 5 );
+	wxString m_choiceTypeChoices[] = { _("Linear or bend line"), _("Corner: first diameter change, then height change"), _("Corner: first height change, then diameter change"), _("Sphere: radius at upper limit, calculate height"), _("Sphere: radius at lower limit, calculate height") };
+	int m_choiceTypeNChoices = sizeof( m_choiceTypeChoices ) / sizeof( wxString );
+	m_choiceType = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceTypeNChoices, m_choiceTypeChoices, 0 );
+	m_choiceType->SetSelection( 0 );
+	bSizer16->Add( m_choiceType, 0, wxALL, 5 );
 	
 	wxFlexGridSizer* fgSizer2;
 	fgSizer2 = new wxFlexGridSizer( 2, 3, 0, 0 );
@@ -553,8 +574,8 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	m_staticText18->Wrap( -1 );
 	fgSizer2->Add( m_staticText18, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrl9 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer2->Add( m_textCtrl9, 0, wxALL, 5 );
+	m_textCtrlDiameter = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer2->Add( m_textCtrlDiameter, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticText19 = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText19->Wrap( -1 );
@@ -564,8 +585,8 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	m_staticText20->Wrap( -1 );
 	fgSizer2->Add( m_staticText20, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrl10 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer2->Add( m_textCtrl10, 0, wxALL, 5 );
+	m_textCtrlHeight = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer2->Add( m_textCtrlHeight, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticText21 = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText21->Wrap( -1 );
@@ -575,20 +596,20 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	m_staticText22->Wrap( -1 );
 	fgSizer2->Add( m_staticText22, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrl11 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer2->Add( m_textCtrl11, 0, wxALL, 5 );
+	m_textCtrlRadius = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer2->Add( m_textCtrlRadius, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticText23 = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText23->Wrap( -1 );
 	fgSizer2->Add( m_staticText23, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText24 = new wxStaticText( this, wxID_ANY, _("Is this surface cutting?"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText24 = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText24->Wrap( -1 );
 	fgSizer2->Add( m_staticText24, 0, wxALL, 5 );
 	
-	m_checkBox1 = new wxCheckBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxCutting = new wxCheckBox( this, wxID_ANY, _("surface is cutting"), wxDefaultPosition, wxDefaultSize, 0 );
 	
-	fgSizer2->Add( m_checkBox1, 0, wxALL, 5 );
+	fgSizer2->Add( m_checkBoxCutting, 0, wxALL, 5 );
 	
 	m_staticText25 = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText25->Wrap( -1 );
@@ -598,15 +619,15 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	
 	bSizer15->Add( bSizer16, 0, 0, 5 );
 	
-	m_listCtrl1 = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VRULES );
-	bSizer15->Add( m_listCtrl1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	m_listCtrl = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VRULES );
+	bSizer15->Add( m_listCtrl, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
 	sbSizer2->Add( bSizer15, 1, wxEXPAND, 5 );
 	
 	fgSizer3->Add( sbSizer2, 0, wxEXPAND, 5 );
 	
-	m_panel1 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	fgSizer3->Add( m_panel1, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	m_canvas = new ToolCanvas(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
+	fgSizer3->Add( m_canvas, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	bSizer13->Add( fgSizer3, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -615,10 +636,12 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	
 	// Connect Events
 	this->Connect( m_menuItem17->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolboxFrame::OnClose ) );
+	this->Connect( m_menuItem25->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolboxFrame::OnChangeStereo3D ) );
 }
 
 GUIToolboxFrame::~GUIToolboxFrame()
 {
 	// Disconnect Events
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolboxFrame::OnClose ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolboxFrame::OnChangeStereo3D ) );
 }

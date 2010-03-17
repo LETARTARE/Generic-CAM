@@ -19,22 +19,23 @@
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
-#include "../simulator/MachineCanvas.h"
+#include "MachineCanvas.h"
 #include <wx/sizer.h>
 #include <wx/frame.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
-#include "../simulator/DataCanvas.h"
+#include "DataCanvas.h"
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/radiobox.h>
 #include <wx/slider.h>
 #include <wx/combobox.h>
 #include <wx/statbox.h>
-#include <wx/panel.h>
+#include "ToolPanel.h"
 #include <wx/choice.h>
 #include <wx/checkbox.h>
 #include <wx/listctrl.h>
+#include "ToolCanvas.h"
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -61,6 +62,9 @@ class GUIMainFrame : public wxFrame
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnLoadMachine( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnReloadMachine( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnLoadToolbox( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnSaveToolbox( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnEditToolbox( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnLoadGCodes( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSelectDataFrame( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnQuit( wxCommandEvent& event ){ event.Skip(); }
@@ -204,52 +208,58 @@ class GUIToolboxFrame : public wxFrame
 	private:
 	
 	protected:
+		enum
+		{
+			wxID_VIEWSTEREO3D = 1000,
+		};
+		
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuTools;
-		wxMenu* m_menu9;
-		wxComboBox* m_comboBox1;
+		wxMenu* m_menuSettings;
+		wxComboBox* m_comboBoxToolSelector;
 		wxButton* m_button6;
 		wxButton* m_button7;
 		wxButton* m_button8;
 		wxStaticText* m_staticText8;
-		wxTextCtrl* m_textCtrl4;
+		wxTextCtrl* m_textCtrlShaftDiameter;
 		wxStaticText* m_staticText9;
 		wxStaticText* m_staticText10;
-		wxTextCtrl* m_textCtrl5;
+		wxTextCtrl* m_textCtrlShaftLength;
 		wxStaticText* m_staticText11;
 		wxStaticText* m_staticText13;
-		wxTextCtrl* m_textCtrl6;
+		wxTextCtrl* m_textCtrlMaxSpeed;
 		wxStaticText* m_staticText12;
 		wxStaticText* m_staticText14;
-		wxTextCtrl* m_textCtrl7;
+		wxTextCtrl* m_textCtrlFeedCoefficient;
 		wxStaticText* m_staticText15;
 		wxStaticText* m_staticText16;
-		wxTextCtrl* m_textCtrl8;
+		wxTextCtrl* m_textCtrlNrOfTeeth;
 		wxStaticText* m_staticText17;
 		wxStaticText* m_staticText26;
-		wxTextCtrl* m_textCtrl12;
-		wxPanel* m_panel2;
+		wxTextCtrl* m_textCtrlComment;
+		ToolPanel* m_panel;
 		wxButton* m_button11;
 		wxButton* m_button10;
 		wxButton* m_button9;
-		wxChoice* m_choice1;
+		wxChoice* m_choiceType;
 		wxStaticText* m_staticText18;
-		wxTextCtrl* m_textCtrl9;
+		wxTextCtrl* m_textCtrlDiameter;
 		wxStaticText* m_staticText19;
 		wxStaticText* m_staticText20;
-		wxTextCtrl* m_textCtrl10;
+		wxTextCtrl* m_textCtrlHeight;
 		wxStaticText* m_staticText21;
 		wxStaticText* m_staticText22;
-		wxTextCtrl* m_textCtrl11;
+		wxTextCtrl* m_textCtrlRadius;
 		wxStaticText* m_staticText23;
 		wxStaticText* m_staticText24;
-		wxCheckBox* m_checkBox1;
+		wxCheckBox* m_checkBoxCutting;
 		wxStaticText* m_staticText25;
-		wxListCtrl* m_listCtrl1;
-		wxPanel* m_panel1;
+		wxListCtrl* m_listCtrl;
+		ToolCanvas* m_canvas;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnChangeStereo3D( wxCommandEvent& event ){ event.Skip(); }
 		
 	
 	public:

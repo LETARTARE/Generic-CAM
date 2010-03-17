@@ -12,6 +12,7 @@
 #include <wx/dynarray.h>
 WX_DECLARE_OBJARRAY(ToolElement, ArrayOfToolElement)
 ;
+#include <wx/string.h>
 
 class Tool {
 	// Constructor/ Destructor
@@ -21,13 +22,19 @@ public:
 
 
 	// Member variables
-private:
+public:
+	wxString toolName;
+	float shaftDiameter;
+	float shaftLength;
+	float maxSpeed;
+	float feedCoefficient;
+	unsigned int nrOfTeeth;
+	wxString comment;
 	ArrayOfToolElement elements;
-
 
 	// Methods
 public:
-
+	void Paint(void);
 
 };
 

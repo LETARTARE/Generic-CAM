@@ -9,6 +9,7 @@
 #include "LUACodeEvaluator.h"
 #include "MachineComponent.h"
 #include "MachinePosition.h"
+#include "Toolbox.h"
 #include <wx/string.h>
 #include <wx/dynarray.h>
 WX_DECLARE_OBJARRAY(MachineComponent, ArrayOfMachineComponent)
@@ -25,6 +26,9 @@ public:
 	wxString machineDescription;
 	ArrayOfMachineComponent components;
 	wxString textOut;
+
+	Toolbox toolbox;
+	unsigned int activeTool;
 
 	MachinePosition position;
 

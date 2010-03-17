@@ -69,21 +69,19 @@ bool MachinePosition::ParseGCodeLine(wxString lineOfText)
 	unsigned char c;
 	unsigned char command;
 	float number;
+	float conversionFactor = 0.01 / 2.54; // 1 cm = 2.54 inch
 	float nCount = 0;
 	bool negativ;
 	bool isCommand;
 	unsigned int i;
 	lineOfText.MakeUpper();
 	lineOfText += _T(" ");
-//	wxLogMessage(lineOfText);
+	//wxLogMessage(lineOfText);
 	for(i = 0; i < lineOfText.Length(); i++){
 		c = lineOfText[i];
 		if(c == '(') state += 4;
 		if(c == ')') state -= 4;
-		if(c == 'F' || c == 'G' || c == 'I' || c == 'J' || c == 'K' || c == 'A'
-				|| c == 'B' || c == 'C' || c == 'U' || c == 'V' || c == 'W'
-				|| c == 'X' || c == 'Y' || c == 'Z' || c == 'M' || c == 'N'
-				|| c == 'R')
+		if(c >= 'A' && c <= 'Z')
 			isCommand = true;
 		else
 			isCommand = false;
@@ -91,6 +89,9 @@ bool MachinePosition::ParseGCodeLine(wxString lineOfText)
 		if(state > 1 && state < 4
 				&& (isCommand || i == lineOfText.Length() - 1)){
 			// Evaluate Command
+			//wxLogMessage(wxString::Format(_T("Commado: %c mit %f"), command,
+				//	number));
+
 			if(negativ) number = -number;
 			switch(command){
 			case 'F':
@@ -100,13 +101,13 @@ bool MachinePosition::ParseGCodeLine(wxString lineOfText)
 				break;
 
 			case 'I':
-				radiusI = number;
+				radiusI = number * conversionFactor;
 				break;
 			case 'J':
-				radiusJ = number;
+				radiusJ = number * conversionFactor;
 				break;
 			case 'K':
-				radiusK = number;
+				radiusK = number * conversionFactor;
 				break;
 
 			case 'A':
@@ -120,23 +121,23 @@ bool MachinePosition::ParseGCodeLine(wxString lineOfText)
 				break;
 
 			case 'U':
-				axisU = number;
+				axisU = number * conversionFactor;
 				break;
 			case 'V':
-				axisV = number;
+				axisV = number * conversionFactor;
 				break;
 			case 'W':
-				axisW = number;
+				axisW = number * conversionFactor;
 				break;
 
 			case 'X':
-				axisX = number;
+				axisX = number * conversionFactor;
 				break;
 			case 'Y':
-				axisY = number;
+				axisY = number * conversionFactor;
 				break;
 			case 'Z':
-				axisZ = number;
+				axisZ = number * conversionFactor;
 				break;
 
 			case 'M':
@@ -146,11 +147,13 @@ bool MachinePosition::ParseGCodeLine(wxString lineOfText)
 				break;
 
 			case 'R':
+				// *conversionFactor;
 				break;
 			default:
-				wxLogMessage(wxString(_T("Unknown G-Code: %c"), command));
+				wxLogMessage(wxString::Format(_T("Unknown G-Code: %c"), command));
 				break;
 			}
+			state = 0;
 		}
 
 		switch(state){
@@ -170,6 +173,11 @@ bool MachinePosition::ParseGCodeLine(wxString lineOfText)
 			if(c >= '0' && c <= '9'){
 				number = (float) (c - '0');
 				state = 2;
+			}
+			if(c == ',' || c == '.'){
+				state = 3;
+				nCount = 1.0;
+				break;
 			}
 			break;
 		case 2:

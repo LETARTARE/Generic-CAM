@@ -12,11 +12,12 @@
 
 ToolElement::ToolElement()
 {
-	// TODO Auto-generated constructor stub
-
+	d = h = 1.0;
+	r = 0.0;
+	cutting = false;
+	t = 0;
 }
 
 ToolElement::~ToolElement()
 {
-	// TODO Auto-generated destructor stub
 }

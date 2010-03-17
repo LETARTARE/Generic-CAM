@@ -9,6 +9,7 @@
 #include "Control6DOFDialog.h"
 #include "ErrorFrame.h"
 #include "DataFrame.h"
+#include "ToolboxFrame.h"
 
 MainFrame::MainFrame(wxWindow* parent) :
 	GUIMainFrame(parent)
@@ -94,8 +95,7 @@ void MainFrame::OnLoadMachine(wxCommandEvent &event)
 					wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if(dialog.ShowModal() == wxID_OK){
-		machineFileName = dialog.GetPath();
-
+		machineFileName.Assign(dialog.GetPath());
 		OnReloadMachine(event);
 
 
@@ -109,9 +109,9 @@ void MainFrame::OnLoadMachine(wxCommandEvent &event)
 
 void MainFrame::OnReloadMachine(wxCommandEvent &event)
 {
-	if(machineFileName.empty()) return;
+	if(!machineFileName.IsOk()) return;
 
-	wxTextFile file(machineFileName);
+	wxTextFile file(machineFileName.GetFullPath());
 	if(!file.Open(wxConvLocal)){
 		if(!file.Open(wxConvFile)){
 			wxLogError(_T("Opening of the file failed!"));
@@ -133,6 +133,78 @@ void MainFrame::OnReloadMachine(wxCommandEvent &event)
 		error->Show();
 	}
 	t = 0;
+}
+
+void MainFrame::OnLoadToolbox(wxCommandEvent &event)
+{
+	wxFileDialog dialog(this, _("Open toolbox..."), _T(""), _T(""),
+			_("Toolbox (*.xml)|*.xml|All files|*.*"), wxFD_OPEN
+					| wxFD_FILE_MUST_EXIST);
+
+	if(dialog.ShowModal() == wxID_OK){
+
+		toolboxFileName.Assign(dialog.GetPath());
+		if(!machine.toolbox.LoadToolbox(toolboxFileName.GetFullPath())){
+			wxLogError(_T("OnLoadToolbox: Opening of the toolbox failed!"));
+		}
+
+
+		//ctrlTextEdit->SetValue(temp);
+		//fname.Assign(dialog.GetPath());
+		//ctrlTextEdit->SetModified(false);
+		//SetWindowTitle();
+
+	}
+}
+
+void MainFrame::OnSaveToolbox(wxCommandEvent &event)
+{
+
+
+	//TODO: Build something like in this snippet.
+	//	wxFileDialog
+	//			dialog(
+	//					this,
+	//					_("Save as..."),
+	//					fname.GetPath(),
+	//					fname.GetFullName(),
+	//					_("LUA Files  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
+	//					wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+	//
+	//	if(dialog.ShowModal() == wxID_OK){
+	//		fname.Assign(dialog.GetPath());
+	//		SetWindowTitle();
+	//		DoSave();
+	//	}
+
+
+	wxFileDialog dialog(this, _("Save toolbox..."), _T(""), _T(""),
+			_("Toolbox (*.xml)|*.xml|All files|*.*"), wxFD_OPEN
+					| wxFD_FILE_MUST_EXIST);
+
+	if(dialog.ShowModal() == wxID_OK){
+		toolboxFileName = dialog.GetPath();
+
+		if(!machine.toolbox.LoadToolbox(toolboxFileName.GetFullPath())){
+			wxLogError(_T("OnLoadToolbox: Opening of the toolbox failed!"));
+		}
+
+
+		//ctrlTextEdit->SetValue(temp);
+		//fname.Assign(dialog.GetPath());
+		//ctrlTextEdit->SetModified(false);
+		//SetWindowTitle();
+
+	}
+}
+
+void MainFrame::OnEditToolbox(wxCommandEvent& event)
+{
+	ToolboxFrame* toolboxFrame = new ToolboxFrame(this);
+
+	toolboxFrame->SetController(&control);
+	toolboxFrame->InsertToolBox(&(machine.toolbox));
+	toolboxFrame->Show(true);
 }
 
 void MainFrame::OnLoadGCodes(wxCommandEvent &event)
