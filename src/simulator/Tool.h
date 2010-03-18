@@ -34,7 +34,13 @@ public:
 
 	// Methods
 public:
-	void Paint(void);
+	void Paint2D(void);
+	void Paint3D(void);
+
+	float GetPositiveLength(void);
+	float GetNegativeLength(void);
+	float GetMaxDiameter(void);
+
 
 };
 

@@ -55,7 +55,14 @@ void ToolCanvas::RenderCoordinateSystem(void)
 void ToolCanvas::Render()
 {
 	RenderCoordinateSystem();
-	if(tool != NULL) tool->Paint();
+	if(tool != NULL){
+		::glEnable(GL_RESCALE_NORMAL);
+		::glScalef(50, 50, 50);
+
+		tool->Paint3D();
+
+		::glDisable(GL_RESCALE_NORMAL);
+	}
 }
 
 // This should happen in a derived class:

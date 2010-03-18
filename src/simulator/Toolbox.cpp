@@ -28,20 +28,37 @@ Toolbox::Toolbox()
 	ToolElement* e;
 
 	e = new ToolElement;
-	e->h = 0.1;
-	e->d = 0.7;
+	e->t = 0;
+	e->h = 0.01;
+	e->d = 0.01;
 	e->r = 0.0;
-	e->t = 2;
 	e->cutting=false;
 	temp->elements.Add(e);
 
 	e = new ToolElement;
-	e->h = 0.1;
-	e->d = 0.0;
-	e->r = 0.0;
 	e->t = 2;
+	e->h = 0.01;
+	e->d = 0.02;
+	e->r = 0.0;
+	e->cutting=false;
+	temp->elements.Add(e);
+
+	e = new ToolElement;
+	e->t = 0;
+	e->h = 0.01;
+	e->d = 0.04;
+	e->r = 0.02;
 	e->cutting=true;
 	temp->elements.Add(e);
+
+//	e = new ToolElement;
+//	e->t = 0;
+//	e->h = 0.01;
+//	e->d = 0.0;
+//	e->r = 0.04;
+//	e->cutting=true;
+//	temp->elements.Add(e);
+
 
 	temp->toolName=_T("Generic Cutter");
 	temp->comment = _T("for testing purposes");
