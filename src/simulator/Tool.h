@@ -9,17 +9,39 @@
 #ifndef TOOL_H_
 #define TOOL_H_
 #include "ToolElement.h"
+#include "../3D/Vector3.h"
+#include <wx/string.h>
 #include <wx/dynarray.h>
+
+class ToolContourElement {
+	// Constructor/ Destructor
+public:
+	ToolContourElement(bool cutting = false, bool partOfShaft = false);
+	virtual ~ToolContourElement();
+
+	// Member variables
+public:
+	Vector3 p1;
+	Vector3 p2;
+	Vector3 n1;
+	Vector3 n2;
+	bool isCutting;
+	bool belongsToShaft;
+
+	// Methods
+public:
+};
+
 WX_DECLARE_OBJARRAY(ToolElement, ArrayOfToolElement)
 ;
-#include <wx/string.h>
+WX_DECLARE_OBJARRAY(ToolContourElement, ArrayOfToolContourElement)
+;
 
 class Tool {
 	// Constructor/ Destructor
 public:
 	Tool();
 	virtual ~Tool();
-
 
 	// Member variables
 public:
@@ -31,16 +53,14 @@ public:
 	unsigned int nrOfTeeth;
 	wxString comment;
 	ArrayOfToolElement elements;
-
+	ArrayOfToolContourElement contour;
 	// Methods
 public:
-	void Paint2D(void);
-	void Paint3D(void);
+	void GenerateContour(void);
 
 	float GetPositiveLength(void);
 	float GetNegativeLength(void);
 	float GetMaxDiameter(void);
-
 
 };
 

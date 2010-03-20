@@ -10,66 +10,61 @@
 
 #include "Tool.h"
 
-#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+#include <wx/arrimpl.cpp>
+// this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfToolElement)
+WX_DEFINE_OBJARRAY(ArrayOfToolContourElement)
 
 #include <GL/gl.h>
 #include <math.h>
 #include <wx/log.h>
 
+ToolContourElement::ToolContourElement(bool cutting, bool partOfShaft)
+{
+	isCutting = cutting;
+	belongsToShaft = partOfShaft;
+}
+ToolContourElement::~ToolContourElement()
+{
+}
 Tool::Tool()
 {
-	// TODO Auto-generated constructor stub
-
 
 }
 
 Tool::~Tool()
 {
-	// TODO Auto-generated destructor stub
+
 }
 
-void Tool::Paint2D(void)
+void Tool::GenerateContour(void)
 {
-	unsigned int i;
-	//	for(i = 0; i < elements.Count(); i++){
-	//		elements[i].Paint();
-	//	}
-}
-
-void Tool::Paint3D(void)
-{
-	unsigned int i;
-	const unsigned int N = 32;
-
-	float ss[N + 1], cc[N + 1];
-	for(i = 0; i <= N; i++){
-		ss[i] = sin(2* M_PI / N * i);
-		cc[i] = cos(2* M_PI / N * i);
-	}
+	contour.Clear();
 
 	float xPosition = shaftDiameter / 2;
 	float zPosition = 0.0;
 
+	ToolContourElement* temp;
+
 
 	// Cap on top
-	::glBegin(GL_TRIANGLE_FAN);
-	::glNormal3f(0, 0, -1);
-	::glVertex3f(0, 0, -shaftLength);
-	for(i = 0; i <= N; i++){
-		glVertex3f(xPosition * cc[i], xPosition * ss[i], -shaftLength);
-	}
-	::glEnd();
+	temp = new ToolContourElement(false, true);
+	temp->n1.z = -1;
+	temp->p1.z = -shaftLength;
+	temp->n2.z = -1;
+	temp->p2.x = xPosition;
+	temp->p2.z = -shaftLength;
+	contour.Add(temp);
 
 
 	// Top part of shaft
-	::glBegin(GL_QUAD_STRIP);
-	for(i = 0; i <= N; i++){
-		::glNormal3f(cc[i], ss[i], 0);
-		::glVertex3f(xPosition * cc[i], xPosition * ss[i], -shaftLength);
-		::glVertex3f(xPosition * cc[i], xPosition * ss[i], 0);
-	}
-	::glEnd();
+	temp = new ToolContourElement(false, true);
+	temp->n1.x = 1;
+	temp->p1.x = xPosition;
+	temp->p1.z = -shaftLength;
+	temp->n2.x = 1;
+	temp->p2.x = xPosition;
+	contour.Add(temp);
 
 	float d, x, z, r;
 	unsigned int j;
@@ -85,55 +80,54 @@ void Tool::Paint3D(void)
 			d = 1.0;
 
 		switch(elements[j].t){
-
 		case 1:
-			::glBegin(GL_QUAD_STRIP);
-			if(x > 0)
-				::glNormal3f(0, 0, -1);
-			else
-				::glNormal3f(0, 0, 1);
-
-			for(i = 0; i <= N; i++){
-				::glVertex3f(xPosition * cc[i], xPosition * ss[i], zPosition);
-				::glVertex3f((xPosition + x) * cc[i], (xPosition + x) * ss[i],
-						zPosition);
+			temp = new ToolContourElement(elements[j].cutting);
+			if(x > 0){
+				temp->n1.z = -1;
+				temp->n2.z = -1;
+			}else{
+				temp->n1.z = 1;
+				temp->n2.z = 1;
 			}
-			::glEnd();
-			::glBegin(GL_QUAD_STRIP);
-			for(i = 0; i <= N; i++){
-				::glNormal3f(cc[i], ss[i], 0);
-				::glVertex3f(xPosition * cc[i], xPosition * ss[i], zPosition);
-				::glVertex3f(xPosition * cc[i], xPosition * ss[i], zPosition
-						+ z);
-			}
-			::glEnd();
-
+			temp->p1.x = xPosition;
+			temp->p1.z = zPosition;
+			temp->p2.x = xPosition + x;
+			temp->p2.z = zPosition;
+			contour.Add(temp);
+			temp = new ToolContourElement(elements[j].cutting);
+			temp->n1.x = 1;
+			temp->n2.x = 1;
+			temp->p1.x = xPosition + x;
+			temp->p1.z = zPosition;
+			temp->p2.x = xPosition + x;
+			temp->p2.z = zPosition + z;
+			contour.Add(temp);
 			break;
 
 		case 2:
-			::glBegin(GL_QUAD_STRIP);
-			for(i = 0; i <= N; i++){
-				::glNormal3f(cc[i], ss[i], 0);
-				::glVertex3f(xPosition * cc[i], xPosition * ss[i], zPosition);
-				::glVertex3f(xPosition * cc[i], xPosition * ss[i], zPosition
-						+ z);
+			temp = new ToolContourElement(elements[j].cutting);
+			temp->n1.x = 1;
+			temp->n2.x = 1;
+			temp->p1.x = xPosition;
+			temp->p1.z = zPosition;
+			temp->p2.x = xPosition;
+			temp->p2.z = zPosition + z;
+			contour.Add(temp);
+			temp = new ToolContourElement(elements[j].cutting);
+			if(x > 0){
+				temp->n1.z = -1;
+				temp->n2.z = -1;
+			}else{
+				temp->n1.z = 1;
+				temp->n2.z = 1;
 			}
-			::glEnd();
-			::glBegin(GL_QUAD_STRIP);
-
-			if(x > 0)
-				::glNormal3f(0, 0, -1);
-			else
-				::glNormal3f(0, 0, 1);
-
-			for(i = 0; i <= N; i++){
-				::glVertex3f(xPosition * cc[i], xPosition * ss[i], zPosition
-						+ z);
-				::glVertex3f((elements[j].d / 2) * cc[i], (elements[j].d / 2)
-						* ss[i], zPosition + z);
-			}
-			::glEnd();
+			temp->p1.x = xPosition;
+			temp->p1.z = zPosition + z;
+			temp->p2.x = xPosition + x;
+			temp->p2.z = zPosition + z;
+			contour.Add(temp);
 			break;
+
 		case 3:
 			// calc h
 			if(x < 0){
@@ -144,7 +138,8 @@ void Tool::Paint3D(void)
 				if(x > 2* xPosition ) x = 2* xPosition ;
 				z = sqrt(r * r - (x - xPosition) * (x - xPosition));
 			}
-
+			elements[j].h = z;
+			elements[j].r = r;
 			break;
 		case 4:
 			// calc h
@@ -156,71 +151,68 @@ void Tool::Paint3D(void)
 				if(x < 2 * (xPosition + x)) x = 2 * (xPosition + x);
 				z = sqrt(r * r - (x + (x + xPosition)) * (x + (x + xPosition)));
 			}
+			elements[j].h = z;
+			elements[j].r = r;
 			break;
 		}
+
 		if(elements[j].t == 0 || elements[j].t == 3 || elements[j].t == 4){
 			if(fabs(r) < 1e-6){
-
-				::glBegin(GL_QUAD_STRIP);
-				for(i = 0; i <= N; i++){
-					::glNormal3f(cc[i] * z / d, ss[i] * z / d, -x / d);
-					::glVertex3f(xPosition * cc[i], xPosition * ss[i],
-							zPosition);
-					::glVertex3f((elements[j].d / 2) * cc[i], (elements[j].d
-							/ 2) * ss[i], zPosition + z);
-				}
-				::glEnd();
+				temp = new ToolContourElement(elements[j].cutting);
+				temp->n1.x = z / d;
+				temp->n1.z = -x / d;
+				temp->n2.x = z / d;
+				temp->n2.z = -x / d;
+				temp->p1.x = xPosition;
+				temp->p1.z = zPosition;
+				temp->p2.x = xPosition + x;
+				temp->p2.z = zPosition + z;
+				contour.Add(temp);
 
 			}else{
-				d = x * x + z * z;
-				if(d > 0)
-					d = sqrt(d);
+				d = sqrt(x * x + z * z);
+				float h = r * r - d * d / 4;
+				if(h < 0)
+					h = 0;
 				else
-					d = 1.0;
-
-				float x2 = x / 2 - z * sqrt(4 * r * r - x * x - z * z) / 2 / d;
-				float z2 = z / 2 + x * sqrt(4 * r * r - x * x - z * z) / 2 / d;
-
-
-				//wxLogMessage(wxString::Format(_T("sqrt(...): %f"),sqrt(4 * r * r - x * x - z * z)));
-
-
-				//wxLogMessage(wxString::Format(_T("x2: %f z2: %f"),x2,z2));
-
-
-
-				float a1 = atan2(zPosition - z2, xPosition - x2);
-				float a2 = atan2(zPosition + z - z2, xPosition + x - x2);
-
-				//wxLogMessage(wxString::Format(_T("a1: %f a2: %f"),a1/M_PI*180,a2/M_PI*180));
-
-				unsigned char n = floor(fabs(a2 - a1) / M_PI * 180 / 1);
-				unsigned char k;
-
-				//wxLogMessage(wxString::Format(_T("n: %u"),n));
-
-
-				//wxLogMessage(wxString::Format(_T("r: %f x: %f, z: %f"),r,x,z));
-
-				for(k = 0; k < n; k++){
-					float cc1 = cos(a1 + (a2 - a1) / (float)n * (float)k);
-					float ss1 = sin(a1 + (a2 - a1) / (float)n * (float)k);
-					float cc2 = cos(a1 + (a2 - a1) / (float)n * (float)(k + 1));
-					float ss2 = sin(a1 + (a2 - a1) / (float)n * (float)(k + 1));
-
-					::glBegin(GL_QUAD_STRIP);
-					for(i = 0; i <= N; i++){
-						::glNormal3f(cc[i] * cc1, ss[i] * cc1, ss1);
-						::glVertex3f(cc[i] * (cc1 * r + x2), ss[i] * (cc1 * r
-								+ x2), ss1 * r + z2);
-						::glNormal3f(cc[i] * cc2, ss[i] * cc2, ss2);
-						::glVertex3f(cc[i] * (cc2 * r + x2), ss[i] * (cc2 * r
-								+ x2), ss2 * r + z2);
-					}
-					::glEnd();
-
+					h = sqrt(h);
+				float x2, z2;
+				if(r > 0){
+					x2 = x / 2 - z * h / d;
+					z2 = z / 2 + x * h / d;
+				}else{
+					x2 = x / 2 + z * h / d;
+					z2 = z / 2 - x * h / d;
 				}
-
+				//wxLogMessage(wxString::Format(_T("x: %f z: %f"),x,z));
+				//wxLogMessage(wxString::Format(_T("x2: %f z2: %f"), x2, z2));
+				float a = atan2(x, z);
+				float a1 = a - asin(d / 2 / r);
+				float a2 = a + asin(d / 2 / r);
+				//				wxLogMessage(wxString::Format(_T("a: %f a1: %f a2: %f"), a
+				//						/ M_PI * 180, a1 / M_PI * 180, a2 / M_PI * 180));
+				unsigned char n = floor(fabs(a2 - a1) / M_PI * 180 / 10);
+				unsigned char k;
+				//wxLogMessage(wxString::Format(_T("n: %u"),n));
+				//wxLogMessage(wxString::Format(_T("r: %f x: %f, z: %f"),r,x,z));
+				for(k = 0; k < n; k++){
+					float cc1 = cos(a1 + (a2 - a1) / (float) n * (float) k);
+					float ss1 = -sin(a1 + (a2 - a1) / (float) n * (float) k);
+					float cc2 = cos(a1 + (a2 - a1) / (float) n
+							* (float) (k + 1));
+					float ss2 = -sin(a1 + (a2 - a1) / (float) n * (float) (k
+							+ 1));
+					temp = new ToolContourElement(elements[j].cutting);
+					temp->n1.x = cc1;
+					temp->n1.z = ss1;
+					temp->n2.x = cc2;
+					temp->n2.z = ss2;
+					temp->p1.x = cc1 * r + x2 + xPosition;
+					temp->p1.z = ss1 * r + z2 + zPosition;
+					temp->p2.x = cc2 * r + x2 + xPosition;
+					temp->p2.z = ss2 * r + z2 + zPosition;
+					contour.Add(temp);
+				}
 			}
 		}
 
@@ -236,7 +228,7 @@ float Tool::GetPositiveLength(void)
 	unsigned int i;
 	for(i = 0; i < elements.Count(); i++){
 		zPosition += elements[i].h;
-		//TODO: Extend this for round elements. Round elements can extend further downwards than the start end endpoint.
+		//TODO: Extend this for round elements. Round elements can extend further downwards than the start and endpoint.
 		if(zPosition > maxLength) maxLength = zPosition;
 	}
 	return maxLength;

@@ -29,35 +29,35 @@ Toolbox::Toolbox()
 
 	e = new ToolElement;
 	e->t = 0;
-	e->h = 0.01;
-	e->d = 0.01;
+	e->h = 0.005;
+	e->d = 0.005;
 	e->r = 0.0;
 	e->cutting=false;
 	temp->elements.Add(e);
 
 	e = new ToolElement;
 	e->t = 2;
-	e->h = 0.01;
-	e->d = 0.02;
+	e->h = 0.02;
+	e->d = 0.01;
 	e->r = 0.0;
 	e->cutting=false;
 	temp->elements.Add(e);
 
 	e = new ToolElement;
-	e->t = 0;
-	e->h = 0.01;
-	e->d = 0.04;
-	e->r = 0.02;
+	e->t = 4;
+	e->h = 0.0;
+	e->d = 0.02;
+	e->r = 0.0;
 	e->cutting=true;
 	temp->elements.Add(e);
 
-//	e = new ToolElement;
-//	e->t = 0;
-//	e->h = 0.01;
-//	e->d = 0.0;
-//	e->r = 0.04;
-//	e->cutting=true;
-//	temp->elements.Add(e);
+	e = new ToolElement;
+	e->t = 3;
+	e->h = 0.0;
+	e->d = 0.0;
+	e->r = 0.0;
+	e->cutting=true;
+	temp->elements.Add(e);
 
 
 	temp->toolName=_T("Generic Cutter");
@@ -68,7 +68,10 @@ Toolbox::Toolbox()
 	temp->feedCoefficient=0.003;
 	temp->nrOfTeeth=2;
 
+	temp->GenerateContour();
+
 	tools.Add(temp);
+
 }
 
 Toolbox::~Toolbox()

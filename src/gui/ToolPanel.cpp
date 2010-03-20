@@ -16,7 +16,7 @@ ToolPanel::ToolPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 	wxPanel(parent, id, pos, size, style)
 {
 
-	this->SetBackgroundColour(wxColour(128, 128, 128));
+	this->SetBackgroundColour(wxColour(200, 200, 200));
 
 	tool = NULL;
 
@@ -52,26 +52,43 @@ void ToolPanel::OnSize(wxSizeEvent &event)
 void ToolPanel::OnPaint(wxPaintEvent& event)
 {
 
+	if(tool == NULL) return;
+
+	wxPoint temp;
 	wxPaintDC dc(this);
 	wxSize sz = GetClientSize();
 
-	dc.SetPen(*wxBLACK_PEN);
+	float scaleX = (float) sz.x / tool->GetMaxDiameter();
+	float scaleY = (float) sz.y / (tool->GetPositiveLength()
+			+ tool->GetNegativeLength());
 
-	if(tool == NULL) return;
+	float scaleFactor = (scaleX < scaleY)? scaleX : scaleY;
+	scaleFactor *= 0.9;
 
-	int i;
-	wxPoint temp;
-	wxString text;
-	wxBrush gold(wxColor(255, 255, 128), wxSOLID);
+	int mx = sz.x / 2;
+	int my = (int) (scaleY * tool->GetNegativeLength());
 
-	wxBrush blueSpecial(*wxBLUE, wxBDIAGONAL_HATCH);
-	wxBrush redSpecial(*wxRED, wxBDIAGONAL_HATCH);
+	dc.CrossHair(mx, my);
 
-	dc.SetTextForeground(wxColor(255, 255, 255));
-	wxFont font(20, wxFONTFAMILY_SWISS, wxNORMAL, wxBOLD);
-	dc.SetFont(font);
 
-	float shift;
+	unsigned int i;
+
+	for(i = 0; i < tool->contour.Count(); i++){
+
+		if(tool->contour[i].isCutting)
+			dc.SetPen(*wxRED_PEN);
+		else
+			dc.SetPen(*wxBLACK_PEN);
+
+		dc.DrawLine(mx + scaleFactor * tool->contour[i].p1.x, my + scaleFactor
+				* tool->contour[i].p1.z, mx + scaleFactor
+				* tool->contour[i].p2.x, my + scaleFactor
+				* tool->contour[i].p2.z);
+		dc.DrawLine(mx - scaleFactor * tool->contour[i].p1.x, my + scaleFactor
+				* tool->contour[i].p1.z, mx - scaleFactor
+				* tool->contour[i].p2.x, my + scaleFactor
+				* tool->contour[i].p2.z);
+	}
 
 
 	//wxLogMessage((linkedField == NULL)? _T("NULL") : _T("not NULL"));
@@ -88,24 +105,6 @@ void ToolPanel::OnMotion(wxMouseEvent& event)
 
 void ToolPanel::OnLeftDown(wxMouseEvent& event)
 {
-	unsigned char i;
-	wxPoint temp;
-	float x;
-	wxSize sz = GetClientSize();
-
 	if(tool == NULL) return;
 
-	for(i = 0; i < tool->elements.Count(); i++){
-		//TODO: Send a message down the pipe, if an element was selected.
-		//		if(temp.x != 0 || temp.y != 0){
-		//			temp -= event.GetPosition();
-		//			x = sqrt(temp.x * temp.x + temp.y * temp.y);
-		//			if(x < d / 2.1){
-		//				wxCommandEvent event(wxEVT_COMMAND_BUTTON_CLICKED, GetId());
-		//				event.SetInt(i);
-		//				GetEventHandler()->ProcessEvent(event);
-		//				//wxLogMessage(wxString::Format(_T("Event sent! (%u) ID = %u"),i,GetId()));
-		//			}
-		//		}
-	}
 }

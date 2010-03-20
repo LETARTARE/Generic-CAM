@@ -1,19 +1,59 @@
-\chapter{Example of usage}
+\chapter{Usage}
 
-Load a machine description.
+\section{Overview}
+
+To generate G-codes for a project You have to:
+
+\begin{itemize}
+\item Load a machine description.
+\item Load geometry data.
+\item Setup the raw material.
+\item Calculate toolpaths.
+\item Simulate the result.
+\item Export G-codes.
+\end{itemize}
+
+\section{Defintion of tools in toolbox}
+
+\subsection{General parameters}
+
+Shaft diameter and shaft length describe the part of an tool that
+disappears inside the chuck. 
+
+Maximum speed is the max speed, the tool can handle  before it suffers
+from a loss of structural integrity.
+
+The feed coefficient $f_z$ is the amount of material a tooth of the tool
+can eat away per revolution. 
+
+\begin{table}[htb]
+\begin{tabular}{|l|r|r|r|}
+\hline
+&\multicolumn{3}{|l|}{$f_z$ for a tool diameter of}\\
+Material&$d=2\ldots4$ mm&$d=5\ldots8$ mm&$d=9\ldots12$ mm\\
+\hline
+Aluminum&0.04&0.05&0.10\\
+Brass, copper, bronze&0.04&0.05&0.10\\
+Steel&0.02&0.03&0.06\\
+Thermoplastics&0.05&0.06&0.07\\
+\hline
+\end{tabular}
+\end{table}
 
 
-Load geometry data.
+I have found no feed coeffient data for different types of wood.
 
+\subsection{Toolshape}
 
-Setup the raw material.
+The shape of the tool is constructed from short segments.
+Each segment can either be a cutting or not.
+Possible shape elements are:
 
-
-Calculate toolpaths.
-
-
-Simulate the result.
-
-
-Export G-codes.
+\begin{itemize}
+\item Straight or bend line.
+\item Height change followed by a diameter change.
+\item Diameter change followed by a height change.
+\item Circle, the radius is orthogonal at the top of the segment.
+\item Circle, the radius is orthogonal at the bottom of the segment.
+\end{itemize}
 

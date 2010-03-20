@@ -575,6 +575,8 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	fgSizer2->Add( m_staticText18, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrlDiameter = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlDiameter->SetToolTip( _("Diameter of the tool at the end of this segment.") );
+	
 	fgSizer2->Add( m_textCtrlDiameter, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticText19 = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -586,6 +588,8 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	fgSizer2->Add( m_staticText20, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrlHeight = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlHeight->SetToolTip( _("Height of this segment.") );
+	
 	fgSizer2->Add( m_textCtrlHeight, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticText21 = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -597,6 +601,8 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	fgSizer2->Add( m_staticText22, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrlRadius = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlRadius->SetToolTip( _("Radius of curvature:\r\nPositive radius = convex surface = bulged to the outside.\r\nNegative radius = concave surface = bulged to the inside.\r\nRadius of 0 = straight line. ") );
+	
 	fgSizer2->Add( m_textCtrlRadius, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticText23 = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );

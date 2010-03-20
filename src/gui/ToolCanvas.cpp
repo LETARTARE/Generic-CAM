@@ -54,13 +54,36 @@ void ToolCanvas::RenderCoordinateSystem(void)
 
 void ToolCanvas::Render()
 {
+	float scaleFactor = 50.0;
 	RenderCoordinateSystem();
 	if(tool != NULL){
+
+		unsigned int i, j;
+		const unsigned int N = 32;
+
+		float ss[N + 1], cc[N + 1];
+		for(i = 0; i <= N; i++){
+			ss[i] = sin(2* M_PI / N * i);
+			cc[i] = cos(2* M_PI / N * i);
+		}
+
 		::glEnable(GL_RESCALE_NORMAL);
-		::glScalef(50, 50, 50);
+		::glScalef(scaleFactor, scaleFactor, scaleFactor);
 
-		tool->Paint3D();
-
+		for(i = 0; i < tool->contour.Count(); i++){
+			::glBegin(GL_QUAD_STRIP);
+			for(j = 0; j <= N; j++){
+				::glNormal3f(cc[j] * tool->contour[i].n1.x, ss[j]
+						* tool->contour[i].n1.x, tool->contour[i].n1.z);
+				::glVertex3f(cc[j] * tool->contour[i].p1.x, ss[j]
+						* tool->contour[i].p1.x, tool->contour[i].p1.z);
+				::glNormal3f(cc[j] * tool->contour[i].n2.x, ss[j]
+						* tool->contour[i].n2.x, tool->contour[i].n2.z);
+				::glVertex3f(cc[j] * tool->contour[i].p2.x, ss[j]
+						* tool->contour[i].p2.x, tool->contour[i].p2.z);
+			}
+			::glEnd();
+		}
 		::glDisable(GL_RESCALE_NORMAL);
 	}
 }
