@@ -15,7 +15,7 @@ WX_DEFINE_OBJARRAY(ArrayOfMachineComponent)
 
 Machine::Machine()
 {
-	activeTool=0;
+	activeTool = 1;
 	position.Zero();
 	ClearComponents();
 }
@@ -29,6 +29,13 @@ void Machine::Paint(void)
 	unsigned int i;
 	for(i = 0; i < components.Count(); i++){
 		components[i].Paint();
+	}
+
+	if(activeTool > 0 && activeTool <= toolbox.tools.Count()){
+		::glPushMatrix();
+		::glMultMatrixd(toolPosition.a);
+		toolbox.tools[activeTool].Paint();
+		::glPopMatrix();
 	}
 }
 
@@ -71,6 +78,18 @@ bool Machine::PlaceComponent(wxString nameOfComponent,
 		if(components[i].nameOfComponent.Cmp(nameOfComponent) == 0){
 			flag = true;
 			components[i].matrix.Set(matrix);
+
+
+			// Sideeffect of placing the components:
+			// The tool and the material matrices are set up.
+			if((int) i == componentWithMaterial){
+				materialPosition.Set(materialPositionRelativ);
+				materialPosition.PostMult(matrix.a);
+			}
+			if((int) i == componentWithTool){
+				toolPosition.Set(toolPositionRelativ);
+				toolPosition.PostMult(matrix.a);
+			}
 		}
 	}
 	return flag;

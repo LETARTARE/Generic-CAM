@@ -54,6 +54,8 @@ public:
 	wxString comment;
 	ArrayOfToolElement elements;
 	ArrayOfToolContourElement contour;
+	unsigned int slot;
+
 	// Methods
 public:
 	void GenerateContour(void);
@@ -62,6 +64,7 @@ public:
 	float GetNegativeLength(void);
 	float GetMaxDiameter(void);
 
+	void Paint(void);
 };
 
 #endif /* TOOL_H_ */

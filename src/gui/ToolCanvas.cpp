@@ -56,60 +56,8 @@ void ToolCanvas::Render()
 {
 	float scaleFactor = 50.0;
 	RenderCoordinateSystem();
-	if(tool != NULL){
-
-		unsigned int i, j;
-		const unsigned int N = 32;
-
-		float ss[N + 1], cc[N + 1];
-		for(i = 0; i <= N; i++){
-			ss[i] = sin(2* M_PI / N * i);
-			cc[i] = cos(2* M_PI / N * i);
-		}
-
-		::glEnable(GL_RESCALE_NORMAL);
-		::glScalef(scaleFactor, scaleFactor, scaleFactor);
-
-		for(i = 0; i < tool->contour.Count(); i++){
-			::glBegin(GL_QUAD_STRIP);
-			for(j = 0; j <= N; j++){
-				::glNormal3f(cc[j] * tool->contour[i].n1.x, ss[j]
-						* tool->contour[i].n1.x, tool->contour[i].n1.z);
-				::glVertex3f(cc[j] * tool->contour[i].p1.x, ss[j]
-						* tool->contour[i].p1.x, tool->contour[i].p1.z);
-				::glNormal3f(cc[j] * tool->contour[i].n2.x, ss[j]
-						* tool->contour[i].n2.x, tool->contour[i].n2.z);
-				::glVertex3f(cc[j] * tool->contour[i].p2.x, ss[j]
-						* tool->contour[i].p2.x, tool->contour[i].p2.z);
-			}
-			::glEnd();
-		}
-		::glDisable(GL_RESCALE_NORMAL);
-	}
+	::glEnable(GL_RESCALE_NORMAL);
+	::glScalef(scaleFactor, scaleFactor, scaleFactor);
+	if(tool != NULL) tool->Paint();
+	::glDisable(GL_RESCALE_NORMAL);
 }
-
-// This should happen in a derived class:
-//void OpenGLCanvas::InsertGeometry(Document* doc)
-//{
-//	SetCurrent();
-//	::glNewList(m_gllist, GL_COMPILE);
-//
-//	std::list <Geometry *>::iterator pg;
-//	for(pg = doc->objectGeometry.begin(); pg != doc->objectGeometry.end(); ++pg){
-//		(*pg)->Paint();
-//	}
-//	std::list <Source *>::iterator ps;
-//	for(ps = doc->objectSource.begin(); ps != doc->objectSource.end(); ++ps){
-//		(*ps)->Paint();
-//	}
-//	std::list <Connector *>::iterator pc;
-//	for(pc = doc->objectConnector.begin(); pc != doc->objectConnector.end(); ++pc){
-//		(*pc)->Paint();
-//	}
-//	std::list <Result *>::iterator pr;
-//	for(pr = doc->objectResult.begin(); pr != doc->objectResult.end(); ++pr){
-//		(*pr)->Paint();
-//	}
-//
-//	::glEndList();
-//}

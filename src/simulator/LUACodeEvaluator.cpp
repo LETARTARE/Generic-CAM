@@ -319,10 +319,32 @@ int LUACodeEvaluator::setstyle_glue(lua_State * L)
 }
 int LUACodeEvaluator::toolholder_glue(lua_State * L)
 {
+	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
+	wxASSERT(CC==NULL);
+	if(lua_gettop(L) != 0){
+		lua_pushstring(L, "identity: parameter mismatch");
+		lua_error(L);
+		return 0;
+	}
+	CC->linkedMachine->toolPositionRelativ.Set(CC->matrix);
+	CC->linkedMachine->toolPosition.Set(CC->matrix);
+	CC->linkedMachine->componentWithTool
+			= CC->linkedMachine->components.Count() - 1;
 	return 0;
 }
 int LUACodeEvaluator::tableorigin_glue(lua_State * L)
 {
+	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
+	wxASSERT(CC==NULL);
+	if(lua_gettop(L) != 0){
+		lua_pushstring(L, "identity: parameter mismatch");
+		lua_error(L);
+		return 0;
+	}
+	CC->linkedMachine->materialPositionRelativ.Set(CC->matrix);
+	CC->linkedMachine->materialPosition.Set(CC->matrix);
+	CC->linkedMachine->componentWithMaterial
+			= CC->linkedMachine->components.Count() - 1;
 	return 0;
 }
 int LUACodeEvaluator::placecomponent_glue(lua_State * L)

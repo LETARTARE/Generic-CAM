@@ -247,7 +247,7 @@ void AffineTransformMatrix::RotateByTrackball(double x, double y, double z)
 	b[10] = c;
 	b[6] = -s;
 	b[9] = s;
-	PreMult(b);
+	PostMult(b);
 
 	for(i = 0; i < 16; i++)
 		b[i] = 0.0f;
@@ -259,7 +259,7 @@ void AffineTransformMatrix::RotateByTrackball(double x, double y, double z)
 	b[10] = c;
 	b[8] = -s;
 	b[2] = s;
-	PreMult(b);
+	PostMult(b);
 
 	for(i = 0; i < 16; i++)
 		b[i] = 0.0f;
@@ -271,7 +271,7 @@ void AffineTransformMatrix::RotateByTrackball(double x, double y, double z)
 	b[5] = c;
 	b[1] = -s;
 	b[4] = s;
-	PreMult(b);
+	PostMult(b);
 }
 
 void AffineTransformMatrix::TranslateByTrackball(double x, double y, double z)
@@ -289,7 +289,7 @@ void AffineTransformMatrix::TranslateByTrackball(double x, double y, double z)
 	b[13] = y;
 	b[14] = z;
 
-	PreMult(b);
+	PostMult(b);
 
 }
 
@@ -325,7 +325,7 @@ void AffineTransformMatrix::RotateAroundVector(Vector3 vector, double phi)
 	PreMult(b);
 }
 
-void AffineTransformMatrix::PreMult(double *b)
+void AffineTransformMatrix::PreMult(const double *b)
 {
 	int i, j, k, pa, pb, pc;
 	double c[16];
@@ -343,7 +343,7 @@ void AffineTransformMatrix::PreMult(double *b)
 		a[i] = c[i];
 }
 
-void AffineTransformMatrix::PostMult(double *b)
+void AffineTransformMatrix::PostMult(const double *b)
 {
 	int i, j, k, pa, pb, pc;
 	double c[16];

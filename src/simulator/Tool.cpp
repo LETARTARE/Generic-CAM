@@ -29,7 +29,12 @@ ToolContourElement::~ToolContourElement()
 }
 Tool::Tool()
 {
-
+	feedCoefficient = 0.005;
+	maxSpeed = 10000;
+	nrOfTeeth = 3;
+	shaftDiameter = 0.006;
+	shaftLength = 0.01;
+	slot = 0;
 }
 
 Tool::~Tool()
@@ -247,4 +252,31 @@ float Tool::GetMaxDiameter(void)
 		if(elements[i].d > maxD) maxD = elements[i].d;
 	}
 	return maxD;
+}
+
+void Tool::Paint(void)
+{
+	unsigned int i, j;
+	const unsigned int N = 32;
+
+	float ss[N + 1], cc[N + 1];
+	for(i = 0; i <= N; i++){
+		ss[i] = sin(2* M_PI / N * i);
+		cc[i] = cos(2* M_PI / N * i);
+	}
+
+	for(i = 0; i < contour.Count(); i++){
+		::glBegin(GL_QUAD_STRIP);
+		for(j = 0; j <= N; j++){
+			::glNormal3f(cc[j] * contour[i].n1.x, ss[j] * contour[i].n1.x,
+					contour[i].n1.z);
+			::glVertex3f(cc[j] * contour[i].p1.x, ss[j] * contour[i].p1.x,
+					contour[i].p1.z);
+			::glNormal3f(cc[j] * contour[i].n2.x, ss[j] * contour[i].n2.x,
+					contour[i].n2.z);
+			::glVertex3f(cc[j] * contour[i].p2.x, ss[j] * contour[i].p2.x,
+					contour[i].p2.z);
+		}
+		::glEnd();
+	}
 }

@@ -53,10 +53,10 @@ public:
 
 
 	///>\brief Multiplies a given matrix in front: a=b*a
-	void PreMult(double *b);
+	void PreMult(const double *b);
 
 	///>\brief Multiplies a given matrix behind: a=a*b
-	void PostMult(double *b);
+	void PostMult(const double *b);
 
 	void RotateByMouse(int x, int y, double scale);
 	void RotateByTrackball(double x, double y, double z);

@@ -60,13 +60,54 @@ Toolbox::Toolbox()
 	temp->elements.Add(e);
 
 
-	temp->toolName=_T("Generic Cutter");
-	temp->comment = _T("for testing purposes");
+	temp->toolName=_T("Round cutter");
+	temp->comment = _T("for testing circle generation");
 	temp->shaftDiameter=0.006;
 	temp->shaftLength=0.01;
 	temp->maxSpeed = 100e3;
 	temp->feedCoefficient=0.003;
 	temp->nrOfTeeth=2;
+	temp->slot=2;
+
+	temp->GenerateContour();
+
+	tools.Add(temp);
+
+
+	temp = new Tool;
+
+	e = new ToolElement;
+	e->t = 0;
+	e->h = 0.005;
+	e->d = 0.005;
+	e->r = 0.0;
+	e->cutting=false;
+	temp->elements.Add(e);
+
+	e = new ToolElement;
+	e->t = 2;
+	e->h = 0.02;
+	e->d = 0.01;
+	e->r = 0.0;
+	e->cutting=false;
+	temp->elements.Add(e);
+
+	e = new ToolElement;
+	e->t = 2;
+	e->h = 0.015;
+	e->d = 0.00;
+	e->r = 0.0;
+	e->cutting=true;
+	temp->elements.Add(e);
+
+	temp->toolName=_T("Standard cutter");
+	temp->comment = _T("all purpose cylindrical");
+	temp->shaftDiameter=0.006;
+	temp->shaftLength=0.01;
+	temp->maxSpeed = 100e3;
+	temp->feedCoefficient=0.003;
+	temp->nrOfTeeth=2;
+	temp->slot=1;
 
 	temp->GenerateContour();
 

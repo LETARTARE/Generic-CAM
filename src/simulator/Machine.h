@@ -15,6 +15,7 @@
 WX_DECLARE_OBJARRAY(MachineComponent, ArrayOfMachineComponent)
 ;
 class Machine {
+	friend class LUACodeEvaluator;
 	//Constructor / Destructor
 public:
 	Machine();
@@ -31,6 +32,14 @@ public:
 	unsigned int activeTool;
 
 	MachinePosition position;
+
+	AffineTransformMatrix toolPosition;
+	AffineTransformMatrix materialPosition;
+private:
+	int componentWithTool;
+	int componentWithMaterial;
+	AffineTransformMatrix toolPositionRelativ;
+	AffineTransformMatrix materialPositionRelativ;
 
 	// Methods
 public:

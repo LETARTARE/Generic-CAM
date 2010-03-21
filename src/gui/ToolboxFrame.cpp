@@ -14,7 +14,7 @@ ToolboxFrame::ToolboxFrame(wxWindow* parent) :
 	GUIToolboxFrame(parent)
 {
 	linkedToolbox = NULL;
-	selectedTool = 0;
+	selectedTool = 1;
 	selectedElement = 0;
 
 	m_menuSettings->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
@@ -48,11 +48,6 @@ void ToolboxFrame::InsertToolBox(Toolbox* toolbox)
 {
 	linkedToolbox = toolbox;
 
-	if(toolbox->tools.Count() > 0){
-		m_panel->InsertTool(&(toolbox->tools[0]));
-		m_canvas->InsertTool(&(toolbox->tools[0]));
-	}
-
 	UpdateDisplay();
 
 }
@@ -68,6 +63,11 @@ void ToolboxFrame::UpdateDisplay(void)
 		m_comboBoxToolSelector->Append(linkedToolbox->tools[i].toolName);
 	}
 	m_comboBoxToolSelector->Select(selectedTool);
+
+	if(selectedTool < linkedToolbox->tools.Count()){
+		m_panel->InsertTool(&(linkedToolbox->tools[selectedTool]));
+		m_canvas->InsertTool(&(linkedToolbox->tools[selectedTool]));
+	}
 
 	if(selectedTool < linkedToolbox->tools.Count()){
 		m_textCtrlShaftDiameter->SetValue(wxString::Format(_T("%f"),
