@@ -134,14 +134,15 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event) )
 	::glTranslatef(0.0, 0, -10);
 	::glMultMatrixd(rotmat.a);
 
-//	if(m_gllist == 0){
-//		m_gllist = glGenLists(1); // Make one (1) empty display list.
-//		glNewList(m_gllist, GL_COMPILE_AND_EXECUTE);
-		Render();
-//		glEndList();
-//	}else{
-//		glCallList(m_gllist);
-//	}
+
+	//	if(m_gllist == 0){
+	//		m_gllist = glGenLists(1); // Make one (1) empty display list.
+	//		glNewList(m_gllist, GL_COMPILE_AND_EXECUTE);
+	Render();
+	//		glEndList();
+	//	}else{
+	//		glCallList(m_gllist);
+	//	}
 
 	if(stereoMode == 1){
 		glDrawBuffer(GL_BACK_RIGHT);
@@ -225,7 +226,7 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 		y = event.m_y;
 	}
 	if(event.Dragging()){
-		rotmat.RotateByMouse(event.m_x - x, event.m_y - y, 0.5);
+		rotmat.RotateXY(event.m_x - x, event.m_y - y, 0.5);
 		x = event.m_x;
 		y = event.m_y;
 
@@ -239,13 +240,13 @@ void OpenGLCanvas::OnTimer(wxTimerEvent& event)
 	if(control != NULL){
 
 		control->Pump();
-		rotmat.RotateByTrackball((float) control->GetAxis(3) / 50.0,
-				(float) control->GetAxis(4) / 50.0, (float) control->GetAxis(5)
-						/ 50.0);
-		rotmat.TranslateByTrackball((float) control->GetAxis(0) / 1000.0,
+		rotmat.RotateInterwoven((float) control->GetAxis(3) / 1000.0,
+				(float) control->GetAxis(4) / 1000.0, (float) control->GetAxis(
+						5) / 1000.0);
+		rotmat.TranslateGlobal((float) control->GetAxis(0) / 1000.0,
 				(float) control->GetAxis(1) / 1000.0, (float) control->GetAxis(
 						2) / 1000.0);
-		//rotmat.RotateByMouse(1,0,1);
+		//rotmat.RotateXY(1,0,1);
 		if(control->GetButton(0)){
 			rotmat.Identity();
 		}

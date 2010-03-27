@@ -47,12 +47,12 @@ addcomponent("Head");
 translate(-thicknessOfBridge/2-0.005,0.0,0.4);
 box(0.01,0.15,0.4);
 
-translate(-0.05,0,-0.1);
+translate(-0.05,0,-0.10);
 cylinder(0.2,0.04);
-
 translate(0,0,-0.1-0.03);
 cylinder(0.06,0.04,0.005);
-translate(0,0,0);
+
+translate(0,0,-0.03);
 rotate(180,0,0);
 toolholder(); -- This is the place where the milling tool is placed.
 -- This command has to be in every machine description exactly once.

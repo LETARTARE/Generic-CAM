@@ -23,6 +23,10 @@
 //  R31 R32 R33 Tz
 //   0   0   0   1
 
+// Right handed coordinate system:
+// X to the right of the screen
+// Y to the top of the screen
+// Z towards the viewer
 
 class AffineTransformMatrix {
 
@@ -42,33 +46,31 @@ public:
 
 	bool linkScaling;
 
-	wxString ToString();
-	void FromString(wxString string);
 
 	// Methods
 
 	void Set(const AffineTransformMatrix &matrix);
-
 	void Identity();
-
 
 	///>\brief Multiplies a given matrix in front: a=b*a
 	void PreMult(const double *b);
-
 	///>\brief Multiplies a given matrix behind: a=a*b
 	void PostMult(const double *b);
 
-	void RotateByMouse(int x, int y, double scale);
-	void RotateByTrackball(double x, double y, double z);
-	void TranslateByTrackball(double x, double y, double z);
+	void RotateInterwoven(double x, double y, double z);
+	void RotateXY(int x, int y, double scale);
+	void RotateXYZ(double x, double y, double z);
+	void TranslateGlobal(double x, double y, double z);
+	void TranslateLocal(double x, double y, double z);
 
 	void RotateAroundVector(Vector3 vector, double phi);
 
+	wxString ToString();
+	void FromString(wxString string);
 
 //private:
 	void TakeMatrixApart(void);
 	void PutMatrixTogether(void);
-
 };
 
 #endif /* AFFINETRANSFORMMATRIX_H_ */

@@ -14,7 +14,7 @@ ToolboxFrame::ToolboxFrame(wxWindow* parent) :
 	GUIToolboxFrame(parent)
 {
 	linkedToolbox = NULL;
-	selectedTool = 1;
+	selectedTool = 0;
 	selectedElement = 0;
 
 	m_menuSettings->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);

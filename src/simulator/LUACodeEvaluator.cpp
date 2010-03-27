@@ -10,6 +10,7 @@
 #include "Machine.h"
 #include <wx/debug.h>
 #include <wx/log.h>
+#include <math.h>
 
 LUACodeEvaluator::LUACodeEvaluator()
 {
@@ -252,7 +253,7 @@ int LUACodeEvaluator::translate_glue(lua_State * L)
 	float y = luaL_checknumber(L, 2);
 	float z = luaL_checknumber(L, 3);
 
-	CC->matrix.TranslateByTrackball(x, y, z);
+	CC->matrix.TranslateLocal(x, y, z);
 	return 0;
 }
 int LUACodeEvaluator::rotate_glue(lua_State * L)
@@ -264,10 +265,10 @@ int LUACodeEvaluator::rotate_glue(lua_State * L)
 		lua_error(L);
 		return 0;
 	}
-	float x = luaL_checknumber(L, 1);
-	float y = luaL_checknumber(L, 2);
-	float z = luaL_checknumber(L, 3);
-	CC->matrix.RotateByTrackball(x, y, z);
+	float x = luaL_checknumber(L, 1) / 180 * M_PI;
+	float y = luaL_checknumber(L, 2) / 180 * M_PI;
+	float z = luaL_checknumber(L, 3) / 180 * M_PI;
+	CC->matrix.RotateXYZ(x, y, z);
 	return 0;
 }
 

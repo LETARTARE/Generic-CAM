@@ -131,27 +131,27 @@ void AffineTransformMatrix::TakeMatrixApart(void)
 	}
 
 	if(b[0] != 0.0 || b[1] != 0.0){
-		rz = atan2(b[1], b[0]) / M_PI * 180.0;
+		rz = atan2(b[1], b[0]);
 	}else{
 		rz = 0.0;
 	}
-	double coz = cos(rz / 180.0 * M_PI);
-	double siz = sin(rz / 180.0 * M_PI);
+	double coz = cos(rz);
+	double siz = sin(rz);
 
 	if(b[0] != 0.0 || b[1] != 0.0 || b[2] != 0.0){
-		ry = atan2(-b[2], sqrt(b[0] * b[0] + b[1] * b[1])) / M_PI * 180.0;
+		ry = atan2(-b[2], sqrt(b[0] * b[0] + b[1] * b[1]));
 	}else{
 		ry = 0.0;
 	}
-	double coy = cos(ry / 180.0 * M_PI);
-	double siy = sin(ry / 180.0 * M_PI);
+	double coy = cos(ry);
+	double siy = sin(ry);
 
 	b[0] = b[5] * coy * siz - b[6] * siy + b[4] * coy * coz;
 	b[1] = -b[4] * siz + b[5] * coz;
 	b[2] = b[5] * siy * siz + b[4] * coz * siy + b[6] * coy;
 
 	if(b[1] != 0.0 || b[2] != 0.0){
-		rx = atan2(b[2], b[1]) / M_PI * 180.0;
+		rx = atan2(b[2], b[1]);
 	}else{
 		rx = 0.0;
 	}
@@ -159,12 +159,12 @@ void AffineTransformMatrix::TakeMatrixApart(void)
 
 void AffineTransformMatrix::PutMatrixTogether(void)
 {
-	double cox = cos(rx / 180.0 * M_PI);
-	double six = sin(rx / 180.0 * M_PI);
-	double coy = cos(ry / 180.0 * M_PI);
-	double siy = sin(ry / 180.0 * M_PI);
-	double coz = cos(rz / 180.0 * M_PI);
-	double siz = sin(rz / 180.0 * M_PI);
+	double cox = cos(rx);
+	double six = sin(rx);
+	double coy = cos(ry);
+	double siy = sin(ry);
+	double coz = cos(rz);
+	double siz = sin(rz);
 
 
 	// Matrix calculated with Axiom:
@@ -193,7 +193,7 @@ void AffineTransformMatrix::PutMatrixTogether(void)
 	a[15] = 1.0;
 }
 
-void AffineTransformMatrix::RotateByMouse(int x, int y, double scale)
+void AffineTransformMatrix::RotateXY(int x, int y, double scale)
 {
 
 	double dx = (double) x / scale;
@@ -231,7 +231,7 @@ void AffineTransformMatrix::RotateByMouse(int x, int y, double scale)
 	}
 }
 
-void AffineTransformMatrix::RotateByTrackball(double x, double y, double z)
+void AffineTransformMatrix::RotateXYZ(double x, double y, double z)
 {
 	unsigned char i;
 	double b[16];
@@ -241,8 +241,8 @@ void AffineTransformMatrix::RotateByTrackball(double x, double y, double z)
 		b[i] = 0.0f;
 	b[0] = 1.0f;
 	b[15] = 1.0f;
-	s = sin(-x / 180.0f * M_PI);
-	c = cos(-x / 180.0f * M_PI);
+	s = sin(-x);
+	c = cos(-x);
 	b[5] = c;
 	b[10] = c;
 	b[6] = -s;
@@ -253,8 +253,8 @@ void AffineTransformMatrix::RotateByTrackball(double x, double y, double z)
 		b[i] = 0.0f;
 	b[5] = 1.0f;
 	b[15] = 1.0f;
-	s = sin(-y / 180.0f * M_PI);
-	c = cos(-y / 180.0f * M_PI);
+	s = sin(-y);
+	c = cos(-y);
 	b[0] = c;
 	b[10] = c;
 	b[8] = -s;
@@ -265,8 +265,8 @@ void AffineTransformMatrix::RotateByTrackball(double x, double y, double z)
 		b[i] = 0.0f;
 	b[10] = 1.0f;
 	b[15] = 1.0f;
-	s = sin(-z / 180.0f * M_PI);
-	c = cos(-z / 180.0f * M_PI);
+	s = sin(-z);
+	c = cos(-z);
 	b[0] = c;
 	b[5] = c;
 	b[1] = -s;
@@ -274,23 +274,18 @@ void AffineTransformMatrix::RotateByTrackball(double x, double y, double z)
 	PostMult(b);
 }
 
-void AffineTransformMatrix::TranslateByTrackball(double x, double y, double z)
+void AffineTransformMatrix::TranslateGlobal(double x, double y, double z)
 {
-	unsigned char i;
-	double b[16];
-	for(i = 0; i < 16; i++)
-		b[i] = 0.0f;
-	b[0] = 1.0f;
-	b[5] = 1.0f;
-	b[10] = 1.0f;
-	b[15] = 1.0f;
+	a[12] += x;
+	a[13] += y;
+	a[14] += z;
+}
 
-	b[12] = x;
-	b[13] = y;
-	b[14] = z;
-
-	PostMult(b);
-
+void AffineTransformMatrix::TranslateLocal(double x, double y, double z)
+{
+	a[12] += x * a[0] + y * a[4] + z * a[8];
+	a[13] += x * a[1] + y * a[5] + z * a[9];
+	a[14] += x * a[2] + y * a[6] + z * a[10];
 }
 
 void AffineTransformMatrix::RotateAroundVector(Vector3 vector, double phi)
@@ -323,6 +318,15 @@ void AffineTransformMatrix::RotateAroundVector(Vector3 vector, double phi)
 	b[15] = 1.0;
 
 	PreMult(b);
+}
+
+void AffineTransformMatrix::RotateInterwoven(double x, double y, double z)
+{
+	double alpha = sqrt(x * x + y * y + z * z);
+	if(alpha == 0) return;
+	Vector3 R;
+	R.Set(x / alpha, y / alpha, z / alpha);
+	RotateAroundVector(R, alpha);
 }
 
 void AffineTransformMatrix::PreMult(const double *b)
