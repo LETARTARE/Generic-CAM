@@ -41,7 +41,6 @@ public:
 	float radiusJ;
 	float radiusK;
 
-
 	float duration;
 
 	float feed;
@@ -150,9 +149,9 @@ public:
 				axisV, axisW);
 	}
 	void Zero(void);
-	float AbsXYZ();
-	float AbsUVW();
-	float AbsXYZUVW();
+	float AbsXYZ() const;
+	float AbsUVW() const;
+	float AbsXYZUVW() const;
 
 	bool ParseGCodeLine(wxString lineOfText);
 

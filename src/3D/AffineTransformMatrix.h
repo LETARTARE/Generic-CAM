@@ -11,6 +11,8 @@
 #include <wx/string.h>
 #include "Vector3.h"
 
+// http://www.parashift.com/c++-faq-lite/operator-overloading.html
+
 // Form of the Matrix:
 
 //   0   4   8  12
@@ -40,35 +42,40 @@ public:
 public:
 	double a[16];
 
-	double rx,ry,rz;
-	double tx,ty,tz;
-	double sx,sy,sz;
+	double rx, ry, rz;
+	double tx, ty, tz;
+	double sx, sy, sz;
 
 	bool linkScaling;
 
-
 	// Methods
+	//AffineTransformMatrix& operator=(const AffineTransformMatrix& b);
+	AffineTransformMatrix operator*(const AffineTransformMatrix& b) const;
+	AffineTransformMatrix operator/(const AffineTransformMatrix& b) const;
 
 	void Set(const AffineTransformMatrix &matrix);
-	void Identity();
+	void SetIdentity();
 
-	///>\brief Multiplies a given matrix in front: a=b*a
-	void PreMult(const double *b);
-	///>\brief Multiplies a given matrix behind: a=a*b
-	void PostMult(const double *b);
+	//>\brief Multiplies a given matrix in front: a=b*a
+	//void PreMult(const double *b);
+	//>\brief Multiplies a given matrix behind: a=a*b
+	//void PostMult(const double *b);
 
-	void RotateInterwoven(double x, double y, double z);
-	void RotateXY(int x, int y, double scale);
-	void RotateXYZ(double x, double y, double z);
+	AffineTransformMatrix Inverse() const;
+
+	static AffineTransformMatrix Identity();
+	static AffineTransformMatrix RotateAroundVector(Vector3 vector, double phi);
+	static AffineTransformMatrix RotateInterwoven(double x, double y, double z);
+	static AffineTransformMatrix RotateXY(int x, int y, double scale);
+	static AffineTransformMatrix RotateXYZ(double x, double y, double z);
+
 	void TranslateGlobal(double x, double y, double z);
 	void TranslateLocal(double x, double y, double z);
-
-	void RotateAroundVector(Vector3 vector, double phi);
 
 	wxString ToString();
 	void FromString(wxString string);
 
-//private:
+	//private:
 	void TakeMatrixApart(void);
 	void PutMatrixTogether(void);
 };

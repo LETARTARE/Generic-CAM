@@ -44,17 +44,17 @@ void MachinePosition::Zero(void)
 	duration = 1.0;
 }
 
-float MachinePosition::AbsXYZ()
+float MachinePosition::AbsXYZ() const
 {
 	return sqrt(axisX * axisX + axisY * axisY + axisZ * axisZ);
 }
 
-float MachinePosition::AbsUVW()
+float MachinePosition::AbsUVW() const
 {
 	return sqrt(axisU * axisU + axisV * axisV + axisW * axisW);
 }
 
-float MachinePosition::AbsXYZUVW()
+float MachinePosition::AbsXYZUVW() const
 {
 	return sqrt(axisX * axisX + axisY * axisY + axisZ * axisZ + axisU * axisU
 			+ axisV * axisV + axisW * axisW);
@@ -90,7 +90,7 @@ bool MachinePosition::ParseGCodeLine(wxString lineOfText)
 				&& (isCommand || i == lineOfText.Length() - 1)){
 			// Evaluate Command
 			//wxLogMessage(wxString::Format(_T("Commado: %c mit %f"), command,
-				//	number));
+			//	number));
 
 			if(negativ) number = -number;
 			switch(command){
@@ -150,7 +150,8 @@ bool MachinePosition::ParseGCodeLine(wxString lineOfText)
 				// *conversionFactor;
 				break;
 			default:
-				wxLogMessage(wxString::Format(_T("Unknown G-Code: %c"), command));
+				wxLogMessage(
+						wxString::Format(_T("Unknown G-Code: %c"), command));
 				break;
 			}
 			state = 0;

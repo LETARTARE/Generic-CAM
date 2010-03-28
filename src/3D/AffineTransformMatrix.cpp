@@ -1,9 +1,13 @@
-/*
- * AffineTransformMatrix.cpp
- *
- *  Created on: 22.07.2009
- *      Author: Tobias Schaefer
- */
+///////////////////////////////////////////////////////////////////////////////
+// Name:        AffineTransformMatrix.cpp
+// Purpose:     class to store a 3D affine transform matrix and provide operations upon.
+// Author:      Tobias Schaefer
+// Modified by:
+// Created:     22.07.2009
+// RCS-ID:
+// Copyright:   (c) 2009 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Licence:     GNU General Public License version 3.0 (GPLv3)
+///////////////////////////////////////////////////////////////////////////////
 
 #include "AffineTransformMatrix.h"
 
@@ -13,7 +17,7 @@
 
 AffineTransformMatrix::AffineTransformMatrix()
 {
-	Identity();
+	SetIdentity();
 	linkScaling = true;
 }
 
@@ -29,7 +33,7 @@ void AffineTransformMatrix::Set(const AffineTransformMatrix &matrix)
 	TakeMatrixApart();
 }
 
-void AffineTransformMatrix::Identity()
+void AffineTransformMatrix::SetIdentity()
 {
 	rx = ry = rz = 0.0;
 	tx = ty = tz = 0.0;
@@ -193,85 +197,135 @@ void AffineTransformMatrix::PutMatrixTogether(void)
 	a[15] = 1.0;
 }
 
-void AffineTransformMatrix::RotateXY(int x, int y, double scale)
+AffineTransformMatrix AffineTransformMatrix::Inverse() const
 {
+	//)set fortran optlevel 2
+	//)set output fortran on
+	//R:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]])
+	//inverse(R)
 
-	double dx = (double) x / scale;
-	double dy = (double) y / scale;
+	double T11 = (a[0] * a[5] + (-a[1] * a[4])) * a[10] + ((-a[0] * a[6])
+			+ a[2] * a[4]) * a[9] + (a[1] * a[6] + (-a[2] * a[5])) * a[8];
 
-	double dist = sqrt(dx * dx + dy * dy);
+	double T12 = a[4] * a[9];
+	double T13 = a[5] * a[8];
+	double T14 = a[4] * a[10];
+	double T15 = a[6] * a[8];
+	double T16 = a[5] * a[10];
+	double T17 = a[6] * a[9];
+	double T18 = a[0] * a[9];
+	double T19 = a[1] * a[8];
+	double T21 = a[0] * a[10];
+	double T22 = a[2] * a[8];
+	double T24 = a[1] * a[10];
+	double T25 = a[2] * a[9];
+	double T27 = a[1] * a[6] + (-a[2] * a[5]);
+	double T28 = (-a[0] * a[6]) + a[2] * a[4];
+	double T29 = a[0] * a[5] + (-a[1] * a[4]);
+	double T30 = a[0] * a[5];
+	double T31 = a[1] * a[4];
+	double T32 = a[0] * a[6];
+	double T33 = a[2] * a[4];
+	double T34 = a[1] * a[6];
+	double T35 = a[2] * a[5];
 
-	if(dist > 0.001){
-		double ang = -atan2(dy, dx);
+	AffineTransformMatrix b;
 
-		double coy = cos(dist / 100);
-		double siy = sin(dist / 100);
-		double coz = cos(ang);
-		double siz = sin(ang);
-
-		double b[16];
-		b[0] = coz * coz * coy + siz * siz;
-		b[1] = coz * siz * coy - coz * siz;
-		b[2] = -coz * siy;
-		b[3] = 0.0;
-		b[4] = siz * coz * coy - coz * siz;
-		b[5] = siz * siz * coy + coz * coz;
-		b[6] = -siz * siy;
-		b[7] = 0.0;
-		b[8] = coz * siy;
-		b[9] = siz * siy;
-		b[10] = coy;
-		b[11] = 0.0;
-		b[12] = 0.0;
-		b[13] = 0.0;
-		b[14] = 0.0;
-		b[15] = 1.0;
-
-		PreMult(b);
-	}
+	b.a[0] = (T16 - T17) / T11;
+	b.a[4] = (-T14 + T15) / T11;
+	b.a[8] = (T12 - T13) / T11;
+	b.a[12] = ((-T12 + T13) * a[14] + (T14 - T15) * a[13] + (-T16 + T17)
+			* a[12]) / T11;
+	b.a[1] = (-T24 + T25) / T11;
+	b.a[5] = (T21 - T22) / T11;
+	b.a[9] = (-T18 + T19) / T11;
+	b.a[13] = ((T18 - T19) * a[14] + (-T21 + T22) * a[13] + (-T25 + T24)
+			* a[12]) / T11;
+	b.a[2] = T27 / T11;
+	b.a[6] = T28 / T11;
+	b.a[10] = T29 / T11;
+	b.a[14] = ((-T30 + T31) * a[14] + (T32 - T33) * a[13] + (-T34 + T35)
+			* a[12]) / T11;
+	b.a[2] = 0;
+	b.a[6] = 0;
+	b.a[11] = 0;
+	b.a[15] = 1;
+	return b;
 }
 
-void AffineTransformMatrix::RotateXYZ(double x, double y, double z)
+AffineTransformMatrix AffineTransformMatrix::operator*(
+		const AffineTransformMatrix& b) const
 {
-	unsigned char i;
-	double b[16];
-	double s, c;
+	//php -r'for($i=0;$i<4;$i++){for($j=0;$j<4;$j++){printf("c.a[%u]=",$i*4+$j);for($k=0;$k<4;$k++){printf("a[%u]*b.a[%u]%s",$k*4+$j,$i*4+$k,($k==3)?";\r\n":"+");}}}'
 
-	for(i = 0; i < 16; i++)
-		b[i] = 0.0f;
-	b[0] = 1.0f;
-	b[15] = 1.0f;
-	s = sin(-x);
-	c = cos(-x);
-	b[5] = c;
-	b[10] = c;
-	b[6] = -s;
-	b[9] = s;
-	PostMult(b);
+	AffineTransformMatrix c;
+	c.a[0] = a[0] * b.a[0] + a[4] * b.a[1] + a[8] * b.a[2];
+	c.a[1] = a[1] * b.a[0] + a[5] * b.a[1] + a[9] * b.a[2];
+	c.a[2] = a[2] * b.a[0] + a[6] * b.a[1] + a[10] * b.a[2];
+	c.a[3] = 0;
+	c.a[4] = a[0] * b.a[4] + a[4] * b.a[5] + a[8] * b.a[6];
+	c.a[5] = a[1] * b.a[4] + a[5] * b.a[5] + a[9] * b.a[6];
+	c.a[6] = a[2] * b.a[4] + a[6] * b.a[5] + a[10] * b.a[6];
+	c.a[7] = 0;
+	c.a[8] = a[0] * b.a[8] + a[4] * b.a[9] + a[8] * b.a[10];
+	c.a[9] = a[1] * b.a[8] + a[5] * b.a[9] + a[9] * b.a[10];
+	c.a[10] = a[2] * b.a[8] + a[6] * b.a[9] + a[10] * b.a[10];
+	c.a[11] = 0;
+	c.a[12] = a[0] * b.a[12] + a[4] * b.a[13] + a[8] * b.a[14] + a[12];
+	c.a[13] = a[1] * b.a[12] + a[5] * b.a[13] + a[9] * b.a[14] + a[13];
+	c.a[14] = a[2] * b.a[12] + a[6] * b.a[13] + a[10] * b.a[14] + a[14];
+	c.a[15] = 1;
+	return c;
+}
 
-	for(i = 0; i < 16; i++)
-		b[i] = 0.0f;
-	b[5] = 1.0f;
-	b[15] = 1.0f;
-	s = sin(-y);
-	c = cos(-y);
-	b[0] = c;
-	b[10] = c;
-	b[8] = -s;
-	b[2] = s;
-	PostMult(b);
+AffineTransformMatrix AffineTransformMatrix::operator/(
+		const AffineTransformMatrix& b) const
+{
+	return *(this) * (b.Inverse());
+}
 
-	for(i = 0; i < 16; i++)
-		b[i] = 0.0f;
-	b[10] = 1.0f;
-	b[15] = 1.0f;
-	s = sin(-z);
-	c = cos(-z);
-	b[0] = c;
-	b[5] = c;
-	b[1] = -s;
-	b[4] = s;
-	PostMult(b);
+//void AffineTransformMatrix::PreMult(const double *b)
+//{
+//	int i, j, k, pa, pb, pc;
+//	double c[16];
+//	for(i = 0; i < 4; i++)
+//		for(j = 0; j < 4; j++){
+//			pc = i + j * 4; // position in the result
+//			c[pc] = 0.0f;
+//			for(k = 0; k < 4; k++){
+//				pa = k + j * 4;
+//				pb = i + k * 4;
+//				c[pc] += b[pb] * a[pa];
+//			}
+//		}
+//	for(i = 0; i < 16; i++)
+//		a[i] = c[i];
+//
+//}
+//
+//void AffineTransformMatrix::PostMult(const double *b)
+//{
+//	int i, j, k, pa, pb, pc;
+//	double c[16];
+//	for(i = 0; i < 4; i++)
+//		for(j = 0; j < 4; j++){
+//			pc = i + j * 4;
+//			c[pc] = 0.0f;
+//			for(k = 0; k < 4; k++){
+//				pa = i + k * 4;
+//				pb = k + j * 4;
+//				c[pc] += a[pa] * b[pb];
+//			}
+//		}
+//	for(i = 0; i < 16; i++)
+//		a[i] = c[i];
+//}
+
+
+AffineTransformMatrix AffineTransformMatrix::Identity()
+{
+	AffineTransformMatrix a;
+	return a;
 }
 
 void AffineTransformMatrix::TranslateGlobal(double x, double y, double z)
@@ -288,7 +342,8 @@ void AffineTransformMatrix::TranslateLocal(double x, double y, double z)
 	a[14] += x * a[2] + y * a[6] + z * a[10];
 }
 
-void AffineTransformMatrix::RotateAroundVector(Vector3 vector, double phi)
+AffineTransformMatrix AffineTransformMatrix::RotateAroundVector(Vector3 vector,
+		double phi)
 {
 	double c = cos(phi);
 	double s = sin(phi);
@@ -296,72 +351,110 @@ void AffineTransformMatrix::RotateAroundVector(Vector3 vector, double phi)
 
 	vector.Normalize();
 
-	double b[16];
-	b[0] = t * vector.x * vector.x + c;
-	b[1] = t * vector.x * vector.y + s * vector.z;
-	b[2] = t * vector.x * vector.z - s * vector.y;
-	b[3] = 0.0;
+	AffineTransformMatrix a;
 
-	b[4] = t * vector.x * vector.y - s * vector.z;
-	b[5] = t * vector.y * vector.y + c;
-	b[6] = t * vector.y * vector.z + s * vector.x;
-	b[7] = 0.0;
+	a.a[0] = t * vector.x * vector.x + c;
+	a.a[1] = t * vector.x * vector.y + s * vector.z;
+	a.a[2] = t * vector.x * vector.z - s * vector.y;
 
-	b[8] = t * vector.x * vector.z + s * vector.y;
-	b[9] = t * vector.y * vector.z - s * vector.x;
-	b[10] = t * vector.z * vector.z + c;
-	b[11] = 0.0;
+	a.a[4] = t * vector.x * vector.y - s * vector.z;
+	a.a[5] = t * vector.y * vector.y + c;
+	a.a[6] = t * vector.y * vector.z + s * vector.x;
 
-	b[12] = 0.0;
-	b[13] = 0.0;
-	b[14] = 0.0;
-	b[15] = 1.0;
+	a.a[8] = t * vector.x * vector.z + s * vector.y;
+	a.a[9] = t * vector.y * vector.z - s * vector.x;
+	a.a[10] = t * vector.z * vector.z + c;
 
-	PreMult(b);
+	return a;
 }
 
-void AffineTransformMatrix::RotateInterwoven(double x, double y, double z)
+AffineTransformMatrix AffineTransformMatrix::RotateXY(int x, int y,
+		double scale)
+{
+
+	double dx = (double) x / scale;
+	double dy = (double) y / scale;
+
+	double dist = sqrt(dx * dx + dy * dy);
+
+	AffineTransformMatrix a;
+
+	if(dist > 0.001){
+		double ang = -atan2(dy, dx);
+
+		double coy = cos(dist / 100);
+		double siy = sin(dist / 100);
+		double coz = cos(ang);
+		double siz = sin(ang);
+
+		a.a[0] = coz * coz * coy + siz * siz;
+		a.a[1] = coz * siz * coy - coz * siz;
+		a.a[2] = -coz * siy;
+		a.a[4] = siz * coz * coy - coz * siz;
+		a.a[5] = siz * siz * coy + coz * coz;
+		a.a[6] = -siz * siy;
+		a.a[8] = coz * siy;
+		a.a[9] = siz * siy;
+		a.a[10] = coy;
+	}
+	return a;
+}
+
+AffineTransformMatrix AffineTransformMatrix::RotateXYZ(double x, double y,
+		double z)
+{
+	AffineTransformMatrix a;
+
+
+	// Rx := matrix[[1,0,0,0],[0,cox,-six,0],[0,six,cox,0],[0,0,0,1]]
+	// Ry := matrix[[coy,0,siy,0],[0,1,0,0],[-siy,0,coy,0],[0,0,0,1]]
+	// Rz := matrix[[coz,-siz,0,0],[siz,coz,0,0],[0,0,1,0],[0,0,0,1]]
+	// Rz*Ry*Rx
+
+	double six = sin(x);
+	double siy = sin(y);
+	double siz = sin(z);
+	double cox = cos(x);
+	double coy = cos(y);
+	double coz = cos(z);
+
+	a.a[0] = coy * coz;
+	a.a[1] = coy * siz;
+	a.a[2] = -siy;
+
+	a.a[4] = -cox * siz + coz * six * siy;
+	a.a[5] = six * siy * siz + cox * coz;
+	a.a[6] = coy * six;
+
+	a.a[8] = six * siz + cox * coz * siy;
+	a.a[9] = cox * siy * siz - coz * six;
+	a.a[10] = cox * coy;
+
+	return a;
+}
+
+AffineTransformMatrix AffineTransformMatrix::RotateInterwoven(double x,
+		double y, double z)
 {
 	double alpha = sqrt(x * x + y * y + z * z);
-	if(alpha == 0) return;
+	if(alpha == 0) return AffineTransformMatrix::Identity();
 	Vector3 R;
 	R.Set(x / alpha, y / alpha, z / alpha);
-	RotateAroundVector(R, alpha);
+	return AffineTransformMatrix::RotateAroundVector(R, alpha);
 }
 
-void AffineTransformMatrix::PreMult(const double *b)
-{
-	int i, j, k, pa, pb, pc;
-	double c[16];
-	for(i = 0; i < 4; i++)
-		for(j = 0; j < 4; j++){
-			pc = i + j * 4; // position in the result
-			c[pc] = 0.0f;
-			for(k = 0; k < 4; k++){
-				pa = k + j * 4;
-				pb = i + k * 4;
-				c[pc] += b[pb] * a[pa];
-			}
-		}
-	for(i = 0; i < 16; i++)
-		a[i] = c[i];
-}
+// RotateTrackball(x1,y1,x2,y2,r)
+// r1= (0,0,r )-(x1,y1,0)
+// r2= (0,0,r )-(x2,y2,0)
+// P1 = SphereIntersect(r1,C,r);
+// P2 = SphereIntersect(r2,C,r);
+// V1 = (P1-C)
+// V2 = (P2-C)
+// V1.Normalize();
+// V2.Normlize();
+// A = V1xV2;
+// alpha = arcsin(abs(A));
+// if(V1*V2 <0)alpha+=M_PI/2;
+//RotateAroundVector(A,alpha);
 
-void AffineTransformMatrix::PostMult(const double *b)
-{
-	int i, j, k, pa, pb, pc;
-	double c[16];
-	for(i = 0; i < 4; i++)
-		for(j = 0; j < 4; j++){
-			pc = i + j * 4;
-			c[pc] = 0.0f;
-			for(k = 0; k < 4; k++){
-				pa = i + k * 4;
-				pb = k + j * 4;
-				c[pc] += a[pa] * b[pb];
-			}
-		}
-	for(i = 0; i < 16; i++)
-		a[i] = c[i];
-}
 

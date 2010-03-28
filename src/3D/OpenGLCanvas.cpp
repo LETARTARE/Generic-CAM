@@ -226,7 +226,8 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 		y = event.m_y;
 	}
 	if(event.Dragging()){
-		rotmat.RotateXY(event.m_x - x, event.m_y - y, 0.5);
+		rotmat = AffineTransformMatrix::RotateXY(event.m_x - x, event.m_y - y,
+				0.5) * rotmat;
 		x = event.m_x;
 		y = event.m_y;
 
@@ -240,15 +241,16 @@ void OpenGLCanvas::OnTimer(wxTimerEvent& event)
 	if(control != NULL){
 
 		control->Pump();
-		rotmat.RotateInterwoven((float) control->GetAxis(3) / 1000.0,
-				(float) control->GetAxis(4) / 1000.0, (float) control->GetAxis(
-						5) / 1000.0);
+		rotmat = AffineTransformMatrix::RotateInterwoven(
+				(float) control->GetAxis(3) / 1000.0, (float) control->GetAxis(
+						4) / 1000.0, (float) control->GetAxis(5) / 1000.0)
+				* rotmat;
 		rotmat.TranslateGlobal((float) control->GetAxis(0) / 1000.0,
 				(float) control->GetAxis(1) / 1000.0, (float) control->GetAxis(
 						2) / 1000.0);
 		//rotmat.RotateXY(1,0,1);
 		if(control->GetButton(0)){
-			rotmat.Identity();
+			rotmat.SetIdentity();
 		}
 	}
 	this->Refresh();

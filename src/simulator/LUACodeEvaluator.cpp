@@ -79,7 +79,7 @@ void LUACodeEvaluator::EvaluateProgram()
 
 	programOutput.Empty();
 
-	matrix.Identity();
+	matrix.SetIdentity();
 
 	error = luaL_loadstring(L, linkedMachine->machineDescription.ToAscii());
 	if(error){
@@ -119,7 +119,7 @@ void LUACodeEvaluator::EvaluateAssembly()
 	componentToManipulate = &(linkedMachine->components[0]);
 
 	programOutput.Empty();
-	matrix.Identity();
+	matrix.SetIdentity();
 
 	InsertVariable(_T("AXIS_X"), linkedMachine->position.axisX);
 	InsertVariable(_T("AXIS_Y"), linkedMachine->position.axisY);
@@ -224,7 +224,7 @@ int LUACodeEvaluator::addcomponent_glue(lua_State * L)
 	CC->componentToManipulate
 			= &(CC->linkedMachine->components[CC->linkedMachine->components.Count()
 					- 1]);
-	CC->matrix.Identity();
+	CC->matrix.SetIdentity();
 	return 0;
 }
 int LUACodeEvaluator::identity_glue(lua_State * L)
@@ -236,7 +236,7 @@ int LUACodeEvaluator::identity_glue(lua_State * L)
 		lua_error(L);
 		return 0;
 	}
-	CC->matrix.Identity();
+	CC->matrix.SetIdentity();
 	return 0;
 }
 
@@ -268,7 +268,7 @@ int LUACodeEvaluator::rotate_glue(lua_State * L)
 	float x = luaL_checknumber(L, 1) / 180 * M_PI;
 	float y = luaL_checknumber(L, 2) / 180 * M_PI;
 	float z = luaL_checknumber(L, 3) / 180 * M_PI;
-	CC->matrix.RotateXYZ(x, y, z);
+	CC->matrix = CC->matrix * AffineTransformMatrix::RotateXYZ(x, y, z);
 	return 0;
 }
 

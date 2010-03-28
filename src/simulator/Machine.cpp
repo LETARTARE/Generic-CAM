@@ -34,7 +34,7 @@ void Machine::Paint(void)
 	if(activeTool > 0 && activeTool <= toolbox.tools.Count()){
 		::glPushMatrix();
 		::glMultMatrixd(toolPosition.a);
-		toolbox.tools[activeTool-1].Paint();
+		toolbox.tools[activeTool - 1].Paint();
 		::glPopMatrix();
 	}
 }
@@ -84,11 +84,11 @@ bool Machine::PlaceComponent(wxString nameOfComponent,
 			// The tool and the material matrices are set up.
 			if((int) i == componentWithMaterial){
 				materialPosition.Set(materialPositionRelativ);
-				materialPosition.PreMult(matrix.a);
+				materialPosition = matrix * materialPosition;
 			}
 			if((int) i == componentWithTool){
 				toolPosition.Set(toolPositionRelativ);
-				toolPosition.PreMult(matrix.a);
+				toolPosition = matrix * toolPosition;
 			}
 		}
 	}
