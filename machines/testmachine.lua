@@ -22,9 +22,8 @@ offset = 0.05 --m Toolhead offset from edge of machine
 -- Base of the machine
 translate(0, 0, 0); -- Actually this line does nothing at all.
 box(sizeX, sizeY, heightOfBed);
-translate(0, 0, heightOfBed/2);
 
-
+translate(offset-sizeX/2, offset-sizeY/2, heightOfBed/2);
 tableorigin(); -- sets the origin of the machine.
 -- The tableorigin is the position, where the part to be milled is placed.
 -- This command has to be in every machine description exactly once.
@@ -63,7 +62,7 @@ toolholder(); -- This is the place where the milling tool is placed.
 function AssembleMachine()
 
     -- The base of the machine is placed automatically.
-    -- So only the moving part have to be placed here.
+    -- So only the moving parts have to be placed here.
     -- Variables for the axis positions are provided as
     -- global variables ( AXIS_X, AXIS_Y, AXIS_Z,
     -- AXIS_A, AXIS_B, AXIS_C, AXIS_U, AXIS_V, AXIS_W).

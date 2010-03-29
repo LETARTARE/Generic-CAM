@@ -132,6 +132,7 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event) )
 		::glTranslatef(0.1, 0, 0);
 	}
 	::glTranslatef(0.0, 0, -10);
+	::glMultMatrixd(transmat.a);
 	::glMultMatrixd(rotmat.a);
 
 
@@ -151,6 +152,7 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event) )
 
 		::glTranslatef(-0.1, 0, -10);
 
+		::glMultMatrixd(transmat.a);
 		::glMultMatrixd(rotmat.a);
 
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -245,12 +247,13 @@ void OpenGLCanvas::OnTimer(wxTimerEvent& event)
 				(float) control->GetAxis(3) / 1000.0, (float) control->GetAxis(
 						4) / 1000.0, (float) control->GetAxis(5) / 1000.0)
 				* rotmat;
-		rotmat.TranslateGlobal((float) control->GetAxis(0) / 1000.0,
+		transmat.TranslateGlobal((float) control->GetAxis(0) / 1000.0,
 				(float) control->GetAxis(1) / 1000.0, (float) control->GetAxis(
 						2) / 1000.0);
 		//rotmat.RotateXY(1,0,1);
 		if(control->GetButton(0)){
 			rotmat.SetIdentity();
+			transmat.SetIdentity();
 		}
 	}
 	this->Refresh();

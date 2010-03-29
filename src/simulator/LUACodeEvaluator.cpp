@@ -342,8 +342,8 @@ int LUACodeEvaluator::tableorigin_glue(lua_State * L)
 		lua_error(L);
 		return 0;
 	}
-	CC->linkedMachine->materialPositionRelativ.Set(CC->matrix);
-	CC->linkedMachine->materialPosition.Set(CC->matrix);
+	CC->linkedMachine->workpiecePositionRelativ.Set(CC->matrix);
+	CC->linkedMachine->workpiecePosition.Set(CC->matrix);
 	CC->linkedMachine->componentWithMaterial
 			= CC->linkedMachine->components.Count() - 1;
 	return 0;

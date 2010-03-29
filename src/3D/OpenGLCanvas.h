@@ -35,6 +35,7 @@ private:
 	GLuint m_gllist;
 
 	AffineTransformMatrix rotmat;
+	AffineTransformMatrix transmat;
 	Control3D* control;
 	wxTimer timer;
 	int x,y;

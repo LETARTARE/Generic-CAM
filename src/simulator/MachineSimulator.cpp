@@ -21,17 +21,17 @@ MachineSimulator::MachineSimulator()
 	tStep = 0;
 
 	MachinePosition* pos;
-	pos = new MachinePosition(0.1, 0.1, -0.1);
-	position.Add(pos);
-	pos = new MachinePosition(0.1, 0.1, -0.2);
+	pos = new MachinePosition(0.1, 0.1, -0.0);
 	position.Add(pos);
 	pos = new MachinePosition(0.1, 0.1, -0.1);
 	position.Add(pos);
-	pos = new MachinePosition(0.1, 0.2, -0.1);
+	pos = new MachinePosition(0.1, 0.1, -0.0);
 	position.Add(pos);
-	pos = new MachinePosition(0.2, 0.2, -0.1);
+	pos = new MachinePosition(0.1, 0.2, -0.0);
 	position.Add(pos);
-	pos = new MachinePosition(0.1, 0.1, -0.1);
+	pos = new MachinePosition(0.2, 0.2, -0.0);
+	position.Add(pos);
+	pos = new MachinePosition(0.1, 0.1, -0.0);
 	position.Add(pos);
 
 }

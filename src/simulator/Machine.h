@@ -10,6 +10,7 @@
 #include "MachineComponent.h"
 #include "MachinePosition.h"
 #include "Toolbox.h"
+#include "Workpiece.h"
 #include <wx/string.h>
 #include <wx/dynarray.h>
 WX_DECLARE_OBJARRAY(MachineComponent, ArrayOfMachineComponent)
@@ -31,15 +32,17 @@ public:
 	Toolbox toolbox;
 	unsigned int activeTool;
 
+	Workpiece workpiece;
+
 	MachinePosition position;
 
 	AffineTransformMatrix toolPosition;
-	AffineTransformMatrix materialPosition;
+	AffineTransformMatrix workpiecePosition;
 private:
 	int componentWithTool;
 	int componentWithMaterial;
 	AffineTransformMatrix toolPositionRelativ;
-	AffineTransformMatrix materialPositionRelativ;
+	AffineTransformMatrix workpiecePositionRelativ;
 
 	// Methods
 public:

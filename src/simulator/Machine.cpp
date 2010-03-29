@@ -37,6 +37,11 @@ void Machine::Paint(void)
 		toolbox.tools[activeTool - 1].Paint();
 		::glPopMatrix();
 	}
+	::glPushMatrix();
+	::glMultMatrixd(workpiecePosition.a);
+	workpiece.Paint();
+	::glPopMatrix();
+
 }
 
 void Machine::SetMachineDescription(wxString text)
@@ -83,8 +88,8 @@ bool Machine::PlaceComponent(wxString nameOfComponent,
 			// Sideeffect of placing the components:
 			// The tool and the material matrices are set up.
 			if((int) i == componentWithMaterial){
-				materialPosition.Set(materialPositionRelativ);
-				materialPosition = matrix * materialPosition;
+				workpiecePosition.Set(workpiecePositionRelativ);
+				workpiecePosition = matrix * workpiecePosition;
 			}
 			if((int) i == componentWithTool){
 				toolPosition.Set(toolPositionRelativ);
