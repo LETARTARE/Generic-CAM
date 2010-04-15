@@ -55,10 +55,12 @@ public:
 	ArrayOfToolElement elements;
 	ArrayOfToolContourElement contour;
 	unsigned int slot;
+	const unsigned int resolution;
 
 	// Methods
 public:
 	void GenerateContour(void);
+	void GenerateOutline(float alpha);
 
 	float GetPositiveLength(void);
 	float GetNegativeLength(void);

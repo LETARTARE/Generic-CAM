@@ -27,7 +27,9 @@ ToolContourElement::ToolContourElement(bool cutting, bool partOfShaft)
 ToolContourElement::~ToolContourElement()
 {
 }
-Tool::Tool()
+
+Tool::Tool() :
+	resolution(32)
 {
 	feedCoefficient = 0.005;
 	maxSpeed = 10000;
@@ -257,17 +259,16 @@ float Tool::GetMaxDiameter(void)
 void Tool::Paint(void)
 {
 	unsigned int i, j;
-	const unsigned int N = 32;
 
-	float ss[N + 1], cc[N + 1];
-	for(i = 0; i <= N; i++){
-		ss[i] = sin(2* M_PI / N * i);
-		cc[i] = cos(2* M_PI / N * i);
+	float ss[resolution + 1], cc[resolution + 1];
+	for(i = 0; i <= resolution; i++){
+		ss[i] = sin(2* M_PI / resolution * i);
+		cc[i] = cos(2* M_PI / resolution * i);
 	}
 
 	for(i = 0; i < contour.Count(); i++){
 		::glBegin(GL_QUAD_STRIP);
-		for(j = 0; j <= N; j++){
+		for(j = 0; j <= resolution; j++){
 			::glNormal3f(cc[j] * contour[i].n1.x, ss[j] * contour[i].n1.x,
 					contour[i].n1.z);
 			::glVertex3f(cc[j] * contour[i].p1.x, ss[j] * contour[i].p1.x,
@@ -280,3 +281,14 @@ void Tool::Paint(void)
 		::glEnd();
 	}
 }
+
+void Tool::GenerateOutline(float alpha)
+{
+
+	unsigned int i;
+
+	for(i = 0; i < contour.Count(); i++){
+		//TODO: Code missing to generate an outline of the tool.
+	}
+}
+

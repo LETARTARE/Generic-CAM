@@ -10,7 +10,7 @@
 
 #ifndef TOOLPATH_H_
 #define TOOLPATH_H_
-#include <gts.h>
+
 #include "Tool.h"
 
 class ToolPath {
@@ -22,7 +22,7 @@ public:
 
 	// Member variables
 public:
-	GtsSurface * linkedWorkpiece;
+
 
 	// Methods
 public:

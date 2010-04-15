@@ -10,9 +10,9 @@
 
 #ifndef WORKPIECE_H_
 #define WORKPIECE_H_
-#include <stdlib.h>
-#include <gts.h>
-#include "../3D/Vector3.h"
+
+#include "../3D/CSGSurface.h"
+
 class Workpiece {
 	// Constructor / Destructor
 public:
@@ -21,15 +21,11 @@ public:
 
 	// Member variables
 public:
-	GtsSurface * s;
+	CSGSurface s;
 
 	// Methods
 public:
 	void Paint();
-	void AddQuad(const Vector3 &p0, const Vector3 &p1, const Vector3 &p2,
-			const Vector3 &p3);
-	void AddTriangle(const Vector3 &p0, const Vector3 &p1, const Vector3 &p2);
-	void AddBox(const double sizeX, const double sizeY, const double sizeZ);
 };
 
 #endif /* WORKPIECE_H_ */

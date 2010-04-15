@@ -12,7 +12,6 @@
 
 ToolPath::ToolPath()
 {
-	linkedWorkpiece = NULL;
 
 }
 
