@@ -20,7 +20,30 @@ CSGSurface::CSGSurface()
 
 CSGSurface::~CSGSurface()
 {
-	delete s;
+	gts_object_destroy (GTS_OBJECT (s));
+}
+
+bool CSGSurface::SelfTest()
+{
+	if(!gts_surface_is_orientable(s)){
+		fprintf(stderr, "surface is not orientable\n");
+		return false;
+	}
+	if(!gts_surface_is_closed(s)){
+		fprintf(stderr, "surface is not closed\n");
+		return false;
+	}
+	if(gts_surface_is_self_intersecting(s)){
+		fprintf(stderr, "surface is self-intersecting\n");
+		return false;
+	}
+	return true;
+}
+
+void CSGSurface::Statistics(void)
+{
+
+	gts_surface_print_stats(s, stderr);
 }
 
 void CSGSurface::Paint()
@@ -37,10 +60,8 @@ void CSGSurface::Paint()
 
 	GtsSurfaceStats st;
 	gts_surface_stats(s, &st);
-	gts_surface_print_stats(s, stderr);
 	g_assert(st.n_incompatible_faces == 0 && st.n_non_manifold_edges == 0);
 
-	return;
 	strips = gts_surface_strip(s);
 	i = strips;
 
@@ -70,33 +91,33 @@ void CSGSurface::AddBox(const double sizeX, const double sizeY,
 		const double sizeZ)
 {
 	// This is so ugly. gts expects closed surfaces, i.e. no overlapping edges and lines.
-	GtsVertex *v0 = gts_vertex_new(gts_vertex_class(), 0, 0, 0);
-	GtsVertex *v1 = gts_vertex_new(gts_vertex_class(), sizeX, 0, 0);
-	GtsVertex *v2 = gts_vertex_new(gts_vertex_class(), sizeX, sizeY, 0);
-	GtsVertex *v3 = gts_vertex_new(gts_vertex_class(), 0, sizeY, 0);
-	GtsVertex *v4 = gts_vertex_new(gts_vertex_class(), 0, 0, sizeZ);
-	GtsVertex *v5 = gts_vertex_new(gts_vertex_class(), sizeX, 0, sizeZ);
-	GtsVertex *v6 = gts_vertex_new(gts_vertex_class(), sizeX, sizeY, sizeZ);
-	GtsVertex *v7 = gts_vertex_new(gts_vertex_class(), 0, sizeY, sizeZ);
+	GtsVertex *v0 = gts_vertex_new(s->vertex_class, 0, 0, 0);
+	GtsVertex *v1 = gts_vertex_new(s->vertex_class, sizeX, 0, 0);
+	GtsVertex *v2 = gts_vertex_new(s->vertex_class, sizeX, sizeY, 0);
+	GtsVertex *v3 = gts_vertex_new(s->vertex_class, 0, sizeY, 0);
+	GtsVertex *v4 = gts_vertex_new(s->vertex_class, 0, 0, sizeZ);
+	GtsVertex *v5 = gts_vertex_new(s->vertex_class, sizeX, 0, sizeZ);
+	GtsVertex *v6 = gts_vertex_new(s->vertex_class, sizeX, sizeY, sizeZ);
+	GtsVertex *v7 = gts_vertex_new(s->vertex_class, 0, sizeY, sizeZ);
 
-	GtsEdge *e00 = gts_edge_new(gts_edge_class(), v4, v1);
-	GtsEdge *e01 = gts_edge_new(gts_edge_class(), v1, v0);
-	GtsEdge *e02 = gts_edge_new(gts_edge_class(), v1, v3);
-	GtsEdge *e03 = gts_edge_new(gts_edge_class(), v3, v2);
-	GtsEdge *e04 = gts_edge_new(gts_edge_class(), v6, v7);
-	GtsEdge *e05 = gts_edge_new(gts_edge_class(), v6, v4);
-	GtsEdge *e06 = gts_edge_new(gts_edge_class(), v5, v4);
-	GtsEdge *e07 = gts_edge_new(gts_edge_class(), v5, v6);
-	GtsEdge *e08 = gts_edge_new(gts_edge_class(), v6, v1);
-	GtsEdge *e09 = gts_edge_new(gts_edge_class(), v2, v1);
-	GtsEdge *e10 = gts_edge_new(gts_edge_class(), v4, v7);
-	GtsEdge *e11 = gts_edge_new(gts_edge_class(), v4, v3);
-	GtsEdge *e12 = gts_edge_new(gts_edge_class(), v3, v0);
-	GtsEdge *e13 = gts_edge_new(gts_edge_class(), v4, v0);
-	GtsEdge *e14 = gts_edge_new(gts_edge_class(), v7, v3);
-	GtsEdge *e15 = gts_edge_new(gts_edge_class(), v6, v3);
-	GtsEdge *e16 = gts_edge_new(gts_edge_class(), v6, v2);
-	GtsEdge *e17 = gts_edge_new(gts_edge_class(), v5, v1);
+	GtsEdge *e00 = gts_edge_new(s->edge_class, v4, v1);
+	GtsEdge *e01 = gts_edge_new(s->edge_class, v1, v0);
+	GtsEdge *e02 = gts_edge_new(s->edge_class, v1, v3);
+	GtsEdge *e03 = gts_edge_new(s->edge_class, v3, v2);
+	GtsEdge *e04 = gts_edge_new(s->edge_class, v6, v7);
+	GtsEdge *e05 = gts_edge_new(s->edge_class, v6, v4);
+	GtsEdge *e06 = gts_edge_new(s->edge_class, v5, v4);
+	GtsEdge *e07 = gts_edge_new(s->edge_class, v5, v6);
+	GtsEdge *e08 = gts_edge_new(s->edge_class, v6, v1);
+	GtsEdge *e09 = gts_edge_new(s->edge_class, v2, v1);
+	GtsEdge *e10 = gts_edge_new(s->edge_class, v4, v7);
+	GtsEdge *e11 = gts_edge_new(s->edge_class, v4, v3);
+	GtsEdge *e12 = gts_edge_new(s->edge_class, v3, v0);
+	GtsEdge *e13 = gts_edge_new(s->edge_class, v4, v0);
+	GtsEdge *e14 = gts_edge_new(s->edge_class, v7, v3);
+	GtsEdge *e15 = gts_edge_new(s->edge_class, v6, v3);
+	GtsEdge *e16 = gts_edge_new(s->edge_class, v6, v2);
+	GtsEdge *e17 = gts_edge_new(s->edge_class, v5, v1);
 
 
 	// A closed box made from triangles.
@@ -200,40 +221,59 @@ void CSGSurface::BooleanRemove(const CSGSurface* surfaceToRemove)
 	g_assert(!gts_surface_is_self_intersecting(s));
 	g_assert(!gts_surface_is_self_intersecting(surfaceToRemove->s));
 
-	GtsSurface * s1out2, *s1in2, *s2out1, *s2in1;
 	GtsSurfaceInter * si;
-	GNode * tree1, *tree2;
+
+	GNode * tree1;
+	GNode * tree2;
+
 	gboolean is_open1, is_open2;
-	GSList * bboxes;
+
 	gboolean closed = TRUE;
 
 
 	// build bounding boxes for first surface
-	bboxes = NULL;
-	gts_surface_foreach_face(s, (GtsFunc) prepend_triangle_bbox, &bboxes);
+	//bboxes = NULL;
+	//gts_surface_foreach_face(s, (GtsFunc) prepend_triangle_bbox, &bboxes);
 	// build bounding box tree for first surface
-	tree1 = gts_bb_tree_new(bboxes);
+	//tree1 = gts_bb_tree_new(bboxes);
+	tree1 = gts_bb_tree_surface(s);
 	// free list of bboxes
-	g_slist_free(bboxes);
+	//g_slist_free(bboxes);
 	is_open1 = gts_surface_volume(s) < 0.? TRUE : FALSE;
 
 
 	// build bounding boxes for second surface
-	bboxes = NULL;
-	gts_surface_foreach_face(surfaceToRemove->s,
-			(GtsFunc) prepend_triangle_bbox, &bboxes);
+	//bboxes = NULL;
+	//gts_surface_foreach_face(surfaceToRemove->s,
+	//		(GtsFunc) prepend_triangle_bbox, &bboxes);
 	// build bounding box tree for second surface
-	tree2 = gts_bb_tree_new(bboxes);
+	//tree2 = gts_bb_tree_new(bboxes);
+	tree2 = gts_bb_tree_surface(surfaceToRemove->s);
+
+
 	// free list of bboxes
-	g_slist_free(bboxes);
+	//g_slist_free(bboxes);
 	is_open2 = gts_surface_volume(surfaceToRemove->s) < 0.? TRUE : FALSE;
+
+	if(is_open1){
+		fprintf(stderr, "set: surface 1 is open\r\n");
+	}
+	if(is_open2){
+		fprintf(stderr, "set: surface 2 is open\r\n");
+	}
 
 	si = gts_surface_inter_new(gts_surface_inter_class(), s,
 			surfaceToRemove->s, tree1, tree2, is_open1, is_open2);
 	g_assert(gts_surface_inter_check(si, &closed));
 
-	s1out2 = gts_surface_new(gts_surface_class(), gts_face_class(),
-			gts_edge_class(), gts_vertex_class());
+	if(!closed){
+		fprintf(stderr,
+				"set: the intersection of the surfaces is not a closed curve\r\n");
+		return;
+	}
+
+	//	s1out2 = gts_surface_new(gts_surface_class(), gts_face_class(),
+	//			gts_edge_class(), gts_vertex_class());
 
 
 	//	s1in2 = gts_surface_new(gts_surface_class(), gts_face_class(),
@@ -244,14 +284,26 @@ void CSGSurface::BooleanRemove(const CSGSurface* surfaceToRemove)
 	//			gts_edge_class(), gts_vertex_class());
 
 
-	delete s;
-	s = gts_surface_new(gts_surface_class(), gts_face_class(),
+	GtsSurface * temp;
+	temp = gts_surface_new(gts_surface_class(), gts_face_class(),
 			gts_edge_class(), gts_vertex_class());
 
 
 	// Generate new surface s
-	gts_surface_inter_boolean(si, s, GTS_1_OUT_2);
+	//gts_surface_inter_boolean(si, temp, GTS_1_OUT_2);
 
+		gts_surface_inter_boolean(si, temp, GTS_1_OUT_2);
+		gts_surface_inter_boolean(si, temp, GTS_2_IN_1);
+		gts_surface_foreach_face(si->s2, (GtsFunc) gts_triangle_revert, NULL);
+		gts_surface_foreach_face(surfaceToRemove->s, (GtsFunc) gts_triangle_revert, NULL);
+
+		gts_object_destroy (GTS_OBJECT (s));
+	s = temp;
+
+
+	gts_bb_tree_destroy (tree1, TRUE);
+	gts_bb_tree_destroy (tree2, TRUE);
+	gts_object_destroy (GTS_OBJECT (si));
 
 	//	if(closed){
 	//		GtsSurfaceStats st1out2, st1in2, st2out1, st2in1;
