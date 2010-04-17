@@ -20,7 +20,7 @@ CSGSurface::CSGSurface()
 
 CSGSurface::~CSGSurface()
 {
-	gts_object_destroy (GTS_OBJECT (s));
+	gts_object_destroy(GTS_OBJECT (s));
 }
 
 bool CSGSurface::SelfTest()
@@ -212,8 +212,8 @@ static void prepend_triangle_bbox(GtsTriangle * t, GSList ** bboxes)
 
 void CSGSurface::BooleanRemove(const CSGSurface* surfaceToRemove)
 {
-	// This here is copied and modified from boole.c.
-	// boole.c is part of the gts-examples.
+	// This here is copied and modified from set.c.
+	// set.c is part of the gts-examples.
 
 	// check surfaces
 	g_assert(gts_surface_is_orientable(s));
@@ -292,18 +292,19 @@ void CSGSurface::BooleanRemove(const CSGSurface* surfaceToRemove)
 	// Generate new surface s
 	//gts_surface_inter_boolean(si, temp, GTS_1_OUT_2);
 
-		gts_surface_inter_boolean(si, temp, GTS_1_OUT_2);
-		gts_surface_inter_boolean(si, temp, GTS_2_IN_1);
-		gts_surface_foreach_face(si->s2, (GtsFunc) gts_triangle_revert, NULL);
-		gts_surface_foreach_face(surfaceToRemove->s, (GtsFunc) gts_triangle_revert, NULL);
+	gts_surface_inter_boolean(si, temp, GTS_1_OUT_2);
+	gts_surface_inter_boolean(si, temp, GTS_2_IN_1);
+	gts_surface_foreach_face(si->s2, (GtsFunc) gts_triangle_revert, NULL);
+	gts_surface_foreach_face(surfaceToRemove->s, (GtsFunc) gts_triangle_revert,
+			NULL);
 
-		gts_object_destroy (GTS_OBJECT (s));
+	gts_object_destroy(GTS_OBJECT (s));
 	s = temp;
 
+	gts_bb_tree_destroy(tree1, TRUE);
+	gts_bb_tree_destroy(tree2, TRUE);
+	gts_object_destroy(GTS_OBJECT (si));
 
-	gts_bb_tree_destroy (tree1, TRUE);
-	gts_bb_tree_destroy (tree2, TRUE);
-	gts_object_destroy (GTS_OBJECT (si));
 
 	//	if(closed){
 	//		GtsSurfaceStats st1out2, st1in2, st2out1, st2in1;
@@ -323,3 +324,73 @@ void CSGSurface::BooleanRemove(const CSGSurface* surfaceToRemove)
 	//				&& st1out2.n_non_manifold_edges == 0);
 	//	}
 }
+
+void CSGSurface::BooleanAdd(const CSGSurface* surfaceToAdd)
+{
+	// This here is copied and modified from set.c.
+	// set.c is part of the gts-examples.
+
+	// check surfaces
+	g_assert(gts_surface_is_orientable(s));
+	g_assert(gts_surface_is_orientable(surfaceToAdd->s));
+	g_assert(!gts_surface_is_self_intersecting(s));
+	g_assert(!gts_surface_is_self_intersecting(surfaceToAdd->s));
+
+	GtsSurfaceInter * si;
+
+	GNode * tree1;
+	GNode * tree2;
+
+	gboolean is_open1, is_open2;
+
+	gboolean closed = TRUE;
+
+
+	// build bounding boxes for first surface
+	tree1 = gts_bb_tree_surface(s);
+	is_open1 = gts_surface_volume(s) < 0.? TRUE : FALSE;
+
+
+	// build bounding boxes for second surface
+	tree2 = gts_bb_tree_surface(surfaceToAdd->s);
+	is_open2 = gts_surface_volume(surfaceToAdd->s) < 0.? TRUE : FALSE;
+
+	if(is_open1) fprintf(stderr, "set: surface 1 is open\r\n");
+
+	if(is_open2) fprintf(stderr, "set: surface 2 is open\r\n");
+
+	si = gts_surface_inter_new(gts_surface_inter_class(), s,
+			surfaceToAdd->s, tree1, tree2, is_open1, is_open2);
+	g_assert(gts_surface_inter_check(si, &closed));
+
+	if(!closed){
+		fprintf(stderr,
+				"set: the intersection of the surfaces is not a closed curve\r\n");
+		return;
+	}
+
+	GtsSurface * temp;
+	temp = gts_surface_new(gts_surface_class(), gts_face_class(),
+			gts_edge_class(), gts_vertex_class());
+
+
+	// Generate new surface s
+	//gts_surface_inter_boolean(si, temp, GTS_1_OUT_2);
+
+	gts_surface_inter_boolean(si, temp, GTS_1_OUT_2);
+	gts_surface_inter_boolean(si, temp, GTS_2_OUT_1);
+//	gts_surface_foreach_face(si->s2, (GtsFunc) gts_triangle_revert, NULL);
+//	gts_surface_foreach_face(surfaceToAdd->s, (GtsFunc) gts_triangle_revert,
+//			NULL);
+//	gts_surface_foreach_face(si->s1, (GtsFunc) gts_triangle_revert, NULL);
+//	gts_surface_foreach_face(s, (GtsFunc) gts_triangle_revert,
+//			NULL);
+
+	gts_object_destroy(GTS_OBJECT (s));
+	s = temp;
+
+	gts_bb_tree_destroy(tree1, TRUE);
+	gts_bb_tree_destroy(tree2, TRUE);
+	gts_object_destroy(GTS_OBJECT (si));
+}
+

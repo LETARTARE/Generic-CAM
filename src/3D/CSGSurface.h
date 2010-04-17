@@ -38,6 +38,8 @@ public:
 			float translateZ = 0);
 
 	void BooleanRemove(const CSGSurface* surfaceToRemove);
+	void BooleanAdd(const CSGSurface* surfaceToAdd);
+
 	bool SelfTest(void);
 	void Statistics(void);
 
