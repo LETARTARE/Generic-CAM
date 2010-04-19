@@ -35,6 +35,7 @@ public:
 	void InsertBox(AffineTransformMatrix matrix, float x, float y, float z);
 	void InsertCylinder(AffineTransformMatrix matrix, float h, float r);
 	void InsertCone(AffineTransformMatrix matrix, float h, float r1, float r2);
+	void InsertSTL(AffineTransformMatrix matrix, wxFileName file);
 private:
 	MachineElement* AddElement();
 };

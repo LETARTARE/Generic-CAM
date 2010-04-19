@@ -69,6 +69,15 @@ void MachineComponent::InsertCone(AffineTransformMatrix matrix, float h,
 	temp->h = h;
 }
 
+void MachineComponent::InsertSTL(AffineTransformMatrix matrix, wxFileName file)
+{
+	MachineElement* temp = AddElement();
+	temp->matrix = matrix;
+	temp->typeOfElement = MACHINEELEMENT_ARBITRARY;
+	temp->ReadSTL(file);
+}
+
+
 void MachineComponent::Paint(void)
 {
 

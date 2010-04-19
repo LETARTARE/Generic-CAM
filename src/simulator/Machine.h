@@ -26,6 +26,7 @@ public:
 public:
 	LUACodeEvaluator evaluator;
 	wxString machineDescription;
+	wxFileName programFile;
 	ArrayOfMachineComponent components;
 	wxString textOut;
 

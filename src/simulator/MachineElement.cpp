@@ -23,6 +23,11 @@ MachineElement::~MachineElement()
 	// TODO Auto-generated destructor stub
 }
 
+bool MachineElement::ReadSTL(wxFileName file)
+{
+	return g.ReadSTL(file.GetFullPath());
+}
+
 void MachineElement::Paint(void)
 {
 	unsigned int i;
@@ -110,6 +115,10 @@ void MachineElement::Paint(void)
 		}
 		::glEnd();
 
+		break;
+
+	case MACHINEELEMENT_ARBITRARY:
+		g.Paint();
 		break;
 	}
 	::glPopMatrix();

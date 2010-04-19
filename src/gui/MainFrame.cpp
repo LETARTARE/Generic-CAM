@@ -111,6 +111,9 @@ void MainFrame::OnReloadMachine(wxCommandEvent &event)
 {
 	if(!machineFileName.IsOk()) return;
 
+	//TODO: Rewrite the next line, so that the machine knows its programs name not the mainframe.
+	machine.programFile = machineFileName;
+
 	wxTextFile file(machineFileName.GetFullPath());
 	if(!file.Open(wxConvLocal)){
 		if(!file.Open(wxConvFile)){

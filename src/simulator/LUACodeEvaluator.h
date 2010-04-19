@@ -93,6 +93,7 @@ public:
 	static int rotate_glue(lua_State * L);
 	static int placecomponent_glue(lua_State * L);
 
+	static int loadstl_glue(lua_State * L);
 };
 
 //TODO: Find out if there is a better way to tell the static functions about the CallingClass.

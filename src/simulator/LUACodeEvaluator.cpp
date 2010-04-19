@@ -38,6 +38,7 @@ LUACodeEvaluator::LUACodeEvaluator()
 
 	lua_register(L,"placecomponent",placecomponent_glue);
 
+	lua_register(L,"loadstl",loadstl_glue);
 }
 
 LUACodeEvaluator::~LUACodeEvaluator()
@@ -260,15 +261,31 @@ int LUACodeEvaluator::rotate_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
 	wxASSERT(CC==NULL);
-	if(lua_gettop(L) != 3){
-		lua_pushstring(L, "rotate: parameter mismatch");
+	float x, y, z, tx, ty, tz;
+	switch(lua_gettop(L)){
+	case 3:
+		x = luaL_checknumber(L, 1) / 180 * M_PI;
+		y = luaL_checknumber(L, 2) / 180 * M_PI;
+		z = luaL_checknumber(L, 3) / 180 * M_PI;
+		CC->matrix = CC->matrix * AffineTransformMatrix::RotateXYZ(x, y, z);
+		break;
+	case 6:
+		x = luaL_checknumber(L, 1) / 180 * M_PI;
+		y = luaL_checknumber(L, 2) / 180 * M_PI;
+		z = luaL_checknumber(L, 3) / 180 * M_PI;
+		tx = luaL_checknumber(L, 4);
+		ty = luaL_checknumber(L, 5);
+		tz = luaL_checknumber(L, 6);
+		CC->matrix.TranslateLocal(tx, ty, tz);
+		CC->matrix = CC->matrix * AffineTransformMatrix::RotateXYZ(x, y, z);
+		CC->matrix.TranslateLocal(-tx, -ty, -tz);
+		break;
+	default:
+		lua_pushstring(L,
+				"rotate: parameter mismatch (3 or 6 parameters expected!).");
 		lua_error(L);
-		return 0;
+		break;
 	}
-	float x = luaL_checknumber(L, 1) / 180 * M_PI;
-	float y = luaL_checknumber(L, 2) / 180 * M_PI;
-	float z = luaL_checknumber(L, 3) / 180 * M_PI;
-	CC->matrix = CC->matrix * AffineTransformMatrix::RotateXYZ(x, y, z);
 	return 0;
 }
 
@@ -316,8 +333,10 @@ int LUACodeEvaluator::cylinder_glue(lua_State * L)
 
 int LUACodeEvaluator::setstyle_glue(lua_State * L)
 {
+	//TODO: Code to change the appearance of the following elements.
 	return 0;
 }
+
 int LUACodeEvaluator::toolholder_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
@@ -376,3 +395,32 @@ int LUACodeEvaluator::placecomponent_glue(lua_State * L)
 	return 0;
 }
 
+int LUACodeEvaluator::loadstl_glue(lua_State * L)
+{
+	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
+	wxASSERT(CC==NULL);
+	if(lua_gettop(L) != 1){
+		lua_pushstring(L, "loadstl: parameter mismatch");
+		lua_error(L);
+		return 0;
+	}
+	// Generate a new part for the machine.
+	int n = lua_gettop(L); /* number of arguments */
+	if(n != 1) return luaL_error(L, "loadstl needs exactly one string");
+
+	lua_getglobal(L, "tostring");
+	const char *s;
+	lua_pushvalue(L, -1); /* function to be called */
+	lua_pushvalue(L, 1); /* value to print */
+	lua_call(L, 1, 1);
+	s = lua_tostring(L, -1); /* get result */
+	if(s == NULL) return luaL_error(L,
+			LUA_QL("tostring") " must return a string to " LUA_QL("print"));
+
+	wxFileName fileName(CC->linkedMachine->programFile);
+
+	fileName.SetFullName(wxString::FromAscii(s));
+
+	CC->componentToManipulate->InsertSTL(CC->matrix, fileName);
+	return 0;
+}

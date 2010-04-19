@@ -13,9 +13,13 @@
 
 #include "../3D/AffineTransformMatrix.h"
 #include "../3D/Vector3.h"
+#include "../3D/Geometry.h"
+#include <wx/filename.h>
 
 #define MACHINEELEMENT_BOX	1
 #define MACHINEELEMENT_CYLINDER	2
+#define MACHINEELEMENT_ARBITRARY	3
+
 
 class MachineElement {
 	// Constructor/ Destructor
@@ -28,10 +32,15 @@ public:
 	AffineTransformMatrix matrix;
 	unsigned char typeOfElement;
 
+
+
 	float x,y,z,r1,r2,h;
+
+	Geometry g;
 
 	// Methods
 public:
+	bool ReadSTL(wxFileName file);
 	void Paint(void);
 
 };

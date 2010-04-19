@@ -44,6 +44,8 @@ void Machine::Paint(void)
 
 }
 
+
+
 void Machine::SetMachineDescription(wxString text)
 {
 	machineDescription = text;
