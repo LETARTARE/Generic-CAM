@@ -5,11 +5,11 @@
 #ifndef _CONTROLSPACEORB_H_
 #define _CONTROLSPACEORB_H_
 
-#include "Control6DOF.h"
+#include "Control3DAbstract.h"
 
 #define CONTROLSPACEORB_MAXDATALENGTH	64
 #define CONTROLSPACEORB_ID 2
-class ControlSpaceOrb:public Control6DOF {
+class ControlSpaceOrb:public Control3DAbstract {
 
 	// Constructor /Destructor
 public:

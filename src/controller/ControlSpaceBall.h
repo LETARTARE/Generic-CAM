@@ -2,11 +2,11 @@
 #ifndef _CONTROLSPACEBALL_H_
 #define _CONTROLSPACEBALL_H_
 
-#include "Control6DOF.h"
+#include "Control3DAbstract.h"
 
 #define CONTROLSPACEBALL_MAXDATALENGTH	256
 #define CONTROLSPACEBALL_ID	1
-class ControlSpaceBall: public Control6DOF
+class ControlSpaceBall: public Control3DAbstract
 {
 	// Constructor / Destructor
 public:

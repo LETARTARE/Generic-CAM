@@ -8,11 +8,11 @@
 #ifndef CONTROLSPACEMOUSE_H_
 #define CONTROLSPACEMOUSE_H_
 
-#include "Control6DOF.h"
+#include "Control3DAbstract.h"
 
 #define CONTROLSPACEMOUSE_MAXDATALENGTH	256
 #define CONTROLSPACEMOUSE_ID	3
-class ControlSpaceMouse: public Control6DOF
+class ControlSpaceMouse: public Control3DAbstract
 {
 	// Constructor / Destructor
 public:

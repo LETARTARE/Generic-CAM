@@ -1,67 +1,67 @@
 /*
- * Control6DOF.cpp
+ * Control3DAbstract.cpp
  *
  *  Created on: 21.07.2009
  *      Author: toby
  */
 
-#include "Control6DOF.h"
+#include "Control3DAbstract.h"
 
-Control6DOF::Control6DOF()
+Control3DAbstract::Control3DAbstract()
 {
 	int i;
 
 	for(i = 0; i < 6; i++){
 		Axis[i] = 0;
 	}
-	for(i = 0; i < CONTROL6DOF_MAXBUTTONS; i++){
+	for(i = 0; i < CONTROL3DABSTRACT_MAXBUTTONS; i++){
 		Button[i] = false;
 	}
 }
 
-Control6DOF::~Control6DOF()
+Control3DAbstract::~Control3DAbstract()
 {
 
 }
 
-void Control6DOF::InitDevice()
+void Control3DAbstract::InitDevice()
 {
 
 }
 
-void Control6DOF::SetPort(wxString connection)
+void Control3DAbstract::SetPort(wxString connection)
 {
 	this->connection = connection;
 }
 
-wxString Control6DOF::GetPort()
+wxString Control3DAbstract::GetPort()
 {
 	return connection;
 }
 
-bool Control6DOF::Open(void)
+bool Control3DAbstract::Open(void)
 {
 	return port.Open(connection.ToAscii(),9600);
 }
 
-void Control6DOF::Close(void)
+void Control3DAbstract::Close(void)
 {
 	port.Close();
 }
 
-int Control6DOF::GetButton(unsigned char i) const
+int Control3DAbstract::GetButton(unsigned char i) const
 {
-	if(i > (CONTROL6DOF_MAXBUTTONS)) return false;
+	if(i > (CONTROL3DABSTRACT_MAXBUTTONS)) return false;
 	return Button[i];
 }
 
-int Control6DOF::GetAxis(unsigned char i) const
+int Control3DAbstract::GetAxis(unsigned char i) const
 {
 	if(i > 5) return 0;
 	return Axis[i];
 }
 
-bool Control6DOF::Pump()
+bool Control3DAbstract::Pump()
 {
 	if(!port.IsOpen()) return false;
 	char temp[128];

@@ -8,7 +8,7 @@
 #ifndef CONTROL3D_H_
 #define CONTROL3D_H_
 
-#include "Control6DOF.h"
+#include "Control3DAbstract.h"
 #include <wx/config.h>
 
 class Control3D {
@@ -19,7 +19,7 @@ public:
 
 	// Member  variables
 protected:
-	Control6DOF* controller;
+	Control3DAbstract* controller;
 private:
 
 

@@ -1,32 +1,32 @@
 /*
- * Control6DOF.h
+ * Control3DAbstract.h
  *
  *  Created on: 21.07.2009
  *      Author: toby
  */
 
-#ifndef CONTROL6DOF_H_
-#define CONTROL6DOF_H_
+#ifndef CONTROL3DABSTRACT_H_
+#define CONTROL3DABSTRACT_H_
 
-#define CONTROL6DOF_MAXBUTTONS	10
+#define CONTROL3DABSTRACT_MAXBUTTONS	10
 
 #include "SerialPort.h"
 #include <wx/string.h>
 
-class Control6DOF {
+class Control3DAbstract {
 
 
 	// Constructor/Destructor
 public:
-	Control6DOF();
-	virtual ~Control6DOF();
+	Control3DAbstract();
+	virtual ~Control3DAbstract();
 
 	// Member variables
 public:
 protected:
 	Serial port;
 	wxString connection;
-	int Button[CONTROL6DOF_MAXBUTTONS];
+	int Button[CONTROL3DABSTRACT_MAXBUTTONS];
 	int Axis[6];
 
 	// Methods
@@ -54,4 +54,4 @@ protected:
 #include "ControlSpaceOrb.h"
 #include "ControlSpaceMouse.h"
 
-#endif /* CONTROL6DOF_H_ */
+#endif /* CONTROL3DABSTRACT_H_ */
