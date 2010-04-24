@@ -17,7 +17,6 @@ WX_DEFINE_OBJARRAY(ArrayOfMachinePosition)
 
 MachineSimulator::MachineSimulator()
 {
-	machine = NULL;
 	tStep = 0;
 
 	MachinePosition* pos;
@@ -41,10 +40,6 @@ MachineSimulator::~MachineSimulator()
 
 }
 
-void MachineSimulator::InsertMachine(Machine* machine)
-{
-	this->machine = machine;
-}
 void MachineSimulator::Reset(void)
 {
 	step = 0;
@@ -63,19 +58,26 @@ void MachineSimulator::Step(float tTarget)
 	}
 
 	if(step + 1 == position.Count()){
-		machine->position = position[step];
+		machine.position = position[step];
 	}else{
-		machine->position = position[step] + (position[step + 1]
+		machine.position = position[step] + (position[step + 1]
 				- position[step]) / position[step].duration * (tTarget - tStep);
 	}
 }
 
-bool MachineSimulator::ReadGCodeFile(wxString fileName)
+bool MachineSimulator::ReadGCodeFile(wxFileName fileName)
 {
+	if(!fileName.IsOk()){
+		wxLogError(_T("ReadGCodeFile: Incorrect fileName ")
+				+ fileName.GetFullPath() + _T(" !"));
+		return false;
+	}
+
 	wxTextFile file;
 
-	if(!file.Open(fileName)){
-		wxLogError(_T("ReadGCodeFile: Can't open ") + fileName + _T(" !"));
+	if(!file.Open(fileName.GetFullPath())){
+		wxLogError(_T("ReadGCodeFile: Can't open ") + fileName.GetFullPath()
+				+ _T(" !"));
 		return false;
 	}
 
@@ -110,12 +112,12 @@ bool MachineSimulator::ReadGCodeFile(wxString fileName)
 	position.Add(pos);
 	file.Close();
 	step = 0;
-	tStep=0;
+	tStep = 0;
 
 	return true;
 }
 
-bool MachineSimulator::WriteGCodeFile(wxString fileName)
+bool MachineSimulator::WriteGCodeFile(wxFileName fileName)
 {
 	//TODO: Writing G-Code Files
 	return false;

@@ -5,11 +5,14 @@
  *      Author: Tobias Schaefer
  */
 #include "MainFrame.h"
+
 #include "AboutDialog.h"
 #include "Control6DOFDialog.h"
 #include "ErrorFrame.h"
 #include "DataFrame.h"
 #include "ToolboxFrame.h"
+
+#include <wx/filename.h>
 
 MainFrame::MainFrame(wxWindow* parent) :
 	GUIMainFrame(parent)
@@ -23,7 +26,7 @@ MainFrame::MainFrame(wxWindow* parent) :
 	config = new wxConfig(_T("GenericCAM"));
 	control.GetConfigFrom(config);
 
-	m_canvas->SetController(&control);
+	m_canvas->SetController(control);
 
 	m_menuView->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
 
@@ -31,12 +34,9 @@ MainFrame::MainFrame(wxWindow* parent) :
 	this->Connect(wxEVT_TIMER, wxTimerEventHandler(MainFrame::OnTimer), NULL,
 			this);
 
-	simulator.InsertMachine(&machine);
-
 	timer.Start(100);
 
-	m_canvas->InsertMachine(&machine);
-
+	m_canvas->InsertMachine(simulator.machine);
 }
 
 MainFrame::~MainFrame()
@@ -57,7 +57,7 @@ void MainFrame::OnQuit(wxCommandEvent& event)
 	Close();
 }
 
-void MainFrame::OnChangeStereo3D(wxCommandEvent &event)
+void MainFrame::OnChangeStereo3D(wxCommandEvent& event)
 {
 	if(m_canvas->stereoMode == 1){
 		m_canvas->stereoMode = 0;
@@ -71,19 +71,19 @@ void MainFrame::OnSelectDataFrame(wxCommandEvent& event)
 {
 	DataFrame* dataFrame = new DataFrame(this);
 
-	dataFrame->SetController(&control);
+	dataFrame->SetController(control);
 
 	dataFrame->Show(true);
 }
 
-void MainFrame::OnSetupController(wxCommandEvent &event)
+void MainFrame::OnSetupController(wxCommandEvent& event)
 {
 	Control6DOFDialog temp(this);
-	temp.SetupWith(&control);
+	temp.InsertController(control);
 	temp.ShowModal();
 }
 
-void MainFrame::OnLoadMachine(wxCommandEvent &event)
+void MainFrame::OnLoadMachine(wxCommandEvent& event)
 {
 	wxFileDialog
 			dialog(
@@ -95,7 +95,7 @@ void MainFrame::OnLoadMachine(wxCommandEvent &event)
 					wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if(dialog.ShowModal() == wxID_OK){
-		machineFileName.Assign(dialog.GetPath());
+		simulator.machine.fileName.Assign(dialog.GetPath());
 		OnReloadMachine(event);
 
 
@@ -107,47 +107,29 @@ void MainFrame::OnLoadMachine(wxCommandEvent &event)
 	}
 }
 
-void MainFrame::OnReloadMachine(wxCommandEvent &event)
+void MainFrame::OnReloadMachine(wxCommandEvent& event)
 {
-	if(!machineFileName.IsOk()) return;
-
-	//TODO: Rewrite the next line, so that the machine knows its programs name not the mainframe.
-	machine.programFile = machineFileName;
-
-	wxTextFile file(machineFileName.GetFullPath());
-	if(!file.Open(wxConvLocal)){
-		if(!file.Open(wxConvFile)){
-			wxLogError(_T("Opening of the file failed!"));
-			return;
-		}
-	}
-	wxString temp, str;
-
-	for(str = file.GetFirstLine(); !file.Eof(); str = file.GetNextLine()){
-		temp += str + _T("\n");
-	}
-
-	machine.SetMachineDescription(temp);
-	if(!machine.textOut.IsEmpty()){
+	if(!simulator.machine.fileName.IsOk()) return;
+	simulator.machine.ReLoadDescription();
+	if(!simulator.machine.textOut.IsEmpty()){
 		//wxLogMessage(_T("Displaying some text in ErrorFrame!"));
 		//TODO: Don't open a new errorframe, if the old one is not closed.
 		ErrorFrame* error = new ErrorFrame(this);
-		error->SetText(machine.textOut);
+		error->SetText(simulator.machine.textOut);
 		error->Show();
 	}
 	t = 0;
 }
 
-void MainFrame::OnLoadToolbox(wxCommandEvent &event)
+void MainFrame::OnLoadToolbox(wxCommandEvent& event)
 {
 	wxFileDialog dialog(this, _("Open toolbox..."), _T(""), _T(""),
 			_("Toolbox (*.xml)|*.xml|All files|*.*"), wxFD_OPEN
 					| wxFD_FILE_MUST_EXIST);
-
+	wxFileName fileName;
 	if(dialog.ShowModal() == wxID_OK){
-
-		toolboxFileName.Assign(dialog.GetPath());
-		if(!machine.toolbox.LoadToolbox(toolboxFileName.GetFullPath())){
+		fileName.Assign(dialog.GetPath());
+		if(!simulator.toolbox.LoadToolbox(fileName)){
 			wxLogError(_T("OnLoadToolbox: Opening of the toolbox failed!"));
 		}
 
@@ -164,7 +146,7 @@ void MainFrame::OnSaveToolbox(wxCommandEvent &event)
 {
 
 
-	//TODO: Build something like in this snippet.
+	//TODO: Build something like this in this snippet.
 	//	wxFileDialog
 	//			dialog(
 	//					this,
@@ -184,11 +166,11 @@ void MainFrame::OnSaveToolbox(wxCommandEvent &event)
 	wxFileDialog dialog(this, _("Save toolbox..."), _T(""), _T(""),
 			_("Toolbox (*.xml)|*.xml|All files|*.*"), wxFD_OPEN
 					| wxFD_FILE_MUST_EXIST);
-
+	wxFileName fileName;
 	if(dialog.ShowModal() == wxID_OK){
-		toolboxFileName = dialog.GetPath();
+		fileName = dialog.GetPath();
 
-		if(!machine.toolbox.LoadToolbox(toolboxFileName.GetFullPath())){
+		if(!simulator.toolbox.LoadToolbox(fileName)){
 			wxLogError(_T("OnLoadToolbox: Opening of the toolbox failed!"));
 		}
 
@@ -205,8 +187,8 @@ void MainFrame::OnEditToolbox(wxCommandEvent& event)
 {
 	ToolboxFrame* toolboxFrame = new ToolboxFrame(this);
 
-	toolboxFrame->SetController(&control);
-	toolboxFrame->InsertToolBox(&(machine.toolbox));
+	toolboxFrame->SetController(control);
+	toolboxFrame->InsertToolBox(simulator.toolbox);
 	toolboxFrame->Show(true);
 }
 
@@ -230,7 +212,6 @@ void MainFrame::OnTimer(wxTimerEvent& event)
 {
 	t += 0.100;
 	simulator.Step(t);
-	machine.Assemble();
+	simulator.machine.Assemble();
 	this->Refresh();
 }
-

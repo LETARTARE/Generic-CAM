@@ -31,11 +31,11 @@ public:
 
 	// Methods
 public:
-	void OnClose(wxCommandEvent &event);
-	void InsertToolBox(Toolbox* toolbox);
-	void OnChangeStereo3D(wxCommandEvent &event);
+	void OnClose(wxCommandEvent& event);
+	void InsertToolBox(Toolbox& toolbox);
+	void OnChangeStereo3D(wxCommandEvent& event);
 	void UpdateDisplay(void);
-	void SetController(Control3D *control);
+	void SetController(Control3D& control);
 };
 
 #endif /* TOOLBOXFRAME_H_ */

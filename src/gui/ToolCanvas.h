@@ -28,7 +28,7 @@ private:
 
 	// Methods
 public:
-	void InsertTool(Tool* t);
+	void InsertTool(Tool& t);
 	void RenderCoordinateSystem(void);
 	void Render();
 

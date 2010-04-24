@@ -8,8 +8,11 @@
 //============================================================================
 #ifndef MACHINESIMULATOR_H_
 #define MACHINESIMULATOR_H_
+#include "Toolbox.h"
+#include "ToolPath.h"
 #include "Machine.h"
 #include "MachinePosition.h"
+#include <wx/filename.h>
 #include <wx/dynarray.h>
 WX_DECLARE_OBJARRAY(MachinePosition, ArrayOfMachinePosition)
 ;
@@ -23,8 +26,11 @@ public:
 	//Member variables
 public:
 
-	Machine* machine;
+	Machine machine;
 	ArrayOfMachinePosition position;
+
+	ToolPath toolpath;
+	Toolbox toolbox;
 
 	float tStep;
 	unsigned long step;
@@ -35,8 +41,8 @@ public:
 	void Reset(void);
 	void Step(float tTarget);
 
-	bool ReadGCodeFile(wxString fileName);
-	bool WriteGCodeFile(wxString fileName);
+	bool ReadGCodeFile(wxFileName fileName);
+	bool WriteGCodeFile(wxFileName fileName);
 
 };
 

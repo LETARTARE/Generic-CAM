@@ -17,6 +17,7 @@ WX_DECLARE_OBJARRAY(Tool, ArrayOfTools)
 ;
 #include <wx/xml/xml.h>
 #include <wx/string.h>
+#include <wx/filename.h>
 
 class Toolbox {
 	//Constructor / Destructor
@@ -26,9 +27,9 @@ public:
 
 	//Member variables
 public:
+	wxFileName fileName;
 
 	ArrayOfTools tools;
-
 
 private:
 	wxXmlDocument* xmlDocument;
@@ -37,8 +38,8 @@ private:
 
 	// Methods
 public:
-	bool LoadToolbox(wxString fileName);
-	bool SaveToolbox(wxString fileName);
+	bool LoadToolbox(wxFileName& fileName);
+	bool SaveToolbox(wxFileName& fileName);
 
 };
 

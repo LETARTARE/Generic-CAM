@@ -39,7 +39,7 @@ public:
 	void OnMotion(wxMouseEvent& event);
 	void OnLeftDown(wxMouseEvent& event);
 
-	void InsertTool(Tool* t);
+	void InsertTool(Tool& t);
 
 };
 

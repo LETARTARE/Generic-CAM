@@ -38,13 +38,13 @@ ToolPanel::~ToolPanel()
 	this->Disconnect(wxEVT_SIZE, wxSizeEventHandler( ToolPanel::OnSize ));
 }
 
-void ToolPanel::InsertTool(Tool* t)
+void ToolPanel::InsertTool(Tool& t)
 {
-	tool = t;
+	tool = &t;
 	this->Refresh();
 }
 
-void ToolPanel::OnSize(wxSizeEvent &event)
+void ToolPanel::OnSize(wxSizeEvent& event)
 {
 	this->Refresh();
 }

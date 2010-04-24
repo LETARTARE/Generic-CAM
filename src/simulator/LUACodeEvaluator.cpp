@@ -97,14 +97,10 @@ void LUACodeEvaluator::EvaluateProgram()
 
 	if(_DEBUGMODE){
 
-		unsigned int i, j;
+		unsigned int i;
 		for(i = 0; i < linkedMachine->components.Count(); i++){
 			wxLogMessage(wxString::Format(_T("Component %u:"), i)
 					+ linkedMachine->components[i].nameOfComponent);
-			for(j = 0; j < linkedMachine->components[i].elements.Count(); j++){
-				wxLogMessage(wxString::Format(_T("Element %u: %u"), j,
-						linkedMachine->components[i].elements[j].typeOfElement));
-			}
 
 		}
 
@@ -417,7 +413,7 @@ int LUACodeEvaluator::loadstl_glue(lua_State * L)
 	if(s == NULL) return luaL_error(L,
 			LUA_QL("tostring") " must return a string to " LUA_QL("print"));
 
-	wxFileName fileName(CC->linkedMachine->programFile);
+	wxFileName fileName(CC->linkedMachine->fileName);
 
 	fileName.SetFullName(wxString::FromAscii(s));
 

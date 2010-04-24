@@ -16,7 +16,7 @@
 #include "../controller/Control3D.h"
 #include <wx/config.h>
 #include <wx/log.h>
-#include <wx/filename.h>
+
 
 class MainFrame:public GUIMainFrame {
 	// Constructor/ Destructor
@@ -30,10 +30,8 @@ private:
 	Control3D control;
 	wxLogWindow* logWindow;
 
-	Machine machine;
 	MachineSimulator simulator;
-	wxFileName machineFileName;
-	wxFileName toolboxFileName;
+
 	wxTimer timer;
 	float t;
 

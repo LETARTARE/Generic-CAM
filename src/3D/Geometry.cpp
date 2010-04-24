@@ -27,15 +27,15 @@ Triangle::~Triangle()
 }
 void Triangle::Paint(void)
 {
-	::glNormal3f(n.x, n.y, n.z);
+	::glNormal3f(n[0].x, n[0].y, n[0].z);
 	unsigned char i;
 	for(i = 0; i < 3; i++)
 		::glVertex3f(p[i].x, p[i].y, p[i].z);
 }
 void Triangle::CalculateNormal()
 {
-	n = (p[1] - p[0]) * (p[2] - p[1]);
-	n.Normalize();
+	n[0] = (p[1] - p[0]) * (p[2] - p[1]);
+	n[0].Normalize();
 }
 
 Geometry::Geometry()
@@ -44,7 +44,19 @@ Geometry::Geometry()
 Geometry::~Geometry()
 {
 }
-void Geometry::Paint(void)
+
+void Geometry::ApplyTransformation(const AffineTransformMatrix &matrix)
+{
+	unsigned long i;
+	for(i = 0; i < triangles.Count(); i++){
+		triangles[i].p[0] = matrix.Transform(triangles[i].p[0]);
+		triangles[i].p[1] = matrix.Transform(triangles[i].p[1]);
+		triangles[i].p[2] = matrix.Transform(triangles[i].p[2]);
+		triangles[i].n[0] = matrix.Transform(triangles[i].n[0]);
+	}
+}
+
+void Geometry::Paint(void) const
 {
 	unsigned long i;
 	::glBegin(GL_TRIANGLES);
@@ -52,6 +64,33 @@ void Geometry::Paint(void)
 		triangles[i].Paint();
 	}
 	::glEnd();
+}
+
+void Geometry::AddTriangle(const AffineTransformMatrix &matrix,
+		const Vector3 &a, const Vector3 &b, const Vector3 &c)
+{
+	Triangle* tri = new Triangle;
+	tri->p[0] = matrix.Transform(a);
+	tri->p[1] = matrix.Transform(b);
+	tri->p[2] = matrix.Transform(c);
+	tri->CalculateNormal();
+	triangles.Add(tri);
+}
+void Geometry::AddQuad(const AffineTransformMatrix &matrix, const Vector3 &a,
+		const Vector3 &b, const Vector3 &c, const Vector3 &d)
+{
+	Triangle* tri0 = new Triangle;
+	Triangle* tri1 = new Triangle;
+	tri0->p[0] = matrix.Transform(a);
+	tri0->p[1] = matrix.Transform(b);
+	tri0->p[2] = matrix.Transform(c);
+	tri1->p[0] = tri0->p[2];
+	tri1->p[1] = matrix.Transform(d);
+	tri1->p[2] = tri0->p[0];
+	tri0->CalculateNormal();
+	tri1->n[0] = tri0->n[0];
+	triangles.Add(tri0);
+	triangles.Add(tri1);
 }
 
 bool Geometry::ReadSTL(wxString fileName)
@@ -117,9 +156,9 @@ bool Geometry::ReadSTL(wxString fileName)
 			}
 
 			tri = new Triangle;
-			tri->n.x = coord[0];
-			tri->n.y = coord[1];
-			tri->n.z = coord[2];
+			tri->n[0].x = coord[0];
+			tri->n[0].y = coord[1];
+			tri->n[0].z = coord[2];
 			for(j = 0; j < 3; j++){
 				tri->p[j].x = coord[3 + j * 3];
 				tri->p[j].y = coord[4 + j * 3];
@@ -127,6 +166,8 @@ bool Geometry::ReadSTL(wxString fileName)
 			}
 			tri->CalculateNormal();
 			triangles.Add(tri);
+
+
 			//			if(i <= 1){
 			//				wxLogMessage(wxString::Format(_T("n: %.1f %.1f %.1f"),
 			//						tri->n.x, tri->n.y, tri->n.z));
@@ -276,8 +317,8 @@ bool Geometry::ReadGTS(wxString fileName)
 		triangles.Add(tri);
 
 		if(i <= 10){
-			wxLogMessage(wxString::Format(_T("n: %.3f %.3f %.3f"), tri->n.x,
-					tri->n.y, tri->n.z));
+			wxLogMessage(wxString::Format(_T("n: %.3f %.3f %.3f"), tri->n[0].x,
+					tri->n[0].y, tri->n[0].z));
 			for(j = 0; j < 3; j++)
 				wxLogMessage(wxString::Format(_T("p: %.3f %.3f %.3f"),
 						tri->p[j].x, tri->p[j].y, tri->p[j].z));

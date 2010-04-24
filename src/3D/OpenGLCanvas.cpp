@@ -61,9 +61,9 @@ OpenGLCanvas::~OpenGLCanvas()
 
 }
 
-void OpenGLCanvas::SetController(Control3D *control)
+void OpenGLCanvas::SetController(Control3D& control)
 {
-	this->control = control;
+	this->control = &control;
 	wxLogMessage(_T("OpenGLCanvas: Controller inserted!"));
 }
 

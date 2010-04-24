@@ -23,10 +23,11 @@ Control6DOFDialog::Control6DOFDialog(wxWindow* parent) :
 
 	timer.SetOwner(this, TIMER_DIALOGCONTROL6DOF);
 
-	this->Connect(wxEVT_TIMER, wxTimerEventHandler(Control6DOFDialog::OnTimer), NULL,
-			this);
+	this->Connect(wxEVT_TIMER, wxTimerEventHandler(Control6DOFDialog::OnTimer),
+			NULL, this);
 
 	timer.Start(100);
+
 
 	//	timer.Connect( wxEVT_TIMER, wxCommandEventHandler(Control6DOFDialog::OnTimer ), NULL, this );
 
@@ -38,17 +39,18 @@ Control6DOFDialog::Control6DOFDialog(wxWindow* parent) :
 Control6DOFDialog::~Control6DOFDialog()
 {
 }
-
-void Control6DOFDialog::SetupWith(Control3D *control)
+void Control6DOFDialog::InsertController(Control3D& control)
 {
-	if(control != NULL){
-		this->control = control;
+	if(&control != NULL){
+		this->control = &control;
+		UpdateData();
 	}
+}
+void Control6DOFDialog::UpdateData()
+{
+	wxASSERT(control!=NULL);
 
-
-	wxASSERT(this->control!=NULL);
-
-	if(this->control->IsOpen()){
+	if(control->IsOpen()){
 		buttonConnect->Enable(false);
 		buttonDisconnect->Enable(true);
 		radioDeviceSelect->Enable(false);
@@ -59,9 +61,9 @@ void Control6DOFDialog::SetupWith(Control3D *control)
 		radioDeviceSelect->Enable(true);
 		textPort->Enable(true);
 	}
-	textPort->ChangeValue(this->control->GetPort());
+	textPort->ChangeValue(control->GetPort());
 
-	unsigned char i = this->control->GetType();
+	unsigned char i = control->GetType();
 	switch(i){
 	case CONTROLSPACEBALL_ID:
 		radioDeviceSelect->SetSelection(0);
@@ -72,7 +74,6 @@ void Control6DOFDialog::SetupWith(Control3D *control)
 	case CONTROLSPACEMOUSE_ID:
 		radioDeviceSelect->SetSelection(2);
 		break;
-
 	default:
 		radioDeviceSelect->SetSelection(1);
 		break;
@@ -103,7 +104,7 @@ void Control6DOFDialog::OnConnect(wxCommandEvent& event)
 	control->SetType(i);
 	if(control->Open(textPort->GetValue())) wxLogMessage(
 			_T("Connected to 3D controller!"));
-	SetupWith();
+	UpdateData();
 }
 
 void Control6DOFDialog::OnDisconnect(wxCommandEvent& event)
@@ -111,7 +112,7 @@ void Control6DOFDialog::OnDisconnect(wxCommandEvent& event)
 	wxASSERT(this->control!=NULL);
 	control->Close();
 	wxLogMessage(_T("Disconnected from 3D controller!"));
-	SetupWith();
+	UpdateData();
 }
 void Control6DOFDialog::OnClose(wxCommandEvent& event)
 {

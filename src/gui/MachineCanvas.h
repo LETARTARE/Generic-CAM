@@ -14,7 +14,6 @@
 #include "../simulator/Machine.h"
 
 class MachineCanvas:public OpenGLCanvas {
-
 	// Constructor / Destructor
 public:
 	MachineCanvas(wxWindow *parent, wxWindowID id = wxID_ANY,
@@ -29,7 +28,7 @@ private:
 
 	// Methods
 public:
-	void InsertMachine(Machine* m);
+	void InsertMachine(Machine& m);
 	void RenderCoordinateSystem(void);
 	void Render();
 };

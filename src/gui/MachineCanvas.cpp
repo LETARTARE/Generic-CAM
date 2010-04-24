@@ -19,9 +19,9 @@ MachineCanvas::~MachineCanvas()
 {
 }
 
-void MachineCanvas::InsertMachine(Machine* m)
+void MachineCanvas::InsertMachine(Machine& m)
 {
-	machine = m;
+	machine = &m;
 }
 
 void MachineCanvas::RenderCoordinateSystem(void)

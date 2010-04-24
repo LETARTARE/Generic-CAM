@@ -24,7 +24,7 @@ DataFrame::~DataFrame()
 
 }
 
-void DataFrame::SetController(Control3D* control)
+void DataFrame::SetController(Control3D& control)
 {
 	m_canvas->SetController(control);
 }

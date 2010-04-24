@@ -9,13 +9,14 @@
 
 #include <wx/log.h>
 #include <GL/gl.h>
+#include <wx/textfile.h>
 
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfMachineComponent)
 
 Machine::Machine()
 {
-	activeTool = 1;
+	tool = NULL;
 	position.Zero();
 	ClearComponents();
 }
@@ -31,10 +32,10 @@ void Machine::Paint(void)
 		components[i].Paint();
 	}
 
-	if(activeTool > 0 && activeTool <= toolbox.tools.Count()){
+	if(tool != NULL){
 		::glPushMatrix();
 		::glMultMatrixd(toolPosition.a);
-		toolbox.tools[activeTool - 1].Paint();
+		tool->Paint();
 		::glPopMatrix();
 	}
 	::glPushMatrix();
@@ -42,21 +43,6 @@ void Machine::Paint(void)
 	workpiece.Paint();
 	::glPopMatrix();
 
-}
-
-
-
-void Machine::SetMachineDescription(wxString text)
-{
-	machineDescription = text;
-	wxLogMessage(_T("Machine::InsertMachineDescription"));
-
-	evaluator.LinkToMachine(this);
-	evaluator.EvaluateProgram();
-
-	evaluator.EvaluateAssembly();
-
-	textOut = evaluator.GetOutput();
 }
 
 void Machine::ClearComponents(void)
@@ -105,4 +91,39 @@ bool Machine::PlaceComponent(wxString nameOfComponent,
 void Machine::Assemble()
 {
 	evaluator.EvaluateAssembly();
+}
+
+void Machine::EvaluateDescription(void)
+{
+	wxLogMessage(_T("Machine::InsertMachineDescription"));
+	evaluator.LinkToMachine(this);
+	evaluator.EvaluateProgram();
+	Assemble();
+	textOut = evaluator.GetOutput();
+}
+
+bool Machine::ReLoadDescription(void)
+{
+	if(!fileName.IsOk()) return false;
+	wxTextFile file(fileName.GetFullPath());
+	if(!file.Open(wxConvLocal)){
+		if(!file.Open(wxConvFile)){
+			wxLogError(_T("Opening of the file failed!"));
+			return false;
+		}
+	}
+	wxString str;
+	machineDescription.Empty();
+	for(str = file.GetFirstLine(); !file.Eof(); str = file.GetNextLine()){
+		machineDescription += str + _T("\n");
+	}
+	EvaluateDescription();
+	return true;
+}
+
+bool Machine::LoadDescription(wxFileName fileName)
+{
+	if(!fileName.IsOk()) return false;
+	this->fileName = fileName;
+	return ReLoadDescription();
 }

@@ -9,7 +9,7 @@
 #include "LUACodeEvaluator.h"
 #include "MachineComponent.h"
 #include "MachinePosition.h"
-#include "Toolbox.h"
+#include "Tool.h"
 #include "Workpiece.h"
 #include <wx/string.h>
 #include <wx/dynarray.h>
@@ -25,17 +25,16 @@ public:
 	// Member variables
 public:
 	LUACodeEvaluator evaluator;
-	wxString machineDescription;
-	wxFileName programFile;
+	MachinePosition position;
 	ArrayOfMachineComponent components;
-	wxString textOut;
 
-	Toolbox toolbox;
-	unsigned int activeTool;
+	wxFileName fileName;
+	wxString machineDescription;
+	wxString textOut;
 
 	Workpiece workpiece;
 
-	MachinePosition position;
+	Tool *tool;
 
 	AffineTransformMatrix toolPosition;
 	AffineTransformMatrix workpiecePosition;
@@ -47,15 +46,17 @@ private:
 
 	// Methods
 public:
-	void SetMachineDescription(wxString text);
+	void Paint(void);
 
 	void ClearComponents(void);
-	bool AddComponent(wxString nameOfComponent);
+
 	bool PlaceComponent(wxString nameOfComponent,
 			const AffineTransformMatrix &matrix);
-
+	bool AddComponent(wxString nameOfComponent);
 	void Assemble(void);
-	void Paint(void);
+	void EvaluateDescription(void);
+	bool ReLoadDescription(void);
+	bool LoadDescription(wxFileName fileName);
 
 };
 

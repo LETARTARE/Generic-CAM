@@ -45,7 +45,7 @@ private:
 	// Methods
 
 public:
-	void SetController(Control3D *control);
+	void SetController(Control3D& control);
 
 	virtual void Render();
 	virtual void InitGL();

@@ -32,7 +32,7 @@ Toolbox::Toolbox()
 	e->h = 0.005;
 	e->d = 0.005;
 	e->r = 0.0;
-	e->cutting=false;
+	e->cutting = false;
 	temp->elements.Add(e);
 
 	e = new ToolElement;
@@ -40,7 +40,7 @@ Toolbox::Toolbox()
 	e->h = 0.02;
 	e->d = 0.01;
 	e->r = 0.0;
-	e->cutting=false;
+	e->cutting = false;
 	temp->elements.Add(e);
 
 	e = new ToolElement;
@@ -48,7 +48,7 @@ Toolbox::Toolbox()
 	e->h = 0.0;
 	e->d = 0.02;
 	e->r = 0.0;
-	e->cutting=true;
+	e->cutting = true;
 	temp->elements.Add(e);
 
 	e = new ToolElement;
@@ -56,23 +56,21 @@ Toolbox::Toolbox()
 	e->h = 0.0;
 	e->d = 0.0;
 	e->r = 0.0;
-	e->cutting=true;
+	e->cutting = true;
 	temp->elements.Add(e);
 
-
-	temp->toolName=_T("Round cutter");
+	temp->toolName = _T("Round cutter");
 	temp->comment = _T("for testing circle generation");
-	temp->shaftDiameter=0.006;
-	temp->shaftLength=0.01;
+	temp->shaftDiameter = 0.006;
+	temp->shaftLength = 0.01;
 	temp->maxSpeed = 100e3;
-	temp->feedCoefficient=0.003;
-	temp->nrOfTeeth=2;
-	temp->slot=2;
+	temp->feedCoefficient = 0.003;
+	temp->nrOfTeeth = 2;
+	temp->slot = 2;
 
 	temp->GenerateContour();
 
 	tools.Add(temp);
-
 
 	temp = new Tool;
 
@@ -81,7 +79,7 @@ Toolbox::Toolbox()
 	e->h = 0.005;
 	e->d = 0.005;
 	e->r = 0.0;
-	e->cutting=false;
+	e->cutting = false;
 	temp->elements.Add(e);
 
 	e = new ToolElement;
@@ -89,7 +87,7 @@ Toolbox::Toolbox()
 	e->h = 0.02;
 	e->d = 0.01;
 	e->r = 0.0;
-	e->cutting=false;
+	e->cutting = false;
 	temp->elements.Add(e);
 
 	e = new ToolElement;
@@ -97,17 +95,17 @@ Toolbox::Toolbox()
 	e->h = 0.015;
 	e->d = 0.00;
 	e->r = 0.0;
-	e->cutting=true;
+	e->cutting = true;
 	temp->elements.Add(e);
 
-	temp->toolName=_T("Standard cutter");
+	temp->toolName = _T("Standard cutter");
 	temp->comment = _T("all purpose cylindrical");
-	temp->shaftDiameter=0.006;
-	temp->shaftLength=0.01;
+	temp->shaftDiameter = 0.006;
+	temp->shaftLength = 0.01;
 	temp->maxSpeed = 100e3;
-	temp->feedCoefficient=0.003;
-	temp->nrOfTeeth=2;
-	temp->slot=1;
+	temp->feedCoefficient = 0.003;
+	temp->nrOfTeeth = 2;
+	temp->slot = 1;
 
 	temp->GenerateContour();
 
@@ -120,13 +118,14 @@ Toolbox::~Toolbox()
 	delete xmlDocument;
 }
 
-bool Toolbox::LoadToolbox(wxString fileName)
+bool Toolbox::LoadToolbox(wxFileName& fileName)
 {
 
 	wxXmlDocument* tempTree = new wxXmlDocument();
 	tempTree->SetFileEncoding(_T("UTF-8"));
 	tempTree->SetVersion(_T(_GENERICCAM_VERSION));
-	if(!tempTree->Load(fileName, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES)){
+	if(!tempTree->Load(fileName.GetFullPath(), wxT("UTF-8"),
+			wxXMLDOC_KEEP_WHITESPACE_NODES)){
 		delete tempTree;
 		return false;
 	}
@@ -134,17 +133,20 @@ bool Toolbox::LoadToolbox(wxString fileName)
 	delete xmlDocument;
 	xmlDocument = tempTree;
 
+	this->fileName = fileName;
+
 
 	//TODO: Loading code comes here.
 
 	return true;
 }
 
-bool Toolbox::SaveToolbox(wxString fileName)
+bool Toolbox::SaveToolbox(wxFileName& fileName)
 {
 
-	if(!xmlDocument->Save(fileName, wxXML_NO_INDENTATION)){
+	if(!xmlDocument->Save(fileName.GetFullPath(), wxXML_NO_INDENTATION)){
 		return false;
 	}
+	this->fileName = fileName;
 	return true;
 }

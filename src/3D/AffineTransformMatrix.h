@@ -72,6 +72,8 @@ public:
 	void TranslateGlobal(double x, double y, double z);
 	void TranslateLocal(double x, double y, double z);
 
+	Vector3 Transform(const Vector3& v) const;
+
 	wxString ToString();
 	void FromString(wxString string);
 

@@ -28,15 +28,22 @@ private:
 
 	// Member Functions
 public:
-	void SetupWith(Control3D *control = NULL);
+	void InsertController(Control3D& control);
+
+
+private:
 	//TODO: The next function shouldn't be here!
-	Control3D *GetControl(){return control;}
+	Control3D *GetControl()
+	{
+		return control;
+	}
 protected:
 	void OnConnect(wxCommandEvent& event);
 	void OnDisconnect(wxCommandEvent& event);
 	void OnClose(wxCommandEvent& event);
 	void OnTimer(wxTimerEvent& event);
 
-	};
+	void UpdateData();
+};
 
 #endif /* CONTROL6DOFDIALOG_H_ */

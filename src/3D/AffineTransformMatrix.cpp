@@ -284,6 +284,18 @@ AffineTransformMatrix AffineTransformMatrix::operator/(
 	return *(this) * (b.Inverse());
 }
 
+Vector3 AffineTransformMatrix::Transform(const Vector3& v) const
+{
+	//R:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]])
+	//R*matrix([[x],[y],[z],[1]])
+
+	Vector3 temp;
+	temp.x = a[0] * v.x + a[4] * v.y + a[8] * v.z + a[12];
+	temp.y = a[1] * v.x + a[5] * v.y + a[9] * v.z + a[13];
+	temp.z = a[2] * v.x + a[6] * v.y + a[10] * v.z + a[14];
+	return temp;
+}
+
 //void AffineTransformMatrix::PreMult(const double *b)
 //{
 //	int i, j, k, pa, pb, pc;

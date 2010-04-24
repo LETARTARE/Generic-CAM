@@ -24,17 +24,17 @@ ToolboxFrame::~ToolboxFrame()
 {
 }
 
-void ToolboxFrame::OnClose(wxCommandEvent &event)
+void ToolboxFrame::OnClose(wxCommandEvent& event)
 {
 	Close();
 }
 
-void ToolboxFrame::SetController(Control3D* control)
+void ToolboxFrame::SetController(Control3D& control)
 {
 	m_canvas->SetController(control);
 }
 
-void ToolboxFrame::OnChangeStereo3D(wxCommandEvent &event)
+void ToolboxFrame::OnChangeStereo3D(wxCommandEvent& event)
 {
 	if(m_canvas->stereoMode == 1){
 		m_canvas->stereoMode = 0;
@@ -44,12 +44,11 @@ void ToolboxFrame::OnChangeStereo3D(wxCommandEvent &event)
 	m_menuSettings->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
 }
 
-void ToolboxFrame::InsertToolBox(Toolbox* toolbox)
+void ToolboxFrame::InsertToolBox(Toolbox& toolbox)
 {
-	linkedToolbox = toolbox;
+	linkedToolbox = &toolbox;
 
 	UpdateDisplay();
-
 }
 
 void ToolboxFrame::UpdateDisplay(void)
@@ -65,8 +64,8 @@ void ToolboxFrame::UpdateDisplay(void)
 	m_comboBoxToolSelector->Select(selectedTool);
 
 	if(selectedTool < linkedToolbox->tools.Count()){
-		m_panel->InsertTool(&(linkedToolbox->tools[selectedTool]));
-		m_canvas->InsertTool(&(linkedToolbox->tools[selectedTool]));
+		m_panel->InsertTool((linkedToolbox->tools[selectedTool]));
+		m_canvas->InsertTool((linkedToolbox->tools[selectedTool]));
 	}
 
 	if(selectedTool < linkedToolbox->tools.Count()){

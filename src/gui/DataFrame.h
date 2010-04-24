@@ -28,10 +28,10 @@ private:
 
 	// Methods
 public:
-	void SetController(Control3D *control);
-	void OnChangeStereo3D(wxCommandEvent &event);
-	void OnClose(wxCommandEvent &event);
-	void OnLoadSTLData(wxCommandEvent &event);
+	void SetController(Control3D& control);
+	void OnChangeStereo3D(wxCommandEvent& event);
+	void OnClose(wxCommandEvent& event);
+	void OnLoadSTLData(wxCommandEvent& event);
 };
 
 #endif /* DATAFRAME_H_ */

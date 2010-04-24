@@ -22,9 +22,9 @@ ToolCanvas::~ToolCanvas()
 {
 }
 
-void ToolCanvas::InsertTool(Tool* t)
+void ToolCanvas::InsertTool(Tool& t)
 {
-	tool = t;
+	tool = &t;
 }
 
 void ToolCanvas::RenderCoordinateSystem(void)
