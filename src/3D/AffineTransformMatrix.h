@@ -6,9 +6,9 @@
 // Compiler Options   : -lm
 // Author             : Tobias Schaefer
 // Created            : 22.07.2009
-//$LastChangedDate    : $
-//$Revision           : $
-//$LastChangedBy      : $
+//$LastChangedDate$
+//$Revision$
+//$LastChangedBy$
 // Copyright          : (C) 2009 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
