@@ -6,9 +6,6 @@
 // Compiler Options   : -lm
 // Author             : Tobias Schaefer
 // Created            : 22.07.2009
-//$LastChangedDate    : $
-//$Revision           : $
-//$LastChangedBy      : $
 // Copyright          : (C) 2009 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,6 +21,10 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//$LastChangedDate$
+//$Revision$
+//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -196,6 +197,7 @@ void AffineTransformMatrix::PutMatrixTogether(void)
 	double siy = sin(ry);
 	double coz = cos(rz);
 	double siz = sin(rz);
+
 
 	// Matrix calculated with Axiom:
 
@@ -442,6 +444,7 @@ AffineTransformMatrix AffineTransformMatrix::RotateXYZ(double x, double y,
 		double z)
 {
 	AffineTransformMatrix a;
+
 
 	// Rx := matrix[[1,0,0,0],[0,cox,-six,0],[0,six,cox,0],[0,0,0,1]]
 	// Ry := matrix[[coy,0,siy,0],[0,1,0,0],[-siy,0,coy,0],[0,0,0,1]]

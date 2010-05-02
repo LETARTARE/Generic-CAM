@@ -1,11 +1,31 @@
-//============================================================================
-// Name        : Geometry.cpp
-// Author      : Tobias Schaefer
-// Version     : 0.1
-// Created on  : 28.02.2010
-// Copyright   : (c) 2010
-// Description : CAM Software
-//============================================================================
+///////////////////////////////////////////////////////////////////////////////
+// Name               : Geometry.cpp
+// Purpose            : Class for managing 3D geometry data.
+// Thread Safe        : Yes
+// Platform dependend : No
+// Compiler Options   :
+// Author             : Tobias Schaefer
+// Created            : 28.02.2010
+// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Licence            : GNU General Public License version 3.0 (GPLv3)
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//$LastChangedDate$
+//$Revision$
+//$LastChangedBy$
+///////////////////////////////////////////////////////////////////////////////
 
 
 #include "Geometry.h"
@@ -27,15 +47,18 @@ Triangle::~Triangle()
 }
 void Triangle::Paint(void)
 {
-	::glNormal3f(n[0].x, n[0].y, n[0].z);
 	unsigned char i;
-	for(i = 0; i < 3; i++)
+	for(i = 0; i < 3; i++){
+		::glNormal3f(n[i].x, n[i].y, n[i].z);
 		::glVertex3f(p[i].x, p[i].y, p[i].z);
+	}
 }
 void Triangle::CalculateNormal()
 {
 	n[0] = (p[1] - p[0]) * (p[2] - p[1]);
 	n[0].Normalize();
+	n[1] = n[0];
+	n[2] = n[0];
 }
 
 Geometry::Geometry()
@@ -47,12 +70,15 @@ Geometry::~Geometry()
 
 void Geometry::ApplyTransformation(const AffineTransformMatrix &matrix)
 {
+	//TODO: This function feels wrong and out of place! Should be part of a triangle.
 	unsigned long i;
 	for(i = 0; i < triangles.Count(); i++){
 		triangles[i].p[0] = matrix.Transform(triangles[i].p[0]);
 		triangles[i].p[1] = matrix.Transform(triangles[i].p[1]);
 		triangles[i].p[2] = matrix.Transform(triangles[i].p[2]);
 		triangles[i].n[0] = matrix.Transform(triangles[i].n[0]);
+		triangles[i].n[1] = matrix.Transform(triangles[i].n[1]);
+		triangles[i].n[2] = matrix.Transform(triangles[i].n[2]);
 	}
 }
 
@@ -89,6 +115,8 @@ void Geometry::AddQuad(const AffineTransformMatrix &matrix, const Vector3 &a,
 	tri1->p[2] = tri0->p[0];
 	tri0->CalculateNormal();
 	tri1->n[0] = tri0->n[0];
+	tri1->n[1] = tri0->n[1];
+	tri1->n[2] = tri0->n[2];
 	triangles.Add(tri0);
 	triangles.Add(tri1);
 }
@@ -124,7 +152,7 @@ bool Geometry::ReadSTL(wxString fileName)
 		wxLogMessage(_T("STL text file found!"));
 
 
-		//TODO: STL loading code missing...
+		//TODO: STL loading code for text files missing...
 
 		tfile.Close();
 	}else{
@@ -270,7 +298,6 @@ bool Geometry::ReadGTS(wxString fileName)
 
 	unsigned long u[6];
 	unsigned long t;
-	unsigned char j;
 	for(i = 0; i < nf; i++){
 		if(file.Eof()){
 			wxLogError(_T("File is empty!"));
@@ -316,13 +343,15 @@ bool Geometry::ReadGTS(wxString fileName)
 		tri->CalculateNormal();
 		triangles.Add(tri);
 
-		if(i <= 10){
-			wxLogMessage(wxString::Format(_T("n: %.3f %.3f %.3f"), tri->n[0].x,
-					tri->n[0].y, tri->n[0].z));
-			for(j = 0; j < 3; j++)
-				wxLogMessage(wxString::Format(_T("p: %.3f %.3f %.3f"),
-						tri->p[j].x, tri->p[j].y, tri->p[j].z));
-		}
+
+		//      unsigned char j;
+		//		if(i <= 10){
+		//			wxLogMessage(wxString::Format(_T("n: %.3f %.3f %.3f"), tri->n[0].x,
+		//					tri->n[0].y, tri->n[0].z));
+		//			for(j = 0; j < 3; j++)
+		//				wxLogMessage(wxString::Format(_T("p: %.3f %.3f %.3f"),
+		//						tri->p[j].x, tri->p[j].y, tri->p[j].z));
+		//		}
 
 	}
 

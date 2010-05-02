@@ -1,17 +1,38 @@
-//============================================================================
-// Name        : CSGSurface.h
-// Author      : Tobias Schaefer
-// Version     : 0.1
-// Created on  : 15.04.2010
-// Copyright   : (c) 2010
-// Description : Wrapper for Constructive Solid Geometry
-//============================================================================
+///////////////////////////////////////////////////////////////////////////////
+// Name               : CSGSurface.h
+// Purpose            : Wrapper for Constructive Solid Geometry.
+// Thread Safe        : Yes
+// Platform dependend : No
+// Compiler Options   : -lm -lgts
+// Author             : Tobias Schaefer
+// Created            : 15.04.2010
+// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Licence            : GNU General Public License version 3.0 (GPLv3)
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//$LastChangedDate$
+//$Revision$
+//$LastChangedBy$
+///////////////////////////////////////////////////////////////////////////////
 
 
 #ifndef CSGSURFACE_H_
 #define CSGSURFACE_H_
 
 #include <gts.h>
+#include "AffineTransformMatrix.h"
 
 class CSGSurface {
 	// Constructor / Destructor
@@ -22,6 +43,7 @@ public:
 public:
 
 private:
+	AffineTransformMatrix m;
 	GtsSurface * s;
 
 	// Methods

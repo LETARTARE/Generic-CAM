@@ -1,11 +1,31 @@
-//============================================================================
-// Name        : CSGSurface.cpp
-// Author      : Tobias Schaefer
-// Version     : 0.1
-// Created on  : 15.04.2010
-// Copyright   : (c) 2010
-// Description : CAM Software
-//============================================================================
+///////////////////////////////////////////////////////////////////////////////
+// Name               : CSGSurface.cpp
+// Purpose            : Wrapper for Constructive Solid Geometry.
+// Thread Safe        : Yes
+// Platform dependend : No
+// Compiler Options   : -lm -lgts
+// Author             : Tobias Schaefer
+// Created            : 15.04.2010
+// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Licence            : GNU General Public License version 3.0 (GPLv3)
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//$LastChangedDate$
+//$Revision$
+//$LastChangedBy$
+///////////////////////////////////////////////////////////////////////////////
 
 
 #include "CSGSurface.h"
@@ -359,8 +379,8 @@ void CSGSurface::BooleanAdd(const CSGSurface* surfaceToAdd)
 
 	if(is_open2) fprintf(stderr, "set: surface 2 is open\r\n");
 
-	si = gts_surface_inter_new(gts_surface_inter_class(), s,
-			surfaceToAdd->s, tree1, tree2, is_open1, is_open2);
+	si = gts_surface_inter_new(gts_surface_inter_class(), s, surfaceToAdd->s,
+			tree1, tree2, is_open1, is_open2);
 	g_assert(gts_surface_inter_check(si, &closed));
 
 	if(!closed){
@@ -379,12 +399,12 @@ void CSGSurface::BooleanAdd(const CSGSurface* surfaceToAdd)
 
 	gts_surface_inter_boolean(si, temp, GTS_1_OUT_2);
 	gts_surface_inter_boolean(si, temp, GTS_2_OUT_1);
-//	gts_surface_foreach_face(si->s2, (GtsFunc) gts_triangle_revert, NULL);
-//	gts_surface_foreach_face(surfaceToAdd->s, (GtsFunc) gts_triangle_revert,
-//			NULL);
-//	gts_surface_foreach_face(si->s1, (GtsFunc) gts_triangle_revert, NULL);
-//	gts_surface_foreach_face(s, (GtsFunc) gts_triangle_revert,
-//			NULL);
+	//	gts_surface_foreach_face(si->s2, (GtsFunc) gts_triangle_revert, NULL);
+	//	gts_surface_foreach_face(surfaceToAdd->s, (GtsFunc) gts_triangle_revert,
+	//			NULL);
+	//	gts_surface_foreach_face(si->s1, (GtsFunc) gts_triangle_revert, NULL);
+	//	gts_surface_foreach_face(s, (GtsFunc) gts_triangle_revert,
+	//			NULL);
 
 	gts_object_destroy(GTS_OBJECT (s));
 	s = temp;

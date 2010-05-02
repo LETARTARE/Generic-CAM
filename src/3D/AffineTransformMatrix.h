@@ -6,9 +6,6 @@
 // Compiler Options   : -lm
 // Author             : Tobias Schaefer
 // Created            : 22.07.2009
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 // Copyright          : (C) 2009 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,6 +21,10 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//$LastChangedDate$
+//$Revision$
+//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef AFFINETRANSFORMMATRIX_H_
@@ -92,12 +93,10 @@ public:
 
 	static AffineTransformMatrix RotateAroundVector(Vector3 vector, double phi);
 
-
 	static AffineTransformMatrix RotateInterwoven(double x, double y, double z);
 
 	static AffineTransformMatrix RotateXY(int x, int y, double scale);
 	static AffineTransformMatrix RotateXYZ(double x, double y, double z);
-
 
 	void TranslateGlobal(double x, double y, double z);
 
@@ -107,7 +106,7 @@ public:
 
 	wxString ToString();
 
-		void FromString(wxString string);
+	void FromString(wxString string);
 
 	//private:
 	void TakeMatrixApart(void);

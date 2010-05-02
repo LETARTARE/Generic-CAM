@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Geometry.h
-// Purpose            : Class for managing 3D geometry data.
+// Name               : IKSolver.h
+// Purpose            : Class for solving inverse kinematic problems.
 // Thread Safe        : Yes
 // Platform dependend : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 28.02.2010
+// Created            : 24.04.2010
 // Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -22,62 +22,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
+//$LastChangedDate: 2010-05-02 15:21:09 +0200 (So, 02 Mai 2010) $
+//$Revision: 41 $
+//$LastChangedBy: tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef GEOMETRY_H_
-#define GEOMETRY_H_
+#ifndef IKSOLVER_H_
+#define IKSOLVER_H_
 
 #include "Vector3.h"
 #include "AffineTransformMatrix.h"
 
-#include <wx/string.h>
-#include <wx/dynarray.h>
-
-class Triangle {
-public:
-	Triangle();
-	virtual ~Triangle();
-	Vector3 p[3];
-	Vector3 n[3];
-	void Paint(void);
-	void CalculateNormal();
-};
-WX_DECLARE_OBJARRAY(Triangle, ArrayOfTriangles)
-;
-WX_DECLARE_OBJARRAY(Vector3, ArrayOfVectors)
-;
-
-class Geometry {
+class IKSolver {
 	// Constructor/ Destructor
 public:
-	Geometry();
-	virtual ~Geometry();
+	IKSolver();
+	virtual ~IKSolver();
 
 	// Member variables
 public:
 
-private:
-	AffineTransformMatrix m;
-	ArrayOfTriangles triangles;
 
 	// Methods
 public:
 
-	void ApplyTransformation(const AffineTransformMatrix &matrix);
-
-	void AddTriangle(const AffineTransformMatrix &matrix, const Vector3 &a,
-			const Vector3 &b, const Vector3 &c);
-	void AddQuad(const AffineTransformMatrix &matrix, const Vector3 &a,
-			const Vector3 &b, const Vector3 &c, const Vector3 &d);
-
-	void Paint(void) const;
-
-	bool ReadSTL(wxString fileName);
-	bool ReadGTS(wxString fileName);
 };
 
-#endif /* GEOMETRY_H_ */
+#endif /* IKSOLVER_H_ */
