@@ -1,13 +1,31 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name:        AffineTransformMatrix.cpp
-// Purpose:     class to store a 3D affine transform matrix and provide operations upon.
-// Author:      Tobias Schaefer
-// Modified by:
-// Created:     22.07.2009
-// RCS-ID:
-// Copyright:   (c) 2009 Tobias Schaefer <tobiassch@users.sourceforge.net>
-// Licence:     GNU General Public License version 3.0 (GPLv3)
+// Name               : AffineTransformMatrix.cpp
+// Purpose            : A class to store a 3D affine transform matrix and provide operations upon.
+// Thread Safe        : Yes
+// Platform dependend : No
+// Compiler Options   : -lm
+// Author             : Tobias Schaefer
+// Created            : 22.07.2009
+//$LastChangedDate    : $
+//$Revision           : $
+//$LastChangedBy      : $
+// Copyright          : (C) 2009 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Licence            : GNU General Public License version 3.0 (GPLv3)
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ///////////////////////////////////////////////////////////////////////////////
+
 
 #include "AffineTransformMatrix.h"
 
@@ -25,6 +43,9 @@ AffineTransformMatrix::~AffineTransformMatrix()
 {
 }
 
+/*! Copies a matrix by inserting a given matrix into \a a.
+ *  \param matrix The matrix to copy.
+ */
 void AffineTransformMatrix::Set(const AffineTransformMatrix &matrix)
 {
 	unsigned char i;
@@ -33,6 +54,7 @@ void AffineTransformMatrix::Set(const AffineTransformMatrix &matrix)
 	TakeMatrixApart();
 }
 
+//! Resets the matrix to the identity matrix.
 void AffineTransformMatrix::SetIdentity()
 {
 	rx = ry = rz = 0.0;
@@ -47,6 +69,7 @@ void AffineTransformMatrix::SetIdentity()
 	a[15] = 1.0;
 }
 
+//! Generate a string containing the matrix.
 wxString AffineTransformMatrix::ToString()
 {
 	TakeMatrixApart();
@@ -56,6 +79,8 @@ wxString AffineTransformMatrix::ToString()
 	temp += wxString::Format(_T("%f\n%f\n%f\n"), sx, sy, sz);
 	return temp;
 }
+
+//! Setup the matrix from a string.
 void AffineTransformMatrix::FromString(wxString string)
 {
 	wxStringTokenizer tkz(string, wxT("\n"));
@@ -94,6 +119,7 @@ void AffineTransformMatrix::FromString(wxString string)
 	PutMatrixTogether();
 }
 
+//! Calculate rx,ry,rz,tx,ty,tz and sx,sy,sz from the matrix.
 void AffineTransformMatrix::TakeMatrixApart(void)
 {
 	double b[16];
@@ -161,6 +187,7 @@ void AffineTransformMatrix::TakeMatrixApart(void)
 	}
 }
 
+//! Calculate the matrix from rx,ry,rz,tx,ty,tz and sx,sy,sz.
 void AffineTransformMatrix::PutMatrixTogether(void)
 {
 	double cox = cos(rx);
@@ -169,7 +196,6 @@ void AffineTransformMatrix::PutMatrixTogether(void)
 	double siy = sin(ry);
 	double coz = cos(rz);
 	double siz = sin(rz);
-
 
 	// Matrix calculated with Axiom:
 
@@ -197,8 +223,16 @@ void AffineTransformMatrix::PutMatrixTogether(void)
 	a[15] = 1.0;
 }
 
+/*! \brief Inverts the matrix.
+ *
+ * The transform used in here is optimized for matrices with 0,0,0,1 in the last row.
+ * It would not give the correct results for other matrices,
+ *
+ * \return Inverted matrix.
+ */
 AffineTransformMatrix AffineTransformMatrix::Inverse() const
 {
+	// Code generated with axiom:
 	//)set fortran optlevel 2
 	//)set output fortran on
 	//R:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]])
@@ -206,6 +240,9 @@ AffineTransformMatrix AffineTransformMatrix::Inverse() const
 
 	double T11 = (a[0] * a[5] + (-a[1] * a[4])) * a[10] + ((-a[0] * a[6])
 			+ a[2] * a[4]) * a[9] + (a[1] * a[6] + (-a[2] * a[5])) * a[8];
+	// T11 is the determinant of the matrix. This should
+	// not be zero for a correct transformation matrix.
+	wxASSERT(T11!=0)
 
 	double T12 = a[4] * a[9];
 	double T13 = a[5] * a[8];
@@ -253,9 +290,11 @@ AffineTransformMatrix AffineTransformMatrix::Inverse() const
 	return b;
 }
 
+//! Overloaded operator to allow correct multiplication of two matrices.
 AffineTransformMatrix AffineTransformMatrix::operator*(
 		const AffineTransformMatrix& b) const
 {
+	//Generated with this code:
 	//php -r'for($i=0;$i<4;$i++){for($j=0;$j<4;$j++){printf("c.a[%u]=",$i*4+$j);for($k=0;$k<4;$k++){printf("a[%u]*b.a[%u]%s",$k*4+$j,$i*4+$k,($k==3)?";\r\n":"+");}}}'
 
 	AffineTransformMatrix c;
@@ -278,12 +317,17 @@ AffineTransformMatrix AffineTransformMatrix::operator*(
 	return c;
 }
 
+/*!\brief  Overloaded operator to allow correct division of two matrices.
+ *
+ * The division is done by inverting the second matrix and the multiplying both.
+ */
 AffineTransformMatrix AffineTransformMatrix::operator/(
 		const AffineTransformMatrix& b) const
 {
 	return *(this) * (b.Inverse());
 }
 
+//! Apply the transformation matrix on a given vector.
 Vector3 AffineTransformMatrix::Transform(const Vector3& v) const
 {
 	//R:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]])
@@ -296,50 +340,14 @@ Vector3 AffineTransformMatrix::Transform(const Vector3& v) const
 	return temp;
 }
 
-//void AffineTransformMatrix::PreMult(const double *b)
-//{
-//	int i, j, k, pa, pb, pc;
-//	double c[16];
-//	for(i = 0; i < 4; i++)
-//		for(j = 0; j < 4; j++){
-//			pc = i + j * 4; // position in the result
-//			c[pc] = 0.0f;
-//			for(k = 0; k < 4; k++){
-//				pa = k + j * 4;
-//				pb = i + k * 4;
-//				c[pc] += b[pb] * a[pa];
-//			}
-//		}
-//	for(i = 0; i < 16; i++)
-//		a[i] = c[i];
-//
-//}
-//
-//void AffineTransformMatrix::PostMult(const double *b)
-//{
-//	int i, j, k, pa, pb, pc;
-//	double c[16];
-//	for(i = 0; i < 4; i++)
-//		for(j = 0; j < 4; j++){
-//			pc = i + j * 4;
-//			c[pc] = 0.0f;
-//			for(k = 0; k < 4; k++){
-//				pa = i + k * 4;
-//				pb = k + j * 4;
-//				c[pc] += a[pa] * b[pb];
-//			}
-//		}
-//	for(i = 0; i < 16; i++)
-//		a[i] = c[i];
-//}
-
-
+//! Function returning an identity matrix.
 AffineTransformMatrix AffineTransformMatrix::Identity()
 {
 	AffineTransformMatrix a;
 	return a;
 }
 
+//! Translate matrix in the global coordinate system.
 void AffineTransformMatrix::TranslateGlobal(double x, double y, double z)
 {
 	a[12] += x;
@@ -347,6 +355,7 @@ void AffineTransformMatrix::TranslateGlobal(double x, double y, double z)
 	a[14] += z;
 }
 
+//! Translate matrix in the local, rotated coordinate system.
 void AffineTransformMatrix::TranslateLocal(double x, double y, double z)
 {
 	a[12] += x * a[0] + y * a[4] + z * a[8];
@@ -354,6 +363,13 @@ void AffineTransformMatrix::TranslateLocal(double x, double y, double z)
 	a[14] += x * a[2] + y * a[6] + z * a[10];
 }
 
+/*! Rotation around a given vector.
+ *
+ * Generates a rotation matrix around a given vector.
+ * \param vector Axis of rotation.
+ * \param phi Angle of rotation.
+ * \return Rotation matrix.
+ */
 AffineTransformMatrix AffineTransformMatrix::RotateAroundVector(Vector3 vector,
 		double phi)
 {
@@ -380,6 +396,15 @@ AffineTransformMatrix AffineTransformMatrix::RotateAroundVector(Vector3 vector,
 	return a;
 }
 
+/*! Rotation by mouse.
+ *
+ * This function is only a drop in until the RotateByTrackball function works.
+ *
+ * \param x Movement of mouse in x direction (=xnew-xold).
+ * \param y Movement of mouse in y direction (=ynew-yold).
+ * \param scale Scaling of the movement.
+ * \return Rotation matrix.
+ */
 AffineTransformMatrix AffineTransformMatrix::RotateXY(int x, int y,
 		double scale)
 {
@@ -412,11 +437,11 @@ AffineTransformMatrix AffineTransformMatrix::RotateXY(int x, int y,
 	return a;
 }
 
+//! Rotation by the Z,Y,X rule.
 AffineTransformMatrix AffineTransformMatrix::RotateXYZ(double x, double y,
 		double z)
 {
 	AffineTransformMatrix a;
-
 
 	// Rx := matrix[[1,0,0,0],[0,cox,-six,0],[0,six,cox,0],[0,0,0,1]]
 	// Ry := matrix[[coy,0,siy,0],[0,1,0,0],[-siy,0,coy,0],[0,0,0,1]]
@@ -445,6 +470,16 @@ AffineTransformMatrix AffineTransformMatrix::RotateXYZ(double x, double y,
 	return a;
 }
 
+/*! An interwoven rotation.
+ *
+ * Generates a rotation matrix around x,y,z.
+ * In this case the rotations are interwoven:
+ *
+ * Every rotation (around x, around y and around z) is done
+ * in infinitesimal small steps. On step around x, one step around y, ...
+ *
+ * This results in a rotation as expected from a 6 DOF controller.
+ */
 AffineTransformMatrix AffineTransformMatrix::RotateInterwoven(double x,
 		double y, double z)
 {
@@ -455,7 +490,7 @@ AffineTransformMatrix AffineTransformMatrix::RotateInterwoven(double x,
 	return AffineTransformMatrix::RotateAroundVector(R, alpha);
 }
 
-// RotateTrackball(x1,y1,x2,y2,r)
+//TODO: Program this: RotateTrackball(x1,y1,x2,y2,r)
 // r1= (0,0,r )-(x1,y1,0)
 // r2= (0,0,r )-(x2,y2,0)
 // P1 = SphereIntersect(r1,C,r);
@@ -463,10 +498,10 @@ AffineTransformMatrix AffineTransformMatrix::RotateInterwoven(double x,
 // V1 = (P1-C)
 // V2 = (P2-C)
 // V1.Normalize();
-// V2.Normlize();
+// V2.Normalize();
 // A = V1xV2;
 // alpha = arcsin(abs(A));
 // if(V1*V2 <0)alpha+=M_PI/2;
-//RotateAroundVector(A,alpha);
+// return RotateAroundVector(A,alpha);
 
 
