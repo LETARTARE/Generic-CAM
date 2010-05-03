@@ -1,9 +1,31 @@
-/*
- * Machine.cpp
- *
- *  Created on: 21.02.2010
- *      Author: Tobias Schaefer
- */
+///////////////////////////////////////////////////////////////////////////////
+// Name               : Machine.cpp
+// Purpose            : The machine.
+// Thread Safe        : Yes
+// Platform dependent : No
+// Compiler Options   :
+// Author             : Tobias Schaefer
+// Created            : 21.02.2010
+// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Licence            : GNU General Public License version 3.0 (GPLv3)
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//$LastChangedDate$
+//$Revision$
+//$LastChangedBy$
+///////////////////////////////////////////////////////////////////////////////
 
 #include "Machine.h"
 
@@ -17,6 +39,7 @@ WX_DEFINE_OBJARRAY(ArrayOfMachineComponent)
 Machine::Machine()
 {
 	tool = NULL;
+	toolpath = NULL;
 	position.Zero();
 	ClearComponents();
 }
@@ -25,7 +48,7 @@ Machine::~Machine()
 {
 }
 
-void Machine::Paint(void)
+void Machine::Paint(void) const
 {
 	unsigned int i;
 	for(i = 0; i < components.Count(); i++){
@@ -43,6 +66,8 @@ void Machine::Paint(void)
 	workpiece.Paint();
 	::glPopMatrix();
 
+	if(toolpath != NULL) toolpath->Paint();
+
 }
 
 void Machine::ClearComponents(void)
@@ -51,7 +76,7 @@ void Machine::ClearComponents(void)
 	AddComponent(_T("Base"));
 }
 
-bool Machine::AddComponent(wxString nameOfComponent)
+bool Machine::AddComponent(wxString const& nameOfComponent)
 {
 	unsigned int i;
 	for(i = 0; i < components.Count(); i++){
@@ -62,8 +87,8 @@ bool Machine::AddComponent(wxString nameOfComponent)
 	return true;
 }
 
-bool Machine::PlaceComponent(wxString nameOfComponent,
-		const AffineTransformMatrix &matrix)
+bool Machine::PlaceComponent(wxString const& nameOfComponent,
+		AffineTransformMatrix const& matrix)
 {
 	unsigned int i;
 	bool flag = false;
@@ -121,7 +146,7 @@ bool Machine::ReLoadDescription(void)
 	return true;
 }
 
-bool Machine::LoadDescription(wxFileName fileName)
+bool Machine::LoadDescription(wxFileName const& fileName)
 {
 	if(!fileName.IsOk()) return false;
 	this->fileName = fileName;
