@@ -2,7 +2,7 @@
 // Name               : Geometry.cpp
 // Purpose            : Class for managing 3D geometry data.
 // Thread Safe        : Yes
-// Platform dependend : No
+// Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
 // Created            : 28.02.2010
@@ -45,7 +45,14 @@ Triangle::Triangle()
 Triangle::~Triangle()
 {
 }
-void Triangle::Paint(void)
+
+/*!\brief Puts a triangle in the OpenGL queue.
+ *
+ * This function does not call glBegin(GL_TRIANGLES); and
+ * glEnd();. This has to be done by the calling function.
+ * (Allows to save OpenGL calls.)
+ */
+void Triangle::Paint(void) const
 {
 	unsigned char i;
 	for(i = 0; i < 3; i++){
@@ -53,6 +60,13 @@ void Triangle::Paint(void)
 		::glVertex3f(p[i].x, p[i].y, p[i].z);
 	}
 }
+/*!\brief Calculates normals for the corners of a triangle.
+ *
+ *  If no normals can be provided from elsewhere, this function
+ *  can generate a set. The normal vectors n[0] to n[2] are all
+ *  set normal to the plane of the triangle. Orientation is
+ *  right handed.
+ */
 void Triangle::CalculateNormal()
 {
 	n[0] = (p[1] - p[0]) * (p[2] - p[1]);
@@ -84,12 +98,16 @@ void Geometry::ApplyTransformation(const AffineTransformMatrix &matrix)
 
 void Geometry::Paint(void) const
 {
+
 	unsigned long i;
+	::glPushMatrix();
+	::glMultMatrixd(m.a);
 	::glBegin(GL_TRIANGLES);
 	for(i = 0; i < triangles.Count(); i++){
 		triangles[i].Paint();
 	}
 	::glEnd();
+	::glPopMatrix();
 }
 
 void Geometry::AddTriangle(const AffineTransformMatrix &matrix,

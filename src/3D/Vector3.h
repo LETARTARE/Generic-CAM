@@ -2,7 +2,7 @@
 // Name               : Vector3.h
 // Purpose            : A 3D vector class with support functions.
 // Thread Safe        : Yes
-// Platform dependend : No
+// Platform dependent : No
 // Compiler Options   : -lm
 // Author             : Tobias Schaefer
 // Created            : 28.01.2010

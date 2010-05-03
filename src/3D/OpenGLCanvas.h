@@ -2,7 +2,7 @@
 // Name               : OpenGLCanvas.h
 // Purpose            : Class providing wxWidgets with an OpenGL canvas with extra functions.
 // Thread Safe        : Yes
-// Platform dependend : Yes
+// Platform dependent : Yes
 // Compiler Options   : -lopengl32 -lglu
 // Author             : Tobias Schaefer
 // Created            : 13.09.2009
@@ -37,6 +37,11 @@
 #include "../controller/Control3D.h"
 #include <wx/glcanvas.h>
 
+/*!\class OpenGLCanvas
+ * \brief Extending wxGLCanvas with some useful features.
+ *
+ *
+ */
 class OpenGLCanvas:public wxGLCanvas {
 	//friend class ChildFrame;
 	// Constructor / Destructor
@@ -76,10 +81,10 @@ public:
 
 
 protected:
-	void OnPaint(wxPaintEvent& event);
+	void OnPaint(wxPaintEvent& WXUNUSED(event));
 	void OnSize(wxSizeEvent& event);
-	void OnEraseBackground(wxEraseEvent& event);
-	void OnEnterWindow(wxMouseEvent& event);
+	void OnEraseBackground(wxEraseEvent& WXUNUSED(event));
+	void OnEnterWindow(wxMouseEvent& WXUNUSED(event));
 	void OnMouseEvent(wxMouseEvent& event);
 	void OnTimer(wxTimerEvent& event);
 

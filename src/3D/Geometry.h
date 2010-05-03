@@ -2,7 +2,7 @@
 // Name               : Geometry.h
 // Purpose            : Class for managing 3D geometry data.
 // Thread Safe        : Yes
-// Platform dependend : No
+// Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
 // Created            : 28.02.2010
@@ -36,14 +36,19 @@
 
 #include <wx/string.h>
 #include <wx/dynarray.h>
+/*!\class Triangle
+ * \brief Defines a simple triangle.
+ *
+ * Holds the data for a simple triangle. Three vertices with three normal vectors.
+ */
 
 class Triangle {
 public:
 	Triangle();
 	virtual ~Triangle();
-	Vector3 p[3];
-	Vector3 n[3];
-	void Paint(void);
+	Vector3 p[3]; //!< Position of vertices.
+	Vector3 n[3]; //!< Normal vectors.
+	void Paint(void) const;
 	void CalculateNormal();
 };
 WX_DECLARE_OBJARRAY(Triangle, ArrayOfTriangles)
@@ -51,6 +56,11 @@ WX_DECLARE_OBJARRAY(Triangle, ArrayOfTriangles)
 WX_DECLARE_OBJARRAY(Vector3, ArrayOfVectors)
 ;
 
+/*!\class Geometry
+ * \brief Contains geometric data.
+ *
+ * Data from STL and GTS files is stored within this class.
+ */
 class Geometry {
 	// Constructor/ Destructor
 public:
@@ -61,8 +71,8 @@ public:
 public:
 
 private:
-	AffineTransformMatrix m;
-	ArrayOfTriangles triangles;
+	AffineTransformMatrix m; //!< Transformation of the data.
+	ArrayOfTriangles triangles; //!< The storage of the geometric data.
 
 	// Methods
 public:

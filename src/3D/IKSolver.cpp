@@ -2,7 +2,7 @@
 // Name               : IKSolver.cpp
 // Purpose            : Class for solving inverse kinematic problems.
 // Thread Safe        : Yes
-// Platform dependend : No
+// Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
 // Created            : 24.04.2010

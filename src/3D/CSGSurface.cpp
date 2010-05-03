@@ -2,7 +2,7 @@
 // Name               : CSGSurface.cpp
 // Purpose            : Wrapper for Constructive Solid Geometry.
 // Thread Safe        : Yes
-// Platform dependend : No
+// Platform dependent : No
 // Compiler Options   : -lm -lgts
 // Author             : Tobias Schaefer
 // Created            : 15.04.2010
@@ -43,6 +43,13 @@ CSGSurface::~CSGSurface()
 	gts_object_destroy(GTS_OBJECT (s));
 }
 
+void CSGSurface::Clear()
+{
+	gts_object_destroy(GTS_OBJECT (s));
+	s = gts_surface_new(gts_surface_class(), gts_face_class(),
+			gts_edge_class(), gts_vertex_class());
+}
+
 bool CSGSurface::SelfTest()
 {
 	if(!gts_surface_is_orientable(s)){
@@ -66,7 +73,7 @@ void CSGSurface::Statistics(void)
 	gts_surface_print_stats(s, stderr);
 }
 
-void CSGSurface::Paint()
+void CSGSurface::Paint() const
 {
 	GSList * strips = NULL;
 	GSList * i;
@@ -225,10 +232,10 @@ void CSGSurface::Translate(float translateX, float translateY, float translateZ)
 	gts_matrix_destroy(m);
 }
 
-static void prepend_triangle_bbox(GtsTriangle * t, GSList ** bboxes)
-{
-	*bboxes = g_slist_prepend(*bboxes, gts_bbox_triangle(gts_bbox_class(), t));
-}
+//static void prepend_triangle_bbox(GtsTriangle * t, GSList ** bboxes)
+//{
+//	*bboxes = g_slist_prepend(*bboxes, gts_bbox_triangle(gts_bbox_class(), t));
+//}
 
 void CSGSurface::BooleanRemove(const CSGSurface* surfaceToRemove)
 {

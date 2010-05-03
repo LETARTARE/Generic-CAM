@@ -2,7 +2,7 @@
 // Name               : AffineTransformMatrix.h
 // Purpose            : A class to store a 3D affine transform matrix and provide operations upon.
 // Thread Safe        : Yes
-// Platform dependend : No
+// Platform dependent : No
 // Compiler Options   : -lm
 // Author             : Tobias Schaefer
 // Created            : 22.07.2009
@@ -82,31 +82,35 @@ public:
 
 	// Methods
 	//AffineTransformMatrix& operator=(const AffineTransformMatrix& b);
-	AffineTransformMatrix operator*(const AffineTransformMatrix& b) const;
-	AffineTransformMatrix operator/(const AffineTransformMatrix& b) const;
+	AffineTransformMatrix operator*(AffineTransformMatrix const& b) const;
+	AffineTransformMatrix operator/(AffineTransformMatrix const& b) const;
 
-	void Set(const AffineTransformMatrix &matrix);
+	void Set(AffineTransformMatrix const& matrix);
 	void SetIdentity();
 	AffineTransformMatrix Inverse() const;
 
 	static AffineTransformMatrix Identity();
 
-	static AffineTransformMatrix RotateAroundVector(Vector3 vector, double phi);
+	static AffineTransformMatrix RotateAroundVector(Vector3 const& vector,
+			double const& phi);
 
-	static AffineTransformMatrix RotateInterwoven(double x, double y, double z);
+	static AffineTransformMatrix RotateInterwoven(double const& x,
+			double const& y, double const& z);
 
-	static AffineTransformMatrix RotateXY(int x, int y, double scale);
-	static AffineTransformMatrix RotateXYZ(double x, double y, double z);
+	static AffineTransformMatrix RotateXY(int const& x, int const& y,
+			double const& scale);
+	static AffineTransformMatrix RotateXYZ(double const& x, double const& y,
+			double const& z);
 
-	void TranslateGlobal(double x, double y, double z);
+	void TranslateGlobal(double const& x, double const& y, double const& z);
 
-	void TranslateLocal(double x, double y, double z);
+	void TranslateLocal(double const& x, double const& y, double const& z);
 
-	Vector3 Transform(const Vector3& v) const;
+	Vector3 Transform(Vector3 const& v) const;
 
 	wxString ToString();
 
-	void FromString(wxString string);
+	void FromString(wxString const& string);
 
 	//private:
 	void TakeMatrixApart(void);

@@ -2,7 +2,7 @@
 // Name               : OpenGLCanvas.cpp
 // Purpose            : Class providing wxWidgets with an OpenGL canvas with extra functions.
 // Thread Safe        : Yes
-// Platform dependend : Yes
+// Platform dependent : Yes
 // Compiler Options   : -lopengl32 -lglu
 // Author             : Tobias Schaefer
 // Created            : 13.09.2009
@@ -26,7 +26,9 @@
 //$Revision$
 //$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
+
 #include "OpenGLCanvas.h"
+
 #include <wx/wx.h>
 #ifdef __WXMAC__
 #include "OpenGL/glu.h"
@@ -35,7 +37,9 @@
 #include <GL/glu.h>
 //#include <GL/gl.h>
 #endif
+
 #define TIMER_OPENGLCANVAS 1902
+
 //TODO: Change this to this->Connect(...) calls.
 BEGIN_EVENT_TABLE(OpenGLCanvas, wxGLCanvas)
 EVT_SIZE(OpenGLCanvas::OnSize)

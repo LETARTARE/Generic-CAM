@@ -1,8 +1,36 @@
-// SerialPort.cpp
+///////////////////////////////////////////////////////////////////////////////
+// Name               : SerialPort.cpp
+// Purpose            : A serial port class for Linux and Windows.
+// Thread Safe        : No
+// Platform dependent : Yes
+// Compiler Options   :
+// Author             : Tobias Schaefer
+// Created            : 08.09.2002
+// Copyright          : (C) 2002 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Licence            : GNU General Public License version 3.0 (GPLv3)
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//$LastChangedDate$
+//$Revision$
+//$LastChangedBy$
+///////////////////////////////////////////////////////////////////////////////
+
 
 #include "SerialPort.h"
 
-Serial::Serial()
+SerialPort::SerialPort()
 {
 #ifdef __WIN
 	memset( &m_OverlappedRead, 0, sizeof( OVERLAPPED ) );
@@ -19,12 +47,12 @@ Serial::Serial()
 	Opened = false;
 }
 
-Serial::~Serial()
+SerialPort::~SerialPort()
 {
 	Close();
 }
 
-bool Serial::Open(int nPort, int nBaud)
+bool SerialPort::Open(int nPort, int nBaud)
 {
 	if(Opened) return (true);
 
@@ -47,7 +75,7 @@ bool Serial::Open(int nPort, int nBaud)
 	return Open(szPort, nBaud);
 }
 
-bool Serial::Open(const char *Port, int nBaud)
+bool SerialPort::Open(const char *Port, int nBaud)
 {
 	if(Port == NULL) return false;
 	if(Opened) return true;
@@ -225,7 +253,7 @@ bool Serial::Open(const char *Port, int nBaud)
 	return (Opened);
 }
 
-bool Serial::Close(void)
+bool SerialPort::Close(void)
 {
 	//	printf("Port ist %s! \n",Opened?"offen":"geschlossen");
 
@@ -256,7 +284,7 @@ bool Serial::Close(void)
 }
 
 #ifdef __WIN
-bool Serial::WriteCommByte( unsigned char ucByte )
+bool SerialPort::WriteCommByte( unsigned char ucByte )
 {
 
 	BOOL bWriteStat;
@@ -274,7 +302,7 @@ bool Serial::WriteCommByte( unsigned char ucByte )
 }
 #endif
 
-int Serial::SendData(char *buffer, unsigned int size)
+int SerialPort::SendData(char *buffer, unsigned int size)
 {
 #ifdef __WIN
 	if(m_hIDComDev == NULL) return (0);
@@ -297,7 +325,7 @@ int Serial::SendData(char *buffer, unsigned int size)
 #endif
 }
 
-int Serial::ReadDataWaiting(void)
+int SerialPort::ReadDataWaiting(void)
 {
 #ifdef __WIN
 	if(m_hIDComDev == NULL ) return( 0 );
@@ -322,7 +350,7 @@ int Serial::ReadDataWaiting(void)
 #endif
 }
 
-int Serial::ReadData(char *buffer, unsigned int limit)
+int SerialPort::ReadData(char *buffer, unsigned int limit)
 {
 #ifdef __WIN
 
@@ -364,7 +392,7 @@ int Serial::ReadData(char *buffer, unsigned int limit)
 #endif
 }
 
-void Serial::FlushData()
+void SerialPort::FlushData()
 {
 	char Dummy[128];
 	unsigned int i = ReadDataWaiting();

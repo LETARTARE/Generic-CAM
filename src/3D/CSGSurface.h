@@ -2,7 +2,7 @@
 // Name               : CSGSurface.h
 // Purpose            : Wrapper for Constructive Solid Geometry.
 // Thread Safe        : Yes
-// Platform dependend : No
+// Platform dependent : No
 // Compiler Options   : -lm -lgts
 // Author             : Tobias Schaefer
 // Created            : 15.04.2010
@@ -34,6 +34,11 @@
 #include <gts.h>
 #include "AffineTransformMatrix.h"
 
+/*!\class CSGSurface
+ * \brief Wrapper class for the The GNU Triangulated Surface Library.
+ *
+ * To hide all the uglieness deep inside...
+ */
 class CSGSurface {
 	// Constructor / Destructor
 public:
@@ -48,7 +53,9 @@ private:
 
 	// Methods
 public:
-	void Paint();
+
+	void Clear();
+	void Paint() const;
 
 	void AddBox(const double sizeX, const double sizeY, const double sizeZ);
 	void SetSphere(const double radius, const unsigned char subdivision = 3);
