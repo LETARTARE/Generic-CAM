@@ -47,7 +47,7 @@ public:
 	// Member variables
 public:
 
-private:
+protected:
 	AffineTransformMatrix m;
 	GtsSurface * s;
 

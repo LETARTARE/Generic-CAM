@@ -28,6 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 /*!\class ToolPath
+ * \code #include "ToolPath.h"\endcode
  * \brief Describes the boundary of the volume to be cut away.
  *
  */
@@ -38,12 +39,6 @@
 #include "../3D/AffineTransformMatrix.h"
 #include "../3D/CSGSurface.h"
 #include "Tool.h"
-
-#include <wx/dynarray.h>
-WX_DECLARE_OBJARRAY(GtsVertex, ArrayOfGtsVertex)
-;
-WX_DECLARE_OBJARRAY(GtsEdge, ArrayOfGtsEdge)
-;
 
 class ToolPath:public CSGSurface {
 	// Constructor / Destructor

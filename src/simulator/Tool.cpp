@@ -214,8 +214,8 @@ void Tool::GenerateContour(void)
 				//wxLogMessage(wxString::Format(_T("x: %f z: %f"),x,z));
 				//wxLogMessage(wxString::Format(_T("x2: %f z2: %f"), x2, z2));
 				float a = atan2(x, z);
-				float a1 = a - asin(d / 2 / r);
-				float a2 = a + asin(d / 2 / r);
+				float a1 = a + asin(d / 2 / r);
+				float a2 = a - asin(d / 2 / r);
 				//				wxLogMessage(wxString::Format(_T("a: %f a1: %f a2: %f"), a
 				//						/ M_PI * 180, a1 / M_PI * 180, a2 / M_PI * 180));
 				unsigned char n = floor(fabs(a2 - a1) / M_PI * 180 / 15);

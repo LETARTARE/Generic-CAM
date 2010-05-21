@@ -141,7 +141,7 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event) )
 		GLdouble ar = (GLdouble) w / (GLdouble) h; // Perspective neu bestimmen
 		::glMatrixMode(GL_PROJECTION);
 		::glLoadIdentity();
-		::gluPerspective(45, ar, 1, 200);
+		::gluPerspective(45, ar, 0.01, 10);
 		::glMatrixMode(GL_MODELVIEW);
 	}
 
@@ -157,7 +157,7 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event) )
 
 		::glTranslatef(0.1, 0, 0);
 	}
-	::glTranslatef(0.0, 0, -10);
+	::glTranslatef(0.0, 0, -1);
 	::glMultMatrixd(transmat.a);
 	::glMultMatrixd(rotmat.a);
 

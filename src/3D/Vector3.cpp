@@ -34,16 +34,19 @@ Vector3::~Vector3(void)
 {
 }
 
+//!The absolut value of a vector.
 float Vector3::Abs(void)
 {
 	return sqrt(x * x + y * y + z * z);
 }
 
+//! Zeros a vector.
 void Vector3::Zero(void)
 {
 	x = y = z = 0.0;
 }
 
+//! Normalizes the length of a vector.
 Vector3 Vector3::Normalize(void)
 {
 	float d = Abs();

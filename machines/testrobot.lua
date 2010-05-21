@@ -10,6 +10,8 @@ AXIS_Z_MAX_VELOCITY = 0.100 --m/s
 
 -- Definition of the geometry
 
+-- http://www.robotmatrix.org/RobotConfiguration.htm
+
 -- Base of the machine
 translate(0, 0, 0); -- Actually this line does nothing at all.
 loadstl("robot1.stl");

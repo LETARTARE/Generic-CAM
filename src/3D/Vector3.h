@@ -27,6 +27,9 @@
 //$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
+/*!\class Vector3
+ * \brief Describes a vector in 3D
+ */
 
 #ifndef _CVECTOR3_H_
 #define _CVECTOR3_H_
@@ -50,10 +53,14 @@ public:
 
 	//	void operator=(const Vector3& a){x=a.x;y=a.y;z=a.z;};
 
+	//! Overloaded operator for vector addition.
 	Vector3 operator+(const Vector3& a)
 	{
 		return Vector3(x + a.x, y + a.y, z + a.z);
 	}
+
+
+	//! Overloaded operator for vector addition.
 	Vector3 operator+=(const Vector3& a)
 	{
 		x += a.x;
@@ -61,10 +68,12 @@ public:
 		z += a.z;
 		return Vector3(x, y, z);
 	}
+	//! Overloaded operator for vector subtraction.
 	Vector3 operator-(const Vector3& a)
 	{
 		return Vector3(x - a.x, y - a.y, z - a.z);
 	}
+	//! Overloaded operator for vector subtraction.
 	Vector3 operator-=(const Vector3& a)
 	{
 		x -= a.x;
@@ -72,18 +81,34 @@ public:
 		z -= a.z;
 		return Vector3(x, y, z);
 	}
+	//! Overloaded operator for vector negation.
 	Vector3 operator-()
 	{
 		return Vector3(-x, -y, -z);
 	}
+	/*!\brief Overloaded operator for vector product.
+	 *
+	 * This function calculates the vector product
+	 * \f[
+	 * \vec{c}=\left\{
+	 * \begin{array}{c}
+	 * \vec{a}_y \cdot \vec{b}_z - \vec{a}_z \cdot \vec{b}_y \\
+	 * \vec{a}_z \cdot \vec{b}_x - \vec{a}_x \cdot \vec{b}_z \\
+	 * \vec{a}_x \cdot \vec{b}_y - \vec{a}_y \cdot \vec{b}_x
+	 * \end{array}
+	 * \right\}
+	 * \f].
+	 */
 	Vector3 operator*(const Vector3& b)
 	{
 		return Vector3(y * b.z - z * b.y, z * b.x - x * b.z, x * b.y - y * b.x);
 	}
+	//! Overloaded operator for scalar product.
 	Vector3 operator*(const float &b)
 	{
 		return Vector3(x * b, y * b, z * b);
 	}
+	//!Overloaded operator for vector product.
 	Vector3 operator*=(const Vector3& b)
 	{
 		Vector3 a = *(this);
@@ -92,6 +117,7 @@ public:
 		z = a.x * b.y - a.y * b.x;
 		return Vector3(x, y, z);
 	}
+	//! Overloaded operator for scalar product.
 	Vector3 operator*=(const float &b)
 	{
 		x *= b;
@@ -99,10 +125,12 @@ public:
 		z *= b;
 		return Vector3(x, y, z);
 	}
+	//! Overloaded operator for scalar division.
 	Vector3 operator/(const float &b)
 	{
 		return Vector3(x / b, y / b, z / b);
 	}
+	//! Overloaded operator for scalar division.
 	Vector3 operator/=(const float &b)
 	{
 		x /= b;
@@ -111,6 +139,7 @@ public:
 		return Vector3(x, y, z);
 	}
 	void Zero(void);
+	//! Sets the vector to the given coordinates.
 	void Set(float x, float y, float z)
 	{
 		this->x = x;

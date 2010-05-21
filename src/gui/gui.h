@@ -22,11 +22,11 @@
 #include "MachineCanvas.h"
 #include <wx/sizer.h>
 #include <wx/frame.h>
+#include <wx/textctrl.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 #include "DataCanvas.h"
 #include <wx/stattext.h>
-#include <wx/textctrl.h>
 #include <wx/radiobox.h>
 #include <wx/slider.h>
 #include <wx/combobox.h>
@@ -87,7 +87,7 @@ class GUIAboutDialog : public wxDialog
 	private:
 	
 	protected:
-		
+		wxTextCtrl* m_textCtrl12;
 		wxButton* m_button1;
 		
 		// Virtual event handlers, overide them in your derived class
@@ -95,7 +95,7 @@ class GUIAboutDialog : public wxDialog
 		
 	
 	public:
-		GUIAboutDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 414,229 ), long style = wxDEFAULT_DIALOG_STYLE );
+		GUIAboutDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 412,227 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~GUIAboutDialog();
 	
 };
