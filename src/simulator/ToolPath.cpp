@@ -74,7 +74,7 @@ void ToolPath::Generate(Tool const& tool,
 		cc[i] = cos(2* M_PI / resolution * i);
 	}
 
-	unsigned int n = 0;
+	unsigned int nrOfElement = 0;
 	unsigned int object = 0;
 
 	const bool workOnNonCutting = true; //TODO: Use this as a flag later.
@@ -95,62 +95,95 @@ void ToolPath::Generate(Tool const& tool,
 
 	float a, a2; // Angles of ToolContourElement normals to the outside.
 
+	//Debugging vectors
+	Vector3 test1, test2;
+	ToolContourElement* test;
+
+
 	// Splitting of the contour in convex elements.
-	while(n < tool.contour.Count()){
-		if(tool.contour[n].isCutting || workOnNonCutting){
+	while(nrOfElement < tool.contour.Count()){
+		if(tool.contour[nrOfElement].isCutting || workOnNonCutting){
 			object++;
 
-			a = atan2(tool.contour[n].p2.x - tool.contour[n].p1.x,
-					tool.contour[n].p2.z - tool.contour[n].p1.z);
+			a = atan2(tool.contour[nrOfElement].p2.x
+					- tool.contour[nrOfElement].p1.x,
+					tool.contour[nrOfElement].p2.z
+							- tool.contour[nrOfElement].p1.z);
 			if(a < (M_PI_2 + epsilona) && a > (-M_PI_2 - epsilona)){
 				contour.Clear();
 
-
+				test = &(tool.contour[nrOfElement]);
 				// Extra top cap?.
-				if(fabs(tool.contour[n].p1.x) > epsilon){
+				if(fabs(tool.contour[nrOfElement].p1.x) > epsilon){
 					temp = new ToolContourElement;
 					temp->p1.x = 0;
-					temp->p1.z = tool.contour[n].p1.z;
-					temp->p2.x = tool.contour[n].p1.x;
-					temp->p2.z = tool.contour[n].p1.z;
+					temp->p1.z = tool.contour[nrOfElement].p1.z;
+					temp->n1.x = 0;
+					temp->n1.z = -1;
+					temp->p2.x = tool.contour[nrOfElement].p1.x;
+					temp->p2.z = tool.contour[nrOfElement].p1.z;
+					temp->n2.x = 0;
+					temp->n2.z = -1;
 					contour.Add(temp);
 					a = M_PI_2;
 				}
 
-				a2 = atan2(tool.contour[n].p2.x - tool.contour[n].p1.x,
-						tool.contour[n].p2.z - tool.contour[n].p1.z);
+				a2 = atan2(tool.contour[nrOfElement].p2.x
+						- tool.contour[nrOfElement].p1.x,
+						tool.contour[nrOfElement].p2.z
+								- tool.contour[nrOfElement].p1.z);
 				while(a2 < a + epsilon && a2 >= -M_PI_2 - epsilon
-						&& (tool.contour[n].isCutting || workOnNonCutting)){
+						&& (tool.contour[nrOfElement].isCutting
+								|| workOnNonCutting)){
 
-					if(tool.contour[n].p1.x >= epsilon || tool.contour[n].p2.x
-							>= epsilon){
+					if(tool.contour[nrOfElement].p1.x >= epsilon
+							|| tool.contour[nrOfElement].p2.x >= epsilon){
 						temp = new ToolContourElement;
-						temp->p1.x = tool.contour[n].p1.x;
-						temp->p1.z = tool.contour[n].p1.z;
-						temp->p2.x = tool.contour[n].p2.x;
-						temp->p2.z = tool.contour[n].p2.z;
+						temp->p1.x = tool.contour[nrOfElement].p1.x;
+						temp->p1.z = tool.contour[nrOfElement].p1.z;
+						temp->n1.x = tool.contour[nrOfElement].n1.x;
+						temp->n1.z = tool.contour[nrOfElement].n1.z;
+						temp->p2.x = tool.contour[nrOfElement].p2.x;
+						temp->p2.z = tool.contour[nrOfElement].p2.z;
+						temp->n2.x = tool.contour[nrOfElement].n2.x;
+						temp->n2.z = tool.contour[nrOfElement].n2.z;
 						contour.Add(temp);
 						a = a2;
 					}
 
-					n++;
-					if(n < tool.contour.Count()){
-						a2 = atan2(tool.contour[n].p2.x - tool.contour[n].p1.x,
-								tool.contour[n].p2.z - tool.contour[n].p1.z);
+					nrOfElement++;
+					if(nrOfElement < tool.contour.Count()){
+						a2 = atan2(tool.contour[nrOfElement].p2.x
+								- tool.contour[nrOfElement].p1.x,
+								tool.contour[nrOfElement].p2.z
+										- tool.contour[nrOfElement].p1.z);
 					}else{
 						a2 = -M_PI;
 					}
 				}
 				// Extra end cap?.
-				if(fabs(tool.contour[n - 1].p2.x) > epsilon){
+				if(fabs(tool.contour[nrOfElement - 1].p2.x) > epsilon){
 					temp = new ToolContourElement;
-					temp->p1.x = tool.contour[n - 1].p2.x;
-					temp->p1.z = tool.contour[n - 1].p2.z;
+					temp->p1.x = tool.contour[nrOfElement - 1].p2.x;
+					temp->p1.z = tool.contour[nrOfElement - 1].p2.z;
+					temp->n1.x = 0;
+					temp->n1.z = 1;
 					temp->p2.x = 0;
-					temp->p2.z = tool.contour[n - 1].p2.z;
+					temp->p2.z = tool.contour[nrOfElement - 1].p2.z;
+					temp->n2.x = 0;
+					temp->n2.z = 1;
 					contour.Add(temp);
 				}
 
+				// Bending normals
+				for(i = 0; i < contour.Count() - 1; i++){
+					if(i > 0){
+						contour[i].n1 = (contour[i - 1].n2 + contour[i].n1) / 2;
+						contour[i - 1].n2 = contour[i].n1;
+					}
+					contour[i].n2 = (contour[i + 1].n1 + contour[i].n2) / 2;
+					contour[i + 1].n1 = contour[i].n2;
+				}
 
 				// Generate mesh:
 
@@ -171,22 +204,25 @@ void ToolPath::Generate(Tool const& tool,
 
 					// Cutting angles of the top cap:
 
-					a2 = 45.0 / 180*M_PI;
+					a2 = atan2(m.y, m.x);
 					a = 90.0 / 180*M_PI;
+
+					Vector3 n; // Normal of a face to generate
+
 
 					int n1, n2;
 					n1 = (int) floor((float) resolution / 2 / M_PI * (a2 - a));
 					n2 = (int) floor((float) resolution / 2 / M_PI * (a2 + a));
 
-					if(n2 > (int) resolution) n2 -= resolution;
-					if(n1 < 0) n1 += resolution;
+					n1 = 28;
+					n2 = 12;
 
 
 					// Top cap:
 					// Generate center vertex
 
-					if((n1 <= n2 && n1 <= 0 && 0 <= n2) || (n1 > n2 && n1 > 0
-							&& 0 > n2)){
+
+					if((contour[0].n1.x * m.x + contour[0].n1.z * m.z) <= 0.0){
 						t = position0.Transform(contour[0].p1);
 					}else{
 						t = position1.Transform(contour[0].p1);
@@ -197,8 +233,8 @@ void ToolPath::Generate(Tool const& tool,
 						t.Set(contour[0].p2.x * cc[j], contour[0].p2.x * ss[j],
 								contour[0].p2.z);
 
-						if((n1 <= n2 && n1 <= (int) j && (int) j <= n2) || (n1
-								> n2 && n1 > (int) j && (int) j > n2)){
+						if((contour[0].n2.x * m.x * cc[j] + contour[0].n2.x
+								* m.y * ss[j] + contour[0].n2.z * m.z) <= 0.0){
 							t = position0.Transform(t);
 						}else{
 							t = position1.Transform(t);
@@ -225,8 +261,8 @@ void ToolPath::Generate(Tool const& tool,
 					// Middle elements:
 					for(i = 1; i < contour.Count() - 1; i++){
 						// First vertex
-						if((n1 <= n2 && n1 <= 0 && 0 <= n2) || (n1 > n2 && n1
-								> 0 && 0 > n2)){
+						if((contour[i].n2.x * m.x + contour[i].n2.z * m.z)
+								<= 0.0){
 							t = position0.Transform(contour[i].p2);
 						}else{
 							t = position1.Transform(contour[i].p2);
@@ -244,8 +280,9 @@ void ToolPath::Generate(Tool const& tool,
 							v1 = v2;
 							t.Set(contour[i].p2.x * cc[j + 1], contour[i].p2.x
 									* ss[j + 1], contour[i].p2.z);
-							if((n1 <= n2 && n1 <= (int) j && (int) j <= n2)
-									|| (n1 > n2 && n1 > (int) j && (int) j > n2)){
+							if((contour[i].n2.x * m.x * cc[j+1] + contour[i].n2.x
+									* m.y * ss[j+1] + contour[i].n2.z * m.z)
+									<= 0.0){
 								t = position0.Transform(t);
 							}else{
 								t = position1.Transform(t);
@@ -289,8 +326,7 @@ void ToolPath::Generate(Tool const& tool,
 					// Bottom cap:
 					// Generate center vertex
 
-					if((n1 <= n2 && n1 <= 0 && 0 <= n2) || (n1 > n2 && n1 > 0
-							&& 0 > n2)){
+					if((contour[i].n2.x * m.x + contour[i].n2.z * m.z) <= 0.0){
 						t = position0.Transform(contour[i].p2);
 					}else{
 						t = position1.Transform(contour[i].p2);

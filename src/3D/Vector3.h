@@ -125,6 +125,15 @@ public:
 		z *= b;
 		return Vector3(x, y, z);
 	}
+
+
+	//! Calculates the dot product (inner product) of two vectors.
+	float Dot(const Vector3& b)
+	{
+		return (x * b.x + y * b.y + z * b.z);
+	}
+
+
 	//! Overloaded operator for scalar division.
 	Vector3 operator/(const float &b)
 	{
