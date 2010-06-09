@@ -77,7 +77,7 @@ void ToolPath::Generate(Tool const& tool,
 	unsigned int nrOfElement = 0;
 	unsigned int object = 0;
 
-	const bool workOnNonCutting = true; //TODO: Use this as a flag later.
+	const bool workOnNonCutting = false;
 	const double epsilon = 1e-5; // = 10 µm
 	const double epsilona = 1e-5; // = 10 µrad
 
@@ -185,7 +185,9 @@ void ToolPath::Generate(Tool const& tool,
 					contour[i + 1].n1 = contour[i].n2;
 				}
 
+
 				// Generate mesh:
+
 
 				if(contour.Count() >= 2){
 
@@ -200,6 +202,9 @@ void ToolPath::Generate(Tool const& tool,
 					GtsEdge* e[resolution];
 
 					Vector3 t;
+
+					CSGSurface surface;
+					GtsSurface* surf = surface.GetSurface();
 
 
 					// Cutting angles of the top cap:
@@ -227,7 +232,7 @@ void ToolPath::Generate(Tool const& tool,
 					}else{
 						t = position1.Transform(contour[0].p1);
 					}
-					v0 = gts_vertex_new(s->vertex_class, t.x, t.y, t.z);
+					v0 = gts_vertex_new(surf->vertex_class, t.x, t.y, t.z);
 					// Generate edge ring and surfaces
 					for(j = 0; j < resolution; j++){
 						t.Set(contour[0].p2.x * cc[j], contour[0].p2.x * ss[j],
@@ -239,23 +244,25 @@ void ToolPath::Generate(Tool const& tool,
 						}else{
 							t = position1.Transform(t);
 						}
-						v[j] = gts_vertex_new(s->vertex_class, t.x, t.y, t.z);
+						v[j]
+								= gts_vertex_new(surf->vertex_class, t.x, t.y,
+										t.z);
 
 						if(j == 0){
-							e0 = gts_edge_new(s->edge_class, v0, v[0]);
+							e0 = gts_edge_new(surf->edge_class, v0, v[0]);
 							e2 = e0;
 						}else{
 							e1 = e2;
-							e2 = gts_edge_new(s->edge_class, v0, v[j]);
-							e[j - 1] = gts_edge_new(s->edge_class, v[j - 1],
+							e2 = gts_edge_new(surf->edge_class, v0, v[j]);
+							e[j - 1] = gts_edge_new(surf->edge_class, v[j - 1],
 									v[j]);
-							gts_surface_add_face(s, gts_face_new(s->face_class,
-									e2, e[j - 1], e1));
+							gts_surface_add_face(surf, gts_face_new(
+									surf->face_class, e2, e[j - 1], e1));
 						}
 					}
-					e[j - 1] = gts_edge_new(s->edge_class, v[j - 1], v[0]);
-					gts_surface_add_face(s, gts_face_new(s->face_class, e0, e[j
-							- 1], e2));
+					e[j - 1] = gts_edge_new(surf->edge_class, v[j - 1], v[0]);
+					gts_surface_add_face(surf, gts_face_new(surf->face_class,
+							e0, e[j - 1], e2));
 
 
 					// Middle elements:
@@ -268,58 +275,59 @@ void ToolPath::Generate(Tool const& tool,
 							t = position1.Transform(contour[i].p2);
 						}
 
-						v0 = gts_vertex_new(s->vertex_class, t.x, t.y, t.z);
+						v0 = gts_vertex_new(surf->vertex_class, t.x, t.y, t.z);
 						v2 = v0;
 
 
 						// First edge
-						e0 = gts_edge_new(s->edge_class, v[0], v2);
+						e0 = gts_edge_new(surf->edge_class, v[0], v2);
 						e2 = e0;
 
 						for(j = 0; j < resolution - 1; j++){
 							v1 = v2;
 							t.Set(contour[i].p2.x * cc[j + 1], contour[i].p2.x
 									* ss[j + 1], contour[i].p2.z);
-							if((contour[i].n2.x * m.x * cc[j+1] + contour[i].n2.x
-									* m.y * ss[j+1] + contour[i].n2.z * m.z)
-									<= 0.0){
+							if((contour[i].n2.x * m.x * cc[j + 1]
+									+ contour[i].n2.x * m.y * ss[j + 1]
+									+ contour[i].n2.z * m.z) <= 0.0){
 								t = position0.Transform(t);
 							}else{
 								t = position1.Transform(t);
 							}
-							v2 = gts_vertex_new(s->vertex_class, t.x, t.y, t.z);
+							v2 = gts_vertex_new(surf->vertex_class, t.x, t.y,
+									t.z);
 
 
 							// Generate 1st triangle
 							e1 = e2;
-							e2 = gts_edge_new(s->edge_class, v[j + 1], v1);
+							e2 = gts_edge_new(surf->edge_class, v[j + 1], v1);
 
-							gts_surface_add_face(s, gts_face_new(s->face_class,
-									e2, e1, e[j]));
+							gts_surface_add_face(surf, gts_face_new(
+									surf->face_class, e2, e1, e[j]));
 
 
 							// Generate 2nd triangle
 							e1 = e2;
-							e2 = gts_edge_new(s->edge_class, v[j + 1], v2);
+							e2 = gts_edge_new(surf->edge_class, v[j + 1], v2);
 
-							e[j] = gts_edge_new(s->edge_class, v1, v2);
+							e[j] = gts_edge_new(surf->edge_class, v1, v2);
 
-							gts_surface_add_face(s, gts_face_new(s->face_class,
-									e1, e2, e[j]));
+							gts_surface_add_face(surf, gts_face_new(
+									surf->face_class, e1, e2, e[j]));
 
 							v[j + 1] = v2;
 						}
 						// Generate 1st triangle
 						e1 = e2;
-						e2 = gts_edge_new(s->edge_class, v[0], v2);
-						gts_surface_add_face(s, gts_face_new(s->face_class, e2,
-								e1, e[j]));
+						e2 = gts_edge_new(surf->edge_class, v[0], v2);
+						gts_surface_add_face(surf, gts_face_new(
+								surf->face_class, e2, e1, e[j]));
 
 
 						// Generate 2nd triangle
-						e[j] = gts_edge_new(s->edge_class, v2, v0);
-						gts_surface_add_face(s, gts_face_new(s->face_class, e2,
-								e0, e[j]));
+						e[j] = gts_edge_new(surf->edge_class, v2, v0);
+						gts_surface_add_face(surf, gts_face_new(
+								surf->face_class, e2, e0, e[j]));
 						v[0] = v0;
 					}
 
@@ -332,20 +340,25 @@ void ToolPath::Generate(Tool const& tool,
 						t = position1.Transform(contour[i].p2);
 					}
 
-					v0 = gts_vertex_new(s->vertex_class, t.x, t.y, t.z);
-					e0 = gts_edge_new(s->edge_class, v[0], v0);
+					v0 = gts_vertex_new(surf->vertex_class, t.x, t.y, t.z);
+					e0 = gts_edge_new(surf->edge_class, v[0], v0);
 					e2 = e0;
 					// Generate surfaces
 					for(j = 0; j < resolution - 1; j++){
 						e1 = e2;
-						e2 = gts_edge_new(s->edge_class, v[j + 1], v0);
-						gts_surface_add_face(s, gts_face_new(s->face_class, e2,
-								e1, e[j]));
+						e2 = gts_edge_new(surf->edge_class, v[j + 1], v0);
+						gts_surface_add_face(surf, gts_face_new(
+								surf->face_class, e2, e1, e[j]));
 					}
-					gts_surface_add_face(s, gts_face_new(s->face_class, e0, e2,
-							e[j]));
+					gts_surface_add_face(surf, gts_face_new(surf->face_class,
+							e0, e2, e[j]));
+
+					BooleanAdd(&surface);
 				}
+
 			}
+		}else{
+			nrOfElement++;
 		}
 	}
 }

@@ -69,8 +69,15 @@ public:
 	void BooleanRemove(const CSGSurface* surfaceToRemove);
 	void BooleanAdd(const CSGSurface* surfaceToAdd);
 
+	void InsertSurface(const CSGSurface* surface);
+
 	bool SelfTest(void);
 	void Statistics(void);
+
+	GtsSurface* GetSurface()
+	{
+		return s;
+	}
 
 };
 

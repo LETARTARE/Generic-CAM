@@ -63,10 +63,10 @@ void Machine::Paint(void) const
 	}
 	::glPushMatrix();
 	::glMultMatrixd(workpiecePosition.a);
-	//workpiece.Paint();
+	workpiece.Paint();
 	::glPopMatrix();
 
-	if(toolpath != NULL) toolpath->Paint();
+	//if(toolpath != NULL) toolpath->Paint();
 
 }
 

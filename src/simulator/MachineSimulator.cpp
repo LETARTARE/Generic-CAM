@@ -60,7 +60,12 @@ MachineSimulator::MachineSimulator()
 
 	machine.tool = &toolbox.tools[0];
 	machine.toolpath = &toolpath;
-	toolpath.Generate(*machine.tool, a, b);
+	//toolpath.Generate(*machine.tool, a, b);
+
+	toolpath.SetSphere(0.335,2);
+	toolpath.SelfTest();
+
+	machine.workpiece.BooleanRemove(&toolpath);
 }
 
 MachineSimulator::~MachineSimulator()

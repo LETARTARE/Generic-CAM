@@ -237,10 +237,17 @@ void CSGSurface::Translate(float translateX, float translateY, float translateZ)
 //	*bboxes = g_slist_prepend(*bboxes, gts_bbox_triangle(gts_bbox_class(), t));
 //}
 
+void InsertSurface(const CSGSurface* surface)
+{
+	//TODO: Write code here.
+}
+
 void CSGSurface::BooleanRemove(const CSGSurface* surfaceToRemove)
 {
 	// This here is copied and modified from set.c.
 	// set.c is part of the gts-examples.
+
+	if(gts_surface_vertex_number(s) == 0) return;
 
 	// check surfaces
 	g_assert(gts_surface_is_orientable(s));
@@ -356,6 +363,11 @@ void CSGSurface::BooleanAdd(const CSGSurface* surfaceToAdd)
 {
 	// This here is copied and modified from set.c.
 	// set.c is part of the gts-examples.
+
+	if(gts_surface_vertex_number(s) == 0){
+		gts_surface_copy(s, surfaceToAdd->s);
+		return;
+	}
 
 	// check surfaces
 	g_assert(gts_surface_is_orientable(s));
