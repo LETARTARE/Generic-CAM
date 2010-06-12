@@ -110,7 +110,9 @@ void MachineComponent::InsertCone(AffineTransformMatrix matrix, float h,
 
 bool MachineComponent::InsertSTL(AffineTransformMatrix matrix, wxFileName file)
 {
-	return geometry.ReadSTL(file.GetFullPath());
+	wxLogMessage(_T("@MachineComponent::InsertSTL: "+file.GetFullPath()));
+
+	return geometry.ReadSTL(file.GetFullPath(),matrix);
 }
 
 void MachineComponent::Paint(void)

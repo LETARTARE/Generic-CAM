@@ -139,12 +139,14 @@ void Geometry::AddQuad(const AffineTransformMatrix &matrix, const Vector3 &a,
 	triangles.Add(tri1);
 }
 
-bool Geometry::ReadSTL(wxString fileName)
+bool Geometry::ReadSTL(wxString fileName, const AffineTransformMatrix &matrix)
 {
 	wxFile file;
 
+	wxLogMessage(wxString::Format(_T("Opening File:") + fileName));
+
 	if(!file.Open(fileName)){
-		wxLogError(_T("STL: Can't open ") + fileName + _T(" as binary!"));
+		wxLogError(_T("STL: Can't open ") + fileName + _T("!"));
 		return false;
 	}
 
@@ -209,6 +211,7 @@ bool Geometry::ReadSTL(wxString fileName)
 				tri->p[j].x = coord[3 + j * 3];
 				tri->p[j].y = coord[4 + j * 3];
 				tri->p[j].z = coord[5 + j * 3];
+				tri->p[j] = matrix.Transform(tri->p[j]);
 			}
 			tri->CalculateNormal();
 			triangles.Add(tri);
@@ -228,7 +231,7 @@ bool Geometry::ReadSTL(wxString fileName)
 	return true;
 }
 
-bool Geometry::ReadGTS(wxString fileName)
+bool Geometry::ReadGTS(wxString fileName, const AffineTransformMatrix &matrix)
 {
 	wxTextFile file;
 
@@ -284,6 +287,7 @@ bool Geometry::ReadGTS(wxString fileName)
 		tokenizer.GetNextToken().ToDouble(&y);
 		tokenizer.GetNextToken().ToDouble(&z);
 		vec = new Vector3(x, y, z);
+		*vec = matrix.Transform(*vec);
 		//		vec->x = x;
 		//		vec->y = y;
 		//		vec->z = z;

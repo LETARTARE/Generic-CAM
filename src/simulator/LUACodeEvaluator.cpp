@@ -436,9 +436,23 @@ int LUACodeEvaluator::loadstl_glue(lua_State * L)
 	if(s == NULL) return luaL_error(L,
 			LUA_QL("tostring") " must return a string to " LUA_QL("print"));
 
-	wxFileName fileName(CC->linkedMachine->fileName);
+	wxFileName machinedirectory(CC->linkedMachine->fileName);
+	wxFileName fileName(wxString::FromAscii(s));
+	machinedirectory.Normalize();
+	fileName.Normalize(wxPATH_NORM_DOTS|wxPATH_NORM_ENV_VARS|wxPATH_NORM_TILDE);
 
-	fileName.SetFullName(wxString::FromAscii(s));
+	fileName.SetPath(machinedirectory.GetPathWithSep()+fileName.GetPath());
+
+	wxLogMessage(_T("machineDirectory:")+machinedirectory.GetPath());
+	wxLogMessage(_T("fileNameDirectory:")+fileName.GetPath());
+
+
+
+	if(!fileName.IsOk())
+	{
+		CC->programOutput+=fileName.GetFullPath();
+		return luaL_error(L, "File does not exist!");
+	}
 
 	CC->componentToManipulate->InsertSTL(CC->matrix, fileName);
 	return 0;

@@ -79,11 +79,12 @@ void DataFrame::OnLoadSTLData(wxCommandEvent &event)
 	if(dialog.ShowModal() == wxID_OK){
 		fileName = dialog.GetPath();
 		//wxLogMessage(_T("File Extension: ")+fileName.GetExt());
+		AffineTransformMatrix identityMatrix;
 
 		if(fileName.GetExt().CmpNoCase(_T("gts")) == 0){
-			geometry.ReadGTS(fileName.GetFullPath());
+			geometry.ReadGTS(fileName.GetFullPath(), identityMatrix);
 		}else{
-			geometry.ReadSTL(fileName.GetFullPath());
+			geometry.ReadSTL(fileName.GetFullPath(), identityMatrix);
 		}
 		Refresh();
 	}

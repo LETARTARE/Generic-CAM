@@ -1,21 +1,12 @@
 -- This is the description file for an industrial robot.
 
--- Parameters of the machine
-
--- a little bit similar to emc.ini
-AXIS_X_MAX_VELOCITY = 0.100 --m/s
-AXIS_Y_MAX_VELOCITY = 0.100 --m/s
-AXIS_Z_MAX_VELOCITY = 0.100 --m/s
-  TRAJ_MAX_VELOCITY = 0.300 --m/s
-
 -- Definition of the geometry
 
 -- http://www.robotmatrix.org/RobotConfiguration.htm
 
 -- Base of the machine
 translate(0, 0, 0); -- Actually this line does nothing at all.
-loadstl("robot1.stl");
-
+loadstl("testrobot/robot1.stl");
 
 
 translate(3,2,0.5);
@@ -32,27 +23,27 @@ toolholder(); -- This is the place where the milling tool is placed.
 
 -- Part 1
 addcomponent("Link1");
-loadstl("robot2.stl");
+loadstl("testrobot/robot2.stl");
 
 -- Part 2
 addcomponent("Link2");
-loadstl("robot3.stl");
+loadstl("testrobot/robot3.stl");
 
 -- Part 3
 addcomponent("Link3");
-loadstl("robot4.stl");
+loadstl("testrobot/robot4.stl");
 
 -- Part 4
 addcomponent("Link4");
-loadstl("robot5.stl");
+loadstl("testrobot/robot5.stl");
 
 -- Part 5
 addcomponent("Link5");
-loadstl("robot6.stl");
+loadstl("testrobot/robot6.stl");
 
 -- Part 6
 addcomponent("Link6");
-loadstl("robot7.stl");
+loadstl("testrobot/robot7.stl");
 
 translate(5.149,0,1.6);
 rotate(0,90,0);

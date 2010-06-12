@@ -86,8 +86,8 @@ public:
 
 	void Paint(void) const;
 
-	bool ReadSTL(wxString fileName);
-	bool ReadGTS(wxString fileName);
+	bool ReadSTL(wxString fileName,const AffineTransformMatrix &matrix);
+	bool ReadGTS(wxString fileName,const AffineTransformMatrix &matrix);
 };
 
 #endif /* GEOMETRY_H_ */
