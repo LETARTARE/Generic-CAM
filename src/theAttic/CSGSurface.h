@@ -22,9 +22,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
+//$LastChangedDate: 2010-06-09 22:52:58 +0200 (Mi, 09 Jun 2010) $
+//$Revision: 48 $
+//$LastChangedBy: tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -48,6 +48,7 @@ public:
 
 protected:
 	AffineTransformMatrix m;
+	GtsSurface * s;
 
 	// Methods
 public:
@@ -71,6 +72,11 @@ public:
 
 	bool SelfTest(void);
 	void Statistics(void);
+
+	GtsSurface* GetSurface()
+	{
+		return s;
+	}
 
 };
 
