@@ -33,6 +33,10 @@
 
 #include "AffineTransformMatrix.h"
 
+class BooleanModeller;
+class Solid;
+class Color;
+
 /*!\class CSGSurface
  * \brief Wrapper class for the The GNU Triangulated Surface Library.
  *
@@ -45,6 +49,8 @@ public:
 	virtual ~CSGSurface();
 	// Member variables
 public:
+
+	Solid * solid;
 
 protected:
 	AffineTransformMatrix m;

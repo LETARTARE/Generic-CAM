@@ -128,7 +128,7 @@ GUIAboutDialog::GUIAboutDialog( wxWindow* parent, wxWindowID id, const wxString&
 	wxBoxSizer* bSizer3;
 	bSizer3 = new wxBoxSizer( wxVERTICAL );
 	
-	m_textCtrl12 = new wxTextCtrl( this, wxID_ANY, _("Generic CAM  Copyright (C) 2010  Tobias Schaefer\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it under certain conditions."), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_WORDWRAP );
+	m_textCtrl12 = new wxTextCtrl( this, wxID_ANY, _("Generic CAM  Copyright (C) 2010  Tobias Schaefer\n\nCSGLib Copyright (C) 2008 and 2009 by Danilo Balby and Greg Santucci (C++ port).\n\nLicence for Generic CAM and CSGLib:\nGNU General Public License version 3.0 (GPLv3)\n\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it under certain conditions.\n\nYou should have received a copy of the GNU General Public License along with this program. \nIf not, see <http://www.gnu.org/licenses/>."), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_WORDWRAP );
 	bSizer3->Add( m_textCtrl12, 1, wxALL|wxEXPAND, 5 );
 	
 	m_button1 = new wxButton( this, wxID_CLOSE, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -332,7 +332,6 @@ GUIControl6DOFDialog::GUIControl6DOFDialog( wxWindow* parent, wxWindowID id, con
 	
 	this->SetSizer( bSizer1 );
 	this->Layout();
-	bSizer1->Fit( this );
 	
 	// Connect Events
 	buttonConnect->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIControl6DOFDialog::OnConnect ), NULL, this );

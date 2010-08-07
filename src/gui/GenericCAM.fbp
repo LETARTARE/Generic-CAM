@@ -386,7 +386,7 @@
             <property name="minimum_size"></property>
             <property name="name">GUIAboutDialog</property>
             <property name="pos"></property>
-            <property name="size">412,227</property>
+            <property name="size">447,375</property>
             <property name="style">wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</property>
             <property name="subclass"></property>
             <property name="title">About</property>
@@ -451,7 +451,7 @@
                         <property name="style">wxTE_MULTILINE|wxTE_READONLY|wxTE_WORDWRAP</property>
                         <property name="subclass"></property>
                         <property name="tooltip"></property>
-                        <property name="value">Generic CAM  Copyright (C) 2010  Tobias Schaefer&#x0A;This program comes with ABSOLUTELY NO WARRANTY.&#x0A;This is free software, and you are welcome to redistribute it under certain conditions.</property>
+                        <property name="value">Generic CAM  Copyright (C) 2010  Tobias Schaefer&#x0A;&#x0A;CSGLib Copyright (C) 2008 and 2009 by Danilo Balby and Greg Santucci (C++ port).&#x0A;&#x0A;Licence for Generic CAM and CSGLib:&#x0A;GNU General Public License version 3.0 (GPLv3)&#x0A;&#x0A;This program comes with ABSOLUTELY NO WARRANTY.&#x0A;This is free software, and you are welcome to redistribute it under certain conditions.&#x0A;&#x0A;You should have received a copy of the GNU General Public License along with this program. &#x0A;If not, see &lt;http://www.gnu.org/licenses/&gt;.</property>
                         <property name="window_extra_style"></property>
                         <property name="window_name"></property>
                         <property name="window_style"></property>
@@ -797,7 +797,7 @@
             <property name="minimum_size">-1,-1</property>
             <property name="name">GUIControl6DOFDialog</property>
             <property name="pos"></property>
-            <property name="size">-1,-1</property>
+            <property name="size">354,527</property>
             <property name="style">wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP</property>
             <property name="subclass"></property>
             <property name="title">Setup 6DOF Controller</property>

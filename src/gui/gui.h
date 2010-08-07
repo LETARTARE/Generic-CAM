@@ -95,7 +95,7 @@ class GUIAboutDialog : public wxDialog
 		
 	
 	public:
-		GUIAboutDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 412,227 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		GUIAboutDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 447,375 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~GUIAboutDialog();
 	
 };
@@ -172,7 +172,7 @@ class GUIControl6DOFDialog : public wxDialog
 		
 	
 	public:
-		GUIControl6DOFDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup 6DOF Controller"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
+		GUIControl6DOFDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup 6DOF Controller"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 354,527 ), long style = wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
 		~GUIControl6DOFDialog();
 	
 };
