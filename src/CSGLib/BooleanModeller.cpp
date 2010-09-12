@@ -16,6 +16,8 @@
 #include "IntSet.h"
 #include "ColorSet.h"
 
+#include <stdio.h>
+
 BooleanModeller::BooleanModeller(Solid * solid1, Solid * solid2)
 {
 	printf("\nConstruction Object3D from Solid\n");
@@ -23,7 +25,7 @@ BooleanModeller::BooleanModeller(Solid * solid1, Solid * solid2)
 	//representation to apply boolean operations
 	m_pObject1 = new Object3D(solid1);
 	m_pObject2 = new Object3D(solid2);
-	
+
 	printf("\nObject1 - Split against Object2\n");
 	//split the faces so that none of them intercepts each other
 	m_pObject1->splitFaces(m_pObject2);
@@ -31,7 +33,7 @@ BooleanModeller::BooleanModeller(Solid * solid1, Solid * solid2)
 	m_pObject2->splitFaces(m_pObject1);
 
 	printf("\nObject1 - Classify faces of Object2\n");
-			
+
 	//classify faces as being inside or outside the other solid
 	m_pObject1->classifyFaces(*m_pObject2);
 
@@ -67,25 +69,25 @@ Solid * BooleanModeller::getDifference()
 	return result;
 }
 
-Solid * BooleanModeller::composeSolid(int faceStatus1, int faceStatus2, int faceStatus3) 
+Solid * BooleanModeller::composeSolid(int faceStatus1, int faceStatus2, int faceStatus3)
 {
 	VertexSet * vertices = new VertexSet();
 	IntSet * indices = new IntSet();
 	ColorSet * colors = new ColorSet();
-	
-	//group the elements of the two solids whose faces fit with the desired status  
+
+	//group the elements of the two solids whose faces fit with the desired status
 	groupObjectComponents(*m_pObject1, *vertices, *indices, *colors, faceStatus1, faceStatus2);
 	groupObjectComponents(*m_pObject2, *vertices, *indices, *colors, faceStatus3, faceStatus3);
-	
+
 	VectorSet * vectors = new VectorSet();
 
 	for(int i = 0; i < vertices->GetNumVertices(); i++)
 	{
 		Vertex * pVertex = vertices->GetVertex(i);
-		
+
 		vectors->AddVector(pVertex->getPosition());
 	}
-	
+
 	Solid *result = new Solid(vectors, indices, colors);
 
 	delete colors;
@@ -106,7 +108,7 @@ void BooleanModeller::groupObjectComponents(Object3D & object, VertexSet & verti
 		//if the face status fits with the desired status...
 		if(face.getStatus()==faceStatus1 || face.getStatus()==faceStatus2)
 		{
-			//adds the face elements into the arrays 
+			//adds the face elements into the arrays
 
 			VertexPointerSet faceVerts;
 			faceVerts.add(face.v1);

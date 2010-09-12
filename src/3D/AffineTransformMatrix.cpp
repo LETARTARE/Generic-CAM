@@ -75,16 +75,16 @@ wxString AffineTransformMatrix::ToString()
 {
 	TakeMatrixApart();
 	wxString temp;
-	temp += wxString::Format(_T("%f\n%f\n%f\n"), tx, ty, tz);
-	temp += wxString::Format(_T("%f\n%f\n%f\n"), rx, ry, rz);
-	temp += wxString::Format(_T("%f\n%f\n%f\n"), sx, sy, sz);
+	temp += wxString::Format(_T("%f#%f#%f#"), tx, ty, tz);
+	temp += wxString::Format(_T("%f#%f#%f#"), rx, ry, rz);
+	temp += wxString::Format(_T("%f#%f#%f"), sx, sy, sz);
 	return temp;
 }
 
 //! Setup the matrix from a string.
 void AffineTransformMatrix::FromString(wxString const& string)
 {
-	wxStringTokenizer tkz(string, wxT("\n"));
+	wxStringTokenizer tkz(string, wxT("#"));
 	while(tkz.HasMoreTokens()){
 		wxString token = tkz.GetNextToken();
 		switch(tkz.CountTokens()){

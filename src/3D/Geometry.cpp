@@ -179,7 +179,7 @@ bool Geometry::ReadSTL(wxString fileName, const AffineTransformMatrix &matrix)
 		// Binary STL File
 		wxLogMessage(_T("STL binary file found!"));
 
-		uint32_t nrOfTriangles;
+		size_t nrOfTriangles;
 
 		if(file.Read(&nrOfTriangles, 4) != 4){
 			wxLogError(_T("File to short!"));
@@ -188,10 +188,10 @@ bool Geometry::ReadSTL(wxString fileName, const AffineTransformMatrix &matrix)
 		wxLogMessage(
 				wxString::Format(_T("Nr of Triangles: %lu"), nrOfTriangles));
 
-		uint32_t i;
+		size_t i;
 		unsigned char j;
 		float coord[12];
-		uint16_t nrOfAttributeBytes;
+		size_t nrOfAttributeBytes;
 		Triangle *tri;
 		for(i = 0; i < nrOfTriangles; i++){
 			if(file.Read(&coord, 12 * sizeof(float)) != 12 * sizeof(float)){

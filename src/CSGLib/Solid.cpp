@@ -14,11 +14,13 @@
 #include "IntSet.h"
 
 #include <fstream>
+#include <cstdlib>
 
-#include <windows.h>
-#include <windowsx.h>
-#include <mmsystem.h>
-#include <tchar.h>
+//#include <windows.h>
+//#include <windowsx.h>
+//#include <mmsystem.h>
+//#include <tchar.h>
+
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -30,7 +32,7 @@ Solid::Solid(const std::string & sFileName, const Color & colBase, int dRed, int
 
 Solid::Solid(VectorSet * vertices, IntSet * indices, ColorSet * colors)
 {
-	setData(*vertices, *indices, *colors);		
+	setData(*vertices, *indices, *colors);
 }
 
 Solid::~Solid()
@@ -92,13 +94,13 @@ bool Solid::isEmpty()
 //---------------------------------------SETS-----------------------------------//
 
 /**
- * Sets the solid data. An exception may occur in the case of abnormal arrays 
- * (indices making references to inexistent vertices, there are less colors 
+ * Sets the solid data. An exception may occur in the case of abnormal arrays
+ * (indices making references to inexistent vertices, there are less colors
  * than vertices...)
- * 
+ *
  * @param vertices array of points defining the solid vertices
  * @param indices array of indices for a array of vertices
- * @param colors array of colors defining the vertices colors 
+ * @param colors array of colors defining the vertices colors
  */
 void Solid::setData(VectorSet & vertices, IntSet & indices, ColorSet & colors)
 {
@@ -121,7 +123,7 @@ void Solid::setData(VectorSet & vertices, IntSet & indices, ColorSet & colors)
 			this->colors.AddColor(colors[i]);
 			//this->indices.AddInt(indices[i]);
 		}
-	
+
 		for(int i=0; i<indices.length(); i++)
 		{
 			this->indices.AddInt(indices[i]);
@@ -131,7 +133,7 @@ void Solid::setData(VectorSet & vertices, IntSet & indices, ColorSet & colors)
 
 /**
  * Sets the solid color (all the vertices with the same color)
- * 
+ *
  * @param color solid color
  */
 void Solid::setColor(const Color & color)
@@ -280,7 +282,7 @@ void Solid::Render()
 
 /**
  * Gets the solid mean
- * 
+ *
  * @return point representing the mean
  */
 Vector Solid::getMean()
@@ -295,13 +297,13 @@ Vector Solid::getMean()
 	mean.x /= vertices.length();
 	mean.y /= vertices.length();
 	mean.z /= vertices.length();
-	
+
 	return mean;
 }
 
 /**
- * Loads a coordinates file, setting vertices and indices 
- * 
+ * Loads a coordinates file, setting vertices and indices
+ *
  * @param solidFile file used to create the solid
  * @param color solid color
  */

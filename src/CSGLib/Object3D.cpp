@@ -21,6 +21,7 @@
 #include "Segment.h"
 
 #include <math.h>
+#include <stdio.h>
 
 //double Object3D::TOL = 1e-10f;
 double Object3D::TOL = 0.5e-5f;
