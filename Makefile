@@ -99,9 +99,9 @@ DEPS := $(patsubst %.cpp, ${OBJDIR}/%.d, ${SOURCES})
 
 # gcc flags:
 INCFLAGS := -I./src
-CXXFLAGS := `wx-config --cxxflags` -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -O0 -g3 -Wall 
-LDFLAGS  := `wx-config --libs gl,core,base,xml` -L/usr/local/lib -L/usr/local/lib/lua/5.1
-LDLIBS   := -llua
+CXXFLAGS := `wx-config --cxxflags` -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/lua5.1 -O0 -g3 -Wall 
+LDFLAGS  := `wx-config --libs gl,core,base,xml` -L/usr/local/lib -L/usr/lib
+LDLIBS   := -llua5.1
 #REZFLAGS := `wx-config --rez-flags`
 
 ifdef FINAL
