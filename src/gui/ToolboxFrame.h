@@ -32,7 +32,7 @@
 #define TOOLBOXFRAME_H_
 
 #include "gui.h"
-#include "../simulator/Toolbox.h"
+#include "../project/Toolbox.h"
 
 class ToolboxFrame:public GUIToolboxFrame {
 	// Constructor/ Destructor
@@ -48,13 +48,12 @@ public:
 	unsigned int selectedTool;
 	unsigned int selectedElement;
 
-
 	// Methods
 public:
 	void OnClose(wxCommandEvent& event);
 	void InsertToolBox(Toolbox& toolbox);
 	void OnChangeStereo3D(wxCommandEvent& event);
-	void UpdateDisplay(void);
+	void UpdateDisplay(bool direction = true);
 	void SetController(Control3D& control);
 };
 

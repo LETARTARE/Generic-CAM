@@ -65,7 +65,7 @@ bool Control3D::SetType(char id)
 	return true;
 }
 
-char Control3D::GetType()
+char Control3D::GetType(void)
 {
 	if(controller == NULL) return 0;
 	return controller->ReturnID();
@@ -86,15 +86,21 @@ bool Control3D::Open(void)
 	return controller->Open();
 }
 
-void Control3D::Close()
+void Control3D::Close(void)
 {
 	controller->Close();
 }
 
-bool Control3D::IsOpen()
+bool Control3D::IsOpen(void)
 {
 	if(controller == NULL) return false;
 	return controller->IsConnected();
+}
+
+bool Control3D::HasChanged(void)
+{
+	if(controller == NULL) return 0;
+	return controller->HasChanged();
 }
 
 int Control3D::GetButton(unsigned char i)
@@ -109,7 +115,7 @@ int Control3D::GetAxis(unsigned char i)
 	return controller->GetAxis(i);
 }
 
-wxString Control3D::GetPort()
+wxString Control3D::GetPort(void)
 {
 	if(controller == NULL) return _T("");
 	return controller->GetPort();
@@ -122,7 +128,7 @@ bool Control3D::SetPort(wxString port)
 	return true;
 }
 
-bool Control3D::Pump()
+bool Control3D::Pump(void)
 {
 	if(controller == NULL) return false;
 	return controller->Pump();

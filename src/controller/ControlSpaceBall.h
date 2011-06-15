@@ -35,8 +35,7 @@
 
 #define CONTROLSPACEBALL_MAXDATALENGTH	256
 #define CONTROLSPACEBALL_ID	1
-class ControlSpaceBall: public Control3DAbstract
-{
+class ControlSpaceBall:public Control3DAbstract {
 	// Constructor / Destructor
 public:
 	ControlSpaceBall();
@@ -49,7 +48,10 @@ private:
 
 	// Methods
 public:
-	virtual const unsigned char ReturnID(){return CONTROLSPACEBALL_ID;}
+	virtual const unsigned char ReturnID()
+	{
+		return CONTROLSPACEBALL_ID;
+	}
 protected:
 
 	virtual void InitDevice();

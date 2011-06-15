@@ -50,4 +50,5 @@ void DataCanvas::InsertData(Geometry* data)
 void DataCanvas::Render()
 {
 	if(geometry != NULL) geometry->Paint();
+	OpenGLCanvas::Render();
 }

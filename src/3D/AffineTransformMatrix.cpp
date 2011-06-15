@@ -161,6 +161,7 @@ void AffineTransformMatrix::TakeMatrixApart(void)
 		b[10] = 0.0;
 	}
 
+	//FIXME: I think this if(...) is wrong, because b[0] can be 0.
 	if(b[0] != 0.0 || b[1] != 0.0){
 		rz = atan2(b[1], b[0]);
 	}else{
@@ -199,8 +200,7 @@ void AffineTransformMatrix::PutMatrixTogether(void)
 	double siz = sin(rz);
 
 
-	// Matrix calculated with Axiom:
-
+	//Matrix calculated with Axiom:
 	// Rx := matrix[[1,0,0],[0,cox,-six],[0,six,cox]]
 	// Ry := matrix[[coy,0,siy],[0,1,0],[-siy,0,coy]]
 	// Rz := matrix[[coz,-siz,0],[siz,coz,0],[0,0,1]]
@@ -234,15 +234,15 @@ void AffineTransformMatrix::PutMatrixTogether(void)
  */
 AffineTransformMatrix AffineTransformMatrix::Inverse() const
 {
-	// Code generated with axiom:
-	//)set fortran optlevel 2
-	//)set output fortran on
-	//R:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]])
-	//inverse(R)
+	//Axiom code:
+	// )set fortran optlevel 2
+	// )set output fortran on
+	// R:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]])
+	// inverse(R)
 
 	double T11 = (a[0] * a[5] + (-a[1] * a[4])) * a[10] + ((-a[0] * a[6])
 			+ a[2] * a[4]) * a[9] + (a[1] * a[6] + (-a[2] * a[5])) * a[8];
-	// T11 is the determinant of the matrix. This should
+	// T11 is the determinant of the matrix. This can not
 	// not be zero for a correct transformation matrix.
 	wxASSERT(T11!=0)
 
@@ -332,6 +332,7 @@ AffineTransformMatrix AffineTransformMatrix::operator/(
 //! Apply the transformation matrix on a given vector.
 Vector3 AffineTransformMatrix::Transform(Vector3 const& v) const
 {
+	//Axiom code:
 	//R:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]])
 	//R*matrix([[x],[y],[z],[1]])
 
@@ -341,6 +342,21 @@ Vector3 AffineTransformMatrix::Transform(Vector3 const& v) const
 	temp.z = a[2] * v.x + a[6] * v.y + a[10] * v.z + a[14];
 	return temp;
 }
+
+//! Apply the transformation matrix on a given vector without shifting the vector.
+Vector3 AffineTransformMatrix::TransformNoShift(Vector3 const& v) const
+{
+    //Axiom code:
+	//R:=matrix([[a[0],a[4],a[8],0],[a[1],a[5],a[9],0],[a[2],a[6],a[10],0],[0,0,0,1]])
+	//R*matrix([[x],[y],[z],[1]])
+
+	Vector3 temp;
+	temp.x = a[0] * v.x + a[4] * v.y + a[8] * v.z;
+	temp.y = a[1] * v.x + a[5] * v.y + a[9] * v.z;
+	temp.z = a[2] * v.x + a[6] * v.y + a[10] * v.z;
+	return temp;
+}
+
 
 //! Function returning an identity matrix.
 AffineTransformMatrix AffineTransformMatrix::Identity()
@@ -365,6 +381,21 @@ void AffineTransformMatrix::TranslateLocal(double const& x, double const& y,
 	a[12] += x * a[0] + y * a[4] + z * a[8];
 	a[13] += x * a[1] + y * a[5] + z * a[9];
 	a[14] += x * a[2] + y * a[6] + z * a[10];
+}
+
+//! Scale matrix in the global coordinate system.
+void AffineTransformMatrix::ScaleGlobal(double const& x, double const& y,
+		double const& z)
+{
+	a[0] *= x;
+	a[1] *= x;
+	a[2] *= x;
+	a[4] *= y;
+	a[5] *= y;
+	a[6] *= y;
+	a[8] *= z;
+	a[9] *= z;
+	a[10] *= z;
 }
 
 /*!\brief Rotation around a given vector.
@@ -448,7 +479,7 @@ AffineTransformMatrix AffineTransformMatrix::RotateXYZ(double const& x,
 {
 	AffineTransformMatrix a;
 
-
+    //Axiom code:
 	// Rx := matrix[[1,0,0,0],[0,cox,-six,0],[0,six,cox,0],[0,0,0,1]]
 	// Ry := matrix[[coy,0,siy,0],[0,1,0,0],[-siy,0,coy,0],[0,0,0,1]]
 	// Rz := matrix[[coz,-siz,0,0],[siz,coz,0,0],[0,0,1,0],[0,0,0,1]]

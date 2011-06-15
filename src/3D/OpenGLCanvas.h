@@ -54,7 +54,7 @@ public:
 
 	// Member Variables
 public:
-	unsigned char stereoMode;
+	bool stereoMode;
 
 private:
 	bool isInitialized;
@@ -62,6 +62,7 @@ private:
 
 	AffineTransformMatrix rotmat;
 	AffineTransformMatrix transmat;
+
 	Control3D* control;
 	wxTimer timer;
 	int x, y;

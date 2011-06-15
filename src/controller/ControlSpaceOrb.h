@@ -5,7 +5,7 @@
 // Platform dependent : Yes
 // Compiler Options   :
 // Author             : Vojtech Pavlik
-// Modified for C++   : Tobias Schäfer
+// Modified for C++   : Tobias Schaefer
 // Adapted            : 21.07.2009
 // Copyright          : (C) 1999-2001 Vojtech Pavlik <vojtech@ucw.cz>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
@@ -29,7 +29,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-
 #ifndef _CONTROLSPACEORB_H_
 #define _CONTROLSPACEORB_H_
 
@@ -38,6 +37,7 @@
 #define CONTROLSPACEORB_MAXDATALENGTH	64
 #define CONTROLSPACEORB_ID 2
 class ControlSpaceOrb:public Control3DAbstract {
+
 
 	// Constructor /Destructor
 public:
@@ -53,7 +53,10 @@ private:
 
 	// Methods
 public:
-	virtual const unsigned char ReturnID(){return CONTROLSPACEORB_ID ;}
+	virtual const unsigned char ReturnID()
+	{
+		return CONTROLSPACEORB_ID;
+	}
 protected:
 	virtual void InitDevice();
 	virtual bool ProcessPacket();

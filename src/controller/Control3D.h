@@ -50,20 +50,21 @@ private:
 public:
 	bool Open(wxString connection);
 	bool Open(void);
-	void Close();
-	bool IsOpen();
+	void Close(void);
+	bool IsOpen(void);
 
 	bool SetType(char id);
-	char GetType();
+	char GetType(void);
 
-	int GetButton(unsigned char i) ;
-	int GetAxis(unsigned char i) ;
-	wxString GetPort();
+	bool HasChanged(void);
+	int GetButton(unsigned char i);
+	int GetAxis(unsigned char i);
+	wxString GetPort(void);
 	bool SetPort(wxString port);
 	bool GetConfigFrom(wxConfig *config);
 	bool WriteConfigTo(wxConfig *config);
 
-	bool Pump();
+	bool Pump(void);
 
 };
 

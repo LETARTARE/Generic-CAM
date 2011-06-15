@@ -81,10 +81,11 @@ bool ControlSpaceBall::ProcessPacket()
 		for(i = 0; i < 6; i++)
 			Axis[i] = (((int16_t) Axis[i]) << 16) >> 16;
 
+
 		// Right Handed Coordinate System
 		Axis[2] = -Axis[2]; // Tz = -Tz
 		Axis[5] = -Axis[5]; // Rz = -Rz
-
+		hasChanged = true;
 		break;
 	case 'K':
 		Button[0] = (InBuffer[2] & 1);
@@ -96,6 +97,7 @@ bool ControlSpaceBall::ProcessPacket()
 		Button[6] = (InBuffer[1] & 4);
 		Button[7] = (InBuffer[1] & 8);
 		Button[8] = (InBuffer[1] & 16);
+		hasChanged = true;
 		break;
 	}
 	return true;

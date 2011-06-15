@@ -71,11 +71,11 @@ void ToolboxFrame::InsertToolBox(Toolbox& toolbox)
 	UpdateDisplay();
 }
 
-void ToolboxFrame::UpdateDisplay(void)
+void ToolboxFrame::UpdateDisplay(bool direction)
 {
 	if(linkedToolbox == NULL) return;
 
-	unsigned int i, j;
+	size_t i, j;
 
 	m_comboBoxToolSelector->Clear();
 	for(i = 0; i < linkedToolbox->tools.Count(); i++){

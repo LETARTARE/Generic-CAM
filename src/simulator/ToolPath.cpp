@@ -52,7 +52,7 @@ void ToolPath::Generate(Tool const& tool,
 		AffineTransformMatrix const& position0,
 		AffineTransformMatrix const& position1)
 {
-	this->Clear();
+	//this->Clear();
 
 	AffineTransformMatrix motion;
 	motion = position1 / position0;
@@ -203,7 +203,7 @@ void ToolPath::Generate(Tool const& tool,
 
 					Vector3 t;
 
-					CSGSurface surface;
+					//CSGSurface surface;
 //					GtsSurface* surf = surface.GetSurface();
 
 
@@ -353,7 +353,7 @@ void ToolPath::Generate(Tool const& tool,
 //					gts_surface_add_face(surf, gts_face_new(surf->face_class,
 //							e0, e2, e[j]));
 
-					BooleanAdd(&surface);
+//					BooleanAdd(&surface);
 				}
 
 			}

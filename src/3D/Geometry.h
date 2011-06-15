@@ -32,34 +32,16 @@
 #define GEOMETRY_H_
 
 #include "Vector3.h"
+#include "Triangle.h"
 #include "AffineTransformMatrix.h"
 
 #include <wx/string.h>
 #include <wx/dynarray.h>
-/*!\class Triangle
- * \brief Defines a simple triangle.
- *
- * Holds the data for a simple triangle. Three vertices with three normal vectors.
- */
-
-class Triangle {
-public:
-	Triangle();
-	virtual ~Triangle();
-	Vector3 p[3]; //!< Position of vertices.
-	Vector3 n[3]; //!< Normal vectors.
-	void Paint(void) const;
-	void CalculateNormal();
-};
-WX_DECLARE_OBJARRAY(Triangle, ArrayOfTriangles)
-;
-WX_DECLARE_OBJARRAY(Vector3, ArrayOfVectors)
-;
 
 /*!\class Geometry
  * \brief Contains geometric data.
  *
- * Data from STL and GTS files is stored within this class.
+ * Geometric data is stored in this class.
  */
 class Geometry {
 	// Constructor/ Destructor
@@ -69,25 +51,40 @@ public:
 
 	// Member variables
 public:
+	wxString objectName;
+	Vector3 color;
+	bool visible;
 
+	AffineTransformMatrix matrix; //!< Transformation of the data.
 private:
-	AffineTransformMatrix m; //!< Transformation of the data.
-	ArrayOfTriangles triangles; //!< The storage of the geometric data.
+	ArrayOfTriangle triangles; //!< The storage of the geometric data.
 
 	// Methods
 public:
-
-	void ApplyTransformation(const AffineTransformMatrix &matrix);
-
-	void AddTriangle(const AffineTransformMatrix &matrix, const Vector3 &a,
-			const Vector3 &b, const Vector3 &c);
-	void AddQuad(const AffineTransformMatrix &matrix, const Vector3 &a,
-			const Vector3 &b, const Vector3 &c, const Vector3 &d);
-
 	void Paint(void) const;
 
-	bool ReadSTL(wxString fileName,const AffineTransformMatrix &matrix);
-	bool ReadGTS(wxString fileName,const AffineTransformMatrix &matrix);
+	void Clear(void);
+	void CopyFrom(const Geometry &geometry);
+	void CopyTrianglesFrom(const Geometry &geometry);
+
+
+	void ApplyTransformation(const AffineTransformMatrix &matrix);
+	void ApplyTransformation(void);
+
+
+	void AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c);
+	void AddTriangleTransform(const Vector3 &a, const Vector3 &b,
+			const Vector3 &c, const AffineTransformMatrix &transformMatrix);
+	void AddTriangleWithNormals(const Vector3 &a, const Vector3 &b,
+			const Vector3 &c, const Vector3 &na, const Vector3 &nb,
+			const Vector3 &nc);
+
+	void AddQuad(const Vector3 &a, const Vector3 &b, const Vector3 &c,
+			const Vector3 &d);
+	void AddQuadTransform(const Vector3 &a, const Vector3 &b, const Vector3 &c,
+			const Vector3 &d, const AffineTransformMatrix &transformMatrix);
 };
+WX_DECLARE_OBJARRAY(Geometry, ArrayOfGeometry)
+;
 
 #endif /* GEOMETRY_H_ */

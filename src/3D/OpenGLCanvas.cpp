@@ -26,9 +26,7 @@
 //$Revision$
 //$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
-
 #include "OpenGLCanvas.h"
-
 #include <wx/wx.h>
 #ifdef __WXMAC__
 #include "OpenGL/glu.h"
@@ -37,9 +35,7 @@
 #include <GL/glu.h>
 //#include <GL/gl.h>
 #endif
-
 #define TIMER_OPENGLCANVAS 1902
-
 //TODO: Change this to this->Connect(...) calls.
 BEGIN_EVENT_TABLE(OpenGLCanvas, wxGLCanvas)
 EVT_SIZE(OpenGLCanvas::OnSize)
@@ -65,7 +61,7 @@ OpenGLCanvas::OpenGLCanvas(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 
 	control = NULL;
 
-	stereoMode = 0;
+	stereoMode = false;
 
 
 	//TODO: Rewrite this to support multiple instances!
@@ -73,24 +69,14 @@ OpenGLCanvas::OpenGLCanvas(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 	timer.Start(100);
 }
 
-//OpenGLCanvas::OpenGLCanvas(wxWindow *parent, const OpenGLCanvas *other,
-//    wxWindowID id, const wxPoint& pos, const wxSize& size, long style,
-//    const wxString& name )
-//    : wxGLCanvas(parent, other->GetContext(), id, pos, size, style|wxFULL_REPAINT_ON_RESIZE , name)
-//{
-//    m_init = false;
-//    m_gllist = other->m_gllist; // share display list
-//}
-
 OpenGLCanvas::~OpenGLCanvas()
 {
-
 }
 
 void OpenGLCanvas::SetController(Control3D& control)
 {
 	this->control = &control;
-	wxLogMessage(_T("OpenGLCanvas: Controller inserted!"));
+	//wxLogMessage(_T("OpenGLCanvas: Controller inserted!"));
 }
 
 void OpenGLCanvas::OnEnterWindow(wxMouseEvent& WXUNUSED(event) )
@@ -132,6 +118,8 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event) )
 	// set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
 	int w, h;
 	GetClientSize(&w, &h);
+
+
 #ifndef __WXMOTIF__
 	if(GetContext())
 #endif
@@ -148,18 +136,23 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event) )
 	//</a>
 
 
-	if(stereoMode == 1){
+	if(stereoMode){
 		glDrawBuffer(GL_BACK_LEFT);
 		glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
-
 		::glPushMatrix();
 		//::glRotatef();
-
 		::glTranslatef(0.1, 0, 0);
 	}
+
 	::glTranslatef(0.0, 0, -1);
 	::glMultMatrixd(transmat.a);
 	::glMultMatrixd(rotmat.a);
+
+
+//	float specReflection[] = { 0.8f, 0.0f, 0.8f, 1.0f };
+//	glMaterialfv(GL_FRONT, GL_SPECULAR, specReflection);
+//	glMateriali(GL_FRONT, GL_SHININESS, 96);
+
 
 
 	//	if(m_gllist == 0){
@@ -171,7 +164,7 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event) )
 	//		glCallList(m_gllist);
 	//	}
 
-	if(stereoMode == 1){
+	if(stereoMode){
 		glDrawBuffer(GL_BACK_RIGHT);
 		::glPopMatrix();
 		glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
@@ -182,8 +175,7 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event) )
 		::glMultMatrixd(rotmat.a);
 
 		glClear(GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE);
+
 		Render();
 		//glCallList(m_gllist);
 
@@ -221,6 +213,13 @@ void OpenGLCanvas::InitGL()
 	//		{1.0f, -0.01f, -.000001f};
 	//::glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, attenuation, 0);
 
+
+	::glEnable(GL_COLOR_MATERIAL);
+	::glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
+	::glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//::glBlendFunc(GL_ONE, GL_ONE); // for Stereo Mode
+
+	::glEnable(GL_BLEND);
 	::glEnable(GL_POINT_SMOOTH);
 	::glEnable(GL_DEPTH_TEST);
 	SetupLighting();
@@ -249,11 +248,12 @@ void OpenGLCanvas::SetupLighting() // Eine Lampe in die Szene setzen
 
 void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 {
-	if(event.ButtonDown(wxMOUSE_BTN_RIGHT)){
+	if(event.ButtonDown(wxMOUSE_BTN_RIGHT) || event.ButtonDown(
+			wxMOUSE_BTN_MIDDLE)){
 		x = event.m_x;
 		y = event.m_y;
 	}
-	if(event.Dragging()){
+	if(event.Dragging() && event.RightIsDown()){
 		rotmat = AffineTransformMatrix::RotateXY(event.m_x - x, event.m_y - y,
 				0.5) * rotmat;
 		x = event.m_x;
@@ -262,25 +262,39 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 		this->Refresh();
 	}
 
+	if(event.Dragging() && event.MiddleIsDown()){
+		float dx = (float) (event.m_x - x) / 200.0;
+		float dy = (float) (event.m_y - y) / 200.0;
+		transmat.TranslateGlobal(dx, -dy, 0);
+		x = event.m_x;
+		y = event.m_y;
+
+		this->Refresh();
+	}
+
+	int x = event.GetWheelRotation();
+	if(x != 0){
+		transmat.TranslateGlobal(0, 0, (float) -x / 350.0);
+		this->Refresh();
+	}
+
 }
 
 void OpenGLCanvas::OnTimer(wxTimerEvent& event)
 {
-	if(control != NULL){
+	if(control == NULL) return;
 
-		control->Pump();
-		rotmat = AffineTransformMatrix::RotateInterwoven(
-				(float) control->GetAxis(3) / 1000.0, (float) control->GetAxis(
-						4) / 1000.0, (float) control->GetAxis(5) / 1000.0)
-				* rotmat;
-		transmat.TranslateGlobal((float) control->GetAxis(0) / 1000.0,
-				(float) control->GetAxis(1) / 1000.0, (float) control->GetAxis(
-						2) / 1000.0);
-		//rotmat.RotateXY(1,0,1);
-		if(control->GetButton(0)){
-			rotmat.SetIdentity();
-			transmat.SetIdentity();
-		}
+	control->Pump();
+	rotmat = AffineTransformMatrix::RotateInterwoven(
+			(float) control->GetAxis(3) / 1000.0, (float) control->GetAxis(4)
+					/ 1000.0, (float) control->GetAxis(5) / 1000.0) * rotmat;
+	transmat.TranslateGlobal((float) control->GetAxis(0) / 1000.0,
+			(float) control->GetAxis(1) / 1000.0, (float) control->GetAxis(2)
+					/ 1000.0);
+	//rotmat.RotateXY(1,0,1);
+	if(control->GetButton(0)){
+		rotmat.SetIdentity();
+		transmat.SetIdentity();
 	}
 	this->Refresh();
 }

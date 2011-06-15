@@ -37,10 +37,10 @@
 #define TOOLPATH_H_
 
 #include "../3D/AffineTransformMatrix.h"
-#include "../3D/CSGSurface.h"
-#include "Tool.h"
+#include "../3D/Geometry.h"
+#include "../machine/Tool.h"
 
-class ToolPath:public CSGSurface {
+class ToolPath:public Geometry {
 	// Constructor / Destructor
 
 public:

@@ -96,6 +96,7 @@ bool ControlSpaceMouse::ProcessPacket()
 		Axis[4] = data[4] - (1 << 15);
 		Axis[5] = data[5] - (1 << 15);
 
+
 		//wxLogMessage(_T("%8u %8u %8u %8u %8u %8u"), data[0], data[1], data[2],
 		//	data[3], data[4], data[5]);
 
@@ -107,7 +108,7 @@ bool ControlSpaceMouse::ProcessPacket()
 		//		// Right Handed Coordinate System
 		//		Axis[2] = -Axis[2]; // Tz = -Tz
 		//		Axis[5] = -Axis[5]; // Rz = -Rz
-
+		hasChanged = true;
 		break;
 	case 'k':
 		Button[0] = (data[0] & (1 << 8));
@@ -119,7 +120,7 @@ bool ControlSpaceMouse::ProcessPacket()
 		Button[6] = (data[0] & (1 << 6));
 		Button[7] = (data[0] & (1 << 7));
 		Button[8] = (data[0] & (1 << 0));
-
+		hasChanged = true;
 		break;
 	}
 	return true;

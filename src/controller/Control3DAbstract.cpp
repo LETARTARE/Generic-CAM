@@ -39,6 +39,7 @@ Control3DAbstract::Control3DAbstract()
 	for(i = 0; i < CONTROL3DABSTRACT_MAXBUTTONS; i++){
 		Button[i] = false;
 	}
+	hasChanged = false;
 }
 
 Control3DAbstract::~Control3DAbstract()
@@ -63,7 +64,7 @@ wxString Control3DAbstract::GetPort()
 
 bool Control3DAbstract::Open(void)
 {
-	return port.Open(connection.ToAscii(),9600);
+	return port.Open(connection.ToAscii(), 9600);
 }
 
 void Control3DAbstract::Close(void)
@@ -85,13 +86,14 @@ int Control3DAbstract::GetAxis(unsigned char i) const
 
 bool Control3DAbstract::Pump()
 {
+	hasChanged = false;
 	if(!port.IsOpen()) return false;
 	char temp[128];
 	unsigned char i, j;
 	i = port.ReadData(temp, 128);
 	while(i != 0){
 		for(j = 0; j < i; j++)
-			DataIn((unsigned char)temp[j]);
+			DataIn((unsigned char) temp[j]);
 		i = port.ReadData(temp, 128);
 	}
 	return true;

@@ -31,9 +31,9 @@
 #ifndef WORKPIECE_H_
 #define WORKPIECE_H_
 
-#include "../3D/CSGSurface.h"
+#include "../3D/AffineTransformMatrix.h"
 
-class Workpiece:public CSGSurface {
+class Workpiece {
 	// Constructor / Destructor
 public:
 	Workpiece();
@@ -42,10 +42,21 @@ public:
 	// Member variables
 public:
 
+	AffineTransformMatrix matrix;
+
+protected:
+	float *field;
+	double sx, sy, sz;
+	size_t nx, ny, N;
+	double rx, ry;
 
 	// Methods
 public:
 
+	void Paint() const;
+
+	void SetupBox(const double sizeX, const double sizeY, const double sizeZ,
+			const double resolutionX = 0.001, const double resolutionY = 0.001);
 };
 
 #endif /* WORKPIECE_H_ */

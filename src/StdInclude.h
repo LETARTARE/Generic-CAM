@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : StdInclude.h
-// Purpose            : Takes care of precompiled header issues.
+// Purpose            : Takes care of precompiled header issues
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -26,7 +26,6 @@
 //$Revision$
 //$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #ifndef STDINC_H_
 #define STDINC_H_

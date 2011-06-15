@@ -30,6 +30,9 @@
 
 #include "Vector3.h"
 
+#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+WX_DEFINE_OBJARRAY(ArrayOfVector3)
+
 Vector3::~Vector3(void)
 {
 }

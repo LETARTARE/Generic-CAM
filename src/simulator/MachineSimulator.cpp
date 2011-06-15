@@ -30,8 +30,7 @@
 
 #include "MachineSimulator.h"
 
-#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
-WX_DEFINE_OBJARRAY(ArrayOfMachinePosition)
+
 
 #include <wx/textfile.h>
 

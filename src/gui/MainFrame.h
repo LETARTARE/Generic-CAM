@@ -32,13 +32,33 @@
 
 #include "../Config.h"
 #include "../StdInclude.h"
+
 #include "gui.h"
-#include "../simulator/Machine.h"
-#include "../simulator/MachineSimulator.h"
+
+#include "../project/Project.h"
+
 #include "../controller/Control3D.h"
 #include <wx/config.h>
 #include <wx/log.h>
 
+class TreeItemData:public wxTreeItemData {
+public:
+	enum ItemDataType {
+		unknown = 0, geometry, connection, source, result
+	};
+
+	TreeItemData()
+	{
+		nr = 0;
+		dataType = unknown;
+	}
+	virtual ~TreeItemData()
+	{
+	}
+
+	size_t nr;
+	ItemDataType dataType;
+};
 
 class MainFrame:public GUIMainFrame {
 	// Constructor/ Destructor
@@ -52,29 +72,48 @@ private:
 	Control3D control;
 	wxLogWindow* logWindow;
 
-	MachineSimulator simulator;
+	ArrayOfProject project;
+	size_t activeProject;
 
 	wxTimer timer;
 	float t;
 
 	// Methods
+public:
+	void SetupTree(void);
+
 private:
 
-	void OnQuit(wxCommandEvent& event);
-	void OnAbout(wxCommandEvent& event);
-	void OnSelectDataFrame(wxCommandEvent& event);
-	void OnSetupController(wxCommandEvent &event);
-
-	void OnChangeStereo3D(wxCommandEvent &event);
-	void OnLoadMachine(wxCommandEvent &event);
-	void OnReloadMachine(wxCommandEvent &event);
-	void OnLoadToolbox(wxCommandEvent &event);
-	void OnSaveToolbox(wxCommandEvent &event);
-	void OnEditToolbox(wxCommandEvent& event);
-
-	void OnLoadGCodes(wxCommandEvent &event);
-
 	void OnTimer(wxTimerEvent& event);
+
+	void OnCreateProject(wxCommandEvent& event);
+	void OnLoadProject(wxCommandEvent& event);
+	void OnSaveProject(wxCommandEvent& event);
+	void OnQuit(wxCommandEvent& event);
+
+	void OnLoadObject(wxCommandEvent& event);
+
+	void OnLoadMachine(wxCommandEvent& event);
+	void OnReloadMachine(wxCommandEvent& event);
+
+	void OnEditToolbox(wxCommandEvent& event);
+	void OnLoadToolbox(wxCommandEvent& event);
+	void OnSaveToolbox(wxCommandEvent& event);
+
+	void OnEditStock(wxCommandEvent& event);
+
+	void OnLoadGCodes(wxCommandEvent& event);
+
+	void OnSetupController(wxCommandEvent& event);
+	void OnChangeStereo3D(wxCommandEvent& event);
+	void OnSetupUnits(wxCommandEvent& event);
+
+	void OnAbout(wxCommandEvent& event);
+
+	void OnBeginLabelEdit(wxTreeEvent& event);
+	void OnEndLabelEdit(wxTreeEvent& event);
+	void OnActivateRightClickMenu(wxTreeEvent& event);
+	void OnSelectionChanged(wxTreeEvent& event);
 
 };
 

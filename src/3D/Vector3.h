@@ -28,13 +28,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 /*!\class Vector3
- * \brief Describes a vector in 3D
+ * \brief Contains a vector in 3D space
  */
 
 #ifndef _CVECTOR3_H_
 #define _CVECTOR3_H_
 
 #include <cmath>
+#include <wx/dynarray.h>
 
 class Vector3 {
 public:
@@ -42,7 +43,7 @@ public:
 		x(px), y(py), z(pz)
 	{
 	}
-	;
+
 	~Vector3(void);
 public:
 	float x;
@@ -157,5 +158,7 @@ public:
 	}
 	Vector3 Normalize(void);
 };
+WX_DECLARE_OBJARRAY(Vector3, ArrayOfVector3)
+;
 
 #endif // _CVECTOR3_H_

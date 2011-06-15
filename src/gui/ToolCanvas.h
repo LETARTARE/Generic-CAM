@@ -32,7 +32,7 @@
 #define TOOLCANVAS_H_
 
 #include "../3D/OpenGLCanvas.h"
-#include "../simulator/Tool.h"
+#include "../machine/Tool.h"
 
 class ToolCanvas:public OpenGLCanvas {
 	// Constructor / Destructor

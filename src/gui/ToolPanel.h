@@ -34,7 +34,7 @@
 #include <wx/panel.h>
 #include <wx/dcclient.h>
 
-#include "../simulator/Tool.h"
+#include "../machine/Tool.h"
 
 class ToolPanel:public wxPanel {
 	// Costructor/ Destructor

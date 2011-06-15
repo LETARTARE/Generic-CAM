@@ -5,7 +5,7 @@
 // Platform dependent : Yes
 // Compiler Options   :
 // Author             : Vojtech Pavlik
-// Modified for C++   : Tobias Schäfer
+// Modified for C++   : Tobias Schaefer
 // Adapted            : 21.07.2009
 // Copyright          : (C) 1999-2001 Vojtech Pavlik <vojtech@ucw.cz>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
@@ -76,11 +76,13 @@ bool ControlSpaceOrb::ProcessPacket()
 			Axis[i] -= ((Axis[i] & 0x200)? 1024 : 0);
 		for(i = 0; i < 7; i++)
 			Button[i] = (Data[1] >> i) & 1;
+		hasChanged = true;
 		break;
 	case 'K': /* Button data */
 		if(idx != 5) return false;
 		for(i = 0; i < 7; i++)
 			Button[i] = (Data[2] >> i) & 1;
+		hasChanged = true;
 		break;
 	case 'E': /* Error packet */
 		if(idx != 4) return false;

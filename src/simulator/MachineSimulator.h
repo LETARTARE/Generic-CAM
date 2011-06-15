@@ -29,14 +29,12 @@
 
 #ifndef MACHINESIMULATOR_H_
 #define MACHINESIMULATOR_H_
-#include "Toolbox.h"
+#include "../project/Toolbox.h"
 #include "ToolPath.h"
-#include "Machine.h"
-#include "MachinePosition.h"
+#include "../machine/Machine.h"
+#include "../machine/MachinePosition.h"
 #include <wx/filename.h>
-#include <wx/dynarray.h>
-WX_DECLARE_OBJARRAY(MachinePosition, ArrayOfMachinePosition)
-;
+
 
 class MachineSimulator {
 	// Constructor/ Destructor

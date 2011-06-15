@@ -46,31 +46,48 @@ public:
 	// Member variables
 public:
 protected:
-	SerialPort port;
-	wxString connection;
-	int Button[CONTROL3DABSTRACT_MAXBUTTONS];
-	int Axis[6];
+	SerialPort port; //< Serial port to 6-DOF controller
+	wxString connection; //< Name of the connection /dev/ttyUSB, COM1, ...
+	int Button[CONTROL3DABSTRACT_MAXBUTTONS]; //< Button states
+	int Axis[6]; //< The six axes of the controller
+	bool hasChanged; //< Indicates a change during the last pumping of data
 
 	// Methods
 public:
+	///\brief Opens the connection to the serial port.
 	bool Open();
+	///\brief Closes the connection to the serial port.
 	void Close();
+	///\brief Sets a new port address
 	void SetPort(wxString connection);
+	///\brief Gets the port address
 	wxString GetPort();
-	bool IsConnected(){return port.IsOpen();}
-
+	///\brief Shows whether the connection is established.
+	bool IsConnected()
+	{
+		return port.IsOpen();
+	}
+	///\brief Returns the state of a given button.
 	int GetButton(unsigned char i) const;
+	///\brief Returns the state of a given axis.
 	int GetAxis(unsigned char i) const;
+	///\brief Indicates a change during the last pumping of data.
+	bool HasChanged()
+	{
+		return hasChanged;
+	}
+
+	///\brief Pumps data from the serial port to the packet analyser.
 	bool Pump();
 
-	virtual const unsigned char ReturnID()=0;
+	///\brief Returns an ID for the given 6-DOF driver.
+	virtual const unsigned char ReturnID() = 0;
 protected:
 	virtual void InitDevice();
 	virtual bool ProcessPacket() = 0;
-	virtual void DataIn(unsigned char c)=0;
+	virtual void DataIn(unsigned char c) = 0;
 
 };
-
 
 #include "ControlSpaceBall.h"
 #include "ControlSpaceOrb.h"

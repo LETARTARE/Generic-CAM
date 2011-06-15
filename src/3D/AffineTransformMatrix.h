@@ -81,40 +81,41 @@ public:
 	bool linkScaling; //!< Force uniform scaling.
 
 	// Methods
+public:
+
+	void TakeMatrixApart(void);
+	void PutMatrixTogether(void);
+
+	wxString ToString();
+	void FromString(wxString const& string);
+
 	//AffineTransformMatrix& operator=(const AffineTransformMatrix& b);
+	void Set(AffineTransformMatrix const& matrix);
 	AffineTransformMatrix operator*(AffineTransformMatrix const& b) const;
 	AffineTransformMatrix operator/(AffineTransformMatrix const& b) const;
 
-	void Set(AffineTransformMatrix const& matrix);
 	void SetIdentity();
-	AffineTransformMatrix Inverse() const;
-
 	static AffineTransformMatrix Identity();
+
+	AffineTransformMatrix Inverse() const;
 
 	static AffineTransformMatrix RotateAroundVector(Vector3 const& vector,
 			double const& phi);
-
 	static AffineTransformMatrix RotateInterwoven(double const& x,
 			double const& y, double const& z);
-
 	static AffineTransformMatrix RotateXY(int const& x, int const& y,
 			double const& scale);
 	static AffineTransformMatrix RotateXYZ(double const& x, double const& y,
 			double const& z);
 
 	void TranslateGlobal(double const& x, double const& y, double const& z);
-
 	void TranslateLocal(double const& x, double const& y, double const& z);
 
+	void ScaleGlobal(double const& x, double const& y, double const& z);
+
 	Vector3 Transform(Vector3 const& v) const;
+	Vector3 TransformNoShift(Vector3 const& v) const;
 
-	wxString ToString();
-
-	void FromString(wxString const& string);
-
-	//private:
-	void TakeMatrixApart(void);
-	void PutMatrixTogether(void);
 };
 
 #endif /* AFFINETRANSFORMMATRIX_H_ */

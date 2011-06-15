@@ -29,43 +29,42 @@
 
 
 #include "Workpiece.h"
-#include <wx/log.h>
+
+#include <GL/gl.h>
 
 Workpiece::Workpiece()
 {
-
-	AddBox(0.4, 0.3, 0.1);
-	//s.SetSphere(0.2);
-	//	if(gts_surface_is_closed(s.s)){
-	//		wxLogMessage(_T("Surface is closed!"));
-	//	}else{
-	//		wxLogMessage(_T("Surface is open!"));
-	//	}
-
-
-	//s.SelfTest();
-
-	//s.Statistics();
-
-	CSGSurface b;
-	//b.SetSphere(0.3);
-	b.AddBox(0.4, 0.3, 0.1);
-	b.Translate(-0.2, -0.15, 0.05);
-
-
-	//b.Statistics();
-
-	//b.SelfTest();
-	BooleanRemove(&b);
-
-
-	//s.Statistics();
-
-
-	//s.SelfTest();
+	field = NULL;
+	sx = sy = sz = 0;
+	rx = ry = 0.0;
 }
 
 Workpiece::~Workpiece()
 {
+	if(field != NULL) delete[] field;
+}
 
+void Workpiece::Paint() const
+{
+	if(field == NULL) return;
+
+}
+
+void Workpiece::SetupBox(const double sizeX, const double sizeY,
+		const double sizeZ, const double resolutionX, const double resolutionY)
+{
+	if(field != NULL) delete[] field;
+
+	rx = resolutionX;
+	ry = resolutionY;
+	sx = sizeX;
+	sy = sizeY;
+	sz = sizeZ;
+	nx = round(sx / rx);
+	ny = round(sy / ry);
+	N = nx * ny;
+
+	field = new float[N];
+	for(size_t i = 0; i < N; i++)
+		field[i] = sz;
 }

@@ -35,8 +35,7 @@
 
 #define CONTROLSPACEMOUSE_MAXDATALENGTH	256
 #define CONTROLSPACEMOUSE_ID	3
-class ControlSpaceMouse: public Control3DAbstract
-{
+class ControlSpaceMouse:public Control3DAbstract {
 	// Constructor / Destructor
 public:
 	ControlSpaceMouse();
@@ -49,7 +48,10 @@ private:
 
 	// Methods
 public:
-	virtual const unsigned char ReturnID(){return CONTROLSPACEMOUSE_ID;}
+	virtual const unsigned char ReturnID()
+	{
+		return CONTROLSPACEMOUSE_ID;
+	}
 protected:
 
 	virtual void InitDevice();
