@@ -94,6 +94,8 @@ public:
 	AffineTransformMatrix operator*(AffineTransformMatrix const& b) const;
 	AffineTransformMatrix operator/(AffineTransformMatrix const& b) const;
 
+	Vector3 GetCenter(void) const;
+
 	void SetIdentity();
 	static AffineTransformMatrix Identity();
 

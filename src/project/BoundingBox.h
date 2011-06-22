@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Control3D.h
-// Purpose            : Main class for 6DOF controller.
+// Name               : BoundingBox.h
+// Purpose            :
 // Thread Safe        : Yes
-// Platform dependent : Yes
+// Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 01.12.2009
-// Copyright          : (C) 2009 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 22.06.2011
+// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,51 +22,46 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
+//$LastChangedDate: $
+//$Revision: $
+//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef CONTROL3D_H_
-#define CONTROL3D_H_
+#ifndef BOUNDINGBOX_H_
+#define BOUNDINGBOX_H_
 
-#include "Control3DAbstract.h"
-#include <wx/config.h>
+#include "../3D/Vector3.h"
+#include "../3D/Geometry.h"
 
-class Control3D {
+/*!\class BoundingBox
+ * \brief ...
+ *
+ * ...
+ */
+
+class BoundingBox {
 	// Constructor / Destructor
 public:
-	Control3D();
-	virtual ~Control3D();
+	BoundingBox();
+	virtual ~BoundingBox();
 
-	// Member  variables
-protected:
-	Control3DAbstract* controller;
-private:
+	// Member variables
+public:
+	Vector3 color;
+	float alpha;
 
+	double xmin, xmax;
+	double ymin, ymax;
+	double zmin, zmax;
 
 	// Methods
 public:
-	bool Open(wxString connection);
-	bool Open(void);
-	void Close(void);
-	bool IsOpen(void);
 
-	bool SetType(char id);
-	char GetType(void);
+	void Reset(void);
+	void Insert(Geometry &geometry);
 
-	bool HasChanged(void);
-	bool IsIdle(void);
-	int GetButton(unsigned char i);
-	int GetAxis(unsigned char i);
-	wxString GetPort(void);
-	bool SetPort(wxString port);
-	bool GetConfigFrom(wxConfig *config);
-	bool WriteConfigTo(wxConfig *config);
-
-	bool Pump(void);
-
+	void Paint(void);
 };
 
-#endif /* CONTROL3D_H_ */
+#endif /* BOUNDINGBOX_H_ */

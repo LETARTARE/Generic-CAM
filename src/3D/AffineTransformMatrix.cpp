@@ -70,6 +70,16 @@ void AffineTransformMatrix::SetIdentity()
 	a[15] = 1.0;
 }
 
+//! Returns the center point of the matrix.
+Vector3 AffineTransformMatrix::GetCenter(void) const
+{
+	Vector3 temp;
+	temp.x = a[12];
+	temp.y = a[13];
+	temp.z = a[14];
+	return temp;
+}
+
 //! Generate a string containing the matrix.
 wxString AffineTransformMatrix::ToString()
 {
@@ -346,7 +356,7 @@ Vector3 AffineTransformMatrix::Transform(Vector3 const& v) const
 //! Apply the transformation matrix on a given vector without shifting the vector.
 Vector3 AffineTransformMatrix::TransformNoShift(Vector3 const& v) const
 {
-    //Axiom code:
+	//Axiom code:
 	//R:=matrix([[a[0],a[4],a[8],0],[a[1],a[5],a[9],0],[a[2],a[6],a[10],0],[0,0,0,1]])
 	//R*matrix([[x],[y],[z],[1]])
 
@@ -356,7 +366,6 @@ Vector3 AffineTransformMatrix::TransformNoShift(Vector3 const& v) const
 	temp.z = a[2] * v.x + a[6] * v.y + a[10] * v.z;
 	return temp;
 }
-
 
 //! Function returning an identity matrix.
 AffineTransformMatrix AffineTransformMatrix::Identity()
@@ -479,7 +488,8 @@ AffineTransformMatrix AffineTransformMatrix::RotateXYZ(double const& x,
 {
 	AffineTransformMatrix a;
 
-    //Axiom code:
+
+	//Axiom code:
 	// Rx := matrix[[1,0,0,0],[0,cox,-six,0],[0,six,cox,0],[0,0,0,1]]
 	// Ry := matrix[[coy,0,siy,0],[0,1,0,0],[-siy,0,coy,0],[0,0,0,1]]
 	// Rz := matrix[[coz,-siz,0,0],[siz,coz,0,0],[0,0,1,0],[0,0,0,1]]

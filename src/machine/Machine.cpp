@@ -33,8 +33,7 @@
 #include <GL/gl.h>
 #include <wx/textfile.h>
 
-#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
-WX_DEFINE_OBJARRAY(ArrayOfMachineComponent)
+
 
 Machine::Machine()
 {
@@ -128,7 +127,7 @@ void Machine::EvaluateDescription(void)
 	textOut = evaluator.GetOutput();
 }
 
-bool Machine::ReLoadDescription(void)
+bool Machine::ReLoad(void)
 {
 	if(!fileName.IsOk()) return false;
 	wxTextFile file(fileName.GetFullPath());
@@ -147,9 +146,9 @@ bool Machine::ReLoadDescription(void)
 	return true;
 }
 
-bool Machine::LoadDescription(wxFileName const& fileName)
+bool Machine::Load(wxFileName const& fileName)
 {
 	if(!fileName.IsOk()) return false;
 	this->fileName = fileName;
-	return ReLoadDescription();
+	return ReLoad();
 }

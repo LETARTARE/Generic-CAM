@@ -28,16 +28,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef MACHINE_H_
 #define MACHINE_H_
+
 #include "LUACodeEvaluator.h"
+
 #include "MachineComponent.h"
 #include "MachinePosition.h"
 #include "Tool.h"
 #include "../simulator/ToolPath.h"
 #include "../simulator/Workpiece.h"
 #include <wx/string.h>
-#include <wx/dynarray.h>
-WX_DECLARE_OBJARRAY(MachineComponent, ArrayOfMachineComponent)
-;
+
 class Machine {
 	friend class LUACodeEvaluator;
 	//Constructor / Destructor
@@ -82,8 +82,8 @@ public:
 	bool AddComponent(wxString const& nameOfComponent);
 	void Assemble(void);
 	void EvaluateDescription(void);
-	bool ReLoadDescription(void);
-	bool LoadDescription(wxFileName const& fileName);
+	bool ReLoad(void);
+	bool Load(wxFileName const& fileName);
 	bool IsInitialized(void)
 	{
 		return initialized;

@@ -34,62 +34,97 @@ MainCanvas::MainCanvas(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 		const wxSize& size, long style, const wxString& name) :
 	OpenGLCanvas(parent, id, pos, size, style, name)
 {
-	machine = NULL;
-	geometry = NULL;
-	stockMaterial = NULL;
+
+
+	displayCoordinateSystem = true;
+
+	linkedProject=NULL;
 }
 
 MainCanvas::~MainCanvas()
 {
 }
 
-void MainCanvas::InsertMachine(Machine* machine)
+void MainCanvas::InsertProject(Project* project)
 {
-	this->machine = machine;
-}
-void MainCanvas::InsertGeometry(ArrayOfGeometry* geometry)
-{
-	this->geometry = geometry;
+	linkedProject = project;
 }
 
-void MainCanvas::InsertStockMaterial(StockMaterial* stockMaterial)
+void MainCanvas::RenderCoordinateSystem(AffineTransformMatrix *matrix)
 {
-	this->stockMaterial = stockMaterial;
-}
+	::glPushMatrix();
+	if(matrix != NULL) ::glMultMatrixd(matrix->a);
 
-void MainCanvas::RenderCoordinateSystem(void)
-{
+	GLfloat s = 1.0;
+	GLfloat n = sqrt(2.0);
+	GLfloat d = s / 10;
+
 	glBegin(GL_LINES);
 
-	glColor3b(255, 0, 0);
-	glNormal3f(-1, 0, 0);
-	glVertex3f(-1, 0, 0);
-	glNormal3f(1, 0, 0);
-	glVertex3f(1, 0, 0);
+	glColor3f(1.0, 0, 0);
+	glNormal3f(-s, 0, 0);
+	glVertex3f(-s, 0, 0);
+	glNormal3f(s, 0, 0);
+	glVertex3f(s, 0, 0);
 
-	glColor3b(0, 255, 0);
-	glNormal3f(0, -1, 0);
-	glVertex3f(0, -1, 0);
-	glNormal3f(0, 1, 0);
-	glVertex3f(0, 1, 0);
+	glNormal3f(n, n, 0);
+	glVertex3f(s, 0, 0);
+	glVertex3f(s - d, d, 0);
+	glNormal3f(n, -n, 0);
+	glVertex3f(s, 0, 0);
+	glVertex3f(s - d, -d, 0);
+	glNormal3f(n, 0, n);
+	glVertex3f(s, 0, 0);
+	glVertex3f(s - d, 0, d);
+	glNormal3f(n, 0, -n);
+	glVertex3f(s, 0, 0);
+	glVertex3f(s - d, 0, -d);
 
-	glColor3b(0, 0, 255);
-	glNormal3f(0, 0, -1);
-	glVertex3f(0, 0, -1);
-	glNormal3f(0, 0, 1);
-	glVertex3f(0, 0, 1);
+	glColor3f(0, 1.0, 0);
+	glNormal3f(0, -s, 0);
+	glVertex3f(0, -s, 0);
+	glNormal3f(0, s, 0);
+	glVertex3f(0, s, 0);
 
-	glEnd();
+	glNormal3f(n, n, 0);
+	glVertex3f(0, s, 0);
+	glVertex3f(d, s - d, 0);
+	glNormal3f(-n, n, 0);
+	glVertex3f(0, s, 0);
+	glVertex3f(-d, s - d, 0);
+	glNormal3f(0, n, n);
+	glVertex3f(0, s, 0);
+	glVertex3f(0, s - d, d);
+	glNormal3f(0, n, -n);
+	glVertex3f(0, s, 0);
+	glVertex3f(0, s - d, -d);
+
+	glColor3f(0, 0, 1.0);
+	glNormal3f(0, 0, -s);
+	glVertex3f(0, 0, -s);
+	glNormal3f(0, 0, s);
+	glVertex3f(0, 0, s);
+
+	glNormal3f(n, 0, n);
+	glVertex3f(0, 0, s);
+	glVertex3f(d, 0, s - d);
+	glNormal3f(-n, 0, n);
+	glVertex3f(0, 0, s);
+	glVertex3f(-d, 0, s - d);
+	glNormal3f(0, n, n);
+	glVertex3f(0, 0, s);
+	glVertex3f(0, d, s - d);
+	glNormal3f(0, -n, n);
+	glVertex3f(0, 0, s);
+	glVertex3f(0, -d, s - d);
+
+	::glEnd();
+	::glPopMatrix();
 }
 
 void MainCanvas::Render()
 {
-	RenderCoordinateSystem();
-	if(machine != NULL && machine->IsInitialized()) machine->Paint();
-	if(geometry != NULL) {
-		size_t i;
-		for(i=0;i<geometry->GetCount();i++)
-		geometry->Item(i).Paint();
-	}
-	if(stockMaterial != NULL) stockMaterial->Paint();
+	if(displayCoordinateSystem)RenderCoordinateSystem();
+	if(linkedProject==NULL)return;
+	linkedProject->Paint();
 }

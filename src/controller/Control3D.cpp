@@ -103,6 +103,17 @@ bool Control3D::HasChanged(void)
 	return controller->HasChanged();
 }
 
+bool Control3D::IsIdle(void)
+{
+	if(controller == NULL) return true;
+	unsigned char i;
+	for(i = 0; i < 6; i++)
+		if(controller->GetAxis(i) != 0) return false;
+	for(i = 0; i < CONTROL3DABSTRACT_MAXBUTTONS; i++)
+		if(controller->GetButton(i) != 0) return false;
+	return true;
+}
+
 int Control3D::GetButton(unsigned char i)
 {
 	if(controller == NULL) return 0;

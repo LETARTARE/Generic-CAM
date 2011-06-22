@@ -33,6 +33,9 @@
 #include <wx/glcanvas.h>
 #include <wx/log.h>
 
+#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+WX_DEFINE_OBJARRAY(ArrayOfMachineComponent)
+
 MachineComponent::MachineComponent(wxString nameOfComponent)
 {
 	this->nameOfComponent = nameOfComponent;

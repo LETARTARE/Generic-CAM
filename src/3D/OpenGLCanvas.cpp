@@ -285,6 +285,7 @@ void OpenGLCanvas::OnTimer(wxTimerEvent& event)
 	if(control == NULL) return;
 
 	control->Pump();
+	if(control->IsIdle())return;
 	rotmat = AffineTransformMatrix::RotateInterwoven(
 			(float) control->GetAxis(3) / 1000.0, (float) control->GetAxis(4)
 					/ 1000.0, (float) control->GetAxis(5) / 1000.0) * rotmat;
@@ -311,6 +312,9 @@ void OpenGLCanvas::Render()
 	GLfloat nx = x / t;
 	GLfloat ny = y / t;
 	GLfloat nz = z / t;
+
+
+
 
 	::glBegin(GL_QUADS);
 	::glNormal3f(nx, ny, nz);

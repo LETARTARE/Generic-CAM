@@ -36,6 +36,7 @@
 #include "../machine/Machine.h"
 #include "Run.h"
 #include "StockMaterial.h"
+#include "BoundingBox.h"
 
 #include <wx/string.h>
 
@@ -59,21 +60,36 @@ public:
 	wxFileName geometryFileName;
 	ArrayOfGeometry geometry;
 
-	wxFileName toolboxFileName;
-	Toolbox toolbox;
+	BoundingBox bbox;
 
 	wxFileName machineFileName;
 	Machine machine;
 
+	wxFileName toolboxFileName;
+	Toolbox toolbox;
+
 	wxFileName stockFileName;
 	ArrayOfStockMaterial stock;
+	size_t selectedStock;
 
 	ArrayOfRun run;
 
 	bool modified;
 
+	bool displayGeometry;
+	bool displayMachine;
+	bool displayStock;
+
+	bool displayBoundingBox;
+
+
 	// Methods
 public:
+
+	void Paint(void);
+
+	void RegenerateBoundingBox(void);
+
 };
 WX_DECLARE_OBJARRAY(Project, ArrayOfProject)
 ;

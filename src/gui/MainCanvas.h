@@ -36,10 +36,9 @@
  */
 
 #include "../3D/OpenGLCanvas.h"
+#include "../project/Project.h"
 
-#include "../3D/Geometry.h"
-#include "../machine/Machine.h"
-#include "../project/StockMaterial.h"
+
 
 class MainCanvas:public OpenGLCanvas {
 	// Constructor / Destructor
@@ -52,17 +51,24 @@ public:
 	// Member Variables
 private:
 
+	Project* linkedProject;
+
 	ArrayOfGeometry* geometry;
 	Machine* machine;
 	StockMaterial* stockMaterial;
 
+
+
+	bool displayCoordinateSystem;
+
 	// Methods
 public:
+	void InsertProject(Project* project);
 	void InsertMachine(Machine* machine);
 	void InsertGeometry(ArrayOfGeometry* geometry);
 	void InsertStockMaterial(StockMaterial* stockMaterial);
 
-	void RenderCoordinateSystem(void);
+	void RenderCoordinateSystem(AffineTransformMatrix *matrix = NULL);
 	void Render();
 };
 

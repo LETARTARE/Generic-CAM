@@ -76,9 +76,10 @@ MainFrame::MainFrame(wxWindow* parent) :
 	project.Add(temp);
 	activeProject = 0;
 
-	m_canvas->InsertGeometry(&(project[activeProject].geometry));
-	m_canvas->InsertMachine(&(project[activeProject].machine));
-	m_canvas->InsertStockMaterial(&(project[activeProject].stock[0]));
+
+	//	m_canvas->InsertGeometry(&(project[activeProject].geometry));
+	//	m_canvas->InsertMachine(&(project[activeProject].machine));
+	m_canvas->InsertProject(&(project[activeProject]));
 
 	SetupTree();
 
@@ -114,7 +115,7 @@ void MainFrame::OnLoadObject(wxCommandEvent& event)
 					_("Open..."),
 					_T(""),
 					_T(""),
-					_("All supported files (*.stl; *.gts)|*.stl;*.gts|Stereolithography files (STL files) (*.stl)|*.stl|GTS files (*.gts)|*.gts|All files|*.*"),
+					_("All supported files (*.dxf; *.stl; *.gts)|*.dxf;*.stl;*.gts|DXF Files (*.dxf)|*.dxf|Stereolithography files (STL files) (*.stl)|*.stl|GTS files (*.gts)|*.gts|All files|*.*"),
 					wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if(project[activeProject].geometryFileName.IsOk()) dialog.SetFilename(
@@ -129,7 +130,7 @@ void MainFrame::OnLoadObject(wxCommandEvent& event)
 		//TODO: Cleanup the structure below. There has to be a better way.
 
 		size_t i;
-
+		bool flag = false;
 		Geometry g;
 
 		if(fileName.GetExt().CmpNoCase(_T("gts")) == 0){
@@ -147,6 +148,7 @@ void MainFrame::OnLoadObject(wxCommandEvent& event)
 				g.objectName
 						= project[activeProject].geometryFileName.GetName();
 				project[activeProject].geometry.Add(g);
+				flag = true;
 			}
 		}
 		if(fileName.GetExt().CmpNoCase(_T("stl")) == 0){
@@ -164,6 +166,7 @@ void MainFrame::OnLoadObject(wxCommandEvent& event)
 				g.objectName
 						= project[activeProject].geometryFileName.GetName();
 				project[activeProject].geometry.Add(g);
+				flag = true;
 			}
 		}
 		if(fileName.GetExt().CmpNoCase(_T("dxf")) == 0){
@@ -181,11 +184,15 @@ void MainFrame::OnLoadObject(wxCommandEvent& event)
 					g.objectName = temp.geometry[i].objectName;
 					project[activeProject].geometry.Add(g);
 				}
+				flag = true;
 			}
+		}
+		if(flag){
+			project[activeProject].RegenerateBoundingBox();
 		}
 
 		SetupTree();
-		Refresh();
+		this->Refresh();
 	}
 }
 
@@ -200,32 +207,43 @@ void MainFrame::OnLoadMachine(wxCommandEvent& event)
 					_("Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
 					wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
+	if(dialog.ShowModal() == wxID_OK){
+		project[activeProject].machine.Load(dialog.GetPath());
 
-	//	if(dialog.ShowModal() == wxID_OK){
-	//		project[activeProject].machine.fileName.Assign(dialog.GetPath());
-	//		OnReloadMachine(event);
-	//
-	//
-	//		//ctrlTextEdit->SetValue(temp);
-	//		//fname.Assign(dialog.GetPath());
-	//		//ctrlTextEdit->SetModified(false);
-	//		//SetWindowTitle();
-	//
-	//	}
+
+		//ctrlTextEdit->SetValue(temp);
+		//fname.Assign(dialog.GetPath());
+		//ctrlTextEdit->SetModified(false);
+		//SetWindowTitle();
+		if(!project[activeProject].machine.textOut.IsEmpty()){
+			//wxLogMessage(_T("Displaying some text in ErrorFrame!"));
+			//TODO: Don't open a new errorframe, if the old one is not closed.
+			ErrorFrame* error = new ErrorFrame(this);
+			error->SetText(project[activeProject].machine.textOut);
+			error->Show();
+		}
+		SetupTree();
+		this->Refresh();
+	}
 }
 
 void MainFrame::OnReloadMachine(wxCommandEvent& event)
 {
+
+	project[activeProject].machine.ReLoad();
+
+
 	//	if(!simulator.machine.fileName.IsOk()) return;
-	//	simulator.machine.ReLoadDescription();
-	//	if(!simulator.machine.textOut.IsEmpty()){
-	//		//wxLogMessage(_T("Displaying some text in ErrorFrame!"));
-	//		//TODO: Don't open a new errorframe, if the old one is not closed.
-	//		ErrorFrame* error = new ErrorFrame(this);
-	//		error->SetText(simulator.machine.textOut);
-	//		error->Show();
-	//	}
+	//	simulator.machine.ReLoad();
+	if(!project[activeProject].machine.textOut.IsEmpty()){
+		//wxLogMessage(_T("Displaying some text in ErrorFrame!"));
+		//TODO: Don't open a new errorframe, if the old one is not closed.
+		ErrorFrame* error = new ErrorFrame(this);
+		error->SetText(project[activeProject].machine.textOut);
+		error->Show();
+	}
 	//	t = 0;
+	this->Refresh();
 }
 
 void MainFrame::OnEditToolbox(wxCommandEvent& event)
@@ -343,6 +361,7 @@ void MainFrame::OnChangeStereo3D(wxCommandEvent& event)
 		m_canvas->stereoMode = 1;
 	}
 	m_menuView->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
+	this->Refresh();
 }
 
 void MainFrame::OnSetupUnits(wxCommandEvent& event)
@@ -360,7 +379,7 @@ void MainFrame::OnTimer(wxTimerEvent& event)
 	//	t += 0.100;
 	//	simulator.Step(t);
 	//	simulator.machine.Assemble();
-	this->Refresh();
+	//this->Refresh();
 }
 
 void MainFrame::OnBeginLabelEdit(wxTreeEvent& event)

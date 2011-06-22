@@ -38,6 +38,8 @@
 #include "../project/Project.h"
 
 #include "../controller/Control3D.h"
+
+
 #include <wx/config.h>
 #include <wx/log.h>
 
@@ -74,6 +76,8 @@ private:
 
 	ArrayOfProject project;
 	size_t activeProject;
+
+
 
 	wxTimer timer;
 	float t;

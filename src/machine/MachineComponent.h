@@ -22,18 +22,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
+//$LastChangedDate:2011-06-16 01:34:14 +0200 (Do, 16 Jun 2011) $
+//$Revision:56 $
+//$LastChangedBy:tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef MACHINECOMPONENT_H_
 #define MACHINECOMPONENT_H_
+
 #include "../3D/AffineTransformMatrix.h"
 #include "../3D/Geometry.h"
 
 #include <wx/string.h>
 #include <wx/filename.h>
+#include <wx/dynarray.h>
+
+
 
 class MachineComponent {
 	// Constructor / Destructor
@@ -59,5 +63,9 @@ public:
 	bool InsertSTL(AffineTransformMatrix matrix, wxFileName file);
 private:
 };
+
+WX_DECLARE_OBJARRAY(MachineComponent, ArrayOfMachineComponent)
+;
+
 
 #endif /* MACHINECOMPONENT_H_ */

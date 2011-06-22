@@ -33,14 +33,43 @@
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfProject)
 
+#include <GL/gl.h>
+
 Project::Project()
 {
 	modified = false;
 	projectName = _("Untitled");
 	StockMaterial temp;
 	stock.Add(temp);
+
+	displayGeometry = false;
+	displayBoundingBox = false;
+	displayMachine = true;
+	displayStock = false;
+
 }
 
 Project::~Project()
 {
+}
+
+void Project::RegenerateBoundingBox(void)
+{
+	size_t i;
+	bbox.Reset();
+	for(i = 0; i < geometry.GetCount(); i++){
+		bbox.Insert((geometry[i]));
+	}
+}
+
+void Project::Paint(void)
+{
+	size_t i;
+	if(displayGeometry){
+		for(i = 0; i < geometry.GetCount(); i++)
+			geometry[i].Paint();
+	}
+	if(displayMachine) machine.Paint();
+	if(displayStock) stock[selectedStock].Paint();
+	if(displayBoundingBox) bbox.Paint();
 }

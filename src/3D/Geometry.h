@@ -56,7 +56,6 @@ public:
 	bool visible;
 
 	AffineTransformMatrix matrix; //!< Transformation of the data.
-private:
 	ArrayOfTriangle triangles; //!< The storage of the geometric data.
 
 	// Methods
