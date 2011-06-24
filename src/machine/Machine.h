@@ -35,7 +35,7 @@
 #include "MachinePosition.h"
 #include "Tool.h"
 #include "../simulator/ToolPath.h"
-#include "../simulator/Workpiece.h"
+//#include "../simulator/Workpiece.h"
 #include <wx/string.h>
 
 class Machine {
@@ -56,7 +56,7 @@ public:
 	wxString machineDescription;
 	wxString textOut;
 
-	Workpiece workpiece;
+//	Workpiece workpiece;
 
 	Tool* tool;
 	ToolPath* toolpath;

@@ -32,11 +32,39 @@
 #define WORKPIECE_H_
 
 #include "../3D/AffineTransformMatrix.h"
+#include "../3D/Vector3.h"
+#include "../project/StockMaterial.h"
+
+class WorkpieceElement {
+	// Constructor / Destructor
+public:
+	WorkpieceElement();
+	virtual ~WorkpieceElement();
+	// Member variables
+public:
+	float upperLimit;
+	float lowerLimit;
+
+	// TODO: ...later...
+	//	float normal; // 0..Pi/2<
+	//	float orientation; // 0..2Pi
+
+	// Methods
+public:
+	bool IsVisible(void)
+	{
+		return (upperLimit > lowerLimit);
+	}
+};
 
 class Workpiece {
 	// Constructor / Destructor
 public:
-	Workpiece();
+	Workpiece(const double sizeX = 0.1, const double sizeY = 0.1,
+			const double sizeZ = 0.05, const double resolutionX = 0.001,
+			const double resolutionY = 0.001);
+	Workpiece(StockMaterial* material, const double resolution = 0.001);
+
 	virtual ~Workpiece();
 
 	// Member variables
@@ -45,7 +73,7 @@ public:
 	AffineTransformMatrix matrix;
 
 protected:
-	float *field;
+	WorkpieceElement *field;
 	double sx, sy, sz;
 	size_t nx, ny, N;
 	double rx, ry;
@@ -53,10 +81,17 @@ protected:
 	// Methods
 public:
 
+	Vector3 colorNormal;
+	Vector3 colorUnscratched;
+	Vector3 colorTodo;
+
 	void Paint() const;
 
 	void SetupBox(const double sizeX, const double sizeY, const double sizeZ,
 			const double resolutionX = 0.001, const double resolutionY = 0.001);
+
+	void InsertTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c);
+
 };
 
 #endif /* WORKPIECE_H_ */

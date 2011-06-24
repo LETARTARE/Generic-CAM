@@ -39,13 +39,19 @@ Project::Project()
 {
 	modified = false;
 	projectName = _("Untitled");
-	StockMaterial temp;
+	StockMaterial* temp = new StockMaterial;
 	stock.Add(temp);
+
+	workpiece.SetupBox(stock[0].x, stock[0].y, stock[0].z);
 
 	displayGeometry = true;
 	displayBoundingBox = true;
 	displayMachine = true;
-	displayStock = true;
+	displayStock = false;
+	displayWorkpiece = true;
+
+
+
 
 }
 
@@ -65,12 +71,11 @@ void Project::RegenerateBoundingBox(void)
 void Project::Assemble(void)
 {
 	machine.Assemble();
-	if(machine.IsInitialized())
-	{
-		stock[selectedStock].matrix=machine.workpiecePosition;
+	if(machine.IsInitialized()){
+		stock[selectedStock].matrix = machine.workpiecePosition;
+		workpiece.matrix = machine.workpiecePosition;
 	}
 }
-
 
 void Project::Paint(void)
 {
@@ -81,5 +86,6 @@ void Project::Paint(void)
 	}
 	if(displayMachine) machine.Paint();
 	if(displayStock) stock[selectedStock].Paint();
+	if(displayWorkpiece) workpiece.Paint();
 	if(displayBoundingBox) bbox.Paint();
 }

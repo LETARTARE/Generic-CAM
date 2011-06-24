@@ -46,10 +46,14 @@ EVT_MOUSE_EVENTS(OpenGLCanvas::OnMouseEvent)
 EVT_TIMER(TIMER_OPENGLCANVAS, OpenGLCanvas::OnTimer)
 END_EVENT_TABLE()
 
+static int wx_gl_attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24, 0};
+
+//wxGLCanvas(parent, wxID_ANY ,wxDefaultPosition, wxDefaultSize, 0, wxT("GLCanvas"));
+
 OpenGLCanvas::OpenGLCanvas(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 		const wxSize& size, long style, const wxString& name) :
 	wxGLCanvas(parent, (wxGLCanvas*) NULL, id, pos, size, style
-			| wxFULL_REPAINT_ON_RESIZE, name)
+			| wxFULL_REPAINT_ON_RESIZE, name, wx_gl_attribs)
 {
 
 

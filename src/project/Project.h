@@ -34,6 +34,7 @@
 #include "../3D/Geometry.h"
 #include "Toolbox.h"
 #include "../machine/Machine.h"
+#include "../simulator/Workpiece.h"
 #include "Run.h"
 #include "StockMaterial.h"
 #include "BoundingBox.h"
@@ -72,6 +73,8 @@ public:
 	ArrayOfStockMaterial stock;
 	size_t selectedStock;
 
+	Workpiece workpiece;
+
 	ArrayOfRun run;
 
 	bool modified;
@@ -79,7 +82,7 @@ public:
 	bool displayGeometry;
 	bool displayMachine;
 	bool displayStock;
-
+	bool displayWorkpiece;
 	bool displayBoundingBox;
 
 
