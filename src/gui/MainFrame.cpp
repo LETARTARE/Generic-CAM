@@ -72,7 +72,7 @@ MainFrame::MainFrame(wxWindow* parent) :
 
 	timer.Start(100);
 
-	Project temp;
+	Project *temp = new Project;
 	project.Add(temp);
 	activeProject = 0;
 
@@ -209,6 +209,7 @@ void MainFrame::OnLoadMachine(wxCommandEvent& event)
 
 	if(dialog.ShowModal() == wxID_OK){
 		project[activeProject].machine.Load(dialog.GetPath());
+		project[activeProject].Assemble();
 
 
 		//ctrlTextEdit->SetValue(temp);
@@ -231,6 +232,7 @@ void MainFrame::OnReloadMachine(wxCommandEvent& event)
 {
 
 	project[activeProject].machine.ReLoad();
+	project[activeProject].Assemble();
 
 
 	//	if(!simulator.machine.fileName.IsOk()) return;
@@ -251,7 +253,7 @@ void MainFrame::OnEditToolbox(wxCommandEvent& event)
 	ToolboxFrame* toolboxFrame = new ToolboxFrame(this);
 
 	toolboxFrame->SetController(control);
-	toolboxFrame->InsertToolBox(project[activeProject].toolbox);
+	toolboxFrame->InsertToolBox(&(project[activeProject].toolbox));
 	toolboxFrame->Show(true);
 }
 
@@ -425,7 +427,7 @@ void MainFrame::SetupTree(void)
 		}
 
 		treeIdMachine = tree->AppendItem(treeIdProject, _("Machine: ")
-				+ project[i].machine.machineDescription);
+				+ project[i].machine.fileName.GetName());
 
 		if(project[i].toolbox.IsInitialized()){
 			treeIdToolbox = tree->AppendItem(treeIdProject, _("Toolbox:")

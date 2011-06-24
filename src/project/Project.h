@@ -87,7 +87,7 @@ public:
 public:
 
 	void Paint(void);
-
+	void Assemble(void);
 	void RegenerateBoundingBox(void);
 
 };

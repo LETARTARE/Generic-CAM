@@ -64,9 +64,9 @@ void ToolboxFrame::OnChangeStereo3D(wxCommandEvent& event)
 	m_menuSettings->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
 }
 
-void ToolboxFrame::InsertToolBox(Toolbox& toolbox)
+void ToolboxFrame::InsertToolBox(Toolbox* toolbox)
 {
-	linkedToolbox = &toolbox;
+	linkedToolbox = toolbox;
 
 	UpdateDisplay();
 }
@@ -149,7 +149,7 @@ void ToolboxFrame::UpdateDisplay(bool direction)
 			m_listCtrl->SetItemState(j, 0, wxLIST_STATE_SELECTED);
 
 			if(selectedElement
-					< linkedToolbox->tools[selectedTool].elements.Count()){
+					< linkedToolbox->tools[selectedTool].elements.GetCount()){
 
 				m_listCtrl->SetItemState(selectedElement,
 						wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);

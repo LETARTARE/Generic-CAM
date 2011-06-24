@@ -22,9 +22,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
+//$LastChangedDate:2011-06-16 01:34:14 +0200 (Do, 16 Jun 2011) $
+//$Revision:56 $
+//$LastChangedBy:tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -40,6 +40,7 @@ LUACodeEvaluator::LUACodeEvaluator()
 	linkedMachine = NULL;
 
 	L = lua_open();
+
 	availableLUACodeEvaluators.push_back(this);
 
 	luaopen_base(L);
@@ -88,10 +89,10 @@ wxString LUACodeEvaluator::GetOutput()
 	return programOutput;
 }
 
-void LUACodeEvaluator::EvaluateProgram()
+bool LUACodeEvaluator::EvaluateProgram()
 {
-	if(linkedMachine == NULL) return;
-	int error;
+	if(linkedMachine == NULL) return false;
+	int error = 0;
 
 	linkedMachine->ClearComponents();
 
@@ -99,7 +100,7 @@ void LUACodeEvaluator::EvaluateProgram()
 	//	wxLogMessage(wxString::Format(_T("Blip: %u"),linkedMachine->components.Count()));
 	//		return NULL;
 
-	componentToManipulate = &(linkedMachine->components[0]);
+	componentToManipulate = 0;
 
 	programOutput.Empty();
 
@@ -109,12 +110,14 @@ void LUACodeEvaluator::EvaluateProgram()
 	if(error){
 		programOutput += _("\n---------- error while parsing ----------\n");
 		programOutput += wxString::FromAscii(lua_tostring(L, -1));
+		return false;
 	}else{
 		error = lua_pcall(L, 0, 0, 0);
 		if(error){
 			programOutput += _("\n---------- error while running ----------\n");
 
 			programOutput += wxString::FromAscii(lua_tostring(L, -1));
+			return false;
 		}
 	}
 
@@ -128,15 +131,16 @@ void LUACodeEvaluator::EvaluateProgram()
 		}
 
 	}
+	return true;
 
 }
 
-void LUACodeEvaluator::EvaluateAssembly()
+bool LUACodeEvaluator::EvaluateAssembly()
 {
-	if(linkedMachine == NULL) return;
+	if(linkedMachine == NULL) return false;
 	int error;
 
-	componentToManipulate = &(linkedMachine->components[0]);
+	componentToManipulate = 0;
 
 	programOutput.Empty();
 	matrix.SetIdentity();
@@ -158,7 +162,9 @@ void LUACodeEvaluator::EvaluateAssembly()
 		programOutput += _("\n---------- error while running ----------\n");
 
 		programOutput += wxString::FromAscii(lua_tostring(L, -1));
+		return false;
 	}
+	return true;
 
 }
 
@@ -241,9 +247,7 @@ int LUACodeEvaluator::addcomponent_glue(lua_State * L)
 	if(!CC->linkedMachine->AddComponent(wxString::FromAscii(s))){
 		return luaL_error(L, "addcomponent: part already exists!");
 	}
-	CC->componentToManipulate
-			= &(CC->linkedMachine->components[CC->linkedMachine->components.Count()
-					- 1]);
+	CC->componentToManipulate = CC->linkedMachine->components.GetCount() - 1;
 	CC->matrix.SetIdentity();
 	return 0;
 }
@@ -321,7 +325,8 @@ int LUACodeEvaluator::box_glue(lua_State * L)
 	float y = luaL_checknumber(L, 2);
 	float z = luaL_checknumber(L, 3);
 
-	CC->componentToManipulate->InsertBox(CC->matrix, x, y, z);
+	CC->linkedMachine->components[CC->componentToManipulate].InsertBox(
+			CC->matrix, x, y, z);
 	return 0;
 }
 int LUACodeEvaluator::cylinder_glue(lua_State * L)
@@ -334,13 +339,16 @@ int LUACodeEvaluator::cylinder_glue(lua_State * L)
 	case 2:
 		h = luaL_checknumber(L, 1);
 		r1 = luaL_checknumber(L, 2);
-		CC->componentToManipulate->InsertCylinder(CC->matrix, h, r1);
+		CC->linkedMachine->components[CC->componentToManipulate].InsertCylinder(
+				CC->matrix, h, r1);
+
 		break;
 	case 3:
 		h = luaL_checknumber(L, 1);
 		r1 = luaL_checknumber(L, 2);
 		r2 = luaL_checknumber(L, 3);
-		CC->componentToManipulate->InsertCone(CC->matrix, h, r1, r2);
+		CC->linkedMachine->components[CC->componentToManipulate].InsertCone(
+				CC->matrix, h, r1, r2);
 		break;
 	default:
 		lua_pushstring(L, "cylinder: parameter mismatch");
@@ -352,7 +360,17 @@ int LUACodeEvaluator::cylinder_glue(lua_State * L)
 
 int LUACodeEvaluator::setstyle_glue(lua_State * L)
 {
-	//TODO: Code to change the appearance of the following elements.
+	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
+	wxASSERT(CC==NULL);
+	if(lua_gettop(L) != 3){
+		lua_pushstring(L, "setstyle: parameter mismatch");
+		lua_error(L);
+		return 0;
+	}
+	float r = luaL_checknumber(L, 1);
+	float g = luaL_checknumber(L, 2);
+	float b = luaL_checknumber(L, 3);
+	CC->linkedMachine->components[CC->componentToManipulate].SetColor(r, g, b);
 	return 0;
 }
 
@@ -368,7 +386,7 @@ int LUACodeEvaluator::toolholder_glue(lua_State * L)
 	CC->linkedMachine->toolPositionRelativ.Set(CC->matrix);
 	CC->linkedMachine->toolPosition.Set(CC->matrix);
 	CC->linkedMachine->componentWithTool
-			= CC->linkedMachine->components.Count() - 1;
+			= CC->linkedMachine->components.GetCount() - 1;
 	return 0;
 }
 int LUACodeEvaluator::tableorigin_glue(lua_State * L)
@@ -439,21 +457,20 @@ int LUACodeEvaluator::loadstl_glue(lua_State * L)
 	wxFileName machinedirectory(CC->linkedMachine->fileName);
 	wxFileName fileName(wxString::FromAscii(s));
 	machinedirectory.Normalize();
-	fileName.Normalize(wxPATH_NORM_DOTS|wxPATH_NORM_ENV_VARS|wxPATH_NORM_TILDE);
+	fileName.Normalize(wxPATH_NORM_DOTS | wxPATH_NORM_ENV_VARS
+			| wxPATH_NORM_TILDE);
 
-	fileName.SetPath(machinedirectory.GetPathWithSep()+fileName.GetPath());
+	fileName.SetPath(machinedirectory.GetPathWithSep() + fileName.GetPath());
 
-	wxLogMessage(_T("machineDirectory:")+machinedirectory.GetPath());
-	wxLogMessage(_T("fileNameDirectory:")+fileName.GetPath());
+	wxLogMessage(_T("machineDirectory:") + machinedirectory.GetPath());
+	wxLogMessage(_T("fileNameDirectory:") + fileName.GetPath());
 
-
-
-	if(!fileName.IsOk())
-	{
-		CC->programOutput+=fileName.GetFullPath();
+	if(!fileName.IsOk()){
+		CC->programOutput += fileName.GetFullPath();
 		return luaL_error(L, "File does not exist!");
 	}
 
-	CC->componentToManipulate->InsertSTL(CC->matrix, fileName);
+	CC->linkedMachine->components[CC->componentToManipulate].InsertSTL(
+			CC->matrix, fileName);
 	return 0;
 }

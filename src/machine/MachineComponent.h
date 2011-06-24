@@ -37,8 +37,6 @@
 #include <wx/filename.h>
 #include <wx/dynarray.h>
 
-
-
 class MachineComponent {
 	// Constructor / Destructor
 public:
@@ -57,15 +55,17 @@ private:
 	// Methods
 public:
 	void Paint(void);
+	void SetColor(float r, float g, float b);
 	void InsertBox(AffineTransformMatrix matrix, float x, float y, float z);
 	void InsertCylinder(AffineTransformMatrix matrix, float h, float r);
 	void InsertCone(AffineTransformMatrix matrix, float h, float r1, float r2);
 	bool InsertSTL(AffineTransformMatrix matrix, wxFileName file);
+	bool InsertDXF(AffineTransformMatrix matrix, wxFileName file,
+			wxString componentName);
+
 private:
 };
-
 WX_DECLARE_OBJARRAY(MachineComponent, ArrayOfMachineComponent)
 ;
-
 
 #endif /* MACHINECOMPONENT_H_ */

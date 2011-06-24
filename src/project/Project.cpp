@@ -42,10 +42,10 @@ Project::Project()
 	StockMaterial temp;
 	stock.Add(temp);
 
-	displayGeometry = false;
-	displayBoundingBox = false;
+	displayGeometry = true;
+	displayBoundingBox = true;
 	displayMachine = true;
-	displayStock = false;
+	displayStock = true;
 
 }
 
@@ -61,6 +61,16 @@ void Project::RegenerateBoundingBox(void)
 		bbox.Insert((geometry[i]));
 	}
 }
+
+void Project::Assemble(void)
+{
+	machine.Assemble();
+	if(machine.IsInitialized())
+	{
+		stock[selectedStock].matrix=machine.workpiecePosition;
+	}
+}
+
 
 void Project::Paint(void)
 {

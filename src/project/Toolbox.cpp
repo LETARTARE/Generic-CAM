@@ -133,7 +133,7 @@ Toolbox::Toolbox()
 
 Toolbox::~Toolbox()
 {
-	delete xmlDocument;
+	if(xmlDocument != NULL) delete xmlDocument;
 }
 
 bool Toolbox::LoadToolbox(wxFileName& fileName)

@@ -51,7 +51,7 @@ public:
 	// Methods
 public:
 	void OnClose(wxCommandEvent& event);
-	void InsertToolBox(Toolbox& toolbox);
+	void InsertToolBox(Toolbox* toolbox);
 	void OnChangeStereo3D(wxCommandEvent& event);
 	void UpdateDisplay(bool direction = true);
 	void SetController(Control3D& control);

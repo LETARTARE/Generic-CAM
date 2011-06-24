@@ -30,6 +30,7 @@
 #include "MachineComponent.h"
 
 #include "../3D/FileSTL.h"
+#include "../3D/FileDXF.h"
 #include <wx/glcanvas.h>
 #include <wx/log.h>
 
@@ -43,6 +44,11 @@ MachineComponent::MachineComponent(wxString nameOfComponent)
 
 MachineComponent::~MachineComponent()
 {
+}
+
+void MachineComponent::SetColor(float r, float g, float b)
+{
+	geometry.color.Set(r, g, b);
 }
 
 void MachineComponent::InsertBox(AffineTransformMatrix matrix, float x,
@@ -125,7 +131,26 @@ bool MachineComponent::InsertSTL(AffineTransformMatrix matrix, wxFileName file)
 	FileSTL f;
 	if(!f.ReadFile(file.GetFullPath())) return false;
 	f.geometry[0].ApplyTransformation(matrix);
+
 	geometry.CopyFrom(f.geometry[0]);
+	return true;
+}
+
+bool MachineComponent::InsertDXF(AffineTransformMatrix matrix, wxFileName file,
+		wxString componentName)
+{
+	wxLogMessage(_T("@MachineComponent::InsertDXF: "+file.GetFullPath()));
+
+	FileDXF f;
+	if(!f.ReadFile(file.GetFullPath())) return false;
+
+	size_t i;
+	for(i = 0; i < f.geometry.GetCount(); i++){
+		if(f.geometry[i].objectName.Cmp(componentName) == 0){
+			f.geometry[i].ApplyTransformation(matrix);
+			geometry.CopyFrom(f.geometry[i]);
+		}
+	}
 	return true;
 }
 

@@ -20,6 +20,9 @@ offset = 0.05 --m Toolhead offset from edge of machine
 -- Definition of the geometry
 
 -- Base of the machine
+
+setstyle(0.5,0.5,0.5);
+
 translate(0, 0, 0); -- Actually this line does nothing at all.
 box(sizeX, sizeY, heightOfBed);
 
@@ -30,7 +33,7 @@ tableorigin(); -- sets the origin of the machine.
 
 -- Bridge of the machine
 addcomponent("Bridge");
-
+setstyle(0.6,0.1,0.1);
 translate(0,sizeY/2+0.01,heightOfBridge/2);
 box(thicknessOfBridge, 0.02, heightOfBridge);
 
@@ -42,6 +45,7 @@ box(thicknessOfBridge, sizeY, thicknessOfBridge);
 
 -- The machinehead
 addcomponent("Head");
+setstyle(0.6,0.1,0.1);
 
 translate(-thicknessOfBridge/2-0.005,0.0,0.4);
 box(0.01,0.15,0.4);

@@ -3,10 +3,11 @@
 -- Definition of the geometry
 
 -- Base of the machine
+setstyle(0.9,0.5,0.1);
 loadstl("staeubli_rx90/rx90_base.stl");
 
 
-translate(0.5+0.2,0.2+0.15,0.2);
+translate(0.58,0.28,0.2);
 box(0.2,0.2,0.4);
 
 identity();
@@ -18,26 +19,32 @@ tableorigin(); -- sets the origin of the machine.
 
 -- Part 1
 addcomponent("Link1");
+setstyle(0.9,0.5,0.1);
 loadstl("staeubli_rx90/rx90_joint1.stl");
 
 -- Part 2
 addcomponent("Link2");
+setstyle(0.9,0.5,0.1);
 loadstl("staeubli_rx90/rx90_joint2.stl");
 
 -- Part 3
 addcomponent("Link3");
+setstyle(0.9,0.5,0.1);
 loadstl("staeubli_rx90/rx90_joint3.stl");
 
 -- Part 4
 addcomponent("Link4");
+setstyle(0.9,0.5,0.1);
 loadstl("staeubli_rx90/rx90_joint4.stl");
 
 -- Part 5
 addcomponent("Link5");
+setstyle(0.9,0.5,0.1);
 loadstl("staeubli_rx90/rx90_joint5.stl");
 
 -- Part 6
 addcomponent("Head");
+setstyle(0.9,0.1,0.1);
 
 translate(0,0,1.644);
 rotate(90,0,90);

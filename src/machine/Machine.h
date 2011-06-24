@@ -66,8 +66,8 @@ public:
 private:
 	bool initialized;
 
-	int componentWithTool;
-	int componentWithMaterial;
+	size_t componentWithTool;
+	size_t componentWithMaterial;
 	AffineTransformMatrix toolPositionRelativ;
 	AffineTransformMatrix workpiecePositionRelativ;
 

@@ -22,9 +22,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
+//$LastChangedDate:2011-06-16 01:34:14 +0200 (Do, 16 Jun 2011) $
+//$Revision:56 $
+//$LastChangedBy:tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -85,7 +85,7 @@ protected:
 	wxString programOutput;
 
 	Machine* linkedMachine;
-	MachineComponent* componentToManipulate;
+	size_t componentToManipulate;
 	AffineTransformMatrix matrix;
 
 	// Methods
@@ -94,8 +94,8 @@ public:
 	void LinkToMachine(Machine* machine);
 	void InsertVariable(wxString vName, float vValue);
 
-	void EvaluateProgram();
-	void EvaluateAssembly();
+	bool EvaluateProgram();
+	bool EvaluateAssembly();
 
 	void StopEvaluation();
 
@@ -106,12 +106,16 @@ public:
 	static int print_glue(lua_State * L);
 
 	static int identity_glue(lua_State * L);
+
 	static int box_glue(lua_State * L);
 	static int cylinder_glue(lua_State * L);
+
 	static int setstyle_glue(lua_State * L);
-	static int addcomponent_glue(lua_State * L);
+
 	static int toolholder_glue(lua_State * L);
 	static int tableorigin_glue(lua_State * L);
+
+	static int addcomponent_glue(lua_State * L);
 
 	static int translate_glue(lua_State * L);
 	static int rotate_glue(lua_State * L);

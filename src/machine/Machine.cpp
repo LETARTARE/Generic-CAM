@@ -33,8 +33,6 @@
 #include <GL/gl.h>
 #include <wx/textfile.h>
 
-
-
 Machine::Machine()
 {
 	initialized = false;
@@ -50,8 +48,8 @@ Machine::~Machine()
 
 void Machine::Paint(void) const
 {
-	unsigned int i;
-	for(i = 0; i < components.Count(); i++){
+	size_t i;
+	for(i = 0; i < components.GetCount(); i++){
 		components[i].Paint();
 	}
 
@@ -66,6 +64,7 @@ void Machine::Paint(void) const
 	workpiece.Paint();
 	::glPopMatrix();
 
+
 	//if(toolpath != NULL) toolpath->Paint();
 
 }
@@ -78,11 +77,11 @@ void Machine::ClearComponents(void)
 
 bool Machine::AddComponent(wxString const& nameOfComponent)
 {
-	unsigned int i;
-	for(i = 0; i < components.Count(); i++){
+	size_t i;
+	for(i = 0; i < components.GetCount(); i++){
 		if(components[i].nameOfComponent.Cmp(nameOfComponent) == 0) return false;
 	}
-	MachineComponent* temp = new MachineComponent(nameOfComponent);
+	MachineComponent temp(nameOfComponent);
 	components.Add(temp);
 	return true;
 }
@@ -90,9 +89,9 @@ bool Machine::AddComponent(wxString const& nameOfComponent)
 bool Machine::PlaceComponent(wxString const& nameOfComponent,
 		AffineTransformMatrix const& matrix)
 {
-	unsigned int i;
+	size_t i;
 	bool flag = false;
-	for(i = 0; i < components.Count(); i++){
+	for(i = 0; i < components.GetCount(); i++){
 		if(components[i].nameOfComponent.Cmp(nameOfComponent) == 0){
 			flag = true;
 			components[i].matrix.Set(matrix);
@@ -100,11 +99,11 @@ bool Machine::PlaceComponent(wxString const& nameOfComponent,
 
 			// Sideeffect of placing the components:
 			// The tool and the material matrices are set up.
-			if((int) i == componentWithMaterial){
+			if(i == componentWithMaterial){
 				workpiecePosition.Set(workpiecePositionRelativ);
 				workpiecePosition = matrix * workpiecePosition;
 			}
-			if((int) i == componentWithTool){
+			if(i == componentWithTool){
 				toolPosition.Set(toolPositionRelativ);
 				toolPosition = matrix * toolPosition;
 			}
@@ -115,14 +114,17 @@ bool Machine::PlaceComponent(wxString const& nameOfComponent,
 
 void Machine::Assemble()
 {
-	evaluator.EvaluateAssembly();
+	if(initialized) evaluator.EvaluateAssembly();
 }
 
 void Machine::EvaluateDescription(void)
 {
 	wxLogMessage(_T("Machine::InsertMachineDescription"));
 	evaluator.LinkToMachine(this);
-	evaluator.EvaluateProgram();
+	if(evaluator.EvaluateProgram())
+		initialized = true;
+	else
+		initialized = false;
 	Assemble();
 	textOut = evaluator.GetOutput();
 }
@@ -143,6 +145,7 @@ bool Machine::ReLoad(void)
 		machineDescription += str + _T("\n");
 	}
 	EvaluateDescription();
+	//wxLogMessage(machineDescription);
 	return true;
 }
 

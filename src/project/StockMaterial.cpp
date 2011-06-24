@@ -36,14 +36,14 @@ WX_DEFINE_OBJARRAY(ArrayOfStockMaterial)
 StockMaterial::StockMaterial()
 {
 	materialName = _T("Default");
-	x = 0.1;
-	y = 0.85;
+	x = 0.85;
+	y = 0.15;
 	z = 0.025;
 	maxSpeed = 10000;
 	maxFeedrate = 0.05;
 	thermalConductivity = 100;
 	ignitionTemperature = 280 + 273.15;
-	color.Set(1.0,0.8,0.1);
+	color.Set(1.0, 0.8, 0.1);
 }
 
 StockMaterial::~StockMaterial()
@@ -56,49 +56,45 @@ void StockMaterial::Paint(void)
 	::glPushMatrix();
 	::glMultMatrixd(matrix.a);
 
-	float x2 = x / 2;
-	float y2 = y / 2;
-	float z2 = z / 2;
-
 	::glBegin(GL_QUADS);
 
-	::glColor3f(color.x,color.y,color.z);
+	::glColor3f(color.x, color.y, color.z);
 
 	::glNormal3f(1, 0, 0);
-	::glVertex3f(x2, y2, z2);
-	::glVertex3f(x2, -y2, z2);
-	::glVertex3f(x2, -y2, -z2);
-	::glVertex3f(x2, y2, -z2);
+	::glVertex3f(x, y, z);
+	::glVertex3f(x, 0, z);
+	::glVertex3f(x, 0, 0);
+	::glVertex3f(x, y, 0);
 
 	::glNormal3f(-1, 0, 0);
-	::glVertex3f(-x2, y2, z2);
-	::glVertex3f(-x2, y2, -z2);
-	::glVertex3f(-x2, -y2, -z2);
-	::glVertex3f(-x2, -y2, z2);
+	::glVertex3f(0, y, z);
+	::glVertex3f(0, y, 0);
+	::glVertex3f(0, 0, 0);
+	::glVertex3f(0, 0, z);
 
 	::glNormal3f(0, 1, 0);
-	::glVertex3f(x2, y2, z2);
-	::glVertex3f(x2, y2, -z2);
-	::glVertex3f(-x2, y2, -z2);
-	::glVertex3f(-x2, y2, z2);
+	::glVertex3f(x, y, z);
+	::glVertex3f(x, y, 0);
+	::glVertex3f(0, y, 0);
+	::glVertex3f(0, y, z);
 
 	::glNormal3f(0, -1, 0);
-	::glVertex3f(x2, -y2, z2);
-	::glVertex3f(-x2, -y2, z2);
-	::glVertex3f(-x2, -y2, -z2);
-	::glVertex3f(x2, -y2, -z2);
+	::glVertex3f(x, 0, z);
+	::glVertex3f(0, 0, z);
+	::glVertex3f(0, 0, 0);
+	::glVertex3f(x, 0, 0);
 
 	::glNormal3f(0, 0, 1);
-	::glVertex3f(x2, y2, z2);
-	::glVertex3f(-x2, y2, z2);
-	::glVertex3f(-x2, -y2, z2);
-	::glVertex3f(x2, -y2, z2);
+	::glVertex3f(x, y, z);
+	::glVertex3f(0, y, z);
+	::glVertex3f(0, 0, z);
+	::glVertex3f(x, 0, z);
 
 	::glNormal3f(0, 0, -1);
-	::glVertex3f(x2, y2, -z2);
-	::glVertex3f(x2, -y2, -z2);
-	::glVertex3f(-x2, -y2, -z2);
-	::glVertex3f(-x2, y2, -z2);
+	::glVertex3f(x, y, 0);
+	::glVertex3f(x, 0, 0);
+	::glVertex3f(0, 0, 0);
+	::glVertex3f(0, y, 0);
 
 	::glEnd();
 
