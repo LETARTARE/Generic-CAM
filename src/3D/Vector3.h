@@ -50,6 +50,7 @@ public:
 	float y;
 	float z;
 
+	//!Calculate the absolut length of a vector.
 	float Abs();
 
 	//	void operator=(const Vector3& a){x=a.x;y=a.y;z=a.z;};
@@ -148,7 +149,10 @@ public:
 		z /= b;
 		return Vector3(x, y, z);
 	}
+
+	//! Zeros a vector.
 	void Zero(void);
+
 	//! Sets the vector to the given coordinates.
 	void Set(float x, float y, float z)
 	{
@@ -156,6 +160,11 @@ public:
 		this->y = y;
 		this->z = z;
 	}
+
+	//! Swap the vector with a given vector.
+	void Swap(Vector3& b);
+
+	//! Normalizes the length of a vector.
 	Vector3 Normalize(void);
 };
 WX_DECLARE_OBJARRAY(Vector3, ArrayOfVector3)

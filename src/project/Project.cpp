@@ -44,6 +44,16 @@ Project::Project()
 
 	workpiece.SetupBox(stock[0].x, stock[0].y, stock[0].z);
 
+
+	Vector3 a,b,c;
+	a.Set(0.2,0.09,0.02);
+	b.Set(0.3,0.06,0.05);
+	c.Set(0.1,0.02,0.01);
+
+
+	workpiece.InsertTriangle(a,b,c);
+
+
 	displayGeometry = true;
 	displayBoundingBox = true;
 	displayMachine = true;

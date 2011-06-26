@@ -90,7 +90,7 @@ public:
 	void SetupBox(const double sizeX, const double sizeY, const double sizeZ,
 			const double resolutionX = 0.001, const double resolutionY = 0.001);
 
-	void InsertTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c);
+	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c);
 
 };
 
