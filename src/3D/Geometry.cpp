@@ -30,10 +30,7 @@
 
 #include "Geometry.h"
 #include <GL/gl.h>
-#include <wx/file.h>
-#include <wx/textfile.h>
 #include <wx/log.h>
-#include <wx/tokenzr.h>
 
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfGeometry)
@@ -41,7 +38,7 @@ WX_DEFINE_OBJARRAY(ArrayOfGeometry)
 Geometry::Geometry()
 {
 	visible = true;
-	color.Set(1,1,1);
+	color.Set(1, 1, 1);
 }
 Geometry::~Geometry()
 {
@@ -59,6 +56,7 @@ void Geometry::CopyFrom(const Geometry &geometry)
 	this->matrix = geometry.matrix;
 	this->objectName = geometry.objectName;
 	this->visible = geometry.visible;
+	this->color = geometry.color;
 }
 
 void Geometry::CopyTrianglesFrom(const Geometry &geometry)
@@ -71,10 +69,9 @@ void Geometry::CopyTrianglesFrom(const Geometry &geometry)
 	}
 }
 
-
 void Geometry::ApplyTransformation(const AffineTransformMatrix &matrix)
 {
-	unsigned long i;
+	size_t i;
 	for(i = 0; i < triangles.Count(); i++){
 		triangles[i].p[0] = matrix.Transform(triangles[i].p[0]);
 		triangles[i].p[1] = matrix.Transform(triangles[i].p[1]);
@@ -87,7 +84,7 @@ void Geometry::ApplyTransformation(const AffineTransformMatrix &matrix)
 
 void Geometry::ApplyTransformation(void)
 {
-	unsigned long i;
+	size_t i;
 	for(i = 0; i < triangles.Count(); i++){
 		triangles[i].p[0] = this->matrix.Transform(triangles[i].p[0]);
 		triangles[i].p[1] = this->matrix.Transform(triangles[i].p[1]);
@@ -101,12 +98,12 @@ void Geometry::ApplyTransformation(void)
 void Geometry::Paint(void) const
 {
 	if(!visible) return;
-	unsigned long i;
+	size_t i;
 	::glPushMatrix();
 	::glMultMatrixd(matrix.a);
 
 	::glBegin(GL_TRIANGLES);
-	::glColor3f(color.x,color.y,color.z);
+	::glColor3f(color.x, color.y, color.z);
 	for(i = 0; i < triangles.Count(); i++){
 		triangles[i].Paint();
 	}

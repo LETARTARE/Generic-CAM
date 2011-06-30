@@ -131,7 +131,7 @@ void MainFrame::OnLoadObject(wxCommandEvent& event)
 
 		size_t i;
 		bool flag = false;
-		Geometry g;
+		Surface g;
 
 		if(fileName.GetExt().CmpNoCase(_T("gts")) == 0){
 			FileGTS temp;
@@ -189,6 +189,7 @@ void MainFrame::OnLoadObject(wxCommandEvent& event)
 		}
 		if(flag){
 			project[activeProject].RegenerateBoundingBox();
+			project[activeProject].geometry[0].CalcNormals();
 		}
 
 		SetupTree();

@@ -51,7 +51,7 @@ void BoundingBox::Reset(void)
 	xmin = ymin = zmin = DBL_MAX;
 }
 
-void BoundingBox::Insert(Geometry &geometry)
+void BoundingBox::Insert(const Geometry &geometry)
 {
 	size_t i, j;
 	for(i = 0; i < geometry.triangles.GetCount(); i++){
@@ -69,6 +69,21 @@ void BoundingBox::Insert(Geometry &geometry)
 			if(geometry.triangles[i].p[j].z < zmin) zmin
 					= geometry.triangles[i].p[j].z;
 		}
+	}
+}
+
+void BoundingBox::Insert(Surface &surface)
+{
+	size_t i;
+	Vector3 temp;
+	for(i = 0; i < surface.GetVertexCount(); i++){
+		temp = surface.GetVertex(i);
+		if(temp.x > xmax) xmax = temp.x;
+		if(temp.x < xmin) xmin = temp.x;
+		if(temp.y > ymax) ymax = temp.y;
+		if(temp.y < ymin) ymin = temp.y;
+		if(temp.z > zmax) zmax = temp.z;
+		if(temp.z < zmin) zmin = temp.z;
 	}
 }
 

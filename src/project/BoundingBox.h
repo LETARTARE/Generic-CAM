@@ -33,6 +33,7 @@
 
 #include "../3D/Vector3.h"
 #include "../3D/Geometry.h"
+#include "../3D/Surface.h"
 
 /*!\class BoundingBox
  * \brief ...
@@ -59,7 +60,8 @@ public:
 public:
 
 	void Reset(void);
-	void Insert(Geometry &geometry);
+	void Insert(const Geometry &geometry);
+	void Insert(Surface &surface);
 
 	void Paint(void);
 };

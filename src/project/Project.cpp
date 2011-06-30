@@ -55,7 +55,7 @@ Project::Project()
 
 
 	displayGeometry = true;
-	displayBoundingBox = true;
+	displayBoundingBox = false;
 	displayMachine = true;
 	displayStock = false;
 	displayWorkpiece = true;

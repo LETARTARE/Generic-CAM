@@ -31,7 +31,7 @@
 #ifndef PROJECT_H_
 #define PROJECT_H_
 
-#include "../3D/Geometry.h"
+#include "../3D/Surface.h"
 #include "Toolbox.h"
 #include "../machine/Machine.h"
 #include "../simulator/Workpiece.h"
@@ -59,7 +59,7 @@ public:
 	wxString projectName;
 
 	wxFileName geometryFileName;
-	ArrayOfGeometry geometry;
+	ArrayOfSurface geometry;
 
 	BoundingBox bbox;
 

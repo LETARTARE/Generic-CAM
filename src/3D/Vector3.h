@@ -55,39 +55,53 @@ public:
 
 	//	void operator=(const Vector3& a){x=a.x;y=a.y;z=a.z;};
 
+
 	//! Overloaded operator for vector addition.
-	Vector3 operator+(const Vector3& a)
+	Vector3 & operator+=(const Vector3 &a)
 	{
-		return Vector3(x + a.x, y + a.y, z + a.z);
+		this->x += a.x;
+		this->y += a.y;
+		this->z += a.z;
+		return *this;
 	}
 
 
 	//! Overloaded operator for vector addition.
-	Vector3 operator+=(const Vector3& a)
+	const Vector3 operator+(const Vector3& a) const
 	{
-		x += a.x;
-		y += a.y;
-		z += a.z;
-		return Vector3(x, y, z);
+		Vector3 temp = *this;
+		temp += a;
+		return temp;
 	}
+
+
 	//! Overloaded operator for vector subtraction.
-	Vector3 operator-(const Vector3& a)
+	Vector3 & operator-=(const Vector3& a)
 	{
-		return Vector3(x - a.x, y - a.y, z - a.z);
+		this->x -= a.x;
+		this->y -= a.y;
+		this->z -= a.z;
+		return *this;
 	}
+
+
 	//! Overloaded operator for vector subtraction.
-	Vector3 operator-=(const Vector3& a)
+	const Vector3 operator-(const Vector3& a) const
 	{
-		x -= a.x;
-		y -= a.y;
-		z -= a.z;
-		return Vector3(x, y, z);
+		Vector3 temp = *this;
+		temp -= a;
+		return temp;
 	}
+
+
 	//! Overloaded operator for vector negation.
-	Vector3 operator-()
+	const Vector3 operator-() const
 	{
-		return Vector3(-x, -y, -z);
+		Vector3 temp(-this->x, -this->y, -this->z);
+		return temp;
 	}
+
+
 	/*!\brief Overloaded operator for vector product.
 	 *
 	 * This function calculates the vector product
@@ -95,37 +109,46 @@ public:
 	 * \vec{c}=\left\{
 	 * \begin{array}{c}
 	 * \vec{a}_y \cdot \vec{b}_z - \vec{a}_z \cdot \vec{b}_y \\
-	 * \vec{a}_z \cdot \vec{b}_x - \vec{a}_x \cdot \vec{b}_z \\
-	 * \vec{a}_x \cdot \vec{b}_y - \vec{a}_y \cdot \vec{b}_x
+				 * \vec{a}_z \cdot \vec{b}_x - \vec{a}_x \cdot \vec{b}_z \\
+				 * \vec{a}_x \cdot \vec{b}_y - \vec{a}_y \cdot \vec{b}_x
 	 * \end{array}
 	 * \right\}
 	 * \f].
 	 */
-	Vector3 operator*(const Vector3& b)
-	{
-		return Vector3(y * b.z - z * b.y, z * b.x - x * b.z, x * b.y - y * b.x);
-	}
-	//! Overloaded operator for scalar product.
-	Vector3 operator*(const float &b)
-	{
-		return Vector3(x * b, y * b, z * b);
-	}
 	//!Overloaded operator for vector product.
-	Vector3 operator*=(const Vector3& b)
+	Vector3 & operator*=(const Vector3& b)
 	{
 		Vector3 a = *(this);
-		x = a.y * b.z - a.z * b.y;
-		y = a.z * b.x - a.x * b.z;
-		z = a.x * b.y - a.y * b.x;
-		return Vector3(x, y, z);
+		this->x = a.y * b.z - a.z * b.y;
+		this->y = a.z * b.x - a.x * b.z;
+		this->z = a.x * b.y - a.y * b.x;
+		return *this;
 	}
+
+
 	//! Overloaded operator for scalar product.
-	Vector3 operator*=(const float &b)
+	Vector3 & operator*=(const float &b)
 	{
-		x *= b;
-		y *= b;
-		z *= b;
-		return Vector3(x, y, z);
+		this->x *= b;
+		this->y *= b;
+		this->z *= b;
+		return *this;
+	}
+
+	const Vector3 operator*(const Vector3& b) const
+	{
+		Vector3 temp = *this;
+		temp *= b;
+		return temp;
+	}
+
+
+	//! Overloaded operator for scalar product.
+	const Vector3 operator*(const float &b) const
+	{
+		Vector3 temp = *this;
+		temp *= b;
+		return temp;
 	}
 
 
@@ -137,18 +160,40 @@ public:
 
 
 	//! Overloaded operator for scalar division.
-	Vector3 operator/(const float &b)
+	Vector3 & operator/=(const float &b)
 	{
-		return Vector3(x / b, y / b, z / b);
+		this->x /= b;
+		this->y /= b;
+		this->z /= b;
+		return *this;
 	}
+
+
 	//! Overloaded operator for scalar division.
-	Vector3 operator/=(const float &b)
+	const Vector3 operator/(const float &b) const
 	{
-		x /= b;
-		y /= b;
-		z /= b;
-		return Vector3(x, y, z);
+		Vector3 temp = *this;
+		temp /= b;
+		return temp;
 	}
+
+
+	//! Comparison operator.
+	bool operator==(const Vector3 &b) const
+	{
+		double epsilon = 1e-5;
+		double epsilon2 = epsilon * epsilon;
+		return (((this->x - b.x) * (this->x - b.x) + (this->y - b.y) * (this->y
+				- b.y) + (this->z - b.z) * (this->z - b.z)) <= epsilon2);
+	}
+
+
+	//! Comparison operator.
+	bool operator!=(const Vector3 &b) const
+	{
+		return !(*this == b);
+	}
+
 
 	//! Zeros a vector.
 	void Zero(void);
@@ -160,6 +205,7 @@ public:
 		this->y = y;
 		this->z = z;
 	}
+
 
 	//! Swap the vector with a given vector.
 	void Swap(Vector3& b);
