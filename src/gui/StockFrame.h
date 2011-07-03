@@ -32,7 +32,7 @@
 #define STOCKFRAME_H_
 
 #include "gui.h"
-#include "../project/StockMaterial.h"
+#include "../project/Project.h"
 
 /*!\class StockFrame
  * \brief ...
@@ -48,16 +48,17 @@ public:
 	virtual ~StockFrame();
 	// Member Variables
 
-	ArrayOfStockMaterial* linkedStock;
+	Project* linkedProject;
 
 	size_t selectedStockMaterial;
 
 	// Methods
 public:
 	void OnClose(wxCommandEvent& event);
-	void InsertStock(ArrayOfStockMaterial& stock);
+	void InsertProject(Project* project);
+
 private:
-	void UpdateDisplay(bool direction=true);
+	bool TransferDataToWindow(void);
 };
 
 #endif /* STOCKFRAME_H_ */

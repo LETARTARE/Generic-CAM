@@ -33,7 +33,7 @@
 ToolboxFrame::ToolboxFrame(wxWindow* parent) :
 	GUIToolboxFrame(parent)
 {
-	linkedToolbox = NULL;
+	linkedProject = NULL;
 	selectedTool = 0;
 	selectedElement = 0;
 
@@ -64,42 +64,51 @@ void ToolboxFrame::OnChangeStereo3D(wxCommandEvent& event)
 	m_menuSettings->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
 }
 
-void ToolboxFrame::InsertToolBox(Toolbox* toolbox)
+void ToolboxFrame::InsertProject(Project *project)
 {
-	linkedToolbox = toolbox;
-
-	UpdateDisplay();
+	linkedProject = project;
 }
 
-void ToolboxFrame::UpdateDisplay(bool direction)
+bool ToolboxFrame::TransferDataToWindow(void)
 {
-	if(linkedToolbox == NULL) return;
+
+	if(linkedProject == NULL) return false;
 
 	size_t i, j;
 
 	m_comboBoxToolSelector->Clear();
-	for(i = 0; i < linkedToolbox->tools.Count(); i++){
-		m_comboBoxToolSelector->Append(linkedToolbox->tools[i].toolName);
+	if(linkedProject->toolbox.tools.GetCount() == 0){
+		m_comboBoxToolSelector->Append(_("No tools in toolbox!"));
+		m_comboBoxToolSelector->Enable(false);
+	}else{
+		for(i = 0; i < linkedProject->toolbox.tools.GetCount(); i++){
+			m_comboBoxToolSelector->Append(
+					linkedProject->toolbox.tools[i].toolName);
+		}
+		m_comboBoxToolSelector->Select(selectedTool);
+		m_comboBoxToolSelector->Enable(true);
 	}
-	m_comboBoxToolSelector->Select(selectedTool);
 
-	if(selectedTool < linkedToolbox->tools.Count()){
-		m_panel->InsertTool((linkedToolbox->tools[selectedTool]));
-		m_canvas->InsertTool((linkedToolbox->tools[selectedTool]));
+	if(selectedTool < linkedProject->toolbox.tools.GetCount()){
+		m_panel->InsertTool(linkedProject->toolbox.tools[selectedTool]);
+		m_canvas->InsertTool(linkedProject->toolbox.tools[selectedTool]);
 	}
 
-	if(selectedTool < linkedToolbox->tools.Count()){
+	if(selectedTool < linkedProject->toolbox.tools.GetCount()){
+
+		Tool *temp = &(linkedProject->toolbox.tools[selectedTool]);
+
 		m_textCtrlShaftDiameter->SetValue(wxString::Format(_T("%f"),
-				linkedToolbox->tools[selectedTool].shaftDiameter));
+				temp->shaftDiameter));
 		m_textCtrlShaftLength->SetValue(wxString::Format(_T("%f"),
-				linkedToolbox->tools[selectedTool].shaftLength));
+				temp->shaftLength));
 		m_textCtrlMaxSpeed->SetValue(wxString::Format(_T("%.0f"),
-				linkedToolbox->tools[selectedTool].maxSpeed));
+				temp->maxSpeed));
 		m_textCtrlFeedCoefficient->SetValue(wxString::Format(_T("%f"),
-				linkedToolbox->tools[selectedTool].feedCoefficient));
+				temp->feedCoefficient));
 		m_textCtrlNrOfTeeth->SetValue(wxString::Format(_T("%u"),
-				linkedToolbox->tools[selectedTool].nrOfTeeth));
-		m_textCtrlComment->SetValue(linkedToolbox->tools[selectedTool].comment);
+				temp->nrOfTeeth));
+		m_textCtrlComment->SetValue(temp->comment);
 
 		wxSize sz = m_listCtrl->GetClientSize();
 		unsigned int w = sz.x / 14;
@@ -110,12 +119,12 @@ void ToolboxFrame::UpdateDisplay(bool direction)
 		m_listCtrl->InsertColumn(3, _T("Radius"), wxLIST_FORMAT_LEFT, 3* w );
 		m_listCtrl->InsertColumn(4, _T("Cutting"), wxLIST_FORMAT_LEFT, 3* w );
 
-		for(j = 0; j < linkedToolbox->tools[selectedTool].elements.Count(); j++){
+		for(j = 0; j < temp->elements.GetCount(); j++){
 
 			wxLogMessage(wxString::Format(_T("Element: %u Type %u"), j,
-					linkedToolbox->tools[selectedTool].elements[j].t));
+					temp->elements[j].t));
 
-			switch(linkedToolbox->tools[selectedTool].elements[j].t){
+			switch(temp->elements[j].t){
 			case 0:
 				m_listCtrl->InsertItem(j, _T("L"));
 				break;
@@ -134,13 +143,13 @@ void ToolboxFrame::UpdateDisplay(bool direction)
 			}
 
 			m_listCtrl->SetItem(j, 1, wxString::Format(_T("%f"),
-					linkedToolbox->tools[selectedTool].elements[j].d));
+					temp->elements[j].d));
 			m_listCtrl->SetItem(j, 2, wxString::Format(_T("%f"),
-					linkedToolbox->tools[selectedTool].elements[j].h));
+					temp->elements[j].h));
 			m_listCtrl->SetItem(j, 3, wxString::Format(_T("%f"),
-					linkedToolbox->tools[selectedTool].elements[j].r));
+					temp->elements[j].r));
 
-			if(linkedToolbox->tools[selectedTool].elements[j].cutting){
+			if(temp->elements[j].cutting){
 				m_listCtrl->SetItem(j, 4, _T("yes"));
 			}else{
 				m_listCtrl->SetItem(j, 4, _T("no"));
@@ -148,32 +157,28 @@ void ToolboxFrame::UpdateDisplay(bool direction)
 
 			m_listCtrl->SetItemState(j, 0, wxLIST_STATE_SELECTED);
 
-			if(selectedElement
-					< linkedToolbox->tools[selectedTool].elements.GetCount()){
+			if(selectedElement < temp->elements.GetCount()){
 
 				m_listCtrl->SetItemState(selectedElement,
 						wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 
-				m_choiceType->Select(
-						linkedToolbox->tools[selectedTool].elements[selectedElement].t);
+				m_choiceType->Select(temp->elements[selectedElement].t);
 
-				m_textCtrlDiameter->SetValue(
-						wxString::Format(
-								_T("%f"),
-								linkedToolbox->tools[selectedTool].elements[selectedElement].d));
-				m_textCtrlHeight->SetValue(
-						wxString::Format(
-								_T("%f"),
-								linkedToolbox->tools[selectedTool].elements[selectedElement].h));
-				m_textCtrlRadius->SetValue(
-						wxString::Format(
-								_T("%f"),
-								linkedToolbox->tools[selectedTool].elements[selectedElement].r));
+				m_textCtrlDiameter->SetValue(wxString::Format(_T("%f"),
+						temp->elements[selectedElement].d));
+				m_textCtrlHeight->SetValue(wxString::Format(_T("%f"),
+						temp->elements[selectedElement].h));
+				m_textCtrlRadius->SetValue(wxString::Format(_T("%f"),
+						temp->elements[selectedElement].r));
 
 				m_checkBoxCutting ->SetValue(
-						linkedToolbox->tools[selectedTool].elements[selectedElement].cutting);
+						temp->elements[selectedElement].cutting);
 
 			}
 		}
 	}
+}
+
+bool ToolboxFrame::TransferDataFromWindow(void){
+
 }

@@ -32,7 +32,7 @@
 #define TOOLBOXFRAME_H_
 
 #include "gui.h"
-#include "../project/Toolbox.h"
+#include "../project/Project.h"
 
 class ToolboxFrame:public GUIToolboxFrame {
 	// Constructor/ Destructor
@@ -43,18 +43,23 @@ public:
 
 	// Member Variables
 
-	Toolbox* linkedToolbox;
+	Project * linkedProject;
 
 	unsigned int selectedTool;
 	unsigned int selectedElement;
 
 	// Methods
 public:
-	void OnClose(wxCommandEvent& event);
-	void InsertToolBox(Toolbox* toolbox);
-	void OnChangeStereo3D(wxCommandEvent& event);
-	void UpdateDisplay(bool direction = true);
+
+	void InsertProject(Project *project);
 	void SetController(Control3D& control);
+
+	void OnClose(wxCommandEvent& event);
+	void OnChangeStereo3D(wxCommandEvent& event);
+
+	bool TransferDataToWindow(void);
+	bool TransferDataFromWindow(void);
+
 };
 
 #endif /* TOOLBOXFRAME_H_ */

@@ -184,3 +184,22 @@ void Geometry::AddQuadTransform(const Vector3 &a, const Vector3 &b,
 	triangles.Add(tri0);
 	triangles.Add(tri1);
 }
+
+void Geometry::CalculateNormals(void)
+{
+	size_t i;
+	for(i = 0; i < triangles.GetCount(); i++){
+		triangles[i].CalculateNormal();
+	}
+}
+
+void Geometry::FlipNormals(void)
+{
+	size_t i;
+	for(i = 0; i < triangles.GetCount(); i++){
+		triangles[i].n[0] *= -1;
+		triangles[i].n[1] *= -1;
+		triangles[i].n[2] *= -1;
+	}
+}
+

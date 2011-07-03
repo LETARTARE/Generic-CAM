@@ -31,13 +31,12 @@
 #ifndef PROJECT_H_
 #define PROJECT_H_
 
-#include "../3D/Surface.h"
+#include "Object.h"
 #include "Toolbox.h"
 #include "../machine/Machine.h"
 #include "../simulator/Workpiece.h"
 #include "Run.h"
-#include "StockMaterial.h"
-#include "BoundingBox.h"
+#include "Stock.h"
 
 #include <wx/string.h>
 
@@ -58,22 +57,10 @@ public:
 public:
 	wxString projectName;
 
-	wxFileName geometryFileName;
-	ArrayOfSurface geometry;
-
-	BoundingBox bbox;
-
-	wxFileName machineFileName;
+	ArrayOfObject objects;
 	Machine machine;
-
-	wxFileName toolboxFileName;
 	Toolbox toolbox;
-
-	wxFileName stockFileName;
-	ArrayOfStockMaterial stock;
-	size_t selectedStock;
-
-	Workpiece workpiece;
+	Stock stock;
 
 	ArrayOfRun run;
 
@@ -91,7 +78,6 @@ public:
 
 	void Paint(void);
 	void Assemble(void);
-	void RegenerateBoundingBox(void);
 
 };
 WX_DECLARE_OBJARRAY(Project, ArrayOfProject)

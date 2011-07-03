@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Triangle.h
-// Purpose            :
+// Name               : Unit.cpp
+// Purpose            : Converts from SI to whatever and back.
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 11.06.2011
+// Created            : 03.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,29 +28,40 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef TRIANGLE_H_
-#define TRIANGLE_H_
+#include "Unit.h"
 
-#include "Vector3.h"
-#include <wx/dynarray.h>
-/*!\class Triangle
- * \brief Defines a simple triangle.
- *
- * Holds the data for a simple triangle. Three vertices with three normal vectors.
- */
+Unit::Unit()
+{
+	factor = 1.0;
+}
 
-class Triangle {
-public:
-	Triangle();
-	virtual ~Triangle();
-	Vector3 p[3]; //!< Position of vertices.
-	Vector3 n[3]; //!< Normal vectors.
-	Vector3 c[3]; //!< Color vectors.
+Unit::~Unit()
+{
+}
 
-	void Paint(bool useNormals = true, bool useColors = false) const;
-	void CalculateNormal();
-};
-WX_DECLARE_OBJARRAY(Triangle, ArrayOfTriangle)
-;
-
-#endif /* TRIANGLE_H_ */
+void Unit::Setup(const wxString SIName, const wxString otherName,
+		const double factor)
+{
+	this->SIName = SIName;
+	this->otherName = otherName;
+	if(factor != 0)
+		this->factor = factor;
+	else
+		this->factor = 1.0;
+}
+double Unit::FromSI(const double value)
+{
+	return value * factor;
+}
+double Unit::ToSI(const double value)
+{
+	return value / factor;
+}
+wxString Unit::GetSIName(void)
+{
+	return SIName;
+}
+wxString Unit::GetOtherName(void)
+{
+	return otherName;
+}

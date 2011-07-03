@@ -39,28 +39,13 @@ Project::Project()
 {
 	modified = false;
 	projectName = _("Untitled");
-	StockMaterial* temp = new StockMaterial;
-	stock.Add(temp);
-
-	workpiece.SetupBox(stock[0].x, stock[0].y, stock[0].z);
-
-
-	Vector3 a,b,c;
-	a.Set(0.2,0.09,0.02);
-	b.Set(0.3,0.06,0.05);
-	c.Set(0.1,0.02,0.01);
-
-
-	workpiece.InsertTriangle(a,b,c);
 
 
 	displayGeometry = true;
 	displayBoundingBox = false;
-	displayMachine = true;
+	displayMachine = false;
 	displayStock = false;
-	displayWorkpiece = true;
-
-
+	displayWorkpiece = false;
 
 
 }
@@ -69,33 +54,29 @@ Project::~Project()
 {
 }
 
-void Project::RegenerateBoundingBox(void)
-{
-	size_t i;
-	bbox.Reset();
-	for(i = 0; i < geometry.GetCount(); i++){
-		bbox.Insert((geometry[i]));
-	}
-}
 
 void Project::Assemble(void)
 {
 	machine.Assemble();
-	if(machine.IsInitialized()){
-		stock[selectedStock].matrix = machine.workpiecePosition;
-		workpiece.matrix = machine.workpiecePosition;
-	}
+	if(machine.IsInitialized())
+		stock.matrix = machine.workpiecePosition;
+
 }
 
 void Project::Paint(void)
 {
 	size_t i;
 	if(displayGeometry){
-		for(i = 0; i < geometry.GetCount(); i++)
-			geometry[i].Paint();
+		for(i = 0; i < objects.GetCount(); i++)
+			objects[i].Paint();
 	}
 	if(displayMachine) machine.Paint();
-	if(displayStock) stock[selectedStock].Paint();
-	if(displayWorkpiece) workpiece.Paint();
-	if(displayBoundingBox) bbox.Paint();
+	if(displayStock) stock.Paint();
+	//if(displayWorkpiece) workpiece.Paint();
+	//if(displayBoundingBox) bbox.Paint();
 }
+
+
+//bool Project::LoadObject(wxFileName)
+
+

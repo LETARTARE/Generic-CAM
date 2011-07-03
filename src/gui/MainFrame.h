@@ -35,6 +35,11 @@
 
 #include "gui.h"
 
+#include "ToolboxFrame.h"
+#include "ObjectFrame.h"
+#include "StockFrame.h"
+#include "ErrorFrame.h"
+
 #include "../project/Project.h"
 
 #include "../controller/Control3D.h"
@@ -74,10 +79,17 @@ private:
 	Control3D control;
 	wxLogWindow* logWindow;
 
+	wxFileName lastObjectFileName;
+
+
 	ArrayOfProject project;
 	size_t activeProject;
 
 
+	ObjectFrame* objectFrame;
+	StockFrame* stockFrame;
+	ToolboxFrame* toolboxFrame;
+	ErrorFrame* errorFrame;
 
 	wxTimer timer;
 	float t;
@@ -93,9 +105,11 @@ private:
 	void OnCreateProject(wxCommandEvent& event);
 	void OnLoadProject(wxCommandEvent& event);
 	void OnSaveProject(wxCommandEvent& event);
+	void OnSaveProjectAs(wxCommandEvent& event);
 	void OnQuit(wxCommandEvent& event);
 
 	void OnLoadObject(wxCommandEvent& event);
+	void OnModifyObject(wxCommandEvent& event);
 
 	void OnLoadMachine(wxCommandEvent& event);
 	void OnReloadMachine(wxCommandEvent& event);

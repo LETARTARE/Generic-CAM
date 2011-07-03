@@ -46,11 +46,12 @@ Triangle::~Triangle()
  * glEnd();. This has to be done by the calling function.
  * (Allows to save on OpenGL calls.)
  */
-void Triangle::Paint(void) const
+void Triangle::Paint(bool useNormals, bool useColors) const
 {
 	unsigned char i;
 	for(i = 0; i < 3; i++){
-		::glNormal3f(n[i].x, n[i].y, n[i].z);
+		if(useNormals) ::glNormal3f(n[i].x, n[i].y, n[i].z);
+		if(useColors) ::glColor3f(c[i].x, c[i].y, c[i].z);
 		::glVertex3f(p[i].x, p[i].y, p[i].z);
 	}
 }

@@ -66,6 +66,8 @@ public:
 	void CopyFrom(const Geometry &geometry);
 	void CopyTrianglesFrom(const Geometry &geometry);
 
+	void CalculateNormals(void);
+	void FlipNormals(void);
 
 	void ApplyTransformation(const AffineTransformMatrix &matrix);
 	void ApplyTransformation(void);

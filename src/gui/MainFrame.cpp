@@ -31,12 +31,7 @@
 
 #include "AboutDialog.h"
 #include "Control6DOFDialog.h"
-#include "ErrorFrame.h"
-#include "ToolboxFrame.h"
-#include "StockFrame.h"
-#include "../3D/FileGTS.h"
-#include "../3D/FileSTL.h"
-#include "../3D/FileDXF.h"
+#include "UnitDialog.h"
 
 #include <wx/filename.h>
 #include <wx/msgdlg.h>
@@ -100,7 +95,9 @@ void MainFrame::OnLoadProject(wxCommandEvent& event)
 void MainFrame::OnSaveProject(wxCommandEvent& event)
 {
 }
-
+void MainFrame::OnSaveProjectAs(wxCommandEvent &event)
+{
+}
 void MainFrame::OnQuit(wxCommandEvent& event)
 {
 	Close();
@@ -118,83 +115,28 @@ void MainFrame::OnLoadObject(wxCommandEvent& event)
 					_("All supported files (*.dxf; *.stl; *.gts)|*.dxf;*.stl;*.gts|DXF Files (*.dxf)|*.dxf|Stereolithography files (STL files) (*.stl)|*.stl|GTS files (*.gts)|*.gts|All files|*.*"),
 					wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
-	if(project[activeProject].geometryFileName.IsOk()) dialog.SetFilename(
-			project[activeProject].geometryFileName.GetFullPath());
+	if(lastObjectFileName.IsOk()) dialog.SetFilename(
+			lastObjectFileName.GetFullPath());
 	if(dialog.ShowModal() == wxID_OK){
 
 		fileName = dialog.GetPath();
+		lastObjectFileName = fileName;
 
 
 		//wxLogMessage(_T("File Extension: ")+fileName.GetExt());
 
-		//TODO: Cleanup the structure below. There has to be a better way.
-
-		size_t i;
-		bool flag = false;
-		Surface g;
-
-		if(fileName.GetExt().CmpNoCase(_T("gts")) == 0){
-			FileGTS temp;
-			if(!temp.ReadFile(dialog.GetPath())){
-				wxMessageDialog(this, _("GTS file not readable!"), _("Error"),
-						wxOK | wxICON_ERROR);
-			}else{
-				project[activeProject].geometryFileName = fileName;
-				project[activeProject].geometry.Clear();
-				for(i = 0; i < temp.geometry.GetCount(); i++){
-					temp.geometry[i].ApplyTransformation();
-					g.CopyFrom(temp.geometry[i]);
-				}
-				g.objectName
-						= project[activeProject].geometryFileName.GetName();
-				project[activeProject].geometry.Add(g);
-				flag = true;
-			}
+		Object temp;
+		if(temp.LoadObject(fileName)){
+			project[activeProject].objects.Add(temp);
 		}
-		if(fileName.GetExt().CmpNoCase(_T("stl")) == 0){
-			FileSTL temp;
-			if(!temp.ReadFile(dialog.GetPath())){
-				wxMessageDialog(this, _("STL file not readable!"), _("Error"),
-						wxOK | wxICON_ERROR);
-			}else{
-				project[activeProject].geometryFileName = fileName;
-				project[activeProject].geometry.Clear();
-				for(i = 0; i < temp.geometry.GetCount(); i++){
-					temp.geometry[i].ApplyTransformation();
-					g.CopyFrom(temp.geometry[i]);
-				}
-				g.objectName
-						= project[activeProject].geometryFileName.GetName();
-				project[activeProject].geometry.Add(g);
-				flag = true;
-			}
-		}
-		if(fileName.GetExt().CmpNoCase(_T("dxf")) == 0){
-			FileDXF temp;
-			if(!temp.ReadFile(dialog.GetPath())){
-				wxMessageDialog(this, _("DXF file not readable!"), _("Error"),
-						wxOK | wxICON_ERROR);
-			}else{
-				project[activeProject].geometryFileName = fileName;
-				project[activeProject].geometry.Clear();
-				for(i = 0; i < temp.geometry.GetCount(); i++){
-					temp.geometry[i].ApplyTransformation();
-					g.Clear();
-					g.CopyFrom(temp.geometry[i]);
-					g.objectName = temp.geometry[i].objectName;
-					project[activeProject].geometry.Add(g);
-				}
-				flag = true;
-			}
-		}
-		if(flag){
-			project[activeProject].RegenerateBoundingBox();
-			project[activeProject].geometry[0].CalcNormals();
-		}
-
 		SetupTree();
 		this->Refresh();
 	}
+}
+
+void MainFrame::OnModifyObject(wxCommandEvent& event)
+{
+
 }
 
 void MainFrame::OnLoadMachine(wxCommandEvent& event)
@@ -251,10 +193,10 @@ void MainFrame::OnReloadMachine(wxCommandEvent& event)
 
 void MainFrame::OnEditToolbox(wxCommandEvent& event)
 {
-	ToolboxFrame* toolboxFrame = new ToolboxFrame(this);
+	toolboxFrame = new ToolboxFrame(this);
 
 	toolboxFrame->SetController(control);
-	toolboxFrame->InsertToolBox(&(project[activeProject].toolbox));
+	toolboxFrame->InsertProject(&(project[activeProject]));
 	toolboxFrame->Show(true);
 }
 
@@ -323,8 +265,8 @@ void MainFrame::OnSaveToolbox(wxCommandEvent &event)
 
 void MainFrame::OnEditStock(wxCommandEvent& event)
 {
-	StockFrame* stockFrame = new StockFrame(this);
-	stockFrame->InsertStock(project[activeProject].stock);
+	stockFrame = new StockFrame(this);
+	stockFrame->InsertProject(&(project[activeProject]));
 
 
 	//toolboxFrame->SetController(control);
@@ -410,6 +352,7 @@ void MainFrame::SetupTree(void)
 	wxTreeItemId treeIdProject;
 
 	wxTreeItemId treeIdObject;
+	wxTreeItemId treeIdGeometry;
 	wxTreeItemId treeIdStock;
 	wxTreeItemId treeIdMachine;
 	wxTreeItemId treeIdToolbox;
@@ -422,28 +365,30 @@ void MainFrame::SetupTree(void)
 		treeIdProject = tree->AppendItem(rootId, _("Project: ")
 				+ project[i].projectName);
 
-		treeIdObject = tree->AppendItem(treeIdProject, _("Objects"));
-		for(j = 0; j < project[i].geometry.GetCount(); j++){
-			tree->AppendItem(treeIdObject, project[i].geometry[j].objectName);
+		for(j = 0; j < project[i].objects.GetCount(); j++){
+			treeIdObject = tree->AppendItem(treeIdProject, _("Object: ")
+					+ project[i].objects[j].fileName.GetName());
+			for(k = 0; k < project[i].objects[j].geometries.GetCount(); k++){
+				{
+					tree->AppendItem(treeIdObject,
+							project[i].objects[j].geometries[k].objectName);
+				}
+			}
+		}
+		treeIdStock = tree->AppendItem(treeIdProject, _("Stock material: ")
+				+ project[i].stock.fileName.GetName());
+		for(j = 0; j < project[i].stock.stockMaterials.GetCount(); j++){
+			tree->AppendItem(treeIdStock, project[i].stock.stockMaterials[j].materialName);
 		}
 
 		treeIdMachine = tree->AppendItem(treeIdProject, _("Machine: ")
 				+ project[i].machine.fileName.GetName());
 
-		if(project[i].toolbox.IsInitialized()){
-			treeIdToolbox = tree->AppendItem(treeIdProject, _("Toolbox:")
-					+ project[i].toolbox.fileName.GetName());
-			for(j = 0; j < project[i].toolbox.tools.GetCount(); j++){
-				tree->AppendItem(treeIdToolbox,
-						project[i].toolbox.tools[j].toolName);
-			}
-		}else{
-			treeIdToolbox = tree->AppendItem(treeIdProject, _("Toolbox: -"));
-		}
-
-		treeIdStock = tree->AppendItem(treeIdProject, _("Stock material:"));
-		for(j = 0; j < project[i].stock.GetCount(); j++){
-			tree->AppendItem(treeIdStock, project[i].stock[j].materialName);
+		treeIdToolbox = tree->AppendItem(treeIdProject, _("Toolbox: ")
+				+ project[i].toolbox.fileName.GetName());
+		for(j = 0; j < project[i].toolbox.tools.GetCount(); j++){
+			tree->AppendItem(treeIdToolbox,
+					project[i].toolbox.tools[j].toolName);
 		}
 
 		treeIdRun = tree->AppendItem(treeIdProject, _("Run:"));

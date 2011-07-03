@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Triangle.h
+// Name               : UnitDialog.cpp
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 11.06.2011
+// Created            : 03.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,29 +28,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef TRIANGLE_H_
-#define TRIANGLE_H_
+#include "UnitDialog.h"
 
-#include "Vector3.h"
-#include <wx/dynarray.h>
-/*!\class Triangle
- * \brief Defines a simple triangle.
- *
- * Holds the data for a simple triangle. Three vertices with three normal vectors.
- */
+UnitDialog::UnitDialog(wxWindow* parent) :
+	GUIUnitDialog(parent)
+{
+}
 
-class Triangle {
-public:
-	Triangle();
-	virtual ~Triangle();
-	Vector3 p[3]; //!< Position of vertices.
-	Vector3 n[3]; //!< Normal vectors.
-	Vector3 c[3]; //!< Color vectors.
+UnitDialog::~UnitDialog()
+{
+}
 
-	void Paint(bool useNormals = true, bool useColors = false) const;
-	void CalculateNormal();
-};
-WX_DECLARE_OBJARRAY(Triangle, ArrayOfTriangle)
-;
-
-#endif /* TRIANGLE_H_ */
+void UnitDialog::OnClose(wxCommandEvent& event)
+{
+	Close();
+}

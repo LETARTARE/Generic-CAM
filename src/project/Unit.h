@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Triangle.h
-// Purpose            :
+// Name               : Unit.h
+// Purpose            : Converts from SI to whatever and back.
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 11.06.2011
+// Created            : 03.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,29 +28,40 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef TRIANGLE_H_
-#define TRIANGLE_H_
+#ifndef UNIT_H_
+#define UNIT_H_
 
-#include "Vector3.h"
-#include <wx/dynarray.h>
-/*!\class Triangle
- * \brief Defines a simple triangle.
+#include <wx/string.h>
+
+/*!\class Unit
+ * \brief Converts from SI to whatever and back.
  *
- * Holds the data for a simple triangle. Three vertices with three normal vectors.
+ * ...
  */
 
-class Triangle {
+class Unit {
+	//Constructor / Destructor
 public:
-	Triangle();
-	virtual ~Triangle();
-	Vector3 p[3]; //!< Position of vertices.
-	Vector3 n[3]; //!< Normal vectors.
-	Vector3 c[3]; //!< Color vectors.
+	Unit();
+	virtual ~Unit();
+	//Member variables
+public:
 
-	void Paint(bool useNormals = true, bool useColors = false) const;
-	void CalculateNormal();
+private:
+	double factor;
+	//wxString TypeOfUnit;
+	wxString SIName;
+	wxString otherName;
+
+	// Methods
+public:
+	void Setup(const wxString SIName, const wxString otherName,
+			const double factor);
+	double FromSI(const double value);
+	double ToSI(const double value);
+	wxString GetSIName(void);
+	wxString GetOtherName(void);
+
 };
-WX_DECLARE_OBJARRAY(Triangle, ArrayOfTriangle)
-;
 
-#endif /* TRIANGLE_H_ */
+#endif /* UNIT_H_ */

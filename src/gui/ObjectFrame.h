@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Triangle.h
+// Name               : ObjectFrame.h
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 11.06.2011
+// Created            : 03.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,29 +28,36 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef TRIANGLE_H_
-#define TRIANGLE_H_
+#ifndef OBJECTFRAME_H_
+#define OBJECTFRAME_H_
 
-#include "Vector3.h"
-#include <wx/dynarray.h>
-/*!\class Triangle
- * \brief Defines a simple triangle.
+#include "gui.h"
+#include "../project/Project.h"
+
+/*!\class ObjectFrame
+ * \brief ...
  *
- * Holds the data for a simple triangle. Three vertices with three normal vectors.
+ * ...
  */
 
-class Triangle {
+class ObjectFrame:public GUIObjectFrame {
+	// Constructor/ Destructor
 public:
-	Triangle();
-	virtual ~Triangle();
-	Vector3 p[3]; //!< Position of vertices.
-	Vector3 n[3]; //!< Normal vectors.
-	Vector3 c[3]; //!< Color vectors.
+	ObjectFrame(wxWindow* parent);
+	virtual ~ObjectFrame();
 
-	void Paint(bool useNormals = true, bool useColors = false) const;
-	void CalculateNormal();
+	// Member Variables
+
+	Project* linkedProject;
+
+	// Methods
+public:
+	void InsertProject(Project *project);
+
+	bool TransferDataToWindow(void);
+	bool TransferDataFromWindow(void);
+
+	void OnClose(wxCommandEvent& event);
 };
-WX_DECLARE_OBJARRAY(Triangle, ArrayOfTriangle)
-;
 
-#endif /* TRIANGLE_H_ */
+#endif /* OBJECTFRAME_H_ */

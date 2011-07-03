@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Triangle.h
+// Name               : Object.h
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 11.06.2011
+// Created            : 03.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,29 +28,49 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef TRIANGLE_H_
-#define TRIANGLE_H_
+#ifndef OBJECT_H_
+#define OBJECT_H_
 
-#include "Vector3.h"
+#include "../3D/Geometry.h"
+#include "../3D/BoundingBox.h"
+
+#include <wx/filename.h>
 #include <wx/dynarray.h>
-/*!\class Triangle
- * \brief Defines a simple triangle.
+
+/*!\class Object
+ * \brief ...
  *
- * Holds the data for a simple triangle. Three vertices with three normal vectors.
+ * ...
  */
 
-class Triangle {
+class Object {
+	// Constructor / Destructor
 public:
-	Triangle();
-	virtual ~Triangle();
-	Vector3 p[3]; //!< Position of vertices.
-	Vector3 n[3]; //!< Normal vectors.
-	Vector3 c[3]; //!< Color vectors.
+	Object();
+	virtual ~Object();
 
-	void Paint(bool useNormals = true, bool useColors = false) const;
-	void CalculateNormal();
+	// Member variables
+public:
+
+	wxFileName fileName;
+
+	ArrayOfGeometry geometries;
+	BoundingBox bbox;
+
+private:
+
+
+	// Methods
+public:
+
+	void UpdateBoundingBox(void);
+	void Paint(void);
+
+	bool LoadObject(wxFileName fileName);
+	bool ReloadObject(void);
+
 };
-WX_DECLARE_OBJARRAY(Triangle, ArrayOfTriangle)
+WX_DECLARE_OBJARRAY(Object, ArrayOfObject)
 ;
 
-#endif /* TRIANGLE_H_ */
+#endif /* OBJECT_H_ */
