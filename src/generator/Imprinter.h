@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : BoundingBox.h
+// Name               : Imprinter.h
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 22.06.2011
+// Created            : 04.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,54 +28,71 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef BOUNDINGBOX_H_
-#define BOUNDINGBOX_H_
+#ifndef IMPRINTER_H_
+#define IMPRINTER_H_
 
+#include "../3D/AffineTransformMatrix.h"
 #include "../3D/Vector3.h"
-#include "../3D/Geometry.h"
-#include "../3D/Surface.h"
 
-/*!\class BoundingBox
+/*!\class Imprinter
  * \brief ...
  *
  * ...
  */
 
-class BoundingBox {
+class ImprinterElement {
 	// Constructor / Destructor
 public:
-	BoundingBox();
-	virtual ~BoundingBox();
-
+	ImprinterElement();
+	virtual ~ImprinterElement();
 	// Member variables
 public:
-	Vector3 color;
-	float alpha;
+	float upperLimit;
+	float lowerLimit;
 
-	double xmin, xmax;
-	double ymin, ymax;
-	double zmin, zmax;
+	// TODO: ...later...
+	//	float normal; // 0..Pi/2<
+	//	float orientation; // 0..2Pi
 
 	// Methods
 public:
-
-	void Reset(void);
-	void Insert(const Geometry &geometry);
-	void Insert(Surface &surface);
-	double GetSizeX(void)
+	bool IsVisible(void)
 	{
-		return xmax - xmin;
+		return (upperLimit > lowerLimit);
 	}
-	double GetSizeY(void)
-	{
-		return ymax - ymin;
-	}
-	double GetSizeZ(void)
-	{
-		return zmax - zmin;
-	}
-
-	void Paint(void);
 };
 
-#endif /* BOUNDINGBOX_H_ */
+class Imprinter {
+	// Constructor / Destructor
+public:
+	Imprinter(const double sizeX = 0.1, const double sizeY = 0.1,
+			const double sizeZ = 0.05, const double resolutionX = 0.001,
+			const double resolutionY = 0.001);
+	Imprinter(const Imprinter& ip); ///> Copy constructor
+	virtual ~Imprinter();
+
+	// Member variables
+public:
+	AffineTransformMatrix matrix;
+
+private:
+	ImprinterElement *field;
+	double sx, sy, sz;
+	size_t nx, ny, N;
+	double rx, ry;
+protected:
+	Vector3 colorNormal;
+	Vector3 colorUnscratched;
+	Vector3 colorTodo;
+
+	// Methods
+public:
+	void Paint() const;
+
+	void SetupBox(const double sizeX, const double sizeY, const double sizeZ,
+			const double resolutionX = 0.001, const double resolutionY = 0.001);
+
+	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c);
+};
+
+#endif /* IMPRINTER_H_ */

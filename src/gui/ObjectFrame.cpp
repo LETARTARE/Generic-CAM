@@ -34,6 +34,7 @@ ObjectFrame::ObjectFrame(wxWindow* parent) :
 	GUIObjectFrame(parent)
 {
 	linkedProject = NULL;
+
 }
 
 ObjectFrame::~ObjectFrame()
@@ -47,14 +48,33 @@ void ObjectFrame::InsertProject(Project *project)
 
 bool ObjectFrame::TransferDataToWindow(void)
 {
+	if(linkedProject == NULL) return false;
 
+	size_t i;
+	m_comboBox->Clear();
+	if(linkedProject->objects.GetCount()>0)
+	{
+		for(i=0;i<linkedProject->objects.GetCount();i++)
+			m_comboBox->Append(linkedProject->objects[i].fileName.GetName());
+		m_comboBox->Enable();
+	}else{
+		m_comboBox->Append(_("No objects in project!"));
+		m_comboBox->Enable(false);
+	}
+	m_comboBox->SetSelection(linkedProject->selectedObject);
+	m_textCtrlSizeX->SetValue(wxString::Format(_T("%.3f"),linkedProject->objects[linkedProject->selectedObject].bbox.GetSizeX()));
+
+
+
+	return true;
 }
 bool ObjectFrame::TransferDataFromWindow(void)
 {
 
+	return true;
 }
 
 void ObjectFrame::OnClose(wxCommandEvent& event)
 {
-
+	Close();
 }

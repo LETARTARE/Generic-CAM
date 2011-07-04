@@ -62,6 +62,9 @@ public:
 	Toolbox toolbox;
 	Stock stock;
 
+	size_t selectedProject;
+	size_t selectedObject;
+
 	ArrayOfRun run;
 
 	bool modified;

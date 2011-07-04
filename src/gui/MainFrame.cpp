@@ -136,7 +136,9 @@ void MainFrame::OnLoadObject(wxCommandEvent& event)
 
 void MainFrame::OnModifyObject(wxCommandEvent& event)
 {
-
+	objectFrame = new ObjectFrame(this);
+	objectFrame->InsertProject(&(project[activeProject]));
+	objectFrame->Show(true);
 }
 
 void MainFrame::OnLoadMachine(wxCommandEvent& event)
@@ -311,6 +313,8 @@ void MainFrame::OnChangeStereo3D(wxCommandEvent& event)
 
 void MainFrame::OnSetupUnits(wxCommandEvent& event)
 {
+	UnitDialog temp(this);
+	temp.ShowModal();
 }
 
 void MainFrame::OnAbout(wxCommandEvent& event)
@@ -378,7 +382,8 @@ void MainFrame::SetupTree(void)
 		treeIdStock = tree->AppendItem(treeIdProject, _("Stock material: ")
 				+ project[i].stock.fileName.GetName());
 		for(j = 0; j < project[i].stock.stockMaterials.GetCount(); j++){
-			tree->AppendItem(treeIdStock, project[i].stock.stockMaterials[j].materialName);
+			tree->AppendItem(treeIdStock,
+					project[i].stock.stockMaterials[j].materialName);
 		}
 
 		treeIdMachine = tree->AppendItem(treeIdProject, _("Machine: ")

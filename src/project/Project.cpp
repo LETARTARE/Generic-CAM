@@ -40,6 +40,8 @@ Project::Project()
 	modified = false;
 	projectName = _("Untitled");
 
+	selectedProject = 0;
+	selectedObject = 0;
 
 	displayGeometry = true;
 	displayBoundingBox = false;
@@ -47,19 +49,16 @@ Project::Project()
 	displayStock = false;
 	displayWorkpiece = false;
 
-
 }
 
 Project::~Project()
 {
 }
 
-
 void Project::Assemble(void)
 {
 	machine.Assemble();
-	if(machine.IsInitialized())
-		stock.matrix = machine.workpiecePosition;
+	if(machine.IsInitialized()) stock.matrix = machine.workpiecePosition;
 
 }
 
@@ -75,7 +74,6 @@ void Project::Paint(void)
 	//if(displayWorkpiece) workpiece.Paint();
 	//if(displayBoundingBox) bbox.Paint();
 }
-
 
 //bool Project::LoadObject(wxFileName)
 

@@ -91,6 +91,7 @@ bool Object::ReloadObject(void)
 				geometries.Add(g);
 			}
 		}
+		UpdateBoundingBox();
 		return true;
 	}
 
@@ -111,6 +112,7 @@ bool Object::ReloadObject(void)
 				geometries.Add(g);
 			}
 		}
+		UpdateBoundingBox();
 		return true;
 	}
 
@@ -129,6 +131,7 @@ bool Object::ReloadObject(void)
 				geometries.Add(g);
 			}
 		}
+		UpdateBoundingBox();
 		return true;
 	}
 
