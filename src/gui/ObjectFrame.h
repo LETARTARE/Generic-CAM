@@ -58,6 +58,24 @@ public:
 	bool TransferDataFromWindow(void);
 
 	void OnClose(wxCommandEvent& event);
+
+	void OnOpen(wxCommandEvent& event);
+	void OnReLoad(wxCommandEvent& event);
+	void OnSaveAs(wxCommandEvent& event);
+	void OnUpdate(wxCommandEvent& event);
+	void OnMultiplyByTen(wxCommandEvent& event);
+	void OnDivideByTen(wxCommandEvent& event);
+	void OnScalePercent(wxCommandEvent& event);
+	void ScaleUnitX(wxCommandEvent& event);
+	void OnScalePercentX(wxCommandEvent& event);
+	void OnScaleUnitY(wxCommandEvent& event);
+	void OnScalePercentY(wxCommandEvent& event);
+	void OnScaleUnitZ(wxCommandEvent& event);
+	void OnScalePercentZ(wxCommandEvent& event);
+	void OnAlignWithStock(wxCommandEvent& event);
+	void OnAlignWithMiddle(wxCommandEvent& event);
+	void OnAlignWithTop(wxCommandEvent& event);
+
 };
 
 #endif /* OBJECTFRAME_H_ */

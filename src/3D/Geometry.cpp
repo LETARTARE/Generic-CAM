@@ -38,7 +38,7 @@ WX_DEFINE_OBJARRAY(ArrayOfGeometry)
 Geometry::Geometry()
 {
 	visible = true;
-	color.Set(1, 1, 1);
+	color.Set(0.8, 0.8, 0.8);
 }
 Geometry::~Geometry()
 {
@@ -73,32 +73,28 @@ void Geometry::ApplyTransformation(const AffineTransformMatrix &matrix)
 {
 	size_t i;
 	for(i = 0; i < triangles.Count(); i++){
-		triangles[i].p[0] = matrix.Transform(triangles[i].p[0]);
-		triangles[i].p[1] = matrix.Transform(triangles[i].p[1]);
-		triangles[i].p[2] = matrix.Transform(triangles[i].p[2]);
-		triangles[i].n[0] = matrix.TransformNoShift(triangles[i].n[0]);
-		triangles[i].n[1] = matrix.TransformNoShift(triangles[i].n[1]);
-		triangles[i].n[2] = matrix.TransformNoShift(triangles[i].n[2]);
+		triangles[i].ApplyTransformation(matrix);
+		//		triangles[i].p[0] = matrix.Transform(triangles[i].p[0]);
+		//		triangles[i].p[1] = matrix.Transform(triangles[i].p[1]);
+		//		triangles[i].p[2] = matrix.Transform(triangles[i].p[2]);
+		//		triangles[i].n[0] = matrix.TransformNoShift(triangles[i].n[0]);
+		//		triangles[i].n[1] = matrix.TransformNoShift(triangles[i].n[1]);
+		//		triangles[i].n[2] = matrix.TransformNoShift(triangles[i].n[2]);
 	}
 }
 
 void Geometry::ApplyTransformation(void)
 {
 	size_t i;
-	for(i = 0; i < triangles.Count(); i++){
-		triangles[i].p[0] = this->matrix.Transform(triangles[i].p[0]);
-		triangles[i].p[1] = this->matrix.Transform(triangles[i].p[1]);
-		triangles[i].p[2] = this->matrix.Transform(triangles[i].p[2]);
-		triangles[i].n[0] = this->matrix.TransformNoShift(triangles[i].n[0]);
-		triangles[i].n[1] = this->matrix.TransformNoShift(triangles[i].n[1]);
-		triangles[i].n[2] = this->matrix.TransformNoShift(triangles[i].n[2]);
-	}
+	for(i = 0; i < triangles.Count(); i++)
+		triangles[i].ApplyTransformation(this->matrix);
 }
 
 void Geometry::Paint(void) const
 {
 	if(!visible) return;
 	size_t i;
+	::glEnable(GL_RESCALE_NORMAL);
 	::glPushMatrix();
 	::glMultMatrixd(matrix.a);
 
@@ -109,6 +105,7 @@ void Geometry::Paint(void) const
 	}
 	::glEnd();
 	::glPopMatrix();
+	::glDisable(GL_RESCALE_NORMAL);
 }
 
 void Geometry::AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c)

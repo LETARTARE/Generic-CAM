@@ -51,11 +51,11 @@ void Unit::Setup(const wxString SIName, const wxString otherName,
 }
 double Unit::FromSI(const double value)
 {
-	return value * factor;
+	return value / factor;
 }
 double Unit::ToSI(const double value)
 {
-	return value / factor;
+	return value * factor;
 }
 wxString Unit::GetSIName(void)
 {

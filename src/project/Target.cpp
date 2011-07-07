@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Stock.cpp
+// Name               : Target.cpp
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 03.07.2011
+// Created            : 06.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,21 +28,25 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#include "Stock.h"
+#include "Target.h"
 
-Stock::Stock()
-{
-	StockMaterial temp;
-	stockMaterials.Add(temp);
-}
+#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+WX_DEFINE_OBJARRAY(ArrayOfTarget)
 
-Stock::~Stock()
+Target::Target()
 {
 }
 
-void Stock::Paint(void)
+Target::~Target()
 {
+}
+
+void Target::InsertObject(Object *object,double shiftZ)
+{
+	InitImprinting();
 	size_t i;
-	for(i = 0; i < stockMaterials.GetCount(); i++)
-		stockMaterials[i].Paint();
+	for(i = 0; i < object->geometries.GetCount(); i++){
+		InsertGeometrie(&(object->geometries[i]),shiftZ);
+	}
+	FinishImprint();
 }

@@ -67,6 +67,7 @@ void ToolboxFrame::OnChangeStereo3D(wxCommandEvent& event)
 void ToolboxFrame::InsertProject(Project *project)
 {
 	linkedProject = project;
+	TransferDataToWindow();
 }
 
 bool ToolboxFrame::TransferDataToWindow(void)
@@ -177,8 +178,38 @@ bool ToolboxFrame::TransferDataToWindow(void)
 			}
 		}
 	}
+	return true;
 }
 
-bool ToolboxFrame::TransferDataFromWindow(void){
+bool ToolboxFrame::TransferDataFromWindow(void)
+{
+	return true;
+}
 
+void ToolboxFrame::OnNewTool(wxCommandEvent& event)
+{
+}
+
+void ToolboxFrame::OnUpdateTool(wxCommandEvent& event)
+{
+}
+
+void ToolboxFrame::OnDeleteTool(wxCommandEvent& event)
+{
+}
+
+void ToolboxFrame::OnShapeNew(wxCommandEvent& event)
+{
+}
+
+void ToolboxFrame::OnShapeUpdate(wxCommandEvent& event)
+{
+}
+
+void ToolboxFrame::OnShapeDelete(wxCommandEvent& event)
+{
+}
+
+void ToolboxFrame::OnShapeSelect(wxListEvent& event)
+{
 }

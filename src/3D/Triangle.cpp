@@ -69,3 +69,14 @@ void Triangle::CalculateNormal()
 	n[1] = n[0];
 	n[2] = n[0];
 }
+
+void Triangle::ApplyTransformation(const AffineTransformMatrix &matrix)
+{
+	p[0] = matrix.Transform(p[0]);
+	p[1] = matrix.Transform(p[1]);
+	p[2] = matrix.Transform(p[2]);
+	n[0] = matrix.TransformNoShift(n[0]);
+	n[1] = matrix.TransformNoShift(n[1]);
+	n[2] = matrix.TransformNoShift(n[2]);
+}
+

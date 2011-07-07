@@ -55,19 +55,15 @@ void BoundingBox::Insert(const Geometry &geometry)
 {
 	size_t i, j;
 	for(i = 0; i < geometry.triangles.GetCount(); i++){
+		Triangle temp = geometry.triangles[i];
+		temp.ApplyTransformation(geometry.matrix);
 		for(j = 0; j < 3; j++){
-			if(geometry.triangles[i].p[j].x > xmax) xmax
-					= geometry.triangles[i].p[j].x;
-			if(geometry.triangles[i].p[j].x < xmin) xmin
-					= geometry.triangles[i].p[j].x;
-			if(geometry.triangles[i].p[j].y > ymax) ymax
-					= geometry.triangles[i].p[j].y;
-			if(geometry.triangles[i].p[j].y < ymin) ymin
-					= geometry.triangles[i].p[j].y;
-			if(geometry.triangles[i].p[j].z > zmax) zmax
-					= geometry.triangles[i].p[j].z;
-			if(geometry.triangles[i].p[j].z < zmin) zmin
-					= geometry.triangles[i].p[j].z;
+			if(temp.p[j].x > xmax) xmax = temp.p[j].x;
+			if(temp.p[j].x < xmin) xmin = temp.p[j].x;
+			if(temp.p[j].y > ymax) ymax = temp.p[j].y;
+			if(temp.p[j].y < ymin) ymin = temp.p[j].y;
+			if(temp.p[j].z > zmax) zmax = temp.p[j].z;
+			if(temp.p[j].z < zmin) zmin = temp.p[j].z;
 		}
 	}
 }

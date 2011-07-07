@@ -32,6 +32,7 @@
 #define TRIANGLE_H_
 
 #include "Vector3.h"
+#include "AffineTransformMatrix.h"
 #include <wx/dynarray.h>
 /*!\class Triangle
  * \brief Defines a simple triangle.
@@ -49,6 +50,8 @@ public:
 
 	void Paint(bool useNormals = true, bool useColors = false) const;
 	void CalculateNormal();
+	void ApplyTransformation(const AffineTransformMatrix &matrix);
+
 };
 WX_DECLARE_OBJARRAY(Triangle, ArrayOfTriangle)
 ;

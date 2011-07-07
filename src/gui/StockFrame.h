@@ -59,6 +59,7 @@ public:
 
 private:
 	bool TransferDataToWindow(void);
+	bool TransferDataFromWindow(void);
 };
 
 #endif /* STOCKFRAME_H_ */

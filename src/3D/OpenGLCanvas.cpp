@@ -234,9 +234,9 @@ void OpenGLCanvas::InitGL()
 void OpenGLCanvas::SetupLighting() // Eine Lampe in die Szene setzen
 {
 	GLfloat ambient0[] =
-		{0.5f, 0.5f, 0.5f};
+		{0.4f, 0.4f, 0.4f};
 	GLfloat diffuse0[] =
-		{0.8f, 0.8f, 0.8f};
+		{0.7f, 0.7f, 0.7f};
 	GLfloat specular0[] =
 		{0.9f, 0.9f, 0.9f};
 	GLfloat position0[] =

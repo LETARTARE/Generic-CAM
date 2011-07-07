@@ -32,6 +32,7 @@
 #include "AboutDialog.h"
 #include "Control6DOFDialog.h"
 #include "UnitDialog.h"
+#include "TargetDialog.h"
 
 #include <wx/filename.h>
 #include <wx/msgdlg.h>
@@ -139,6 +140,13 @@ void MainFrame::OnModifyObject(wxCommandEvent& event)
 	objectFrame = new ObjectFrame(this);
 	objectFrame->InsertProject(&(project[activeProject]));
 	objectFrame->Show(true);
+}
+
+void MainFrame::OnGenerateTargets(wxCommandEvent& event)
+{
+	TargetDialog temp(this);
+	temp.InsertProject(&(project[activeProject]));
+	temp.ShowModal();
 }
 
 void MainFrame::OnLoadMachine(wxCommandEvent& event)
@@ -349,7 +357,7 @@ void MainFrame::SetupTree(void)
 	tree->DeleteAllItems();
 
 	size_t i, j, k;
-	TreeItemData* tid;
+	//TreeItemData* tid;
 
 	wxTreeItemId rootId = tree->AddRoot(_T("TreeRoot"));
 

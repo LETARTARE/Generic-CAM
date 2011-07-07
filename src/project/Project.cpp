@@ -40,14 +40,27 @@ Project::Project()
 	modified = false;
 	projectName = _("Untitled");
 
-	selectedProject = 0;
-	selectedObject = 0;
+	activeObject = 0;
+	activeTarget = 0;
+	activeStock = 0;
 
 	displayGeometry = true;
 	displayBoundingBox = false;
 	displayMachine = false;
-	displayStock = false;
+	displayStock = true;
 	displayWorkpiece = false;
+	displayTarget = true;
+
+	Tolerance.Setup(_T("m"), _T("mm"), (double) 1 / 1000);
+	Distance.Setup(_T("m"), _T("mm"), (double) 1 / 1000);
+	RotationalSpeed.Setup(_T("1/s"), _T("rpm"), (double) 1 / 60);
+	LinearSpeed.Setup(_T("m/s"), _T("mm/s"), (double) 1 / 1000);
+
+	sliceThickness = 0.010;
+	slotWidth = 0.010;
+	supportDistance = 0.050;
+	supportWidth = 0.010;
+	supportHeight = 0.005;
 
 }
 
@@ -71,10 +84,45 @@ void Project::Paint(void)
 	}
 	if(displayMachine) machine.Paint();
 	if(displayStock) stock.Paint();
+
+	if(displayTarget){
+		for(i = 0; i < targets.GetCount(); i++)
+			targets[i].Paint();
+	}
+
+
 	//if(displayWorkpiece) workpiece.Paint();
 	//if(displayBoundingBox) bbox.Paint();
 }
 
 //bool Project::LoadObject(wxFileName)
 
+
+void Project::GenerateTargets(void)
+{
+	targets.Clear();
+
+	Target temp;
+	Object* obj = &(objects[activeObject]);
+	obj->UpdateBoundingBox();
+
+	temp.SetupBox(obj->bbox.xmax, obj->bbox.ymax, sliceThickness);
+
+	size_t i, n;
+	n = ceil(obj->bbox.zmax / sliceThickness);
+
+	temp.matrix.TranslateGlobal(slotWidth, 0, 0);
+	for(i = 0; i < n; i++){
+
+
+		temp.InsertObject(obj, (double) i * sliceThickness);
+		temp.matrix.TranslateGlobal(slotWidth, 0, 0);
+		targets.Add(temp);
+		temp.matrix.TranslateGlobal(obj->bbox.xmax +slotWidth*2, 0, 0);
+
+	}
+
+	objects[0].geometries[0].matrix.TranslateGlobal(0,-0.35,0);
+	stock.stockMaterials[0].matrix.TranslateGlobal(0, 0.35, 0);
+}
 

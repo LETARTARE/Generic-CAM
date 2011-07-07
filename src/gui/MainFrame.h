@@ -39,6 +39,7 @@
 #include "ObjectFrame.h"
 #include "StockFrame.h"
 #include "ErrorFrame.h"
+#include "../project/Unit.h"
 
 #include "../project/Project.h"
 
@@ -82,6 +83,9 @@ private:
 	wxFileName lastObjectFileName;
 
 
+
+
+
 	ArrayOfProject project;
 	size_t activeProject;
 
@@ -110,6 +114,7 @@ private:
 
 	void OnLoadObject(wxCommandEvent& event);
 	void OnModifyObject(wxCommandEvent& event);
+	void OnGenerateTargets( wxCommandEvent& event );
 
 	void OnLoadMachine(wxCommandEvent& event);
 	void OnReloadMachine(wxCommandEvent& event);

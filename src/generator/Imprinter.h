@@ -32,6 +32,7 @@
 #define IMPRINTER_H_
 
 #include "../3D/AffineTransformMatrix.h"
+#include "../3D/Geometry.h"
 #include "../3D/Vector3.h"
 
 /*!\class Imprinter
@@ -49,6 +50,10 @@ public:
 public:
 	float upperLimit;
 	float lowerLimit;
+	float upperLimitUpside;
+	float lowerLimitUpside;
+	float upperLimitDownside;
+	float lowerLimitDownside;
 
 	// TODO: ...later...
 	//	float normal; // 0..Pi/2<
@@ -91,8 +96,26 @@ public:
 
 	void SetupBox(const double sizeX, const double sizeY, const double sizeZ,
 			const double resolutionX = 0.001, const double resolutionY = 0.001);
+	size_t MemoryUsageInBytes(void);
+	void InitImprinting(void);
+	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c, char strategy = 1);
+	void InsertGeometrie(const Geometry *geometry, double shiftZ = 0.0);
+	void FinishImprint(void);
 
-	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c);
+	void SetSphere(double radius, const double resolutionX = 0.001,
+			const double resolutionY = 0.001);
+	void SetCylinder(double radius,double height, const double resolutionX = 0.001,
+			const double resolutionY = 0.001);
+	void SetDisc(double radius, const double resolutionX = 0.001,
+			const double resolutionY = 0.001);
+	void FoldRaise(const Imprinter *b);
+	void FoldReplace(const Imprinter *b);
+	void FlipX(void);
+	void FlipY(void);
+	void Rot90(void);
+	void Rot180(void);
+	void Rot270(void);
+
 };
 
 #endif /* IMPRINTER_H_ */

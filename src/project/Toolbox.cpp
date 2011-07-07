@@ -41,9 +41,51 @@ Toolbox::Toolbox()
 
 	// an example Tool for the toolbox
 
-	Tool* temp = new Tool;
-
+	Tool* temp;
 	ToolElement* e;
+
+
+	temp = new Tool;
+
+	e = new ToolElement;
+	e->t = 0;
+	e->h = 0.005;
+	e->d = 0.005;
+	e->r = 0.0;
+	e->cutting = false;
+	temp->elements.Add(e);
+
+	e = new ToolElement;
+	e->t = 2;
+	e->h = 0.01;
+	e->d = 0.006;
+	e->r = 0.0;
+	e->cutting = false;
+	temp->elements.Add(e);
+
+	e = new ToolElement;
+	e->t = 2;
+	e->h = 0.025;
+	e->d = 0.00;
+	e->r = 0.0;
+	e->cutting = true;
+	temp->elements.Add(e);
+
+	temp->toolName = _T("Standard cutter");
+	temp->comment = _T("all purpose cylindrical");
+	temp->shaftDiameter = 0.006;
+	temp->shaftLength = 0.01;
+	temp->maxSpeed = 166.67;
+	temp->feedCoefficient = 0.003;
+	temp->nrOfTeeth = 2;
+	temp->slot = 1;
+
+	temp->GenerateContour();
+
+	tools.Add(temp);
+
+
+	temp = new Tool;
 
 	e = new ToolElement;
 	e->t = 0;
@@ -90,44 +132,7 @@ Toolbox::Toolbox()
 
 	tools.Add(temp);
 
-	temp = new Tool;
 
-	e = new ToolElement;
-	e->t = 0;
-	e->h = 0.005;
-	e->d = 0.005;
-	e->r = 0.0;
-	e->cutting = false;
-	temp->elements.Add(e);
-
-	e = new ToolElement;
-	e->t = 2;
-	e->h = 0.02;
-	e->d = 0.01;
-	e->r = 0.0;
-	e->cutting = false;
-	temp->elements.Add(e);
-
-	e = new ToolElement;
-	e->t = 2;
-	e->h = 0.015;
-	e->d = 0.00;
-	e->r = 0.0;
-	e->cutting = true;
-	temp->elements.Add(e);
-
-	temp->toolName = _T("Standard cutter");
-	temp->comment = _T("all purpose cylindrical");
-	temp->shaftDiameter = 0.006;
-	temp->shaftLength = 0.01;
-	temp->maxSpeed = 100e3;
-	temp->feedCoefficient = 0.003;
-	temp->nrOfTeeth = 2;
-	temp->slot = 1;
-
-	temp->GenerateContour();
-
-	tools.Add(temp);
 
 }
 

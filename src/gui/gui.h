@@ -39,6 +39,7 @@
 #include <wx/checkbox.h>
 #include <wx/listctrl.h>
 #include "ToolCanvas.h"
+#include <wx/notebook.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -52,7 +53,8 @@ class GUIMainFrame : public wxFrame
 	protected:
 		enum
 		{
-			wxID_SETUPCONTROLLER = 1000,
+			wxID_GENERATETARGET = 1000,
+			wxID_SETUPCONTROLLER,
 			wxID_VIEWSTEREO3D,
 			wxID_SETUPUNITS,
 		};
@@ -82,6 +84,7 @@ class GUIMainFrame : public wxFrame
 		virtual void OnQuit( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnLoadObject( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnModifyObject( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnGenerateTargets( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnLoadMachine( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReloadMachine( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditToolbox( wxCommandEvent& event ) { event.Skip(); }
@@ -357,7 +360,7 @@ class GUIObjectFrame : public wxFrame
 		wxButton* m_buttonMultTen;
 		wxButton* m_buttonDivTen;
 
-		wxTextCtrl* m_textCtrl28;
+		wxTextCtrl* m_textCtrlPercent;
 		wxStaticText* m_staticText43;
 		wxButton* m_button15;
 		wxStaticText* m_staticText44;
@@ -396,6 +399,7 @@ class GUIObjectFrame : public wxFrame
 		virtual void OnReLoad( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSaveAs( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSelectObject( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnMultiplyByTen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDivideByTen( wxCommandEvent& event ) { event.Skip(); }
@@ -442,6 +446,53 @@ class GUIUnitDialog : public wxDialog
 
 		GUIUnitDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup Units"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~GUIUnitDialog();
+
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class GUITargetDialog
+///////////////////////////////////////////////////////////////////////////////
+class GUITargetDialog : public wxDialog
+{
+	private:
+
+	protected:
+		wxNotebook* m_notebook1;
+		wxPanel* m_panel3;
+		wxStaticText* m_staticText67;
+		wxTextCtrl* m_textCtrlSliceThickness;
+		wxStaticText* m_staticText69;
+		wxButton* m_button28;
+		wxStaticText* m_staticText72;
+		wxTextCtrl* m_textCtrlSliceNumber;
+
+
+		wxPanel* m_panel4;
+		wxStaticText* m_staticText59;
+		wxTextCtrl* m_textCtrlSlotWidth;
+		wxStaticText* m_staticText60;
+		wxStaticText* m_staticText61;
+		wxTextCtrl* m_textCtrlSupportDistance;
+		wxStaticText* m_staticText62;
+		wxStaticText* m_staticText63;
+		wxTextCtrl* m_textCtrlSupportWidth;
+		wxStaticText* m_staticText64;
+		wxStaticText* m_staticText65;
+		wxTextCtrl* m_textCtrlSupportHeight;
+		wxStaticText* m_staticText66;
+		wxCheckBox* m_checkBoxMultipiece;
+		wxCheckBox* m_checkBoxSuperstuff;
+		wxButton* m_buttonGenerate;
+
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnFromStock( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnGenerate( wxCommandEvent& event ) { event.Skip(); }
+
+
+	public:
+
+		GUITargetDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Prepare Targets"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,500 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
+		~GUITargetDialog();
 
 };
 

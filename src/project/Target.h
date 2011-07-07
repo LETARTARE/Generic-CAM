@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Stock.cpp
+// Name               : Target.h
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 03.07.2011
+// Created            : 06.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,21 +28,37 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#include "Stock.h"
+#ifndef TARGET_H_
+#define TARGET_H_
 
-Stock::Stock()
-{
-	StockMaterial temp;
-	stockMaterials.Add(temp);
-}
+/*!\class Target
+ * \brief ...
+ *
+ * ...
+ */
 
-Stock::~Stock()
-{
-}
+#include "../generator/Imprinter.h"
+#include <wx/dynarray.h>
 
-void Stock::Paint(void)
-{
-	size_t i;
-	for(i = 0; i < stockMaterials.GetCount(); i++)
-		stockMaterials[i].Paint();
-}
+#include "Object.h"
+
+class Target:public Imprinter {
+	// Constructor/ Destructor
+public:
+	Target();
+	virtual ~Target();
+
+	//Member variables:
+public:
+	//double shiftZ;
+
+
+	//Methods:
+public:
+	void InsertObject(Object *object, double shiftZ = 0.0);
+
+};
+WX_DECLARE_OBJARRAY(Target, ArrayOfTarget)
+;
+
+#endif /* TARGET_H_ */

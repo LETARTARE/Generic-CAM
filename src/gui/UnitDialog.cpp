@@ -43,3 +43,19 @@ void UnitDialog::OnClose(wxCommandEvent& event)
 {
 	Close();
 }
+
+void UnitDialog::InsertProject(Project *project)
+{
+	linkedProject = project;
+	TransferDataToWindow();
+}
+
+bool UnitDialog::TransferDataToWindow(void)
+{
+	return true;
+}
+bool UnitDialog::TransferDataFromWindow(void)
+{
+
+	return true;
+}

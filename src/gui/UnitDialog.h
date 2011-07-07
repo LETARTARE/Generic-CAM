@@ -49,10 +49,13 @@ public:
 	// Member variables
 private:
 
-
+	Project* linkedProject;
 	// Methods
 private:
-
+	bool TransferDataToWindow(void);
+	bool TransferDataFromWindow(void);
+public:
+	void InsertProject(Project *project);
 	void OnClose(wxCommandEvent& event);
 };
 

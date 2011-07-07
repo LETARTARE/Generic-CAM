@@ -29,7 +29,7 @@
 
 
 #include "Imprinter.h"
-
+#include <float.h>
 #include <GL/gl.h>
 
 ImprinterElement::ImprinterElement()
@@ -106,8 +106,72 @@ void Imprinter::SetupBox(const double sizeX, const double sizeY,
 	colorUnscratched.Set(0.0, 0.8, 0.1);
 }
 
-void Imprinter::InsertTriangle(Vector3 a, Vector3 b, Vector3 c)
+void Imprinter::SetSphere(double radius, const double resolutionX,
+		const double resolutionY)
 {
+	SetupBox(radius * 2, radius * 2, radius * 2, resolutionX, resolutionY);
+}
+void Imprinter::SetCylinder(double radius, double height,
+		const double resolutionX, const double resolutionY)
+{
+	SetupBox(radius * 2, radius * 2, height, resolutionX, resolutionY);
+}
+void Imprinter::SetDisc(double radius, const double resolutionX,
+		const double resolutionY)
+{
+	SetupBox(radius * 2, radius * 2, 0, resolutionX, resolutionY);
+}
+void Imprinter::FoldRaise(const Imprinter *b)
+{
+
+}
+void Imprinter::FoldReplace(const Imprinter *b)
+{
+
+}
+void Imprinter::FlipX(void)
+{
+
+}
+void Imprinter::FlipY(void)
+{
+
+}
+void Imprinter::Rot90(void)
+{
+
+}
+void Imprinter::Rot180(void)
+{
+
+}
+void Imprinter::Rot270(void)
+{
+
+}
+
+size_t Imprinter::MemoryUsageInBytes(void)
+{
+	return N * sizeof(ImprinterElement);
+}
+
+void Imprinter::InitImprinting(void)
+{
+	for(size_t i = 0; i < N; i++){
+		field[i].upperLimit = 0.0;
+		field[i].lowerLimit = sz;
+		field[i].upperLimitUpside = FLT_MAX;
+		field[i].lowerLimitUpside = FLT_MAX;
+		field[i].upperLimitDownside = -FLT_MAX;
+		field[i].lowerLimitDownside = -FLT_MAX;
+	}
+}
+
+void Imprinter::InsertTriangle(Vector3 a, Vector3 b, Vector3 c, char strategy)
+{
+	double maxz = sz;
+
+
 	// Sort Vertices by y
 	if(a.y > b.y) a.Swap(b);
 	if(b.y > c.y) b.Swap(c);
@@ -221,7 +285,60 @@ void Imprinter::InsertTriangle(Vector3 a, Vector3 b, Vector3 c)
 		// Loop over x:
 		for(j = pxl; j <= pxs; j++){
 
-			field[i * nx + j].upperLimit = xz;
+			switch(strategy){
+
+			case 1:
+				if(xz > field[i * nx + j].upperLimit) field[i * nx + j].upperLimit
+						= xz;
+				break;
+
+			case 2: // Facing down
+
+
+				if(xz >= maxz){
+					if(xz < field[i * nx + j].lowerLimitUpside) field[i * nx
+							+ j].lowerLimitUpside = xz;
+
+				}else{
+					if(xz <= 0.0){
+						if(xz > field[i * nx + j].lowerLimitDownside) field[i
+								* nx + j].lowerLimitDownside = xz;
+
+					}else{
+						if(xz < field[i * nx + j].lowerLimit) field[i * nx + j].lowerLimit
+								= xz;
+					}
+				}
+
+				break;
+
+			case 3: // Facing up
+
+				if(xz >= maxz){
+					if(xz < field[i * nx + j].upperLimitUpside) field[i * nx
+							+ j].upperLimitUpside = xz;
+
+				}else{
+					if(xz <= 0.0){
+						if(xz > field[i * nx + j].upperLimitDownside) field[i
+								* nx + j].upperLimitDownside = xz;
+
+					}else{
+						if(xz > field[i * nx + j].upperLimit) field[i * nx + j].upperLimit
+								= xz;
+					}
+				}
+
+				break;
+			case 4: // Side (nz==0)
+				//TODO: Ignore this case?
+				break;
+
+			default:
+				field[i * nx + j].upperLimit = xz;
+				break;
+			}
+
 			xz += dxz;
 		}
 
@@ -243,6 +360,48 @@ void Imprinter::InsertTriangle(Vector3 a, Vector3 b, Vector3 c)
 			sx = b.x;
 			sz = b.z;
 		}
+	}
+}
+
+void Imprinter::FinishImprint(void)
+{
+	for(size_t i = 0; i < N; i++){
+
+
+		//		if(field[i].upperLimit < field[i].lowerLimit)// Inside is switched
+		//		{
+		if(field[i].lowerLimitDownside > field[i].upperLimitDownside
+				&& field[i].lowerLimitDownside > -FLT_MAX / 2){
+			field[i].lowerLimit = 0.0;
+		}
+		if(field[i].upperLimitUpside < field[i].lowerLimitUpside
+				&& field[i].upperLimitUpside < FLT_MAX / 2){
+			field[i].upperLimit = sz;
+		}
+		//		}else{
+		//
+		//
+		//
+		//
+		//		}
+	}
+}
+
+void Imprinter::InsertGeometrie(const Geometry *geometry, double shiftZ)
+{
+	size_t i;
+	AffineTransformMatrix m = geometry->matrix;
+	m.TranslateGlobal(0, 0, -shiftZ);
+
+	for(i = 0; i < geometry->triangles.GetCount(); i++){
+		Triangle temp = geometry->triangles[i];
+		temp.ApplyTransformation(m);
+
+		if(temp.n[0].z < 0.0) InsertTriangle(temp.p[0], temp.p[1], temp.p[2], 2);
+		if(temp.n[0].z == 0.0) InsertTriangle(temp.p[0], temp.p[1], temp.p[2],
+				4);
+		if(temp.n[0].z > 0.0) InsertTriangle(temp.p[0], temp.p[1], temp.p[2], 3);
+
 	}
 }
 
@@ -286,3 +445,4 @@ void Imprinter::Paint() const
 	::glEnd();
 	::glPopMatrix();
 }
+

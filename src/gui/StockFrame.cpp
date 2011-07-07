@@ -74,19 +74,22 @@ bool StockFrame::TransferDataToWindow(void)
 	for(i = 0; i < temp->GetCount(); i++){
 
 		m_listCtrl->InsertItem(i, temp->Item(i).materialName);
-		m_listCtrl->SetItem(i, 1, wxString::Format(_T("%f"), temp->Item(
-				i).x));
-		m_listCtrl->SetItem(i, 2, wxString::Format(_T("%f"), temp->Item(
-				i).y));
-		m_listCtrl->SetItem(i, 3, wxString::Format(_T("%f"), temp->Item(
-				i).z));
-		m_listCtrl->SetItem(i, 4, wxString::Format(_T("%f"), temp->Item(
-				i).maxSpeed));
-		m_listCtrl->SetItem(i, 5, wxString::Format(_T("%f"), temp->Item(
-				i).maxFeedrate));
+		m_listCtrl->SetItem(i, 1, wxString::Format(_T("%f"), temp->Item(i).x));
+		m_listCtrl->SetItem(i, 2, wxString::Format(_T("%f"), temp->Item(i).y));
+		m_listCtrl->SetItem(i, 3, wxString::Format(_T("%f"), temp->Item(i).z));
+		m_listCtrl->SetItem(i, 4, wxString::Format(_T("%f"),
+				temp->Item(i).maxSpeed));
+		m_listCtrl->SetItem(i, 5, wxString::Format(_T("%f"),
+				temp->Item(i).maxFeedrate));
 
 	}
 
 	return true;
 
 }
+bool StockFrame::TransferDataFromWindow(void)
+{
+
+	return true;
+}
+

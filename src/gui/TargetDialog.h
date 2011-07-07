@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Stock.cpp
+// Name               : TargetDialog.h
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 03.07.2011
+// Created            : 06.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,21 +28,42 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#include "Stock.h"
+#ifndef TARGETDIALOG_H_
+#define TARGETDIALOG_H_
 
-Stock::Stock()
-{
-	StockMaterial temp;
-	stockMaterials.Add(temp);
-}
+#include "../StdInclude.h"
+#include "gui.h"
 
-Stock::~Stock()
-{
-}
+/*!\class TargetDialog
+ * \brief ...
+ *
+ * ...
+ */
 
-void Stock::Paint(void)
-{
-	size_t i;
-	for(i = 0; i < stockMaterials.GetCount(); i++)
-		stockMaterials[i].Paint();
-}
+class TargetDialog:public GUITargetDialog {
+	// Constructor/ Destructor
+
+public:
+	TargetDialog(wxWindow* parent);
+	virtual ~TargetDialog();
+	// Member variables
+private:
+	Project* linkedProject;
+
+	// Methods
+public:
+	void InsertProject(Project *project);
+
+
+private:
+	bool TransferDataToWindow(void);
+	bool TransferDataFromWindow(void);
+	void OnClose(wxCommandEvent& event);
+
+	void OnFromStock(wxCommandEvent& event);
+	void OnGenerate(wxCommandEvent& event);
+
+
+};
+
+#endif /* TARGETDIALOG_H_ */

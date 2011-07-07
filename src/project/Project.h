@@ -36,7 +36,9 @@
 #include "../machine/Machine.h"
 #include "../simulator/Workpiece.h"
 #include "Run.h"
+#include "Target.h"
 #include "Stock.h"
+#include "Unit.h"
 
 #include <wx/string.h>
 
@@ -62,9 +64,11 @@ public:
 	Toolbox toolbox;
 	Stock stock;
 
-	size_t selectedProject;
-	size_t selectedObject;
+	size_t activeObject;
+	size_t activeStock;
+	size_t activeTarget;
 
+	ArrayOfTarget targets;
 	ArrayOfRun run;
 
 	bool modified;
@@ -74,13 +78,27 @@ public:
 	bool displayStock;
 	bool displayWorkpiece;
 	bool displayBoundingBox;
+	bool displayTarget;
 
+	Unit Tolerance;
+	Unit Distance;
+	Unit LinearSpeed;
+	Unit RotationalSpeed;
+
+	// For target generator
+
+	double sliceThickness;
+	double slotWidth;
+	double supportDistance;
+	double supportWidth;
+	double supportHeight;
 
 	// Methods
 public:
 
 	void Paint(void);
 	void Assemble(void);
+	void GenerateTargets(void);
 
 };
 WX_DECLARE_OBJARRAY(Project, ArrayOfProject)

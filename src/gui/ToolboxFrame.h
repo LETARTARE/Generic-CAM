@@ -60,6 +60,17 @@ public:
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 
+
+	void OnNewTool( wxCommandEvent& event ) ;
+	void OnUpdateTool( wxCommandEvent& event ) ;
+	void OnDeleteTool( wxCommandEvent& event ) ;
+	void OnShapeNew( wxCommandEvent& event ) ;
+	void OnShapeUpdate( wxCommandEvent& event ) ;
+	void OnShapeDelete( wxCommandEvent& event ) ;
+	void OnShapeSelect( wxListEvent& event ) ;
+
+
+
 };
 
 #endif /* TOOLBOXFRAME_H_ */
