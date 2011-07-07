@@ -111,18 +111,48 @@ void Project::GenerateTargets(void)
 	size_t i, n;
 	n = ceil(obj->bbox.zmax / sliceThickness);
 
+	Target sphere;
+	Target cylinder;
+	Target disc;
+
+	sphere.matrix.TranslateGlobal(0,-0.1,0);
+	cylinder.matrix.TranslateGlobal(0.1,-0.1,0);
+	disc.matrix.TranslateGlobal(0.2,-0.1,0);
+
+
+	sphere.SetupSphere(0.003);
+	cylinder.SetupCylinder(0.01, sliceThickness);
+	disc.SetupDisc(0.006);
+
+	targets.Add(sphere);
+	targets.Add(cylinder);
+	targets.Add(disc);
+
+
 	temp.matrix.TranslateGlobal(slotWidth, 0, 0);
 	for(i = 0; i < n; i++){
 
 
-		temp.InsertObject(obj, (double) i * sliceThickness);
-		temp.matrix.TranslateGlobal(slotWidth, 0, 0);
+			temp.InsertObject(obj, (double) i * sliceThickness);
+			temp.matrix.TranslateGlobal(slotWidth, 0, 0);
+
+		//		if(i == 2) temp.HardInvert();
+		//		if(i == 3) temp.FlipX();
+		//		if(i == 4) temp.FoldReplace(&cylinder);
+		//		if(i == 5) temp.FoldRaise(&sphere);
+		//		if(i == 6) temp.FoldRaise(&disc);
+		//		if(i == 7){
+		//			temp.FoldReplace(&cylinder);
+		//			temp.HardInvert();
+		//		}
+
+
 		targets.Add(temp);
-		temp.matrix.TranslateGlobal(obj->bbox.xmax +slotWidth*2, 0, 0);
+		temp.matrix.TranslateGlobal(obj->bbox.xmax + slotWidth * 2, 0, 0);
 
 	}
 
-	objects[0].geometries[0].matrix.TranslateGlobal(0,-0.35,0);
+	objects[0].geometries[0].matrix.TranslateGlobal(0, -0.35, 0);
 	stock.stockMaterials[0].matrix.TranslateGlobal(0, 0.35, 0);
 }
 

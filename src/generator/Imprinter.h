@@ -61,10 +61,9 @@ public:
 
 	// Methods
 public:
-	bool IsVisible(void)
-	{
-		return (upperLimit > lowerLimit);
-	}
+	bool IsVisible(void);
+	void Set(const ImprinterElement& b);
+	void Swap(ImprinterElement& b);
 };
 
 class Imprinter {
@@ -93,23 +92,28 @@ protected:
 	// Methods
 public:
 	void Paint() const;
-
-	void SetupBox(const double sizeX, const double sizeY, const double sizeZ,
+	bool SetupField(const size_t sizeX, const size_t sizeY,
 			const double resolutionX = 0.001, const double resolutionY = 0.001);
+
+	bool SetupBox(const double sizeX, const double sizeY, const double sizeZ,
+			const double resolutionX = 0.001, const double resolutionY = 0.001);
+
 	size_t MemoryUsageInBytes(void);
 	void InitImprinting(void);
 	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c, char strategy = 1);
 	void InsertGeometrie(const Geometry *geometry, double shiftZ = 0.0);
 	void FinishImprint(void);
 
-	void SetSphere(double radius, const double resolutionX = 0.001,
+	void SetupSphere(double radius, const double resolutionX = 0.001,
 			const double resolutionY = 0.001);
-	void SetCylinder(double radius,double height, const double resolutionX = 0.001,
-			const double resolutionY = 0.001);
-	void SetDisc(double radius, const double resolutionX = 0.001,
+	void SetupCylinder(double radius, double height, const double resolutionX =
+			0.001, const double resolutionY = 0.001);
+	void SetupDisc(double radius, const double resolutionX = 0.001,
 			const double resolutionY = 0.001);
 	void FoldRaise(const Imprinter *b);
 	void FoldReplace(const Imprinter *b);
+	void HardInvert(void);
+	void InvertZ(void);
 	void FlipX(void);
 	void FlipY(void);
 	void Rot90(void);

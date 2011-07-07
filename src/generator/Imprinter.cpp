@@ -38,6 +38,27 @@ ImprinterElement::ImprinterElement()
 ImprinterElement::~ImprinterElement()
 {
 }
+bool ImprinterElement::IsVisible(void)
+{
+	return (upperLimit > lowerLimit);
+}
+void ImprinterElement::Set(const ImprinterElement& b)
+{
+	this->lowerLimitUpside = b.lowerLimitUpside;
+	this->upperLimitUpside = b.upperLimitUpside;
+	this->lowerLimit = b.lowerLimit;
+	this->upperLimit = b.upperLimit;
+	this->lowerLimitDownside = b.lowerLimitDownside;
+	this->upperLimitDownside = b.upperLimitDownside;
+}
+
+void ImprinterElement::Swap(ImprinterElement& b)
+{
+	ImprinterElement temp;
+	temp.Set(*this);
+	this->Set(b);
+	b.Set(temp);
+}
 
 Imprinter::Imprinter(const double sizeX, const double sizeY,
 		const double sizeZ, const double resolutionX, const double resolutionY)
@@ -65,37 +86,55 @@ Imprinter::~Imprinter()
 	if(field != NULL) delete[] field;
 }
 
-void Imprinter::SetupBox(const double sizeX, const double sizeY,
+bool Imprinter::SetupField(const size_t sizeX, const size_t sizeY,
+		const double resolutionX, const double resolutionY)
+{
+	if(field != NULL) delete[] field;
+	field = NULL;
+
+	if(sizeX < 1) return false;
+	if(sizeY < 1) return false;
+	if(resolutionX <= 0.0) return false;
+	if(resolutionY <= 0.0) return false;
+
+	rx = resolutionX;
+	ry = resolutionY;
+	nx = sizeX;
+	ny = sizeY;
+
+	sx = (double) nx * rx;
+	sy = (double) ny * ry;
+	N = nx * ny;
+
+	field = new ImprinterElement[N];
+	return true;
+}
+
+bool Imprinter::SetupBox(const double sizeX, const double sizeY,
 		const double sizeZ, const double resolutionX, const double resolutionY)
 {
 	if(field != NULL) delete[] field;
 	field = NULL;
 
-	if(sizeX <= 0.0) return;
-	if(sizeY <= 0.0) return;
-	if(sizeZ <= 0.0) return;
+	if(sizeX <= 0.0) return false;
+	if(sizeY <= 0.0) return false;
+	if(sizeZ <= 0.0) return false;
+	if(resolutionX <= 0.0) return false;
+	if(resolutionY <= 0.0) return false;
+
+	nx = round(sizeX / resolutionX);
+	ny = round(sizeY / resolutionY);
+	if(nx < 1) return false;
+	if(nx < 1) return false;
+
+	if(!SetupField(nx, ny, resolutionX, resolutionY)) return false;
 
 	sx = sizeX;
 	sy = sizeY;
 	sz = sizeZ;
 
-	if(resolutionX <= 0.0) return;
-	if(resolutionY <= 0.0) return;
-
-	rx = resolutionX;
-	ry = resolutionY;
-
-	nx = round(sx / rx);
-	ny = round(sy / ry);
-
-	if(nx <= 3) return;
-	if(nx <= 3) return;
-
-	N = nx * ny;
-
 
 	// Every element describes the middle of a rx*ry sized element.
-	field = new ImprinterElement[N];
 	for(size_t i = 0; i < N; i++){
 		field[i].upperLimit = sz;
 		field[i].lowerLimit = 0.0;
@@ -104,34 +143,249 @@ void Imprinter::SetupBox(const double sizeX, const double sizeY,
 	colorNormal.Set(0.8, 0.4, 0.0);
 	colorTodo.Set(0, 0, 0.8);
 	colorUnscratched.Set(0.0, 0.8, 0.1);
+	return true;
 }
 
-void Imprinter::SetSphere(double radius, const double resolutionX,
+void Imprinter::SetupSphere(double radius, const double resolutionX,
 		const double resolutionY)
 {
-	SetupBox(radius * 2, radius * 2, radius * 2, resolutionX, resolutionY);
+	size_t cellsX = ceil(radius / resolutionX) * 2 + 1;
+	size_t cellsY = ceil(radius / resolutionY) * 2 + 1;
+	if(!SetupField(cellsX, cellsY, resolutionX, resolutionY)) return;
+
+	double centerX = (ceil(radius / resolutionX) + 0.5) * rx;
+	double centerY = (ceil(radius / resolutionY) + 0.5) * ry;
+
+	size_t i, j, p;
+	double px, py;
+	double d;
+	p = 0;
+	py = ry / 2;
+	for(j = 0; j < ny; j++){
+		px = rx / 2;
+		for(i = 0; i < nx; i++){
+			d = (px - centerX) * (px - centerX) + (py - centerY) * (py
+					- centerY);
+			d = radius * radius - d;
+			if(d >= 0.0)
+				d = sqrt(d);
+			else
+				d = 0;
+			field[p].upperLimit = d;
+			field[p].lowerLimit = -d;
+
+			px += rx;
+			p++;
+		}
+		py += ry;
+	}
+
 }
-void Imprinter::SetCylinder(double radius, double height,
+void Imprinter::SetupCylinder(double radius, double height,
 		const double resolutionX, const double resolutionY)
 {
-	SetupBox(radius * 2, radius * 2, height, resolutionX, resolutionY);
+	size_t cellsX = ceil(radius / resolutionX) * 2 + 1;
+	size_t cellsY = ceil(radius / resolutionY) * 2 + 1;
+	if(!SetupField(cellsX, cellsY, resolutionX, resolutionY)) return;
+
+	double centerX = (ceil(radius / resolutionX) + 0.5) * rx;
+	double centerY = (ceil(radius / resolutionY) + 0.5) * ry;
+
+	size_t i, j, p;
+	double px, py;
+	double d;
+	p = 0;
+	py = ry / 2;
+	for(j = 0; j < ny; j++){
+		px = rx / 2;
+		for(i = 0; i < nx; i++){
+			d = (px - centerX) * (px - centerX) + (py - centerY) * (py
+					- centerY);
+			if(d <= radius * radius){
+				field[p].upperLimit = height;
+				field[p].lowerLimit = 0.0;
+			}else{
+				field[p].upperLimit = 0.0;
+				field[p].lowerLimit = sz;
+
+			}
+			px += rx;
+			p++;
+		}
+		py += ry;
+	}
 }
-void Imprinter::SetDisc(double radius, const double resolutionX,
+void Imprinter::SetupDisc(double radius, const double resolutionX,
 		const double resolutionY)
 {
-	SetupBox(radius * 2, radius * 2, 0, resolutionX, resolutionY);
+	size_t cellsX = ceil(radius / resolutionX) * 2 + 1;
+	size_t cellsY = ceil(radius / resolutionY) * 2 + 1;
+	if(!SetupField(cellsX, cellsY, resolutionX, resolutionY)) return;
+
+	double centerX = (ceil(radius / resolutionX) + 0.5) * rx;
+	double centerY = (ceil(radius / resolutionY) + 0.5) * ry;
+
+	size_t i, j, p;
+	double px, py;
+	double d;
+	p = 0;
+	py = ry / 2;
+	for(j = 0; j < ny; j++){
+		px = rx / 2;
+		for(i = 0; i < nx; i++){
+			d = (px - centerX) * (px - centerX) + (py - centerY) * (py
+					- centerY);
+			if(d <= radius * radius){
+				field[p].upperLimit = 5*FLT_EPSILON;
+				field[p].lowerLimit = -5*FLT_EPSILON;
+			}else{
+				field[p].upperLimit = 0.0;
+				field[p].lowerLimit = sz;
+			}
+			px += rx;
+			p++;
+		}
+		py += ry;
+	}
 }
 void Imprinter::FoldRaise(const Imprinter *b)
 {
+	size_t i, j, p, ib, jb, pb, ph;
+	size_t cx, cy;
+	cx = b->nx / 2;
+	cy = b->ny / 2;
+
+
+	// Init
+	for(i = 0; i < N; i++){
+		field[i].upperLimitUpside = field[i].upperLimit;
+	}
+
+	float h;
+
+	p = 0;
+	pb = 0;
+	for(j = 0; j < ny; j++){
+		for(i = 0; i < nx; i++){
+			if(field[p].IsVisible()){
+				pb = 0;
+				for(jb = 0; jb < b->ny; jb++){
+					for(ib = 0; ib < b->nx; ib++){
+						if(b->field[pb].IsVisible()){
+							if(ib + i >= cx && ib + i <= nx - cx && jb + j
+									>= cy && jb + j <= ny - cy){
+								h = field[p].upperLimitUpside
+										+ b->field[pb].upperLimit;
+								ph = i + ib - cx + (j + jb - cy) * nx;
+								if(h > field[ph].upperLimitUpside) field[ph].upperLimitUpside
+										= h;
+							}
+						}
+						pb++;
+					}
+				}
+
+			}
+
+			p++;
+		}
+	}
+
+
+	// Finish
+	for(i = 0; i < N; i++){
+		field[i].upperLimit = field[i].upperLimitUpside;
+	}
 
 }
 void Imprinter::FoldReplace(const Imprinter *b)
 {
+	size_t i, j, p, ib, jb, pb, ph;
+	size_t cx, cy;
+	cx = b->nx / 2;
+	cy = b->ny / 2;
+
+
+	// Init
+	for(i = 0; i < N; i++){
+		field[i].upperLimitUpside = field[i].upperLimit;
+	}
+
+	p = 0;
+	pb = 0;
+	for(j = 0; j < ny; j++){
+		for(i = 0; i < nx; i++){
+			if(field[p].IsVisible()){
+				pb = 0;
+				for(jb = 0; jb < b->ny; jb++){
+					for(ib = 0; ib < b->nx; ib++){
+						if(b->field[pb].IsVisible()){
+							if(ib + i >= cx && ib + i <= nx - cx && jb + j
+									>= cy && jb + j <= ny - cy){
+								ph = i + ib - cx + (j + jb - cy) * nx;
+								if(b->field[pb].upperLimit
+										> field[ph].upperLimitUpside) field[ph].upperLimitUpside
+										= b->field[pb].upperLimit;
+							}
+						}
+						pb++;
+					}
+				}
+
+			}
+
+			p++;
+		}
+	}
+
+
+	// Finish
+	for(i = 0; i < N; i++){
+		field[i].upperLimit = field[i].upperLimitUpside;
+	}
 
 }
+
+void Imprinter::HardInvert(void)
+{
+	size_t i;
+	for(i = 0; i < N; i++){
+		if(field[i].IsVisible()){
+			field[i].upperLimit = 0.0;
+			field[i].lowerLimit = sz;
+		}else{
+			field[i].upperLimit = sz;
+			field[i].lowerLimit = 0.0;
+		}
+	}
+}
+
+void Imprinter::InvertZ(void)
+{
+	size_t i;
+	float temp;
+	for(i = 0; i < N; i++){
+		temp = field[i].upperLimit;
+		field[i].upperLimit = sz - field[i].lowerLimit;
+		field[i].lowerLimit = sz - temp;
+	}
+}
+
 void Imprinter::FlipX(void)
 {
+	size_t i, j, p1, p2, c;
 
+	c = ny / 2;
+	for(j = 0; j < c; j++){
+		p1 = j * nx;
+		p2 = (ny - j - 1) * nx;
+		for(i = 0; i < nx; i++){
+			field[p1].Swap(field[p2]);
+			p1++;
+			p2++;
+		}
+	}
+	InvertZ();
 }
 void Imprinter::FlipY(void)
 {
