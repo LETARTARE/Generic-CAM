@@ -92,6 +92,7 @@ class GUIMainFrame : public wxFrame
 		virtual void OnSaveToolbox( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditStock( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnLoadGCodes( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSaveGCodes( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSetupController( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnChangeStereo3D( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSetupUnits( wxCommandEvent& event ) { event.Skip(); }
@@ -347,6 +348,8 @@ class GUIObjectFrame : public wxFrame
 		wxMenu* m_menuSettings;
 		wxComboBox* m_comboBox;
 		wxButton* m_buttonUpdate;
+		wxNotebook* m_notebook2;
+		wxPanel* m_panel5;
 		wxStaticText* m_staticText37;
 		wxTextCtrl* m_textCtrlSizeX;
 		wxStaticText* m_staticTextUnitX;
@@ -390,6 +393,8 @@ class GUIObjectFrame : public wxFrame
 		wxTextCtrl* m_textCtrlScalePercentZ;
 		wxStaticText* m_staticText55;
 		wxButton* m_button24;
+		wxPanel* m_panel6;
+		wxPanel* m_panel7;
 		wxButton* m_button16;
 		wxButton* m_button17;
 		wxButton* m_button18;

@@ -37,10 +37,12 @@
 #define TOOLPATH_H_
 
 #include "../3D/AffineTransformMatrix.h"
-#include "../3D/Geometry.h"
-#include "../machine/Tool.h"
+#include "../machine/MachinePosition.h"
+#include "../3D/AffineTransformMatrix.h"
+#include "../3D/Vector3.h"
+#include <wx/dynarray.h>
 
-class ToolPath:public Geometry {
+class ToolPath{
 	// Constructor / Destructor
 
 public:
@@ -49,14 +51,22 @@ public:
 
 	// Member variables
 public:
+	AffineTransformMatrix matrix;
 
+	ArrayOfMachinePosition positions;
+
+	Vector3 colorMoving;
+	Vector3 colorCutting;
 
 	// Methods
 public:
 
-	void Generate(Tool const& tool, AffineTransformMatrix const& position1,
-			AffineTransformMatrix const& position2);
+	void Paint(void);
+
 
 };
+
+WX_DECLARE_OBJARRAY(ToolPath, ArrayOfToolPath)
+;
 
 #endif /* TOOLPATH_H_ */

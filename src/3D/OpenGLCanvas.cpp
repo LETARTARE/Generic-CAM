@@ -267,8 +267,8 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 	}
 
 	if(event.Dragging() && event.MiddleIsDown()){
-		float dx = (float) (event.m_x - x) / 200.0;
-		float dy = (float) (event.m_y - y) / 200.0;
+		float dx = (float) (event.m_x - x) / 1000.0;
+		float dy = (float) (event.m_y - y) / 1000.0;
 		transmat.TranslateGlobal(dx, -dy, 0);
 		x = event.m_x;
 		y = event.m_y;
@@ -278,7 +278,7 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 
 	int x = event.GetWheelRotation();
 	if(x != 0){
-		transmat.TranslateGlobal(0, 0, (float) -x / 350.0);
+		transmat.TranslateGlobal(0, 0, (float) -x / 1000.0);
 		this->Refresh();
 	}
 

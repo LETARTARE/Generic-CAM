@@ -34,9 +34,9 @@
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfPolygon3)
 
-
 Polygon3::Polygon3()
 {
+	isClosed = false;
 	color.Set(0.8, 0.8, 0.8);
 }
 
@@ -53,6 +53,30 @@ void Polygon3::InsertPoint(double x, double y, double z)
 	Vector3 temp(x, y, z);
 	elements.Add(temp);
 }
+void Polygon3::Close(bool close)
+{
+	isClosed = close;
+}
+
+double Polygon3::GetLength(void) const
+{
+	if(elements.GetCount() <= 1) return 0.0;
+	double d = 0.0;
+	size_t i;
+	Vector3 temp, temp2;
+
+	temp = elements[0];
+	for(i = 1; i < elements.GetCount(); i++){
+		temp2 = temp - elements[i];
+		d += temp2.Abs();
+		temp = elements[i];
+	}
+	if(isClosed){
+		temp2 = temp - elements[0];
+		d += temp2.Abs();
+	}
+	return d;
+}
 
 void Polygon3::Paint() const
 {
@@ -62,7 +86,10 @@ void Polygon3::Paint() const
 	::glColor3f(color.x, color.y, color.z);
 	::glNormal3f(0, 0, 1);
 
-	::glBegin(GL_LINE_LOOP);
+	if(isClosed)
+		::glBegin(GL_LINE_LOOP);
+	else
+		::glBegin(GL_LINE_STRIP);
 	size_t i;
 	for(i = 0; i < elements.GetCount(); i++)
 		::glVertex3f(elements[i].x, elements[i].y, elements[i].z);

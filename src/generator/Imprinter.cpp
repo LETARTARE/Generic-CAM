@@ -280,8 +280,8 @@ void Imprinter::SetupDisc(double radius, const double resolutionX,
 			d = (px - centerX) * (px - centerX) + (py - centerY) * (py
 					- centerY);
 			if(d <= radius * radius){
-				field[p].upperLimit = 5*FLT_EPSILON;
-				field[p].lowerLimit = -5*FLT_EPSILON;
+				field[p].upperLimit = 5 * FLT_EPSILON;
+				field[p].lowerLimit = -5 * FLT_EPSILON;
 			}else{
 				field[p].upperLimit = 0.0;
 				field[p].lowerLimit = sz;
@@ -418,6 +418,34 @@ void Imprinter::FoldReplace(const Imprinter *b)
 
 }
 
+void Imprinter::FoldLower(int x, int y, double z, const Imprinter *b)
+{
+	size_t ib, jb, pb, ph;
+	size_t cx, cy;
+	cx = b->nx / 2;
+	cy = b->ny / 2;
+
+	pb = 0;
+	for(jb = 0; jb < b->ny; jb++){
+		for(ib = 0; ib < b->nx; ib++){
+			if(b->field[pb].IsVisible()){
+				if(ib + x >= cx && ib + x < nx + cx && jb + y >= cy && jb + y
+						< ny + cy){
+					ph = x + ib - cx + (y + jb - cy) * nx;
+
+					if(field[ph].upperLimit > b->field[pb].lowerLimit + z){
+						field[ph].upperLimit = b->field[pb].lowerLimit + z;
+					}
+					if(field[ph].upperLimit < field[ph].lowerLimit){
+						field[ph].lowerLimit = sz;
+						field[ph].upperLimit = 0.0;
+					}
+				}
+			}
+			pb++;
+		}
+	}
+}
 void Imprinter::HardInvert(void)
 {
 	size_t i;
@@ -458,6 +486,11 @@ bool Imprinter::IsFilledAbove(int x, int y, double height)
 {
 	if(x < 0 || y < 0 || x >= nx || y >= ny) return false;
 	size_t p = x + y * nx;
+
+
+	//	ImprinterElement temp;
+	//	temp = field[p];
+
 	if(field[p].upperLimit >= height) return true;
 	return false;
 }
@@ -475,6 +508,21 @@ bool Imprinter::IsFilled(size_t p)
 	return false;
 }
 
+bool Imprinter::IsVisible(int x, int y)
+{
+	if(x < 0 || y < 0 || x >= nx || y >= ny) return false;
+	size_t p = x + y * nx;
+	if(field[p].lowerLimit <= field[p].upperLimit) return true;
+	return false;
+}
+
+bool Imprinter::IsVisible(size_t p)
+{
+	if(p > N) return false;
+	if(field[p].lowerLimit <= field[p].upperLimit) return true;
+	return false;
+}
+
 bool Imprinter::IsOnOuterBorder(size_t p)
 {
 	if(p < nx) return true;
@@ -486,6 +534,29 @@ bool Imprinter::IsOnOuterBorder(size_t p)
 	return false;
 }
 
+double Imprinter::GetMeanLevel(int x, int y)
+{
+	if(x < 0 || y < 0 || x >= nx || y >= ny) return -1.0;
+	size_t p = x + y * nx;
+	if(!field[p].IsVisible()) return -1.0;
+	return (field[p].upperLimit + field[p].lowerLimit) / 2;
+}
+double Imprinter::GetMeanLevel(size_t p)
+{
+	if(p >= N) return -1.0;
+	if(!field[p].IsVisible()) return -1.0;
+	return (field[p].upperLimit + field[p].lowerLimit) / 2;
+}
+double Imprinter::GetLevel(double x, double y)
+{
+	int px, py;
+	px = round(x / rx);
+	py = round(y / ry);
+	if(px < 0 || py < 0 || px >= nx || py >= ny) return -1.0;
+	size_t p = px + py * nx;
+	if(!field[p].IsVisible()) return -1.0;
+	return field[p].lowerLimit;
+}
 bool Imprinter::IsSurrounded(size_t p)
 {
 	if(IsOnOuterBorder(p)) return false;
@@ -573,6 +644,26 @@ void Imprinter::CleanOutlier(void)
 		}
 	}
 
+}
+
+void Imprinter::InvertTop(void)
+{
+	size_t i;
+	for(i = 0; i < N; i++){
+		if(field[i].IsVisible()){
+			if(field[i].upperLimit >= sz - 0.0001){
+				field[i].lowerLimit = sz;
+				field[i].upperLimit = 0.0;
+
+			}else{
+				field[i].lowerLimit = field[i].upperLimit;
+				field[i].upperLimit = sz;
+			}
+		}else{
+			field[i].lowerLimit = 0.0;
+			field[i].upperLimit = sz;
+		}
+	}
 }
 
 void Imprinter::InvertZ(void)

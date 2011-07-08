@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Polygon3.h
-// Purpose            :
+// Name               : ToolPath.h
+// Purpose            : Describing the boundary of the volume to be cut away.
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 07.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 30.03.2010
+// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,47 +22,45 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
+//$LastChangedDate: 2011-06-16 01:34:14 +0200 (Do, 16. Jun 2011) $
+//$Revision: 56 $
+//$LastChangedBy: tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef POLYGON3_H_
-#define POLYGON3_H_
-
-/*!\class Polygon3
- * \brief ...
+/*!\class ToolPath
+ * \code #include "ToolPath.h"\endcode
+ * \brief Describes the boundary of the volume to be cut away.
  *
- * ...
  */
 
-#include <wx/dynarray.h>
-#include "Vector3.h"
-#include "AffineTransformMatrix.h"
+#ifndef TOOLPATH_H_
+#define TOOLPATH_H_
 
-class Polygon3 {
+#include "../3D/AffineTransformMatrix.h"
+#include "../3D/Geometry.h"
+#include "../machine/Tool.h"
+#include <wx/dynarray.h>
+
+class ToolPath:public Geometry {
 	// Constructor / Destructor
+
 public:
-	Polygon3();
-	virtual ~Polygon3();
+	ToolPath();
+	virtual ~ToolPath();
+
 	// Member variables
 public:
-	AffineTransformMatrix matrix;
-	Vector3 color;
-	ArrayOfVector3 elements;
 
-	bool isClosed;
 
 	// Methods
 public:
-	void Clear(void);
-	void Close(bool close = true);
-	void InsertPoint(double x = 0.0, double y = 0.0, double z = 0.0);
-	void Paint(void) const;
-	double GetLength(void) const;
+
+	void Generate(Tool const& tool, AffineTransformMatrix const& position1,
+			AffineTransformMatrix const& position2);
+
 };
-WX_DECLARE_OBJARRAY(Polygon3, ArrayOfPolygon3)
+
+WX_DECLARE_OBJARRAY(Toolpath, ArrayOfToolpath)
 ;
 
-#endif /* POLYGON3_H_ */
+#endif /* TOOLPATH_H_ */

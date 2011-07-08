@@ -51,6 +51,7 @@ MachinePosition::MachinePosition(float x, float y, float z, float a, float b,
 
 	duration = 1.0;
 	feed = 1.0;
+	isCutting = false;
 }
 
 MachinePosition::~MachinePosition()

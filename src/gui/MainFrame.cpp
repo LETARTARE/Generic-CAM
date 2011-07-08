@@ -253,8 +253,8 @@ void MainFrame::OnSaveToolbox(wxCommandEvent &event)
 
 
 	wxFileDialog dialog(this, _("Save toolbox..."), _T(""), _T(""),
-			_("Toolbox (*.xml)|*.xml|All files|*.*"), wxFD_OPEN
-					| wxFD_FILE_MUST_EXIST);
+			_("Toolbox (*.xml)|*.xml|All files|*.*"), wxFD_SAVE
+					| wxFD_OVERWRITE_PROMPT);
 	wxFileName fileName;
 	if(dialog.ShowModal() == wxID_OK){
 		fileName = dialog.GetPath();
@@ -300,6 +300,22 @@ void MainFrame::OnLoadGCodes(wxCommandEvent &event)
 	//		simulator.ReadGCodeFile(dialog.GetPath());
 	//	}
 }
+
+void MainFrame::OnSaveGCodes(wxCommandEvent &event)
+{
+	wxFileDialog
+			dialog(
+					this,
+					_("Save G-Code file..."),
+					_T(""),
+					_T(""),
+					_("G-Code File (*.tap *.cnc *.nc *.ncd *.txt)|*.tap;*.cnc;*.nc;*.ncd;*.txt|Text files (*.txt)|*.txt|All files|*.*"),
+					wxFD_SAVE
+										| wxFD_OVERWRITE_PROMPT);
+
+
+}
+
 
 void MainFrame::OnSetupController(wxCommandEvent& event)
 {

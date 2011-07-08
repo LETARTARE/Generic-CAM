@@ -35,6 +35,8 @@
 #include "Toolbox.h"
 #include "../machine/Machine.h"
 #include "../simulator/Workpiece.h"
+#include "../simulator/ToolPath.h"
+
 #include "Run.h"
 #include "Target.h"
 #include "Stock.h"
@@ -70,6 +72,7 @@ public:
 
 	ArrayOfTarget targets;
 	ArrayOfRun run;
+	ArrayOfToolPath toolpath;
 
 	bool modified;
 
@@ -79,6 +82,7 @@ public:
 	bool displayWorkpiece;
 	bool displayBoundingBox;
 	bool displayTarget;
+	bool displayToolpath;
 
 	Unit Tolerance;
 	Unit Distance;
@@ -94,6 +98,9 @@ public:
 	double supportDistance;
 	double supportWidth;
 	double supportHeight;
+	double freeHeightAboveMaterial;
+
+	double levelDrop;
 
 	// Methods
 public:
@@ -101,6 +108,7 @@ public:
 	void Paint(void);
 	void Assemble(void);
 	void GenerateTargets(void);
+	void GenerateToolpath(size_t nrTarget);
 
 };
 WX_DECLARE_OBJARRAY(Project, ArrayOfProject)

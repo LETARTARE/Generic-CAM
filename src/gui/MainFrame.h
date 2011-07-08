@@ -126,6 +126,7 @@ private:
 	void OnEditStock(wxCommandEvent& event);
 
 	void OnLoadGCodes(wxCommandEvent& event);
+	void OnSaveGCodes(wxCommandEvent& event);
 
 	void OnSetupController(wxCommandEvent& event);
 	void OnChangeStereo3D(wxCommandEvent& event);

@@ -68,6 +68,8 @@ public:
 
 	wxString code;
 
+	bool isCutting;
+
 	// Methods
 
 	//TODO: Cleanup all the operator stuff.

@@ -42,6 +42,7 @@
 
 #include "Object.h"
 #include "../3D/Polygon3.h"
+#include <cstddef>
 
 class Target:public Imprinter {
 	// Constructor/ Destructor
@@ -56,9 +57,18 @@ public:
 
 	//Methods:
 public:
-	void InsertObject(Object *object, AffineTransformMatrix  shift);
-	int NextDir(int sx,int sy,double height,int olddir);
-	void GeneratePolygon(int sx = -1, int sy = -1, double height = 0.0);
+	void InsertObject(Object *object, AffineTransformMatrix shift);
+	int NextDir(int sx, int sy, double height, int olddir);
+	int NextDir(int sx, int sy, int olddir);
+	bool GeneratePolygon(int sx, int sy, double height);
+	void GeneratePolygon(int sx, int sy);
+	void PolygonFillHoles(size_t nr);
+	void PolygonSmooth(size_t nr);
+	void PolygonDropTarget(size_t nrPolygon, Target* target);
+	void PolygonDrop(size_t nrPolygon, double level);
+	void PolygonDiminish(size_t nrPolygon, double r);
+	void AddSupport(size_t polygonNr, double distance, double height,
+			double width, double slotWidth);
 	void Paint(void);
 };
 WX_DECLARE_OBJARRAY(Target, ArrayOfTarget)

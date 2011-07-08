@@ -129,19 +129,49 @@ public:
 	bool IsOnOuterBorder(size_t p);
 	bool IsSurrounded(size_t p);
 
+	bool IsVisible(int x, int y);
+	bool IsVisible(size_t p);
+
+	double GetMeanLevel(int x, int y);
+	double GetMeanLevel(size_t p);
+	double GetLevel(double x,double y);
+
 	void CleanOutlier(void);
 
 	void Limit(void);
 	void FoldRaise(const Imprinter *b);
 	void FoldReplace(const Imprinter *b);
+	void FoldLower(int x, int y, double z, const Imprinter *b);
 	void HardInvert(void);
 	void MaxFilling(void);
+	void InvertTop(void);
 	void InvertZ(void);
 	void FlipX(void);
 	void FlipY(void);
 	void Rot90(void);
 	void Rot180(void);
 	void Rot270(void);
+
+	double GetSizeX(void)
+	{
+		return sx;
+	}
+	double GetSizeY(void)
+	{
+		return sy;
+	}
+	double GetSizeZ(void)
+	{
+		return sz;
+	}
+	double GetSizeRX(void)
+		{
+			return rx;
+		}
+		double GetSizeRY(void)
+		{
+			return ry;
+		}
 
 };
 
