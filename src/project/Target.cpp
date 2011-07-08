@@ -33,6 +33,8 @@
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfTarget)
 
+#include <GL/gl.h>
+
 Target::Target()
 {
 }
@@ -41,12 +43,124 @@ Target::~Target()
 {
 }
 
-void Target::InsertObject(Object *object,double shiftZ)
+void Target::InsertObject(Object *object, AffineTransformMatrix shift)
 {
 	InitImprinting();
 	size_t i;
 	for(i = 0; i < object->geometries.GetCount(); i++){
-		InsertGeometrie(&(object->geometries[i]),shiftZ);
+		InsertGeometrie(&(object->geometries[i]), shift);
 	}
 	FinishImprint();
 }
+
+int Target::NextDir(int sx, int sy, double height, int olddir)
+{
+	int d = (olddir + 4) % 8;
+
+	char c;
+	for(c = 0; c < 8; c++){
+		switch(d){
+		case 0:
+			if(IsFilledAbove(sx + 1, sy + 1, height)) return d;
+			break;
+		case 1:
+			if(IsFilledAbove(sx + 0, sy + 1, height)) return d;
+			break;
+		case 2:
+			if(IsFilledAbove(sx - 1, sy + 1, height)) return d;
+			break;
+		case 3:
+			if(IsFilledAbove(sx - 1, sy + 0, height)) return d;
+			break;
+		case 4:
+			if(IsFilledAbove(sx - 1, sy - 1, height)) return d;
+			break;
+		case 5:
+			if(IsFilledAbove(sx + 0, sy - 1, height)) return d;
+			break;
+		case 6:
+			if(IsFilledAbove(sx + 1, sy - 1, height)) return d;
+			break;
+		case 7:
+			if(IsFilledAbove(sx + 1, sy + 0, height)) return d;
+			break;
+		}
+
+		d = (d + 1) % 8;
+	}
+	return olddir;
+}
+
+void Target::GeneratePolygon(int sx, int sy, double height)
+{
+	while(!IsFilledAbove(sx + 1, sy, height)){
+		sx++;
+		if(sx + 2 >= nx){
+			sx = -1;
+			sy++;
+			if(sy >= ny) break;
+		}
+	}
+
+	Polygon3 temp;
+	temp.Clear();
+
+	int x = sx;
+	int y = sy;
+	int dir = 0;
+
+	do{
+		temp.InsertPoint((double) x * rx, (double) y * ry, 0.0);
+		dir = NextDir(x, y, height, dir);
+		switch(dir){
+		case 0:
+			x++;
+			break;
+		case 1:
+			x++;
+			y++;
+			break;
+		case 2:
+			y++;
+			break;
+		case 3:
+			x--;
+			y++;
+			break;
+		case 4:
+			x--;
+			break;
+		case 5:
+			x--;
+			y--;
+			break;
+		case 6:
+			y--;
+			break;
+		case 7:
+			x++;
+			y--;
+			break;
+		}
+	}while(x != sx || y != sy);
+
+	temp.matrix.TranslateLocal(0, 0, height);
+	polygons.Add(temp);
+
+}
+
+void Target::Paint(void)
+{
+	Imprinter::Paint();
+	::glPushMatrix();
+	::glMultMatrixd(matrix.a);
+	::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
+
+	size_t i;
+	for(i = 0; i < polygons.GetCount(); i++){
+		polygons[i].Paint();
+	}
+
+	::glPopMatrix();
+}
+

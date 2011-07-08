@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Target.h
+// Name               : Polygon3.cpp
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 06.07.2011
+// Created            : 07.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,40 +28,46 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef TARGET_H_
-#define TARGET_H_
+#include "Polygon3.h"
 
-/*!\class Target
- * \brief ...
- *
- * ...
- */
+#include <GL/gl.h>
+#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+WX_DEFINE_OBJARRAY(ArrayOfPolygon3)
 
-#include "../generator/Imprinter.h"
-#include <wx/dynarray.h>
 
-#include "Object.h"
-#include "../3D/Polygon3.h"
+Polygon3::Polygon3()
+{
+	color.Set(0.8, 0.8, 0.8);
+}
 
-class Target:public Imprinter {
-	// Constructor/ Destructor
-public:
-	Target();
-	virtual ~Target();
+Polygon3::~Polygon3()
+{
+}
+void Polygon3::Clear(void)
+{
+	elements.Clear();
+}
 
-	//Member variables:
-public:
-	//double shiftZ;
-	ArrayOfPolygon3 polygons;
+void Polygon3::InsertPoint(double x, double y, double z)
+{
+	Vector3 temp(x, y, z);
+	elements.Add(temp);
+}
 
-	//Methods:
-public:
-	void InsertObject(Object *object, AffineTransformMatrix  shift);
-	int NextDir(int sx,int sy,double height,int olddir);
-	void GeneratePolygon(int sx = -1, int sy = -1, double height = 0.0);
-	void Paint(void);
-};
-WX_DECLARE_OBJARRAY(Target, ArrayOfTarget)
-;
+void Polygon3::Paint() const
+{
+	::glPushMatrix();
+	::glMultMatrixd(matrix.a);
 
-#endif /* TARGET_H_ */
+	::glColor3f(color.x, color.y, color.z);
+	::glNormal3f(0, 0, 1);
+
+	::glBegin(GL_LINE_LOOP);
+	size_t i;
+	for(i = 0; i < elements.GetCount(); i++)
+		::glVertex3f(elements[i].x, elements[i].y, elements[i].z);
+	::glEnd();
+
+	::glPopMatrix();
+}
+

@@ -79,11 +79,16 @@ public:
 public:
 	AffineTransformMatrix matrix;
 
-private:
+	enum face_t {
+		facing_up, facing_down, facing_side, other
+	};
+
+protected:
 	ImprinterElement *field;
 	double sx, sy, sz;
-	size_t nx, ny, N;
 	double rx, ry;
+	size_t nx, ny, N;
+
 protected:
 	Vector3 colorNormal;
 	Vector3 colorUnscratched;
@@ -91,6 +96,11 @@ protected:
 
 	// Methods
 public:
+
+	Imprinter& operator=(const Imprinter &b);
+	Imprinter & operator+=(const Imprinter &a);
+	const Imprinter operator+(const Imprinter& a) const;
+
 	void Paint() const;
 	bool SetupField(const size_t sizeX, const size_t sizeY,
 			const double resolutionX = 0.001, const double resolutionY = 0.001);
@@ -100,8 +110,9 @@ public:
 
 	size_t MemoryUsageInBytes(void);
 	void InitImprinting(void);
-	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c, char strategy = 1);
-	void InsertGeometrie(const Geometry *geometry, double shiftZ = 0.0);
+	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c, face_t facetype =
+			other);
+	void InsertGeometrie(const Geometry *geometry, AffineTransformMatrix shift);
 	void FinishImprint(void);
 
 	void SetupSphere(double radius, const double resolutionX = 0.001,
@@ -110,9 +121,21 @@ public:
 			0.001, const double resolutionY = 0.001);
 	void SetupDisc(double radius, const double resolutionX = 0.001,
 			const double resolutionY = 0.001);
+
+	bool IsFilled(int x, int y, double height);
+	bool IsFilledAbove(int x, int y, double height);
+	bool IsFilled(size_t p, double height);
+	bool IsFilled(size_t p);
+	bool IsOnOuterBorder(size_t p);
+	bool IsSurrounded(size_t p);
+
+	void CleanOutlier(void);
+
+	void Limit(void);
 	void FoldRaise(const Imprinter *b);
 	void FoldReplace(const Imprinter *b);
 	void HardInvert(void);
+	void MaxFilling(void);
 	void InvertZ(void);
 	void FlipX(void);
 	void FlipY(void);

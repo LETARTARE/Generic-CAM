@@ -61,7 +61,7 @@ bool TargetDialog::TransferDataToWindow(void)
 	m_textCtrlSliceThickness->SetValue(wxString::Format(_T("%.1f"),
 			temp.FromSI(linkedProject->sliceThickness)));
 
-	m_textCtrlSliceNumber->SetValue(wxString::Format(_T("%i"), (int)ceil(
+	m_textCtrlSliceNumber->SetValue(wxString::Format(_T("%i"), (int) ceil(
 			linkedProject->objects[linkedProject->activeObject].bbox.GetSizeZ()
 					/ linkedProject->sliceThickness)));
 
@@ -96,5 +96,6 @@ void TargetDialog::OnFromStock(wxCommandEvent& event)
 void TargetDialog::OnGenerate(wxCommandEvent& event)
 {
 	linkedProject->GenerateTargets();
+	this->GetParent()->Refresh();
 
 }

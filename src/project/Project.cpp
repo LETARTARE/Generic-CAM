@@ -62,6 +62,8 @@ Project::Project()
 	supportWidth = 0.010;
 	supportHeight = 0.005;
 
+	resolution = 0.0005;
+
 }
 
 Project::~Project()
@@ -103,10 +105,15 @@ void Project::GenerateTargets(void)
 	targets.Clear();
 
 	Target temp;
+	Target temp2;
+	AffineTransformMatrix shift;
+
 	Object* obj = &(objects[activeObject]);
 	obj->UpdateBoundingBox();
 
-	temp.SetupBox(obj->bbox.xmax, obj->bbox.ymax, sliceThickness);
+	temp.SetupBox(obj->bbox.xmax + 4* slotWidth ,
+			obj->bbox.ymax + 4* slotWidth , sliceThickness, resolution,
+			resolution);
 
 	size_t i, n;
 	n = ceil(obj->bbox.zmax / sliceThickness);
@@ -115,40 +122,45 @@ void Project::GenerateTargets(void)
 	Target cylinder;
 	Target disc;
 
-	sphere.matrix.TranslateGlobal(0,-0.1,0);
-	cylinder.matrix.TranslateGlobal(0.1,-0.1,0);
-	disc.matrix.TranslateGlobal(0.2,-0.1,0);
+	sphere.SetupSphere(0.003, resolution, resolution);
+	cylinder.SetupCylinder(slotWidth, sliceThickness, resolution, resolution);
+	disc.SetupDisc(0.003, resolution, resolution);
 
-
-	sphere.SetupSphere(0.003);
-	cylinder.SetupCylinder(0.01, sliceThickness);
-	disc.SetupDisc(0.006);
-
+	sphere.matrix.TranslateGlobal(0, -0.1, 0);
+	cylinder.matrix.TranslateGlobal(0.1, -0.1, 0);
+	disc.matrix.TranslateGlobal(0.2, -0.1, 0);
 	targets.Add(sphere);
 	targets.Add(cylinder);
 	targets.Add(disc);
 
 
-	temp.matrix.TranslateGlobal(slotWidth, 0, 0);
-	for(i = 0; i < n; i++){
+	//temp.matrix.TranslateGlobal(slotWidth, 0, 0);
 
+	for(i = 2; i < 3; i++){
 
-			temp.InsertObject(obj, (double) i * sliceThickness);
-			temp.matrix.TranslateGlobal(slotWidth, 0, 0);
+		shift.SetIdentity();
+		shift.TranslateGlobal(2.0 * slotWidth, 2.0 * slotWidth, (double) i
+				* -sliceThickness);
 
-		//		if(i == 2) temp.HardInvert();
-		//		if(i == 3) temp.FlipX();
-		//		if(i == 4) temp.FoldReplace(&cylinder);
-		//		if(i == 5) temp.FoldRaise(&sphere);
-		//		if(i == 6) temp.FoldRaise(&disc);
-		//		if(i == 7){
-		//			temp.FoldReplace(&cylinder);
-		//			temp.HardInvert();
-		//		}
+		temp.InsertObject(obj, shift);
+		temp2 = temp;
+		temp2.FoldReplace(&cylinder);
+		temp2.HardInvert();
 
+		temp.GeneratePolygon(-1, -1, 20.0 / 1000);
+
+		temp += temp2;
+
+		temp.matrix.SetIdentity();
+		temp.matrix.TranslateGlobal((4* slotWidth + obj->bbox.xmax) * i, 0, 0);
 
 		targets.Add(temp);
-		temp.matrix.TranslateGlobal(obj->bbox.xmax + slotWidth * 2, 0, 0);
+
+
+		//temp.FoldRaise(&sphere);
+		//temp.Limit();
+
+		//temp.matrix.TranslateGlobal(obj->bbox.xmax + slotWidth * 2, 0, 0);
 
 	}
 

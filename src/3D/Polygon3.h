@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Project.h
-// Purpose            : Defines a Generic CAM Project.
+// Name               : Polygon3.h
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 15.06.2011
+// Created            : 07.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,82 +28,37 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef PROJECT_H_
-#define PROJECT_H_
+#ifndef POLYGON3_H_
+#define POLYGON3_H_
 
-#include "Object.h"
-#include "Toolbox.h"
-#include "../machine/Machine.h"
-#include "../simulator/Workpiece.h"
-#include "Run.h"
-#include "Target.h"
-#include "Stock.h"
-#include "Unit.h"
-
-#include <wx/string.h>
-
-#include <wx/dynarray.h>
-
-/*!\class Project
+/*!\class Polygon3
  * \brief ...
  *
  * ...
  */
 
-class Project {
+#include <wx/dynarray.h>
+#include "Vector3.h"
+#include "AffineTransformMatrix.h"
+
+class Polygon3 {
 	// Constructor / Destructor
 public:
-	Project();
-	virtual ~Project();
+	Polygon3();
+	virtual ~Polygon3();
 	// Member variables
 public:
-	wxString projectName;
-
-	ArrayOfObject objects;
-	Machine machine;
-	Toolbox toolbox;
-	Stock stock;
-
-	size_t activeObject;
-	size_t activeStock;
-	size_t activeTarget;
-
-	ArrayOfTarget targets;
-	ArrayOfRun run;
-
-	bool modified;
-
-	bool displayGeometry;
-	bool displayMachine;
-	bool displayStock;
-	bool displayWorkpiece;
-	bool displayBoundingBox;
-	bool displayTarget;
-
-	Unit Tolerance;
-	Unit Distance;
-	Unit LinearSpeed;
-	Unit RotationalSpeed;
-
-	// For target generator
-
-	double resolution;
-
-	double sliceThickness;
-	double slotWidth;
-	double supportDistance;
-	double supportWidth;
-	double supportHeight;
+	AffineTransformMatrix matrix;
+	Vector3 color;
+	ArrayOfVector3 elements;
 
 	// Methods
 public:
-
-	void Paint(void);
-	void Assemble(void);
-	void GenerateTargets(void);
-
+	void Clear(void);
+	void InsertPoint(double x=0.0, double y=0.0, double z=0.0);
+	void Paint(void) const;
 };
-WX_DECLARE_OBJARRAY(Project, ArrayOfProject)
+WX_DECLARE_OBJARRAY(Polygon3, ArrayOfPolygon3)
 ;
 
-#endif /* PROJECT_H_ */
+#endif /* POLYGON3_H_ */
