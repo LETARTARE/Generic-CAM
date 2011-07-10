@@ -33,62 +33,71 @@ PROJECT := genericcam
 SOURCES = src/GenericCAM.cpp
 
 # 3D object files:
-SOURCES += src/3D/Geometry.cpp \
-	src/3D/OpenGLCanvas.cpp \
-	src/3D/Vector3.cpp \
+SOURCES += src/3D/AffineTransformMatrix.cpp \
+	src/3D/BoundingBox.cpp \
+	src/3D/FileDXF.cpp \
+	src/3D/FileGTS.cpp \
+	src/3D/FileSTL.cpp \
+	src/3D/Geometry.cpp \
+	src/3D/GeometryFileAbstract.cpp \
 	src/3D/IKSolver.cpp \
-	src/3D/AffineTransformMatrix.cpp \
-	src/3D/CSGSurface.cpp \
-
-# CSGLib object files:
-SOURCES += src/CSGLib/Face.cpp \
-	src/CSGLib/Vector.cpp \
-	src/CSGLib/BooleanModeller.cpp \
-	src/CSGLib/Bound.cpp \
-	src/CSGLib/Color.cpp \
-	src/CSGLib/Solid.cpp \
-	src/CSGLib/Segment.cpp \
-	src/CSGLib/Line.cpp \
-	src/CSGLib/VectorSet.cpp \
-	src/CSGLib/Object3D.cpp \
-	src/CSGLib/Vertex.cpp \
-	src/CSGLib/ColorSet.cpp \
-	src/CSGLib/VertexSet.cpp \
-	src/CSGLib/FaceSet.cpp \
-	src/CSGLib/IntSet.cpp \
-
-# simulator object files:
-SOURCES += src/simulator/Workpiece.cpp \
-	src/simulator/LUACodeEvaluator.cpp \
-	src/simulator/Toolbox.cpp \
-	src/simulator/MachineComponent.cpp \
-	src/simulator/Machine.cpp \
-	src/simulator/ToolPath.cpp \
-	src/simulator/Tool.cpp \
-	src/simulator/MachinePosition.cpp \
-	src/simulator/MachineSimulator.cpp \
-	src/simulator/ToolElement.cpp \
+	src/3D/OpenGLCanvas.cpp \
+	src/3D/Polygon3.cpp \
+	src/3D/Surface.cpp \
+	src/3D/Triangle.cpp \
+	src/3D/Vector3.cpp \
 
 # 3D controller object files:
-SOURCES += src/controller/SerialPort.cpp \
+SOURCES += src/controller/Control3D.cpp \
 	src/controller/Control3DAbstract.cpp \
 	src/controller/ControlSpaceBall.cpp \
 	src/controller/ControlSpaceMouse.cpp \
-	src/controller/Control3D.cpp \
 	src/controller/ControlSpaceOrb.cpp \
+	src/controller/SerialPort.cpp \
+	
+# Generator object files:
+SOURCES += src/generator/Imprinter.cpp \
 
 # GUI object files:
-SOURCES += src/gui/ToolPanel.cpp \
-	src/gui/MainFrame.cpp \
-	src/gui/ErrorFrame.cpp \
-	src/gui/MachineCanvas.cpp \
-	src/gui/ToolCanvas.cpp \
-	src/gui/DataCanvas.cpp \
-	src/gui/AboutDialog.cpp \
-	src/gui/gui.cpp \
-	src/gui/DataFrame.cpp \
+SOURCES += src/gui/AboutDialog.cpp \
 	src/gui/Control6DOFDialog.cpp \
+	src/gui/DataCanvas.cpp \
+	src/gui/ErrorFrame.cpp \
+	src/gui/gui.cpp \
+	src/gui/MainCanvas.cpp \
+	src/gui/MainFrame.cpp \
+	src/gui/ObjectFrame.cpp \
+	src/gui/StockFrame.cpp \
+	src/gui/TargetDialog.cpp \
 	src/gui/ToolboxFrame.cpp \
+	src/gui/ToolCanvas.cpp \
+	src/gui/ToolPanel.cpp \
+	src/gui/UnitDialog.cpp \
+
+# machine object files:
+SOURCES += src/machine/LUACodeEvaluator.cpp \
+	src/machine/Machine.cpp \
+	src/machine/MachineComponent.cpp \
+	src/machine/MachinePosition.cpp \
+	src/machine/Tool.cpp \
+	src/machine/ToolElement.cpp \
+	
+# project object files:
+SOURCES += src/project/Object.cpp \
+	src/project/Project.cpp \
+	src/project/Run.cpp \
+	src/project/Stock.cpp \
+	src/project/StockMaterial.cpp \
+	src/project/Target.cpp \
+	src/project/Toolbox.cpp \
+	src/project/Unit.cpp \
+	
+# simulator object files:
+SOURCES += src/simulator/MachineSimulator.cpp \
+	src/simulator/ToolPath.cpp \
+	src/simulator/Workpiece.cpp \
+	
+	
 
 # Generate the object file names and dependency filenames
 OBJDIR := bin_linux
@@ -155,8 +164,10 @@ $(OBJDIR) :
 		mkdir $(OBJDIR)
 		mkdir $(OBJDIR)/src
 		mkdir $(OBJDIR)/src/3D
-		mkdir $(OBJDIR)/src/CSGLib
-		mkdir $(OBJDIR)/src/simulator
 		mkdir $(OBJDIR)/src/controller
+		mkdir $(OBJDIR)/src/generator
 		mkdir $(OBJDIR)/src/gui
+		mkdir $(OBJDIR)/src/machine
+		mkdir $(OBJDIR)/src/project
+		mkdir $(OBJDIR)/src/simulator
 		
