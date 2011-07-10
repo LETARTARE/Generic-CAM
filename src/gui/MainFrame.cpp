@@ -35,6 +35,7 @@
 #include "TargetDialog.h"
 
 #include <wx/filename.h>
+#include <wx/textfile.h>
 #include <wx/msgdlg.h>
 
 MainFrame::MainFrame(wxWindow* parent) :
@@ -113,7 +114,8 @@ void MainFrame::OnLoadObject(wxCommandEvent& event)
 					_("Open..."),
 					_T(""),
 					_T(""),
-					_("All supported files (*.dxf; *.stl; *.gts)|*.dxf;*.stl;*.gts|DXF Files (*.dxf)|*.dxf|Stereolithography files (STL files) (*.stl)|*.stl|GTS files (*.gts)|*.gts|All files|*.*"),
+					_(
+							"All supported files (*.dxf; *.stl; *.gts)|*.dxf;*.stl;*.gts|DXF Files (*.dxf)|*.dxf|Stereolithography files (STL files) (*.stl)|*.stl|GTS files (*.gts)|*.gts|All files|*.*"),
 					wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if(lastObjectFileName.IsOk()) dialog.SetFilename(
@@ -157,7 +159,8 @@ void MainFrame::OnLoadMachine(wxCommandEvent& event)
 					_("Open machine description..."),
 					_T(""),
 					_T(""),
-					_("Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
+					_(
+							"Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
 					wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if(dialog.ShowModal() == wxID_OK){
@@ -212,9 +215,9 @@ void MainFrame::OnEditToolbox(wxCommandEvent& event)
 
 void MainFrame::OnLoadToolbox(wxCommandEvent& event)
 {
-	wxFileDialog dialog(this, _("Open toolbox..."), _T(""), _T(""),
-			_("Toolbox (*.xml)|*.xml|All files|*.*"), wxFD_OPEN
-					| wxFD_FILE_MUST_EXIST);
+	wxFileDialog dialog(this, _("Open toolbox..."), _T(""), _T(""), _(
+			"Toolbox (*.xml)|*.xml|All files|*.*"), wxFD_OPEN
+			| wxFD_FILE_MUST_EXIST);
 	wxFileName fileName;
 	//	if(dialog.ShowModal() == wxID_OK){
 	//		fileName.Assign(dialog.GetPath());
@@ -252,9 +255,9 @@ void MainFrame::OnSaveToolbox(wxCommandEvent &event)
 	//	}
 
 
-	wxFileDialog dialog(this, _("Save toolbox..."), _T(""), _T(""),
-			_("Toolbox (*.xml)|*.xml|All files|*.*"), wxFD_SAVE
-					| wxFD_OVERWRITE_PROMPT);
+	wxFileDialog dialog(this, _("Save toolbox..."), _T(""), _T(""), _(
+			"Toolbox (*.xml)|*.xml|All files|*.*"), wxFD_SAVE
+			| wxFD_OVERWRITE_PROMPT);
 	wxFileName fileName;
 	if(dialog.ShowModal() == wxID_OK){
 		fileName = dialog.GetPath();
@@ -292,7 +295,8 @@ void MainFrame::OnLoadGCodes(wxCommandEvent &event)
 					_("Open G-Code file..."),
 					_T(""),
 					_T(""),
-					_("G-Code File (*.tap *.cnc *.nc *.ncd *.txt)|*.tap;*.cnc;*.nc;*.ncd;*.txt|Text files (*.txt)|*.txt|All files|*.*"),
+					_(
+							"G-Code File (*.tap *.cnc *.nc *.ncd *.txt)|*.tap;*.cnc;*.nc;*.ncd;*.txt|Text files (*.txt)|*.txt|All files|*.*"),
 					wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 
@@ -309,13 +313,26 @@ void MainFrame::OnSaveGCodes(wxCommandEvent &event)
 					_("Save G-Code file..."),
 					_T(""),
 					_T(""),
-					_("G-Code File (*.tap *.cnc *.nc *.ncd *.txt)|*.tap;*.cnc;*.nc;*.ncd;*.txt|Text files (*.txt)|*.txt|All files|*.*"),
-					wxFD_SAVE
-										| wxFD_OVERWRITE_PROMPT);
+					_(
+							"G-Code File (*.tap *.cnc *.nc *.ncd *.txt)|*.tap;*.cnc;*.nc;*.ncd;*.txt|Text files (*.txt)|*.txt|All files|*.*"),
+					wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+	if(dialog.ShowModal() == wxID_OK){
 
+		wxFileName fname;
+		fname = dialog.GetPath();
 
+		wxTextFile f;
+		if(fname.FileExists()){
+			f.Open(fname.GetFullPath());
+			f.Clear();
+		}else
+			f.Create(fname.GetFullPath());
+
+		project[activeProject].toolpath[0].WriteToFile(f);
+		f.Write();
+		f.Close();
+	}
 }
-
 
 void MainFrame::OnSetupController(wxCommandEvent& event)
 {

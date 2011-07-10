@@ -67,3 +67,36 @@ void ToolPath::Paint(void)
 	::glEnd();
 	::glPopMatrix();
 }
+
+void ToolPath::WriteToFile(wxTextFile &f)
+{
+	f.AddLine(_T("G90 G80 G40 G54 G21 G17 G50 G94 G64 (safety block)"));
+
+	f.AddLine(_T("G49 (disable tool length compensation)"));
+	f.AddLine(_T("G80 (disable modal motion)"));
+	f.AddLine(_T("G61 (exact path mode)"));
+
+	f.AddLine(_T("F3000 (Feedrate mm/min)"));
+
+	f.AddLine(_T("T1 M6 (Tool 1, Select tool)"));
+
+	f.AddLine(_T("S10000 (Spindle speed rpm)"));
+	f.AddLine(_T("M3 (Start spindel)"));
+	f.AddLine(_T("G4 P3 (Wait For Seconds, Parameter 3 Seconds)"));
+
+	size_t i;
+	for(i = 0; i < positions.GetCount(); i++){
+		if(positions[i].isCutting)
+			f.AddLine(_T("G1"));
+		else
+			f.AddLine(_T("G0"));
+
+		f.AddLine(wxString::Format(_T("X%.4f Y%.4f Z%.4f"), positions[i].axisX*1000,
+				positions[i].axisY*1000, positions[i].axisZ*1000));
+	}
+
+	f.AddLine(_T("M5 (Stop spindel)"));
+	f.AddLine(_T("G4 P3 (Wait For Seconds, Parameter 3 Seconds)"));
+	f.AddLine(_T("M2 (End programm)"));
+
+}

@@ -57,7 +57,7 @@ Project::Project()
 	RotationalSpeed.Setup(_T("1/s"), _T("rpm"), (double) 1 / 60);
 	LinearSpeed.Setup(_T("m/s"), _T("mm/s"), (double) 1 / 1000);
 
-	sliceThickness = 0.025;
+	sliceThickness = 0.020;
 	slotWidth = 0.010;
 	supportDistance = 0.050;
 	supportWidth = 0.005;
@@ -65,7 +65,7 @@ Project::Project()
 
 	resolution = 0.0005;
 
-	levelDrop = 0.005;
+	levelDrop = 0.003;
 
 	freeHeightAboveMaterial = 0.010;
 
@@ -242,7 +242,7 @@ void Project::GenerateToolpath(size_t nrTarget)
 		while(flag){
 			flag = t.GeneratePolygon(-1, -1, level);
 			if(flag){
-				t.PolygonDiminish(t.polygons.GetCount() - 1, t.GetSizeRX());
+				//t.PolygonDiminish(t.polygons.GetCount() - 1, t.GetSizeRX());
 				t.PolygonDrop(t.polygons.GetCount() - 1, levelDrop);
 				t.PolygonSmooth(t.polygons.GetCount() - 1);
 				t.PolygonDropTarget(t.polygons.GetCount() - 1, &discTool);
@@ -284,6 +284,12 @@ void Project::GenerateToolpath(size_t nrTarget)
 	m.isCutting = false;
 	temp.positions.Add(m);
 
+
+	for(size_t i=0;i<temp.positions.GetCount();i++)
+	{
+		temp.positions[i].axisZ-=t.GetSizeZ();
+	}
+	temp.matrix.TranslateGlobal(0,0,t.GetSizeZ());
 
 	//	t.InitImprinting();
 	//	t.matrix.SetIdentity();

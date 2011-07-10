@@ -55,6 +55,7 @@ void Target::InsertObject(Object *object, AffineTransformMatrix shift)
 	FinishImprint();
 }
 
+//Moves on the outside
 int Target::NextDir(int sx, int sy, int olddir)
 {
 	int d = (olddir + 3) % 8;
@@ -94,45 +95,45 @@ int Target::NextDir(int sx, int sy, int olddir)
 	return -1;
 }
 
+// Moves on the inside
 int Target::NextDir(int sx, int sy, double height, int olddir)
 {
-	int d = (olddir + 3) % 8;
+	int d = (olddir + 5) % 8;
 
 	char c;
 	for(c = 0; c < 8; c++){
 		switch(d){
 		case 0:
-			if(!IsFilledAbove(sx + 1, sy + 0, height)) return d;
+			if(IsFilledAbove(sx + 1, sy + 0, height)) return d;
 			break;
 		case 1:
-			if(!IsFilledAbove(sx + 1, sy + 1, height)) return d;
+			if(IsFilledAbove(sx + 1, sy + 1, height)) return d;
 			break;
 		case 2:
-			if(!IsFilledAbove(sx + 0, sy + 1, height)) return d;
+			if(IsFilledAbove(sx + 0, sy + 1, height)) return d;
 			break;
 		case 3:
-			if(!IsFilledAbove(sx - 1, sy + 1, height)) return d;
+			if(IsFilledAbove(sx - 1, sy + 1, height)) return d;
 			break;
 		case 4:
-			if(!IsFilledAbove(sx - 1, sy + 0, height)) return d;
+			if(IsFilledAbove(sx - 1, sy + 0, height)) return d;
 			break;
 		case 5:
-			if(!IsFilledAbove(sx - 1, sy - 1, height)) return d;
+			if(IsFilledAbove(sx - 1, sy - 1, height)) return d;
 			break;
 		case 6:
-			if(!IsFilledAbove(sx + 0, sy - 1, height)) return d;
+			if(IsFilledAbove(sx + 0, sy - 1, height)) return d;
 			break;
 		case 7:
-			if(!IsFilledAbove(sx + 1, sy - 1, height)) return d;
+			if(IsFilledAbove(sx + 1, sy - 1, height)) return d;
 			break;
 		}
-
-		d--;
-		if(d <= -1) d = 7;
+		d = (d + 1) % 8;
 	}
 	return -1;
 }
 
+// On the outside
 void Target::GeneratePolygon(int stx, int sty)
 {
 	while(!IsVisible(stx + 1, sty)){
@@ -227,6 +228,7 @@ void Target::GeneratePolygon(int stx, int sty)
 	PolygonSmooth(polygons.GetCount() - 1);
 }
 
+//On the inside
 bool Target::GeneratePolygon(int stx, int sty, double height)
 {
 	while(!IsFilledAbove(stx + 1, sty, height)){
@@ -242,10 +244,10 @@ bool Target::GeneratePolygon(int stx, int sty, double height)
 	temp.Clear();
 	temp.Close();
 	if(sty == ny) return false;
-
+	stx++;
 	int x = stx;
 	int y = sty;
-	int dir = 4;
+	int dir = 0;
 
 	do{
 
@@ -344,7 +346,8 @@ void Target::PolygonDropTarget(size_t nrPolygon, Target* target)
 	size_t i;
 	for(i = 0; i < polygons[nrPolygon].elements.GetCount(); i++){
 		FoldLower(round(polygons[nrPolygon].elements[i].x / rx), round(
-				polygons[nrPolygon].elements[i].y / ry), polygons[nrPolygon].elements[i].z, target);
+				polygons[nrPolygon].elements[i].y / ry),
+				polygons[nrPolygon].elements[i].z, target);
 	}
 }
 

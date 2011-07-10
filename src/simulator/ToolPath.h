@@ -41,6 +41,7 @@
 #include "../3D/AffineTransformMatrix.h"
 #include "../3D/Vector3.h"
 #include <wx/dynarray.h>
+#include <wx/textfile.h>
 
 class ToolPath{
 	// Constructor / Destructor
@@ -62,7 +63,7 @@ public:
 public:
 
 	void Paint(void);
-
+	void WriteToFile(wxTextFile &f);
 
 };
 

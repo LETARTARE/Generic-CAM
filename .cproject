@@ -26,7 +26,9 @@
 <option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1036404111" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 <option id="gnu.cpp.compiler.option.include.paths.1473237874" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="/usr/include/wx-2.8"/>
+<listOptionValue builtIn="false" value="/usr/include/lua5.1"/>
 <listOptionValue builtIn="false" value="/usr/include/glib-2.0"/>
+<listOptionValue builtIn="false" value="/usr/include"/>
 <listOptionValue builtIn="false" value="/usr/lib/glib-2.0/include"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.575471476" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -39,11 +41,11 @@
 <tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.499271279" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
 <tool command="g++  `wx-config --libs gl,core,base,xml`" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.376884687" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 <option id="gnu.cpp.link.option.libs.960362737" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-<listOptionValue builtIn="false" value="lua"/>
+<listOptionValue builtIn="false" value="lua5.1"/>
 </option>
 <option id="gnu.cpp.link.option.paths.1318683508" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 <listOptionValue builtIn="false" value="/usr/local/lib"/>
-<listOptionValue builtIn="false" value="/usr/local/lib/lua/5.1"/>
+<listOptionValue builtIn="false" value="/usr/lib"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1271724444" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
