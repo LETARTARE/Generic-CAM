@@ -80,6 +80,9 @@ MainFrame::MainFrame(wxWindow* parent) :
 
 	SetupTree();
 
+	stockFrame = new StockFrame(this);
+
+
 }
 
 MainFrame::~MainFrame()
@@ -278,12 +281,7 @@ void MainFrame::OnSaveToolbox(wxCommandEvent &event)
 
 void MainFrame::OnEditStock(wxCommandEvent& event)
 {
-	stockFrame = new StockFrame(this);
-	stockFrame->InsertProject(&(project[activeProject]));
-
-
-	//toolboxFrame->SetController(control);
-	//	toolboxFrame->InsertToolBox(simulator.toolbox);
+		stockFrame->InsertProject(&(project[activeProject]));
 	stockFrame->Show(true);
 }
 
@@ -356,6 +354,12 @@ void MainFrame::OnSetupUnits(wxCommandEvent& event)
 {
 	UnitDialog temp(this);
 	temp.ShowModal();
+}
+
+void MainFrame::OnShowAnimationControl( wxCommandEvent& event ){
+	animationFrame= new AnimationFrame(this);
+	animationFrame->InsertProject(&(project[activeProject]));
+	animationFrame->Show(true);
 }
 
 void MainFrame::OnAbout(wxCommandEvent& event)

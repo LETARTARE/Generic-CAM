@@ -39,8 +39,9 @@
 #include "ObjectFrame.h"
 #include "StockFrame.h"
 #include "ErrorFrame.h"
-#include "../project/Unit.h"
+#include "AnimationFrame.h"
 
+#include "../project/Unit.h"
 #include "../project/Project.h"
 
 #include "../controller/Control3D.h"
@@ -89,10 +90,10 @@ private:
 	ArrayOfProject project;
 	size_t activeProject;
 
-
 	ObjectFrame* objectFrame;
 	StockFrame* stockFrame;
 	ToolboxFrame* toolboxFrame;
+	AnimationFrame* animationFrame;
 	ErrorFrame* errorFrame;
 
 	wxTimer timer;
@@ -131,6 +132,8 @@ private:
 	void OnSetupController(wxCommandEvent& event);
 	void OnChangeStereo3D(wxCommandEvent& event);
 	void OnSetupUnits(wxCommandEvent& event);
+
+	void OnShowAnimationControl(wxCommandEvent& event);
 
 	void OnAbout(wxCommandEvent& event);
 
