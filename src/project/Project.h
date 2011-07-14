@@ -37,6 +37,8 @@
 #include "../simulator/Workpiece.h"
 #include "../simulator/ToolPath.h"
 
+#include "../generator/TPGeneratorTest.h"
+
 #include "Run.h"
 #include "Target.h"
 #include "Stock.h"
@@ -72,7 +74,8 @@ public:
 
 	ArrayOfTarget targets;
 	ArrayOfRun run;
-	ArrayOfToolPath toolpath;
+
+	TPGeneratorTest ToolPathGenerator;
 
 	bool modified;
 
@@ -92,15 +95,8 @@ public:
 	// For target generator
 
 	double resolution;
-
-	double sliceThickness;
 	double slotWidth;
-	double supportDistance;
-	double supportWidth;
-	double supportHeight;
-	double freeHeightAboveMaterial;
 
-	double levelDrop;
 
 	// Methods
 public:

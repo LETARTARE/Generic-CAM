@@ -64,12 +64,20 @@ Imprinter::Imprinter(const double sizeX, const double sizeY,
 		const double sizeZ, const double resolutionX, const double resolutionY)
 {
 	field = NULL;
+	nx = ny = N = 0;
+	sx = sy = 0.0;
+	rx = ry = 1.0;
+
 	this->SetupBox(sizeX, sizeY, sizeZ, resolutionX, resolutionY);
 }
 
 Imprinter::Imprinter(const Imprinter& ip)
 {
 	this->field = NULL;
+	this->nx = this->ny = this->N = 0;
+	this->sx = this->sy = 0.0;
+	this->rx = this->ry = 1.0;
+
 	if(ip.N == 0) return;
 	this->SetupBox(ip.sx, ip.sy, ip.sz, ip.rx, ip.ry);
 	size_t i;
@@ -110,6 +118,13 @@ bool Imprinter::SetupField(const size_t sizeX, const size_t sizeY,
 	return true;
 }
 
+void Imprinter::ClearField(void)
+{
+	if(field != NULL) delete[] field;
+	field = NULL;
+	nx = ny = N = 0;
+}
+
 Imprinter& Imprinter::operator=(const Imprinter &b)
 {
 	// Check for self-assignment!
@@ -118,8 +133,11 @@ Imprinter& Imprinter::operator=(const Imprinter &b)
 
 	if(this->N != b.N){
 		if(this->field != NULL) delete[] this->field;
-		this->N = b.N;
-		this->field = new ImprinterElement[this->N];
+
+		if(b.N > 0){
+			this->N = b.N;
+			this->field = new ImprinterElement[this->N];
+		}
 	}
 	this->rx = b.rx;
 	this->ry = b.ry;
@@ -131,9 +149,11 @@ Imprinter& Imprinter::operator=(const Imprinter &b)
 	this->colorNormal = b.colorNormal;
 	this->colorTodo = b.colorTodo;
 	this->colorUnscratched = b.colorUnscratched;
-	size_t i;
-	for(i = 0; i < N; i++)
-		this->field[i] = b.field[i];
+	if(N > 0){
+		size_t i;
+		for(i = 0; i < N; i++)
+			this->field[i] = b.field[i];
+	}
 	return *this;
 }
 
@@ -303,12 +323,12 @@ void Imprinter::Limit(void)
 
 }
 
-void Imprinter::FoldRaise(const Imprinter *b)
+void Imprinter::FoldRaise(const Imprinter &b)
 {
 	size_t i, j, p, ib, jb, pb, ph;
 	size_t cx, cy;
-	cx = b->nx / 2;
-	cy = b->ny / 2;
+	cx = b.nx / 2;
+	cy = b.ny / 2;
 
 
 	// Init
@@ -326,22 +346,22 @@ void Imprinter::FoldRaise(const Imprinter *b)
 		for(i = 0; i < nx; i++){
 			if(field[p].IsVisible()){
 				pb = 0;
-				for(jb = 0; jb < b->ny; jb++){
-					for(ib = 0; ib < b->nx; ib++){
-						if(b->field[pb].IsVisible()){
+				for(jb = 0; jb < b.ny; jb++){
+					for(ib = 0; ib < b.nx; ib++){
+						if(b.field[pb].IsVisible()){
 							if(ib + i >= cx && ib + i < nx + cx && jb + j >= cy
 									&& jb + j < ny + cy){
 
 								ph = i + ib - cx + (j + jb - cy) * nx;
 
 								h = field[p].upperLimit
-										+ b->field[pb].upperLimit;
+										+ b.field[pb].upperLimit;
 
 								if(h > field[ph].upperLimitUpside) field[ph].upperLimitUpside
 										= h;
 
 								h = field[p].lowerLimit
-										+ b->field[pb].lowerLimit;
+										+ b.field[pb].lowerLimit;
 
 								if(h < field[ph].lowerLimitUpside) field[ph].lowerLimitUpside
 										= h;
@@ -366,12 +386,12 @@ void Imprinter::FoldRaise(const Imprinter *b)
 	}
 
 }
-void Imprinter::FoldReplace(const Imprinter *b)
+void Imprinter::FoldReplace(const Imprinter &b)
 {
 	size_t i, j, p, ib, jb, pb, ph;
 	size_t cx, cy;
-	cx = b->nx / 2;
-	cy = b->ny / 2;
+	cx = b.nx / 2;
+	cy = b.ny / 2;
 
 
 	// Init
@@ -386,17 +406,17 @@ void Imprinter::FoldReplace(const Imprinter *b)
 		for(i = 0; i < nx; i++){
 			if(field[p].IsVisible()){
 				pb = 0;
-				for(jb = 0; jb < b->ny; jb++){
-					for(ib = 0; ib < b->nx; ib++){
-						if(b->field[pb].IsVisible()){
+				for(jb = 0; jb < b.ny; jb++){
+					for(ib = 0; ib < b.nx; ib++){
+						if(b.field[pb].IsVisible()){
 							if(ib + i >= cx && ib + i < nx + cx && jb + j >= cy
 									&& jb + j < ny + cy){
 								ph = i + ib - cx + (j + jb - cy) * nx;
 
 								field[ph].upperLimitUpside
-										= b->field[pb].upperLimit;
+										= b.field[pb].upperLimit;
 								field[ph].lowerLimitUpside
-										= b->field[pb].lowerLimit;
+										= b.field[pb].lowerLimit;
 							}
 						}
 						pb++;
@@ -418,23 +438,23 @@ void Imprinter::FoldReplace(const Imprinter *b)
 
 }
 
-void Imprinter::FoldLower(int x, int y, double z, const Imprinter *b)
+void Imprinter::FoldLower(int x, int y, double z, const Imprinter &b)
 {
 	size_t ib, jb, pb, ph;
 	size_t cx, cy;
-	cx = b->nx / 2;
-	cy = b->ny / 2;
+	cx = b.nx / 2;
+	cy = b.ny / 2;
 
 	pb = 0;
-	for(jb = 0; jb < b->ny; jb++){
-		for(ib = 0; ib < b->nx; ib++){
-			if(b->field[pb].IsVisible()){
+	for(jb = 0; jb < b.ny; jb++){
+		for(ib = 0; ib < b.nx; ib++){
+			if(b.field[pb].IsVisible()){
 				if(ib + x >= cx && ib + x < nx + cx && jb + y >= cy && jb + y
 						< ny + cy){
 					ph = x + ib - cx + (y + jb - cy) * nx;
 
-					if(field[ph].upperLimit > b->field[pb].lowerLimit + z){
-						field[ph].upperLimit = b->field[pb].lowerLimit + z;
+					if(field[ph].upperLimit > b.field[pb].lowerLimit + z){
+						field[ph].upperLimit = b.field[pb].lowerLimit + z;
 					}
 					if(field[ph].upperLimit < field[ph].lowerLimit){
 						field[ph].lowerLimit = sz;

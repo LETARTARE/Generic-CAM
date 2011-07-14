@@ -35,11 +35,15 @@ WX_DEFINE_OBJARRAY(ArrayOfRun)
 
 Run::Run()
 {
-	// TODO Auto-generated constructor stub
 
 }
 
 Run::~Run()
 {
-	// TODO Auto-generated destructor stub
+
+}
+
+void Run::WriteToFile(wxTextFile &f)
+{
+	toolPath.WriteToFile(f);
 }

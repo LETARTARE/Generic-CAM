@@ -72,6 +72,12 @@ public:
 	void OnScalePercentY(wxCommandEvent& event);
 	void OnScaleUnitZ(wxCommandEvent& event);
 	void OnScalePercentZ(wxCommandEvent& event);
+	void OnYMinus(wxCommandEvent& event);
+	void OnXMinus(wxCommandEvent& event);
+	void OnYPlus(wxCommandEvent& event);
+	void OnZMinus(wxCommandEvent& event);
+	void OnZPlus(wxCommandEvent& event);
+	void OnXPlus(wxCommandEvent& event);
 	void OnAlignWithStock(wxCommandEvent& event);
 	void OnAlignWithMiddle(wxCommandEvent& event);
 	void OnAlignWithTop(wxCommandEvent& event);

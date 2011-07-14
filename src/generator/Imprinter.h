@@ -104,6 +104,7 @@ public:
 	void Paint() const;
 	bool SetupField(const size_t sizeX, const size_t sizeY,
 			const double resolutionX = 0.001, const double resolutionY = 0.001);
+	void ClearField(void);
 
 	bool SetupBox(const double sizeX, const double sizeY, const double sizeZ,
 			const double resolutionX = 0.001, const double resolutionY = 0.001);
@@ -134,14 +135,14 @@ public:
 
 	double GetMeanLevel(int x, int y);
 	double GetMeanLevel(size_t p);
-	double GetLevel(double x,double y);
+	double GetLevel(double x, double y);
 
 	void CleanOutlier(void);
 
 	void Limit(void);
-	void FoldRaise(const Imprinter *b);
-	void FoldReplace(const Imprinter *b);
-	void FoldLower(int x, int y, double z, const Imprinter *b);
+	void FoldRaise(const Imprinter &b);
+	void FoldReplace(const Imprinter &b);
+	void FoldLower(int x, int y, double z, const Imprinter &b);
 	void HardInvert(void);
 	void MaxFilling(void);
 	void InvertTop(void);
@@ -165,13 +166,13 @@ public:
 		return sz;
 	}
 	double GetSizeRX(void)
-		{
-			return rx;
-		}
-		double GetSizeRY(void)
-		{
-			return ry;
-		}
+	{
+		return rx;
+	}
+	double GetSizeRY(void)
+	{
+		return ry;
+	}
 
 };
 

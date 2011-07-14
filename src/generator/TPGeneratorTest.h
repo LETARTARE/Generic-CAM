@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Target.h
+// Name               : TPGeneratorTest.h
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 06.07.2011
+// Created            : 13.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,59 +28,47 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef TARGET_H_
-#define TARGET_H_
+#ifndef TPGENERATORTEST_H_
+#define TPGENERATORTEST_H_
 
-/*!\class Target
+#include "../project/Target.h"
+#include "../3D/Polygon3.h"
+#include "../machine/Tool.h"
+/*!\class TPGeneratorTest
  * \brief ...
  *
  * ...
  */
 
-#include "../generator/Imprinter.h"
-#include <wx/dynarray.h>
-
-#include "Object.h"
-#include "../3D/Polygon3.h"
-#include "../simulator/ToolPath.h"
-#include <cstddef>
-
-class Target:public Imprinter {
+class TPGeneratorTest {
 	// Constructor/ Destructor
 public:
-	Target();
-	virtual ~Target();
+	TPGeneratorTest();
+	virtual ~TPGeneratorTest();
 
 	//Member variables:
 public:
-	//double shiftZ;
-	Polygon3 outline;
-	ToolPath toolpath;
-	AffineTransformMatrix shift;
+
+
+	// Slot around Object
+	double slotWidth;
+	double supportDistance;
+	double supportWidth;
+	double supportHeight;
+
+	// Generic Toolpath parameters
+	double freeHeightAboveMaterial;
+
+	// Toolpath generation parameter (extract from tool?)
+	double levelDrop;
 
 	//Methods:
 public:
-	void InsertObject(Object &object, AffineTransformMatrix &shift);
+	void SetupSlot(double slotWidth, double supportDistance,
+			double supportWidth, double supportHeight);
 
-	int NextDir(int sx, int sy, double height, int olddir);
-	int NextDir(int sx, int sy, int olddir);
-	const Polygon3 GeneratePolygon(int sx, int sy, double height);
-	const Polygon3 GeneratePolygon(int sx, int sy);
+	void GenerateToolpath(Target &target, Object &obj, Tool &tool);
 
-	// Polygon3 Methods
-	void PolygonFillHoles(Polygon3 &polygon);
-	void PolygonSmooth(Polygon3 &polygon);
-	void PolygonDropTarget(Polygon3 &polygon, Target &tool);
-	void PolygonDrop(Polygon3 &polygon, double level);
-	void PolygonExpand(Polygon3 &polygon, double r);
-	void PolygonDiminish(Polygon3 &polygon, double r);
-
-	void AddSupport(Polygon3 &polygon, double distance, double height,
-			double width, double slotWidth);
-
-	void Paint(void);
 };
-WX_DECLARE_OBJARRAY(Target, ArrayOfTarget)
-;
 
-#endif /* TARGET_H_ */
+#endif /* TPGENERATORTEST_H_ */

@@ -78,6 +78,28 @@ double Polygon3::GetLength(void) const
 	return d;
 }
 
+double Polygon3::GetLengthXY(void) const
+{
+	if(elements.GetCount() <= 1) return 0.0;
+	double d = 0.0;
+	size_t i;
+	Vector3 temp, temp2;
+
+	temp = elements[0];
+	for(i = 1; i < elements.GetCount(); i++){
+		temp2 = temp - elements[i];
+		temp2.z = 0;
+		d += temp2.Abs();
+		temp = elements[i];
+	}
+	if(isClosed){
+		temp2 = temp - elements[0];
+		temp2.z = 0;
+		d += temp2.Abs();
+	}
+	return d;
+}
+
 void Polygon3::Paint() const
 {
 	::glPushMatrix();

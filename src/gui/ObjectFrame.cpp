@@ -29,6 +29,7 @@
 
 
 #include "ObjectFrame.h"
+#include <math.h>
 
 ObjectFrame::ObjectFrame(wxWindow* parent) :
 	GUIObjectFrame(parent)
@@ -117,14 +118,11 @@ void ObjectFrame::OnUpdate(wxCommandEvent& event)
 	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
 
 	size_t i;
-		for(i = 0; i
-				< linkedProject->objects[linkedProject->activeObject].geometries.GetCount(); i++)
-			linkedProject->objects[linkedProject->activeObject].geometries[i].CalculateNormals();
-
-
+	for(i = 0; i
+			< linkedProject->objects[linkedProject->activeObject].geometries.GetCount(); i++)
+		linkedProject->objects[linkedProject->activeObject].geometries[i].CalculateNormals();
 
 	this->GetParent()->Refresh();
-
 
 	TransferDataToWindow();
 }
@@ -190,6 +188,105 @@ void ObjectFrame::OnScaleUnitZ(wxCommandEvent& event)
 void ObjectFrame::OnScalePercentZ(wxCommandEvent& event)
 {
 }
+
+void ObjectFrame::OnYMinus(wxCommandEvent& event)
+{
+	if(linkedProject == NULL) return;
+	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
+	size_t i;
+
+	for(i = 0; i
+			< linkedProject->objects[linkedProject->activeObject].geometries.GetCount(); i++){
+
+		linkedProject->objects[linkedProject->activeObject].geometries[i].matrix
+				*= AffineTransformMatrix::RotateXYZ(0, -M_PI_2, 0);
+	}
+	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
+	this->GetParent()->Refresh();
+	TransferDataToWindow();
+
+}
+void ObjectFrame::OnXMinus(wxCommandEvent& event)
+{
+	if(linkedProject == NULL) return;
+	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
+	size_t i;
+
+	for(i = 0; i
+			< linkedProject->objects[linkedProject->activeObject].geometries.GetCount(); i++){
+
+		linkedProject->objects[linkedProject->activeObject].geometries[i].matrix
+				*= AffineTransformMatrix::RotateXYZ(-M_PI_2, 0, 0);
+	}
+	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
+	this->GetParent()->Refresh();
+	TransferDataToWindow();
+}
+void ObjectFrame::OnYPlus(wxCommandEvent& event)
+{
+	if(linkedProject == NULL) return;
+	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
+	size_t i;
+
+	for(i = 0; i
+			< linkedProject->objects[linkedProject->activeObject].geometries.GetCount(); i++){
+
+		linkedProject->objects[linkedProject->activeObject].geometries[i].matrix
+				*= AffineTransformMatrix::RotateXYZ(0, M_PI_2, 0);
+	}
+	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
+	this->GetParent()->Refresh();
+	TransferDataToWindow();
+}
+void ObjectFrame::OnZMinus(wxCommandEvent& event)
+{
+	if(linkedProject == NULL) return;
+	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
+	size_t i;
+
+	for(i = 0; i
+			< linkedProject->objects[linkedProject->activeObject].geometries.GetCount(); i++){
+
+		linkedProject->objects[linkedProject->activeObject].geometries[i].matrix
+				*= AffineTransformMatrix::RotateXYZ(0, 0, -M_PI_2);
+	}
+	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
+	this->GetParent()->Refresh();
+	TransferDataToWindow();
+}
+void ObjectFrame::OnZPlus(wxCommandEvent& event)
+{
+	if(linkedProject == NULL) return;
+	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
+	size_t i;
+
+	for(i = 0; i
+			< linkedProject->objects[linkedProject->activeObject].geometries.GetCount(); i++){
+
+		linkedProject->objects[linkedProject->activeObject].geometries[i].matrix
+				*= AffineTransformMatrix::RotateXYZ(0, 0, M_PI_2);
+	}
+	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
+	this->GetParent()->Refresh();
+	TransferDataToWindow();
+}
+void ObjectFrame::OnXPlus(wxCommandEvent& event)
+{
+	if(linkedProject == NULL) return;
+	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
+	size_t i;
+
+	for(i = 0; i
+			< linkedProject->objects[linkedProject->activeObject].geometries.GetCount(); i++){
+
+		linkedProject->objects[linkedProject->activeObject].geometries[i].matrix
+				*= AffineTransformMatrix::RotateXYZ(M_PI_2, 0, 0);
+	}
+	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
+	this->GetParent()->Refresh();
+	TransferDataToWindow();
+}
+
 void ObjectFrame::OnAlignWithStock(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
@@ -216,47 +313,47 @@ void ObjectFrame::OnAlignWithStock(wxCommandEvent& event)
 void ObjectFrame::OnAlignWithMiddle(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
-		if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-		size_t i;
+	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
+	size_t i;
 
-		double shiftX =
-				-linkedProject->objects[linkedProject->activeObject].bbox.xmin;
-		double shiftY =
-				-linkedProject->objects[linkedProject->activeObject].bbox.ymin;
-		double shiftZ =
-				-linkedProject->objects[linkedProject->activeObject].bbox.zmin;
+	double shiftX =
+			-linkedProject->objects[linkedProject->activeObject].bbox.xmin;
+	double shiftY =
+			-linkedProject->objects[linkedProject->activeObject].bbox.ymin;
+	double shiftZ =
+			-linkedProject->objects[linkedProject->activeObject].bbox.zmin;
 
-		for(i = 0; i
-				< linkedProject->objects[linkedProject->activeObject].geometries.GetCount(); i++){
+	for(i = 0; i
+			< linkedProject->objects[linkedProject->activeObject].geometries.GetCount(); i++){
 
-			linkedProject->objects[linkedProject->activeObject].geometries[i].matrix.TranslateGlobal(
-					shiftX, shiftY, shiftZ);
-		}
-		linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
-		this->GetParent()->Refresh();
-		TransferDataToWindow();
+		linkedProject->objects[linkedProject->activeObject].geometries[i].matrix.TranslateGlobal(
+				shiftX, shiftY, shiftZ);
+	}
+	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
+	this->GetParent()->Refresh();
+	TransferDataToWindow();
 }
 void ObjectFrame::OnAlignWithTop(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
-		if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-		size_t i;
+	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
+	size_t i;
 
-		double shiftX =
-				-linkedProject->objects[linkedProject->activeObject].bbox.xmin;
-		double shiftY =
-				-linkedProject->objects[linkedProject->activeObject].bbox.ymin;
-		double shiftZ =
-				-linkedProject->objects[linkedProject->activeObject].bbox.zmin;
+	double shiftX =
+			-linkedProject->objects[linkedProject->activeObject].bbox.xmin;
+	double shiftY =
+			-linkedProject->objects[linkedProject->activeObject].bbox.ymin;
+	double shiftZ =
+			-linkedProject->objects[linkedProject->activeObject].bbox.zmin;
 
-		for(i = 0; i
-				< linkedProject->objects[linkedProject->activeObject].geometries.GetCount(); i++){
+	for(i = 0; i
+			< linkedProject->objects[linkedProject->activeObject].geometries.GetCount(); i++){
 
-			linkedProject->objects[linkedProject->activeObject].geometries[i].matrix.TranslateGlobal(
-					shiftX, shiftY, shiftZ);
-		}
-		linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
-		this->GetParent()->Refresh();
-		TransferDataToWindow();
+		linkedProject->objects[linkedProject->activeObject].geometries[i].matrix.TranslateGlobal(
+				shiftX, shiftY, shiftZ);
+	}
+	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
+	this->GetParent()->Refresh();
+	TransferDataToWindow();
 }
 

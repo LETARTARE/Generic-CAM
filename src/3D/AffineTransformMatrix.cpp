@@ -47,12 +47,24 @@ AffineTransformMatrix::~AffineTransformMatrix()
 /*!\brief Copies a matrix by inserting a given matrix into \a a.
  *  \param matrix The matrix to copy.
  */
-void AffineTransformMatrix::Set(AffineTransformMatrix const& matrix)
+void AffineTransformMatrix::Set(AffineTransformMatrix const& b)
 {
-	unsigned char i;
+	if(this == &b) return;
+	size_t i;
 	for(i = 0; i < 16; i++)
-		a[i] = matrix.a[i];
+		a[i] = b.a[i];
 	TakeMatrixApart();
+}
+
+AffineTransformMatrix& AffineTransformMatrix::operator=(
+		const AffineTransformMatrix &b)
+{
+	if(this == &b) return *this;
+	size_t i;
+	for(i = 0; i < 16; i++)
+		this->a[i] = b.a[i];
+	//this->TakeMatrixApart();
+	return *this;
 }
 
 //! Resets the matrix to the identity matrix.
@@ -242,7 +254,7 @@ void AffineTransformMatrix::PutMatrixTogether(void)
  *
  * \return Inverted matrix.
  */
-AffineTransformMatrix AffineTransformMatrix::Inverse() const
+const AffineTransformMatrix AffineTransformMatrix::Inverse() const
 {
 	//Axiom code:
 	// )set fortran optlevel 2
@@ -303,29 +315,55 @@ AffineTransformMatrix AffineTransformMatrix::Inverse() const
 }
 
 //! Overloaded operator to allow correct multiplication of two matrices.
-AffineTransformMatrix AffineTransformMatrix::operator*(
-		AffineTransformMatrix const& b) const
+AffineTransformMatrix & AffineTransformMatrix::operator*=(
+		const AffineTransformMatrix &b)
 {
 	//Generated with this code:
-	//php -r'for($i=0;$i<4;$i++){for($j=0;$j<4;$j++){printf("c.a[%u]=",$i*4+$j);for($k=0;$k<4;$k++){printf("a[%u]*b.a[%u]%s",$k*4+$j,$i*4+$k,($k==3)?";\r\n":"+");}}}'
+	//php -r'for($i=0;$i<4;$i++){for($j=0;$j<4;$j++){printf("this->a[%u]=",$i*4+$j);for($k=0;$k<4;$k++){printf("c[%u]*b.a[%u]%s",$k*4+$j,$i*4+$k,($k==3)?";\r\n":"+");}}}'
 
-	AffineTransformMatrix c;
-	c.a[0] = a[0] * b.a[0] + a[4] * b.a[1] + a[8] * b.a[2];
-	c.a[1] = a[1] * b.a[0] + a[5] * b.a[1] + a[9] * b.a[2];
-	c.a[2] = a[2] * b.a[0] + a[6] * b.a[1] + a[10] * b.a[2];
-	c.a[3] = 0;
-	c.a[4] = a[0] * b.a[4] + a[4] * b.a[5] + a[8] * b.a[6];
-	c.a[5] = a[1] * b.a[4] + a[5] * b.a[5] + a[9] * b.a[6];
-	c.a[6] = a[2] * b.a[4] + a[6] * b.a[5] + a[10] * b.a[6];
-	c.a[7] = 0;
-	c.a[8] = a[0] * b.a[8] + a[4] * b.a[9] + a[8] * b.a[10];
-	c.a[9] = a[1] * b.a[8] + a[5] * b.a[9] + a[9] * b.a[10];
-	c.a[10] = a[2] * b.a[8] + a[6] * b.a[9] + a[10] * b.a[10];
-	c.a[11] = 0;
-	c.a[12] = a[0] * b.a[12] + a[4] * b.a[13] + a[8] * b.a[14] + a[12];
-	c.a[13] = a[1] * b.a[12] + a[5] * b.a[13] + a[9] * b.a[14] + a[13];
-	c.a[14] = a[2] * b.a[12] + a[6] * b.a[13] + a[10] * b.a[14] + a[14];
-	c.a[15] = 1;
+	double c[16];
+	size_t i;
+	for(i = 0; i < 16; i++)
+		c[i] = this->a[i];
+
+	this->a[0] = c[0] * b.a[0] + c[4] * b.a[1] + c[8] * b.a[2] + c[12] * b.a[3];
+	this->a[1] = c[1] * b.a[0] + c[5] * b.a[1] + c[9] * b.a[2] + c[13] * b.a[3];
+	this->a[2] = c[2] * b.a[0] + c[6] * b.a[1] + c[10] * b.a[2] + c[14]
+			* b.a[3];
+	this->a[3] = c[3] * b.a[0] + c[7] * b.a[1] + c[11] * b.a[2] + c[15]
+			* b.a[3];
+	this->a[4] = c[0] * b.a[4] + c[4] * b.a[5] + c[8] * b.a[6] + c[12] * b.a[7];
+	this->a[5] = c[1] * b.a[4] + c[5] * b.a[5] + c[9] * b.a[6] + c[13] * b.a[7];
+	this->a[6] = c[2] * b.a[4] + c[6] * b.a[5] + c[10] * b.a[6] + c[14]
+			* b.a[7];
+	this->a[7] = c[3] * b.a[4] + c[7] * b.a[5] + c[11] * b.a[6] + c[15]
+			* b.a[7];
+	this->a[8] = c[0] * b.a[8] + c[4] * b.a[9] + c[8] * b.a[10] + c[12]
+			* b.a[11];
+	this->a[9] = c[1] * b.a[8] + c[5] * b.a[9] + c[9] * b.a[10] + c[13]
+			* b.a[11];
+	this->a[10] = c[2] * b.a[8] + c[6] * b.a[9] + c[10] * b.a[10] + c[14]
+			* b.a[11];
+	this->a[11] = c[3] * b.a[8] + c[7] * b.a[9] + c[11] * b.a[10] + c[15]
+			* b.a[11];
+	this->a[12] = c[0] * b.a[12] + c[4] * b.a[13] + c[8] * b.a[14] + c[12]
+			* b.a[15];
+	this->a[13] = c[1] * b.a[12] + c[5] * b.a[13] + c[9] * b.a[14] + c[13]
+			* b.a[15];
+	this->a[14] = c[2] * b.a[12] + c[6] * b.a[13] + c[10] * b.a[14] + c[14]
+			* b.a[15];
+	this->a[15] = c[3] * b.a[12] + c[7] * b.a[13] + c[11] * b.a[14] + c[15]
+			* b.a[15];
+
+	return *this;
+}
+
+//! Overloaded operator to allow correct multiplication of two matrices.
+const AffineTransformMatrix AffineTransformMatrix::operator*(
+		const AffineTransformMatrix &b) const
+{
+	AffineTransformMatrix c = *this;
+	c *= b;
 	return c;
 }
 
@@ -333,10 +371,19 @@ AffineTransformMatrix AffineTransformMatrix::operator*(
  *
  * The division is done by inverting the second matrix and the multiplying both.
  */
-AffineTransformMatrix AffineTransformMatrix::operator/(
-		AffineTransformMatrix const& b) const
+AffineTransformMatrix & AffineTransformMatrix::operator/=(
+		const AffineTransformMatrix &b)
 {
-	return *(this) * (b.Inverse());
+	(*this) = (*this) * (b.Inverse());
+	return *this;
+}
+
+const AffineTransformMatrix AffineTransformMatrix::operator/(
+		const AffineTransformMatrix &b) const
+{
+	AffineTransformMatrix c = *this;
+	c /= b;
+	return c;
 }
 
 //! Apply the transformation matrix on a given vector.

@@ -45,12 +45,12 @@ Target::~Target()
 {
 }
 
-void Target::InsertObject(Object *object, AffineTransformMatrix shift)
+void Target::InsertObject(Object &object, AffineTransformMatrix &shift)
 {
 	InitImprinting();
 	size_t i;
-	for(i = 0; i < object->geometries.GetCount(); i++){
-		InsertGeometrie(&(object->geometries[i]), shift);
+	for(i = 0; i < object.geometries.GetCount(); i++){
+		InsertGeometrie(&(object.geometries[i]), shift);
 	}
 	FinishImprint();
 }
@@ -134,8 +134,10 @@ int Target::NextDir(int sx, int sy, double height, int olddir)
 }
 
 // On the outside
-void Target::GeneratePolygon(int stx, int sty)
+const Polygon3 Target::GeneratePolygon(int stx, int sty)
 {
+	Polygon3 temp;
+
 	while(!IsVisible(stx + 1, sty)){
 		stx++;
 		if(stx + 2 >= nx){
@@ -145,10 +147,8 @@ void Target::GeneratePolygon(int stx, int sty)
 		}
 	}
 
-	Polygon3 temp;
-	temp.Clear();
 	temp.Close();
-	if(sty == ny) return;
+	if(sty == ny) return temp;
 
 	int x = stx;
 	int y = sty;
@@ -180,7 +180,7 @@ void Target::GeneratePolygon(int stx, int sty)
 
 		if(dir == -1){
 			wxLogError(_T("Target::GeneratePolygon: Lost wall contact!"));
-			return;
+			return temp;
 		}
 
 		switch(dir){
@@ -223,14 +223,17 @@ void Target::GeneratePolygon(int stx, int sty)
 		}
 	}while(x != stx || y != sty);
 
-	polygons.Add(temp);
-	PolygonFillHoles(polygons.GetCount() - 1);
-	PolygonSmooth(polygons.GetCount() - 1);
+	PolygonFillHoles(temp);
+	PolygonSmooth(temp);
+
+	return temp;
 }
 
 //On the inside
-bool Target::GeneratePolygon(int stx, int sty, double height)
+const Polygon3 Target::GeneratePolygon(int stx, int sty, double height)
 {
+	Polygon3 temp;
+
 	while(!IsFilledAbove(stx + 1, sty, height)){
 		stx++;
 		if(stx + 2 >= nx){
@@ -240,10 +243,8 @@ bool Target::GeneratePolygon(int stx, int sty, double height)
 		}
 	}
 
-	Polygon3 temp;
-	temp.Clear();
 	temp.Close();
-	if(sty == ny) return false;
+	if(sty == ny) return temp;
 	stx++;
 	int x = stx;
 	int y = sty;
@@ -256,7 +257,7 @@ bool Target::GeneratePolygon(int stx, int sty, double height)
 
 		if(dir == -1){
 			wxLogError(_T("Target::GeneratePolygon: Lost wall contact!"));
-			return false;
+			return temp;
 		}
 
 		switch(dir){
@@ -291,13 +292,13 @@ bool Target::GeneratePolygon(int stx, int sty, double height)
 		}
 	}while(x != stx || y != sty);
 
-	polygons.Add(temp);
+
 	//PolygonFillHoles(polygons.GetCount() - 1);
 	//PolygonSmooth(polygons.GetCount() - 1);
-	return true;
+	return temp;
 }
 
-void Target::PolygonFillHoles(size_t nr)
+void Target::PolygonFillHoles(Polygon3 &polygon)
 {
 	//TODO: This is crude! Find a better way.
 	size_t i;
@@ -305,94 +306,92 @@ void Target::PolygonFillHoles(size_t nr)
 	double m;
 	m = 0.0;
 	nrp = 0;
-	for(i = 0; i < polygons[nr].elements.GetCount(); i++){
-		if(polygons[nr].elements[i].z > -0.5){
+	for(i = 0; i < polygon.elements.GetCount(); i++){
+		if(polygon.elements[i].z > -0.5){
 			nrp++;
-			m += polygons[nr].elements[i].z;
+			m += polygon.elements[i].z;
 		}
 	}
 	if(nrp == 0) return;
 	m /= (double) nrp;
-	for(i = 0; i < polygons[nr].elements.GetCount(); i++){
-		if(polygons[nr].elements[i].z < -0.5){
-			polygons[nr].elements[i].z = m;
+	for(i = 0; i < polygon.elements.GetCount(); i++){
+		if(polygon.elements[i].z < -0.5){
+			polygon.elements[i].z = m;
 		}
 	}
 }
 
-void Target::PolygonSmooth(size_t nr)
+void Target::PolygonSmooth(Polygon3 &polygon)
 {
 	size_t i;
 	Vector3 d;
 	ArrayOfVector3 temp;
-	temp = polygons[nr].elements;
+	temp = polygon.elements;
 
-	for(i = 0; i < temp.GetCount(); i++){
+	for(i = 0; i < polygon.elements.GetCount(); i++){
 		if(i > 0)
-			d = temp[i - 1];
+			d = polygon.elements[i - 1];
 		else
-			d = temp[temp.GetCount() - 1];
-		d += temp[i];
-		if(i + 1 < temp.GetCount())
-			d += temp[i + 1];
+			d = polygon.elements[polygon.elements.GetCount() - 1];
+		d += polygon.elements[i];
+		if(i + 1 < polygon.elements.GetCount())
+			d += polygon.elements[i + 1];
 		else
-			d += temp[0];
-		polygons[nr].elements[i] = d / 3;
+			d += polygon.elements[0];
+		polygon.elements[i] = d / 3;
 	}
 }
 
-void Target::PolygonDropTarget(size_t nrPolygon, Target* target)
+void Target::PolygonDropTarget(Polygon3 &polygon, Target &tool)
 {
 	size_t i;
-	for(i = 0; i < polygons[nrPolygon].elements.GetCount(); i++){
-		FoldLower(round(polygons[nrPolygon].elements[i].x / rx), round(
-				polygons[nrPolygon].elements[i].y / ry),
-				polygons[nrPolygon].elements[i].z, target);
+	for(i = 0; i < polygon.elements.GetCount(); i++){
+		this->FoldLower(round(polygon.elements[i].x / rx), round(
+				polygon.elements[i].y / ry), polygon.elements[i].z, tool);
 	}
 }
 
-void Target::PolygonDrop(size_t nrPolygon, double level)
+void Target::PolygonDrop(Polygon3 &polygon, double level)
 {
 	size_t i;
 	double d;
-	for(i = 0; i < polygons[nrPolygon].elements.GetCount(); i++){
-		d = GetLevel(polygons[nrPolygon].elements[i].x,
-				polygons[nrPolygon].elements[i].y);
-		polygons[nrPolygon].elements[i].z -= level;
+	for(i = 0; i < polygon.elements.GetCount(); i++){
+		d = this->GetLevel(polygon.elements[i].x, polygon.elements[i].y);
+		polygon.elements[i].z -= level;
 		if(d >= 0.0){
-			if(d > polygons[nrPolygon].elements[i].z) polygons[nrPolygon].elements[i].z
-					= d;
+			if(d > polygon.elements[i].z) polygon.elements[i].z = d;
 		}
 	}
 }
 
-void Target::PolygonDiminish(size_t nrPolygon, double r)
+void Target::PolygonExpand(Polygon3 &polygon, double r)
 {
-	if(polygons[nrPolygon].elements.GetCount() < 2) return;
-
+	if(polygon.elements.GetCount() < 2) return;
 	size_t i;
-
 	Vector3 o, n, d;
-
-	o = polygons[nrPolygon].elements[0];
-	for(i = 1; i < polygons[nrPolygon].elements.GetCount(); i++){
-		n = polygons[nrPolygon].elements[i];
+	o = polygon.elements[0];
+	for(i = 1; i < polygon.elements.GetCount(); i++){
+		n = polygon.elements[i];
 		o = n - o;
 		o.Normalize();
-		d.x = -o.y;
-		d.y = o.x;
+		d.x = o.y;
+		d.y = -o.x;
 		d.z = o.z;
 		o = n;
-
-		polygons[nrPolygon].elements[i] = n + d * r;
+		polygon.elements[i] = n + d * r;
 	}
 }
 
-void Target::AddSupport(size_t polygonNr, double distance, double height,
+void Target::PolygonDiminish(Polygon3 &polygon, double r)
+{
+	PolygonExpand(polygon, -r);
+}
+
+void Target::AddSupport(Polygon3 &polygon, double distance, double height,
 		double width, double slotWidth)
 {
 
-	if(polygons[polygonNr].elements.GetCount() < 2) return;
+	if(polygon.elements.GetCount() < 2) return;
 
 	double dc = -distance / 2;
 	size_t i;
@@ -401,16 +400,16 @@ void Target::AddSupport(size_t polygonNr, double distance, double height,
 
 
 	// Limit polygon range
-	for(i = 0; i < polygons[polygonNr].elements.GetCount(); i++){
-		if(polygons[polygonNr].elements[i].z >= sz - (height / 2)) polygons[polygonNr].elements[i].z
+	for(i = 0; i < polygon.elements.GetCount(); i++){
+		if(polygon.elements[i].z >= sz - (height / 2)) polygon.elements[i].z
 				= sz - (height / 2) - 0.0001;
-		if(polygons[polygonNr].elements[i].z <= (height / 2)) polygons[polygonNr].elements[i].z
+		if(polygon.elements[i].z <= (height / 2)) polygon.elements[i].z
 				= (height / 2) + 0.0001;
 	}
 
-	o = polygons[polygonNr].elements[0];
-	for(i = 1; i < polygons[polygonNr].elements.GetCount(); i++){
-		p = polygons[polygonNr].elements[i];
+	o = polygon.elements[0];
+	for(i = 1; i < polygon.elements.GetCount(); i++){
+		p = polygon.elements[i];
 		h = o - p;
 		o = p;
 		h.z = 0.0;
@@ -455,15 +454,13 @@ void Target::AddSupport(size_t polygonNr, double distance, double height,
 void Target::Paint(void)
 {
 	Imprinter::Paint();
-	::glPushMatrix();
-	::glMultMatrixd(matrix.a);
+
+//	::glPushMatrix();
+//	::glMultMatrixd(matrix.a);
 	::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
+	toolpath.Paint();
+	outline.Paint();
 
-	size_t i;
-	for(i = 0; i < polygons.GetCount(); i++){
-		polygons[i].Paint();
-	}
-
-	::glPopMatrix();
+//	::glPopMatrix();
 }
 

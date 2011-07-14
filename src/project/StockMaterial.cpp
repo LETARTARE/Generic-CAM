@@ -36,9 +36,9 @@ WX_DEFINE_OBJARRAY(ArrayOfStockMaterial)
 StockMaterial::StockMaterial()
 {
 	materialName = _T("Default");
-	x = 0.85;
-	y = 0.15;
-	z = 0.025;
+	x = 0.700;
+	y = 0.450;
+	z = 0.020;
 	maxSpeed = 10000;
 	maxFeedrate = 0.05;
 	thermalConductivity = 100;

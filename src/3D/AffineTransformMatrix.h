@@ -89,17 +89,21 @@ public:
 	wxString ToString();
 	void FromString(wxString const& string);
 
-	//AffineTransformMatrix& operator=(const AffineTransformMatrix& b);
-	void Set(AffineTransformMatrix const& matrix);
-	AffineTransformMatrix operator*(AffineTransformMatrix const& b) const;
-	AffineTransformMatrix operator/(AffineTransformMatrix const& b) const;
+	AffineTransformMatrix& operator=(const AffineTransformMatrix &b);
+	void Set(AffineTransformMatrix const& b);
+
+	AffineTransformMatrix & operator*=(const AffineTransformMatrix &b);
+	const AffineTransformMatrix operator*(const AffineTransformMatrix &b) const;
+
+	AffineTransformMatrix & operator/=(const AffineTransformMatrix &b);
+	const AffineTransformMatrix operator/(const AffineTransformMatrix &b) const;
 
 	Vector3 GetCenter(void) const;
 
 	void SetIdentity();
 	static AffineTransformMatrix Identity();
 
-	AffineTransformMatrix Inverse() const;
+	const AffineTransformMatrix Inverse() const;
 
 	static AffineTransformMatrix RotateAroundVector(Vector3 const& vector,
 			double const& phi);

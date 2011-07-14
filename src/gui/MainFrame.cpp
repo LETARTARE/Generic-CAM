@@ -326,7 +326,7 @@ void MainFrame::OnSaveGCodes(wxCommandEvent &event)
 		}else
 			f.Create(fname.GetFullPath());
 
-		project[activeProject].toolpath[0].WriteToFile(f);
+		project[activeProject].run[0].WriteToFile(f);
 		f.Write();
 		f.Close();
 	}

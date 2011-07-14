@@ -36,8 +36,10 @@
 #include "../machine/Machine.h"
 #include "StockMaterial.h"
 #include "../simulator/Workpiece.h"
+#include "../simulator/ToolPath.h"
 
 #include <wx/string.h>
+#include <wx/textfile.h>
 #include <wx/dynarray.h>
 
 /*!\class Run
@@ -60,12 +62,17 @@ public:
 	bool useExtraToolbox;
 	Toolbox toolbox;
 
+	ToolPath toolPath;
+
 	StockMaterial stockMaterial;
 	Workpiece workPiece;
 	Geometry target;
 
 	// Methods
 public:
+
+	void WriteToFile(wxTextFile &f);
+
 };
 WX_DECLARE_OBJARRAY(Run, ArrayOfRun)
 ;
