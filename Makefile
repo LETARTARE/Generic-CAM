@@ -57,9 +57,11 @@ SOURCES += src/controller/Control3D.cpp \
 	
 # Generator object files:
 SOURCES += src/generator/Imprinter.cpp \
+	src/generator/TPGeneratorTest.cpp \
 
 # GUI object files:
 SOURCES += src/gui/AboutDialog.cpp \
+	src/gui/AnimationFrame.cpp \
 	src/gui/Control6DOFDialog.cpp \
 	src/gui/DataCanvas.cpp \
 	src/gui/ErrorFrame.cpp \

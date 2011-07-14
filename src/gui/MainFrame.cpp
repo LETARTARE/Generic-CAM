@@ -82,7 +82,6 @@ MainFrame::MainFrame(wxWindow* parent) :
 
 	stockFrame = new StockFrame(this);
 
-
 }
 
 MainFrame::~MainFrame()
@@ -93,16 +92,41 @@ MainFrame::~MainFrame()
 
 void MainFrame::OnCreateProject(wxCommandEvent& event)
 {
+	Project temp;
+	project.Add(temp);
 }
 void MainFrame::OnLoadProject(wxCommandEvent& event)
 {
+	wxFileName fileName;
+	wxFileDialog dialog(this, _("Open Project..."), _T(""), _T(""), _(
+			"Generic CAM Project (*.prj)|*.prj|All Files|*.*"), wxFD_OPEN
+			| wxFD_FILE_MUST_EXIST);
+
+	if(lastObjectFileName.IsOk()) dialog.SetFilename(
+			lastObjectFileName.GetFullPath());
+	if(dialog.ShowModal() == wxID_OK){
+
+		fileName = dialog.GetPath();
+		project[activeProject].Load(fileName);
+	}
 }
 void MainFrame::OnSaveProject(wxCommandEvent& event)
 {
+	wxFileName fileName;
+	wxFileDialog dialog(this, _("Save Project..."), _T(""), _T(""), _(
+			"Generic CAM Project (*.prj)|*.prj|All Files|*.*"), wxFD_SAVE
+			| wxFD_OVERWRITE_PROMPT);
+	if(dialog.ShowModal() == wxID_OK){
+		fileName = dialog.GetPath();
+
+		project[activeProject].Save(fileName);
+
+	}
 }
 void MainFrame::OnSaveProjectAs(wxCommandEvent &event)
 {
 }
+
 void MainFrame::OnQuit(wxCommandEvent& event)
 {
 	Close();
@@ -281,7 +305,7 @@ void MainFrame::OnSaveToolbox(wxCommandEvent &event)
 
 void MainFrame::OnEditStock(wxCommandEvent& event)
 {
-		stockFrame->InsertProject(&(project[activeProject]));
+	stockFrame->InsertProject(&(project[activeProject]));
 	stockFrame->Show(true);
 }
 
@@ -356,8 +380,9 @@ void MainFrame::OnSetupUnits(wxCommandEvent& event)
 	temp.ShowModal();
 }
 
-void MainFrame::OnShowAnimationControl( wxCommandEvent& event ){
-	animationFrame= new AnimationFrame(this);
+void MainFrame::OnShowAnimationControl(wxCommandEvent& event)
+{
+	animationFrame = new AnimationFrame(this);
 	animationFrame->InsertProject(&(project[activeProject]));
 	animationFrame->Show(true);
 }

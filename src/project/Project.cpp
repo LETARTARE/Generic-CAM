@@ -33,6 +33,7 @@
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfProject)
 
+#include <wx/xml/xml.h>
 #include <GL/gl.h>
 
 Project::Project()
@@ -64,6 +65,182 @@ Project::Project()
 
 Project::~Project()
 {
+}
+
+bool Project::Save(wxFileName fileName)
+{
+	if(!file) return false;
+
+	wxASSERT(xmlDocument!=NULL);
+
+	// OnSave returns false is saving failed.
+	// Save code insert below this line
+
+	wxXmlNode* root = xmlDocument->GetRoot();
+	if(root == NULL){
+		root = new wxXmlNode(wxXML_ELEMENT_NODE, _T("ringelwolfdatafile"));
+		xmlDocument->SetRoot(root);
+	}
+
+	wxXmlNode *nodeGeometry = NULL;
+	wxXmlNode *nodeSource = NULL;
+	wxXmlNode *nodeConnection = NULL;
+	wxXmlNode *nodeResult = NULL;
+	wxXmlNode *temp;
+
+	temp = root->GetChildren();
+	while(temp != NULL){
+		if(temp->GetName() == _T("geometry")) nodeGeometry = temp;
+		if(temp->GetName() == _T("source")) nodeSource = temp;
+		if(temp->GetName() == _T("connection")) nodeConnection = temp;
+		if(temp->GetName() == _T("result")) nodeResult = temp;
+		temp = temp->GetNext();
+	}
+	if(nodeGeometry == NULL){
+		nodeGeometry = new wxXmlNode(wxXML_ELEMENT_NODE, _T("geometry"));
+		root->InsertChild(nodeGeometry, NULL);
+	}
+	if(nodeSource == NULL){
+		nodeSource = new wxXmlNode(wxXML_ELEMENT_NODE, _T("source"));
+		root->InsertChild(nodeSource, NULL);
+	}
+	if(nodeConnection == NULL){
+		nodeConnection = new wxXmlNode(wxXML_ELEMENT_NODE, _T("connection"));
+		root->InsertChild(nodeConnection, NULL);
+	}
+	if(nodeResult == NULL){
+		nodeResult = new wxXmlNode(wxXML_ELEMENT_NODE, _T("result"));
+		root->InsertChild(nodeResult, NULL);
+	}
+
+	unsigned int i;
+	for(i = 0; i < geometry.Count(); i++)
+		geometry[i].ToXml(nodeGeometry);
+	for(i = 0; i < connection.Count(); i++)
+		connection[i].ToXml(nodeConnection);
+	for(i = 0; i < source.Count(); i++)
+		source[i].ToXml(nodeSource);
+	for(i = 0; i < result.Count(); i++)
+		result[i].ToXml(nodeResult);
+
+	if(!xmlDocument->Save(file, wxXML_NO_INDENTATION)){
+		return false;
+	}
+	Modify(false);
+	SetFilename( file);
+	SetDocumentSaved(true);
+#if defined( __WXOSX_MAC__ ) && wxOSX_USE_CARBON
+	wxFileName fn(file);
+	fn.MacSetDefaultTypeAndCreator();
+#endif
+	return true;
+}
+bool Project::Load(wxFileName fileName)
+{
+	wxXmlDocument* tempTree = new wxXmlDocument();
+	tempTree->SetFileEncoding(_T("UTF-8"));
+	tempTree->SetVersion(_T(_RINGELWOLF_VERSION));
+	if(!tempTree->Load(file, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES)){
+		delete tempTree;
+		return false;
+	}
+	// Swap XML trees
+	delete xmlDocument;
+	xmlDocument = tempTree;
+
+
+	// Take the tree apart
+	wxXmlNode *temp = xmlDocument->GetRoot();
+	if(temp == NULL){
+		wxLogWarning(_T("File contains no data (i.e. no root)!"));
+		return false;
+	}
+	if(temp->GetName() != _T("ringelwolfdatafile")){
+		wxLogWarning(_T("Not a Ringelwolf datafile!"));
+		return false;
+	}
+
+	ClearDocument();
+
+	Geometry *tempGeometryObject = NULL;
+	Source *tempSourceObject = NULL;
+	Connection *tempConnectionObject = NULL;
+	Result *tempResultObject = NULL;
+
+	wxXmlNode *temp2;
+
+
+	//TODO: Remove this dialog. The Parsing should be made "infinite-loop"-less.
+	bool flagParseGeometry = false;
+	wxMessageDialog dialog(NULL, _T("Parse object gemetry?"), _T("Parse data"),
+			wxYES_NO | wxYES_DEFAULT);
+	if(dialog.ShowModal() == wxID_YES) flagParseGeometry = true;
+
+	temp = temp->GetChildren();
+	while(temp != NULL){
+		if(temp->GetName() == _T("geometry")){
+			temp2 = temp->GetChildren();
+			while(temp2 != NULL){
+				tempGeometryObject = new Geometry();
+				tempGeometryObject->FromXml(temp2);
+
+				if(flagParseGeometry) tempGeometryObject->Generate();
+
+				geometry.Add(tempGeometryObject);
+				temp2 = temp2->GetNext();
+			}
+
+			wxLogMessage(_T("Geometry found!"));
+		}
+		if(temp->GetName() == _T("source")){
+			temp2 = temp->GetChildren();
+			while(temp2 != NULL){
+				tempSourceObject = new Source();
+				tempSourceObject->FromXml(temp2);
+				source.Add(tempSourceObject);
+				temp2 = temp2->GetNext();
+			}
+
+			wxLogMessage(_T("Source found!"));
+		}
+		if(temp->GetName() == _T("connection")){
+			temp2 = temp->GetChildren();
+			while(temp2 != NULL){
+				tempConnectionObject = new Connection();
+				tempConnectionObject->FromXml(temp2);
+				connection.Add(tempConnectionObject);
+				temp2 = temp2->GetNext();
+			}
+
+			wxLogMessage(_T("Connection found!"));
+		}
+		if(temp->GetName() == _T("result")){
+			temp2 = temp->GetChildren();
+			while(temp2 != NULL){
+				tempResultObject = new Result();
+				tempResultObject->FromXml(temp2);
+				result.Add(tempResultObject);
+				temp2 = temp2->GetNext();
+			}
+
+			wxLogMessage(_T("Result found!"));
+		}
+
+		temp = temp->GetNext();
+	}
+
+	SetFilename(file, true);
+
+
+	// stretching the logic a little this does make sense because the document
+	// had been saved into the file we just loaded it from, it just could have
+	// happened during a previous program execution, it's just that the name of
+	// this method is a bit unfortunate, it should probably have been called
+	// HasAssociatedFileName()
+	SetDocumentSaved(true);
+	EvaluateConnections();
+	UpdateAllViews();
+	return true;
 }
 
 void Project::Assemble(void)

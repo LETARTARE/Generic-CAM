@@ -71,8 +71,9 @@ void TPGeneratorTest::GenerateToolpath(Target &target, Object &obj, Tool &tool)
 	discSlot.SetupCylinder(slotWidth, target.GetSizeRX(), target.GetSizeRY());
 
 	obj.UpdateBoundingBox();
-	target.SetupField(obj.bbox.xmax + 4 * slotWidth, obj.bbox.ymax + 4
-			* slotWidth, target.GetSizeRX(), target.GetSizeRY());
+	target.SetupBox(obj.bbox.xmax + 4 * slotWidth, obj.bbox.ymax + 4
+			* slotWidth, target.GetSizeZ(), target.GetSizeRX(),
+			target.GetSizeRY());
 
 	target.InsertObject(obj, target.shift);
 

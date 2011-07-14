@@ -102,6 +102,10 @@ public:
 public:
 
 	void Paint(void);
+	bool Save(wxFileName fileName);
+	bool Load(wxFileName fileName);
+
+
 	void Assemble(void);
 	void GenerateTargets(void);
 	void GenerateToolpath(size_t nrTarget);
