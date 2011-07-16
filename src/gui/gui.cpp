@@ -30,7 +30,6 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	wxMenuItem* m_menuItem371;
 	m_menuItem371 = new wxMenuItem( m_menuProject, wxID_SAVE, wxString( _("&Save Project") ) + wxT('\t') + wxT("CTRL+S"), wxEmptyString, wxITEM_NORMAL );
 	m_menuProject->Append( m_menuItem371 );
-	m_menuItem371->Enable( false );
 
 	wxMenuItem* m_separator4;
 	m_separator4 = m_menuProject->AppendSeparator();
@@ -63,7 +62,7 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 
 	m_menuMachine = new wxMenu();
 	wxMenuItem* m_menuItem11;
-	m_menuItem11 = new wxMenuItem( m_menuMachine, wxID_OPEN, wxString( _("&Load Machine...") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItem11 = new wxMenuItem( m_menuMachine, wxID_ANY, wxString( _("&Load Machine...") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuMachine->Append( m_menuItem11 );
 
 	wxMenuItem* m_menuItem12;

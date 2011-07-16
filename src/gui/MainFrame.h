@@ -102,6 +102,7 @@ private:
 	// Methods
 public:
 	void SetupTree(void);
+	void LoadProject(wxString fileName);
 
 private:
 
@@ -109,6 +110,7 @@ private:
 
 	void OnCreateProject(wxCommandEvent& event);
 	void OnLoadProject(wxCommandEvent& event);
+
 	void OnSaveProject(wxCommandEvent& event);
 	void OnSaveProjectAs(wxCommandEvent& event);
 	void OnQuit(wxCommandEvent& event);

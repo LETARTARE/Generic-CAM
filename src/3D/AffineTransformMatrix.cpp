@@ -32,7 +32,6 @@
 
 #include <cmath>
 #include <wx/tokenzr.h>
-#include <wx/string.h>
 
 AffineTransformMatrix::AffineTransformMatrix()
 {

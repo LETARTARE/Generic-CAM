@@ -45,6 +45,51 @@ Target::~Target()
 {
 }
 
+void Target::ToXml(wxXmlNode* parentNode)
+{
+	wxXmlNode *temp, *temp2;
+	wxXmlNode *nodeObject = NULL;
+
+	nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("target"));
+	//		nodeObject->AddProperty(_T("name"), objectName);
+	parentNode->InsertChild(nodeObject, NULL);
+
+
+	// Insert new matrix
+	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("matrix"));
+	nodeObject->InsertChild(temp, NULL);
+	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
+			matrix.ToString());
+	temp->InsertChild(temp2, NULL);
+
+
+	// Insert outline
+	//	size_t i;
+	//	for(i = 0; i < triangles.GetCount(); i++){
+	//		temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("tri"));
+	//		nodeObject->InsertChild(temp, NULL);
+	//		temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
+	//				triangles[i].ToString());
+	//		temp->InsertChild(temp2, NULL);
+	//	}
+}
+
+bool Target::FromXml(wxXmlNode* node)
+{
+	if(node->GetName() != _T("target")) return false;
+	//	objectName = node->GetPropVal(_T("name"), _T(""));
+
+
+	wxXmlNode *temp = node->GetChildren();
+
+	while(temp != NULL){
+		if(temp->GetName() == _T("matrix")) matrix.FromString(
+				temp->GetNodeContent());
+		temp = temp->GetNext();
+	}
+	return true;
+}
+
 void Target::InsertObject(Object &object, AffineTransformMatrix &shift)
 {
 	InitImprinting();
@@ -455,12 +500,14 @@ void Target::Paint(void)
 {
 	Imprinter::Paint();
 
-//	::glPushMatrix();
-//	::glMultMatrixd(matrix.a);
+
+	//	::glPushMatrix();
+	//	::glMultMatrixd(matrix.a);
 	::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
 	toolpath.Paint();
 	outline.Paint();
 
-//	::glPopMatrix();
+
+	//	::glPopMatrix();
 }
 

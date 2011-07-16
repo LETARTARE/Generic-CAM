@@ -37,6 +37,7 @@
 #include "../simulator/ToolPath.h"
 //#include "../simulator/Workpiece.h"
 #include <wx/string.h>
+#include <wx/xml/xml.h>
 
 class Machine {
 	friend class LUACodeEvaluator;
@@ -73,6 +74,9 @@ private:
 
 	// Methods
 public:
+	void ToXml(wxXmlNode* parentNode);
+	bool FromXml(wxXmlNode* node);
+
 	void Paint(void) const;
 
 	void ClearComponents(void);

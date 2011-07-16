@@ -39,6 +39,7 @@
 
 #include "../generator/Imprinter.h"
 #include <wx/dynarray.h>
+#include <wx/xml/xml.h>
 
 #include "Object.h"
 #include "../3D/Polygon3.h"
@@ -60,6 +61,9 @@ public:
 
 	//Methods:
 public:
+	void ToXml(wxXmlNode* parentNode);
+	bool FromXml(wxXmlNode* node);
+
 	void InsertObject(Object &object, AffineTransformMatrix &shift);
 
 	int NextDir(int sx, int sy, double height, int olddir);

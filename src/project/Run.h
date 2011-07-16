@@ -40,6 +40,7 @@
 
 #include <wx/string.h>
 #include <wx/textfile.h>
+#include <wx/xml/xml.h>
 #include <wx/dynarray.h>
 
 /*!\class Run
@@ -70,6 +71,8 @@ public:
 
 	// Methods
 public:
+	void ToXml(wxXmlNode* parentNode);
+	bool FromXml(wxXmlNode* node);
 
 	void WriteToFile(wxTextFile &f);
 

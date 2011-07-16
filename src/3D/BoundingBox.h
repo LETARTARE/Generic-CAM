@@ -60,18 +60,24 @@ public:
 public:
 
 	void Reset(void);
-	void Insert(const Geometry &geometry);
+	void Insert(const Geometry &geometry, AffineTransformMatrix &matrix);
 	void Insert(Surface &surface);
+
+	bool IsVolumeZero(void);
+
 	double GetSizeX(void)
 	{
+		if(xmax < xmin) return 0.0;
 		return xmax - xmin;
 	}
 	double GetSizeY(void)
 	{
+		if(ymax < ymin) return 0.0;
 		return ymax - ymin;
 	}
 	double GetSizeZ(void)
 	{
+		if(zmax < zmin) return 0.0;
 		return zmax - zmin;
 	}
 

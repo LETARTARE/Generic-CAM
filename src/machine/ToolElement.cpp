@@ -29,6 +29,7 @@
 
 #include "ToolElement.h"
 
+#include <wx/tokenzr.h>
 #include <wx/arrimpl.cpp>
 // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfToolElement)
@@ -52,6 +53,47 @@ ToolElement::ToolElement()
 	t = 0;
 }
 
+ToolElement::ToolElement(wxString string)
+
+{
+	this->FromString(string);
+}
+
+
 ToolElement::~ToolElement()
 {
+}
+
+wxString ToolElement::ToString(void) const
+{
+	return wxString::Format(_T("%f#%f#%f#%u#%c"), d, h, r, t,
+			cutting? 'C' : 'N');
+}
+
+void ToolElement::FromString(wxString const &string)
+{
+	wxStringTokenizer tkz(string, wxT("#"));
+	double temp;
+	while(tkz.HasMoreTokens()){
+		wxString token = tkz.GetNextToken();
+		switch(tkz.CountTokens()){
+		case 4:
+			token.ToDouble(&temp);
+			d = temp;
+			break;
+		case 3:
+			token.ToDouble(&temp);
+			h = temp;
+			break;
+		case 2:
+			token.ToDouble(&temp);
+			r = temp;
+			break;
+		case 1:
+			t=token[0];
+			break;
+		case 0:
+			if(token=='C')cutting=true; else cutting=false;
+		}
+	}
 }

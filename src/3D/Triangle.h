@@ -33,6 +33,7 @@
 
 #include "Vector3.h"
 #include "AffineTransformMatrix.h"
+#include <wx/string.h>
 #include <wx/dynarray.h>
 /*!\class Triangle
  * \brief Defines a simple triangle.
@@ -41,12 +42,19 @@
  */
 
 class Triangle {
+	// Constructor/Destructor:
 public:
 	Triangle();
+	Triangle(wxString string);
 	virtual ~Triangle();
+	//Member variables:
 	Vector3 p[3]; //!< Position of vertices.
 	Vector3 n[3]; //!< Normal vectors.
 	Vector3 c[3]; //!< Color vectors.
+
+	//Methods:
+	wxString ToString(void) const;
+	void FromString(wxString const &string);
 
 	void Paint(bool useNormals = true, bool useColors = false) const;
 	void CalculateNormal();

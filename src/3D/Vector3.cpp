@@ -30,11 +30,34 @@
 
 #include "Vector3.h"
 
+#include <wx/tokenzr.h>
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfVector3)
 
-Vector3::~Vector3(void)
+wxString Vector3::ToString(void) const
 {
+	return wxString::Format(_T("%f#%f#%f"), x, y, z);
+}
+
+void Vector3::FromString(wxString const& string)
+{
+	wxStringTokenizer tkz(string, wxT("#"));
+	double temp;
+	while(tkz.HasMoreTokens()){
+		wxString token = tkz.GetNextToken();
+		token.ToDouble(&temp);
+		switch(tkz.CountTokens()){
+		case 2:
+			x = temp;
+			break;
+		case 1:
+			y = temp;
+			break;
+		case 0:
+			z = temp;
+			break;
+		}
+	}
 }
 
 float Vector3::Abs(void)

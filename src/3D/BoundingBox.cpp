@@ -51,12 +51,21 @@ void BoundingBox::Reset(void)
 	xmin = ymin = zmin = DBL_MAX;
 }
 
-void BoundingBox::Insert(const Geometry &geometry)
+bool BoundingBox::IsVolumeZero(void)
+{
+	if(xmax < xmin) return true;
+	if(ymax < ymin) return true;
+	if(zmax < zmin) return true;
+	return false;
+}
+
+void BoundingBox::Insert(const Geometry &geometry,
+		AffineTransformMatrix &matrix)
 {
 	size_t i, j;
 	for(i = 0; i < geometry.triangles.GetCount(); i++){
 		Triangle temp = geometry.triangles[i];
-		temp.ApplyTransformation(geometry.matrix);
+		temp.ApplyTransformation(matrix * geometry.matrix);
 		for(j = 0; j < 3; j++){
 			if(temp.p[j].x > xmax) xmax = temp.p[j].x;
 			if(temp.p[j].x < xmin) xmin = temp.p[j].x;

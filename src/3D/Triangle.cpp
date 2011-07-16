@@ -29,15 +29,73 @@
 
 #include "Triangle.h"
 #include <GL/gl.h>
-
+#include <wx/tokenzr.h>
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfTriangle)
 
 Triangle::Triangle()
 {
 }
+Triangle::Triangle(wxString string)
+{
+	this->FromString(string);
+}
+
 Triangle::~Triangle()
 {
+}
+
+wxString Triangle::ToString(void) const
+{
+	wxString temp;
+	temp = p[0].ToString() + _T(";");
+	temp += p[1].ToString() + _T(";");
+	temp += p[2].ToString() + _T(";");
+	temp += n[0].ToString() + _T(";");
+	temp += n[1].ToString() + _T(";");
+	temp += n[2].ToString() + _T(";");
+	temp += c[0].ToString() + _T(";");
+	temp += c[1].ToString() + _T(";");
+	temp += c[2].ToString();
+	return temp;
+}
+
+void Triangle::FromString(wxString const &string)
+{
+	wxStringTokenizer tkz(string, wxT(";"));
+	double temp;
+	while(tkz.HasMoreTokens()){
+		wxString token = tkz.GetNextToken();
+		switch(tkz.CountTokens()){
+		case 8:
+			p[0].FromString(token);
+			break;
+		case 7:
+			p[1].FromString(token);
+			break;
+		case 6:
+			p[2].FromString(token);
+			break;
+		case 5:
+			n[0].FromString(token);
+			break;
+		case 4:
+			n[1].FromString(token);
+			break;
+		case 3:
+			n[2].FromString(token);
+			break;
+		case 2:
+			c[0].FromString(token);
+			break;
+		case 1:
+			c[1].FromString(token);
+			break;
+		case 0:
+			c[2].FromString(token);
+			break;
+		}
+	}
 }
 
 /*!\brief Puts a triangle in the OpenGL queue.

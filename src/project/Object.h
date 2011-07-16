@@ -36,7 +36,7 @@
 
 #include <wx/filename.h>
 #include <wx/dynarray.h>
-
+#include <wx/xml/xml.h>
 /*!\class Object
  * \brief ...
  *
@@ -51,6 +51,8 @@ public:
 
 	// Member variables
 public:
+
+	AffineTransformMatrix matrix;
 
 	wxFileName fileName;
 
@@ -69,6 +71,11 @@ public:
 	bool LoadObject(wxFileName fileName);
 	bool ReloadObject(void);
 
+	void ToXml(wxXmlNode* parentNode);
+	bool FromXml(wxXmlNode* node);
+
+private:
+	void XMLRemoveAllChildren(wxXmlNode* node);
 };
 WX_DECLARE_OBJARRAY(Object, ArrayOfObject)
 ;

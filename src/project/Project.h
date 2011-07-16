@@ -45,6 +45,7 @@
 #include "Unit.h"
 
 #include <wx/string.h>
+#include <wx/xml/xml.h>
 
 #include <wx/dynarray.h>
 
@@ -61,6 +62,7 @@ public:
 	virtual ~Project();
 	// Member variables
 public:
+	wxFileName fileName;
 	wxString projectName;
 
 	ArrayOfObject objects;
@@ -98,9 +100,13 @@ public:
 	double slotWidth;
 
 
+
+protected:
+	wxXmlDocument doc;
+
 	// Methods
 public:
-
+	void ClearProject(void);
 	void Paint(void);
 	bool Save(wxFileName fileName);
 	bool Load(wxFileName fileName);
@@ -110,6 +116,8 @@ public:
 	void GenerateTargets(void);
 	void GenerateToolpath(size_t nrTarget);
 
+private:
+	void XMLRemoveAllChildren(wxXmlNode* node);
 };
 WX_DECLARE_OBJARRAY(Project, ArrayOfProject)
 ;

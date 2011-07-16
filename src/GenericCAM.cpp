@@ -38,8 +38,35 @@ GenericCAMApp::GenericCAMApp()
 
 bool GenericCAMApp::OnInit()
 {
+	if(!wxApp::OnInit()) return false;
+
 	frame = new MainFrame(NULL);
-	frame -> Show();
+
+	if(!loadOnStartup.IsEmpty()) frame->LoadProject(loadOnStartup);
+
+	frame -> Show(true);
+	SetTopWindow(frame);
+
+	return true;
+}
+
+void GenericCAMApp::OnInitCmdLine(wxCmdLineParser& parser)
+{
+	parser.AddParam(_("<filepath of document to open>"), wxCMD_LINE_VAL_STRING,
+			wxCMD_LINE_PARAM_OPTIONAL);
+	return wxApp::OnInitCmdLine(parser);
+}
+
+bool GenericCAMApp::OnCmdLineParsed(wxCmdLineParser& parser)
+{
+	wxString str;
+	int count = parser.GetParamCount();
+	if(count == 1){
+		str = parser.GetParam(0);
+//		if(_DEBUGMODE) wxLogMessage(_T("cmd line param: ") + str);
+		loadOnStartup = str;
+
+	}
 	return true;
 }
 

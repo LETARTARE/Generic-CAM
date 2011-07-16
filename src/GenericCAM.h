@@ -33,6 +33,8 @@
 #include "StdInclude.h"
 #include "Config.h"
 #include "gui/MainFrame.h"
+#include <wx/cmdline.h>
+#include <wx/string.h>
 
 class GenericCAMApp:public wxApp {
 	// Constructor
@@ -42,10 +44,13 @@ public:
 	// Member variables
 public:
 	MainFrame* frame;
+	wxString loadOnStartup;
 
 	// Methods
 public:
 	virtual bool OnInit();
+	virtual void OnInitCmdLine(wxCmdLineParser& parser);
+	virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
 
 };
 DECLARE_APP(GenericCAMApp)

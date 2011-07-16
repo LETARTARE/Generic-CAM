@@ -35,20 +35,33 @@
 #define _CVECTOR3_H_
 
 #include <cmath>
+#include <wx/string.h>
 #include <wx/dynarray.h>
 
 class Vector3 {
+	// Constructor/Destructor:
 public:
-	Vector3(float px = 0, float py = 0, float pz = 0) :
+	Vector3(float px = 0.0, float py = 0.0, float pz = 0.0) :
 		x(px), y(py), z(pz)
 	{
 	}
+	Vector3(wxString string)
+	{
+		this->FromString(string);
+	}
 
-	~Vector3(void);
+	~Vector3(void){}
+
+	// Member variables:
 public:
 	float x;
 	float y;
 	float z;
+
+	// Methods:
+public:
+	wxString ToString(void) const;
+	void FromString(wxString const& string);
 
 	//!Calculate the absolut length of a vector.
 	float Abs();

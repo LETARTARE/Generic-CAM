@@ -34,7 +34,7 @@
 #include "../3D/Vector3.h"
 
 #include <wx/dynarray.h>
-
+#include <wx/string.h>
 class ToolContourElement {
 	// Constructor/ Destructor
 public:
@@ -60,6 +60,7 @@ class ToolElement {
 	// Constructor / Destructor
 public:
 	ToolElement();
+	ToolElement(wxString string);
 	virtual ~ToolElement();
 
 	// Member variables
@@ -72,6 +73,9 @@ public:
 
 	// Methods
 public:
+
+	wxString ToString(void) const;
+	void FromString(wxString const &string);
 
 };
 WX_DECLARE_OBJARRAY(ToolElement, ArrayOfToolElement)

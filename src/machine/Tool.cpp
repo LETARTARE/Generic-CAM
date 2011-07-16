@@ -53,6 +53,72 @@ Tool::~Tool()
 
 }
 
+void Tool::ToXml(wxXmlNode* parentNode)
+{
+	wxXmlNode *temp, *temp2;
+	wxXmlNode *nodeObject = NULL;
+
+
+	// Find out, if object already exists in XML tree.
+	temp = parentNode->GetChildren();
+	while(temp != NULL && nodeObject == NULL){
+		if(temp->GetName() == _T("tool")
+				&& temp->GetPropVal(_T("name"), _T("")) == toolName) nodeObject
+				= temp;
+		temp = temp->GetNext();
+	}
+	if(nodeObject == NULL){
+		nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("tool"));
+		nodeObject->AddProperty(_T("name"), toolName);
+		parentNode->InsertChild(nodeObject, NULL);
+	}
+
+	// Remove the subelements, that will be updated
+	temp = nodeObject->GetChildren();
+	while(temp != NULL){
+		temp2 = NULL;
+		if(temp->GetName() == _T("feedcoefficient")) temp2 = temp;
+		if(temp->GetName() == _T("tri")) temp2 = temp;
+		temp = temp->GetNext();
+		if(temp2 != NULL){
+			nodeObject->RemoveChild(temp2);
+			delete (temp2);
+		}
+	}
+
+	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("feedcoefficient"));
+	nodeObject->InsertChild(temp, NULL);
+	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
+			wxString::Format(_T("%f"), feedCoefficient));
+	temp->InsertChild(temp2, NULL);
+
+
+	//	// Insert new triangles
+	//	size_t i;
+	//	for(i = 0; i < triangles.GetCount(); i++){
+	//		temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("tri"));
+	//		nodeObject->InsertChild(temp, NULL);
+	//		temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
+	//				triangles[i].ToString());
+	//		temp->InsertChild(temp2, NULL);
+	//	}
+}
+
+void Tool::FromXml(wxXmlNode* node)
+{
+	toolName = node->GetPropVal(_T("name"), _T(""));
+
+	wxXmlNode *temp = node->GetChildren();
+	while(temp != NULL){
+		if(temp->GetName() == _T("feedcoefficient")){
+			temp->GetNodeContent().ToDouble(&feedCoefficient);
+
+		}
+
+		temp = temp->GetNext();
+	}
+}
+
 void Tool::GenerateContour(void)
 {
 	contour.Clear();

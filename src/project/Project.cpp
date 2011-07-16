@@ -29,15 +29,30 @@
 
 
 #include "Project.h"
-
+#include "../Config.h"
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfProject)
 
-#include <wx/xml/xml.h>
 #include <GL/gl.h>
 
 Project::Project()
 {
+	doc.SetFileEncoding(_T("UTF-8"));
+	//doc.SetVersion(_T(_GENERICCAM_VERSION));
+	doc.SetVersion(_T("1.0"));
+	ClearProject();
+}
+
+Project::~Project()
+{
+}
+
+void Project::ClearProject(void)
+{
+	objects.Empty();
+	targets.Empty();
+	run.Empty();
+
 	modified = false;
 	projectName = _("Untitled");
 
@@ -48,7 +63,7 @@ Project::Project()
 	displayGeometry = true;
 	displayBoundingBox = false;
 	displayMachine = false;
-	displayStock = true;
+	displayStock = false;
 	displayWorkpiece = false;
 	displayTarget = true;
 	displayToolpath = true;
@@ -60,186 +75,196 @@ Project::Project()
 
 	slotWidth = 0.010;
 	resolution = 0.0005;
-
 }
 
-Project::~Project()
+// Recursive tree deletion.
+void Project::XMLRemoveAllChildren(wxXmlNode* node)
 {
+	wxXmlNode *temp, *temp2;
+	temp = node->GetChildren();
+	while(temp != NULL){
+		XMLRemoveAllChildren(temp);
+		temp2 = temp;
+		temp = temp->GetNext();
+		node->RemoveChild(temp2);
+		delete (temp2);
+	}
 }
 
 bool Project::Save(wxFileName fileName)
 {
-	if(!file) return false;
+	if(!fileName.IsOk()) return false;
 
-	wxASSERT(xmlDocument!=NULL);
-
-	// OnSave returns false is saving failed.
-	// Save code insert below this line
-
-	wxXmlNode* root = xmlDocument->GetRoot();
+	wxXmlNode* root = doc.GetRoot();
 	if(root == NULL){
-		root = new wxXmlNode(wxXML_ELEMENT_NODE, _T("ringelwolfdatafile"));
-		xmlDocument->SetRoot(root);
+		root = new wxXmlNode(wxXML_ELEMENT_NODE, _T("GenericCAMProjectFile"));
+		doc.SetRoot(root);
 	}
 
-	wxXmlNode *nodeGeometry = NULL;
-	wxXmlNode *nodeSource = NULL;
-	wxXmlNode *nodeConnection = NULL;
-	wxXmlNode *nodeResult = NULL;
+	wxXmlNode *nodeObject = NULL;
+	wxXmlNode *nodeMachine = NULL;
+	wxXmlNode *nodeTool = NULL;
+	wxXmlNode *nodeTarget = NULL;
+	wxXmlNode *nodeRun = NULL;
+
 	wxXmlNode *temp;
 
 	temp = root->GetChildren();
+
+
+	// Check if there are already all necessary nodes in the document.
 	while(temp != NULL){
-		if(temp->GetName() == _T("geometry")) nodeGeometry = temp;
-		if(temp->GetName() == _T("source")) nodeSource = temp;
-		if(temp->GetName() == _T("connection")) nodeConnection = temp;
-		if(temp->GetName() == _T("result")) nodeResult = temp;
+		if(temp->GetName() == _T("Objects")) nodeObject = temp;
+		if(temp->GetName() == _T("Machine")) nodeMachine = temp;
+		if(temp->GetName() == _T("Tools")) nodeTool = temp;
+		if(temp->GetName() == _T("Targets")) nodeTarget = temp;
+		if(temp->GetName() == _T("Runs")) nodeRun = temp;
 		temp = temp->GetNext();
 	}
-	if(nodeGeometry == NULL){
-		nodeGeometry = new wxXmlNode(wxXML_ELEMENT_NODE, _T("geometry"));
-		root->InsertChild(nodeGeometry, NULL);
+	// If a knode is missing, generate it!
+	if(nodeObject == NULL){
+		nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("Objects"));
+		root->InsertChild(nodeObject, NULL);
 	}
-	if(nodeSource == NULL){
-		nodeSource = new wxXmlNode(wxXML_ELEMENT_NODE, _T("source"));
-		root->InsertChild(nodeSource, NULL);
+	if(nodeMachine == NULL){
+		nodeMachine = new wxXmlNode(wxXML_ELEMENT_NODE, _T("Machine"));
+		root->InsertChildAfter(nodeMachine, nodeObject);
 	}
-	if(nodeConnection == NULL){
-		nodeConnection = new wxXmlNode(wxXML_ELEMENT_NODE, _T("connection"));
-		root->InsertChild(nodeConnection, NULL);
+	if(nodeTool == NULL){
+		nodeTool = new wxXmlNode(wxXML_ELEMENT_NODE, _T("Tools"));
+		root->InsertChildAfter(nodeTool, nodeMachine);
 	}
-	if(nodeResult == NULL){
-		nodeResult = new wxXmlNode(wxXML_ELEMENT_NODE, _T("result"));
-		root->InsertChild(nodeResult, NULL);
+	if(nodeTarget == NULL){
+		nodeTarget = new wxXmlNode(wxXML_ELEMENT_NODE, _T("Targets"));
+		root->InsertChildAfter(nodeTarget, nodeTool);
+	}
+	if(nodeRun == NULL){
+		nodeRun = new wxXmlNode(wxXML_ELEMENT_NODE, _T("Runs"));
+		root->InsertChildAfter(nodeRun, nodeTarget);
 	}
 
-	unsigned int i;
-	for(i = 0; i < geometry.Count(); i++)
-		geometry[i].ToXml(nodeGeometry);
-	for(i = 0; i < connection.Count(); i++)
-		connection[i].ToXml(nodeConnection);
-	for(i = 0; i < source.Count(); i++)
-		source[i].ToXml(nodeSource);
-	for(i = 0; i < result.Count(); i++)
-		result[i].ToXml(nodeResult);
+	// Insert Data into the nodes.
+	size_t i;
+	for(i = 0; i < objects.GetCount(); i++)
+		objects[i].ToXml(nodeObject);
+	machine.ToXml(nodeMachine);
+	//TODO: Rework the tool system!
 
-	if(!xmlDocument->Save(file, wxXML_NO_INDENTATION)){
-		return false;
-	}
-	Modify(false);
-	SetFilename( file);
-	SetDocumentSaved(true);
-#if defined( __WXOSX_MAC__ ) && wxOSX_USE_CARBON
-	wxFileName fn(file);
-	fn.MacSetDefaultTypeAndCreator();
-#endif
+	XMLRemoveAllChildren(nodeTarget);
+	for(i = 0; i < targets.GetCount(); i++)
+		targets[i].ToXml(nodeTarget);
+	for(i = 0; i < run.GetCount(); i++)
+		run[i].ToXml(nodeRun);
+
+	if(!doc.Save(fileName.GetFullPath(), wxXML_NO_INDENTATION)) return false;
+	modified = false;
+	this->fileName = fileName;
 	return true;
 }
+
 bool Project::Load(wxFileName fileName)
 {
 	wxXmlDocument* tempTree = new wxXmlDocument();
-	tempTree->SetFileEncoding(_T("UTF-8"));
-	tempTree->SetVersion(_T(_RINGELWOLF_VERSION));
-	if(!tempTree->Load(file, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES)){
+	//tempTree->SetFileEncoding(_T("UTF-8"));
+	//tempTree->SetVersion(_T(_GENERICCAM_VERSION));
+
+	if(!tempTree->Load(fileName.GetFullPath(), wxT("UTF-8"))){
 		delete tempTree;
+		wxLogWarning(_T("Project::Load: Coud not load ")
+				+ fileName.GetFullPath() + _T(" file!"));
 		return false;
 	}
 	// Swap XML trees
-	delete xmlDocument;
-	xmlDocument = tempTree;
+	this->doc = *tempTree;
 
 
 	// Take the tree apart
-	wxXmlNode *temp = xmlDocument->GetRoot();
+	wxXmlNode *temp = doc.GetRoot();
 	if(temp == NULL){
 		wxLogWarning(_T("File contains no data (i.e. no root)!"));
 		return false;
 	}
-	if(temp->GetName() != _T("ringelwolfdatafile")){
-		wxLogWarning(_T("Not a Ringelwolf datafile!"));
+	if(temp->GetName() != _T("GenericCAMProjectFile")){
+		wxLogWarning(_T("Not a Generic CAM datafile!"));
 		return false;
 	}
 
-	ClearDocument();
+	ClearProject();
 
-	Geometry *tempGeometryObject = NULL;
-	Source *tempSourceObject = NULL;
-	Connection *tempConnectionObject = NULL;
-	Result *tempResultObject = NULL;
+	Object* tempObject = NULL;
+	Tool* tempTool = NULL;
+	Target* tempTarget = NULL;
+	Run* tempRun = NULL;
 
 	wxXmlNode *temp2;
 
-
-	//TODO: Remove this dialog. The Parsing should be made "infinite-loop"-less.
-	bool flagParseGeometry = false;
-	wxMessageDialog dialog(NULL, _T("Parse object gemetry?"), _T("Parse data"),
-			wxYES_NO | wxYES_DEFAULT);
-	if(dialog.ShowModal() == wxID_YES) flagParseGeometry = true;
-
 	temp = temp->GetChildren();
 	while(temp != NULL){
-		if(temp->GetName() == _T("geometry")){
+
+//		wxLogMessage(_T("Node found: ") + temp->GetName());
+
+		if(temp->GetName() == _T("Objects")){
 			temp2 = temp->GetChildren();
 			while(temp2 != NULL){
-				tempGeometryObject = new Geometry();
-				tempGeometryObject->FromXml(temp2);
+//				wxLogMessage(_T("Objects node found: ") + temp2->GetName());
+				tempObject = new Object();
+				if(tempObject->FromXml(temp2))
+					objects.Add(tempObject);
+				else
+					delete tempObject;
 
-				if(flagParseGeometry) tempGeometryObject->Generate();
-
-				geometry.Add(tempGeometryObject);
+				temp2 = temp2->GetNext();
+			}
+//			wxLogMessage(_T("Objects node found!"));
+		}
+		if(temp->GetName() == _T("Machine")){
+			temp2 = temp->GetChildren();
+			while(temp2 != NULL){
+				machine.FromXml(temp2);
+				temp2 = temp2->GetNext();
+			}
+//			wxLogMessage(_T("Machine node found!"));
+		}
+		if(temp->GetName() == _T("Tools")){
+			//TODO: Rework tool system!
+			//			temp2 = temp->GetChildren();
+			//			while(temp2 != NULL){
+			//				tempObject = new Object();
+			//				tempObject->FromXml(temp2);
+			//				objects.Add(tempObject);
+			//				temp2 = temp2->GetNext();
+			//			}
+//			wxLogMessage(_T("Tools node found!"));
+		}
+		if(temp->GetName() == _T("Targets")){
+			temp2 = temp->GetChildren();
+			while(temp2 != NULL){
+				tempTarget = new Target();
+				if(tempTarget->FromXml(temp2))
+					targets.Add(tempTarget);
+				else
+					delete tempTarget;
 				temp2 = temp2->GetNext();
 			}
 
-			wxLogMessage(_T("Geometry found!"));
+//			wxLogMessage(_T("Targets node found!"));
 		}
-		if(temp->GetName() == _T("source")){
+
+		if(temp->GetName() == _T("Runs")){
 			temp2 = temp->GetChildren();
 			while(temp2 != NULL){
-				tempSourceObject = new Source();
-				tempSourceObject->FromXml(temp2);
-				source.Add(tempSourceObject);
+				tempRun = new Run();
+				if(tempRun->FromXml(temp2))
+					run.Add(tempRun);
+				else
+					delete tempRun;
 				temp2 = temp2->GetNext();
 			}
 
-			wxLogMessage(_T("Source found!"));
+//			wxLogMessage(_T("Runs node found!"));
 		}
-		if(temp->GetName() == _T("connection")){
-			temp2 = temp->GetChildren();
-			while(temp2 != NULL){
-				tempConnectionObject = new Connection();
-				tempConnectionObject->FromXml(temp2);
-				connection.Add(tempConnectionObject);
-				temp2 = temp2->GetNext();
-			}
-
-			wxLogMessage(_T("Connection found!"));
-		}
-		if(temp->GetName() == _T("result")){
-			temp2 = temp->GetChildren();
-			while(temp2 != NULL){
-				tempResultObject = new Result();
-				tempResultObject->FromXml(temp2);
-				result.Add(tempResultObject);
-				temp2 = temp2->GetNext();
-			}
-
-			wxLogMessage(_T("Result found!"));
-		}
-
 		temp = temp->GetNext();
 	}
-
-	SetFilename(file, true);
-
-
-	// stretching the logic a little this does make sense because the document
-	// had been saved into the file we just loaded it from, it just could have
-	// happened during a previous program execution, it's just that the name of
-	// this method is a bit unfortunate, it should probably have been called
-	// HasAssociatedFileName()
-	SetDocumentSaved(true);
-	EvaluateConnections();
-	UpdateAllViews();
 	return true;
 }
 

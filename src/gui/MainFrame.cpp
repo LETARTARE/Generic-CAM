@@ -109,22 +109,44 @@ void MainFrame::OnLoadProject(wxCommandEvent& event)
 		fileName = dialog.GetPath();
 		project[activeProject].Load(fileName);
 	}
+	SetupTree();
+	this->Refresh();
+
 }
+
+void MainFrame::LoadProject(wxString fileName)
+{
+	wxFileName file;
+	file = fileName;
+	project[activeProject].Load(file);
+	SetupTree();
+	this->Refresh();
+}
+
 void MainFrame::OnSaveProject(wxCommandEvent& event)
 {
+	if(!project[activeProject].fileName.IsOk()) OnSaveProjectAs(event);
+
 	wxFileName fileName;
 	wxFileDialog dialog(this, _("Save Project..."), _T(""), _T(""), _(
 			"Generic CAM Project (*.prj)|*.prj|All Files|*.*"), wxFD_SAVE
 			| wxFD_OVERWRITE_PROMPT);
 	if(dialog.ShowModal() == wxID_OK){
 		fileName = dialog.GetPath();
-
 		project[activeProject].Save(fileName);
 
 	}
 }
 void MainFrame::OnSaveProjectAs(wxCommandEvent &event)
 {
+	wxFileName fileName;
+	wxFileDialog dialog(this, _("Save Project As..."), _T(""), _T(""), _(
+			"Generic CAM Project (*.prj)|*.prj|All Files|*.*"), wxFD_SAVE
+			| wxFD_OVERWRITE_PROMPT);
+	if(dialog.ShowModal() == wxID_OK){
+		fileName = dialog.GetPath();
+		project[activeProject].Save(fileName);
+	}
 }
 
 void MainFrame::OnQuit(wxCommandEvent& event)

@@ -37,6 +37,7 @@
 
 #include <wx/string.h>
 #include <wx/dynarray.h>
+#include <wx/xml/xml.h>
 
 /*!\class Geometry
  * \brief Contains geometric data.
@@ -60,6 +61,9 @@ public:
 
 	// Methods
 public:
+	void ToXml(wxXmlNode* parentNode);
+	bool FromXml(wxXmlNode* node);
+
 	void Paint(void) const;
 
 	void Clear(void);

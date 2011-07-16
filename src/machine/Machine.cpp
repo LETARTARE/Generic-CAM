@@ -46,6 +46,70 @@ Machine::~Machine()
 {
 }
 
+void Machine::ToXml(wxXmlNode* parentNode)
+{
+	wxXmlNode *temp, *temp2;
+	wxXmlNode *nodeObject = NULL;
+
+
+	// Find out, if object already exists in XML tree.
+	temp = parentNode->GetChildren();
+	while(temp != NULL && nodeObject == NULL){
+		if(temp->GetName() == _T("machine") && temp->GetPropVal(_T("name"),
+				_T("")) == fileName.GetFullName()) nodeObject = temp;
+		temp = temp->GetNext();
+	}
+	if(nodeObject == NULL){
+		nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("machine"));
+		nodeObject->AddProperty(_T("name"), fileName.GetFullName());
+		parentNode->InsertChild(nodeObject, NULL);
+	}
+
+	// Remove the subelements, that will be updated
+	temp = nodeObject->GetChildren();
+	while(temp != NULL){
+		temp2 = NULL;
+		if(temp->GetName() == _T("filename")) temp2 = temp;
+		if(temp->GetName() == _T("description")) temp2 = temp;
+		temp = temp->GetNext();
+		if(temp2 != NULL){
+			nodeObject->RemoveChild(temp2);
+			delete (temp2);
+		}
+	}
+
+	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("filename"));
+	nodeObject->InsertChild(temp, NULL);
+	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
+			fileName.GetFullPath());
+	temp->InsertChild(temp2, NULL);
+
+	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("description"));
+	nodeObject->InsertChild(temp, NULL);
+	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
+			machineDescription);
+	temp->InsertChild(temp2, NULL);
+
+}
+
+bool Machine::FromXml(wxXmlNode* node)
+{
+	//	objectName = node->GetPropVal(_T("name"), _T(""));
+	if(node->GetName() != _T("machine")) return false;
+
+	wxXmlNode *temp = node->GetChildren();
+	while(temp != NULL){
+		if(temp->GetName() == _T("filename")){
+			fileName = temp->GetNodeContent();
+		}
+		if(temp->GetName() == _T("description")){
+			machineDescription = temp->GetNodeContent();
+		}
+		temp = temp->GetNext();
+	}
+	return true;
+}
+
 void Machine::Paint(void) const
 {
 	size_t i;
@@ -59,10 +123,10 @@ void Machine::Paint(void) const
 		tool->Paint();
 		::glPopMatrix();
 	}
-//	::glPushMatrix();
-//	::glMultMatrixd(workpiecePosition.a);
-//	workpiece.Paint();
-//	::glPopMatrix();
+	//	::glPushMatrix();
+	//	::glMultMatrixd(workpiecePosition.a);
+	//	workpiece.Paint();
+	//	::glPopMatrix();
 
 
 	//if(toolpath != NULL) toolpath->Paint();

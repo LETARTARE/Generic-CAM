@@ -34,6 +34,7 @@
 WX_DEFINE_OBJARRAY(ArrayOfObject)
 
 #include <wx/log.h>
+#include <GL/gl.h>
 
 #include "../3D/FileGTS.h"
 #include "../3D/FileSTL.h"
@@ -49,9 +50,12 @@ Object::~Object()
 
 void Object::Paint(void)
 {
+	::glPushMatrix();
+	::glMultMatrixd(matrix.a);
 	size_t i;
 	for(i = 0; i < geometries.GetCount(); i++)
 		geometries[i].Paint();
+	::glPopMatrix();
 }
 
 void Object::UpdateBoundingBox(void)
@@ -59,7 +63,7 @@ void Object::UpdateBoundingBox(void)
 	size_t i;
 	bbox.Reset();
 	for(i = 0; i < geometries.GetCount(); i++)
-		bbox.Insert((geometries[i]));
+		bbox.Insert((geometries[i]), matrix);
 }
 
 bool Object::LoadObject(wxFileName fileName)
@@ -137,3 +141,90 @@ bool Object::ReloadObject(void)
 
 	return false;
 }
+
+// Recursive tree deletion.
+void Object::XMLRemoveAllChildren(wxXmlNode* node)
+{
+	wxXmlNode *temp, *temp2;
+	temp = node->GetChildren();
+	while(temp != NULL){
+		XMLRemoveAllChildren(temp);
+		temp2 = temp;
+		temp = temp->GetNext();
+		node->RemoveChild(temp2);
+		delete (temp2);
+	}
+}
+
+void Object::ToXml(wxXmlNode* parentNode)
+{
+	wxXmlNode *temp, *temp2;
+	wxXmlNode *nodeObject = NULL;
+
+
+	// Find out, if object already exists in XML tree.
+	temp = parentNode->GetChildren();
+	while(temp != NULL && nodeObject == NULL){
+		if(temp->GetName() == _T("object") && temp->GetPropVal(_T("name"),
+				_T("")) == fileName.GetName()) nodeObject = temp;
+		temp = temp->GetNext();
+	}
+	if(nodeObject == NULL){
+		nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("object"));
+		nodeObject->AddProperty(_T("name"), fileName.GetName());
+		parentNode->InsertChild(nodeObject, NULL);
+	}
+
+	// Remove the subelements, that will be updated
+	temp = nodeObject->GetChildren();
+	while(temp != NULL){
+		temp2 = NULL;
+		if(temp->GetName() == _T("geometry")) temp2 = temp;
+		if(temp->GetName() == _T("matrix")) temp2 = temp;
+		temp = temp->GetNext();
+		if(temp2 != NULL){
+			XMLRemoveAllChildren(temp2);
+			nodeObject->RemoveChild(temp2);
+			delete (temp2);
+		}
+	}
+
+	// Insert new geometries
+	size_t i;
+	for(i = 0; i < geometries.GetCount(); i++)
+		geometries[i].ToXml(nodeObject);
+
+
+	// Insert new matrix
+	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("matrix"));
+	nodeObject->InsertChild(temp, NULL);
+	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
+			matrix.ToString());
+	temp->InsertChild(temp2, NULL);
+}
+
+bool Object::FromXml(wxXmlNode* node)
+{
+	if(node->GetName() != _T("object")) return false;
+
+	fileName.SetName(node->GetPropVal(_T("name"), _T("")));
+	wxXmlNode *temp = node->GetChildren();
+	Geometry * geometry;
+
+	while(temp != NULL){
+		if(temp->GetName() == _T("geometry")){
+			geometry = new Geometry();
+			if(geometry->FromXml(temp))
+				geometries.Add(geometry);
+			else
+				delete geometry;
+		}
+		if(temp->GetName() == _T("matrix")) matrix.FromString(
+				temp->GetNodeContent());
+
+		temp = temp->GetNext();
+	}
+	UpdateBoundingBox();
+	return true;
+}
+

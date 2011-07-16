@@ -36,8 +36,8 @@
 #include "../3D/Vector3.h"
 
 #include <wx/string.h>
+#include <wx/xml/xml.h>
 #include <wx/dynarray.h>
-
 
 class Tool {
 	// Constructor / Destructor
@@ -48,10 +48,10 @@ public:
 	// Member variables
 public:
 	wxString toolName;
-	float shaftDiameter;
-	float shaftLength;
-	float maxSpeed;
-	float feedCoefficient;
+	double shaftDiameter;
+	double shaftLength;
+	double maxSpeed;
+	double feedCoefficient;
 	unsigned int nrOfTeeth;
 	wxString comment;
 	ArrayOfToolElement elements;
@@ -61,6 +61,9 @@ public:
 
 	// Methods
 public:
+	void ToXml(wxXmlNode* parentNode);
+	void FromXml(wxXmlNode* node);
+
 	void GenerateContour(void);
 
 	float GetPositiveLength(void);
@@ -69,7 +72,6 @@ public:
 
 	void Paint(void);
 };
-
 WX_DECLARE_OBJARRAY(Tool, ArrayOfTool)
 ;
 
