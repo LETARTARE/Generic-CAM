@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : Polygon3.h
-// Purpose            :
+// Purpose            : Contains a 2.5D polygon.
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 07.07.2011
+// Created            : 17.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,8 +28,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef POLYGON3_H_
-#define POLYGON3_H_
+#ifndef POLYGON25_H_
+#define POLYGON25_H_
 
 /*!\class Polygon3
  * \brief ...
@@ -38,31 +38,27 @@
  */
 
 #include <wx/dynarray.h>
-#include "Vector3.h"
-#include "AffineTransformMatrix.h"
+#include "../3D/Polygon3.h"
 
-class Polygon3 {
+class Polygon25:public Polygon3 {
 	// Constructor / Destructor
 public:
-	Polygon3();
-	virtual ~Polygon3();
+	Polygon25();
+	virtual ~Polygon25();
 	// Member variables
 public:
-	AffineTransformMatrix matrix;
-	Vector3 color;
-	ArrayOfVector3 elements;
 
-	bool isClosed;
 
 	// Methods
 public:
-	void Clear(void);
-	void Close(bool close = true);
-	void InsertPoint(double x = 0.0, double y = 0.0, double z = 0.0);
-	void Paint(void) const;
-	double GetLength(void) const;
+	double GetLengthXY(void) const;
+
+	void PolygonFillHoles(void);
+	void PolygonSmooth(void);
+	void PolygonExpand(double r);
+	void PolygonDiminish(double r);
 };
-WX_DECLARE_OBJARRAY(Polygon3, ArrayOfPolygon3)
+WX_DECLARE_OBJARRAY(Polygon25, ArrayOfPolygon25)
 ;
 
-#endif /* POLYGON3_H_ */
+#endif /* POLYGON25_H_ */

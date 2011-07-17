@@ -83,6 +83,8 @@ public:
 		facing_up, facing_down, facing_side, other
 	};
 
+	bool displayBox;
+
 protected:
 	ImprinterElement *field;
 	double sx, sy, sz;

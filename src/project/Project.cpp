@@ -201,12 +201,13 @@ bool Project::Load(wxFileName fileName)
 	temp = temp->GetChildren();
 	while(temp != NULL){
 
-//		wxLogMessage(_T("Node found: ") + temp->GetName());
+
+		//		wxLogMessage(_T("Node found: ") + temp->GetName());
 
 		if(temp->GetName() == _T("Objects")){
 			temp2 = temp->GetChildren();
 			while(temp2 != NULL){
-//				wxLogMessage(_T("Objects node found: ") + temp2->GetName());
+				//				wxLogMessage(_T("Objects node found: ") + temp2->GetName());
 				tempObject = new Object();
 				if(tempObject->FromXml(temp2))
 					objects.Add(tempObject);
@@ -215,7 +216,7 @@ bool Project::Load(wxFileName fileName)
 
 				temp2 = temp2->GetNext();
 			}
-//			wxLogMessage(_T("Objects node found!"));
+			//			wxLogMessage(_T("Objects node found!"));
 		}
 		if(temp->GetName() == _T("Machine")){
 			temp2 = temp->GetChildren();
@@ -223,7 +224,7 @@ bool Project::Load(wxFileName fileName)
 				machine.FromXml(temp2);
 				temp2 = temp2->GetNext();
 			}
-//			wxLogMessage(_T("Machine node found!"));
+			//			wxLogMessage(_T("Machine node found!"));
 		}
 		if(temp->GetName() == _T("Tools")){
 			//TODO: Rework tool system!
@@ -234,7 +235,7 @@ bool Project::Load(wxFileName fileName)
 			//				objects.Add(tempObject);
 			//				temp2 = temp2->GetNext();
 			//			}
-//			wxLogMessage(_T("Tools node found!"));
+			//			wxLogMessage(_T("Tools node found!"));
 		}
 		if(temp->GetName() == _T("Targets")){
 			temp2 = temp->GetChildren();
@@ -247,7 +248,8 @@ bool Project::Load(wxFileName fileName)
 				temp2 = temp2->GetNext();
 			}
 
-//			wxLogMessage(_T("Targets node found!"));
+
+			//			wxLogMessage(_T("Targets node found!"));
 		}
 
 		if(temp->GetName() == _T("Runs")){
@@ -261,7 +263,8 @@ bool Project::Load(wxFileName fileName)
 				temp2 = temp2->GetNext();
 			}
 
-//			wxLogMessage(_T("Runs node found!"));
+
+			//			wxLogMessage(_T("Runs node found!"));
 		}
 		temp = temp->GetNext();
 	}
@@ -312,8 +315,7 @@ void Project::GenerateTargets(void)
 	n = ceil(obj->bbox.zmax / stock.stockMaterials[activeStock].z);
 
 	Target discSlot;
-	discSlot.SetupCylinder(slotWidth, stock.stockMaterials[activeStock].z,
-			resolution, resolution);
+	discSlot.SetupDisc(slotWidth, resolution, resolution);
 
 	discSlot.matrix.TranslateGlobal(0.1, -0.1, 0);
 	targets.Add(discSlot);
@@ -329,16 +331,27 @@ void Project::GenerateTargets(void)
 				* -stock.stockMaterials[activeStock].z);
 
 		temp.InsertObject(*obj, temp.shift);
+
+		temp.matrix.TranslateGlobal(obj->bbox.xmax + 4 * slotWidth, 0, 0);
+		targets.Add(temp);
+
 		temp.FoldRaise(discSlot);
+
+		temp.matrix.TranslateGlobal(obj->bbox.xmax + 4 * slotWidth, 0, 0);
+		targets.Add(temp);
+
 		temp.outline = temp.GeneratePolygon(-1, -1);
-		temp.PolygonSmooth(temp.outline);
-		temp.PolygonSmooth(temp.outline);
-		temp.PolygonSmooth(temp.outline);
+		temp.outline.PolygonSmooth();
+		temp.outline.PolygonSmooth();
+		temp.outline.PolygonSmooth();
+
+		temp.matrix.TranslateGlobal(obj->bbox.xmax + 4 * slotWidth, 0, 0);
 
 
 		//temp.ClearField();
 
 		if(temp.outline.elements.GetCount() >= 2){
+
 
 			ToolPathGenerator.GenerateToolpath(temp, *obj, toolbox.tools[0]);
 			targets.Add(temp);
@@ -347,7 +360,7 @@ void Project::GenerateTargets(void)
 
 	}
 
-	displayGeometry = false;
+//	displayGeometry = false;
 	displayStock = false;
 
 }

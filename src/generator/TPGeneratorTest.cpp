@@ -68,7 +68,7 @@ void TPGeneratorTest::GenerateToolpath(Target &target, Object &obj, Tool &tool)
 	discTool.SetupDisc(0.003, target.GetSizeRX(), target.GetSizeRY());
 
 	Target discSlot;
-	discSlot.SetupCylinder(slotWidth, target.GetSizeRX(), target.GetSizeRY());
+	discSlot.SetupDisc(slotWidth, target.GetSizeRX(), target.GetSizeRY());
 
 	obj.UpdateBoundingBox();
 	target.SetupBox(obj.bbox.xmax + 4 * slotWidth, obj.bbox.ymax + 4
@@ -104,7 +104,7 @@ void TPGeneratorTest::GenerateToolpath(Target &target, Object &obj, Tool &tool)
 	tp.positions.Add(m);
 
 	ArrayOfPolygon3 pgs;
-	Polygon3 pg;
+	Polygon25 pg;
 
 	while(level > 0.0){
 
@@ -115,7 +115,7 @@ void TPGeneratorTest::GenerateToolpath(Target &target, Object &obj, Tool &tool)
 			if(pg.elements.GetCount() < 2) flag = false;
 			if(flag){
 				target.PolygonDrop(pg, levelDrop);
-				target.PolygonSmooth(pg);
+				pg.PolygonSmooth();
 				target.PolygonDropTarget(pg, discTool);
 				pgs.Add(pg);
 			}

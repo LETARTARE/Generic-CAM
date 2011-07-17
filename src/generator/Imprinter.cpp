@@ -31,6 +31,7 @@
 #include "Imprinter.h"
 #include <float.h>
 #include <GL/gl.h>
+#include <math.h>
 
 ImprinterElement::ImprinterElement()
 {
@@ -65,8 +66,10 @@ Imprinter::Imprinter(const double sizeX, const double sizeY,
 {
 	field = NULL;
 	nx = ny = N = 0;
-	sx = sy = 0.0;
+	sx = sy = sz = 0.0;
 	rx = ry = 1.0;
+
+	displayBox = false;
 
 	this->SetupBox(sizeX, sizeY, sizeZ, resolutionX, resolutionY);
 }
@@ -75,7 +78,7 @@ Imprinter::Imprinter(const Imprinter& ip)
 {
 	this->field = NULL;
 	this->nx = this->ny = this->N = 0;
-	this->sx = this->sy = 0.0;
+	this->sx = this->sy = this->sz = 0.0;
 	this->rx = this->ry = 1.0;
 
 	if(ip.N == 0) return;
@@ -86,6 +89,7 @@ Imprinter::Imprinter(const Imprinter& ip)
 	this->colorNormal = ip.colorNormal;
 	this->colorTodo = ip.colorTodo;
 	this->colorUnscratched = ip.colorUnscratched;
+	this->displayBox = ip.displayBox;
 	this->matrix = ip.matrix;
 }
 
@@ -217,6 +221,8 @@ void Imprinter::SetupSphere(double radius, const double resolutionX,
 	size_t cellsY = ceil(radius / resolutionY) * 2 + 1;
 	if(!SetupField(cellsX, cellsY, resolutionX, resolutionY)) return;
 
+	sz = radius;
+
 	double centerX = (ceil(radius / resolutionX) + 0.5) * rx;
 	double centerY = (ceil(radius / resolutionY) + 0.5) * ry;
 
@@ -251,7 +257,7 @@ void Imprinter::SetupCylinder(double radius, double height,
 	size_t cellsX = ceil(radius / resolutionX) * 2 + 1;
 	size_t cellsY = ceil(radius / resolutionY) * 2 + 1;
 	if(!SetupField(cellsX, cellsY, resolutionX, resolutionY)) return;
-
+	sz = height;
 	double centerX = (ceil(radius / resolutionX) + 0.5) * rx;
 	double centerY = (ceil(radius / resolutionY) + 0.5) * ry;
 
@@ -286,6 +292,8 @@ void Imprinter::SetupDisc(double radius, const double resolutionX,
 	size_t cellsY = ceil(radius / resolutionY) * 2 + 1;
 	if(!SetupField(cellsX, cellsY, resolutionX, resolutionY)) return;
 
+	sz = 5*FLT_EPSILON;
+
 	double centerX = (ceil(radius / resolutionX) + 0.5) * rx;
 	double centerY = (ceil(radius / resolutionY) + 0.5) * ry;
 
@@ -301,7 +309,7 @@ void Imprinter::SetupDisc(double radius, const double resolutionX,
 					- centerY);
 			if(d <= radius * radius){
 				field[p].upperLimit = 5 * FLT_EPSILON;
-				field[p].lowerLimit = -5 * FLT_EPSILON;
+				field[p].lowerLimit = 0.0;
 			}else{
 				field[p].upperLimit = 0.0;
 				field[p].lowerLimit = sz;
@@ -1051,8 +1059,85 @@ void Imprinter::Paint() const
 		}
 		py += ry;
 	}
-
 	::glEnd();
+	if(displayBox || true){
+
+		double cornerLength = 0.3; // 30% of a side
+		double dx = this->sx * cornerLength;
+		double dy = this->sy * cornerLength;
+		double dz = this->sz * cornerLength;
+
+		::glColor3f(0.8, 0.8, 0.8);
+
+		::glBegin(GL_LINES);
+
+		glNormal3d(0, -M_SQRT2, -M_SQRT2);
+		glVertex3d(0, 0, 0);
+		glVertex3d(dx, 0, 0);
+		glVertex3d(sx, 0, 0);
+		glVertex3d(sx - dx, 0, 0);
+		glNormal3d(0, M_SQRT2, -M_SQRT2);
+		glVertex3d(0, sy, 0);
+		glVertex3d(dx, sy, 0);
+		glVertex3d(sx, sy, 0);
+		glVertex3d(sx - dx, sy, 0);
+		glNormal3d(0, M_SQRT2, M_SQRT2);
+		glVertex3d(0, sy, sz);
+		glVertex3d(dx, sy, sz);
+		glVertex3d(sx, sy, sz);
+		glVertex3d(sx - dx, sy, sz);
+		glNormal3d(0, -M_SQRT2, M_SQRT2);
+		glVertex3d(0, 0, sz);
+		glVertex3d(dx, 0, sz);
+		glVertex3d(sx, 0, sz);
+		glVertex3d(sx - dx, 0, sz);
+
+		glNormal3d(-M_SQRT2, 0, -M_SQRT2);
+		glVertex3d(0, 0, 0);
+		glVertex3d(0, dy, 0);
+		glVertex3d(0, sy, 0);
+		glVertex3d(0, sy - dy, 0);
+		glNormal3d(M_SQRT2, 0, -M_SQRT2);
+		glVertex3d(sx, 0, 0);
+		glVertex3d(sx, dy, 0);
+		glVertex3d(sx, sy, 0);
+		glVertex3d(sx, sy - dy, 0);
+		glNormal3d(M_SQRT2, 0, M_SQRT2);
+		glVertex3d(sx, 0, sz);
+		glVertex3d(sx, dy, sz);
+		glVertex3d(sx, sy, sz);
+		glVertex3d(sx, sy - dy, sz);
+		glNormal3d(-M_SQRT2, 0, M_SQRT2);
+		glVertex3d(0, 0, sz);
+		glVertex3d(0, dy, sz);
+		glVertex3d(0, sy, sz);
+		glVertex3d(0, sy - dy, sz);
+
+		glNormal3d(-M_SQRT2, -M_SQRT2, 0);
+		glVertex3d(0, 0, 0);
+		glVertex3d(0, 0, dz);
+		glVertex3d(0, 0, sz);
+		glVertex3d(0, 0, sz - dz);
+		glNormal3d(M_SQRT2, -M_SQRT2, 0);
+		glVertex3d(sx, 0, 0);
+		glVertex3d(sx, 0, dz);
+		glVertex3d(sx, 0, sz);
+		glVertex3d(sx, 0, sz - dz);
+		glNormal3d(M_SQRT2, M_SQRT2, 0);
+		glVertex3d(sx, sy, 0);
+		glVertex3d(sx, sy, dz);
+		glVertex3d(sx, sy, sz);
+		glVertex3d(sx, sy, sz - dz);
+		glNormal3d(-M_SQRT2, M_SQRT2, 0);
+		glVertex3d(0, sy, 0);
+		glVertex3d(0, sy, dz);
+		glVertex3d(0, sy, sz);
+		glVertex3d(0, sy, sz - dz);
+
+		::glEnd();
+
+	}
+
 	::glPopMatrix();
 }
 

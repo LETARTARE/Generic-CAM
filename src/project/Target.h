@@ -42,9 +42,9 @@
 #include <wx/xml/xml.h>
 
 #include "Object.h"
-#include "../3D/Polygon3.h"
+#include "../generator/Polygon25.h"
 #include "../simulator/ToolPath.h"
-#include <cstddef>
+//#include <cstddef>
 
 class Target:public Imprinter {
 	// Constructor/ Destructor
@@ -55,7 +55,7 @@ public:
 	//Member variables:
 public:
 	//double shiftZ;
-	Polygon3 outline;
+	Polygon25 outline;
 	ToolPath toolpath;
 	AffineTransformMatrix shift;
 
@@ -68,16 +68,15 @@ public:
 
 	int NextDir(int sx, int sy, double height, int olddir);
 	int NextDir(int sx, int sy, int olddir);
-	const Polygon3 GeneratePolygon(int sx, int sy, double height);
-	const Polygon3 GeneratePolygon(int sx, int sy);
+	const Polygon25 GeneratePolygon(int sx, int sy, double height);
+	const Polygon25 GeneratePolygon(int sx, int sy);
+	const Polygon25 GenerateConvexOutline(void);
 
 	// Polygon3 Methods
-	void PolygonFillHoles(Polygon3 &polygon);
-	void PolygonSmooth(Polygon3 &polygon);
+
 	void PolygonDropTarget(Polygon3 &polygon, Target &tool);
 	void PolygonDrop(Polygon3 &polygon, double level);
-	void PolygonExpand(Polygon3 &polygon, double r);
-	void PolygonDiminish(Polygon3 &polygon, double r);
+
 
 	void AddSupport(Polygon3 &polygon, double distance, double height,
 			double width, double slotWidth);

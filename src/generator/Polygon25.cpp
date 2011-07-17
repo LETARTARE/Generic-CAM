@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Polygon3.cpp
-// Purpose            :
+// Name               : Polygon25.cpp
+// Purpose            : Contains a 2.5D polygon.
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 07.07.2011
+// Created            : 17.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,37 +28,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#include "Polygon3.h"
+#include "Polygon25.h"
 
 #include <GL/gl.h>
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
-WX_DEFINE_OBJARRAY(ArrayOfPolygon3)
+WX_DEFINE_OBJARRAY(ArrayOfPolygon25)
 
-Polygon3::Polygon3()
+Polygon25::Polygon25()
 {
-	isClosed = false;
-	color.Set(0.8, 0.8, 0.8);
 }
 
-Polygon3::~Polygon3()
+Polygon25::~Polygon25()
 {
-}
-void Polygon3::Clear(void)
-{
-	elements.Clear();
 }
 
-void Polygon3::InsertPoint(double x, double y, double z)
-{
-	Vector3 temp(x, y, z);
-	elements.Add(temp);
-}
-void Polygon3::Close(bool close)
-{
-	isClosed = close;
-}
-
-double Polygon3::GetLength(void) const
+double Polygon25::GetLengthXY(void) const
 {
 	if(elements.GetCount() <= 1) return 0.0;
 	double d = 0.0;
@@ -68,33 +52,83 @@ double Polygon3::GetLength(void) const
 	temp = elements[0];
 	for(i = 1; i < elements.GetCount(); i++){
 		temp2 = temp - elements[i];
+		temp2.z = 0;
 		d += temp2.Abs();
 		temp = elements[i];
 	}
 	if(isClosed){
 		temp2 = temp - elements[0];
+		temp2.z = 0;
 		d += temp2.Abs();
 	}
 	return d;
 }
 
-void Polygon3::Paint() const
+void Polygon25::PolygonFillHoles(void)
 {
-	::glPushMatrix();
-	::glMultMatrixd(matrix.a);
-
-	::glColor3f(color.x, color.y, color.z);
-	::glNormal3f(0, 0, 1);
-
-	if(isClosed)
-		::glBegin(GL_LINE_LOOP);
-	else
-		::glBegin(GL_LINE_STRIP);
+	//TODO: This is crude! Find a better way.
 	size_t i;
-	for(i = 0; i < elements.GetCount(); i++)
-		::glVertex3f(elements[i].x, elements[i].y, elements[i].z);
-	::glEnd();
+	size_t nrp;
+	double m;
+	m = 0.0;
+	nrp = 0;
+	for(i = 0; i < elements.GetCount(); i++){
+		if(elements[i].z > -0.5){
+			nrp++;
+			m += elements[i].z;
+		}
+	}
+	if(nrp == 0) return;
+	m /= (double) nrp;
+	for(i = 0; i < elements.GetCount(); i++){
+		if(elements[i].z < -0.5){
+			elements[i].z = m;
+		}
+	}
+}
 
-	::glPopMatrix();
+void Polygon25::PolygonSmooth(void)
+{
+	size_t i;
+	Vector3 d;
+	ArrayOfVector3 temp;
+	temp = elements;
+
+	for(i = 0; i < elements.GetCount(); i++){
+		if(i > 0)
+			d = elements[i - 1];
+		else
+			d = elements[elements.GetCount() - 1];
+		d += elements[i];
+		if(i + 1 < elements.GetCount())
+			d += elements[i + 1];
+		else
+			d += elements[0];
+		temp[i] = d / 3;
+	}
+	elements = temp;
+}
+
+void Polygon25::PolygonExpand(double r)
+{
+	if(elements.GetCount() < 2) return;
+	size_t i;
+	Vector3 o, n, d;
+	o = elements[0];
+	for(i = 1; i < elements.GetCount(); i++){
+		n = elements[i];
+		o = n - o;
+		o.Normalize();
+		d.x = o.y;
+		d.y = -o.x;
+		d.z = o.z;
+		o = n;
+		elements[i] = n + d * r;
+	}
+}
+
+void Polygon25::PolygonDiminish(double r)
+{
+	this->PolygonExpand(-r);
 }
 
