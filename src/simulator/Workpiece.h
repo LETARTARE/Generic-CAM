@@ -48,12 +48,11 @@ public:
 	// Member variables
 public:
 
+
 	// Methods
 public:
 
-
-
-	void Paint() const;
+	void Paint();
 
 	void SetupBox(const double sizeX, const double sizeY, const double sizeZ,
 			const double resolutionX = 0.001, const double resolutionY = 0.001);

@@ -50,8 +50,7 @@ Project::~Project()
 void Project::ClearProject(void)
 {
 	objects.Empty();
-	targets.Empty();
-	run.Empty();
+	runs.Empty();
 
 	modified = false;
 	projectName = _("Untitled");
@@ -65,7 +64,8 @@ void Project::ClearProject(void)
 	displayMachine = false;
 	displayStock = false;
 	displayWorkpiece = false;
-	displayTarget = true;
+	displayRun = true;
+	displayTargets = true;
 	displayToolpath = true;
 
 	Tolerance.Setup(_T("m"), _T("mm"), (double) 1 / 1000);
@@ -151,10 +151,10 @@ bool Project::Save(wxFileName fileName)
 	//TODO: Rework the tool system!
 
 	XMLRemoveAllChildren(nodeTarget);
-	for(i = 0; i < targets.GetCount(); i++)
-		targets[i].ToXml(nodeTarget);
-	for(i = 0; i < run.GetCount(); i++)
-		run[i].ToXml(nodeRun);
+	//	for(i = 0; i < targets.GetCount(); i++)
+	//		targets[i].ToXml(nodeTarget);
+	for(i = 0; i < runs.GetCount(); i++)
+		runs[i].ToXml(nodeRun);
 
 	if(!doc.Save(fileName.GetFullPath(), wxXML_NO_INDENTATION)) return false;
 	modified = false;
@@ -237,27 +237,27 @@ bool Project::Load(wxFileName fileName)
 			//			}
 			//			wxLogMessage(_T("Tools node found!"));
 		}
-		if(temp->GetName() == _T("Targets")){
-			temp2 = temp->GetChildren();
-			while(temp2 != NULL){
-				tempTarget = new Target();
-				if(tempTarget->FromXml(temp2))
-					targets.Add(tempTarget);
-				else
-					delete tempTarget;
-				temp2 = temp2->GetNext();
-			}
-
-
-			//			wxLogMessage(_T("Targets node found!"));
-		}
+		//		if(temp->GetName() == _T("Targets")){
+		//			temp2 = temp->GetChildren();
+		//			while(temp2 != NULL){
+		//				tempTarget = new Target();
+		//				if(tempTarget->FromXml(temp2))
+		//					targets.Add(tempTarget);
+		//				else
+		//					delete tempTarget;
+		//				temp2 = temp2->GetNext();
+		//			}
+		//
+		//
+		//			//			wxLogMessage(_T("Targets node found!"));
+		//		}
 
 		if(temp->GetName() == _T("Runs")){
 			temp2 = temp->GetChildren();
 			while(temp2 != NULL){
 				tempRun = new Run();
 				if(tempRun->FromXml(temp2))
-					run.Add(tempRun);
+					runs.Add(tempRun);
 				else
 					delete tempRun;
 				temp2 = temp2->GetNext();
@@ -280,7 +280,7 @@ void Project::Assemble(void)
 
 void Project::Paint(void)
 {
-	size_t i;
+	size_t i, j;
 	if(displayGeometry){
 		for(i = 0; i < objects.GetCount(); i++)
 			objects[i].Paint();
@@ -288,9 +288,19 @@ void Project::Paint(void)
 	if(displayMachine) machine.Paint();
 	if(displayStock) stock.Paint();
 
-	if(displayTarget){
-		for(i = 0; i < targets.GetCount(); i++)
-			targets[i].Paint();
+	if(displayRun){
+		for(i = 0; i < runs.GetCount(); i++){
+			runs[i].Paint();
+			if(displayTargets){
+				for(j = 0; j < runs[i].placements.GetCount(); j++){
+					::glPushMatrix();
+					::glMultMatrixd(runs[i].placements[j].matrix.a);
+					targets[runs[i].placements[j].targetNumber].Paint();
+					::glPopMatrix();
+				}
+			}
+
+		}
 	}
 
 
@@ -303,11 +313,15 @@ void Project::Paint(void)
 
 void Project::GenerateTargets(void)
 {
-	targets.Clear();
 
-	Target temp;
+	Target temp, temp2;
+	TargetPlacement tempPlace;
+	Run* run = new Run;
+
+	AffineTransformMatrix shift;
 
 	Object* obj = &(objects[activeObject]);
+	AffineTransformMatrix oldPos = obj->matrix;
 
 	obj->UpdateBoundingBox();
 
@@ -317,35 +331,76 @@ void Project::GenerateTargets(void)
 	Target discSlot;
 	discSlot.SetupDisc(slotWidth, resolution, resolution);
 
-	discSlot.matrix.TranslateGlobal(0.1, -0.1, 0);
-	targets.Add(discSlot);
 
-	for(i = 2; i < 3; i++){
+	//	discSlot.matrix.TranslateGlobal(0.1, -0.1, 0);
+	//	targets.Add(discSlot);
+
+	double gridx = 0.0;
+	double gridy = 0.0;
+	double gridsx = obj->bbox.xmax + 4 * slotWidth;
+	double gridsy = obj->bbox.ymax + 4 * slotWidth;
+
+	runs.Clear();
+	targets.Clear();
+
+	for(i = 0; i < n; i++){
 
 		temp.SetupBox(obj->bbox.xmax + 4 * slotWidth, obj->bbox.ymax + 4
 				* slotWidth, stock.stockMaterials[activeStock].z, resolution,
 				resolution);
 
-		temp.shift.SetIdentity();
-		temp.shift.TranslateGlobal(2.0 * slotWidth, 2.0 * slotWidth, (double) i
+		shift.SetIdentity();
+		shift.TranslateGlobal(2.0 * slotWidth, 2.0 * slotWidth, (double) i
 				* -stock.stockMaterials[activeStock].z);
 
-		temp.InsertObject(*obj, temp.shift);
+		obj->matrix = shift * oldPos;
+		temp.InsertObject(*obj);
 
-		temp.matrix.TranslateGlobal(obj->bbox.xmax + 4 * slotWidth, 0, 0);
+
+		//		temp.matrix.TranslateGlobal(obj->bbox.xmax + 4 * slotWidth, 0, 0);
+		//		targets.Add(temp);
+
+		temp2 = temp;
+		temp2.FoldRaise(discSlot);
+		temp.outline = temp2.GeneratePolygon(-1, -1);
+		temp.outline.PolygonSmooth();
+		temp.outline.PolygonSmooth();
+		temp.outline.PolygonSmooth();
+
+
+		//temp.FillOutsidePolygon(temp.outline);
+		temp2.HardInvert();
+		temp += temp2;
+
+		temp.AddSupport(temp.outline, supportDistance, supportHeight,
+				supportWidth, slotWidth);
+		tempPlace.matrix.SetIdentity();
+		tempPlace.matrix.TranslateGlobal(gridx, gridy, 0.0);
+
+		temp.refresh=true;
 		targets.Add(temp);
+		tempPlace.targetNumber = targets.GetCount() - 1;
+		tempPlace.outline = temp.outline;
+		run->placements.Add(tempPlace);
 
-		temp.FoldRaise(discSlot);
+		gridx += gridsx;
+		if(gridx + gridsx > stock.stockMaterials[activeStock].x){
+			gridx = 0.0;
+			gridy += gridsy;
+		}
 
-		temp.matrix.TranslateGlobal(obj->bbox.xmax + 4 * slotWidth, 0, 0);
-		targets.Add(temp);
 
-		temp.outline = temp.GeneratePolygon(-1, -1);
-		temp.outline.PolygonSmooth();
-		temp.outline.PolygonSmooth();
-		temp.outline.PolygonSmooth();
+		//		Target mill;
+		//		mill.SetupDisc(3.0/1000,temp.GetSizeRX(),temp.GetSizeRY());
+		//		temp.FoldRaise(mill);
+		//
+		//		temp.InvertTop();
+		//
+		//		temp.matrix.TranslateGlobal(obj->bbox.xmax + 4 * slotWidth, 0, 0);
+		//		targets.Add(temp);
 
-		temp.matrix.TranslateGlobal(obj->bbox.xmax + 4 * slotWidth, 0, 0);
+
+		//temp.matrix.TranslateGlobal(obj->bbox.xmax + 4 * slotWidth, 0, 0);
 
 
 		//temp.ClearField();
@@ -353,14 +408,18 @@ void Project::GenerateTargets(void)
 		if(temp.outline.elements.GetCount() >= 2){
 
 
-			ToolPathGenerator.GenerateToolpath(temp, *obj, toolbox.tools[0]);
-			targets.Add(temp);
+			//			ToolPathGenerator.GenerateToolpath(temp, *obj, toolbox.tools[0]);
+			//						targets.Add(temp);
 
 		}
 
 	}
+	runs.Add(run);
 
-//	displayGeometry = false;
+	obj->matrix = oldPos;
+
+
+	//	displayGeometry = false;
 	displayStock = false;
 
 }

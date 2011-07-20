@@ -56,11 +56,11 @@ void Target::ToXml(wxXmlNode* parentNode)
 
 
 	// Insert new matrix
-	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("matrix"));
-	nodeObject->InsertChild(temp, NULL);
-	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
-			matrix.ToString());
-	temp->InsertChild(temp2, NULL);
+//	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("matrix"));
+//	nodeObject->InsertChild(temp, NULL);
+//	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
+//			matrix.ToString());
+//	temp->InsertChild(temp2, NULL);
 
 
 	// Insert outline
@@ -83,19 +83,19 @@ bool Target::FromXml(wxXmlNode* node)
 	wxXmlNode *temp = node->GetChildren();
 
 	while(temp != NULL){
-		if(temp->GetName() == _T("matrix")) matrix.FromString(
-				temp->GetNodeContent());
+//		if(temp->GetName() == _T("matrix")) matrix.FromString(
+//				temp->GetNodeContent());
 		temp = temp->GetNext();
 	}
 	return true;
 }
 
-void Target::InsertObject(Object &object, AffineTransformMatrix &shift)
+void Target::InsertObject(Object &object)
 {
 	InitImprinting();
 	size_t i;
 	for(i = 0; i < object.geometries.GetCount(); i++){
-		InsertGeometrie(&(object.geometries[i]), shift * object.matrix);
+		InsertGeometrie(&(object.geometries[i]), object.matrix);
 	}
 	FinishImprint();
 }
@@ -350,7 +350,7 @@ const Polygon25 Target::GenerateConvexOutline(void)
 	size_t i, j;
 
 	for(i = 0; i < ny; i++){
-
+		//TODO: Program this!
 	}
 
 	return temp;
@@ -376,6 +376,48 @@ void Target::PolygonDrop(Polygon3 &polygon, double level)
 			if(d > polygon.elements[i].z) polygon.elements[i].z = d;
 		}
 	}
+}
+
+void Target::FillOutsidePolygon(Polygon3 &polygon)
+{
+	size_t *left;
+	size_t *right;
+
+	left = new size_t[this->ny];
+	right = new size_t[this->ny];
+
+	size_t i, j;
+	for(i = 0; i < this->ny; i++){
+		left[i] = this->nx;
+		right[i] = 0;
+	}
+
+	int px, py;
+	for(i = 0; i < polygon.elements.GetCount(); i++){
+		//TODO: Change this to a real line algorithm.
+		px = round(polygon.elements[i].x / this->rx);
+		py = round(polygon.elements[i].y / this->ry);
+		if(py >= 0 && py < this->ny){
+			if(px < this->nx && px > right[py]) right[py] = px;
+			if(px < left[py] && px >= 0) left[py] = px;
+		}
+	}
+
+	size_t p = 0;
+	for(i = 0; i < this->ny; i++){
+		if(right[i] < left[i]) right[i] = left[i];
+		for(j = 0; j < left[i]; j++){
+			this->field[p + j].lowerLimit = 0.0;
+			this->field[p + j].upperLimit = this->sz;
+		}
+		for(j = right[i]; j < this->nx; j++){
+			this->field[p + j].lowerLimit = 0.0;
+			this->field[p + j].upperLimit = this->sz;
+		}
+		p += this->nx;
+	}
+	delete[] left;
+	delete[] right;
 }
 
 void Target::AddSupport(Polygon3 &polygon, double distance, double height,
@@ -446,13 +488,10 @@ void Target::Paint(void)
 {
 	Imprinter::Paint();
 
-	::glPushMatrix();
-	::glMultMatrixd(matrix.a);
 	::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
 
 	toolpath.Paint();
 	outline.Paint();
 
-	::glPopMatrix();
 }
 

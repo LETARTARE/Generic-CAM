@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Run.h
-// Purpose            : Defines a machine run.
+// Name               : TargetPlacement.cpp
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 15.06.2011
+// Created            : 20.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,65 +28,27 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef RUN_H_
-#define RUN_H_
-
-#include "../3D/Geometry.h"
-#include "Toolbox.h"
-#include "../machine/Machine.h"
-#include "StockMaterial.h"
-#include "../simulator/Workpiece.h"
-#include "../simulator/ToolPath.h"
-#include "../generator/TPGeneratorTest.h"
-
 #include "TargetPlacement.h"
 
-#include <wx/string.h>
-#include <wx/textfile.h>
-#include <wx/xml/xml.h>
-#include <wx/dynarray.h>
+#include <GL/gl.h>
+#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+WX_DEFINE_OBJARRAY(ArrayOfTargetPlacement)
 
-/*!\class Run
- * \brief ...
- *
- * ...
- */
+TargetPlacement::TargetPlacement()
+{
+	isFlipped = false;
+	isMovable = true;
+	targetNumber = 0;
+}
 
-class Run {
-	// Constructor / Destructor
-public:
-	Run();
-	virtual ~Run();
-	// Member variables
-public:
-	wxString runName;
+TargetPlacement::~TargetPlacement()
+{
+}
 
-	bool useExtraMachine;
-	Machine machine;
-	bool useExtraToolbox;
-	Toolbox toolbox;
-
-	ToolPath toolPath;
-	ArrayOfTargetPlacement placements;
-
-	StockMaterial stockMaterial;
-	Workpiece workPiece;
-
-	TPGeneratorTest ToolPathGenerator;
-
-
-
-	// Methods
-public:
-	void ToXml(wxXmlNode* parentNode);
-	bool FromXml(wxXmlNode* node);
-
-	void WriteToFile(wxTextFile &f);
-
-	void Paint(void);
-
-};
-WX_DECLARE_OBJARRAY(Run, ArrayOfRun)
-;
-
-#endif /* RUN_H_ */
+void TargetPlacement::Paint(void) const
+{
+	::glPushMatrix();
+	::glMultMatrixd(matrix.a);
+	outline.Paint();
+	::glPopMatrix();
+}

@@ -69,13 +69,13 @@ bool TargetDialog::TransferDataToWindow(void)
 			linkedProject->slotWidth)));
 
 	m_textCtrlSupportDistance->SetValue(wxString::Format(_T("%.1f"),
-			temp.FromSI(linkedProject->ToolPathGenerator.supportDistance)));
+			temp.FromSI(linkedProject->supportDistance)));
 
 	m_textCtrlSupportWidth->SetValue(wxString::Format(_T("%.1f"), temp.FromSI(
-			linkedProject->ToolPathGenerator.supportWidth)));
+			linkedProject->supportWidth)));
 
 	m_textCtrlSupportHeight->SetValue(wxString::Format(_T("%.1f"), temp.FromSI(
-			linkedProject->ToolPathGenerator.supportHeight)));
+			linkedProject->supportHeight)));
 
 	return true;
 }

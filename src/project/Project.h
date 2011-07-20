@@ -37,8 +37,6 @@
 #include "../simulator/Workpiece.h"
 #include "../simulator/ToolPath.h"
 
-#include "../generator/TPGeneratorTest.h"
-
 #include "Run.h"
 #include "Target.h"
 #include "Stock.h"
@@ -65,19 +63,20 @@ public:
 	wxFileName fileName;
 	wxString projectName;
 
-	ArrayOfObject objects;
 	Machine machine;
+
 	Toolbox toolbox;
 	Stock stock;
 
 	size_t activeObject;
 	size_t activeStock;
 	size_t activeTarget;
+	size_t activeRun;
 
+	ArrayOfObject objects;
 	ArrayOfTarget targets;
-	ArrayOfRun run;
+	ArrayOfRun runs;
 
-	TPGeneratorTest ToolPathGenerator;
 
 	bool modified;
 
@@ -86,7 +85,8 @@ public:
 	bool displayStock;
 	bool displayWorkpiece;
 	bool displayBoundingBox;
-	bool displayTarget;
+	bool displayRun;
+	bool displayTargets;
 	bool displayToolpath;
 
 	Unit Tolerance;
@@ -97,7 +97,12 @@ public:
 	// For target generator
 
 	double resolution;
+
+	// Slot around Objects
 	double slotWidth;
+	double supportDistance;
+	double supportWidth;
+	double supportHeight;
 
 
 

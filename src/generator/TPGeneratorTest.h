@@ -50,12 +50,6 @@ public:
 public:
 
 
-	// Slot around Object
-	double slotWidth;
-	double supportDistance;
-	double supportWidth;
-	double supportHeight;
-
 	// Generic Toolpath parameters
 	double freeHeightAboveMaterial;
 
@@ -64,10 +58,8 @@ public:
 
 	//Methods:
 public:
-	void SetupSlot(double slotWidth, double supportDistance,
-			double supportWidth, double supportHeight);
 
-	void GenerateToolpath(Target &target, Object &obj, Tool &tool);
+	void GenerateToolpath(Target &target, Tool &tool);
 
 };
 

@@ -31,6 +31,8 @@
 #include "Polygon25.h"
 
 #include <GL/gl.h>
+#include <float.h>
+
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfPolygon25)
 
@@ -130,5 +132,52 @@ void Polygon25::PolygonExpand(double r)
 void Polygon25::PolygonDiminish(double r)
 {
 	this->PolygonExpand(-r);
+}
+
+double Polygon25::DistanceToElement(const size_t elementInPolygon,
+		const double x, const double y, const double vx, const double vy) const
+{
+	double qx, qy, px, py;
+	px = elements[elementInPolygon].x;
+	py = elements[elementInPolygon].y;
+	if(elementInPolygon + 1 == elements.GetCount()){
+		qx = elements[0].x;
+		qy = elements[0].y;
+	}else{
+		qx = elements[elementInPolygon + 1].x;
+		qy = elements[elementInPolygon + 1].y;
+	}
+
+	// From axiom code:
+	//	x1 := px+(qx-px)*r
+	//	y1 := py+(qy-py)*r
+	//	x2 := x+vx*s
+	//	y2 := y+vy*s
+	//	solve([x1=x2,y1=y2],[r,s])
+
+	double denom = (qx - px) * vy + (-qy + py) * vx;
+	if(denom == 0.0) return DBL_MAX;
+	double r = (-vx * y + vy * x - px * vy + py * vx) / denom;
+	double s = ((-qx + px) * y + (qy - py) * x - px * qy + py * qx) / denom;
+
+	if(r < 0.0 || r > 1.0) return DBL_MAX;
+	return s;
+}
+
+double Polygon25::DistanceToPolygon(const Polygon25 &polygon, double vx,
+		double vy) const
+{
+	//TODO: Make this faster!
+	size_t i, j;
+	double dmin = DBL_MAX;
+	double d;
+	for(i = 0; i < elements.GetCount(); i++){
+		for(j = 0; j < polygon.elements.GetCount(); j++){
+			d = polygon.DistanceToElement(j, elements[i].x, elements[i].y, vx,
+					vy);
+			if(d < dmin) dmin = d;
+		}
+	}
+	return dmin;
 }
 

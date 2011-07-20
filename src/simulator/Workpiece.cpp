@@ -32,7 +32,6 @@
 
 #include <GL/gl.h>
 
-
 Workpiece::Workpiece(const double sizeX, const double sizeY,
 		const double sizeZ, const double resolutionX, const double resolutionY) :
 	Imprinter(sizeX, sizeY, sizeZ, resolutionX, resolutionY)
@@ -43,7 +42,6 @@ Workpiece::Workpiece(StockMaterial* material, const double resolution)
 {
 	this->SetupBox(material->x, material->y, material->y, resolution,
 			resolution);
-	this->matrix = material->matrix;
 }
 
 Workpiece::~Workpiece()
@@ -55,24 +53,20 @@ void Workpiece::SetupBox(const double sizeX, const double sizeY,
 		const double sizeZ, const double resolutionX, const double resolutionY)
 {
 
-	Imprinter::SetupBox(sizeX,sizeY,sizeZ,resolutionX,resolutionY);
+	Imprinter::SetupBox(sizeX, sizeY, sizeZ, resolutionX, resolutionY);
 
 	colorNormal.Set(0.8, 0.4, 0.0);
 	colorTodo.Set(0, 0, 0.8);
 	colorUnscratched.Set(0.0, 0.8, 0.1);
 }
 
-
 void Workpiece::InsertTriangle(Vector3 a, Vector3 b, Vector3 c)
 {
 	Imprinter::InsertTriangle(a, b, c);
 }
 
-void Workpiece::Paint() const
+void Workpiece::Paint()
 {
-
-
 	Imprinter::Paint();
-
 }
 

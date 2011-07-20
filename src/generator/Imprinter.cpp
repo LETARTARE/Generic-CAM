@@ -30,7 +30,6 @@
 
 #include "Imprinter.h"
 #include <float.h>
-#include <GL/gl.h>
 #include <math.h>
 
 ImprinterElement::ImprinterElement()
@@ -70,7 +69,7 @@ Imprinter::Imprinter(const double sizeX, const double sizeY,
 	rx = ry = 1.0;
 
 	displayBox = false;
-
+	displayListGenerated = false;
 	this->SetupBox(sizeX, sizeY, sizeZ, resolutionX, resolutionY);
 }
 
@@ -80,21 +79,25 @@ Imprinter::Imprinter(const Imprinter& ip)
 	this->nx = this->ny = this->N = 0;
 	this->sx = this->sy = this->sz = 0.0;
 	this->rx = this->ry = 1.0;
+	this->colorNormal = ip.colorNormal;
+	this->colorTodo = ip.colorTodo;
+	this->colorUnscratched = ip.colorUnscratched;
+	this->displayBox = ip.displayBox;
+	this->displayListGenerated = false;
 
 	if(ip.N == 0) return;
 	this->SetupBox(ip.sx, ip.sy, ip.sz, ip.rx, ip.ry);
 	size_t i;
 	for(i = 0; i < this->N; i++)
 		this->field[i] = ip.field[i];
-	this->colorNormal = ip.colorNormal;
-	this->colorTodo = ip.colorTodo;
-	this->colorUnscratched = ip.colorUnscratched;
-	this->displayBox = ip.displayBox;
-	this->matrix = ip.matrix;
 }
 
 Imprinter::~Imprinter()
 {
+	if(displayListGenerated){
+		::glDeleteLists(displayListIndex, 1);
+	}
+
 	if(field != NULL) delete[] field;
 }
 
@@ -1023,121 +1026,130 @@ void Imprinter::InsertGeometrie(const Geometry *geometry,
 	}
 }
 
-void Imprinter::Paint() const
+void Imprinter::Paint()
 {
 	if(field == NULL) return;
 
-	::glPushMatrix();
-	::glMultMatrixd(matrix.a);
-
-	::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
-	::glBegin(GL_QUADS);
-
-	size_t i, j, p = 0;
-
-	float px = 0.0, py = 0;
-	for(j = 0; j < ny; j++){
-		px = 0.0;
-		for(i = 0; i < nx; i++){
-
-			if(field[p].IsVisible()){
-				glNormal3f(0, 0, 1);
-				glVertex3f(px, py, field[p].upperLimit);
-				glVertex3f(px + rx, py, field[p].upperLimit);
-				glVertex3f(px + rx, py + ry, field[p].upperLimit);
-				glVertex3f(px, py + ry, field[p].upperLimit);
-
-				glNormal3f(0, 0, -1);
-				glVertex3f(px, py, field[p].lowerLimit);
-				glVertex3f(px + rx, py, field[p].lowerLimit);
-				glVertex3f(px + rx, py + ry, field[p].lowerLimit);
-				glVertex3f(px, py + ry, field[p].lowerLimit);
-			}
-
-			px += rx;
-			p++;
-		}
-		py += ry;
+	if(!displayListGenerated){
+		displayListIndex = ::glGenLists(1);
+		displayListGenerated = true;
+		refresh = true;
 	}
-	::glEnd();
-	if(displayBox || true){
 
-		double cornerLength = 0.3; // 30% of a side
-		double dx = this->sx * cornerLength;
-		double dy = this->sy * cornerLength;
-		double dz = this->sz * cornerLength;
+	if(refresh){
+		::glNewList(displayListIndex, GL_COMPILE_AND_EXECUTE);
 
-		::glColor3f(0.8, 0.8, 0.8);
+		::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
+		::glBegin(GL_QUADS);
 
-		::glBegin(GL_LINES);
+		size_t i, j, p = 0;
+		float px = 0.0, py = 0;
+		for(j = 0; j < ny; j++){
+			px = 0.0;
+			for(i = 0; i < nx; i++){
 
-		glNormal3d(0, -M_SQRT2, -M_SQRT2);
-		glVertex3d(0, 0, 0);
-		glVertex3d(dx, 0, 0);
-		glVertex3d(sx, 0, 0);
-		glVertex3d(sx - dx, 0, 0);
-		glNormal3d(0, M_SQRT2, -M_SQRT2);
-		glVertex3d(0, sy, 0);
-		glVertex3d(dx, sy, 0);
-		glVertex3d(sx, sy, 0);
-		glVertex3d(sx - dx, sy, 0);
-		glNormal3d(0, M_SQRT2, M_SQRT2);
-		glVertex3d(0, sy, sz);
-		glVertex3d(dx, sy, sz);
-		glVertex3d(sx, sy, sz);
-		glVertex3d(sx - dx, sy, sz);
-		glNormal3d(0, -M_SQRT2, M_SQRT2);
-		glVertex3d(0, 0, sz);
-		glVertex3d(dx, 0, sz);
-		glVertex3d(sx, 0, sz);
-		glVertex3d(sx - dx, 0, sz);
+				if(field[p].IsVisible()){
+					glNormal3f(0, 0, 1);
+					glVertex3f(px, py, field[p].upperLimit);
+					glVertex3f(px + rx, py, field[p].upperLimit);
+					glVertex3f(px + rx, py + ry, field[p].upperLimit);
+					glVertex3f(px, py + ry, field[p].upperLimit);
 
-		glNormal3d(-M_SQRT2, 0, -M_SQRT2);
-		glVertex3d(0, 0, 0);
-		glVertex3d(0, dy, 0);
-		glVertex3d(0, sy, 0);
-		glVertex3d(0, sy - dy, 0);
-		glNormal3d(M_SQRT2, 0, -M_SQRT2);
-		glVertex3d(sx, 0, 0);
-		glVertex3d(sx, dy, 0);
-		glVertex3d(sx, sy, 0);
-		glVertex3d(sx, sy - dy, 0);
-		glNormal3d(M_SQRT2, 0, M_SQRT2);
-		glVertex3d(sx, 0, sz);
-		glVertex3d(sx, dy, sz);
-		glVertex3d(sx, sy, sz);
-		glVertex3d(sx, sy - dy, sz);
-		glNormal3d(-M_SQRT2, 0, M_SQRT2);
-		glVertex3d(0, 0, sz);
-		glVertex3d(0, dy, sz);
-		glVertex3d(0, sy, sz);
-		glVertex3d(0, sy - dy, sz);
-
-		glNormal3d(-M_SQRT2, -M_SQRT2, 0);
-		glVertex3d(0, 0, 0);
-		glVertex3d(0, 0, dz);
-		glVertex3d(0, 0, sz);
-		glVertex3d(0, 0, sz - dz);
-		glNormal3d(M_SQRT2, -M_SQRT2, 0);
-		glVertex3d(sx, 0, 0);
-		glVertex3d(sx, 0, dz);
-		glVertex3d(sx, 0, sz);
-		glVertex3d(sx, 0, sz - dz);
-		glNormal3d(M_SQRT2, M_SQRT2, 0);
-		glVertex3d(sx, sy, 0);
-		glVertex3d(sx, sy, dz);
-		glVertex3d(sx, sy, sz);
-		glVertex3d(sx, sy, sz - dz);
-		glNormal3d(-M_SQRT2, M_SQRT2, 0);
-		glVertex3d(0, sy, 0);
-		glVertex3d(0, sy, dz);
-		glVertex3d(0, sy, sz);
-		glVertex3d(0, sy, sz - dz);
-
+					glNormal3f(0, 0, -1);
+					glVertex3f(px, py, field[p].lowerLimit);
+					glVertex3f(px + rx, py, field[p].lowerLimit);
+					glVertex3f(px + rx, py + ry, field[p].lowerLimit);
+					glVertex3f(px, py + ry, field[p].lowerLimit);
+				}
+				px += rx;
+				p++;
+			}
+			py += ry;
+		}
 		::glEnd();
 
-	}
+		if(displayBox || true){
 
-	::glPopMatrix();
+			double cornerLength = 0.3; // 30% of a side
+			double dx = this->sx * cornerLength;
+			double dy = this->sy * cornerLength;
+			double dz = this->sz * cornerLength;
+
+			::glColor3f(0.8, 0.8, 0.8);
+
+			::glBegin(GL_LINES);
+
+			glNormal3d(0, -M_SQRT2, -M_SQRT2);
+			glVertex3d(0, 0, 0);
+			glVertex3d(dx, 0, 0);
+			glVertex3d(sx, 0, 0);
+			glVertex3d(sx - dx, 0, 0);
+			glNormal3d(0, M_SQRT2, -M_SQRT2);
+			glVertex3d(0, sy, 0);
+			glVertex3d(dx, sy, 0);
+			glVertex3d(sx, sy, 0);
+			glVertex3d(sx - dx, sy, 0);
+			glNormal3d(0, M_SQRT2, M_SQRT2);
+			glVertex3d(0, sy, sz);
+			glVertex3d(dx, sy, sz);
+			glVertex3d(sx, sy, sz);
+			glVertex3d(sx - dx, sy, sz);
+			glNormal3d(0, -M_SQRT2, M_SQRT2);
+			glVertex3d(0, 0, sz);
+			glVertex3d(dx, 0, sz);
+			glVertex3d(sx, 0, sz);
+			glVertex3d(sx - dx, 0, sz);
+
+			glNormal3d(-M_SQRT2, 0, -M_SQRT2);
+			glVertex3d(0, 0, 0);
+			glVertex3d(0, dy, 0);
+			glVertex3d(0, sy, 0);
+			glVertex3d(0, sy - dy, 0);
+			glNormal3d(M_SQRT2, 0, -M_SQRT2);
+			glVertex3d(sx, 0, 0);
+			glVertex3d(sx, dy, 0);
+			glVertex3d(sx, sy, 0);
+			glVertex3d(sx, sy - dy, 0);
+			glNormal3d(M_SQRT2, 0, M_SQRT2);
+			glVertex3d(sx, 0, sz);
+			glVertex3d(sx, dy, sz);
+			glVertex3d(sx, sy, sz);
+			glVertex3d(sx, sy - dy, sz);
+			glNormal3d(-M_SQRT2, 0, M_SQRT2);
+			glVertex3d(0, 0, sz);
+			glVertex3d(0, dy, sz);
+			glVertex3d(0, sy, sz);
+			glVertex3d(0, sy - dy, sz);
+
+			glNormal3d(-M_SQRT2, -M_SQRT2, 0);
+			glVertex3d(0, 0, 0);
+			glVertex3d(0, 0, dz);
+			glVertex3d(0, 0, sz);
+			glVertex3d(0, 0, sz - dz);
+			glNormal3d(M_SQRT2, -M_SQRT2, 0);
+			glVertex3d(sx, 0, 0);
+			glVertex3d(sx, 0, dz);
+			glVertex3d(sx, 0, sz);
+			glVertex3d(sx, 0, sz - dz);
+			glNormal3d(M_SQRT2, M_SQRT2, 0);
+			glVertex3d(sx, sy, 0);
+			glVertex3d(sx, sy, dz);
+			glVertex3d(sx, sy, sz);
+			glVertex3d(sx, sy, sz - dz);
+			glNormal3d(-M_SQRT2, M_SQRT2, 0);
+			glVertex3d(0, sy, 0);
+			glVertex3d(0, sy, dz);
+			glVertex3d(0, sy, sz);
+			glVertex3d(0, sy, sz - dz);
+
+			::glEnd();
+
+		}
+		::glEndList();
+
+		refresh = false;
+	}else{
+		::glCallList(displayListIndex);
+	}
 }
 

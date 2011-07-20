@@ -92,8 +92,12 @@ MainFrame::~MainFrame()
 
 void MainFrame::OnCreateProject(wxCommandEvent& event)
 {
-	Project temp;
-	project.Add(temp);
+	//	Project temp;
+	//	project.Add(temp);
+	project[0].ClearProject();
+	SetupTree();
+	this->Refresh();
+
 }
 void MainFrame::OnLoadProject(wxCommandEvent& event)
 {
@@ -372,7 +376,7 @@ void MainFrame::OnSaveGCodes(wxCommandEvent &event)
 		}else
 			f.Create(fname.GetFullPath());
 
-		project[activeProject].run[0].WriteToFile(f);
+		project[activeProject].runs[0].WriteToFile(f);
 		f.Write();
 		f.Close();
 	}
@@ -489,8 +493,9 @@ void MainFrame::SetupTree(void)
 		}
 
 		treeIdRun = tree->AppendItem(treeIdProject, _("Run:"));
-		for(j = 0; j < project[i].run.GetCount(); j++){
-			treeIdRun2 = tree->AppendItem(treeIdRun, project[i].run[j].runName);
+		for(j = 0; j < project[i].runs.GetCount(); j++){
+			treeIdRun2
+					= tree->AppendItem(treeIdRun, project[i].runs[j].runName);
 
 			tree->AppendItem(treeIdRun2, _("Stock material"));
 			tree->AppendItem(treeIdRun2, _("Target"));

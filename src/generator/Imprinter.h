@@ -35,6 +35,8 @@
 #include "../3D/Geometry.h"
 #include "../3D/Vector3.h"
 
+#include <GL/gl.h>
+
 /*!\class Imprinter
  * \brief ...
  *
@@ -77,7 +79,6 @@ public:
 
 	// Member variables
 public:
-	AffineTransformMatrix matrix;
 
 	enum face_t {
 		facing_up, facing_down, facing_side, other
@@ -85,11 +86,16 @@ public:
 
 	bool displayBox;
 
+	bool refresh;
+
 protected:
 	ImprinterElement *field;
 	double sx, sy, sz;
 	double rx, ry;
 	size_t nx, ny, N;
+
+	GLuint displayListIndex;
+	bool displayListGenerated;
 
 protected:
 	Vector3 colorNormal;
@@ -103,7 +109,7 @@ public:
 	Imprinter & operator+=(const Imprinter &a);
 	const Imprinter operator+(const Imprinter& a) const;
 
-	void Paint() const;
+	void Paint();
 	bool SetupField(const size_t sizeX, const size_t sizeY,
 			const double resolutionX = 0.001, const double resolutionY = 0.001);
 	void ClearField(void);

@@ -92,6 +92,7 @@ SOURCES += src/project/Object.cpp \
 	src/project/Stock.cpp \
 	src/project/StockMaterial.cpp \
 	src/project/Target.cpp \
+	src/project/TargetPlacement.cpp \
 	src/project/Toolbox.cpp \
 	src/project/Unit.cpp \
 	

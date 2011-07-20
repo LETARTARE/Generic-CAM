@@ -32,10 +32,6 @@
 
 TPGeneratorTest::TPGeneratorTest()
 {
-	slotWidth = 0.010;
-	supportDistance = 0.050;
-	supportHeight = 0.005;
-	supportWidth = 0.005;
 
 	freeHeightAboveMaterial = 0.002;
 
@@ -47,17 +43,7 @@ TPGeneratorTest::~TPGeneratorTest()
 
 }
 
-void TPGeneratorTest::SetupSlot(double slotWidth, double supportDistance,
-		double supportWidth, double supportHeight)
-{
-	this->slotWidth = slotWidth;
-	this->supportDistance = supportDistance;
-	this->supportWidth = supportWidth;
-	this->supportHeight = supportHeight;
-
-}
-
-void TPGeneratorTest::GenerateToolpath(Target &target, Object &obj, Tool &tool)
+void TPGeneratorTest::GenerateToolpath(Target &target, Tool &tool)
 {
 	ToolPath tp;
 	MachinePosition m;
@@ -67,31 +53,11 @@ void TPGeneratorTest::GenerateToolpath(Target &target, Object &obj, Tool &tool)
 	Target discTool;
 	discTool.SetupDisc(0.003, target.GetSizeRX(), target.GetSizeRY());
 
-	Target discSlot;
-	discSlot.SetupDisc(slotWidth, target.GetSizeRX(), target.GetSizeRY());
-
-	obj.UpdateBoundingBox();
-	target.SetupBox(obj.bbox.xmax + 4 * slotWidth, obj.bbox.ymax + 4
-			* slotWidth, target.GetSizeZ(), target.GetSizeRX(),
-			target.GetSizeRY());
-
-	target.InsertObject(obj, target.shift);
-
 	Target temp = target;
 
-	target.FoldRaise(discSlot);
-
-	Polygon3 outline = target.GeneratePolygon(-1, -1);
-
-	target.HardInvert();
-	target += temp;
-
-	target.AddSupport(outline, supportDistance, supportHeight, supportWidth,
-			slotWidth);
-
-	target.FoldRaise(discTool);
-	target.Limit();
-	target.InvertTop();
+	temp.FoldRaise(discTool);
+	temp.Limit();
+	temp.InvertTop();
 
 	double level = temp.GetSizeZ() - 0.00015;
 

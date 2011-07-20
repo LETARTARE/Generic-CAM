@@ -62,6 +62,7 @@
 
 
 #include <wx/string.h>
+#include <wx/dynarray.h>
 #include "Vector3.h"
 
 class AffineTransformMatrix {
@@ -123,5 +124,8 @@ public:
 	Vector3 TransformNoShift(Vector3 const& v) const;
 
 };
+
+WX_DECLARE_OBJARRAY(AffineTransformMatrix, ArrayOfAffineTransformMatrix)
+;
 
 #endif /* AFFINETRANSFORMMATRIX_H_ */

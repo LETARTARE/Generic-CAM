@@ -57,6 +57,12 @@ public:
 	void PolygonSmooth(void);
 	void PolygonExpand(double r);
 	void PolygonDiminish(double r);
+
+	double DistanceToElement(const size_t elementInPolygon, const double x,
+			const double y, const double vx, const double vy) const;
+	double
+			DistanceToPolygon(const Polygon25 &polygon, double vx, double vy) const;
+
 };
 WX_DECLARE_OBJARRAY(Polygon25, ArrayOfPolygon25)
 ;

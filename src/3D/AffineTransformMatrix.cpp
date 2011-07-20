@@ -32,6 +32,8 @@
 
 #include <cmath>
 #include <wx/tokenzr.h>
+#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+WX_DEFINE_OBJARRAY(ArrayOfAffineTransformMatrix)
 
 AffineTransformMatrix::AffineTransformMatrix()
 {

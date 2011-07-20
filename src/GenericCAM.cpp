@@ -28,6 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "GenericCAM.h"
+#include "icon/logo.xpm"
 
 // The line that starts it all.
 IMPLEMENT_APP(GenericCAMApp)
@@ -44,7 +45,9 @@ bool GenericCAMApp::OnInit()
 
 	if(!loadOnStartup.IsEmpty()) frame->LoadProject(loadOnStartup);
 
-	frame -> Show(true);
+	wxIcon iconLogo(logo_xpm);
+	frame->SetIcon(iconLogo);
+	frame->Show(true);
 	SetTopWindow(frame);
 
 	return true;

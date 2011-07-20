@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Run.h
-// Purpose            : Defines a machine run.
+// Name               : TargetPlacement.h
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 15.06.2011
+// Created            : 20.07.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,65 +28,38 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef RUN_H_
-#define RUN_H_
+#ifndef TARGETPLACEMENT_H_
+#define TARGETPLACEMENT_H_
 
-#include "../3D/Geometry.h"
-#include "Toolbox.h"
-#include "../machine/Machine.h"
-#include "StockMaterial.h"
-#include "../simulator/Workpiece.h"
-#include "../simulator/ToolPath.h"
-#include "../generator/TPGeneratorTest.h"
-
-#include "TargetPlacement.h"
-
-#include <wx/string.h>
-#include <wx/textfile.h>
-#include <wx/xml/xml.h>
-#include <wx/dynarray.h>
-
-/*!\class Run
+/*!\class TargetPlacement
  * \brief ...
  *
  * ...
  */
 
-class Run {
-	// Constructor / Destructor
+#include <wx/dynarray.h>
+#include <wx/xml/xml.h>
+
+#include "../generator/Polygon25.h"
+#include "../simulator/ToolPath.h"
+
+class TargetPlacement {
+	// Constructor/ Destructor
 public:
-	Run();
-	virtual ~Run();
-	// Member variables
+	TargetPlacement();
+	virtual ~TargetPlacement();
+	//Member variables:
 public:
-	wxString runName;
+	AffineTransformMatrix matrix;
+	bool isFlipped;
+	Polygon25 outline;
+	bool isMovable;
+	size_t targetNumber;
 
-	bool useExtraMachine;
-	Machine machine;
-	bool useExtraToolbox;
-	Toolbox toolbox;
-
-	ToolPath toolPath;
-	ArrayOfTargetPlacement placements;
-
-	StockMaterial stockMaterial;
-	Workpiece workPiece;
-
-	TPGeneratorTest ToolPathGenerator;
-
-
-
-	// Methods
+	//Methods:
 public:
-	void ToXml(wxXmlNode* parentNode);
-	bool FromXml(wxXmlNode* node);
-
-	void WriteToFile(wxTextFile &f);
-
-	void Paint(void);
-
+	void Paint(void)const;
 };
-WX_DECLARE_OBJARRAY(Run, ArrayOfRun)
+WX_DECLARE_OBJARRAY(TargetPlacement, ArrayOfTargetPlacement)
 ;
-
-#endif /* RUN_H_ */
+#endif /* TARGETPLACEMENT_H_ */

@@ -57,14 +57,14 @@ public:
 	//double shiftZ;
 	Polygon25 outline;
 	ToolPath toolpath;
-	AffineTransformMatrix shift;
+	ToolPath toolpathFlipped;
 
 	//Methods:
 public:
 	void ToXml(wxXmlNode* parentNode);
 	bool FromXml(wxXmlNode* node);
 
-	void InsertObject(Object &object, AffineTransformMatrix &shift);
+	void InsertObject(Object &object);
 
 	int NextDir(int sx, int sy, double height, int olddir);
 	int NextDir(int sx, int sy, int olddir);
@@ -76,7 +76,7 @@ public:
 
 	void PolygonDropTarget(Polygon3 &polygon, Target &tool);
 	void PolygonDrop(Polygon3 &polygon, double level);
-
+	void FillOutsidePolygon(Polygon3 &polygon);
 
 	void AddSupport(Polygon3 &polygon, double distance, double height,
 			double width, double slotWidth);
