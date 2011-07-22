@@ -56,11 +56,11 @@ void Target::ToXml(wxXmlNode* parentNode)
 
 
 	// Insert new matrix
-//	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("matrix"));
-//	nodeObject->InsertChild(temp, NULL);
-//	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
-//			matrix.ToString());
-//	temp->InsertChild(temp2, NULL);
+	//	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("matrix"));
+	//	nodeObject->InsertChild(temp, NULL);
+	//	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
+	//			matrix.ToString());
+	//	temp->InsertChild(temp2, NULL);
 
 
 	// Insert outline
@@ -83,8 +83,8 @@ bool Target::FromXml(wxXmlNode* node)
 	wxXmlNode *temp = node->GetChildren();
 
 	while(temp != NULL){
-//		if(temp->GetName() == _T("matrix")) matrix.FromString(
-//				temp->GetNodeContent());
+		//		if(temp->GetName() == _T("matrix")) matrix.FromString(
+		//				temp->GetNodeContent());
 		temp = temp->GetNext();
 	}
 	return true;
@@ -346,13 +346,35 @@ const Polygon25 Target::GeneratePolygon(int stx, int sty, double height)
 const Polygon25 Target::GenerateConvexOutline(void)
 {
 	Polygon25 temp, temp2;
-
 	size_t i, j;
 
-	for(i = 0; i < ny; i++){
-		//TODO: Program this!
+	size_t *left;
+	size_t *right;
+
+	left = new size_t[this->ny];
+	right = new size_t[this->ny];
+
+	for(i = 0; i < this->ny; i++){
+		left[i] = this->nx - 1;
+		right[i] = 0;
 	}
 
+	size_t p = 0;
+	for(j = 0; j < ny; j++){
+		for(i = 0; i < nx; i++){
+			if(field[p].IsVisible()){
+				if(i < left[j]) left[j] = i;
+				if(i > right[j]) right[j] = i;
+			}
+			p++;
+		}
+	}
+
+	//TODO: Insert algotirhm here!
+
+
+	delete[] left;
+	delete[] right;
 	return temp;
 }
 

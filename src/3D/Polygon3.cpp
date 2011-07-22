@@ -53,9 +53,37 @@ void Polygon3::InsertPoint(double x, double y, double z)
 	Vector3 temp(x, y, z);
 	elements.Add(temp);
 }
+//! Overloaded operator for polygon concatanation.
+Polygon3 & Polygon3::operator+=(const Polygon3 &a)
+{
+	Vector3 temp;
+	size_t i;
+	for(i = 0; i < a.elements.GetCount(); i++){
+		temp = a.elements[i];
+		this->elements.Add(temp);
+	}
+	return *this;
+}
+
+//! Overloaded operator for polygon concatanation.
+const Polygon3 Polygon3::operator+(const Polygon3 &a) const
+{
+	Polygon3 temp = *this;
+	temp += a;
+	return temp;
+}
+
 void Polygon3::Close(bool close)
 {
 	isClosed = close;
+}
+
+void Polygon3::Reverse(void)
+{
+	size_t i;
+	for(i = 0; i < (elements.GetCount() / 2); i++){
+		//TODO: Work here!
+	}
 }
 
 double Polygon3::GetLength(void) const
