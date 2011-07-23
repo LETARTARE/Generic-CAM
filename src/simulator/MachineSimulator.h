@@ -35,7 +35,6 @@
 #include "../machine/MachinePosition.h"
 #include <wx/filename.h>
 
-
 class MachineSimulator {
 	// Constructor/ Destructor
 public:
@@ -61,8 +60,6 @@ public:
 	void Step(float tTarget);
 
 	bool ReadGCodeFile(wxFileName fileName);
-	bool WriteGCodeFile(wxFileName fileName);
-
 };
 
 #endif /* MACHINESIMULATOR_H_ */

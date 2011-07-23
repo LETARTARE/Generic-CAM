@@ -134,6 +134,56 @@ void Polygon25::PolygonDiminish(double r)
 	this->PolygonExpand(-r);
 }
 
+bool Polygon25::IsElementInside(const Vector3 v)
+{
+	size_t i, j;
+
+	bool flagTryY = false;
+	size_t c = 0;
+
+	for(i = 0; i < elements.GetCount(); i++){
+		if(i < elements.GetCount() - 1)
+			j = i + 1;
+		else
+			j = 0;
+		// Test if line i-j is on v->X-Infty
+		if(elements[i].y == v.y && elements[j].y == v.y){
+			flagTryY = true;
+			break;
+		}
+		if((elements[i].y <= v.y && elements[j].y >= v.y) || (elements[i].y
+				>= v.y && elements[j].y <= v.y)){
+			double px = ((elements[j].x - elements[i].x) * v.y + elements[i].x
+					* elements[j].y - elements[i].y * elements[j].x)
+					/ (elements[j].y - elements[i].y);
+			if(px > v.x) c++;
+		}
+	}
+
+	if(flagTryY){
+		c = 0;
+		for(i = 0; i < elements.GetCount(); i++){
+			if(i < elements.GetCount() - 1)
+				j = i + 1;
+			else
+				j = 0;
+			// Test if line i-j is on v->Y-Infty
+			if(elements[i].x == v.x && elements[j].x == v.x){
+				return false;
+			}
+			if((elements[i].x <= v.x && elements[j].x >= v.x) || (elements[i].x
+					>= v.x && elements[j].x <= v.x)){
+				double py = ((elements[j].y - elements[i].y) * v.x
+						- elements[i].x * elements[j].y + elements[i].y
+						* elements[j].x) / (elements[j].x - elements[i].x);
+				if(py > v.y) c++;
+			}
+		}
+	}
+	if((c % 2) == 1) return true;
+	return false;
+}
+
 double Polygon25::DistanceToElement(const size_t elementInPolygon,
 		const double x, const double y, const double vx, const double vy) const
 {

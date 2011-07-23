@@ -81,8 +81,9 @@ void Polygon3::Close(bool close)
 void Polygon3::Reverse(void)
 {
 	size_t i;
-	for(i = 0; i < (elements.GetCount() / 2); i++){
-		//TODO: Work here!
+	size_t j = elements.GetCount();
+	for(i = 0; i < (j / 2); i++){
+		elements[i].Swap(elements[j - i - 1]);
 	}
 }
 

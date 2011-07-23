@@ -30,8 +30,6 @@
 
 #include "MachineSimulator.h"
 
-
-
 #include <wx/textfile.h>
 
 MachineSimulator::MachineSimulator()
@@ -54,8 +52,8 @@ MachineSimulator::MachineSimulator()
 
 	AffineTransformMatrix a, b;
 
-	a.TranslateGlobal(-0.05,0,0);
-	b.TranslateGlobal(+0.05,0.1,0);
+	a.TranslateGlobal(-0.05, 0, 0);
+	b.TranslateGlobal(+0.05, 0.1, 0);
 
 	machine.tool = &toolbox.tools[0];
 	machine.toolpath = &toolpath;
@@ -147,11 +145,5 @@ bool MachineSimulator::ReadGCodeFile(wxFileName fileName)
 	tStep = 0;
 
 	return true;
-}
-
-bool MachineSimulator::WriteGCodeFile(wxFileName fileName)
-{
-	//TODO: Writing G-Code Files
-	return false;
 }
 

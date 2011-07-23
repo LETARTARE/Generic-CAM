@@ -57,7 +57,7 @@ public:
 	void PolygonSmooth(void);
 	void PolygonExpand(double r);
 	void PolygonDiminish(double r);
-
+	bool IsElementInside(const Vector3 v);
 	double DistanceToElement(const size_t elementInPolygon, const double x,
 			const double y, const double vx, const double vy) const;
 	double
