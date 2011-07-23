@@ -138,6 +138,8 @@ vpath %.o	$(OBJDIR)/src
 
 all:	$(PROJECT)
 
+Release: 	$(PROJECT)
+
 $(PROJECT):	$(OBJECTS)
 		$(CXX) $(LDFLAGS) -o $(PROJECT) $(OBJECTS) $(LDLIBS)
 #ifdef RELEASE

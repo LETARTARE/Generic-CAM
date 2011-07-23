@@ -44,6 +44,7 @@
 #include "Object.h"
 #include "../generator/Polygon25.h"
 #include "../simulator/ToolPath.h"
+#include "../machine/Tool.h"
 //#include <cstddef>
 
 class Target:public Imprinter {
@@ -55,7 +56,9 @@ public:
 	//Member variables:
 public:
 	//double shiftZ;
-	Polygon25 outline;
+	Polygon25 outLine;
+	Polygon25 supportLine;
+
 	ToolPath toolpath;
 	ToolPath toolpathFlipped;
 
@@ -77,6 +80,8 @@ public:
 	void PolygonDropTarget(Polygon3 &polygon, Target &tool);
 	void PolygonDrop(Polygon3 &polygon, double level);
 	void FillOutsidePolygon(Polygon3 &polygon);
+
+	void SetupDrill(Tool &tool, double diameter, double depth);
 
 	void AddSupport(Polygon3 &polygon, double distance, double height,
 			double width, double slotWidth);

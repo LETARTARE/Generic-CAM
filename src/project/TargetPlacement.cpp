@@ -38,6 +38,7 @@ TargetPlacement::TargetPlacement()
 {
 	isFlipped = false;
 	isMovable = true;
+	isKeepout = false;
 	targetNumber = 0;
 }
 
@@ -45,10 +46,34 @@ TargetPlacement::~TargetPlacement()
 {
 }
 
+void TargetPlacement::Clear(void)
+{
+	isFlipped = false;
+	isMovable = true;
+	isKeepout = false;
+	targetNumber = 0;
+	outLine.Clear();
+	matrix.SetIdentity();
+}
+
+void TargetPlacement::SetKeepout(double x, double y, double sizex, double sizey)
+{
+	matrix.SetIdentity();
+	matrix.TranslateGlobal(x, y, 0.0);
+	outLine.Clear();
+	outLine.InsertPoint(0.0, 0.0, 0.0);
+	outLine.InsertPoint(sizex, 0.0, 0.0);
+	outLine.InsertPoint(sizex, sizey, 0.0);
+	outLine.InsertPoint(0.0, sizey, 0.0);
+	outLine.Close();
+	isMovable = false;
+	isKeepout = true;
+}
+
 void TargetPlacement::Paint(void) const
 {
 	::glPushMatrix();
 	::glMultMatrixd(matrix.a);
-	outline.Paint();
+	outLine.Paint();
 	::glPopMatrix();
 }

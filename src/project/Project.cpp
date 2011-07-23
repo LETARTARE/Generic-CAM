@@ -62,7 +62,7 @@ void Project::ClearProject(void)
 	displayGeometry = true;
 	displayBoundingBox = false;
 	displayMachine = false;
-	displayStock = false;
+	displayStock = true;
 	displayWorkpiece = false;
 	displayRun = true;
 	displayTargets = true;
@@ -74,6 +74,10 @@ void Project::ClearProject(void)
 	LinearSpeed.Setup(_T("m/s"), _T("mm/s"), (double) 1 / 1000);
 
 	slotWidth = 0.010;
+	supportDistance = 0.05;
+	supportWidth = 0.005;
+	supportHeight = 0.005;
+
 	resolution = 0.0005;
 }
 
@@ -274,7 +278,7 @@ bool Project::Load(wxFileName fileName)
 void Project::Assemble(void)
 {
 	machine.Assemble();
-	if(machine.IsInitialized()) stock.matrix = machine.workpiecePosition;
+	if(machine.IsInitialized()) stock.stockMaterials[0].matrix = machine.workpiecePosition;
 
 }
 
@@ -295,7 +299,11 @@ void Project::Paint(void)
 				for(j = 0; j < runs[i].placements.GetCount(); j++){
 					::glPushMatrix();
 					::glMultMatrixd(runs[i].placements[j].matrix.a);
-					targets[runs[i].placements[j].targetNumber].Paint();
+
+					runs[i].placements[j].outLine.Paint();
+					if(!runs[i].placements[j].isKeepout){
+						targets[runs[i].placements[j].targetNumber].Paint();
+					}
 					::glPopMatrix();
 				}
 			}
@@ -311,12 +319,36 @@ void Project::Paint(void)
 //bool Project::LoadObject(wxFileName)
 
 
+void Project::InsertDrillGrid(Run &run, double sizex, double sizey,
+		bool flipped)
+{
+	Target temp;
+	TargetPlacement tempPlace;
+	temp.SetupDrill(toolbox.tools[0], 0.006, 0.010);
+	targets.Add(temp);
+	tempPlace.targetNumber = targets.GetCount() - 1;
+	tempPlace.matrix.SetIdentity();
+	tempPlace.matrix.TranslateGlobal(0.015,
+			run.stockMaterial.y / 2 - sizey / 2, 0.0);
+	run.placements.Add(tempPlace);
+	tempPlace.matrix.SetIdentity();
+	tempPlace.matrix.TranslateGlobal(0.015 + sizex, run.stockMaterial.y / 2
+			- sizey / 2, 0.0);
+	run.placements.Add(tempPlace);
+	tempPlace.matrix.SetIdentity();
+	tempPlace.matrix.TranslateGlobal(0.015,
+			run.stockMaterial.y / 2 + sizey / 2, 0.0);
+	run.placements.Add(tempPlace);
+}
+
 void Project::GenerateTargets(void)
 {
 
 	Target temp, temp2;
 	TargetPlacement tempPlace;
 	Run* run = new Run;
+
+	run->stockMaterial = stock.stockMaterials[0];
 
 	AffineTransformMatrix shift;
 
@@ -331,19 +363,43 @@ void Project::GenerateTargets(void)
 	Target discSlot;
 	discSlot.SetupDisc(slotWidth, resolution, resolution);
 
+	runs.Clear();
+	targets.Clear();
+
 
 	//	discSlot.matrix.TranslateGlobal(0.1, -0.1, 0);
 	//	targets.Add(discSlot);
+
+
+	// Test 1:
+	tempPlace.SetKeepout(0.0, 0.0, 0.060, 0.100);
+	run->placements.Add(tempPlace);
+
+
+	// Screw 1:
+	tempPlace.SetKeepout(0.000, 0.100, 0.025, 0.020);
+	run->placements.Add(tempPlace);
+
+
+	// Screw 2:
+	tempPlace.SetKeepout(0.000, 0.285, 0.025, 0.020);
+	run->placements.Add(tempPlace);
+
+
+	// Screw 3:
+	tempPlace.SetKeepout(0.395, 0.085, 0.025, 0.020);
+	run->placements.Add(tempPlace);
+
+	InsertDrillGrid(*run, 0.450, 0.240, true);
 
 	double gridx = 0.0;
 	double gridy = 0.0;
 	double gridsx = obj->bbox.xmax + 4 * slotWidth;
 	double gridsy = obj->bbox.ymax + 4 * slotWidth;
 
-	runs.Clear();
-	targets.Clear();
 
-	for(i = 0; i < n; i++){
+	//	for(i = 0; i < n; i++){
+	for(i = 1; i <= 3; i++){
 
 		temp.SetupBox(obj->bbox.xmax + 4 * slotWidth, obj->bbox.ymax + 4
 				* slotWidth, stock.stockMaterials[activeStock].z, resolution,
@@ -362,25 +418,26 @@ void Project::GenerateTargets(void)
 
 		temp2 = temp;
 		temp2.FoldRaise(discSlot);
-		temp.outline = temp2.GeneratePolygon(-1, -1);
-		temp.outline.PolygonSmooth();
-		temp.outline.PolygonSmooth();
-		temp.outline.PolygonSmooth();
+		temp.outLine = temp2.GenerateConvexOutline();
+		temp.supportLine = temp2.GeneratePolygon(-1, -1);
+		temp.supportLine.PolygonSmooth();
+		temp.supportLine.PolygonSmooth();
+		temp.supportLine.PolygonSmooth();
 
 
 		//temp.FillOutsidePolygon(temp.outline);
-		temp2.HardInvert();
-		temp += temp2;
+		//temp2.HardInvert();
+		//temp += temp2;
 
-		temp.AddSupport(temp.outline, supportDistance, supportHeight,
-				supportWidth, slotWidth);
-		tempPlace.matrix.SetIdentity();
+		//		temp.AddSupport(temp.outline, supportDistance, supportHeight,
+		//				supportWidth, slotWidth);
+		tempPlace.Clear();
 		tempPlace.matrix.TranslateGlobal(gridx, gridy, 0.0);
 
-		temp.refresh=true;
+		temp.refresh = true;
 		targets.Add(temp);
 		tempPlace.targetNumber = targets.GetCount() - 1;
-		tempPlace.outline = temp.outline;
+		tempPlace.outLine = temp.outLine;
 		run->placements.Add(tempPlace);
 
 		gridx += gridsx;
@@ -405,7 +462,7 @@ void Project::GenerateTargets(void)
 
 		//temp.ClearField();
 
-		if(temp.outline.elements.GetCount() >= 2){
+		if(temp.outLine.elements.GetCount() >= 2){
 
 
 			//			ToolPathGenerator.GenerateToolpath(temp, *obj, toolbox.tools[0]);
@@ -419,8 +476,8 @@ void Project::GenerateTargets(void)
 	obj->matrix = oldPos;
 
 
-	//	displayGeometry = false;
-	displayStock = false;
+	displayGeometry = false;
+	displayStock = true;
 
 }
 

@@ -51,8 +51,6 @@ public:
 
 	wxFileName fileName;
 
-	AffineTransformMatrix matrix;
-
 	ArrayOfStockMaterial stockMaterials;
 
 private:

@@ -36,8 +36,8 @@ WX_DEFINE_OBJARRAY(ArrayOfStockMaterial)
 StockMaterial::StockMaterial()
 {
 	materialName = _T("Default");
-	x = 0.700;
-	y = 0.450;
+	x = 0.648;
+	y = 0.390;
 	z = 0.020;
 	maxSpeed = 10000;
 	maxFeedrate = 0.05;
@@ -58,7 +58,7 @@ void StockMaterial::Paint(void)
 
 	::glBegin(GL_QUADS);
 
-	::glColor3f(color.x, color.y, color.z);
+	::glColor4f(color.x, color.y, color.z, 0.1);
 
 	::glNormal3f(1, 0, 0);
 	::glVertex3f(x, y, z);

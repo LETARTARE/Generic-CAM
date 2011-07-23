@@ -35,6 +35,7 @@ WX_DEFINE_OBJARRAY(ArrayOfTarget)
 
 #include <GL/gl.h>
 #include <wx/log.h>
+#include <float.h>
 #include <wx/string.h>
 
 Target::Target()
@@ -345,11 +346,15 @@ const Polygon25 Target::GeneratePolygon(int stx, int sty, double height)
 
 const Polygon25 Target::GenerateConvexOutline(void)
 {
-	Polygon25 temp, temp2;
-	size_t i, j;
+	Vector3 temp;
+	Polygon25 temp1, temp2;
+	size_t i, j, k;
 
 	size_t *left;
 	size_t *right;
+
+	size_t first = this->ny;
+	size_t last = this->ny;
 
 	left = new size_t[this->ny];
 	right = new size_t[this->ny];
@@ -365,17 +370,68 @@ const Polygon25 Target::GenerateConvexOutline(void)
 			if(field[p].IsVisible()){
 				if(i < left[j]) left[j] = i;
 				if(i > right[j]) right[j] = i;
+				if(first == this->ny) first = j;
+				last = j;
 			}
 			p++;
 		}
 	}
 
-	//TODO: Insert algotirhm here!
+	//	for(i = first; i <= last; i++){
+	//		temp1.InsertPoint(left[i] * this->rx, i * this->ry, 0.03);
+	//	}
+	temp1.Close(true);
 
+	if(first == this->ny){
+		delete[] left;
+		delete[] right;
+		return temp1;
+	}
+
+	temp2.InsertPoint(right[first] * this->rx, first * this->ry, 0.0);
+
+	double d, dmax;
+
+	i = first;
+	temp1.InsertPoint(left[i] * this->rx, i * this->ry, 0.0);
+	while(i < last){
+		dmax = DBL_MAX;
+		k = i;
+		for(j = i + 1; j <= last; j++){
+			d = (double) ((double) left[j] - (double) left[k]) / ((double) j
+					- (double) k);
+			if(d < dmax){
+				i = j;
+				dmax = d;
+			}
+		}
+		temp1.InsertPoint(left[i] * this->rx, i * this->ry, 0.0);
+	}
+
+	i = first;
+	temp2.InsertPoint(right[i] * this->rx, i * this->ry, 0.0);
+	while(i < last){
+		dmax = -DBL_MAX;
+		k = i;
+		for(j = i + 1; j <= last; j++){
+			d = (double) ((double) right[j] - (double) right[k]) / ((double) j
+					- (double) k);
+			if(d > dmax){
+				i = j;
+				dmax = d;
+			}
+		}
+		temp2.InsertPoint(right[i] * this->rx, i * this->ry, 0.0);
+	}
+
+	temp1.Reverse();
+	temp1 += temp2;
+	temp1.RemoveZeroLength();
 
 	delete[] left;
 	delete[] right;
-	return temp;
+
+	return temp1;
 }
 
 void Target::PolygonDropTarget(Polygon3 &polygon, Target &tool)
@@ -506,6 +562,47 @@ void Target::AddSupport(Polygon3 &polygon, double distance, double height,
 
 }
 
+void Target::SetupDrill(Tool &tool, double diameter,
+		double depth)
+{
+	this->ClearField();
+
+	double d = diameter + 0.002;
+	outLine.Clear();
+	outLine.InsertPoint(-d, -d, 0.0);
+	outLine.InsertPoint(d, -d, 0.0);
+	outLine.InsertPoint(d, d, 0.0);
+	outLine.InsertPoint(-d, d, 0.0);
+	outLine.Close();
+
+	double r = (diameter - 0.0061) / 2.0;
+	MachinePosition temp;
+	temp.axisZ = 0.004;
+	toolpath.positions.Add(temp);
+	temp.axisZ = 0.001;
+	toolpath.positions.Add(temp);
+	temp.isCutting = true;
+	temp.axisZ = -0.001;
+	temp.axisX = r;
+	toolpath.positions.Add(temp);
+	temp.isRotationPositiv = true;
+	temp.radiusI = -r;
+	while(temp.axisZ > 0.003 - depth){
+		temp.axisZ -= 0.003;
+		toolpath.positions.Add(temp);
+	}
+	temp.axisZ = -depth;
+	toolpath.positions.Add(temp);
+	toolpath.positions.Add(temp);
+	temp.axisZ += 0.001;
+	temp.axisX = 0.000;
+	temp.radiusI = 0.000;
+	temp.isCutting = false;
+	toolpath.positions.Add(temp);
+	temp.axisZ = 0.004;
+	toolpath.positions.Add(temp);
+}
+
 void Target::Paint(void)
 {
 	Imprinter::Paint();
@@ -513,7 +610,10 @@ void Target::Paint(void)
 	::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
 
 	toolpath.Paint();
-	outline.Paint();
+	::glColor3f(0.5, 0.5, 0.5);
+	supportLine.Paint();
+	::glColor3f(0.5, 0.8, 0.5);
+	outLine.Paint();
 
 }
 

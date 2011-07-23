@@ -30,6 +30,7 @@
 
 #include "Polygon3.h"
 
+#include <float.h>
 #include <GL/gl.h>
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfPolygon3)
@@ -85,6 +86,24 @@ void Polygon3::Reverse(void)
 	for(i = 0; i < (j / 2); i++){
 		elements[i].Swap(elements[j - i - 1]);
 	}
+}
+
+void Polygon3::RemoveZeroLength(void)
+{
+    size_t i,j,k;
+    Vector3 temp;
+    k = elements.GetCount();
+    for(i=0;i<k;i++)
+    {
+        j=(i+1)%k;
+        temp = elements[i]-elements[j];
+        if(temp.Abs()<FLT_EPSILON){
+         elements.RemoveAt(i);
+         i--;
+         k--;
+        }
+    }
+
 }
 
 double Polygon3::GetLength(void) const

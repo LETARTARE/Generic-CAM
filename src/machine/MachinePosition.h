@@ -61,6 +61,7 @@ public:
 	float radiusI;
 	float radiusJ;
 	float radiusK;
+	bool isRotationPositiv;
 
 	float duration;
 
@@ -86,102 +87,112 @@ public:
 	//	}
 
 
-	const MachinePosition operator+(const MachinePosition& a) const
-	{
-		return MachinePosition(axisX + a.axisX, axisY + a.axisY, axisZ
-				+ a.axisZ, axisA + a.axisA, axisB + a.axisB, axisC + a.axisC,
-				axisU + a.axisU, axisV + a.axisV, axisW + a.axisW);
-	}
 	MachinePosition & operator+=(const MachinePosition& a)
 	{
-		axisX += a.axisX;
-		axisY += a.axisY;
-		axisZ += a.axisZ;
-		axisA += a.axisA;
-		axisB += a.axisB;
-		axisC += a.axisC;
-		axisU += a.axisU;
-		axisV += a.axisV;
-		axisW += a.axisW;
+		this->axisX += a.axisX;
+		this->axisY += a.axisY;
+		this->axisZ += a.axisZ;
+		this->axisA += a.axisA;
+		this->axisB += a.axisB;
+		this->axisC += a.axisC;
+		this->axisU += a.axisU;
+		this->axisV += a.axisV;
+		this->axisW += a.axisW;
 		return *this;
-		//MachinePosition(axisX, axisY, axisZ, axisA, axisB, axisC, axisU,
-		//	axisV, axisW);
 	}
-	MachinePosition operator-(const MachinePosition& a)
+
+	const MachinePosition operator+(const MachinePosition &b) const
 	{
-		return MachinePosition(axisX - a.axisX, axisY - a.axisY, axisZ
-				- a.axisZ, axisA - a.axisA, axisB - a.axisB, axisC - a.axisC,
-				axisU - a.axisU, axisV - a.axisV, axisW - a.axisW);
+		MachinePosition temp = *this;
+		temp += b;
+		return temp;
 	}
+
 	MachinePosition & operator-=(const MachinePosition& a)
 	{
-		axisX -= a.axisX;
-		axisY -= a.axisY;
-		axisZ -= a.axisZ;
-		axisA -= a.axisA;
-		axisB -= a.axisB;
-		axisC -= a.axisC;
-		axisU -= a.axisU;
-		axisV -= a.axisV;
-		axisW -= a.axisW;
+		this->axisX -= a.axisX;
+		this->axisY -= a.axisY;
+		this->axisZ -= a.axisZ;
+		this->axisA -= a.axisA;
+		this->axisB -= a.axisB;
+		this->axisC -= a.axisC;
+		this->axisU -= a.axisU;
+		this->axisV -= a.axisV;
+		this->axisW -= a.axisW;
 		return *this;
-		//return MachinePosition(axisX, axisY, axisZ, axisA, axisB, axisC, axisU,
-		//	axisV, axisW);
 	}
-	MachinePosition operator-()
+
+	const MachinePosition operator-(const MachinePosition &b) const
 	{
-		return MachinePosition(-axisX, -axisY, -axisZ, -axisA, -axisB, -axisC,
-				-axisU, -axisV, -axisW);
+		MachinePosition temp = *this;
+		temp -= b;
+		return temp;
 	}
-	MachinePosition operator*(const float &b)
+
+	const MachinePosition operator-() const
 	{
-		return MachinePosition(axisX * b, axisY * b, axisZ * b, axisA * b,
-				axisB * b, axisC * b, axisU * b, axisV * b, axisW * b);
+		MachinePosition temp(-this->axisX, -this->axisY, -this->axisZ,
+				-this->axisA, -this->axisB, -this->axisC, -this->axisU,
+				-this->axisV, -this->axisW);
+		return temp;
 	}
-	MachinePosition operator*=(const float &b)
+
+	MachinePosition & operator*=(const float &b)
 	{
-		axisX *= b;
-		axisY *= b;
-		axisZ *= b;
-		axisA *= b;
-		axisB *= b;
-		axisC *= b;
-		axisU *= b;
-		axisV *= b;
-		axisW *= b;
-		return MachinePosition(axisX, axisY, axisZ, axisA, axisB, axisC, axisU,
-				axisV, axisW);
+		this->axisX *= b;
+		this->axisY *= b;
+		this->axisZ *= b;
+		this->axisA *= b;
+		this->axisB *= b;
+		this->axisC *= b;
+		this->axisU *= b;
+		this->axisV *= b;
+		this->axisW *= b;
+		return *this;
 	}
-	MachinePosition operator/(const float &b)
+
+	const MachinePosition operator*(const float &b) const
 	{
-		return MachinePosition(axisX / b, axisY / b, axisZ / b, axisA / b,
-				axisB / b, axisC / b, axisU / b, axisV / b, axisW / b);
+		MachinePosition temp = *this;
+		temp *= b;
+		return temp;
 	}
-	MachinePosition operator/=(const float &b)
+
+	MachinePosition & operator/=(const float &b)
 	{
-		axisX /= b;
-		axisY /= b;
-		axisZ /= b;
-		axisA /= b;
-		axisB /= b;
-		axisC /= b;
-		axisU /= b;
-		axisV /= b;
-		axisW /= b;
-		return MachinePosition(axisX, axisY, axisZ, axisA, axisB, axisC, axisU,
-				axisV, axisW);
+		this->axisX /= b;
+		this->axisY /= b;
+		this->axisZ /= b;
+		this->axisA /= b;
+		this->axisB /= b;
+		this->axisC /= b;
+		this->axisU /= b;
+		this->axisV /= b;
+		this->axisW /= b;
+		return *this;
 	}
+
+	const MachinePosition operator/(const float &b) const
+	{
+		MachinePosition temp = *this;
+		temp /= b;
+		return temp;
+	}
+
 	void Zero(void);
 	float AbsXYZ() const;
 	float AbsUVW() const;
 	float AbsXYZUVW() const;
 
 	bool ParseGCodeLine(wxString lineOfText);
+	unsigned char GetGNumber(void) const;
+	wxString GenerateCommandXYZ(void);
+	wxString GenerateCommandXYZABC(void);
+	wxString GenerateCommandXYZABCUVW(void);
+	wxString GenerateCommandDiff(const MachinePosition &oldPosition);
 
 };
-
 WX_DECLARE_OBJARRAY(MachinePosition, ArrayOfMachinePosition)
 ;
-
 
 #endif /* MACHINEPOSITION_H_ */

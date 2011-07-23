@@ -77,7 +77,6 @@ public:
 	ArrayOfTarget targets;
 	ArrayOfRun runs;
 
-
 	bool modified;
 
 	bool displayGeometry;
@@ -104,8 +103,6 @@ public:
 	double supportWidth;
 	double supportHeight;
 
-
-
 protected:
 	wxXmlDocument doc;
 
@@ -116,8 +113,9 @@ public:
 	bool Save(wxFileName fileName);
 	bool Load(wxFileName fileName);
 
-
 	void Assemble(void);
+
+	void InsertDrillGrid(Run &run, double sizex, double sizey, bool flipped = true);
 	void GenerateTargets(void);
 	void GenerateToolpath(size_t nrTarget);
 

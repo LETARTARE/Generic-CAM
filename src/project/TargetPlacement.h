@@ -41,7 +41,6 @@
 #include <wx/xml/xml.h>
 
 #include "../generator/Polygon25.h"
-#include "../simulator/ToolPath.h"
 
 class TargetPlacement {
 	// Constructor/ Destructor
@@ -51,14 +50,21 @@ public:
 	//Member variables:
 public:
 	AffineTransformMatrix matrix;
+	Polygon25 outLine;
+
 	bool isFlipped;
-	Polygon25 outline;
 	bool isMovable;
+	bool isKeepout;
+
 	size_t targetNumber;
 
 	//Methods:
 public:
-	void Paint(void)const;
+	void Clear(void);
+
+	void SetKeepout(double x, double y, double sizex, double sizey);
+
+	void Paint(void) const;
 };
 WX_DECLARE_OBJARRAY(TargetPlacement, ArrayOfTargetPlacement)
 ;

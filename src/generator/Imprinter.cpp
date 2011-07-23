@@ -295,7 +295,7 @@ void Imprinter::SetupDisc(double radius, const double resolutionX,
 	size_t cellsY = ceil(radius / resolutionY) * 2 + 1;
 	if(!SetupField(cellsX, cellsY, resolutionX, resolutionY)) return;
 
-	sz = 5*FLT_EPSILON;
+	sz = 5 * FLT_EPSILON;
 
 	double centerX = (ceil(radius / resolutionX) + 0.5) * rx;
 	double centerY = (ceil(radius / resolutionY) + 0.5) * ry;
@@ -1039,35 +1039,37 @@ void Imprinter::Paint()
 	if(refresh){
 		::glNewList(displayListIndex, GL_COMPILE_AND_EXECUTE);
 
-		::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
-		::glBegin(GL_QUADS);
+		if(field != NULL){
 
-		size_t i, j, p = 0;
-		float px = 0.0, py = 0;
-		for(j = 0; j < ny; j++){
-			px = 0.0;
-			for(i = 0; i < nx; i++){
+			::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
+			::glBegin(GL_QUADS);
 
-				if(field[p].IsVisible()){
-					glNormal3f(0, 0, 1);
-					glVertex3f(px, py, field[p].upperLimit);
-					glVertex3f(px + rx, py, field[p].upperLimit);
-					glVertex3f(px + rx, py + ry, field[p].upperLimit);
-					glVertex3f(px, py + ry, field[p].upperLimit);
+			size_t i, j, p = 0;
+			float px = 0.0, py = 0;
+			for(j = 0; j < ny; j++){
+				px = 0.0;
+				for(i = 0; i < nx; i++){
 
-					glNormal3f(0, 0, -1);
-					glVertex3f(px, py, field[p].lowerLimit);
-					glVertex3f(px + rx, py, field[p].lowerLimit);
-					glVertex3f(px + rx, py + ry, field[p].lowerLimit);
-					glVertex3f(px, py + ry, field[p].lowerLimit);
+					if(field[p].IsVisible()){
+						glNormal3f(0, 0, 1);
+						glVertex3f(px, py, field[p].upperLimit);
+						glVertex3f(px + rx, py, field[p].upperLimit);
+						glVertex3f(px + rx, py + ry, field[p].upperLimit);
+						glVertex3f(px, py + ry, field[p].upperLimit);
+
+						glNormal3f(0, 0, -1);
+						glVertex3f(px, py, field[p].lowerLimit);
+						glVertex3f(px + rx, py, field[p].lowerLimit);
+						glVertex3f(px + rx, py + ry, field[p].lowerLimit);
+						glVertex3f(px, py + ry, field[p].lowerLimit);
+					}
+					px += rx;
+					p++;
 				}
-				px += rx;
-				p++;
+				py += ry;
 			}
-			py += ry;
+			::glEnd();
 		}
-		::glEnd();
-
 		if(displayBox || true){
 
 			double cornerLength = 0.3; // 30% of a side

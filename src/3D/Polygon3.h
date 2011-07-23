@@ -60,6 +60,7 @@ public:
 	void Close(bool close = true);
 	void InsertPoint(double x = 0.0, double y = 0.0, double z = 0.0);
 	void Reverse(void);
+	void RemoveZeroLength(void);
 	Polygon3 & operator+=(const Polygon3 &a);
 	const Polygon3 operator+(const Polygon3 &a) const;
 	void Paint(void) const;
