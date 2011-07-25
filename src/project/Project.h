@@ -87,6 +87,7 @@ public:
 	bool displayRun;
 	bool displayTargets;
 	bool displayToolpath;
+	bool displayOutLines;
 
 	Unit Tolerance;
 	Unit Distance;
@@ -115,9 +116,16 @@ public:
 
 	void Assemble(void);
 
-	void InsertDrillGrid(Run &run, double sizex, double sizey, bool flipped = true);
+	void GenerateToolPath(void);
+	void CollectToolPath(void);
+
+	size_t SetupMachineBed(bool flipped=false);
+	void FlipRun(void);
+
+
+	void InsertDrillGrid(Run &run, double sizex, double sizey, bool flipped =
+			true);
 	void GenerateTargets(void);
-	void GenerateToolpath(size_t nrTarget);
 
 private:
 	void XMLRemoveAllChildren(wxXmlNode* node);

@@ -45,6 +45,63 @@ ToolPath::~ToolPath()
 {
 }
 
+void ToolPath::Clear(void)
+{
+	matrix.SetIdentity();
+	positions.Empty();
+}
+
+//! Overloaded operator for polygon concatenation.
+ToolPath & ToolPath::operator+=(const ToolPath &a)
+{
+	size_t i;
+	for(i = 0; i < a.positions.GetCount(); i++)
+		this->positions.Add(a.positions[i]);
+	return *this;
+}
+
+//! Overloaded operator for polygon concatenation.
+const ToolPath ToolPath::operator+(const ToolPath &a) const
+{
+	ToolPath temp = *this;
+	temp += a;
+	return temp;
+}
+
+bool ToolPath::IsEmpty(void) const
+{
+	return (positions.GetCount() == 0);
+}
+
+void ToolPath::ApplyTransformation(void)
+{
+	size_t i;
+	Vector3 temp;
+	for(i = 0; i < positions.GetCount(); i++){
+		temp.Set(positions[i].axisX, positions[i].axisY, positions[i].axisZ);
+		temp = matrix.Transform(temp);
+		positions[i].axisX = temp.x;
+		positions[i].axisY = temp.y;
+		positions[i].axisZ = temp.z;
+
+	}
+	matrix.SetIdentity();
+}
+
+void ToolPath::ApplyTransformation(const AffineTransformMatrix &matrix)
+{
+	size_t i;
+	Vector3 temp;
+	for(i = 0; i < positions.GetCount(); i++){
+		temp.Set(positions[i].axisX, positions[i].axisY, positions[i].axisZ);
+		temp = matrix.Transform(temp);
+		positions[i].axisX = temp.x;
+		positions[i].axisY = temp.y;
+		positions[i].axisZ = temp.z;
+
+	}
+}
+
 void ToolPath::Paint(void)
 {
 
@@ -70,6 +127,8 @@ void ToolPath::Paint(void)
 
 void ToolPath::WriteToFile(wxTextFile &f)
 {
+	setlocale(LC_ALL,"C");
+
 	f.AddLine(_T("G90 G80 G40 G54 G21 G17 G50 G94 G64 (safety block)"));
 
 	f.AddLine(_T("G49 (disable tool length compensation)"));
@@ -85,18 +144,16 @@ void ToolPath::WriteToFile(wxTextFile &f)
 	f.AddLine(_T("G4 P3 (Wait For Seconds, Parameter 3 Seconds)"));
 
 	size_t i;
-	for(i = 0; i < positions.GetCount(); i++){
-		if(positions[i].isCutting)
-			f.AddLine(_T("G1"));
-		else
-			f.AddLine(_T("G0"));
 
-		f.AddLine(wxString::Format(_T("X%.4f Y%.4f Z%.4f"), positions[i].axisX*1000,
-				positions[i].axisY*1000, positions[i].axisZ*1000));
-	}
+	f.AddLine(positions[0].GenerateCommandXYZ());
+
+	for(i = 1; i < positions.GetCount(); i++)
+		f.AddLine(positions[i].GenerateCommandDiff(positions[i - 1]));
 
 	f.AddLine(_T("M5 (Stop spindel)"));
 	f.AddLine(_T("G4 P3 (Wait For Seconds, Parameter 3 Seconds)"));
 	f.AddLine(_T("M2 (End programm)"));
 
+
+	setlocale(LC_ALL,"");
 }

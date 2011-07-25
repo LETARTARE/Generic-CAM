@@ -206,24 +206,6 @@ const Polygon25 Target::GeneratePolygon(int stx, int sty)
 		temp.InsertPoint((double) x * rx, (double) y * ry, z);
 		dir = NextDir(x, y, dir);
 
-
-		//		if(x == 100 && y == 66){
-		//			int i, j;
-		//			wxString temp;
-		//			for(j = -3; j <= 3; j++){
-		//				temp = wxString::Format(_T("y %3i:"), j);
-		//				for(int i = -3; i <= 3; i++){
-		//					if(IsVisible(x + i, y + j))
-		//						temp += _T("X ");
-		//					else
-		//						temp += _T(". ");
-		//				}
-		//				wxLogMessage(temp);
-		//
-		//			}
-		//			i = i + 1;
-		//		}
-
 		if(dir == -1){
 			wxLogError(_T("Target::GeneratePolygon: Lost wall contact!"));
 			return temp;
@@ -303,6 +285,21 @@ const Polygon25 Target::GeneratePolygon(int stx, int sty, double height)
 
 		if(dir == -1){
 			wxLogError(_T("Target::GeneratePolygon: Lost wall contact!"));
+
+
+			int i, j;
+			wxString tp;
+			for(j = -3; j <= 3; j++){
+				tp = wxString::Format(_T("x:%3i y%3i:"), x, y - j);
+				for(int i = -3; i <= 3; i++){
+					if(IsFilledAbove(x + i, y - j, height))
+						tp += _T("# ");
+					else
+						tp += _T("_ ");
+				}
+				wxLogMessage(tp);
+			}
+			this->field[x+y*nx].upperLimit=-0.0001;
 			return temp;
 		}
 
@@ -449,9 +446,19 @@ void Target::PolygonDrop(Polygon3 &polygon, double level)
 	double d;
 	for(i = 0; i < polygon.elements.GetCount(); i++){
 		d = this->GetLevel(polygon.elements[i].x, polygon.elements[i].y);
+
+
+		//		if(d >= 0)
+		//			polygon.elements[i].z = d;
+		//		else
+		//			polygon.elements[i].z = 0.0;
+
+
 		polygon.elements[i].z -= level;
 		if(d >= 0.0){
-			if(d > polygon.elements[i].z) polygon.elements[i].z = d;
+			if(polygon.elements[i].z < d) polygon.elements[i].z = d;
+		}else{
+			if(polygon.elements[i].z < 0.0) polygon.elements[i].z = 0.0;
 		}
 	}
 }
@@ -562,8 +569,7 @@ void Target::AddSupport(Polygon3 &polygon, double distance, double height,
 
 }
 
-void Target::SetupDrill(Tool &tool, double diameter,
-		double depth)
+void Target::SetupDrill(Tool &tool, double diameter, double depth)
 {
 	this->ClearField();
 
@@ -601,6 +607,21 @@ void Target::SetupDrill(Tool &tool, double diameter,
 	toolpath.positions.Add(temp);
 	temp.axisZ = 0.004;
 	toolpath.positions.Add(temp);
+}
+
+void Target::Simulate(void)
+{
+	this->InitImprinting();
+	this->HardInvert();
+	Polygon3 temp;
+	size_t i;
+	for(i = 0; i < toolpath.positions.GetCount(); i++){
+		temp.InsertPoint(toolpath.positions[i].axisX,
+				toolpath.positions[i].axisY, toolpath.positions[i].axisZ + sz);
+	}
+	Target discTool;
+	discTool.SetupDisc(0.003, rx, rx);
+	this->PolygonDropTarget(temp, discTool);
 }
 
 void Target::Paint(void)

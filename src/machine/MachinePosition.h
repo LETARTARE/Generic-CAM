@@ -73,19 +73,6 @@ public:
 
 	// Methods
 
-	//TODO: Cleanup all the operator stuff.
-
-	// This may be useful, if the class gets a pointer as a member variable.
-	//	MachinePosition & operator=(const MachinePostion &a)
-	//	{
-	//		ASSERT(this != a); // Self assignment = error in program.
-	//		// 1.  Deallocate any memory that MyClass is using internally
-	//		// 2.  Allocate some memory to hold the contents of rhs
-	//		// 3.  Copy the values from rhs into this instance
-	//		// 4.  Return *this
-	//		return *this;
-	//	}
-
 
 	MachinePosition & operator+=(const MachinePosition& a)
 	{

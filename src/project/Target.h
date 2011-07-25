@@ -86,6 +86,8 @@ public:
 	void AddSupport(Polygon3 &polygon, double distance, double height,
 			double width, double slotWidth);
 
+	void Simulate(void);
+
 	void Paint(void);
 };
 WX_DECLARE_OBJARRAY(Target, ArrayOfTarget)

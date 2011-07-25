@@ -88,6 +88,8 @@ private:
 
 
 	ArrayOfProject project;
+	size_t selectedTargetPosition;
+
 	size_t activeProject;
 
 	ObjectFrame* objectFrame;
@@ -107,6 +109,7 @@ public:
 private:
 
 	void OnTimer(wxTimerEvent& event);
+	void OnKeyDown(wxKeyEvent& event);
 
 	void OnCreateProject(wxCommandEvent& event);
 	void OnLoadProject(wxCommandEvent& event);
@@ -127,6 +130,10 @@ private:
 	void OnSaveToolbox(wxCommandEvent& event);
 
 	void OnEditStock(wxCommandEvent& event);
+
+	void OnGenerateToolpath( wxCommandEvent& event );
+	void OnFlipRun( wxCommandEvent& event );
+	void OnPrepareMachinebed( wxCommandEvent& event );
 
 	void OnLoadGCodes(wxCommandEvent& event);
 	void OnSaveGCodes(wxCommandEvent& event);

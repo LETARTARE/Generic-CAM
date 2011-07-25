@@ -63,6 +63,8 @@ public:
 	double
 			DistanceToPolygon(const Polygon25 &polygon, double vx, double vy) const;
 
+	void RotatePolygonStart(double x, double y);
+
 };
 WX_DECLARE_OBJARRAY(Polygon25, ArrayOfPolygon25)
 ;

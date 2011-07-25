@@ -30,6 +30,9 @@
 
 #include "TPGeneratorTest.h"
 
+#include <math.h>
+#include <wx/log.h>
+
 TPGeneratorTest::TPGeneratorTest()
 {
 
@@ -48,83 +51,119 @@ void TPGeneratorTest::GenerateToolpath(Target &target, Tool &tool)
 	ToolPath tp;
 	MachinePosition m;
 
+	if(target.IsEmpty()) return;
 
 	// TODO: Change this to reflect tool shape.
 	Target discTool;
 	discTool.SetupDisc(0.003, target.GetSizeRX(), target.GetSizeRY());
 
 	Target temp = target;
+	Target temptop;
 
 	temp.FoldRaise(discTool);
 	temp.Limit();
+	temptop = temp;
 	temp.InvertTop();
 
-	double level = temp.GetSizeZ() - 0.00015;
+	double level = temp.GetSizeZ() - 0.0005;
 
 
 	// Starting point
+	//
+	//	tp.positions.Add(m);
+
+	// Position at start (! not a toolpath position)
 	m.axisX = 0.0;
 	m.axisY = 0.0;
-	m.axisZ = target.GetSizeZ() + freeHeightAboveMaterial;
+	m.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
 	m.isCutting = false;
-	tp.positions.Add(m);
 
-	ArrayOfPolygon3 pgs;
+	ArrayOfPolygon25 pgs;
 	Polygon25 pg;
 
-	while(level > 0.0){
+	AffineTransformMatrix tm;
+	tm.TranslateGlobal(0.0, 0.0, -0.0001);
 
+	while(level > -0.0001){
+
+
+		// Find All polygons on one level
 		bool flag;
 		flag = true;
 		while(flag){
-			pg = target.GeneratePolygon(-1, -1, level);
-			if(pg.elements.GetCount() < 2) flag = false;
-			if(flag){
-				target.PolygonDrop(pg, levelDrop);
+			pg = temp.GeneratePolygon(-1, -1, level);
+			pg.ApplyTransformation(tm);
+			if(pg.elements.GetCount() < 1) flag = false;
+			if(pg.elements.GetCount() > 1){
+				temptop.PolygonDrop(pg, levelDrop - 0.0005);
+				pg.ApplyTransformation(tm);
+				temp.PolygonDropTarget(pg, discTool);
 				pg.PolygonSmooth();
-				target.PolygonDropTarget(pg, discTool);
 				pgs.Add(pg);
 			}
 		}
 
+		bool isMillUp = true;
+		// Generate a toolpath from polygons
 		size_t j;
-		int i;
-		for(i = pgs.GetCount() - 1; i >= 0; i--){
-			if(pgs[i].elements.GetCount() > 0){
-				// Starting point
-				m.axisX = pgs[i].elements[0].x;
-				m.axisY = pgs[i].elements[0].y;
-				m.axisZ = target.GetSizeZ() + freeHeightAboveMaterial;
-				m.isCutting = false;
-				tp.positions.Add(m);
-				m.isCutting = true;
+		size_t i;
+		double d2;
+		for(i = pgs.GetCount(); i > 0; i--){
+			if(pgs[i - 1].elements.GetCount() > 0){
 
-				for(j = 1; j < pgs[i].elements.GetCount(); j++){
-					m.axisX = pgs[i].elements[j].x;
-					m.axisY = pgs[i].elements[j].y;
-					m.axisZ = pgs[i].elements[j].z;
+				pgs[i - 1].RotatePolygonStart(m.axisX, m.axisY);
+
+				if(!isMillUp){
+					d2 = (m.axisX - pgs[i - 1].elements[0].x) * (m.axisX
+							- pgs[i - 1].elements[0].x) + (m.axisY
+							- pgs[i - 1].elements[0].y) * (m.axisY
+							- pgs[i - 1].elements[0].y);
+					if(d2 > (0.008 * 0.008)){
+						// Move tool out of material to travel to next polygon.
+						m.isCutting = false;
+						m.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
+						tp.positions.Add(m);
+						isMillUp = true;
+					}
+				}
+
+				if(isMillUp){
+					// Move tool into material
+					m.axisX = pgs[i - 1].elements[0].x;
+					m.axisY = pgs[i - 1].elements[0].y;
+					m.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
+					m.isCutting = false;
 					tp.positions.Add(m);
 				}
-				m.isCutting = false;
-				m.axisZ = target.GetSizeZ() + freeHeightAboveMaterial;
-				tp.positions.Add(m);
+				// Add polyg.positions[i].axisX,on
+				m.isCutting = true;
+				isMillUp = false;
+
+				for(j = 0; j < pgs[i - 1].elements.GetCount(); j++){
+					m.axisX = pgs[i - 1].elements[j].x;
+					m.axisY = pgs[i - 1].elements[j].y;
+					m.axisZ = pgs[i - 1].elements[j].z;
+					tp.positions.Add(m);
+				}
+
 			}
 		}
 		pgs.Clear();
 		level -= levelDrop;
+		wxLogMessage(wxString::Format(_T("Next Level: %.3f m"), level));
 	}
 
-	// Starting point
-	m.axisX = 0.0;
-	m.axisY = 0.0;
-	m.axisZ = target.GetSizeZ() + freeHeightAboveMaterial;
+	// Move tool out of material
+	m.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
 	m.isCutting = false;
 	tp.positions.Add(m);
 
+
+	// Shift toolpath down to align 0 with top-of-stock
 	for(size_t i = 0; i < tp.positions.GetCount(); i++){
-		tp.positions[i].axisZ -= target.GetSizeZ();
+		tp.positions[i].axisZ -= temp.GetSizeZ();
 	}
-	tp.matrix.TranslateGlobal(0, 0, target.GetSizeZ());
+	tp.matrix.TranslateGlobal(0, 0, temp.GetSizeZ());
 
 
 	//	t.InitImprinting();

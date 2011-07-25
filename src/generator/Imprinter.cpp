@@ -156,9 +156,9 @@ Imprinter& Imprinter::operator=(const Imprinter &b)
 	this->colorNormal = b.colorNormal;
 	this->colorTodo = b.colorTodo;
 	this->colorUnscratched = b.colorUnscratched;
-	if(N > 0){
+	if(b.N > 0){
 		size_t i;
-		for(i = 0; i < N; i++)
+		for(i = 0; i < b.N; i++)
 			this->field[i] = b.field[i];
 	}
 	return *this;
@@ -586,7 +586,7 @@ double Imprinter::GetLevel(double x, double y)
 	if(px < 0 || py < 0 || px >= nx || py >= ny) return -1.0;
 	size_t p = px + py * nx;
 	if(!field[p].IsVisible()) return -1.0;
-	return field[p].lowerLimit;
+	return field[p].upperLimit;
 }
 bool Imprinter::IsSurrounded(size_t p)
 {
@@ -617,7 +617,7 @@ void Imprinter::CleanOutlier(void)
 
 	double d;
 	for(i = nx; i < (N - nx); i++){
-		if(!IsSurrounded(i)){
+		if(IsSurrounded(i)){
 			j = i - nx - 1;
 			sumu = field[i].upperLimit + field[i + 1].upperLimit
 					+ field[i + 2].upperLimit;
@@ -710,6 +710,7 @@ void Imprinter::InvertZ(void)
 
 void Imprinter::FlipX(void)
 {
+	if(field == NULL) return;
 	size_t i, j, p1, p2, c;
 
 	c = ny / 2;
@@ -726,19 +727,19 @@ void Imprinter::FlipX(void)
 }
 void Imprinter::FlipY(void)
 {
-
+	//TODO: Write FlipY
 }
 void Imprinter::Rot90(void)
 {
-
+	//TODO: Write Rot90
 }
 void Imprinter::Rot180(void)
 {
-
+	//TODO: Write Rot180
 }
 void Imprinter::Rot270(void)
 {
-
+	//TODO: Write Rot270
 }
 
 size_t Imprinter::MemoryUsageInBytes(void)

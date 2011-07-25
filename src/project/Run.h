@@ -74,14 +74,15 @@ public:
 
 	TPGeneratorTest ToolPathGenerator;
 
-
-
 	// Methods
 public:
 	void ToXml(wxXmlNode* parentNode);
 	bool FromXml(wxXmlNode* node);
 
 	void WriteToFile(wxTextFile &f);
+
+	void SortTargets(void);
+
 
 	void Paint(void);
 

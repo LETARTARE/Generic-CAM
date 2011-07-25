@@ -34,6 +34,7 @@
 WX_DEFINE_OBJARRAY(ArrayOfProject)
 
 #include <GL/gl.h>
+#include <math.h>
 
 Project::Project()
 {
@@ -58,6 +59,7 @@ void Project::ClearProject(void)
 	activeObject = 0;
 	activeTarget = 0;
 	activeStock = 0;
+	activeRun = 0;
 
 	displayGeometry = true;
 	displayBoundingBox = false;
@@ -67,6 +69,7 @@ void Project::ClearProject(void)
 	displayRun = true;
 	displayTargets = true;
 	displayToolpath = true;
+	displayOutLines = true;
 
 	Tolerance.Setup(_T("m"), _T("mm"), (double) 1 / 1000);
 	Distance.Setup(_T("m"), _T("mm"), (double) 1 / 1000);
@@ -125,7 +128,7 @@ bool Project::Save(wxFileName fileName)
 		if(temp->GetName() == _T("Runs")) nodeRun = temp;
 		temp = temp->GetNext();
 	}
-	// If a knode is missing, generate it!
+	// If a node is missing, generate it!
 	if(nodeObject == NULL){
 		nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("Objects"));
 		root->InsertChild(nodeObject, NULL);
@@ -278,7 +281,8 @@ bool Project::Load(wxFileName fileName)
 void Project::Assemble(void)
 {
 	machine.Assemble();
-	if(machine.IsInitialized()) stock.stockMaterials[0].matrix = machine.workpiecePosition;
+	if(machine.IsInitialized()) stock.stockMaterials[0].matrix
+			= machine.workpiecePosition;
 
 }
 
@@ -290,34 +294,164 @@ void Project::Paint(void)
 			objects[i].Paint();
 	}
 	if(displayMachine) machine.Paint();
-	if(displayStock) stock.Paint();
 
 	if(displayRun){
 		for(i = 0; i < runs.GetCount(); i++){
 			runs[i].Paint();
-			if(displayTargets){
-				for(j = 0; j < runs[i].placements.GetCount(); j++){
-					::glPushMatrix();
-					::glMultMatrixd(runs[i].placements[j].matrix.a);
+			for(j = 0; j < runs[i].placements.GetCount(); j++){
+				::glPushMatrix();
+				::glMultMatrixd(runs[i].placements[j].matrix.a);
 
-					runs[i].placements[j].outLine.Paint();
+				if(displayOutLines) runs[i].placements[j].outLine.Paint();
+				if(displayTargets){
 					if(!runs[i].placements[j].isKeepout){
 						targets[runs[i].placements[j].targetNumber].Paint();
 					}
-					::glPopMatrix();
 				}
+				::glPopMatrix();
+
 			}
 
 		}
 	}
 
-
+	if(displayStock) stock.Paint();
 	//if(displayWorkpiece) workpiece.Paint();
 	//if(displayBoundingBox) bbox.Paint();
 }
 
 //bool Project::LoadObject(wxFileName)
 
+
+size_t Project::SetupMachineBed(bool flipped)
+{
+	TargetPlacement tempPlace;
+	Run* run = new Run;
+	runs.Empty();
+	targets.Empty();
+
+	tempPlace.Clear();
+	tempPlace.outLine.InsertPoint(stock.stockMaterials[activeStock].x, 0.0, 0.0);
+	tempPlace.outLine.InsertPoint(0.0, 0.0, 0.0);
+	tempPlace.outLine.InsertPoint(0.0, stock.stockMaterials[activeStock].y, 0.0);
+	tempPlace.outLine.InsertPoint(stock.stockMaterials[activeStock].x,
+			stock.stockMaterials[activeStock].y, 0.0);
+	tempPlace.outLine.Close();
+	tempPlace.isMovable = false;
+	tempPlace.isKeepout = true;
+	run->placements.Add(tempPlace);
+
+	InsertDrillGrid(*run, 0.450, 0.240, flipped);
+
+	runs.Add(run);
+	return (runs.GetCount() - 1);
+}
+
+void Project::FlipRun(void)
+{
+	size_t n = runs[activeRun].placements.GetCount();
+	if(n < 4) return;
+	size_t i, j, m, p;
+	Vector3 temp;
+	double dx, dy;
+	for(i = 1; i < n; i++){
+		m = runs[activeRun].placements[i].outLine.elements.GetCount();
+
+		if(runs[activeRun].placements[i].isKeepout){
+			for(j = 0; j < m; j++)
+				runs[activeRun].placements[i].outLine.elements[j].y
+						= -runs[activeRun].placements[i].outLine.elements[j].y;
+
+			temp = runs[activeRun].placements[i].matrix.GetCenter();
+			runs[activeRun].placements[i].matrix.TranslateGlobal(0.0,
+					(runs[activeRun].stockMaterial.y / 2 - temp.y) * 2, 0.0);
+
+		}else{
+			p = runs[activeRun].placements[i].targetNumber;
+			dx = targets[p].GetSizeX() / 2;
+			dy = targets[p].GetSizeY() / 2;
+
+			for(j = 0; j < m; j++)
+				runs[activeRun].placements[i].outLine.elements[j].y = dy*2
+						- runs[activeRun].placements[i].outLine.elements[j].y;
+
+			temp = runs[activeRun].placements[i].matrix.GetCenter();
+
+			//runs[activeRun].placements[i].matrix.TranslateLocal(+dx, +dy, 0.0);
+
+			runs[activeRun].placements[i].matrix.TranslateGlobal(0.0,
+					(runs[activeRun].stockMaterial.y/2-dy - temp.y)*2, 0.0);
+
+			//runs[activeRun].placements[i].matrix.TranslateLocal(-dx, -dy, 0.0);
+
+		}
+
+	}
+	for(i = 0; i < targets.GetCount(); i++){
+		targets[i].FlipX();
+		targets[i].toolpathFlipped = targets[i].toolpath;
+		targets[i].toolpath.Clear();
+	}
+
+}
+
+void Project::CollectToolPath(void)
+{
+	size_t i, n;
+	ToolPath temp;
+	runs[activeRun].toolPath.Clear();
+	MachinePosition mp;
+	if(true){ // Startup move, to prevent WinPC-NC from messing up the toolpath.
+		mp.axisX = 0.0;
+		mp.axisY = 0.0;
+		mp.axisZ = this->stock.stockMaterials[activeStock].z + 0.010;
+		mp.isCutting = false;
+		runs[activeRun].toolPath.positions.Add(mp);
+		mp.axisZ = this->stock.stockMaterials[activeStock].z + 0.011;
+		mp.isCutting = true;
+		runs[activeRun].toolPath.positions.Add(mp);
+	}
+
+	for(i = 0; i < runs[activeRun].placements.GetCount(); i++){
+		if(!runs[activeRun].placements[i].isKeepout){
+			n = runs[activeRun].placements[i].targetNumber;
+			if(!targets[n].toolpath.IsEmpty()){
+				temp = targets[n].toolpath;
+				temp.ApplyTransformation();
+				temp.ApplyTransformation(runs[activeRun].placements[i].matrix);
+				runs[activeRun].toolPath += temp;
+			}
+		}
+	}
+	displayTargets = false;
+}
+
+void Project::GenerateToolPath(void)
+{
+	size_t i, j;
+	bool isUsed;
+	for(i = 0; i < targets.GetCount(); i++){
+		if(targets[i].toolpath.IsEmpty()){
+
+			isUsed = false;
+			for(j = 0; j < runs[activeRun].placements.GetCount(); j++){
+				if(!runs[activeRun].placements[j].isKeepout
+						&& runs[activeRun].placements[j].targetNumber == i) isUsed
+						= true;
+			}
+
+			if(isUsed){
+
+				wxLogMessage(wxString::Format(
+						_T("Generating toolpath for target %u:"), i));
+
+				runs[activeRun].ToolPathGenerator.GenerateToolpath(targets[i],
+						toolbox.tools[0]);
+			}
+		}
+	}
+	CollectToolPath();
+}
 
 void Project::InsertDrillGrid(Run &run, double sizex, double sizey,
 		bool flipped)
@@ -326,18 +460,26 @@ void Project::InsertDrillGrid(Run &run, double sizex, double sizey,
 	TargetPlacement tempPlace;
 	temp.SetupDrill(toolbox.tools[0], 0.006, 0.010);
 	targets.Add(temp);
+	tempPlace.outLine = temp.outLine;
+	tempPlace.isMovable = false;
 	tempPlace.targetNumber = targets.GetCount() - 1;
 	tempPlace.matrix.SetIdentity();
 	tempPlace.matrix.TranslateGlobal(0.015,
-			run.stockMaterial.y / 2 - sizey / 2, 0.0);
-	run.placements.Add(tempPlace);
-	tempPlace.matrix.SetIdentity();
-	tempPlace.matrix.TranslateGlobal(0.015 + sizex, run.stockMaterial.y / 2
-			- sizey / 2, 0.0);
+			run.stockMaterial.y / 2 - sizey / 2, run.stockMaterial.z);
+
 	run.placements.Add(tempPlace);
 	tempPlace.matrix.SetIdentity();
 	tempPlace.matrix.TranslateGlobal(0.015,
-			run.stockMaterial.y / 2 + sizey / 2, 0.0);
+			run.stockMaterial.y / 2 + sizey / 2, run.stockMaterial.z);
+	run.placements.Add(tempPlace);
+	tempPlace.matrix.SetIdentity();
+	if(flipped){
+		tempPlace.matrix.TranslateGlobal(0.015 + sizex, run.stockMaterial.y / 2
+				- sizey / 2, run.stockMaterial.z);
+	}else{
+		tempPlace.matrix.TranslateGlobal(0.015 + sizex, run.stockMaterial.y / 2
+				+ sizey / 2, run.stockMaterial.z);
+	}
 	run.placements.Add(tempPlace);
 }
 
@@ -363,12 +505,17 @@ void Project::GenerateTargets(void)
 	Target discSlot;
 	discSlot.SetupDisc(slotWidth, resolution, resolution);
 
-	runs.Clear();
-	targets.Clear();
+	i = SetupMachineBed(true);
+	run = &(runs[i]);
 
 
 	//	discSlot.matrix.TranslateGlobal(0.1, -0.1, 0);
 	//	targets.Add(discSlot);
+
+
+	wxLogMessage(wxString::Format(
+			_T("%u Targets after stockmaterial placement."),
+			run->placements.GetCount()));
 
 
 	// Test 1:
@@ -390,16 +537,20 @@ void Project::GenerateTargets(void)
 	tempPlace.SetKeepout(0.395, 0.085, 0.025, 0.020);
 	run->placements.Add(tempPlace);
 
-	InsertDrillGrid(*run, 0.450, 0.240, true);
+	wxLogMessage(wxString::Format(_T("%u Targets after keepout placement."),
+			run->placements.GetCount()));
+
+	wxLogMessage(wxString::Format(_T("%u Targets after drill placement."),
+			run->placements.GetCount()));
 
 	double gridx = 0.0;
 	double gridy = 0.0;
 	double gridsx = obj->bbox.xmax + 4 * slotWidth;
 	double gridsy = obj->bbox.ymax + 4 * slotWidth;
 
-
-	//	for(i = 0; i < n; i++){
-	for(i = 1; i <= 3; i++){
+	if(n > 4) n = 4; // Remove this line!
+	for(i = 0; i < n; i++){
+		//for(i = 0; i <= 2; i++){
 
 		temp.SetupBox(obj->bbox.xmax + 4 * slotWidth, obj->bbox.ymax + 4
 				* slotWidth, stock.stockMaterials[activeStock].z, resolution,
@@ -411,6 +562,7 @@ void Project::GenerateTargets(void)
 
 		obj->matrix = shift * oldPos;
 		temp.InsertObject(*obj);
+		temp.CleanOutlier();
 
 
 		//		temp.matrix.TranslateGlobal(obj->bbox.xmax + 4 * slotWidth, 0, 0);
@@ -419,31 +571,37 @@ void Project::GenerateTargets(void)
 		temp2 = temp;
 		temp2.FoldRaise(discSlot);
 		temp.outLine = temp2.GenerateConvexOutline();
-		temp.supportLine = temp2.GeneratePolygon(-1, -1);
-		temp.supportLine.PolygonSmooth();
-		temp.supportLine.PolygonSmooth();
-		temp.supportLine.PolygonSmooth();
+
+		if(temp.outLine.elements.GetCount() >= 2){
+
+			temp.supportLine = temp2.GeneratePolygon(-1, -1);
+			temp.supportLine.PolygonSmooth();
+			temp.supportLine.PolygonSmooth();
+			temp.supportLine.PolygonSmooth();
 
 
-		//temp.FillOutsidePolygon(temp.outline);
-		//temp2.HardInvert();
-		//temp += temp2;
+			//temp.FillOutsidePolygon(temp.outline);
+			temp2.HardInvert();
+			temp += temp2;
 
-		//		temp.AddSupport(temp.outline, supportDistance, supportHeight,
-		//				supportWidth, slotWidth);
-		tempPlace.Clear();
-		tempPlace.matrix.TranslateGlobal(gridx, gridy, 0.0);
+			temp.AddSupport(temp.supportLine, supportDistance, supportHeight,
+					supportWidth, slotWidth);
+			tempPlace.Clear();
+			tempPlace.matrix.TranslateGlobal(gridx, gridy, 0.0);
+			//		tempPlace.matrix = AffineTransformMatrix::RotateXYZ(0.0, 0.0,
+			//				(double) (i % 2) * 2 * M_PI) * tempPlace.matrix;
 
-		temp.refresh = true;
-		targets.Add(temp);
-		tempPlace.targetNumber = targets.GetCount() - 1;
-		tempPlace.outLine = temp.outLine;
-		run->placements.Add(tempPlace);
+			temp.refresh = true;
+			targets.Add(temp);
+			tempPlace.targetNumber = targets.GetCount() - 1;
+			tempPlace.outLine = temp.outLine;
+			run->placements.Add(tempPlace);
 
-		gridx += gridsx;
-		if(gridx + gridsx > stock.stockMaterials[activeStock].x){
-			gridx = 0.0;
-			gridy += gridsy;
+			gridx += gridsx;
+			if(gridx + gridsx > stock.stockMaterials[activeStock].x){
+				gridx = 0.0;
+				gridy += gridsy;
+			}
 		}
 
 
@@ -459,25 +617,58 @@ void Project::GenerateTargets(void)
 
 		//temp.matrix.TranslateGlobal(obj->bbox.xmax + 4 * slotWidth, 0, 0);
 
+		//		if(temp.outLine.elements.GetCount() >= 2){
+
 
 		//temp.ClearField();
 
-		if(temp.outLine.elements.GetCount() >= 2){
 
+		//			ToolPathGenerator.GenerateToolpath(temp, *obj, toolbox.tools[0]);
 
-			//			ToolPathGenerator.GenerateToolpath(temp, *obj, toolbox.tools[0]);
-			//						targets.Add(temp);
-
-		}
 
 	}
+
+	wxLogMessage(wxString::Format(_T("%u Targets after target placement."),
+			run->placements.GetCount()));
+
+
+	//run->SortTargets();
+
 	runs.Add(run);
 
 	obj->matrix = oldPos;
 
-
 	displayGeometry = false;
-	displayStock = true;
+	displayStock = false;
+	displayTargets = false;
+	if(false){
+		GenerateToolPath();
+
+		n = targets.GetCount() - 1;
+
+		temp = targets[n];
+		temp.Simulate();
+		targets.Add(temp);
+		tempPlace.targetNumber = targets.GetCount() - 1;
+		tempPlace.matrix.SetIdentity();
+		tempPlace.matrix.TranslateGlobal(2 * temp.GetSizeX(), 0.0, 0.0);
+		runs[0].placements.Add(tempPlace);
+
+		temp = targets[n];
+
+		Target discTool;
+		discTool.SetupDisc(0.003, temp.GetSizeRX(), temp.GetSizeRY());
+
+		temp.FoldRaise(discTool);
+		temp.Limit();
+		temp.InvertTop();
+
+		targets.Add(temp);
+		tempPlace.targetNumber = targets.GetCount() - 1;
+		tempPlace.matrix.SetIdentity();
+		tempPlace.matrix.TranslateGlobal(temp.GetSizeX(), 0.0, 0.0);
+		runs[0].placements.Add(tempPlace);
+	}
 
 }
 

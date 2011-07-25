@@ -69,6 +69,13 @@ MainFrame::MainFrame(wxWindow* parent) :
 
 	timer.Start(100);
 
+	m_canvas->Connect(wxID_ANY,wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrame::OnKeyDown),
+			NULL, this);
+
+
+
+	selectedTargetPosition = 0;
+
 	Project *temp = new Project;
 	project.Add(temp);
 	activeProject = 0;
@@ -334,6 +341,22 @@ void MainFrame::OnEditStock(wxCommandEvent& event)
 	stockFrame->InsertProject(&(project[activeProject]));
 	stockFrame->Show(true);
 }
+void MainFrame::OnGenerateToolpath(wxCommandEvent& event)
+{
+	project[activeProject].GenerateToolPath();
+	this->Refresh();
+}
+void MainFrame::OnFlipRun(wxCommandEvent& event)
+{
+	project[activeProject].FlipRun();
+	this->Refresh();
+}
+void MainFrame::OnPrepareMachinebed(wxCommandEvent& event)
+{
+	project[activeProject].SetupMachineBed();
+	project[activeProject].CollectToolPath();
+	this->Refresh();
+}
 
 void MainFrame::OnLoadGCodes(wxCommandEvent &event)
 {
@@ -425,6 +448,35 @@ void MainFrame::OnTimer(wxTimerEvent& event)
 	//	simulator.Step(t);
 	//	simulator.machine.Assemble();
 	//this->Refresh();
+}
+
+void MainFrame::OnKeyDown(wxKeyEvent& event)
+{
+	int k = event.GetKeyCode();
+
+
+	// Select placement
+	if(k == WXK_NUMPAD_ADD && selectedTargetPosition
+			< project[activeProject].runs[0].placements.GetCount() - 1) selectedTargetPosition++;
+	if(k == WXK_NUMPAD_SUBTRACT && selectedTargetPosition > 0) selectedTargetPosition--;
+
+	if(selectedTargetPosition
+			< project[activeProject].runs[0].placements.GetCount()
+			&& project[activeProject].runs[0].placements[selectedTargetPosition].isMovable){
+
+		if(k == WXK_UP) project[activeProject].runs[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
+				0.0, 0.001, 0.0);
+		if(k == WXK_DOWN) project[activeProject].runs[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
+				0.0, -0.001, 0.0);
+		if(k == WXK_RIGHT) project[activeProject].runs[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
+				0.001, 0.0, 0.0);
+		if(k == WXK_LEFT) project[activeProject].runs[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
+				-0.001, 0.0, 0.0);
+
+		this->Refresh();
+	}
+
+	event.Skip();
 }
 
 void MainFrame::OnBeginLabelEdit(wxTreeEvent& event)

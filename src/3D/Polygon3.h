@@ -65,6 +65,8 @@ public:
 	const Polygon3 operator+(const Polygon3 &a) const;
 	void Paint(void) const;
 	double GetLength(void) const;
+	void ApplyTransformation(void);
+	void ApplyTransformation(const AffineTransformMatrix &matrix);
 };
 WX_DECLARE_OBJARRAY(Polygon3, ArrayOfPolygon3)
 ;

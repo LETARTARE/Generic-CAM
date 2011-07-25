@@ -54,7 +54,7 @@ void Polygon3::InsertPoint(double x, double y, double z)
 	Vector3 temp(x, y, z);
 	elements.Add(temp);
 }
-//! Overloaded operator for polygon concatanation.
+//! Overloaded operator for polygon concatenation.
 Polygon3 & Polygon3::operator+=(const Polygon3 &a)
 {
 	Vector3 temp;
@@ -66,7 +66,7 @@ Polygon3 & Polygon3::operator+=(const Polygon3 &a)
 	return *this;
 }
 
-//! Overloaded operator for polygon concatanation.
+//! Overloaded operator for polygon concatenation.
 const Polygon3 Polygon3::operator+(const Polygon3 &a) const
 {
 	Polygon3 temp = *this;
@@ -90,19 +90,18 @@ void Polygon3::Reverse(void)
 
 void Polygon3::RemoveZeroLength(void)
 {
-    size_t i,j,k;
-    Vector3 temp;
-    k = elements.GetCount();
-    for(i=0;i<k;i++)
-    {
-        j=(i+1)%k;
-        temp = elements[i]-elements[j];
-        if(temp.Abs()<FLT_EPSILON){
-         elements.RemoveAt(i);
-         i--;
-         k--;
-        }
-    }
+	size_t i, j, k;
+	Vector3 temp;
+	k = elements.GetCount();
+	for(i = 0; i < k; i++){
+		j = (i + 1) % k;
+		temp = elements[i] - elements[j];
+		if(temp.Abs() < FLT_EPSILON){
+			elements.RemoveAt(i);
+			i--;
+			k--;
+		}
+	}
 
 }
 
@@ -146,3 +145,16 @@ void Polygon3::Paint() const
 	::glPopMatrix();
 }
 
+void Polygon3::ApplyTransformation(void)
+{
+	size_t i;
+	for(i = 0; i < elements.GetCount(); i++)
+		elements[i] = matrix.Transform(elements[i]);
+	matrix.SetIdentity();
+}
+void Polygon3::ApplyTransformation(const AffineTransformMatrix &matrix)
+{
+	size_t i;
+	for(i = 0; i < elements.GetCount(); i++)
+		elements[i] = matrix.Transform(elements[i]);
+}

@@ -30,6 +30,8 @@
 
 #include "Run.h"
 
+#include <float.h>
+#include <wx/log.h>
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfRun)
 
@@ -123,6 +125,39 @@ void Run::WriteToFile(wxTextFile &f)
 	toolPath.WriteToFile(f);
 }
 
+void Run::SortTargets(void)
+{
+	size_t i, j;
+	double dmin, d;
+	Polygon25 temp, temp2;
+
+	for(i = 0; i < placements.GetCount(); i++){
+		if(placements[i].isMovable){
+			wxLogMessage(wxString::Format(_T("Moving Target %u:"), i));
+
+			temp = placements[i].outLine;
+			temp.ApplyTransformation(placements[i].matrix);
+
+			dmin = +DBL_MAX;
+			for(j = i; j > 0; j--){
+				temp2 = placements[j - 1].outLine;
+				temp2.ApplyTransformation(placements[j - 1].matrix);
+				d = temp.DistanceToPolygon(temp2, -1.0, 0.0);
+				if(d < dmin){
+					dmin = d;
+
+					wxLogMessage(wxString::Format(
+							_T("To Target %u: d= %.3f m"), j - 1, d));
+				}
+			}
+			if(dmin < 1.0){
+				placements[i].matrix.TranslateGlobal(-dmin, 0.0, 0.0);
+			}
+		}
+	}
+
+}
+
 void Run::Paint()
 {
 	toolPath.Paint();
@@ -130,4 +165,5 @@ void Run::Paint()
 	for(i = 0; i < placements.GetCount(); i++)
 		placements[i].Paint();
 }
+
 

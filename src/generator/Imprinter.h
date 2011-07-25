@@ -114,6 +114,11 @@ public:
 			const double resolutionX = 0.001, const double resolutionY = 0.001);
 	void ClearField(void);
 
+	bool IsEmpty(void) const
+	{
+		return (field == NULL);
+	}
+
 	bool SetupBox(const double sizeX, const double sizeY, const double sizeZ,
 			const double resolutionX = 0.001, const double resolutionY = 0.001);
 

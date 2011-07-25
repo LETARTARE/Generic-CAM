@@ -32,7 +32,7 @@
 
 #include <GL/gl.h>
 #include <float.h>
-
+#include <wx/log.h>
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfPolygon25)
 
@@ -221,9 +221,12 @@ double Polygon25::DistanceToPolygon(const Polygon25 &polygon, double vx,
 	size_t i, j;
 	double dmin = DBL_MAX;
 	double d;
-	for(i = 0; i < elements.GetCount(); i++){
-		for(j = 0; j < polygon.elements.GetCount(); j++){
-			d = polygon.DistanceToElement(j, elements[i].x, elements[i].y, vx,
+	size_t n = polygon.elements.GetCount();
+	if(!polygon.isClosed & n > 0) n--;
+	for(i = 0; i < n; i++){
+		//		wxLogMessage(wxString::Format(_T("to element %u."),i));
+		for(j = 0; j < this->elements.GetCount(); j++){
+			d = polygon.DistanceToElement(i, elements[j].x, elements[j].y, vx,
 					vy);
 			if(d < dmin) dmin = d;
 		}
@@ -231,3 +234,36 @@ double Polygon25::DistanceToPolygon(const Polygon25 &polygon, double vx,
 	return dmin;
 }
 
+void Polygon25::RotatePolygonStart(double x, double y)
+{
+
+	if(elements.GetCount() == 0) return;
+
+	size_t i;
+	Vector3 t;
+	double d;
+	double dmin = DBL_MAX;
+	size_t n = elements.GetCount();
+
+
+	// Find element with minimal distance to (x,y)
+	size_t nshift = 0;
+	for(i = 0; i < n; i++){
+		t = elements[i];
+		d = (t.x - x) * (t.x - x) + (t.y - y) * (t.y - y);
+		if(d < dmin){
+			dmin = d;
+			nshift = i;
+		}
+	}
+
+	// Shift by -nshift (so nshift becomes 0)
+	nshift = n - nshift;
+	size_t j;
+	ArrayOfVector3 temp;
+	for(i = 0; i < n; i++){
+		j = (i + nshift) % n;
+		temp.Add(elements[j]);
+	}
+	elements = temp;
+}

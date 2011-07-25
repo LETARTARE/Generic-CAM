@@ -36,6 +36,7 @@ WX_DEFINE_OBJARRAY(ArrayOfMachinePosition)
 #include <math.h>
 #include <wx/log.h>
 #include <float.h>
+#include <locale.h>
 
 MachinePosition::MachinePosition(float x, float y, float z, float a, float b,
 		float c, float u, float v, float w)
@@ -244,8 +245,8 @@ bool MachinePosition::ParseGCodeLine(wxString lineOfText)
 
 unsigned char MachinePosition::GetGNumber(void) const
 {
-	bool doCircle = (fabs(this->radiusI) < FLT_EPSILON && fabs(this->radiusJ)
-			< FLT_EPSILON && fabs(this->radiusK) < FLT_EPSILON);
+	bool doCircle = (fabs(this->radiusI) > FLT_EPSILON || fabs(this->radiusJ)
+			> FLT_EPSILON || fabs(this->radiusK) > FLT_EPSILON);
 	if(!(this->isCutting)){
 		return 0;
 	}else{
@@ -266,12 +267,12 @@ wxString MachinePosition::GenerateCommandXYZ(void)
 	unsigned char gNum = this->GetGNumber();
 	wxString temp = wxString::Format(_T("G%02u"), gNum);
 
-	temp += wxString::Format(_T(" X%.4f Y%.4f Z%.4f"), this->axisX,
-			this->axisY, this->axisZ);
+	temp += wxString::Format(_T(" X%.2f Y%.2f Z%.2f"), this->axisX * 1000.0,
+			this->axisY * 1000.0, this->axisZ * 1000.0);
 
 	if(gNum == 2 || gNum == 3){
-		temp += wxString::Format(_T(" I%.4f J%.4f K%.4f"), this->radiusI,
-				this->radiusJ, this->radiusK);
+		temp += wxString::Format(_T(" I%.2f J%.2f K%.2f"), this->radiusI
+				* 1000.0, this->radiusJ * 1000.0, this->radiusK * 1000.0);
 	}
 	return temp;
 }
@@ -281,14 +282,14 @@ wxString MachinePosition::GenerateCommandXYZABC(void)
 	unsigned char gNum = this->GetGNumber();
 	wxString temp = wxString::Format(_T("G%02u"), gNum);
 
-	temp += wxString::Format(_T(" X%.4f Y%.4f Z%.4f"), this->axisX,
-			this->axisY, this->axisZ);
-	temp += wxString::Format(_T(" A%.4f B%.4f C%.4f"), this->axisA,
-			this->axisB, this->axisC);
+	temp += wxString::Format(_T(" X%.2f Y%.2f Z%.2f"), this->axisX * 1000.0,
+			this->axisY * 1000.0, this->axisZ * 1000.0);
+	temp += wxString::Format(_T(" A%.2f B%.2f C%.2f"), this->axisA * 1000.0,
+			this->axisB * 1000.0, this->axisC * 1000.0);
 
 	if(gNum == 2 || gNum == 3){
-		temp += wxString::Format(_T(" I%.4f J%.4f K%.4f"), this->radiusI,
-				this->radiusJ, this->radiusK);
+		temp += wxString::Format(_T(" I%.2f J%.2f K%.2f"), this->radiusI
+				* 1000.0, this->radiusJ * 1000.0, this->radiusK * 1000.0);
 	}
 	return temp;
 }
@@ -297,16 +298,16 @@ wxString MachinePosition::GenerateCommandXYZABCUVW(void)
 	unsigned char gNum = this->GetGNumber();
 	wxString temp = wxString::Format(_T("G%02u"), gNum);
 
-	temp += wxString::Format(_T(" X%.4f Y%.4f Z%.4f"), this->axisX,
-			this->axisY, this->axisZ);
-	temp += wxString::Format(_T(" A%.4f B%.4f C%.4f"), this->axisA,
-			this->axisB, this->axisC);
-	temp += wxString::Format(_T(" U%.4f V%.4f W%.4f"), this->axisU,
-			this->axisV, this->axisW);
+	temp += wxString::Format(_T(" X%.2f Y%.2f Z%.2f"), this->axisX * 1000.0,
+			this->axisY * 1000.0, this->axisZ * 1000.0);
+	temp += wxString::Format(_T(" A%.2f B%.2f C%.2f"), this->axisA * 1000.0,
+			this->axisB * 1000.0, this->axisC * 1000.0);
+	temp += wxString::Format(_T(" U%.2f V%.2f W%.2f"), this->axisU * 1000.0,
+			this->axisV * 1000.0, this->axisW * 1000.0);
 
 	if(gNum == 2 || gNum == 3){
-		temp += wxString::Format(_T(" I%.4f J%.4f K%.4f"), this->radiusI,
-				this->radiusJ, this->radiusK);
+		temp += wxString::Format(_T(" I%.2f J%.2f K%.2f"), this->radiusI
+				* 1000.0, this->radiusJ * 1000.0, this->radiusK * 1000.0);
 	}
 	return temp;
 }
@@ -321,29 +322,29 @@ wxString MachinePosition::GenerateCommandDiff(
 		temp = wxString::Format(_T("G%02u"), gNum);
 	}
 	if(fabs(this->axisX - oldPosition.axisX) > FLT_EPSILON) temp
-			+= wxString::Format(_T(" X%.4f"), this->axisX);
+			+= wxString::Format(_T(" X%.2f"), this->axisX * 1000.0);
 	if(fabs(this->axisY - oldPosition.axisY) > FLT_EPSILON) temp
-			+= wxString::Format(_T(" Y%.4f"), this->axisY);
+			+= wxString::Format(_T(" Y%.2f"), this->axisY * 1000.0);
 	if(fabs(this->axisZ - oldPosition.axisZ) > FLT_EPSILON) temp
-			+= wxString::Format(_T(" Z%.4f"), this->axisZ);
+			+= wxString::Format(_T(" Z%.2f"), this->axisZ * 1000.0);
 
 	if(fabs(this->axisA - oldPosition.axisA) > FLT_EPSILON) temp
-			+= wxString::Format(_T(" A%.4f"), this->axisA);
+			+= wxString::Format(_T(" A%.2f"), this->axisA * 1000.0);
 	if(fabs(this->axisB - oldPosition.axisB) > FLT_EPSILON) temp
-			+= wxString::Format(_T(" B%.4f"), this->axisB);
+			+= wxString::Format(_T(" B%.2f"), this->axisB * 1000.0);
 	if(fabs(this->axisC - oldPosition.axisC) > FLT_EPSILON) temp
-			+= wxString::Format(_T(" C%.4f"), this->axisC);
+			+= wxString::Format(_T(" C%.2f"), this->axisC * 1000.0);
 
 	if(fabs(this->axisU - oldPosition.axisU) > FLT_EPSILON) temp
-			+= wxString::Format(_T(" U%.4f"), this->axisU);
+			+= wxString::Format(_T(" U%.2f"), this->axisU * 1000.0);
 	if(fabs(this->axisV - oldPosition.axisV) > FLT_EPSILON) temp
-			+= wxString::Format(_T(" V%.4f"), this->axisV);
+			+= wxString::Format(_T(" V%.2f"), this->axisV * 1000.0);
 	if(fabs(this->axisW - oldPosition.axisW) > FLT_EPSILON) temp
-			+= wxString::Format(_T(" W%.4f"), this->axisW);
+			+= wxString::Format(_T(" W%.2f"), this->axisW * 1000.0);
 
 	if(gNum == 2 || gNum == 3){
-		temp += wxString::Format(_T(" I%.4f J%.4f K%.4f"), this->radiusI,
-				this->radiusJ, this->radiusK);
+		temp += wxString::Format(_T(" I%.2f J%.2f K%.2f"), this->radiusI
+				* 1000.0, this->radiusJ * 1000.0, this->radiusK * 1000.0);
 	}
 	return temp;
 }

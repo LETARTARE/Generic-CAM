@@ -43,7 +43,7 @@
 #include <wx/dynarray.h>
 #include <wx/textfile.h>
 
-class ToolPath{
+class ToolPath {
 	// Constructor / Destructor
 
 public:
@@ -62,11 +62,18 @@ public:
 	// Methods
 public:
 
+	ToolPath & operator+=(const ToolPath &a);
+	const ToolPath operator+(const ToolPath &a) const;
+	void Clear(void);
+	bool IsEmpty(void) const;
+	void ApplyTransformation(void);
+	void ApplyTransformation(const AffineTransformMatrix &matrix);
 	void Paint(void);
 	void WriteToFile(wxTextFile &f);
 
-};
 
+
+};
 WX_DECLARE_OBJARRAY(ToolPath, ArrayOfToolPath)
 ;
 
