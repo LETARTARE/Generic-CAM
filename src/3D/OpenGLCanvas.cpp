@@ -46,7 +46,8 @@ EVT_MOUSE_EVENTS(OpenGLCanvas::OnMouseEvent)
 EVT_TIMER(TIMER_OPENGLCANVAS, OpenGLCanvas::OnTimer)
 END_EVENT_TABLE()
 
-static int wx_gl_attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24, 0};
+static int wx_gl_attribs[] =
+	{WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24, 0};
 
 //wxGLCanvas(parent, wxID_ANY ,wxDefaultPosition, wxDefaultSize, 0, wxT("GLCanvas"));
 
@@ -153,10 +154,9 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event) )
 	::glMultMatrixd(rotmat.a);
 
 
-//	float specReflection[] = { 0.8f, 0.0f, 0.8f, 1.0f };
-//	glMaterialfv(GL_FRONT, GL_SPECULAR, specReflection);
-//	glMateriali(GL_FRONT, GL_SHININESS, 96);
-
+	//	float specReflection[] = { 0.8f, 0.0f, 0.8f, 1.0f };
+	//	glMaterialfv(GL_FRONT, GL_SPECULAR, specReflection);
+	//	glMateriali(GL_FRONT, GL_SHININESS, 96);
 
 
 	//	if(m_gllist == 0){
@@ -219,7 +219,7 @@ void OpenGLCanvas::InitGL()
 
 
 	::glEnable(GL_COLOR_MATERIAL);
-	::glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
+	::glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	::glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//::glBlendFunc(GL_ONE, GL_ONE); // for Stereo Mode
 
@@ -289,13 +289,17 @@ void OpenGLCanvas::OnTimer(wxTimerEvent& event)
 	if(control == NULL) return;
 
 	control->Pump();
-	if(control->IsIdle())return;
+	if(control->IsIdle()) return;
+
+	float resRot = 2000;
+	float resMov = 10000;
+
 	rotmat = AffineTransformMatrix::RotateInterwoven(
-			(float) control->GetAxis(3) / 1000.0, (float) control->GetAxis(4)
-					/ 1000.0, (float) control->GetAxis(5) / 1000.0) * rotmat;
-	transmat.TranslateGlobal((float) control->GetAxis(0) / 1000.0,
-			(float) control->GetAxis(1) / 1000.0, (float) control->GetAxis(2)
-					/ 1000.0);
+			(float) control->GetAxis(3) / resRot, (float) control->GetAxis(4)
+					/ resRot, (float) control->GetAxis(5) / resRot) * rotmat;
+	transmat.TranslateGlobal((float) control->GetAxis(0) / resMov,
+			(float) control->GetAxis(1) / resMov, (float) control->GetAxis(2)
+					/ resMov);
 	//rotmat.RotateXY(1,0,1);
 	if(control->GetButton(0)){
 		rotmat.SetIdentity();
@@ -316,9 +320,6 @@ void OpenGLCanvas::Render()
 	GLfloat nx = x / t;
 	GLfloat ny = y / t;
 	GLfloat nz = z / t;
-
-
-
 
 	::glBegin(GL_QUADS);
 	::glNormal3f(nx, ny, nz);

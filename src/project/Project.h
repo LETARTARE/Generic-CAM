@@ -104,8 +104,16 @@ public:
 	double supportWidth;
 	double supportHeight;
 
+
+
+
 protected:
 	wxXmlDocument doc;
+
+	double middleY;
+	double offsetX;
+
+
 
 	// Methods
 public:

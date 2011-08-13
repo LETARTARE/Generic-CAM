@@ -51,7 +51,7 @@ public:
 
 private:
 	bool initialized;
-	wxXmlDocument* xmlDocument;
+	wxXmlDocument xmlDocument;
 
 	// Methods
 public:

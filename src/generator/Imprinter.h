@@ -86,6 +86,11 @@ public:
 
 	bool displayBox;
 
+	bool displayUpUp;
+	bool displayUpDown;
+	bool displayDownUp;
+	bool displayDownDown;
+
 	bool refresh;
 
 protected:
@@ -123,6 +128,7 @@ public:
 			const double resolutionX = 0.001, const double resolutionY = 0.001);
 
 	size_t MemoryUsageInBytes(void);
+	void InitOutSides(void);
 	void InitImprinting(void);
 	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c, face_t facetype =
 			other);

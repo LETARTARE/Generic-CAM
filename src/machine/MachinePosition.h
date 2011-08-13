@@ -40,32 +40,33 @@
 class MachinePosition {
 	// Constructor/ Destructor
 public:
-	MachinePosition(float x = 0.0, float y = 0.0, float z = 0.0, float a = 0.0,
-			float b = 0.0, float c = 0.0, float u = 0.0, float v = 0.0,
-			float w = 0.0);
+	MachinePosition(double x = 0.0, double y = 0.0, double z = 0.0, double a = 0.0,
+			double b = 0.0, double c = 0.0, double u = 0.0, double v = 0.0,
+			double w = 0.0);
 
 	virtual ~MachinePosition();
 
 	// Member variables
 public:
-	float axisX;
-	float axisY;
-	float axisZ;
-	float axisA;
-	float axisB;
-	float axisC;
-	float axisU;
-	float axisV;
-	float axisW;
+	double axisX;
+	double axisY;
+	double axisZ;
+	double axisA;
+	double axisB;
+	double axisC;
+	double axisU;
+	double axisV;
+	double axisW;
 
-	float radiusI;
-	float radiusJ;
-	float radiusK;
+	double radiusI;
+	double radiusJ;
+	double radiusK;
+	double radiusR;
 	bool isRotationPositiv;
 
-	float duration;
+	double duration;
 
-	float feed;
+	double feed;
 
 	wxString code;
 
@@ -124,7 +125,7 @@ public:
 		return temp;
 	}
 
-	MachinePosition & operator*=(const float &b)
+	MachinePosition & operator*=(const double &b)
 	{
 		this->axisX *= b;
 		this->axisY *= b;
@@ -138,14 +139,14 @@ public:
 		return *this;
 	}
 
-	const MachinePosition operator*(const float &b) const
+	const MachinePosition operator*(const double &b) const
 	{
 		MachinePosition temp = *this;
 		temp *= b;
 		return temp;
 	}
 
-	MachinePosition & operator/=(const float &b)
+	MachinePosition & operator/=(const double &b)
 	{
 		this->axisX /= b;
 		this->axisY /= b;
@@ -159,7 +160,7 @@ public:
 		return *this;
 	}
 
-	const MachinePosition operator/(const float &b) const
+	const MachinePosition operator/(const double &b) const
 	{
 		MachinePosition temp = *this;
 		temp /= b;
@@ -167,9 +168,9 @@ public:
 	}
 
 	void Zero(void);
-	float AbsXYZ() const;
-	float AbsUVW() const;
-	float AbsXYZUVW() const;
+	double AbsXYZ() const;
+	double AbsUVW() const;
+	double AbsXYZUVW() const;
 
 	bool ParseGCodeLine(wxString lineOfText);
 	unsigned char GetGNumber(void) const;

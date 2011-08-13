@@ -75,10 +75,29 @@ public:
 	const Polygon25 GeneratePolygon(int sx, int sy);
 	const Polygon25 GenerateConvexOutline(void);
 
+	void DocumentField(int x,int y,double height);
+	void DocumentField(int x, int y);
+	void GenerateDistanceMap(double height, bool invert = false);
+	void RaiseDistanceMap(double height, bool invert);
+	void FoldLowerDistance(int x, int y, const Target &b);
+	bool FindNextDistance(int &x, int&y);
+	bool IsInsideWorkingArea(int x, int y);
+	bool HasToBeCut(int x, int y);
+	bool HadBeenCut(int x, int y);
+	void MoveInDir(int &x, int &y, int dir);
+	int NextDirReverseDistance(int sx, int sy, int olddir);
+	int NextDirForwardDistance(int sx, int sy, int olddir);
+	bool FindStartCutting(int &x, int &y);
+	Polygon25 FindCut(int &x, int &y);
+
+	double GetMinLevel(void);
+	double GetMaxUpsideLevel(int &x, int &y);
+
 	// Polygon3 Methods
 
 	void PolygonDropTarget(Polygon3 &polygon, Target &tool);
 	void PolygonDrop(Polygon3 &polygon, double level);
+	void VectorDrop(double &x, double &y, double &z, double level);
 	void FillOutsidePolygon(Polygon3 &polygon);
 
 	void SetupDrill(Tool &tool, double diameter, double depth);

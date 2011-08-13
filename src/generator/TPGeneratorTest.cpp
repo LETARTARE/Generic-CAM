@@ -35,10 +35,8 @@
 
 TPGeneratorTest::TPGeneratorTest()
 {
-
 	freeHeightAboveMaterial = 0.002;
-
-	levelDrop = 0.005;
+	levelDrop = 0.020;
 }
 
 TPGeneratorTest::~TPGeneratorTest()
@@ -150,14 +148,13 @@ void TPGeneratorTest::GenerateToolpath(Target &target, Tool &tool)
 		}
 		pgs.Clear();
 		level -= levelDrop;
+		// Move tool out of material
+		m.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
+		m.isCutting = false;
+		isMillUp = true;
+		tp.positions.Add(m);
 		wxLogMessage(wxString::Format(_T("Next Level: %.3f m"), level));
 	}
-
-	// Move tool out of material
-	m.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
-	m.isCutting = false;
-	tp.positions.Add(m);
-
 
 	// Shift toolpath down to align 0 with top-of-stock
 	for(size_t i = 0; i < tp.positions.GetCount(); i++){

@@ -69,9 +69,8 @@ public:
 	void ApplyTransformation(void);
 	void ApplyTransformation(const AffineTransformMatrix &matrix);
 	void Paint(void);
+	void CleanPath(double tolerance = 0.0002);
 	void WriteToFile(wxTextFile &f);
-
-
 
 };
 WX_DECLARE_OBJARRAY(ToolPath, ArrayOfToolPath)

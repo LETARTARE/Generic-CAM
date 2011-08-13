@@ -43,7 +43,10 @@ bool GenericCAMApp::OnInit()
 
 	frame = new MainFrame(NULL);
 
-	if(!loadOnStartup.IsEmpty()) frame->LoadProject(loadOnStartup);
+	if(!loadOnStartup.IsEmpty()) {
+		frame->LoadProject(loadOnStartup);
+
+	}
 
 	wxIcon iconLogo(logo_xpm);
 	frame->SetIcon(iconLogo);

@@ -36,6 +36,7 @@ WX_DEFINE_OBJARRAY(ArrayOfTarget)
 #include <GL/gl.h>
 #include <wx/log.h>
 #include <float.h>
+#include <math.h>
 #include <wx/string.h>
 
 Target::Target()
@@ -257,6 +258,22 @@ const Polygon25 Target::GeneratePolygon(int stx, int sty)
 	return temp;
 }
 
+void Target::DocumentField(int x, int y, double height)
+{
+	int i, j;
+	wxString tp;
+	for(j = -3; j <= 3; j++){
+		tp = wxString::Format(_T("x:%3i y%3i:"), x, y - j);
+		for(int i = -3; i <= 3; i++){
+			if(IsFilledAbove(x + i, y - j, height))
+				tp += _T("# ");
+			else
+				tp += _T("_ ");
+		}
+		wxLogMessage(tp);
+	}
+}
+
 //On the inside
 const Polygon25 Target::GeneratePolygon(int stx, int sty, double height)
 {
@@ -285,21 +302,8 @@ const Polygon25 Target::GeneratePolygon(int stx, int sty, double height)
 
 		if(dir == -1){
 			wxLogError(_T("Target::GeneratePolygon: Lost wall contact!"));
-
-
-			int i, j;
-			wxString tp;
-			for(j = -3; j <= 3; j++){
-				tp = wxString::Format(_T("x:%3i y%3i:"), x, y - j);
-				for(int i = -3; i <= 3; i++){
-					if(IsFilledAbove(x + i, y - j, height))
-						tp += _T("# ");
-					else
-						tp += _T("_ ");
-				}
-				wxLogMessage(tp);
-			}
-			this->field[x+y*nx].upperLimit=-0.0001;
+			DocumentField(x, y, height);
+			this->field[x + y * nx].upperLimit = -0.0001;
 			return temp;
 		}
 
@@ -460,6 +464,19 @@ void Target::PolygonDrop(Polygon3 &polygon, double level)
 		}else{
 			if(polygon.elements[i].z < 0.0) polygon.elements[i].z = 0.0;
 		}
+	}
+}
+
+void Target::VectorDrop(double &x, double &y, double &z, double level)
+{
+	size_t i;
+	double d;
+	d = this->GetLevel(x, y);
+	z -= level;
+	if(d >= 0.0){
+		if(z < d) z = d;
+	}else{
+		if(z < 0.0) z = 0.0;
 	}
 }
 
@@ -624,16 +641,592 @@ void Target::Simulate(void)
 	this->PolygonDropTarget(temp, discTool);
 }
 
+double Target::GetMinLevel(void)
+{
+	double d = FLT_MAX;
+	size_t i;
+	for(i = 0; i < N; i++)
+		if(field[i].lowerLimit < d) d = field[i].lowerLimit;
+	return d;
+}
+
+double Target::GetMaxUpsideLevel(int &x, int &y)
+{
+	double d = -FLT_MAX;
+	size_t i;
+	x = -1;
+	y = -1;
+	for(i = 0; i < N; i++)
+		if(field[i].upperLimitUpside > d){
+			d = field[i].upperLimitUpside;
+			x = i % nx;
+			y = floor(i / nx);
+		}
+	return d;
+}
+
+void Target::GenerateDistanceMap(double height, bool invert)
+{
+	size_t i, j, k;
+	if(invert){
+		for(i = 0; i < N; i++){
+			if(field[i].lowerLimit > height){
+				field[i].upperLimitUpside = 0.000;
+			}else{
+				field[i].upperLimitUpside = -1.000;
+			}
+		}
+	}else{
+		for(i = 0; i < N; i++){
+			if(field[i].upperLimit > height){
+				field[i].upperLimitUpside = 0.000;
+			}else{
+				field[i].upperLimitUpside = -1.000;
+			}
+		}
+	}
+
+	for(i = 0; i < N; i++){
+		if(field[i].upperLimitUpside < -0.5) // = inside of area
+		{
+			field[i].lowerLimitDownside = height - 0.0005;
+			field[i].upperLimitDownside = 0.000;
+		}else{
+			field[i].lowerLimitDownside = -0.001;
+			field[i].upperLimitDownside = -0.001;
+		}
+	}
+
+	double d;
+	double r2 = sqrt(rx * rx + ry * ry);
+
+	bool flag = true;
+	bool firstRound = true;
+
+	while(flag){
+		flag = false;
+		for(i = 0; i < N; i++)
+			field[i].lowerLimitUpside = field[i].upperLimitUpside;
+		for(i = 0; i < N; i++){
+			if(!IsOnOuterBorder(i)){
+				if(field[i].lowerLimitUpside < -0.5){
+					d = FLT_MAX;
+
+					if(field[i + 1].lowerLimitUpside > -0.5
+							&& field[i + 1].lowerLimitUpside + rx < d) d
+							= field[i + 1].lowerLimitUpside + rx;
+					if(field[i - 1].lowerLimitUpside > -0.5
+							&& field[i - 1].lowerLimitUpside + rx < d) d
+							= field[i - 1].lowerLimitUpside + rx;
+					if(field[i + nx].lowerLimitUpside > -0.5
+							&& field[i + nx].lowerLimitUpside + ry < d) d
+							= field[i + nx].lowerLimitUpside + ry;
+					if(field[i - nx].lowerLimitUpside > -0.5
+							&& field[i - nx].lowerLimitUpside + ry < d) d
+							= field[i - nx].lowerLimitUpside + ry;
+
+
+					//					if(field[i + nx + 1].lowerLimitUpside > -0.5 && field[i
+					//							+ nx + 1].lowerLimitUpside + r2 < d) d = field[i
+					//							+ nx + 1].lowerLimitUpside + r2;
+					//					if(field[i + nx - 1].lowerLimitUpside > -0.5 && field[i
+					//							+ nx - 1].lowerLimitUpside + r2 < d) d = field[i
+					//							+ nx - 1].lowerLimitUpside + r2;
+					//					if(field[i - nx + 1].lowerLimitUpside > -0.5 && field[i
+					//							- nx + 1].lowerLimitUpside + r2 < d) d = field[i
+					//							- nx + 1].lowerLimitUpside + r2;
+					//					if(field[i - nx - 1].lowerLimitUpside > -0.5 && field[i
+					//							- nx - 1].lowerLimitUpside + r2 < d) d = field[i
+					//							- nx - 1].lowerLimitUpside + r2;
+
+					if(d < 1000.0){
+						field[i].upperLimitUpside = d;
+						flag = true;
+					}
+
+
+					// Mark outline in upperLimitDownside
+					if(firstRound){
+						if(d < 1000.0){
+							field[i].upperLimitDownside = height;
+						}
+					}
+
+				}
+			}
+		}
+		firstRound = false;
+
+	}
+
+	for(i = 0; i < N; i++)
+		field[i].upperLimitUpside += sz;
+
+}
+
+void Target::RaiseDistanceMap(double height, bool invert)
+{
+	size_t i, j, k;
+	if(invert){
+		for(i = 0; i < N; i++){
+			if(field[i].lowerLimit > height){
+				field[i].upperLimitUpside = 0.000;
+			}else{
+				field[i].upperLimitUpside = -1.000;
+			}
+		}
+	}else{
+		for(i = 0; i < N; i++){
+			if(field[i].upperLimit > height){
+				field[i].upperLimitUpside = 0.000;
+			}else{
+				field[i].upperLimitUpside = -1.000;
+			}
+		}
+	}
+
+	for(i = 0; i < N; i++){
+		if(field[i].upperLimitUpside < -0.5) // = inside of area
+		{
+			if(field[i].lowerLimitDownside < 0.0) field[i].lowerLimitDownside
+					= height - 0.0005;
+			field[i].upperLimitDownside = 0.000;
+		}
+	}
+	bool flag;
+	for(i = 0; i < N; i++){
+		if(!IsOnOuterBorder(i)){
+			if(field[i].upperLimitUpside < -0.5){
+				flag = false;
+				if(field[i + 1].upperLimitUpside > -0.5) flag = true;
+				if(field[i - 1].upperLimitUpside > -0.5) flag = true;
+				if(field[i + nx].upperLimitUpside > -0.5) flag = true;
+				if(field[i - nx].upperLimitUpside > -0.5) flag = true;
+
+
+				// Mark outline in upperLimitDownside
+				if(flag && field[i].lowerLimitDownside > 0.0){
+					field[i].upperLimitDownside = height;
+				}
+			}
+		}
+	}
+}
+
+void Target::FoldLowerDistance(int x, int y, const Target &b)
+{
+	size_t ib, jb, pb, ph;
+	size_t cx, cy;
+	cx = b.nx / 2;
+	cy = b.ny / 2;
+
+	if(x >= 0 && x < nx && y >= 0 && y < ny){
+		ph = x + nx * y;
+		if(field[ph].upperLimitDownside > 0.0001){
+			field[ph].upperLimitDownside = 0.0;
+		}
+	}
+	pb = 0;
+	for(jb = 0; jb < b.ny; jb++){
+		for(ib = 0; ib < b.nx; ib++){
+			if(b.field[pb].IsVisible()){
+				if(ib + x >= cx && ib + x < nx + cx && jb + y >= cy && jb + y
+						< ny + cy){
+					ph = x + ib - cx + (y + jb - cy) * nx;
+
+					if(field[ph].lowerLimitDownside > 0.0001){
+						field[ph].lowerLimitDownside = 0.0;
+					}
+				}
+			}
+			pb++;
+		}
+	}
+}
+
+bool Target::FindNextDistance(int &x, int&y)
+{
+	size_t i, j, p;
+	double d = FLT_MAX;
+	double dc;
+	int cx, cy;
+	bool foundSomething = false;
+
+	p = 0;
+	for(j = 0; j < ny; j++)
+		for(i = 0; i < nx; i++){
+			if(field[p].lowerLimitDownside > 0.0001
+					|| field[p].upperLimitDownside > 0.0001){
+				dc = ((double) i - (double) x) * ((double) i - (double) x)
+						+ ((double) j - (double) y) * ((double) j - (double) y);
+				if(dc < d){
+					cx = i;
+					cy = j;
+					d = dc;
+					foundSomething = true;
+				}
+			}
+			p++;
+		}
+	if(foundSomething){
+		x = cx;
+		y = cy;
+	}
+	return foundSomething;
+}
+
+bool Target::IsInsideWorkingArea(int x, int y)
+{
+	if(x < 0 || x >= nx) return false;
+	if(y < 0 || y >= ny) return false;
+	size_t p = x + y * nx;
+
+	if(field[p].upperLimitDownside > -0.0001) return true;
+	return false;
+
+}
+
+bool Target::HadBeenCut(int x, int y)
+{
+	if(x < 0 || x >= nx) return false;
+	if(y < 0 || y >= ny) return false;
+	size_t p = x + y * nx;
+
+
+	//Outside working area ?
+	if(field[p].upperLimitDownside < -0.0001) return false;
+
+	//On border uncut?
+	if(field[p].upperLimitDownside > -0.0) return false;
+
+	//Material left?
+	if(field[p].lowerLimitDownside > 0.0) return false;
+
+	return true;
+}
+
+bool Target::HasToBeCut(int x, int y)
+{
+	if(x < 0 || x >= nx) return false;
+	if(y < 0 || y >= ny) return false;
+	size_t p = x + y * nx;
+	if(field[p].lowerLimitDownside > 0.0001) return true;
+	if(field[p].upperLimitDownside > 0.0001) return true;
+	return false;
+}
+
+void Target::MoveInDir(int &x, int &y, int dir)
+{
+	switch(dir){
+	case 0:
+		x++;
+		break;
+	case 1:
+		x++;
+		y++;
+		break;
+	case 2:
+		y++;
+		break;
+	case 3:
+		x--;
+		y++;
+		break;
+	case 4:
+		x--;
+		break;
+	case 5:
+		x--;
+		y--;
+		break;
+	case 6:
+		y--;
+		break;
+	case 7:
+		x++;
+		y--;
+		break;
+	}
+}
+
+//Moves inside the matrial clockwise
+int Target::NextDirReverseDistance(int sx, int sy, int olddir)
+{
+	int d = (olddir + 5) % 8;
+
+	char c;
+	bool isOutOfMaterial = HadBeenCut(sx, sy);
+	for(c = 0; c < 16; c++){
+		switch(d){
+		case 0:
+			if(HadBeenCut(sx + 1, sy + 0)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 0)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 0)) return d;
+
+			break;
+		case 1:
+			if(HadBeenCut(sx + 1, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 1)) return d;
+			break;
+		case 2:
+			if(HadBeenCut(sx + 0, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 0, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy + 1)) return d;
+			break;
+		case 3:
+			if(HadBeenCut(sx - 1, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 1)) return d;
+			break;
+		case 4:
+			if(HadBeenCut(sx - 1, sy + 0)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 0)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 0)) return d;
+			break;
+		case 5:
+			if(HadBeenCut(sx - 1, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx - 1, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy - 1)) return d;
+			break;
+		case 6:
+			if(HadBeenCut(sx + 0, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 0, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy - 1)) return d;
+			break;
+		case 7:
+			if(HadBeenCut(sx + 1, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 1, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy - 1)) return d;
+			break;
+		}
+
+		d = (d + 1) % 8;
+	}
+	return -1;
+}
+
+//Moves inside the material to be cut counter-clockwise
+int Target::NextDirForwardDistance(int sx, int sy, int olddir)
+{
+	int d = (olddir + 3) % 8;
+
+	bool isOutOfMaterial = HadBeenCut(sx, sy);
+
+	char c;
+	for(c = 0; c < 16; c++){
+		switch(d){
+		case 0:
+			if(HadBeenCut(sx + 1, sy + 0)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 0)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 0)) return d;
+
+			break;
+		case 1:
+			if(HadBeenCut(sx + 1, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 1)) return d;
+			break;
+		case 2:
+			if(HadBeenCut(sx + 0, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 0, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy + 1)) return d;
+			break;
+		case 3:
+			if(HadBeenCut(sx - 1, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 1)) return d;
+			break;
+		case 4:
+			if(HadBeenCut(sx - 1, sy + 0)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 0)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 0)) return d;
+			break;
+		case 5:
+			if(HadBeenCut(sx - 1, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx - 1, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy - 1)) return d;
+			break;
+		case 6:
+			if(HadBeenCut(sx + 0, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 0, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy - 1)) return d;
+			break;
+		case 7:
+			if(HadBeenCut(sx + 1, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 1, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy - 1)) return d;
+			break;
+		}
+
+		d--;
+		if(d <= -1) d = 7;
+	}
+	return -1;
+}
+
+void Target::DocumentField(int x, int y)
+{
+	int i, j;
+	wxString tp;
+	for(j = -3; j <= 3; j++){
+		tp = wxString::Format(_T("x:%3i y%3i:"), x, y - j);
+		for(int i = -3; i <= 3; i++){
+			if(HasToBeCut(x + i, y - j))
+				tp += _T("X ");
+			else
+				if(IsInsideWorkingArea(x + i, y - j))
+					tp += _T("_ ");
+				else
+					tp += _T("0 ");
+		}
+		wxLogMessage(tp);
+	}
+}
+
+bool Target::FindStartCutting(int &x, int &y)
+{
+	int sx = x;
+	int sy = y;
+
+	int dx = x;
+	int dy = y;
+
+	size_t N = 1000* 4 ;
+
+	if(dx == 54 && dy == 49){
+		DocumentField(dx, dy);
+		//return false;
+	}
+
+	int hx, hy;
+
+	if(!HasToBeCut(x, y)){
+		wxLogMessage(
+				_T("FindStartCutting::Test started in a place not to be cut!"));
+		return false;
+	}
+	char dir = 0;
+
+	while(true) // TODO: Restructure this loop! A while(true)! Yeah right! goto is evil!
+	{
+
+		dir = NextDirReverseDistance(sx, sy, dir);
+
+		if(dir == -1) // Wall contact lost
+		{
+			wxLogMessage(_T("FindStartCutting::Wall contact lost!"));
+			return false;
+		}
+
+		N--;
+		if(N == 0) // Wall contact lost
+		{
+			wxLogMessage(_T("FindStartCutting:: Timeout!"));
+			return false;
+		}
+
+		hx = sx;
+		hy = sy;
+		MoveInDir(hx, hy, dir);
+
+		if(hx == x && hy == y) // Full circle
+		{
+			return true;
+		}
+
+		if(!IsInsideWorkingArea(hx, hy)) // Start of cut found
+		{
+			x = sx;
+			y = sy;
+			return true;
+		}
+		sx = hx;
+		sy = hy;
+
+	}
+	return false;
+}
+
+Polygon25 Target::FindCut(int &x, int &y)
+{
+	Polygon25 temp;
+	Polygon25 temp2;
+
+	int sx = x;
+	int sy = y;
+	int hx, hy;
+
+	size_t N = 1000* 4 ;
+
+	double rx2 = rx / 2;
+	double ry2 = ry / 2;
+
+	temp.InsertPoint((double) x * rx + rx2, (double) y * ry + ry2, 0.002);
+
+	if(!HasToBeCut(x, y)){
+		wxLogMessage(_T("FindCut::Test started in a place not to be cut!"));
+		return temp;
+	}
+
+	char dir = 0;
+	while(true) // TODO: Restructure this loop! A while(true)! Yeah right! goto is evil!
+	{
+		dir = NextDirForwardDistance(sx, sy, dir);
+
+		if(dir == -1) // Wall contact lost
+		{
+			wxLogMessage(_T("FindCut::Wall contact lost!"));
+			return temp;
+		}
+
+		N--;
+		if(N == 0) // Wall contact lost
+		{
+			wxLogMessage(_T("FindCut:: Timeout!"));
+
+			size_t i;
+			for(i=0;i<5;i++)
+			{
+				temp2.elements.Add(temp.elements[i]);
+			}
+			return temp2;
+		}
+
+		hx = sx;
+		hy = sy;
+		MoveInDir(hx, hy, dir);
+
+		if(hx == x && hy == y) // Full circle
+		{
+			return temp;
+		}
+
+		if(!IsInsideWorkingArea(hx, hy)) // End of cut found
+		{
+			x = sx;
+			y = sy;
+			return temp;
+		}
+
+		sx = hx;
+		sy = hy;
+
+		temp.InsertPoint((double) sx * rx + rx2, (double) sy * ry + ry2, 0.002);
+
+	}
+
+	return temp;
+}
+
 void Target::Paint(void)
 {
 	Imprinter::Paint();
-
 	::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
-
 	toolpath.Paint();
 	::glColor3f(0.5, 0.5, 0.5);
 	supportLine.Paint();
-	::glColor3f(0.5, 0.8, 0.5);
+	::glColor3f(0.9, 0.9, 0.1);
 	outLine.Paint();
 
 }

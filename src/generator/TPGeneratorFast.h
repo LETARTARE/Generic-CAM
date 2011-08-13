@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Run.h
-// Purpose            : Defines a machine run.
+// Name               : TPGeneratorFast.h
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 15.06.2011
+// Created            : 01.08.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -28,67 +28,48 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef RUN_H_
-#define RUN_H_
+#ifndef TPGENERATORFAST_H_
+#define TPGENERATORFAST_H_
 
-#include "../3D/Geometry.h"
-#include "Toolbox.h"
-#include "../machine/Machine.h"
-#include "StockMaterial.h"
-#include "../simulator/Workpiece.h"
-#include "../simulator/ToolPath.h"
-#include "../generator/TPGeneratorFast.h"
-#include "../generator/TPGeneratorTest.h"
+#include "../project/Target.h"
+#include "../3D/Polygon3.h"
+#include "../machine/Tool.h"
 
-#include "TargetPlacement.h"
-
-#include <wx/string.h>
-#include <wx/textfile.h>
-#include <wx/xml/xml.h>
-#include <wx/dynarray.h>
-
-/*!\class Run
+/*!\class TPGeneratorFast
  * \brief ...
  *
  * ...
  */
-
-class Run {
-	// Constructor / Destructor
+class TPGeneratorFast {
+	// Constructor/ Destructor
 public:
-	Run();
-	virtual ~Run();
-	// Member variables
+	TPGeneratorFast();
+	virtual ~TPGeneratorFast();
+
+	//Member variables:
 public:
-	wxString runName;
 
-	bool useExtraMachine;
-	Machine machine;
-	bool useExtraToolbox;
-	Toolbox toolbox;
+	double freeHeightAboveMaterial;
+	double maxSingleStep;
+	double raiseStep;
 
-	ToolPath toolPath;
-	ArrayOfTargetPlacement placements;
+	double dropStep;
 
-	StockMaterial stockMaterial;
-	//Workpiece workPiece;
+private:
+	double toolDiameter;
 
-	TPGeneratorFast ToolPathGenerator;
-
-	// Methods
+	//Methods:
 public:
-	void ToXml(wxXmlNode* parentNode);
-	bool FromXml(wxXmlNode* node);
+	void GenerateToolpath(Target &target, Tool &tool);
 
-	void WriteToFile(wxTextFile &f);
-
-	void SortTargets(void);
-
-
-	void Paint(void);
+private:
+	ToolPath GenerateSpiral(double x, double y, double radius);
+	ToolPath GenerateDrill(double x, double y, double diameter, double depth);
+	bool IsDirectlyReachable(Target &target, double sx, double sy, double sz,
+			double x, double y, double z);
+	ToolPath MoveSavely(Target &target, double sx, double sy, double sz,
+			double x, double y, double z);
 
 };
-WX_DECLARE_OBJARRAY(Run, ArrayOfRun)
-;
 
-#endif /* RUN_H_ */
+#endif /* TPGENERATORFAST_H_ */

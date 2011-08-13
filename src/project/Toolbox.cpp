@@ -34,9 +34,9 @@
 
 Toolbox::Toolbox()
 {
-	xmlDocument = new wxXmlDocument();
-	xmlDocument->SetFileEncoding(_T("UTF-8"));
-	xmlDocument->SetVersion(_T(_GENERICCAM_VERSION));
+//	xmlDocument = new wxXmlDocument();
+//	xmlDocument->SetFileEncoding(_T("UTF-8"));
+//	xmlDocument->SetVersion(_T(_GENERICCAM_VERSION));
 
 
 	// an example Tool for the toolbox
@@ -138,25 +138,25 @@ Toolbox::Toolbox()
 
 Toolbox::~Toolbox()
 {
-	if(xmlDocument != NULL) delete xmlDocument;
+//	if(xmlDocument != NULL) delete xmlDocument;
 }
 
 bool Toolbox::LoadToolbox(wxFileName& fileName)
 {
 
-	wxXmlDocument* tempTree = new wxXmlDocument();
-	tempTree->SetFileEncoding(_T("UTF-8"));
-	tempTree->SetVersion(_T(_GENERICCAM_VERSION));
-	if(!tempTree->Load(fileName.GetFullPath(), wxT("UTF-8"),
-			wxXMLDOC_KEEP_WHITESPACE_NODES)){
-		delete tempTree;
-		return false;
-	}
-	// Swap XML trees
-	delete xmlDocument;
-	xmlDocument = tempTree;
-
-	this->fileName = fileName;
+//	wxXmlDocument* tempTree = new wxXmlDocument();
+//	tempTree->SetFileEncoding(_T("UTF-8"));
+//	tempTree->SetVersion(_T(_GENERICCAM_VERSION));
+//	if(!tempTree->Load(fileName.GetFullPath(), wxT("UTF-8"),
+//			wxXMLDOC_KEEP_WHITESPACE_NODES)){
+//		delete tempTree;
+//		return false;
+//	}
+//	// Swap XML trees
+//	delete xmlDocument;
+//	xmlDocument = tempTree;
+//
+//	this->fileName = fileName;
 
 
 	//TODO: Loading code comes here.
@@ -167,9 +167,9 @@ bool Toolbox::LoadToolbox(wxFileName& fileName)
 bool Toolbox::SaveToolbox(wxFileName& fileName)
 {
 
-	if(!xmlDocument->Save(fileName.GetFullPath(), wxXML_NO_INDENTATION)){
-		return false;
-	}
-	this->fileName = fileName;
+//	if(!xmlDocument->Save(fileName.GetFullPath(), wxXML_NO_INDENTATION)){
+//		return false;
+//	}
+//	this->fileName = fileName;
 	return true;
 }

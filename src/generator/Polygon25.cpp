@@ -258,7 +258,7 @@ void Polygon25::RotatePolygonStart(double x, double y)
 	}
 
 	// Shift by -nshift (so nshift becomes 0)
-	nshift = n - nshift;
+//	nshift = n - nshift;
 	size_t j;
 	ArrayOfVector3 temp;
 	for(i = 0; i < n; i++){

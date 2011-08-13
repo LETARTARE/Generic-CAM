@@ -125,35 +125,142 @@ void ToolPath::Paint(void)
 	::glPopMatrix();
 }
 
+void ToolPath::CleanPath(double tolerance)
+{
+	ArrayOfMachinePosition temp;
+	size_t i, j, k;
+	if(positions.GetCount() < 2) return;
+
+	bool isOnLine;
+	bool isSameSort;
+
+	double gx, gy, gz;
+	double px, py, pz;
+	double s, d2;
+	double hx, hy, hz;
+	double t2 = tolerance * tolerance;
+	double dg;
+	size_t lastWritten = 0;
+	temp.Add(positions[lastWritten]);
+	unsigned char lastGCode = positions[lastWritten].GetGNumber();
+	unsigned char gCode;
+	for(i = 1; i < positions.GetCount(); i++){
+		isOnLine = true;
+		isSameSort = true;
+		gCode = positions[i].GetGNumber();
+		if(gCode != lastGCode) isSameSort = false;
+		if(lastGCode != 0 && lastGCode != 1) isSameSort = false;
+
+		if(isSameSort){
+			gx = positions[i].axisX - positions[lastWritten].axisX;
+			gy = positions[i].axisY - positions[lastWritten].axisY;
+			gz = positions[i].axisZ - positions[lastWritten].axisZ;
+
+			dg = gx * gx + gy * gy + gz * gz;
+			if(dg > 0.0){
+
+				for(j = lastWritten + 1; j < i; j++){
+					px = positions[j].axisX - positions[lastWritten].axisX;
+					py = positions[j].axisY - positions[lastWritten].axisY;
+					pz = positions[j].axisZ - positions[lastWritten].axisZ;
+
+					s = (gx * px + gy * py + gz * pz) / dg;
+
+					if(s < 0.0 || s > 1.0){
+						isOnLine = false;
+						break;
+					}
+
+					hx = gx * s;
+					hy = gy * s;
+					hz = gz * s;
+					hx -= px;
+					hy -= py;
+					hz -= pz;
+					d2 = hx * hx + hy * hy + hz * hz;
+
+					if(d2 > t2){
+						isOnLine = false;
+						break;
+					}
+				}
+			}else{
+				isOnLine = false;
+			}
+		}
+
+		if(!isOnLine || !isSameSort){
+			if(lastWritten < i - 1){
+				temp.Add(positions[i - 1]);
+				lastWritten = i - 1;
+				lastGCode = positions[lastWritten].GetGNumber();
+			}
+		}
+		if(!isSameSort){
+			if(lastWritten < i){
+				temp.Add(positions[i]);
+				lastWritten = i;
+				lastGCode = positions[lastWritten].GetGNumber();
+			}
+		}
+	}
+	if(lastWritten < i - 1) temp.Add(positions[i - 1]);
+	positions = temp;
+}
+
 void ToolPath::WriteToFile(wxTextFile &f)
 {
-	setlocale(LC_ALL,"C");
+	if(positions.GetCount() < 2) return;
 
-	f.AddLine(_T("G90 G80 G40 G54 G21 G17 G50 G94 G64 (safety block)"));
+	CleanPath();
 
-	f.AddLine(_T("G49 (disable tool length compensation)"));
-	f.AddLine(_T("G80 (disable modal motion)"));
-	f.AddLine(_T("G61 (exact path mode)"));
+	setlocale(LC_ALL, "C"); // To get a 3.1415 instead 3,1415 or else on every computer.
 
-	f.AddLine(_T("F3000 (Feedrate mm/min)"));
+	bool useWithFanucM = true;
+	wxTextFileType fileType = wxTextFileType_Dos;
 
-	f.AddLine(_T("T1 M6 (Tool 1, Select tool)"));
+	if(useWithFanucM){
+		// For the fanucm.exe g-code simulator.
+		f.AddLine(_T("[billet x100 y100 z30"), fileType);
+		f.AddLine(_T("[tooldef t1 d6 z35"), fileType);
+	}
 
-	f.AddLine(_T("S10000 (Spindle speed rpm)"));
-	f.AddLine(_T("M3 (Start spindel)"));
-	f.AddLine(_T("G4 P3 (Wait For Seconds, Parameter 3 Seconds)"));
+	if(!useWithFanucM){
+		f.AddLine(_T("G90 G80 G40 G54 G21 G17 G50 G94 G64 (safety block)"),
+				fileType);
+	}
+	f.AddLine(_T("G49 (disable tool length compensation)"), fileType);
+	f.AddLine(_T("G80 (disable modal motion)"), fileType);
+	f.AddLine(_T("G61 (exact path mode)"), fileType);
+
+	f.AddLine(_T("F3000 (Feedrate mm/min)"), fileType);
+	f.AddLine(_T("T1 M6 (Tool 1, Select tool)"), fileType);
+
+	if(useWithFanucM){
+		f.AddLine(_T("S1000 (Spindle speed rpm)"), fileType);
+		f.AddLine(_T("M3 (Start spindel)"), fileType);
+		f.AddLine(_T("G4 X3 (Wait For Seconds, Parameter 3 Seconds)"), fileType);
+	}else{
+		f.AddLine(_T("S10000 (Spindle speed rpm)"), fileType);
+		f.AddLine(_T("M3 (Start spindel)"), fileType);
+		f.AddLine(_T("G4 P3 (Wait For Seconds, Parameter 3 Seconds)"), fileType);
+
+	}
 
 	size_t i;
 
-	f.AddLine(positions[0].GenerateCommandXYZ());
+	f.AddLine(positions[0].GenerateCommandXYZ(), fileType);
 
 	for(i = 1; i < positions.GetCount(); i++)
-		f.AddLine(positions[i].GenerateCommandDiff(positions[i - 1]));
+		f.AddLine(positions[i].GenerateCommandDiff(positions[i - 1]), fileType);
 
-	f.AddLine(_T("M5 (Stop spindel)"));
-	f.AddLine(_T("G4 P3 (Wait For Seconds, Parameter 3 Seconds)"));
-	f.AddLine(_T("M2 (End programm)"));
+	f.AddLine(_T("M5 (Stop spindel)"), fileType);
+	if(useWithFanucM){
+		f.AddLine(_T("G4 X3 (Wait For Seconds, Parameter 3 Seconds)"), fileType);
+	}else{
+		f.AddLine(_T("G4 P3 (Wait For Seconds, Parameter 3 Seconds)"), fileType);
+	}
+	f.AddLine(_T("M2 (End programm)"), fileType);
 
-
-	setlocale(LC_ALL,"");
+	setlocale(LC_ALL, "");
 }

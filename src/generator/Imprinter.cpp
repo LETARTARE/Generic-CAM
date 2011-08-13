@@ -70,6 +70,12 @@ Imprinter::Imprinter(const double sizeX, const double sizeY,
 
 	displayBox = false;
 	displayListGenerated = false;
+
+	displayUpUp = false;
+	displayUpDown = false;
+	displayDownUp = true;
+	displayDownDown = true;
+
 	this->SetupBox(sizeX, sizeY, sizeZ, resolutionX, resolutionY);
 }
 
@@ -84,6 +90,10 @@ Imprinter::Imprinter(const Imprinter& ip)
 	this->colorUnscratched = ip.colorUnscratched;
 	this->displayBox = ip.displayBox;
 	this->displayListGenerated = false;
+	this->displayUpUp = ip.displayUpUp;
+	this->displayUpDown = ip.displayUpDown;
+	this->displayDownUp = ip.displayDownUp;
+	this->displayDownDown = ip.displayDownDown;
 
 	if(ip.N == 0) return;
 	this->SetupBox(ip.sx, ip.sy, ip.sz, ip.rx, ip.ry);
@@ -156,6 +166,12 @@ Imprinter& Imprinter::operator=(const Imprinter &b)
 	this->colorNormal = b.colorNormal;
 	this->colorTodo = b.colorTodo;
 	this->colorUnscratched = b.colorUnscratched;
+	this->displayBox = b.displayBox;
+	this->displayUpUp = b.displayUpUp;
+	this->displayUpDown = b.displayUpDown;
+	this->displayDownUp = b.displayDownUp;
+	this->displayDownDown = b.displayDownDown;
+
 	if(b.N > 0){
 		size_t i;
 		for(i = 0; i < b.N; i++)
@@ -477,6 +493,7 @@ void Imprinter::FoldLower(int x, int y, double z, const Imprinter &b)
 		}
 	}
 }
+
 void Imprinter::HardInvert(void)
 {
 	size_t i;
@@ -581,8 +598,8 @@ double Imprinter::GetMeanLevel(size_t p)
 double Imprinter::GetLevel(double x, double y)
 {
 	int px, py;
-	px = round(x / rx);
-	py = round(y / ry);
+	px = round((x - rx / 2) / rx);
+	py = round((y - ry / 2) / ry);
 	if(px < 0 || py < 0 || px >= nx || py >= ny) return -1.0;
 	size_t p = px + py * nx;
 	if(!field[p].IsVisible()) return -1.0;
@@ -756,6 +773,16 @@ void Imprinter::InitImprinting(void)
 		field[i].lowerLimitUpside = FLT_MAX;
 		field[i].upperLimitDownside = -FLT_MAX;
 		field[i].lowerLimitDownside = -FLT_MAX;
+	}
+}
+
+void Imprinter::InitOutSides(void)
+{
+	for(size_t i = 0; i < N; i++){
+		field[i].upperLimitUpside = sz;
+		field[i].lowerLimitUpside = sz;
+		field[i].upperLimitDownside = 0;
+		field[i].lowerLimitDownside = 0;
 	}
 }
 
@@ -1046,7 +1073,8 @@ void Imprinter::Paint()
 			::glBegin(GL_QUADS);
 
 			size_t i, j, p = 0;
-			float px = 0.0, py = 0;
+			float px = 0.0;
+			float py = 0.0;
 			for(j = 0; j < ny; j++){
 				px = 0.0;
 				for(i = 0; i < nx; i++){
@@ -1070,6 +1098,128 @@ void Imprinter::Paint()
 				py += ry;
 			}
 			::glEnd();
+
+			if(displayUpUp){
+
+				::glColor3f(0.0, 0.0, 0.9);
+				::glNormal3f(0, 0, 1);
+
+				::glBegin(GL_LINES);
+
+				p = 0;
+				py = ry / 2;
+				for(j = 0; j < ny; j++){
+					px = rx / 2;
+					for(i = 0; i < nx; i++){
+
+						if(i > 0){
+							glVertex3f(px, py, field[p].upperLimitUpside);
+							glVertex3f(px - rx, py,
+									field[p - 1].upperLimitUpside);
+						}
+						if(j > 0){
+							glVertex3f(px, py, field[p].upperLimitUpside);
+							glVertex3f(px, py - ry,
+									field[p - nx].upperLimitUpside);
+						}
+						px += rx;
+						p++;
+					}
+					py += ry;
+				}
+				::glEnd();
+			}
+			if(displayUpDown){
+
+				::glColor3f(0.0, 0.9, 0.0);
+				::glNormal3f(0, 0, 1);
+
+				::glBegin(GL_LINES);
+
+				p = 0;
+				py = ry / 2;
+				for(j = 0; j < ny; j++){
+					px = rx / 2;
+					for(i = 0; i < nx; i++){
+
+						if(i > 0){
+							glVertex3f(px, py, field[p].lowerLimitUpside);
+							glVertex3f(px - rx, ry,
+									field[p - 1].lowerLimitUpside);
+						}
+						if(j > 0){
+							glVertex3f(px, py, field[p].lowerLimitUpside);
+							glVertex3f(px, py - ry,
+									field[p - nx].lowerLimitUpside);
+						}
+						px += rx;
+						p++;
+					}
+					py += ry;
+				}
+				::glEnd();
+			}
+			if(displayDownUp){
+
+				::glColor3f(0.0, 0.9, 0.0);
+				::glNormal3f(0, 0, 1);
+
+				::glBegin(GL_LINES);
+
+				p = 0;
+				py = ry / 2;
+				for(j = 0; j < ny; j++){
+					px = rx / 2;
+					for(i = 0; i < nx; i++){
+
+						if(i > 0){
+							glVertex3f(px, py, field[p].upperLimitDownside);
+							glVertex3f(px - rx, py,
+									field[p - 1].upperLimitDownside);
+						}
+						if(j > 0){
+							glVertex3f(px, py, field[p].upperLimitDownside);
+							glVertex3f(px, py - ry,
+									field[p - nx].upperLimitDownside);
+						}
+						px += rx;
+						p++;
+					}
+					py += ry;
+				}
+				::glEnd();
+			}
+			if(displayDownDown){
+
+				::glColor3f(0.9, 0.0, 0.0);
+				::glNormal3f(0, 0, 1);
+
+				::glBegin(GL_LINES);
+
+				p = 0;
+				py = ry / 2;
+				for(j = 0; j < ny; j++){
+					px = rx / 2;
+					for(i = 0; i < nx; i++){
+
+						if(i > 0){
+							glVertex3f(px, py, field[p].lowerLimitDownside);
+							glVertex3f(px - rx, py,
+									field[p - 1].lowerLimitDownside);
+						}
+						if(j > 0){
+							glVertex3f(px, py, field[p].lowerLimitDownside);
+							glVertex3f(px, py - ry,
+									field[p - nx].lowerLimitDownside);
+						}
+						px += rx;
+						p++;
+					}
+					py += ry;
+				}
+				::glEnd();
+			}
+
 		}
 		if(displayBox || true){
 

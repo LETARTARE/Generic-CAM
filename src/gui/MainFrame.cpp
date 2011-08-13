@@ -69,10 +69,8 @@ MainFrame::MainFrame(wxWindow* parent) :
 
 	timer.Start(100);
 
-	m_canvas->Connect(wxID_ANY,wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrame::OnKeyDown),
-			NULL, this);
-
-
+	m_canvas->Connect(wxID_ANY, wxEVT_KEY_DOWN,
+			wxKeyEventHandler(MainFrame::OnKeyDown), NULL, this);
 
 	selectedTargetPosition = 0;
 
@@ -130,6 +128,8 @@ void MainFrame::LoadProject(wxString fileName)
 	wxFileName file;
 	file = fileName;
 	project[activeProject].Load(file);
+	project[activeProject].GenerateTargets();
+	project[activeProject].GenerateToolPath();
 	SetupTree();
 	this->Refresh();
 }
