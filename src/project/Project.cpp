@@ -80,7 +80,7 @@ void Project::ClearProject(void)
 	RotationalSpeed.Setup(_T("1/s"), _T("rpm"), (double) 1 / 60);
 	LinearSpeed.Setup(_T("m/s"), _T("mm/s"), (double) 1 / 1000);
 
-	slotWidth = 0.010;
+	slotWidth = 0.020;
 	supportDistance = 0.05;
 	supportWidth = 0.005;
 	supportHeight = 0.005;
@@ -574,8 +574,8 @@ void Project::GenerateTargets(void)
 	double gridsx = obj->bbox.xmax + 4 * slotWidth;
 	double gridsy = obj->bbox.ymax + 4 * slotWidth;
 
-	if(n > 1) n = 1; // TODO: Remove this line!
-	for(i = 0; i < n; i++){
+	if(n > 2) n = 2; // TODO: Remove this line!
+	for(i = n; i <= n; i++){
 		//for(i = 0; i <= 2; i++){
 
 

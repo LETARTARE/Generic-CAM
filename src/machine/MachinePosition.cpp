@@ -340,7 +340,7 @@ wxString MachinePosition::GenerateCommandDiff(
 	if(fabs(this->axisY - oldPosition.axisY) > FLT_EPSILON) temp
 			+= wxString::Format(_T(" Y%.2f"), this->axisY * 1000.0);
 	if(fabs(this->axisZ - oldPosition.axisZ) > FLT_EPSILON) temp
-			+= wxString::Format(_T(" Z%.2f"), this->axisZ * 1000.0-30.0);
+			+= wxString::Format(_T(" Z%.2f"), this->axisZ * 1000.0);
 
 	if(fabs(this->axisA - oldPosition.axisA) > FLT_EPSILON) temp
 			+= wxString::Format(_T(" A%.2f"), this->axisA * 1000.0);

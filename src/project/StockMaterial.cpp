@@ -38,7 +38,7 @@ StockMaterial::StockMaterial()
 	materialName = _T("Default");
 	x = 0.648;
 	y = 0.390;
-	z = 0.030;
+	z = 0.020;
 	maxSpeed = 10000;
 	maxFeedrate = 0.05;
 	thermalConductivity = 100;

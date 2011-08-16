@@ -216,16 +216,14 @@ void ToolPath::WriteToFile(wxTextFile &f)
 
 	setlocale(LC_ALL, "C"); // To get a 3.1415 instead 3,1415 or else on every computer.
 
-	bool useWithFanucM = true;
+	bool useWithFanucM = false;
 	wxTextFileType fileType = wxTextFileType_Dos;
 
 	if(useWithFanucM){
 		// For the fanucm.exe g-code simulator.
-		f.AddLine(_T("[billet x100 y100 z30"), fileType);
+		f.AddLine(_T("[billet x100 y100 z20"), fileType);
 		f.AddLine(_T("[tooldef t1 d6 z35"), fileType);
-	}
-
-	if(!useWithFanucM){
+	}else{
 		f.AddLine(_T("G90 G80 G40 G54 G21 G17 G50 G94 G64 (safety block)"),
 				fileType);
 	}
@@ -249,10 +247,22 @@ void ToolPath::WriteToFile(wxTextFile &f)
 
 	size_t i;
 
-	f.AddLine(positions[0].GenerateCommandXYZ(), fileType);
+	// First two position are the "anti-messup".
+	for(i = 2; i < positions.GetCount(); i++){
+		positions[i].axisX -= 0.000;
+		positions[i].axisY -= 0.000;
+		positions[i].axisZ -= 0.020;
+	}
 
+	f.AddLine(positions[0].GenerateCommandXYZ(), fileType);
 	for(i = 1; i < positions.GetCount(); i++)
 		f.AddLine(positions[i].GenerateCommandDiff(positions[i - 1]), fileType);
+
+	for(i = 2; i < positions.GetCount(); i++){
+		positions[i].axisX += 0.000;
+		positions[i].axisY += 0.000;
+		positions[i].axisZ += 0.020;
+	}
 
 	f.AddLine(_T("M5 (Stop spindel)"), fileType);
 	if(useWithFanucM){

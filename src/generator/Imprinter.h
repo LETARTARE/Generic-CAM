@@ -86,6 +86,8 @@ public:
 
 	bool displayBox;
 
+	bool displayField;
+
 	bool displayUpUp;
 	bool displayUpDown;
 	bool displayDownUp;

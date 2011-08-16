@@ -71,10 +71,12 @@ Imprinter::Imprinter(const double sizeX, const double sizeY,
 	displayBox = false;
 	displayListGenerated = false;
 
+	displayField = false;
+
 	displayUpUp = false;
 	displayUpDown = false;
-	displayDownUp = true;
-	displayDownDown = true;
+	displayDownUp = false;
+	displayDownDown = false;
 
 	this->SetupBox(sizeX, sizeY, sizeZ, resolutionX, resolutionY);
 }
@@ -90,6 +92,8 @@ Imprinter::Imprinter(const Imprinter& ip)
 	this->colorUnscratched = ip.colorUnscratched;
 	this->displayBox = ip.displayBox;
 	this->displayListGenerated = false;
+	this->displayField = ip.displayField;
+
 	this->displayUpUp = ip.displayUpUp;
 	this->displayUpDown = ip.displayUpDown;
 	this->displayDownUp = ip.displayDownUp;
@@ -167,6 +171,7 @@ Imprinter& Imprinter::operator=(const Imprinter &b)
 	this->colorTodo = b.colorTodo;
 	this->colorUnscratched = b.colorUnscratched;
 	this->displayBox = b.displayBox;
+	this->displayField = b.displayField;
 	this->displayUpUp = b.displayUpUp;
 	this->displayUpDown = b.displayUpDown;
 	this->displayDownUp = b.displayDownUp;
@@ -1069,36 +1074,37 @@ void Imprinter::Paint()
 
 		if(field != NULL){
 
-			::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
-			::glBegin(GL_QUADS);
-
 			size_t i, j, p = 0;
 			float px = 0.0;
 			float py = 0.0;
-			for(j = 0; j < ny; j++){
-				px = 0.0;
-				for(i = 0; i < nx; i++){
+			if(displayField){
+				::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
+				::glBegin(GL_QUADS);
 
-					if(field[p].IsVisible()){
-						glNormal3f(0, 0, 1);
-						glVertex3f(px, py, field[p].upperLimit);
-						glVertex3f(px + rx, py, field[p].upperLimit);
-						glVertex3f(px + rx, py + ry, field[p].upperLimit);
-						glVertex3f(px, py + ry, field[p].upperLimit);
+				for(j = 0; j < ny; j++){
+					px = 0.0;
+					for(i = 0; i < nx; i++){
 
-						glNormal3f(0, 0, -1);
-						glVertex3f(px, py, field[p].lowerLimit);
-						glVertex3f(px + rx, py, field[p].lowerLimit);
-						glVertex3f(px + rx, py + ry, field[p].lowerLimit);
-						glVertex3f(px, py + ry, field[p].lowerLimit);
+						if(field[p].IsVisible()){
+							glNormal3f(0, 0, 1);
+							glVertex3f(px, py, field[p].upperLimit);
+							glVertex3f(px + rx, py, field[p].upperLimit);
+							glVertex3f(px + rx, py + ry, field[p].upperLimit);
+							glVertex3f(px, py + ry, field[p].upperLimit);
+
+							glNormal3f(0, 0, -1);
+							glVertex3f(px, py, field[p].lowerLimit);
+							glVertex3f(px + rx, py, field[p].lowerLimit);
+							glVertex3f(px + rx, py + ry, field[p].lowerLimit);
+							glVertex3f(px, py + ry, field[p].lowerLimit);
+						}
+						px += rx;
+						p++;
 					}
-					px += rx;
-					p++;
+					py += ry;
 				}
-				py += ry;
+				::glEnd();
 			}
-			::glEnd();
-
 			if(displayUpUp){
 
 				::glColor3f(0.0, 0.0, 0.9);
