@@ -59,6 +59,9 @@ public:
 	Vector3 colorMoving;
 	Vector3 colorCutting;
 
+MachinePosition minPosition,maxPosition;
+
+
 	// Methods
 public:
 
@@ -71,7 +74,7 @@ public:
 	void Paint(void);
 	void CleanPath(double tolerance = 0.0002);
 	void WriteToFile(wxTextFile &f);
-
+	void CalculateMinMaxValues(void);
 };
 WX_DECLARE_OBJARRAY(ToolPath, ArrayOfToolPath)
 ;

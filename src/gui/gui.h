@@ -92,6 +92,8 @@ class GUIMainFrame : public wxFrame
 		virtual void OnSaveToolbox( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditStock( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnGenerateToolpath( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRecollectToolpath( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCleanToolpath( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFlipRun( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPrepareMachinebed( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnLoadGCodes( wxCommandEvent& event ) { event.Skip(); }

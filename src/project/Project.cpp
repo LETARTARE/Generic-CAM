@@ -80,7 +80,7 @@ void Project::ClearProject(void)
 	RotationalSpeed.Setup(_T("1/s"), _T("rpm"), (double) 1 / 60);
 	LinearSpeed.Setup(_T("m/s"), _T("mm/s"), (double) 1 / 1000);
 
-	slotWidth = 0.020;
+	slotWidth = 0.010;
 	supportDistance = 0.05;
 	supportWidth = 0.005;
 	supportHeight = 0.005;
@@ -400,16 +400,21 @@ void Project::FlipRun(void)
 				runs[activeRun].placements[i].outLine.elements[j].y = dy * 2
 						- runs[activeRun].placements[i].outLine.elements[j].y;
 
+			runs[activeRun].placements[i].matrix.TranslateLocal(+dx, +dy, 0.0);
+
 			temp = runs[activeRun].placements[i].matrix.GetCenter();
+			double alpha = atan2(runs[activeRun].placements[i].matrix.a[1],
+					runs[activeRun].placements[i].matrix.a[0]);
 
+			AffineTransformMatrix tr;
+			tr = AffineTransformMatrix::RotateXYZ(0.0, 0.0, -2 * alpha);
+			runs[activeRun].placements[i].matrix
+					= runs[activeRun].placements[i].matrix * tr;
 
-			//runs[activeRun].placements[i].matrix.TranslateLocal(+dx, +dy, 0.0);
+			runs[activeRun].placements[i].matrix.TranslateGlobal(0.0, 2
+					* (middleY - temp.y), 0.0);
 
-			runs[activeRun].placements[i].matrix.TranslateGlobal(0.0, (middleY
-					- dy - temp.y) * 2, 0.0);
-
-
-			//runs[activeRun].placements[i].matrix.TranslateLocal(-dx, -dy, 0.0);
+			runs[activeRun].placements[i].matrix.TranslateLocal(-dx, -dy, 0.0);
 
 		}
 
@@ -418,6 +423,7 @@ void Project::FlipRun(void)
 		targets[i].FlipX();
 		targets[i].toolpathFlipped = targets[i].toolpath;
 		targets[i].toolpath.Clear();
+		targets[i].refresh = true;
 	}
 
 }
@@ -484,7 +490,7 @@ void Project::InsertDrillGrid(Run &run, double sizex, double sizey,
 {
 	Target temp;
 	TargetPlacement tempPlace;
-	temp.SetupDrill(toolbox.tools[0], 0.006, 0.012);
+	temp.SetupDrill(toolbox.tools[0], 0.0082, 0.012);
 	targets.Add(temp);
 	tempPlace.outLine = temp.outLine;
 	tempPlace.isMovable = false;
@@ -531,6 +537,10 @@ void Project::GenerateTargets(void)
 	Target discSlot;
 	discSlot.SetupDisc(slotWidth, resolution, resolution);
 
+	slotWidth = 0.025;
+	Target discSlot2;
+	discSlot2.SetupDisc(slotWidth, resolution, resolution);
+
 	i = SetupMachineBed(true);
 	run = &(runs[i]);
 
@@ -544,24 +554,24 @@ void Project::GenerateTargets(void)
 			run->placements.GetCount()));
 
 
-	//	// Test 1:
-	//	tempPlace.SetKeepout(0.0, 0.0, 0.060, 0.100);
+	//	// Hole@:
+	//	tempPlace.SetKeepout(0.23858 - 0.010, 0.329268 - 0.010, 0.020, 0.020);
 	//	run->placements.Add(tempPlace);
-	//
-	//
-	//	// Screw 1:
-	//	tempPlace.SetKeepout(0.000, 0.100, 0.025, 0.020);
-	//	run->placements.Add(tempPlace);
-	//
-	//
-	//	// Screw 2:
-	//	tempPlace.SetKeepout(0.000, 0.285, 0.025, 0.020);
-	//	run->placements.Add(tempPlace);
-	//
-	//
-	//	// Screw 3:
-	//	tempPlace.SetKeepout(0.395, 0.085, 0.025, 0.020);
-	//	run->placements.Add(tempPlace);
+
+
+	// Screw 1:
+	tempPlace.SetKeepout(0.0785 - 0.010, 0.114 - 0.010, 0.020, 0.020);
+	run->placements.Add(tempPlace);
+
+
+	// Screw 2:
+	tempPlace.SetKeepout(0.0755 - 0.010, 0.301 - 0.010, 0.020, 0.020);
+	run->placements.Add(tempPlace);
+
+
+	// Screw 3:
+	tempPlace.SetKeepout(0.469 - 0.010, 0.099 - 0.010, 0.020, 0.020);
+	run->placements.Add(tempPlace);
 
 	wxLogMessage(wxString::Format(_T("%u Targets after keepout placement."),
 			run->placements.GetCount()));
@@ -574,8 +584,9 @@ void Project::GenerateTargets(void)
 	double gridsx = obj->bbox.xmax + 4 * slotWidth;
 	double gridsy = obj->bbox.ymax + 4 * slotWidth;
 
-	if(n > 2) n = 2; // TODO: Remove this line!
-	for(i = n; i <= n; i++){
+
+	//if(n > 2) n = 2; // TODO: Remove this line!
+	for(i = 4; i < 9; i++){
 		//for(i = 0; i <= 2; i++){
 
 
@@ -607,7 +618,13 @@ void Project::GenerateTargets(void)
 		if(true) //TODO: Remove this line
 		{
 			temp2 = temp;
-			temp2.FoldRaise(discSlot);
+
+			if(i == 0){
+				temp2.FoldRaise(discSlot2);
+			}else{
+				temp2.FoldRaise(discSlot);
+			}
+
 			temp.outLine = temp2.GenerateConvexOutline();
 
 			if(temp.outLine.elements.GetCount() >= 2){
@@ -680,7 +697,7 @@ void Project::GenerateTargets(void)
 	obj->matrix = oldPos;
 
 	displayGeometry = false;
-	displayStock = false;
+	displayStock = true;
 	displayTargets = true;
 	if(false){
 		GenerateToolPath();

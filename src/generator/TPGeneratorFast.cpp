@@ -34,8 +34,8 @@
 TPGeneratorFast::TPGeneratorFast()
 {
 	freeHeightAboveMaterial = 0.002;
-	maxSingleStep = 0.030;
-	raiseStep = 0.003;
+	maxSingleStep = 0.020;
+	raiseStep = 0.005;
 	dropStep = 0.008;
 
 	toolDiameter = 0.0061;
@@ -119,8 +119,8 @@ ToolPath TPGeneratorFast::GenerateSpiral(double x, double y, double radius)
 	for(n = 1; n <= Nt; n++){
 		r = radius / (double) Nt * (double) n;
 		mp.radiusR = r;
-		mp.axisX = x + r * cos(2*M_PI / (double) Npt * (double) n);
-		mp.axisY = y + r * sin(2*M_PI / (double) Npt * (double) n);
+		mp.axisX = x + r * cos(2 * M_PI / (double) Npt * (double) n);
+		mp.axisY = y + r * sin(2 * M_PI / (double) Npt * (double) n);
 		temp.positions.Add(mp);
 	}
 	return temp;
@@ -153,17 +153,8 @@ ToolPath TPGeneratorFast::MoveSavely(Target &target, double sx, double sy,
 {
 	ToolPath tp;
 	MachinePosition mp;
-	mp.axisX = sx;
-	mp.axisY = sy;
-	mp.axisZ = sz + 0.001;
-	mp.isCutting = false;
-	tp.positions.Add(mp);
 
 	bool hasToDrop = false;
-
-	double dx = x - sx;
-	double dy = y - sy;
-	double dz = z - sz;
 
 	size_t i;
 	double px, py;
@@ -173,31 +164,54 @@ ToolPath TPGeneratorFast::MoveSavely(Target &target, double sx, double sy,
 	double ry = target.GetSizeRY();
 	double r = (rx + ry) / 2;
 
+	mp.axisX = sx;
+	mp.axisY = sy;
+	mp.axisZ = sz;
+	mp.isCutting = false;
+
+	double dx = x - sx;
+	double dy = y - sy;
+	double dz = z - sz;
+
 	double d = sqrt(dx * dx + dy * dy);
+	double dt;
 
-	if(d > 3 * r){
+	if(dz >= 0){
+		mp.axisZ = z + 0.001;
+		tp.positions.Add(mp);
+	}
 
-		size_t n = round(d / (rx + ry) * 2);
+	size_t n = round(d / r);
 
-		for(i = 0; i < n; i++){
-			px = sx + dx / (double) n * (double) i;
-			py = sy + dy / (double) n * (double) i;
-			hz = target.GetLevel(px, py);
-			if(hz > mp.axisZ){
-				mp.axisZ = target.GetSizeZ() + freeHeightAboveMaterial;
-				tp.positions.Add(mp);
-				hasToDrop = true;
-			}
+	for(i = 1; i < n; i++){
+
+		px = sx + dx / (double) n * (double) i;
+		py = sy + dy / (double) n * (double) i;
+		hz = target.GetLevel(px, py);
+
+		dt = d * (1 - (double) i / (double) n);
+
+		if(hz > mp.axisZ && !mp.isCutting){
+			mp.axisX = sx + dx / (double) (n - 1) * (double) i;
+			mp.axisY = sy + dy / (double) (n - 1) * (double) i;
+			mp.axisZ = target.GetSizeZ() + freeHeightAboveMaterial;
+			tp.positions.Add(mp);
+			hasToDrop = true;
+		}
+
+		if(dt <= toolDiameter / 2 && !mp.isCutting && !hasToDrop){
+			mp.axisX = sx + dx / (double) (n - 1) * (double) i;
+			mp.axisY = sy + dy / (double) (n - 1) * (double) i;
+			tp.positions.Add(mp);
 			mp.axisX = px;
 			mp.axisY = py;
-			if(!hasToDrop) mp.axisZ = sz + dz / (double) n * (double) i + 0.001;
+			mp.isCutting = true;
 			tp.positions.Add(mp);
 		}
 	}
 	mp.axisX = x;
 	mp.axisY = y;
 	if(!hasToDrop) mp.axisZ = z;
-
 	tp.positions.Add(mp);
 
 	if(hasToDrop){
@@ -315,7 +329,7 @@ void TPGeneratorFast::GenerateToolpath(Target &target, Tool &tool)
 				mp.axisZ = level;
 				tp.positions.Add(mp);
 			}
-
+			//if(poly.elements.GetCount() > 3){
 			for(i = 0; i < poly.elements.GetCount(); i++){
 
 				temptop.FoldLowerDistance(
@@ -332,6 +346,7 @@ void TPGeneratorFast::GenerateToolpath(Target &target, Tool &tool)
 				mp.axisZ = poly.elements[i].z;
 				mp.isCutting = true;
 				tp.positions.Add(mp);
+				//}
 			}
 		}
 
@@ -375,7 +390,17 @@ void TPGeneratorFast::GenerateToolpath(Target &target, Tool &tool)
 	//
 	//	tp += temptp;
 
+
+	// Move out of material
+	mp.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
+	mp.isCutting = false;
+	tp.positions.Add(mp);
+
+
 	//target = temptop;
+
+	//tp.CleanPath(0.0003);
+
 	target.toolpath = tp;
 	target.refresh = true;
 	return;

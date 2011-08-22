@@ -46,7 +46,6 @@
 
 #include "../controller/Control3D.h"
 
-
 #include <wx/config.h>
 #include <wx/log.h>
 
@@ -83,10 +82,6 @@ private:
 
 	wxFileName lastObjectFileName;
 
-
-
-
-
 	ArrayOfProject project;
 	size_t selectedTargetPosition;
 
@@ -105,7 +100,7 @@ private:
 public:
 	void SetupTree(void);
 	void LoadProject(wxString fileName);
-
+	void SetStatus(void);
 private:
 
 	void OnTimer(wxTimerEvent& event);
@@ -120,7 +115,7 @@ private:
 
 	void OnLoadObject(wxCommandEvent& event);
 	void OnModifyObject(wxCommandEvent& event);
-	void OnGenerateTargets( wxCommandEvent& event );
+	void OnGenerateTargets(wxCommandEvent& event);
 
 	void OnLoadMachine(wxCommandEvent& event);
 	void OnReloadMachine(wxCommandEvent& event);
@@ -131,9 +126,12 @@ private:
 
 	void OnEditStock(wxCommandEvent& event);
 
-	void OnGenerateToolpath( wxCommandEvent& event );
-	void OnFlipRun( wxCommandEvent& event );
-	void OnPrepareMachinebed( wxCommandEvent& event );
+	void OnGenerateToolpath(wxCommandEvent& event);
+	void OnRecollectToolpath(wxCommandEvent& event);
+	void OnCleanToolpath(wxCommandEvent&);
+
+	void OnFlipRun(wxCommandEvent& event);
+	void OnPrepareMachinebed(wxCommandEvent& event);
 
 	void OnLoadGCodes(wxCommandEvent& event);
 	void OnSaveGCodes(wxCommandEvent& event);

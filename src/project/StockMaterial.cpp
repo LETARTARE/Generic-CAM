@@ -36,9 +36,12 @@ WX_DEFINE_OBJARRAY(ArrayOfStockMaterial)
 StockMaterial::StockMaterial()
 {
 	materialName = _T("Default");
-	x = 0.648;
-	y = 0.390;
-	z = 0.020;
+	x = 0.626-0.063;
+	y = 0.435-0.008 - 0.020;
+	z = 0.0145;
+
+	matrix.TranslateGlobal(0.063,0.008,0.0);
+
 	maxSpeed = 10000;
 	maxFeedrate = 0.05;
 	thermalConductivity = 100;
@@ -58,7 +61,7 @@ void StockMaterial::Paint(void)
 
 	::glBegin(GL_QUADS);
 
-	::glColor4f(color.x, color.y, color.z, 0.1);
+	::glColor4f(color.x, color.y, color.z, 0.4);
 
 	::glNormal3f(1, 0, 0);
 	::glVertex3f(x, y, z);

@@ -34,6 +34,7 @@ WX_DEFINE_OBJARRAY(ArrayOfToolPath)
 
 #include <wx/log.h>
 #include <GL/gl.h>
+#include <float.h>
 
 ToolPath::ToolPath()
 {
@@ -98,7 +99,6 @@ void ToolPath::ApplyTransformation(const AffineTransformMatrix &matrix)
 		positions[i].axisX = temp.x;
 		positions[i].axisY = temp.y;
 		positions[i].axisZ = temp.z;
-
 	}
 }
 
@@ -125,10 +125,75 @@ void ToolPath::Paint(void)
 	::glPopMatrix();
 }
 
+void ToolPath::CalculateMinMaxValues(void)
+{
+	size_t i;
+
+	minPosition.axisX = +FLT_MAX;
+	minPosition.axisY = +FLT_MAX;
+	minPosition.axisZ = +FLT_MAX;
+	minPosition.axisU = +FLT_MAX;
+	minPosition.axisV = +FLT_MAX;
+	minPosition.axisW = +FLT_MAX;
+	minPosition.axisA = +FLT_MAX;
+	minPosition.axisB = +FLT_MAX;
+	minPosition.axisC = +FLT_MAX;
+
+	maxPosition.axisX = -FLT_MAX;
+	maxPosition.axisY = -FLT_MAX;
+	maxPosition.axisZ = -FLT_MAX;
+	maxPosition.axisU = -FLT_MAX;
+	maxPosition.axisV = -FLT_MAX;
+	maxPosition.axisW = -FLT_MAX;
+	maxPosition.axisA = -FLT_MAX;
+	maxPosition.axisB = -FLT_MAX;
+	maxPosition.axisC = -FLT_MAX;
+
+	for(i = 0; i < positions.GetCount(); i++){
+		if(positions[i].axisX > maxPosition.axisX) maxPosition.axisX
+				= positions[i].axisX;
+		if(positions[i].axisY > maxPosition.axisY) maxPosition.axisY
+				= positions[i].axisY;
+		if(positions[i].axisZ > maxPosition.axisZ) maxPosition.axisZ
+				= positions[i].axisZ;
+		if(positions[i].axisU > maxPosition.axisU) maxPosition.axisU
+				= positions[i].axisU;
+		if(positions[i].axisV > maxPosition.axisV) maxPosition.axisV
+				= positions[i].axisV;
+		if(positions[i].axisW > maxPosition.axisW) maxPosition.axisW
+				= positions[i].axisW;
+		if(positions[i].axisA > maxPosition.axisA) maxPosition.axisA
+				= positions[i].axisA;
+		if(positions[i].axisB > maxPosition.axisB) maxPosition.axisB
+				= positions[i].axisB;
+		if(positions[i].axisC > maxPosition.axisC) maxPosition.axisC
+				= positions[i].axisC;
+
+		if(positions[i].axisX < minPosition.axisX) minPosition.axisX
+				= positions[i].axisX;
+		if(positions[i].axisY < minPosition.axisY) minPosition.axisY
+				= positions[i].axisY;
+		if(positions[i].axisZ < minPosition.axisZ) minPosition.axisZ
+				= positions[i].axisZ;
+		if(positions[i].axisU < minPosition.axisU) minPosition.axisU
+				= positions[i].axisU;
+		if(positions[i].axisV < minPosition.axisV) minPosition.axisV
+				= positions[i].axisV;
+		if(positions[i].axisW < minPosition.axisW) minPosition.axisW
+				= positions[i].axisW;
+		if(positions[i].axisA < minPosition.axisA) minPosition.axisA
+				= positions[i].axisA;
+		if(positions[i].axisB < minPosition.axisB) minPosition.axisB
+				= positions[i].axisB;
+		if(positions[i].axisC < minPosition.axisC) minPosition.axisC
+				= positions[i].axisC;
+	}
+}
+
 void ToolPath::CleanPath(double tolerance)
 {
 	ArrayOfMachinePosition temp;
-	size_t i, j, k;
+	size_t i, j;
 	if(positions.GetCount() < 2) return;
 
 	bool isOnLine;
@@ -212,7 +277,7 @@ void ToolPath::WriteToFile(wxTextFile &f)
 {
 	if(positions.GetCount() < 2) return;
 
-	CleanPath();
+	CleanPath(0.0003);
 
 	setlocale(LC_ALL, "C"); // To get a 3.1415 instead 3,1415 or else on every computer.
 
@@ -247,11 +312,12 @@ void ToolPath::WriteToFile(wxTextFile &f)
 
 	size_t i;
 
+
 	// First two position are the "anti-messup".
 	for(i = 2; i < positions.GetCount(); i++){
-		positions[i].axisX -= 0.000;
-		positions[i].axisY -= 0.000;
-		positions[i].axisZ -= 0.020;
+		positions[i].axisX -= 0.054;
+		positions[i].axisY -= 0.008;
+		positions[i].axisZ -= 0.0;
 	}
 
 	f.AddLine(positions[0].GenerateCommandXYZ(), fileType);
@@ -259,9 +325,9 @@ void ToolPath::WriteToFile(wxTextFile &f)
 		f.AddLine(positions[i].GenerateCommandDiff(positions[i - 1]), fileType);
 
 	for(i = 2; i < positions.GetCount(); i++){
-		positions[i].axisX += 0.000;
-		positions[i].axisY += 0.000;
-		positions[i].axisZ += 0.020;
+		positions[i].axisX += 0.054;
+		positions[i].axisY += 0.008;
+		positions[i].axisZ += 0.000;
 	}
 
 	f.AddLine(_T("M5 (Stop spindel)"), fileType);

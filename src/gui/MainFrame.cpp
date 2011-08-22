@@ -108,8 +108,8 @@ void MainFrame::OnLoadProject(wxCommandEvent& event)
 {
 	wxFileName fileName;
 	wxFileDialog dialog(this, _("Open Project..."), _T(""), _T(""), _(
-			"Generic CAM Project (*.prj)|*.prj|All Files|*.*"), wxFD_OPEN
-			| wxFD_FILE_MUST_EXIST);
+			"Generic CAM Project (*.prj; *.xml)|*.prj;*.xml|All Files|*.*"),
+			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if(lastObjectFileName.IsOk()) dialog.SetFilename(
 			lastObjectFileName.GetFullPath());
@@ -140,8 +140,8 @@ void MainFrame::OnSaveProject(wxCommandEvent& event)
 
 	wxFileName fileName;
 	wxFileDialog dialog(this, _("Save Project..."), _T(""), _T(""), _(
-			"Generic CAM Project (*.prj)|*.prj|All Files|*.*"), wxFD_SAVE
-			| wxFD_OVERWRITE_PROMPT);
+			"Generic CAM Project (*.prj; *.xml)|*.prj;*.xml|All Files|*.*"),
+			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 	if(dialog.ShowModal() == wxID_OK){
 		fileName = dialog.GetPath();
 		project[activeProject].Save(fileName);
@@ -152,8 +152,8 @@ void MainFrame::OnSaveProjectAs(wxCommandEvent &event)
 {
 	wxFileName fileName;
 	wxFileDialog dialog(this, _("Save Project As..."), _T(""), _T(""), _(
-			"Generic CAM Project (*.prj)|*.prj|All Files|*.*"), wxFD_SAVE
-			| wxFD_OVERWRITE_PROMPT);
+			"Generic CAM Project (*.prj; *.xml)|*.prj;*.xml|All Files|*.*"),
+			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 	if(dialog.ShowModal() == wxID_OK){
 		fileName = dialog.GetPath();
 		project[activeProject].Save(fileName);
@@ -346,6 +346,18 @@ void MainFrame::OnGenerateToolpath(wxCommandEvent& event)
 	project[activeProject].GenerateToolPath();
 	this->Refresh();
 }
+void MainFrame::OnRecollectToolpath(wxCommandEvent& event)
+{
+	project[activeProject].CollectToolPath();
+	this->Refresh();
+}
+
+void MainFrame::OnCleanToolpath(wxCommandEvent& event)
+{
+	//	project[activeProject].CleanToolPath();
+	this->Refresh();
+}
+
 void MainFrame::OnFlipRun(wxCommandEvent& event)
 {
 	project[activeProject].FlipRun();
@@ -367,7 +379,7 @@ void MainFrame::OnLoadGCodes(wxCommandEvent &event)
 					_T(""),
 					_T(""),
 					_(
-							"G-Code File (*.tap *.cnc *.nc *.ncd *.txt)|*.tap;*.cnc;*.nc;*.ncd;*.txt|Text files (*.txt)|*.txt|All files|*.*"),
+							"G-Code File (*.tap *.cnc *.nc *.ngc *.txt)|*.tap;*.cnc;*.nc;*.ngc;*.txt|Text files (*.txt)|*.txt|All files|*.*"),
 					wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 
@@ -385,7 +397,7 @@ void MainFrame::OnSaveGCodes(wxCommandEvent &event)
 					_T(""),
 					_T(""),
 					_(
-							"G-Code File (*.tap *.cnc *.nc *.ncd *.txt)|*.tap;*.cnc;*.nc;*.ncd;*.txt|Text files (*.txt)|*.txt|All files|*.*"),
+							"G-Code File (*.tap *.cnc *.nc *.ngc *.txt)|*.tap;*.cnc;*.nc;*.ngc;*.txt|Text files (*.txt)|*.txt|All files|*.*"),
 					wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 	if(dialog.ShowModal() == wxID_OK){
 
@@ -473,6 +485,25 @@ void MainFrame::OnKeyDown(wxKeyEvent& event)
 		if(k == WXK_LEFT) project[activeProject].runs[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
 				-0.001, 0.0, 0.0);
 
+		if(k == WXK_PAGEUP){
+			AffineTransformMatrix temp;
+			temp = AffineTransformMatrix::RotateXYZ(0.0, 0.0, M_PI / 16);
+			project[activeProject].runs[0].placements[selectedTargetPosition].matrix
+					= project[activeProject].runs[0].placements[selectedTargetPosition].matrix
+							* temp;
+		}
+		if(k == WXK_PAGEDOWN){
+			AffineTransformMatrix temp;
+			temp = AffineTransformMatrix::RotateXYZ(0.0, 0.0, -M_PI / 16);
+			project[activeProject].runs[0].placements[selectedTargetPosition].matrix
+					= project[activeProject].runs[0].placements[selectedTargetPosition].matrix
+							* temp;
+		}
+
+
+		m_statusBar->SetStatusText(_T("Dummy text..."));
+
+
 		this->Refresh();
 	}
 
@@ -491,6 +522,7 @@ void MainFrame::OnActivateRightClickMenu(wxTreeEvent& event)
 void MainFrame::OnSelectionChanged(wxTreeEvent& event)
 {
 }
+
 
 void MainFrame::SetupTree(void)
 {
