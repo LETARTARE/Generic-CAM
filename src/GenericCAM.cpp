@@ -29,33 +29,43 @@
 
 #include "GenericCAM.h"
 #include "icon/logo.xpm"
-
+#include "languages.h"
 // The line that starts it all.
 IMPLEMENT_APP(GenericCAMApp)
 
 GenericCAMApp::GenericCAMApp()
 {
-}
 
-bool GenericCAMApp::OnInit()
-{
-	if(!wxApp::OnInit()) return false;
+	config = new wxConfig(_T("GenericCAM"));
 
-	frame = new MainFrame(NULL);
+	unsigned int selectedLanguage = wxLocale::GetSystemLanguage();
+	if(selectedLanguage == wxLANGUAGE_UNKNOWN) selectedLanguage
+			= wxLANGUAGE_DEFAULT;
 
-	if(!loadOnStartup.IsEmpty()) {
-		frame->LoadProject(loadOnStartup);
 
+	// Read language from config.
+	wxString str;
+	if(config->Read(_T("Language"), &str)){
+		unsigned int i;
+		for(i = 0; i < WXSIZEOF(langNames); i++)
+			if(str.CmpNoCase(langNames[i]) == 0){
+				selectedLanguage = langIds[i];
+			}
 	}
 
-	wxIcon iconLogo(logo_xpm);
-	frame->SetIcon(iconLogo);
-	frame->Show(true);
-	SetTopWindow(frame);
+	//CHECK: Why does wxLOCALE_CONV_ENCODING not work?
+	if(!locale.Init(selectedLanguage, wxLOCALE_LOAD_DEFAULT)){
+		wxLogError(_T("This language is not supported by the system."));
+		return;
+	}
 
-	return true;
+	locale.AddCatalogLookupPathPrefix(_T("./i18n/"));
+	locale.AddCatalog(_T("GenericCAM"));
+	//m_locale.AddCatalog(_T("fileutils"));
+
 }
 
+// The Commandline is parsed before OnInit is called.
 void GenericCAMApp::OnInitCmdLine(wxCmdLineParser& parser)
 {
 	parser.AddParam(_("<filepath of document to open>"), wxCMD_LINE_VAL_STRING,
@@ -69,10 +79,29 @@ bool GenericCAMApp::OnCmdLineParsed(wxCmdLineParser& parser)
 	int count = parser.GetParamCount();
 	if(count == 1){
 		str = parser.GetParam(0);
-//		if(_DEBUGMODE) wxLogMessage(_T("cmd line param: ") + str);
+		//		if(_DEBUGMODE) wxLogMessage(_T("cmd line param: ") + str);
 		loadOnStartup = str;
 
 	}
+	return true;
+}
+
+bool GenericCAMApp::OnInit()
+{
+	if(!wxApp::OnInit()) return false;
+
+	frame = new MainFrame(NULL, &locale, config);
+
+	if(!loadOnStartup.IsEmpty()){
+		frame->LoadProject(loadOnStartup);
+
+	}
+
+	wxIcon iconLogo(logo_xpm);
+	frame->SetIcon(iconLogo);
+	frame->Show(true);
+	SetTopWindow(frame);
+
 	return true;
 }
 

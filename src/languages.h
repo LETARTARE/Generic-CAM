@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GenericCAM.h
-// Purpose            : Main entry point.
+// Name               : languages.h
+// Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 21.02.2010
-// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 11.12.2011
+// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,41 +22,32 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
+//$LastChangedDate: $
+//$Revision: $
+//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef GENERICCAM_H_
-#define GENERICCAM_H_
 
-#include "StdInclude.h"
-#include "Config.h"
-#include "gui/MainFrame.h"
-#include <wx/cmdline.h>
+#ifndef LANGUAGES_H_
+#define LANGUAGES_H_
+
+/*!\class languages
+ * \brief Definition of the languages provided in the i18n directory.
+ */
+
 #include <wx/string.h>
 #include <wx/intl.h>
-#include <wx/config.h>
 
-class GenericCAMApp:public wxApp {
-	// Constructor
-public:
-	GenericCAMApp(void);
+// language data
+static const wxLanguage langIds[] =
+	{wxLANGUAGE_DEFAULT, wxLANGUAGE_ENGLISH, wxLANGUAGE_FRENCH,
+			wxLANGUAGE_GERMAN};
 
-	// Member variables
-public:
-	MainFrame* frame;
-	wxString loadOnStartup;
+const wxString langNames[] =
+	{_T("System default"), _T("English"), _T("French"), _T("German")};
 
-protected:
-	wxLocale locale;
-	wxConfig* config;
-	// Methods
-public:
-	virtual bool OnInit();
-	virtual void OnInitCmdLine(wxCmdLineParser& parser);
-	virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
+// the arrays must be in sync
+wxCOMPILE_TIME_ASSERT( WXSIZEOF(langNames) == WXSIZEOF(langIds),
+		LangArraysMismatch );
 
-};
-DECLARE_APP(GenericCAMApp)
-#endif /* GENERICCAM_H_ */
+#endif /* LANGUAGES_H_ */

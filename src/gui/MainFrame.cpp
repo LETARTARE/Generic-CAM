@@ -33,12 +33,13 @@
 #include "Control6DOFDialog.h"
 #include "UnitDialog.h"
 #include "TargetDialog.h"
+#include "../languages.h"
 
 #include <wx/filename.h>
 #include <wx/textfile.h>
 #include <wx/msgdlg.h>
 
-MainFrame::MainFrame(wxWindow* parent) :
+MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	GUIMainFrame(parent)
 {
 
@@ -56,9 +57,17 @@ MainFrame::MainFrame(wxWindow* parent) :
 
 
 	// Setup configuration
-	config = new wxConfig(_T("GenericCAM"));
-	control.GetConfigFrom(config);
+	this->config = config;
+	this->locale = locale;
 
+
+	// Set the window size from config file
+	int w, h;
+	w = config->Read(_T("MainFrameWidth"), 600);
+	h = config->Read(_T("MainFrameHeight"), 400);
+	SetClientSize(w, h);
+
+	control.GetConfigFrom(config);
 	m_canvas->SetController(control);
 
 	m_menuView->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
@@ -92,6 +101,14 @@ MainFrame::MainFrame(wxWindow* parent) :
 MainFrame::~MainFrame()
 {
 	control.WriteConfigTo(config);
+
+
+	// Save the size of the mainframe
+	int w, h;
+	GetClientSize(&w, &h);
+	config->Write(_T("MainFrameWidth"), (long) w);
+	config->Write(_T("MainFrameHeight"), (long) h);
+
 	delete config; // config is written back to file (automagically)
 }
 
@@ -417,6 +434,16 @@ void MainFrame::OnSaveGCodes(wxCommandEvent &event)
 	}
 }
 
+void MainFrame::OnChangeLanguage(wxCommandEvent& event)
+{
+	long
+			lng =
+					wxGetSingleChoiceIndex(
+							_T("Please choose language:\nChanges will take place after restart!"),
+							_T("Language"), WXSIZEOF(langNames), langNames);
+	config->Write(_T("Language"), langNames[lng]);
+}
+
 void MainFrame::OnSetupController(wxCommandEvent& event)
 {
 	Control6DOFDialog temp(this);
@@ -500,9 +527,7 @@ void MainFrame::OnKeyDown(wxKeyEvent& event)
 							* temp;
 		}
 
-
 		m_statusBar->SetStatusText(_T("Dummy text..."));
-
 
 		this->Refresh();
 	}
@@ -522,7 +547,6 @@ void MainFrame::OnActivateRightClickMenu(wxTreeEvent& event)
 void MainFrame::OnSelectionChanged(wxTreeEvent& event)
 {
 }
-
 
 void MainFrame::SetupTree(void)
 {

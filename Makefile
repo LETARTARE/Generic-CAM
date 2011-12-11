@@ -59,6 +59,7 @@ SOURCES += src/controller/Control3D.cpp \
 SOURCES += src/generator/Imprinter.cpp \
 	src/generator/Polygon25.cpp \
 	src/generator/TPGeneratorTest.cpp \
+	src/generator/TPGeneratorFast.cpp \
 
 # GUI object files:
 SOURCES += src/gui/AboutDialog.cpp \

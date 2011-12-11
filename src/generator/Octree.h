@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GenericCAM.h
-// Purpose            : Main entry point.
+// Name               : Octree.h
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 21.02.2010
-// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 22.08.2011
+// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,41 +22,61 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
+//$LastChangedDate: $
+//$Revision: $
+//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef GENERICCAM_H_
-#define GENERICCAM_H_
 
-#include "StdInclude.h"
-#include "Config.h"
-#include "gui/MainFrame.h"
-#include <wx/cmdline.h>
-#include <wx/string.h>
-#include <wx/intl.h>
-#include <wx/config.h>
+#ifndef OCTREE_H_
+#define OCTREE_H_
 
-class GenericCAMApp:public wxApp {
-	// Constructor
+#include <wx/dynarray.h>
+
+/*!\class Octree
+ * \brief ...
+ *
+ * ...
+ */
+
+class OctreeElement {
+	// Constructor / Destructor
 public:
-	GenericCAMApp(void);
+	OctreeElement();
+	virtual ~OctreeElement();
+	// Member variables
+public:
+
+
+	// Methods
+public:
+};
+WX_DECLARE_OBJARRAY(OctreeElement, ArrayOfOctreeElement)
+;
+
+/*!\class Octree
+ * \brief ...
+ *
+ * ...
+ */
+
+class Octree {
+	// Constructor / Destructor
+public:
+	Octree();
+	virtual ~Octree();
 
 	// Member variables
 public:
-	MainFrame* frame;
-	wxString loadOnStartup;
 
-protected:
-	wxLocale locale;
-	wxConfig* config;
+private:
+	ArrayOfOctreeElement oe;
+
 	// Methods
 public:
-	virtual bool OnInit();
-	virtual void OnInitCmdLine(wxCmdLineParser& parser);
-	virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
 
+
+	void Paint(void);
 };
-DECLARE_APP(GenericCAMApp)
-#endif /* GENERICCAM_H_ */
+
+#endif /* OCTREE_H_ */

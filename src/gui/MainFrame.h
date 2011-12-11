@@ -71,12 +71,13 @@ public:
 class MainFrame:public GUIMainFrame {
 	// Constructor/ Destructor
 public:
-	MainFrame(wxWindow* parent);
+	MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config);
 	virtual ~MainFrame();
 
 	// Member variables
 private:
 	wxConfig *config;
+	wxLocale *locale;
 	Control3D control;
 	wxLogWindow* logWindow;
 
@@ -136,6 +137,7 @@ private:
 	void OnLoadGCodes(wxCommandEvent& event);
 	void OnSaveGCodes(wxCommandEvent& event);
 
+	void OnChangeLanguage(wxCommandEvent& event);
 	void OnSetupController(wxCommandEvent& event);
 	void OnChangeStereo3D(wxCommandEvent& event);
 	void OnSetupUnits(wxCommandEvent& event);

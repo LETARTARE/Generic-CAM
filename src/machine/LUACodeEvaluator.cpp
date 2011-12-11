@@ -362,6 +362,7 @@ int LUACodeEvaluator::setstyle_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
 	wxASSERT(CC==NULL);
+
 	if(lua_gettop(L) != 3){
 		lua_pushstring(L, "setstyle: parameter mismatch");
 		lua_error(L);

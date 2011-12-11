@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GenericCAM.h
-// Purpose            : Main entry point.
+// Name               : TPGenerator.h
+// Purpose            : Abstract class for toolpath generators
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 21.02.2010
-// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 22.08.2011
+// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,41 +22,35 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
+//$LastChangedDate: $
+//$Revision: $
+//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef GENERICCAM_H_
-#define GENERICCAM_H_
 
-#include "StdInclude.h"
-#include "Config.h"
-#include "gui/MainFrame.h"
-#include <wx/cmdline.h>
-#include <wx/string.h>
-#include <wx/intl.h>
-#include <wx/config.h>
+#ifndef TPGENERATOR_H_
+#define TPGENERATOR_H_
 
-class GenericCAMApp:public wxApp {
-	// Constructor
+/*!\class TPGenerator
+ * \brief ...
+ *
+ * ...
+ */
+
+class TPGenerator {
+	// Constructor/ Destructor
 public:
-	GenericCAMApp(void);
+	TPGenerator();
+	virtual ~TPGenerator();
 
-	// Member variables
+	//Member variables:
 public:
-	MainFrame* frame;
-	wxString loadOnStartup;
 
-protected:
-	wxLocale locale;
-	wxConfig* config;
-	// Methods
+
+	//Methods:
 public:
-	virtual bool OnInit();
-	virtual void OnInitCmdLine(wxCmdLineParser& parser);
-	virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
+	virtual void GenerateToolpath(void) = 0;
 
 };
-DECLARE_APP(GenericCAMApp)
-#endif /* GENERICCAM_H_ */
+
+#endif /* TPGENERATOR_H_ */

@@ -98,6 +98,7 @@ class GUIMainFrame : public wxFrame
 		virtual void OnPrepareMachinebed( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnLoadGCodes( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSaveGCodes( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnChangeLanguage( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSetupController( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnChangeStereo3D( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSetupUnits( wxCommandEvent& event ) { event.Skip(); }
@@ -111,7 +112,7 @@ class GUIMainFrame : public wxFrame
 	
 	public:
 		
-		GUIMainFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Generic CAM"), const wxPoint& pos = wxPoint( -1,300 ), const wxSize& size = wxSize( 674,483 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		GUIMainFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Generic CAM"), const wxPoint& pos = wxPoint( -1,-1 ), const wxSize& size = wxSize( -1,600 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		~GUIMainFrame();
 		void m_splitterOnIdle( wxIdleEvent& )
 		{
@@ -185,7 +186,7 @@ class GUIControl6DOFDialog : public wxDialog
 	
 	public:
 		
-		GUIControl6DOFDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup 6DOF Controller"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 354,527 ), long style = wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
+		GUIControl6DOFDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup 6DOF Controller"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,600 ), long style = wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
 		~GUIControl6DOFDialog();
 	
 };
@@ -286,7 +287,7 @@ class GUIToolboxFrame : public wxFrame
 	
 	public:
 		
-		GUIToolboxFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolbox"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 611,790 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIToolboxFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolbox"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 611,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		~GUIToolboxFrame();
 	
 };
@@ -330,7 +331,7 @@ class GUIStockFrame : public wxFrame
 	
 	public:
 		
-		GUIStockFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Stock"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 620,241 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		GUIStockFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Stock"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		~GUIStockFrame();
 	
 };
@@ -517,7 +518,7 @@ class GUITargetDialog : public wxDialog
 	
 	public:
 		
-		GUITargetDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Prepare Targets"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,500 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
+		GUITargetDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Prepare Targets"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
 		~GUITargetDialog();
 	
 };
@@ -553,7 +554,7 @@ class GUIAnimationFrame : public wxFrame
 	
 	public:
 		
-		GUIAnimationFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolpath Animation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 583,179 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		GUIAnimationFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolpath Animation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		~GUIAnimationFrame();
 	
 };

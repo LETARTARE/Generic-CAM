@@ -139,6 +139,13 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menubar->Append( m_menuToolpath, _("Tool&path") );
 	
 	m_menuSettings = new wxMenu();
+	wxMenuItem* m_menuItem51;
+	m_menuItem51 = new wxMenuItem( m_menuSettings, wxID_ANY, wxString( _("Change Language") ) , _("Change the programs language."), wxITEM_NORMAL );
+	m_menuSettings->Append( m_menuItem51 );
+	
+	wxMenuItem* m_separator71;
+	m_separator71 = m_menuSettings->AppendSeparator();
+	
 	wxMenuItem* m_menuItem21;
 	m_menuItem21 = new wxMenuItem( m_menuSettings, wxID_SETUPCONTROLLER, wxString( _("Setup 6DOF &controller") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuSettings->Append( m_menuItem21 );
@@ -250,6 +257,7 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	this->Connect( m_menuItem491->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnPrepareMachinebed ) );
 	this->Connect( m_menuItem16->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnLoadGCodes ) );
 	this->Connect( m_menuItem441->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSaveGCodes ) );
+	this->Connect( m_menuItem51->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnChangeLanguage ) );
 	this->Connect( m_menuItem21->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSetupController ) );
 	this->Connect( m_menuItem22->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnChangeStereo3D ) );
 	this->Connect( m_menuItem23->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSetupUnits ) );
@@ -285,6 +293,7 @@ GUIMainFrame::~GUIMainFrame()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnPrepareMachinebed ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnLoadGCodes ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSaveGCodes ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnChangeLanguage ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSetupController ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnChangeStereo3D ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSetupUnits ) );
@@ -324,7 +333,7 @@ GUIAboutDialog::~GUIAboutDialog()
 
 GUIControl6DOFDialog::GUIControl6DOFDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-	this->SetSizeHints( wxSize( -1,-1 ), wxSize( -1,-1 ) );
+	this->SetSizeHints( wxSize( 400,-1 ), wxSize( -1,-1 ) );
 	
 	wxBoxSizer* bSizer1;
 	bSizer1 = new wxBoxSizer( wxVERTICAL );
@@ -339,7 +348,7 @@ GUIControl6DOFDialog::GUIControl6DOFDialog( wxWindow* parent, wxWindowID id, con
 	wxString radioDeviceSelectChoices[] = { _("SpaceBall"), _("SpaceOrb"), _("SpaceMouse") };
 	int radioDeviceSelectNChoices = sizeof( radioDeviceSelectChoices ) / sizeof( wxString );
 	radioDeviceSelect = new wxRadioBox( this, wxID_ANY, _("Type of controller"), wxDefaultPosition, wxDefaultSize, radioDeviceSelectNChoices, radioDeviceSelectChoices, 1, wxRA_SPECIFY_COLS );
-	radioDeviceSelect->SetSelection( 0 );
+	radioDeviceSelect->SetSelection( 2 );
 	bSizer1->Add( radioDeviceSelect, 0, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizerTx;
@@ -571,7 +580,7 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	fgSizer1->SetFlexibleDirection( wxBOTH );
 	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText8 = new wxStaticText( this, wxID_ANY, _("Shaft diameter"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText8 = new wxStaticText( this, wxID_ANY, _("Shaft diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText8->Wrap( -1 );
 	fgSizer1->Add( m_staticText8, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -584,7 +593,7 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	m_staticTextUnitShaftDiameter->Wrap( -1 );
 	fgSizer1->Add( m_staticTextUnitShaftDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText10 = new wxStaticText( this, wxID_ANY, _("Shaft length"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText10 = new wxStaticText( this, wxID_ANY, _("Shaft length:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText10->Wrap( -1 );
 	fgSizer1->Add( m_staticText10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -597,7 +606,7 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	m_staticTextUnitShaftLength->Wrap( -1 );
 	fgSizer1->Add( m_staticTextUnitShaftLength, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText13 = new wxStaticText( this, wxID_ANY, _("Maximum speed"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText13 = new wxStaticText( this, wxID_ANY, _("Maximum speed:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText13->Wrap( -1 );
 	fgSizer1->Add( m_staticText13, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -610,7 +619,7 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	m_staticTextUnitMaxSpeed->Wrap( -1 );
 	fgSizer1->Add( m_staticTextUnitMaxSpeed, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText14 = new wxStaticText( this, wxID_ANY, _("Feed coefficient"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText14 = new wxStaticText( this, wxID_ANY, _("Feed coefficient:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText14->Wrap( -1 );
 	fgSizer1->Add( m_staticText14, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -623,7 +632,7 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	m_staticTextUnitFeedCoefficient->Wrap( -1 );
 	fgSizer1->Add( m_staticTextUnitFeedCoefficient, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText16 = new wxStaticText( this, wxID_ANY, _("Number of teeth"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText16 = new wxStaticText( this, wxID_ANY, _("Number of teeth:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText16->Wrap( -1 );
 	fgSizer1->Add( m_staticText16, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -715,7 +724,7 @@ GUIToolboxFrame::GUIToolboxFrame( wxWindow* parent, wxWindowID id, const wxStrin
 	fgSizer2->Add( m_staticText22, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrlRadius = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrlRadius->SetToolTip( _("Radius of curvature:\r\nPositive radius = convex surface = bulged to the outside.\r\nNegative radius = concave surface = bulged to the inside.\r\nRadius of 0 = straight line. ") );
+	m_textCtrlRadius->SetToolTip( _("Radius of curvature:\nPositive radius = convex surface = bulged to the outside.\nNegative radius = concave surface = bulged to the inside.\nRadius of 0 = straight line. ") );
 	
 	fgSizer2->Add( m_textCtrlRadius, 0, wxALL|wxEXPAND, 5 );
 	
@@ -881,6 +890,7 @@ GUIStockFrame::GUIStockFrame( wxWindow* parent, wxWindowID id, const wxString& t
 	
 	this->SetSizer( bSizer20 );
 	this->Layout();
+	bSizer20->Fit( this );
 	
 	// Connect Events
 	this->Connect( m_menuItem34->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIStockFrame::OnClose ) );
@@ -1451,6 +1461,7 @@ GUITargetDialog::GUITargetDialog( wxWindow* parent, wxWindowID id, const wxStrin
 	
 	this->SetSizer( bSizer25 );
 	this->Layout();
+	bSizer25->Fit( this );
 	
 	// Connect Events
 	m_button28->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUITargetDialog::OnFromStock ), NULL, this );
@@ -1527,6 +1538,7 @@ GUIAnimationFrame::GUIAnimationFrame( wxWindow* parent, wxWindowID id, const wxS
 	
 	this->SetSizer( bSizer29 );
 	this->Layout();
+	bSizer29->Fit( this );
 	
 	// Connect Events
 	m_button31->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIAnimationFrame::OnLast ), NULL, this );

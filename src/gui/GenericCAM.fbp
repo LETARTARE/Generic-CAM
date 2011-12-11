@@ -19,7 +19,7 @@
         <property name="relative_path">1</property>
         <property name="use_enum">1</property>
         <property name="use_microsoft_bom">0</property>
-        <object class="Frame" expanded="1">
+        <object class="Frame" expanded="0">
             <property name="bg"></property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -32,8 +32,8 @@
             <property name="maximum_size"></property>
             <property name="minimum_size"></property>
             <property name="name">GUIMainFrame</property>
-            <property name="pos">-1,300</property>
-            <property name="size">674,483</property>
+            <property name="pos">-1,-1</property>
+            <property name="size">-1,600</property>
             <property name="style">wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU</property>
             <property name="subclass"></property>
             <property name="title">Generic CAM</property>
@@ -529,6 +529,25 @@
                     <property name="label">S&amp;ettings</property>
                     <property name="name">m_menuSettings</property>
                     <property name="permission">protected</property>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help">Change the programs language.</property>
+                        <property name="id">wxID_ANY</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">Change Language</property>
+                        <property name="name">m_menuItem51</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">OnChangeLanguage</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="separator" expanded="1">
+                        <property name="name">m_separator71</property>
+                        <property name="permission">none</property>
+                    </object>
                     <object class="wxMenuItem" expanded="1">
                         <property name="bitmap"></property>
                         <property name="checked">0</property>
@@ -1254,10 +1273,10 @@
             <property name="hidden">0</property>
             <property name="id">wxID_ANY</property>
             <property name="maximum_size">-1,-1</property>
-            <property name="minimum_size">-1,-1</property>
+            <property name="minimum_size">400,-1</property>
             <property name="name">GUIControl6DOFDialog</property>
             <property name="pos"></property>
-            <property name="size">354,527</property>
+            <property name="size">-1,600</property>
             <property name="style">wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP</property>
             <property name="subclass"></property>
             <property name="title">Setup 6DOF Controller</property>
@@ -1438,7 +1457,7 @@
                         <property name="name">radioDeviceSelect</property>
                         <property name="permission">protected</property>
                         <property name="pos"></property>
-                        <property name="selection">0</property>
+                        <property name="selection">2</property>
                         <property name="size"></property>
                         <property name="style">wxRA_SPECIFY_COLS</property>
                         <property name="subclass"></property>
@@ -2770,7 +2789,7 @@
             <property name="minimum_size"></property>
             <property name="name">GUIToolboxFrame</property>
             <property name="pos"></property>
-            <property name="size">611,790</property>
+            <property name="size">611,-1</property>
             <property name="style">wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER</property>
             <property name="subclass"></property>
             <property name="title">Toolbox</property>
@@ -2950,7 +2969,7 @@
                     </object>
                 </object>
             </object>
-            <object class="wxBoxSizer" expanded="1">
+            <object class="wxBoxSizer" expanded="0">
                 <property name="minimum_size"></property>
                 <property name="name">bSizer13</property>
                 <property name="orient">wxVERTICAL</property>
@@ -3248,7 +3267,7 @@
                                                 <property name="font"></property>
                                                 <property name="hidden">0</property>
                                                 <property name="id">wxID_ANY</property>
-                                                <property name="label">Shaft diameter</property>
+                                                <property name="label">Shaft diameter:</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minimum_size"></property>
                                                 <property name="name">m_staticText8</property>
@@ -3417,7 +3436,7 @@
                                                 <property name="font"></property>
                                                 <property name="hidden">0</property>
                                                 <property name="id">wxID_ANY</property>
-                                                <property name="label">Shaft length</property>
+                                                <property name="label">Shaft length:</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minimum_size"></property>
                                                 <property name="name">m_staticText10</property>
@@ -3586,7 +3605,7 @@
                                                 <property name="font"></property>
                                                 <property name="hidden">0</property>
                                                 <property name="id">wxID_ANY</property>
-                                                <property name="label">Maximum speed</property>
+                                                <property name="label">Maximum speed:</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minimum_size"></property>
                                                 <property name="name">m_staticText13</property>
@@ -3755,7 +3774,7 @@
                                                 <property name="font"></property>
                                                 <property name="hidden">0</property>
                                                 <property name="id">wxID_ANY</property>
-                                                <property name="label">Feed coefficient</property>
+                                                <property name="label">Feed coefficient:</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minimum_size"></property>
                                                 <property name="name">m_staticText14</property>
@@ -3924,7 +3943,7 @@
                                                 <property name="font"></property>
                                                 <property name="hidden">0</property>
                                                 <property name="id">wxID_ANY</property>
-                                                <property name="label">Number of teeth</property>
+                                                <property name="label">Number of teeth:</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minimum_size"></property>
                                                 <property name="name">m_staticText16</property>
@@ -4950,7 +4969,7 @@
                                                                 <property name="size"></property>
                                                                 <property name="style"></property>
                                                                 <property name="subclass"></property>
-                                                                <property name="tooltip">Radius of curvature:&#x0D;&#x0A;Positive radius = convex surface = bulged to the outside.&#x0D;&#x0A;Negative radius = concave surface = bulged to the inside.&#x0D;&#x0A;Radius of 0 = straight line. </property>
+                                                                <property name="tooltip">Radius of curvature:&#x0A;Positive radius = convex surface = bulged to the outside.&#x0A;Negative radius = concave surface = bulged to the inside.&#x0A;Radius of 0 = straight line. </property>
                                                                 <property name="validator_data_type"></property>
                                                                 <property name="validator_style">wxFILTER_NONE</property>
                                                                 <property name="validator_type">wxDefaultValidator</property>
@@ -5365,7 +5384,7 @@
             <property name="minimum_size"></property>
             <property name="name">GUIStockFrame</property>
             <property name="pos"></property>
-            <property name="size">620,241</property>
+            <property name="size">-1,-1</property>
             <property name="style">wxDEFAULT_FRAME_STYLE</property>
             <property name="subclass"></property>
             <property name="title">Stock</property>
@@ -10396,7 +10415,7 @@
             <property name="minimum_size"></property>
             <property name="name">GUITargetDialog</property>
             <property name="pos"></property>
-            <property name="size">-1,500</property>
+            <property name="size">-1,-1</property>
             <property name="style">wxCAPTION|wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP</property>
             <property name="subclass"></property>
             <property name="title">Prepare Targets</property>
@@ -11889,8 +11908,8 @@
             <property name="minimum_size"></property>
             <property name="name">GUIAnimationFrame</property>
             <property name="pos"></property>
-            <property name="size">583,179</property>
-            <property name="style">wxDEFAULT_FRAME_STYLE</property>
+            <property name="size">-1,-1</property>
+            <property name="style">wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER</property>
             <property name="subclass"></property>
             <property name="title">Toolpath Animation</property>
             <property name="tooltip"></property>
