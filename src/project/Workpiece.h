@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : DataCanvas.h
-// Purpose            : 3D display of geometry.
+// Name               : Workpiece.h
+// Purpose            : The workpiece.
 // Thread Safe        : Yes
-// Platform dependent : Yes
-// Compiler Options   : -lopengl32 -lglu
+// Platform dependent : No
+// Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 17.03.2010
+// Created            : 29.03.2010
 // Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -22,30 +22,41 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
+//$LastChangedDate: 2011-07-20 23:54:54 +0200 (Mi, 20 Jul 2011) $
+//$Revision: 76 $
+//$LastChangedBy: tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef DATACANVAS_H_
-#define DATACANVAS_H_
+#ifndef WORKPIECE_H_
+#define WORKPIECE_H_
 
-#include "../3D/OpenGLCanvas.h"
-#include "../3D/Geometry.h"
+#include "../3D/Vector3.h"
+#include "../project/StockMaterial.h"
+#include "../generator/Imprinter.h"
 
-class DataCanvas:public OpenGLCanvas {
+class Workpiece:public Imprinter {
+	// Constructor / Destructor
 public:
-	DataCanvas(wxWindow *parent, wxWindowID id = wxID_ANY,
-			const wxPoint& pos = wxDefaultPosition, const wxSize& size =
-					wxDefaultSize, long style = 0, const wxString& name =
-					_T(""));
+	Workpiece(const double sizeX = 0.1, const double sizeY = 0.1,
+			const double sizeZ = 0.05, const double resolutionX = 0.001,
+			const double resolutionY = 0.001);
+	Workpiece(StockMaterial* material, const double resolution = 0.001);
 
-	Geometry *geometry;
+	virtual ~Workpiece();
 
-	void InsertData(Geometry* data);
-	virtual ~DataCanvas();
-	void Render();
+	// Member variables
+public:
+
+
+	// Methods
+public:
+
+	void Paint();
+
+	void SetupBox(const double sizeX, const double sizeY, const double sizeZ,
+			const double resolutionX = 0.001, const double resolutionY = 0.001);
+	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c);
 };
 
-#endif /* DATACANVAS_H_ */
+#endif /* WORKPIECE_H_ */

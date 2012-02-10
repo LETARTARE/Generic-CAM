@@ -114,11 +114,11 @@ bool ToolboxFrame::TransferDataToWindow(void)
 		wxSize sz = m_listCtrl->GetClientSize();
 		unsigned int w = sz.x / 14;
 		m_listCtrl->ClearAll();
-		m_listCtrl->InsertColumn(0, _T("Type"), wxLIST_FORMAT_LEFT, 2* w );
-		m_listCtrl->InsertColumn(1, _T("Diameter"), wxLIST_FORMAT_LEFT, 3* w );
-		m_listCtrl->InsertColumn(2, _T("height"), wxLIST_FORMAT_LEFT, 3* w );
-		m_listCtrl->InsertColumn(3, _T("Radius"), wxLIST_FORMAT_LEFT, 3* w );
-		m_listCtrl->InsertColumn(4, _T("Cutting"), wxLIST_FORMAT_LEFT, 3* w );
+		m_listCtrl->InsertColumn(0, _("Type"), wxLIST_FORMAT_LEFT, 2* w );
+		m_listCtrl->InsertColumn(1, _("Diameter"), wxLIST_FORMAT_LEFT, 3* w );
+		m_listCtrl->InsertColumn(2, _("Height"), wxLIST_FORMAT_LEFT, 3* w );
+		m_listCtrl->InsertColumn(3, _("Radius"), wxLIST_FORMAT_LEFT, 3* w );
+		m_listCtrl->InsertColumn(4, _("Cutting"), wxLIST_FORMAT_LEFT, 3* w );
 
 		for(j = 0; j < temp->elements.GetCount(); j++){
 
@@ -151,9 +151,9 @@ bool ToolboxFrame::TransferDataToWindow(void)
 					temp->elements[j].r));
 
 			if(temp->elements[j].cutting){
-				m_listCtrl->SetItem(j, 4, _T("yes"));
+				m_listCtrl->SetItem(j, 4, _("Yes"));
 			}else{
-				m_listCtrl->SetItem(j, 4, _T("no"));
+				m_listCtrl->SetItem(j, 4, _("No"));
 			}
 
 			m_listCtrl->SetItemState(j, 0, wxLIST_STATE_SELECTED);

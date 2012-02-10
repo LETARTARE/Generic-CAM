@@ -65,7 +65,6 @@ SOURCES += src/generator/Imprinter.cpp \
 SOURCES += src/gui/AboutDialog.cpp \
 	src/gui/AnimationFrame.cpp \
 	src/gui/Control6DOFDialog.cpp \
-	src/gui/DataCanvas.cpp \
 	src/gui/ErrorFrame.cpp \
 	src/gui/gui.cpp \
 	src/gui/MainCanvas.cpp \
@@ -96,11 +95,12 @@ SOURCES += src/project/Object.cpp \
 	src/project/TargetPlacement.cpp \
 	src/project/Toolbox.cpp \
 	src/project/Unit.cpp \
-	
+	src/project/ToolPath.cpp \
+	src/project/Workpiece.cpp \
+
 # simulator object files:
-SOURCES += src/simulator/MachineSimulator.cpp \
-	src/simulator/ToolPath.cpp \
-	src/simulator/Workpiece.cpp \
+# SOURCES += src/simulator/MachineSimulator.cpp \
+	
 	
 	
 

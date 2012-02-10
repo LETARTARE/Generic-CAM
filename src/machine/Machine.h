@@ -34,7 +34,7 @@
 #include "MachineComponent.h"
 #include "MachinePosition.h"
 #include "Tool.h"
-#include "../simulator/ToolPath.h"
+#include "../project/ToolPath.h"
 //#include "../simulator/Workpiece.h"
 #include <wx/string.h>
 #include <wx/xml/xml.h>

@@ -33,8 +33,9 @@ customHeadersFooters
 \paperfontsize 12
 \spacing single
 \use_hyperref true
-\pdf_title "GenericCAM"
+\pdf_title "Generic CAM - User manual"
 \pdf_author "Tobias Schäfer"
+\pdf_keywords "Manual, CNC, Milling, CAM"
 \pdf_bookmarks true
 \pdf_bookmarksnumbered false
 \pdf_bookmarksopen true
@@ -69,7 +70,7 @@ customHeadersFooters
 \tocdepth 3
 \paragraph_separation skip
 \defskip smallskip
-\quotes_language danish
+\quotes_language swedish
 \papercolumns 1
 \papersides 1
 \paperpagestyle fancy
@@ -88,6 +89,29 @@ Generic CAM - Users manual
 
 \begin_layout Author
 Tobias Schäfer
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+thispagestyle{empty}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace vfill
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -111,6 +135,22 @@ Tobias Schäfer
 
 \begin_layout Standard
 \begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+pagenumbering{arabic}
+\end_layout
+
 \end_inset
 
 
@@ -593,57 +633,205 @@ www.lua.org
  University of Rio de Janeiro in Brazil.
 \end_layout
 
+\begin_layout Standard
+The machine descriptions consist of two parts:
+\end_layout
+
+\begin_layout Enumerate
+Description of the components of the machine.
+\end_layout
+
+\begin_layout Enumerate
+The function 
+\series bold
+AssembleMachine()
+\series default
+ with instructions to where all the parts belong.
+\end_layout
+
+\begin_layout Standard
+To generate geometry the commands 
+\series bold
+box
+\series default
+, 
+\series bold
+cylinder
+\series default
+, 
+\series bold
+loadstl
+\series default
+ and 
+\series bold
+loaddxf
+\series default
+ are used.
+\end_layout
+
+\begin_layout Standard
+The very first geometry generated belongs to the base of the machine.
+ This geometry is fixed and does not move at all.
+\end_layout
+
+\begin_layout Standard
+The next command is 
+\series bold
+addcomponent
+\series default
+.
+ Geometry definitions following this command are added to the defined component.
+ An abitrary number of components can be defined.
+\end_layout
+
+\begin_layout Standard
+Special components are 
+\series bold
+tableorigin
+\series default
+ and 
+\series bold
+toolholder
+\series default
+ these commands have to be in the machine description exactly once.
+ They describe where the stock material and the tool is placed.
+ Table and tool may move freely.
+ In a 5-axis CNC mill for example the table rotates around two axis and
+ the tool moves in X, Y, and Z.
+\end_layout
+
 \begin_layout Subsection
 Commands
 \end_layout
 
-\begin_layout Description
-addcomponent Starts a new component in the machine description.
+\begin_layout Subsubsection
+addcomponent
 \end_layout
 
-\begin_layout Description
-identity Usage: identity();
+\begin_layout Standard
+Starts a new component in the machine description.
 \end_layout
 
-\begin_layout Description
+\begin_layout Subsubsection
+identity
+\end_layout
+
+\begin_layout Standard
+Usage: identity();
+\end_layout
+
+\begin_layout Subsubsection
 translate
 \end_layout
 
-\begin_layout Description
+\begin_layout Standard
+Usage: translate(tx, ty, tz);
+\end_layout
+
+\begin_layout Subsubsection
 rotate
 \end_layout
 
-\begin_layout Description
+\begin_layout Standard
+Usage: rotate(rx, ry, rz);
+\end_layout
+
+\begin_layout Standard
+Usage: rotate(rx, ry, rz, ox, oy, oz);
+\end_layout
+
+\begin_layout Subsubsection
 box
 \end_layout
 
-\begin_layout Description
+\begin_layout Standard
+Usage: box(h, w, d);
+\end_layout
+
+\begin_layout Subsubsection
 cylinder
 \end_layout
 
-\begin_layout Description
+\begin_layout Standard
+Usage: cylinder(...);
+\end_layout
+
+\begin_layout Subsubsection
 loadstl
 \end_layout
 
-\begin_layout Description
-loaddxf Not yet implemented!
+\begin_layout Standard
+Usage: loadstl('filename');
 \end_layout
 
-\begin_layout Description
+\begin_layout Subsubsection
+loaddxf
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Not yet implemented!
+\end_layout
+
+\begin_layout Standard
+Usage: loaddxf(
+\begin_inset Quotes sld
+\end_inset
+
+filename
+\begin_inset Quotes srd
+\end_inset
+
+);
+\end_layout
+
+\begin_layout Subsubsection
 setstyle
 \end_layout
 
-\begin_layout Description
+\begin_layout Standard
+Usage: setstyle(r, g, b);
+\end_layout
+
+\begin_layout Subsubsection
 toolholder
 \end_layout
 
-\begin_layout Description
+\begin_layout Standard
+Usage: toolholder();
+\end_layout
+
+\begin_layout Subsubsection
 tableorigin
 \end_layout
 
-\begin_layout Description
+\begin_layout Standard
+Usage: tableorigin();
+\end_layout
+
+\begin_layout Subsubsection
 \noindent
 placecomponent
+\end_layout
+
+\begin_layout Standard
+Usage: placecomponent(
+\begin_inset Quotes sld
+\end_inset
+
+componentname
+\begin_inset Quotes srd
+\end_inset
+
+);
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -651,12 +839,43 @@ Modelling machines with Blender
 \end_layout
 
 \begin_layout Standard
-Blender
-\begin_inset Foot
+The software blender is a free 3D modeller.
+ It is available from www.blender.org.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement h
+wide false
+sideways false
 status open
 
 \begin_layout Plain Layout
-www.blender.org
+\noindent
+\align center
+\begin_inset Graphics
+	filename pictures/robot_blender.png
+	lyxscale 25
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Modelling a Stäubli RX-90 robot with Blender
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset

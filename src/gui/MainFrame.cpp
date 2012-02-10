@@ -27,6 +27,7 @@
 //$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
+
 #include "MainFrame.h"
 
 #include "AboutDialog.h"
@@ -42,6 +43,12 @@
 MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	GUIMainFrame(parent)
 {
+
+
+	long style = tree->GetWindowStyle() ^ wxTR_NO_LINES;
+	tree->SetWindowStyle(style);
+
+
 
 
 	//	wxBoxSizer* bSizer1;
@@ -70,32 +77,26 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	control.GetConfigFrom(config);
 	m_canvas->SetController(control);
 
-	m_menuView->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
-
 	timer.SetOwner(this);
 	this->Connect(wxEVT_TIMER, wxTimerEventHandler(MainFrame::OnTimer), NULL,
 			this);
-
 	timer.Start(100);
 
 	m_canvas->Connect(wxID_ANY, wxEVT_KEY_DOWN,
 			wxKeyEventHandler(MainFrame::OnKeyDown), NULL, this);
 
-	selectedTargetPosition = 0;
-
 	Project *temp = new Project;
 	project.Add(temp);
 	activeProject = 0;
 
+	selectedTargetPosition = 0;
 
-	//	m_canvas->InsertGeometry(&(project[activeProject].geometry));
-	//	m_canvas->InsertMachine(&(project[activeProject].machine));
-	m_canvas->InsertProject(&(project[activeProject]));
+	TransferDataToWindow();
 
-	SetupTree();
-
-	stockFrame = new StockFrame(this);
-
+	stockFrame = NULL;
+	objectFrame = NULL;
+	toolboxFrame = NULL;
+	animationFrame = NULL;
 }
 
 MainFrame::~MainFrame()
@@ -109,7 +110,104 @@ MainFrame::~MainFrame()
 	config->Write(_T("MainFrameWidth"), (long) w);
 	config->Write(_T("MainFrameHeight"), (long) h);
 
-	delete config; // config is written back to file (automagically)
+	delete config; // config is written back (automagically)
+}
+
+bool MainFrame::TransferDataToWindow(void)
+{
+	if(activeProject < project.GetCount()){
+		m_canvas->InsertProject(&(project[activeProject]));
+	}else{
+		m_canvas->InsertProject(NULL);
+	}
+	SetupTree();
+
+	m_menuView->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
+
+	return true;
+}
+bool MainFrame::TransferDataFromWindow(void)
+{
+	m_canvas->stereoMode = m_menuView->IsChecked(wxID_VIEWSTEREO3D);
+
+	return true;
+}
+
+void MainFrame::SetupTree(void)
+{
+	tree->DeleteAllItems();
+
+	size_t i, j, k;
+	//TreeItemData* tid;
+
+	wxTreeItemId rootId = tree->AddRoot(_T("TreeRoot"));
+
+	wxTreeItemId treeIdProject;
+
+	wxTreeItemId treeIdObject;
+	wxTreeItemId treeIdGeometry;
+	wxTreeItemId treeIdStock;
+	wxTreeItemId treeIdMachine;
+	wxTreeItemId treeIdToolbox;
+	wxTreeItemId treeIdRun;
+	wxTreeItemId treeIdRun2;
+
+	wxTreeItemId treeIdToolpath;
+
+	for(i = 0; i < project.GetCount(); i++){
+		treeIdProject = tree->AppendItem(rootId, _("Project: ")
+				+ project[i].projectName);
+
+		for(j = 0; j < project[i].objects.GetCount(); j++){
+			treeIdObject = tree->AppendItem(treeIdProject, _("Object: ")
+					+ project[i].objects[j].fileName.GetName());
+			for(k = 0; k < project[i].objects[j].geometries.GetCount(); k++){
+				{
+					tree->AppendItem(treeIdObject,
+							project[i].objects[j].geometries[k].objectName);
+				}
+			}
+		}
+		treeIdStock = tree->AppendItem(treeIdProject, _("Stock material: ")
+				+ project[i].stock.fileName.GetName());
+		for(j = 0; j < project[i].stock.stockMaterials.GetCount(); j++){
+			tree->AppendItem(treeIdStock,
+					project[i].stock.stockMaterials[j].materialName);
+		}
+
+		treeIdMachine = tree->AppendItem(treeIdProject, _("Machine: ")
+				+ project[i].machine.fileName.GetName());
+
+		treeIdToolbox = tree->AppendItem(treeIdProject, _("Toolbox: ")
+				+ project[i].toolbox.fileName.GetName());
+		for(j = 0; j < project[i].toolbox.tools.GetCount(); j++){
+			tree->AppendItem(treeIdToolbox,
+					project[i].toolbox.tools[j].toolName);
+		}
+
+		treeIdRun = tree->AppendItem(treeIdProject, _("Run:"));
+		for(j = 0; j < project[i].runs.GetCount(); j++){
+			treeIdRun2
+					= tree->AppendItem(treeIdRun, project[i].runs[j].runName);
+
+			tree->AppendItem(treeIdRun2, _("Stock material"));
+			tree->AppendItem(treeIdRun2, _("Target"));
+			treeIdToolpath = tree->AppendItem(treeIdRun2, _("Toolpath"));
+		}
+
+	}
+
+
+	//	for(i = 0; i < doc->geometry.Count(); i++){
+	//		tid = new TreeItemData;
+	//		tid->nr = i;
+	//		tid->dataType = TreeItemData::geometry;
+	//		tree->AppendItem(treeIdGeometry, doc->geometry[i].objectName, -1, -1,
+	//				tid);
+	//	}
+
+
+	tree->ExpandAll();
 }
 
 void MainFrame::OnCreateProject(wxCommandEvent& event)
@@ -216,7 +314,7 @@ void MainFrame::OnLoadObject(wxCommandEvent& event)
 
 void MainFrame::OnModifyObject(wxCommandEvent& event)
 {
-	objectFrame = new ObjectFrame(this);
+	if(objectFrame == NULL) objectFrame = new ObjectFrame(this);
 	objectFrame->InsertProject(&(project[activeProject]));
 	objectFrame->Show(true);
 }
@@ -283,7 +381,7 @@ void MainFrame::OnReloadMachine(wxCommandEvent& event)
 
 void MainFrame::OnEditToolbox(wxCommandEvent& event)
 {
-	toolboxFrame = new ToolboxFrame(this);
+	if(toolboxFrame == NULL) toolboxFrame = new ToolboxFrame(this);
 
 	toolboxFrame->SetController(control);
 	toolboxFrame->InsertProject(&(project[activeProject]));
@@ -355,6 +453,7 @@ void MainFrame::OnSaveToolbox(wxCommandEvent &event)
 
 void MainFrame::OnEditStock(wxCommandEvent& event)
 {
+	if(stockFrame == NULL) stockFrame = new StockFrame(this);
 	stockFrame->InsertProject(&(project[activeProject]));
 	stockFrame->Show(true);
 }
@@ -470,7 +569,7 @@ void MainFrame::OnSetupUnits(wxCommandEvent& event)
 
 void MainFrame::OnShowAnimationControl(wxCommandEvent& event)
 {
-	animationFrame = new AnimationFrame(this);
+	if(animationFrame == NULL) animationFrame = new AnimationFrame(this);
 	animationFrame->InsertProject(&(project[activeProject]));
 	animationFrame->Show(true);
 }
@@ -548,80 +647,8 @@ void MainFrame::OnSelectionChanged(wxTreeEvent& event)
 {
 }
 
-void MainFrame::SetupTree(void)
+void MainFrame::OnUpdateVisibility(wxCommandEvent& event)
 {
-	tree->DeleteAllItems();
-
-	size_t i, j, k;
-	//TreeItemData* tid;
-
-	wxTreeItemId rootId = tree->AddRoot(_T("TreeRoot"));
-
-	wxTreeItemId treeIdProject;
-
-	wxTreeItemId treeIdObject;
-	wxTreeItemId treeIdGeometry;
-	wxTreeItemId treeIdStock;
-	wxTreeItemId treeIdMachine;
-	wxTreeItemId treeIdToolbox;
-	wxTreeItemId treeIdRun;
-	wxTreeItemId treeIdRun2;
-
-	wxTreeItemId treeIdToolpath;
-
-	for(i = 0; i < project.GetCount(); i++){
-		treeIdProject = tree->AppendItem(rootId, _("Project: ")
-				+ project[i].projectName);
-
-		for(j = 0; j < project[i].objects.GetCount(); j++){
-			treeIdObject = tree->AppendItem(treeIdProject, _("Object: ")
-					+ project[i].objects[j].fileName.GetName());
-			for(k = 0; k < project[i].objects[j].geometries.GetCount(); k++){
-				{
-					tree->AppendItem(treeIdObject,
-							project[i].objects[j].geometries[k].objectName);
-				}
-			}
-		}
-		treeIdStock = tree->AppendItem(treeIdProject, _("Stock material: ")
-				+ project[i].stock.fileName.GetName());
-		for(j = 0; j < project[i].stock.stockMaterials.GetCount(); j++){
-			tree->AppendItem(treeIdStock,
-					project[i].stock.stockMaterials[j].materialName);
-		}
-
-		treeIdMachine = tree->AppendItem(treeIdProject, _("Machine: ")
-				+ project[i].machine.fileName.GetName());
-
-		treeIdToolbox = tree->AppendItem(treeIdProject, _("Toolbox: ")
-				+ project[i].toolbox.fileName.GetName());
-		for(j = 0; j < project[i].toolbox.tools.GetCount(); j++){
-			tree->AppendItem(treeIdToolbox,
-					project[i].toolbox.tools[j].toolName);
-		}
-
-		treeIdRun = tree->AppendItem(treeIdProject, _("Run:"));
-		for(j = 0; j < project[i].runs.GetCount(); j++){
-			treeIdRun2
-					= tree->AppendItem(treeIdRun, project[i].runs[j].runName);
-
-			tree->AppendItem(treeIdRun2, _("Stock material"));
-			tree->AppendItem(treeIdRun2, _("Target"));
-			treeIdToolpath = tree->AppendItem(treeIdRun2, _("Toolpath"));
-		}
-
-	}
-
-
-	//	for(i = 0; i < doc->geometry.Count(); i++){
-	//		tid = new TreeItemData;
-	//		tid->nr = i;
-	//		tid->dataType = TreeItemData::geometry;
-	//		tree->AppendItem(treeIdGeometry, doc->geometry[i].objectName, -1, -1,
-	//				tid);
-	//	}
-
-
-	tree->ExpandAll();
+	event.Skip();
 }
 

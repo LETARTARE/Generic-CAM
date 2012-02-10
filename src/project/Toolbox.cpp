@@ -71,8 +71,8 @@ Toolbox::Toolbox()
 	e->cutting = true;
 	temp->elements.Add(e);
 
-	temp->toolName = _T("Standard cutter");
-	temp->comment = _T("all purpose cylindrical");
+	temp->toolName = _("Standard cutter");
+	temp->comment = _("all purpose cylindrical");
 	temp->shaftDiameter = 0.006;
 	temp->shaftLength = 0.01;
 	temp->maxSpeed = 166.67;

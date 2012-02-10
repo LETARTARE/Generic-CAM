@@ -28,7 +28,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "GenericCAM.h"
+
+#ifndef __WIN32__
 #include "icon/logo.xpm"
+#endif
+
 #include "languages.h"
 // The line that starts it all.
 IMPLEMENT_APP(GenericCAMApp)
@@ -59,10 +63,17 @@ GenericCAMApp::GenericCAMApp()
 		return;
 	}
 
-	locale.AddCatalogLookupPathPrefix(_T("./i18n/"));
-	locale.AddCatalog(_T("GenericCAM"));
-	//m_locale.AddCatalog(_T("fileutils"));
+	//	wxLogMessage(wxString::Format(_T("id language : %u " ), selectedLanguage));
+	//	wxLogMessage(wxString::Format(_T("id language : %u " ),
+	//			locale.GetLanguage()));
+	//	wxLogMessage(_T("name language :") + locale.GetCanonicalName());
 
+	locale.AddCatalogLookupPathPrefix(_T("i18n"));
+	bool catalogLoaded = locale.AddCatalog(_T("GenericCAM"));
+	if(!catalogLoaded){
+		wxLogError(_T("The translation catalog for ")
+				+ locale.GetCanonicalName() + _T(" was not loaded !"));
+	}
 }
 
 // The Commandline is parsed before OnInit is called.
@@ -97,8 +108,12 @@ bool GenericCAMApp::OnInit()
 
 	}
 
+
+	//TODO: Check, why the icon is not working under Windows / Code::Blocks.
+#ifndef __WIN32__
 	wxIcon iconLogo(logo_xpm);
 	frame->SetIcon(iconLogo);
+#endif
 	frame->Show(true);
 	SetTopWindow(frame);
 

@@ -25,6 +25,7 @@
 #include "MainCanvas.h"
 #include <wx/splitter.h>
 #include <wx/statusbr.h>
+#include <wx/toolbar.h>
 #include <wx/frame.h>
 #include <wx/textctrl.h>
 #include <wx/button.h>
@@ -75,6 +76,7 @@ class GUIMainFrame : public wxFrame
 		wxPanel* m_panel2;
 		MainCanvas* m_canvas;
 		wxStatusBar* m_statusBar;
+		wxToolBar* m_toolBar1;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnCreateProject( wxCommandEvent& event ) { event.Skip(); }
@@ -102,17 +104,18 @@ class GUIMainFrame : public wxFrame
 		virtual void OnSetupController( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnChangeStereo3D( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSetupUnits( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnShowAnimationFrame( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnShowAnimationControl( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAbout( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnBeginLabelEdit( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnEndLabelEdit( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnActivateRightClickMenu( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnSelectionChanged( wxTreeEvent& event ) { event.Skip(); }
+		virtual void OnUpdateVisibility( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		GUIMainFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Generic CAM"), const wxPoint& pos = wxPoint( -1,-1 ), const wxSize& size = wxSize( -1,600 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		GUIMainFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Generic CAM"), const wxPoint& pos = wxPoint( -1,-1 ), const wxSize& size = wxSize( 639,600 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		~GUIMainFrame();
 		void m_splitterOnIdle( wxIdleEvent& )
 		{

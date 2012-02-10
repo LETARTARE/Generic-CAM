@@ -35,8 +35,8 @@
 #include "Toolbox.h"
 #include "../machine/Machine.h"
 #include "StockMaterial.h"
-#include "../simulator/Workpiece.h"
-#include "../simulator/ToolPath.h"
+#include "Workpiece.h"
+#include "ToolPath.h"
 #include "../generator/TPGeneratorFast.h"
 #include "../generator/TPGeneratorTest.h"
 

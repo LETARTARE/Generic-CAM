@@ -50,7 +50,7 @@ public:
 
 private:
 	enum StateType {
-		idle = 0, inSection, inBlock, inObject, inEntities
+		idle = 0, inSection, inBlock, inEntities
 	};
 	StateType state;
 

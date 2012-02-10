@@ -38,8 +38,8 @@ WX_DEFINE_OBJARRAY(ArrayOfMachinePosition)
 #include <float.h>
 #include <locale.h>
 
-MachinePosition::MachinePosition(double x, double y, double z, double a, double b,
-		double c, double u, double v, double w)
+MachinePosition::MachinePosition(double x, double y, double z, double a,
+		double b, double c, double u, double v, double w)
 {
 	axisX = x;
 	axisY = y;
@@ -101,11 +101,11 @@ bool MachinePosition::ParseGCodeLine(wxString lineOfText)
 
 	unsigned char state = 0;
 	unsigned char c;
-	unsigned char command;
+	unsigned char command = 'N';
 	double number;
 	double conversionFactor = 0.01 / 2.54; // 1 cm = 2.54 inch
 	double nCount = 0;
-	bool negativ;
+	bool negativ = false;
 	bool isCommand;
 	unsigned int i;
 	lineOfText.MakeUpper();

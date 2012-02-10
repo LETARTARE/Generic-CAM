@@ -34,8 +34,8 @@
 #include "Object.h"
 #include "Toolbox.h"
 #include "../machine/Machine.h"
-#include "../simulator/Workpiece.h"
-#include "../simulator/ToolPath.h"
+#include "Workpiece.h"
+#include "ToolPath.h"
 
 #include "Run.h"
 #include "Target.h"

@@ -22,9 +22,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
+//$LastChangedDate: 2011-08-22 22:20:17 +0200 (Mo, 22 Aug 2011) $
+//$Revision: 83 $
+//$LastChangedBy: tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
 
 

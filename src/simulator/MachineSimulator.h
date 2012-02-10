@@ -30,7 +30,7 @@
 #ifndef MACHINESIMULATOR_H_
 #define MACHINESIMULATOR_H_
 #include "../project/Toolbox.h"
-#include "ToolPath.h"
+#include "../project/ToolPath.h"
 #include "../machine/Machine.h"
 #include "../machine/MachinePosition.h"
 #include <wx/filename.h>

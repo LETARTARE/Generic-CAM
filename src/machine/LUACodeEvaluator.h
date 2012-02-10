@@ -28,6 +28,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
+//TODO: On LUA 5.2 there is no lua_open() function. It has been replaced by luaL_newstate().
+
+
 // The evaluation of the LUA code takes place in a
 // seperate thread. This way, if the program hangs
 // it can be killed by the main thread.

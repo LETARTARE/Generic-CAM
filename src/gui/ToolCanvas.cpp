@@ -49,7 +49,7 @@ void ToolCanvas::InsertTool(Tool& t)
 
 void ToolCanvas::RenderCoordinateSystem(void)
 {
-	glBegin(GL_LINES);
+	glBegin( GL_LINES);
 
 	glColor3b(255, 0, 0);
 	glNormal3f(-1, 0, 0);
@@ -76,8 +76,16 @@ void ToolCanvas::Render()
 {
 	float scaleFactor = 50.0;
 	RenderCoordinateSystem();
-	::glEnable(GL_RESCALE_NORMAL);
+#if defined (__WIN32__)
+	::glEnable(GL_NORMALIZE);
+#else
+	::glEnable( GL_RESCALE_NORMAL);
+#endif
 	::glScalef(scaleFactor, scaleFactor, scaleFactor);
 	if(tool != NULL) tool->Paint();
+#if defined (__WIN32__)
+	::glDisable(GL_NORMALIZE);
+#else
 	::glDisable(GL_RESCALE_NORMAL);
+#endif
 }

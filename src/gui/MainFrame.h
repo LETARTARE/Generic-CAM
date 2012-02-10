@@ -99,10 +99,14 @@ private:
 
 	// Methods
 public:
-	void SetupTree(void);
+
 	void LoadProject(wxString fileName);
-	void SetStatus(void);
+
+
 private:
+	bool TransferDataToWindow(void);
+	bool TransferDataFromWindow(void);
+	void SetupTree(void);
 
 	void OnTimer(wxTimerEvent& event);
 	void OnKeyDown(wxKeyEvent& event);
@@ -150,6 +154,8 @@ private:
 	void OnEndLabelEdit(wxTreeEvent& event);
 	void OnActivateRightClickMenu(wxTreeEvent& event);
 	void OnSelectionChanged(wxTreeEvent& event);
+
+	void OnUpdateVisibility(wxCommandEvent& event);
 
 };
 

@@ -76,7 +76,7 @@ bool FileGTS::ReadFile(wxString fileName)
 
 	geometry.Clear(); // Clear the old geometry and
 	geometry.Add(g); //insert the new one.
-	size_t nGeometry = geometry.Count() - 1;
+	size_t nGeometry = geometry.GetCount() - 1;
 	wxASSERT(nGeometry==0);
 
 	long nv;
@@ -139,7 +139,7 @@ bool FileGTS::ReadFile(wxString fileName)
 
 	unsigned long v1, v2, v3;
 
-	wxLogMessage(wxString::Format(_T("vectors.Count() = %lu"), vectors.Count()));
+	wxLogMessage(wxString::Format(_T("vectors.GetCount() = %lu"), vectors.GetCount()));
 
 	unsigned long u[6];
 	unsigned long t;

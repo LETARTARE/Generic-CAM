@@ -210,7 +210,7 @@ double Polygon25::DistanceToElement(const size_t elementInPolygon,
 	double r = (-vx * y + vy * x - px * vy + py * vx) / denom;
 	double s = ((-qx + px) * y + (qy - py) * x - px * qy + py * qx) / denom;
 
-	if(r < 0.0 || r > 1.0) return DBL_MAX;
+	if((r < 0.0) || (r > 1.0)) return DBL_MAX;
 	return s;
 }
 
@@ -222,7 +222,7 @@ double Polygon25::DistanceToPolygon(const Polygon25 &polygon, double vx,
 	double dmin = DBL_MAX;
 	double d;
 	size_t n = polygon.elements.GetCount();
-	if(!polygon.isClosed & n > 0) n--;
+	if(!polygon.isClosed && (n > 0)) n--;
 	for(i = 0; i < n; i++){
 		//		wxLogMessage(wxString::Format(_T("to element %u."),i));
 		for(j = 0; j < this->elements.GetCount(); j++){
@@ -258,7 +258,7 @@ void Polygon25::RotatePolygonStart(double x, double y)
 	}
 
 	// Shift by -nshift (so nshift becomes 0)
-//	nshift = n - nshift;
+	//	nshift = n - nshift;
 	size_t j;
 	ArrayOfVector3 temp;
 	for(i = 0; i < n; i++){

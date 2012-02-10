@@ -73,7 +73,7 @@ bool FileSTL::ReadFile(wxString fileName)
 
 	geometry.Clear(); // Clear the old geometry and
 	geometry.Add(g); //insert the new one.
-	size_t nGeometry = geometry.Count() - 1;
+	size_t nGeometry = geometry.GetCount() - 1;
 	wxASSERT(nGeometry==0);
 
 	if(temp.StartsWith(_T("solid"))){
@@ -81,7 +81,7 @@ bool FileSTL::ReadFile(wxString fileName)
 		file.Close();
 		wxTextFile tfile;
 		if(!tfile.Open(fileName)){
-			wxLogError(_T("STL: Can't open ") + fileName + _T(" as ascii!"));
+			wxLogError(_T("STL: Can't open ") + fileName + _T(" as ascii text file!"));
 			return false;
 		}
 		wxLogMessage(_T("STL text file found!"));

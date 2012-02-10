@@ -63,7 +63,6 @@ wxString Triangle::ToString(void) const
 void Triangle::FromString(wxString const &string)
 {
 	wxStringTokenizer tkz(string, wxT(";"));
-	double temp;
 	while(tkz.HasMoreTokens()){
 		wxString token = tkz.GetNextToken();
 		switch(tkz.CountTokens()){

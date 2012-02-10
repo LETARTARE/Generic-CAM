@@ -94,7 +94,18 @@ void Geometry::Paint(void) const
 {
 	if(!visible) return;
 	size_t i;
+
+
+	// GL_RESCALE_NORMAL is faster, but doesn't work on non-uniform scaled models
+	// GL_NORMALIZE is slower, but works always
+	// ... and there seems to be a problem under Windows with OpenGL 1.1...
+
+#if defined __WIN32__
+	::glEnable(GL_NORMALIZE);
+#else
 	::glEnable(GL_RESCALE_NORMAL);
+#endif
+
 	::glPushMatrix();
 	::glMultMatrixd(matrix.a);
 
@@ -105,7 +116,11 @@ void Geometry::Paint(void) const
 	}
 	::glEnd();
 	::glPopMatrix();
+#if defined (__WIN32__)
+	::glDisable(GL_NORMALIZE);
+#else
 	::glDisable(GL_RESCALE_NORMAL);
+#endif
 }
 
 void Geometry::AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c)
@@ -256,7 +271,6 @@ bool Geometry::FromXml(wxXmlNode* node)
 	if(node->GetName() != _T("geometry")) return false;
 	objectName = node->GetPropVal(_T("name"), _T(""));
 	wxXmlNode *temp = node->GetChildren();
-	long tempLong;
 
 	triangles.Empty();
 	Triangle* tri;
@@ -264,16 +278,16 @@ bool Geometry::FromXml(wxXmlNode* node)
 	while(temp != NULL){
 		if(temp->GetName() == _T("tri")){
 			tri = new Triangle(temp->GetNodeContent());
-//			if(triangles.GetCount() < 20) wxLogMessage(
-//					_T("Geometry::FromXml: Tri from >")
-//							+ temp->GetNodeContent() + _T("<."));
+			//			if(triangles.GetCount() < 20) wxLogMessage(
+			//					_T("Geometry::FromXml: Tri from >")
+			//							+ temp->GetNodeContent() + _T("<."));
 
 			triangles.Add(tri);
 		}
 		if(temp->GetName() == _T("matrix")){
 			matrix.FromString(temp->GetNodeContent());
-//			wxLogMessage(_T("Geometry::FromXml: Matrix from >")
-//					+ temp->GetNodeContent() + _T("<."));
+			//			wxLogMessage(_T("Geometry::FromXml: Matrix from >")
+			//					+ temp->GetNodeContent() + _T("<."));
 		}
 		temp = temp->GetNext();
 	}
