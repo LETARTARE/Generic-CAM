@@ -297,7 +297,7 @@ msgstr "Werkzeugsammlung"
 
 #: ../../src/./gui/gui.cpp:94
 msgid "&Organize Stock"
-msgstr "R&ohmaterial Verwalten"
+msgstr "R&ohmaterial verwalten"
 
 #: ../../src/./gui/gui.cpp:98
 #: ../../src/./gui/gui.cpp:807

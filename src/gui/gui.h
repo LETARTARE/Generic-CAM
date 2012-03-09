@@ -58,6 +58,8 @@ class GUIMainFrame : public wxFrame
 			wxID_SETUPCONTROLLER,
 			wxID_VIEWSTEREO3D,
 			wxID_SETUPUNITS,
+			wxID_DISPLAYMACHINE,
+			wxID_DISPLAYMATERIAL,
 		};
 		
 		wxMenuBar* m_menubar;

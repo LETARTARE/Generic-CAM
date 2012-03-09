@@ -44,11 +44,8 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	GUIMainFrame(parent)
 {
 
-
 	long style = tree->GetWindowStyle() ^ wxTR_NO_LINES;
 	tree->SetWindowStyle(style);
-
-
 
 
 	//	wxBoxSizer* bSizer1;
@@ -649,6 +646,13 @@ void MainFrame::OnSelectionChanged(wxTreeEvent& event)
 
 void MainFrame::OnUpdateVisibility(wxCommandEvent& event)
 {
+	project[activeProject].displayMachine = m_toolBar1->GetToolState(
+			wxID_DISPLAYMACHINE);
+	project[activeProject].displayGeometry = m_toolBar1->GetToolState(
+			wxID_DISPLAYMATERIAL);
+
+	this->Refresh();
+
 	event.Skip();
 }
 

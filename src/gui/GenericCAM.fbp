@@ -1136,7 +1136,7 @@
                 <event name="OnUpdateUI"></event>
                 <object class="tool" expanded="1">
                     <property name="bitmap">../icon/machine.xpm; Load From File</property>
-                    <property name="id">wxID_ANY</property>
+                    <property name="id">wxID_DISPLAYMACHINE</property>
                     <property name="kind">wxITEM_CHECK</property>
                     <property name="label">tool</property>
                     <property name="name">m_tool1</property>
@@ -1150,7 +1150,7 @@
                 </object>
                 <object class="tool" expanded="1">
                     <property name="bitmap">../icon/material.xpm; Load From File</property>
-                    <property name="id">wxID_ANY</property>
+                    <property name="id">wxID_DISPLAYMATERIAL</property>
                     <property name="kind">wxITEM_CHECK</property>
                     <property name="label">tool</property>
                     <property name="name">m_tool2</property>
