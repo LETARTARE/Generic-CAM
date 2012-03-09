@@ -48,9 +48,17 @@
 #include <wx/dynarray.h>
 
 /*!\class Project
- * \brief ...
+ * \brief Holds the data for an project.
  *
- * ...
+ * An GenericCAM project consists of
+ * - a machine (with setup)
+ * - a toolbox for the machine (at least one tool)
+ * - one more objects (may be modified, sliced, inverted into mold forms, ect.)
+ * - one or more pieces of stock material
+ * - toolpath generators
+ * - generated toolpaths
+ *
+ *
  */
 
 class Project {

@@ -220,15 +220,15 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_panel1->Layout();
 	bSizer19->Fit( m_panel1 );
 	m_panel2 = new wxPanel( m_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* bSizer18;
-	bSizer18 = new wxBoxSizer( wxVERTICAL );
+	wxBoxSizer* bSizerMainCanvas;
+	bSizerMainCanvas = new wxBoxSizer( wxVERTICAL );
 	
 	m_canvas = new MainCanvas(m_panel2);
-	bSizer18->Add( m_canvas, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	bSizerMainCanvas->Add( m_canvas, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
-	m_panel2->SetSizer( bSizer18 );
+	m_panel2->SetSizer( bSizerMainCanvas );
 	m_panel2->Layout();
-	bSizer18->Fit( m_panel2 );
+	bSizerMainCanvas->Fit( m_panel2 );
 	m_splitter->SplitVertically( m_panel1, m_panel2, 144 );
 	bSizer1->Add( m_splitter, 1, wxEXPAND, 5 );
 	
