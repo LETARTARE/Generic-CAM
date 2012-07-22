@@ -30,6 +30,8 @@
 
 #include "SerialPort.h"
 
+//#include <wx/log.h>
+
 SerialPort::SerialPort()
 {
 #ifdef __WIN
@@ -45,6 +47,7 @@ SerialPort::SerialPort()
 #endif
 	Error[0] = 0;
 	Opened = false;
+	szPort[0] = 0;
 }
 
 SerialPort::~SerialPort()
@@ -57,21 +60,16 @@ bool SerialPort::Open(int nPort, int nBaud)
 	if(Opened) return (true);
 
 #ifdef __WIN
-
-	char szPort[15];
 	wsprintf(szPort, "COM%d", nPort);
-
 #endif
 
 
 #ifdef __LINUX
-	char szPort[15];
-
 	if(nPort < 1) return false;
 	sprintf(szPort, "/dev/ttyS%1i", nPort - 1);
 	//  sprintf (szPort, "/dev/ttyUSB0");
 #endif
-
+	//wxLogMessage(_T("sizeof(szPort)=%u"), sizeof(szPort));
 	return Open(szPort, nBaud);
 }
 
@@ -82,7 +80,6 @@ bool SerialPort::Open(const char *Port, int nBaud)
 
 #ifdef __WIN
 
-	char szPort[15];
 	char szComParams[50];
 	DCB dcb;
 
@@ -130,7 +127,6 @@ bool SerialPort::Open(const char *Port, int nBaud)
 
 
 #ifdef __LINUX
-	char szPort[15];
 
 
 	//  if (nPort < 1)  return false;
@@ -142,7 +138,7 @@ bool SerialPort::Open(const char *Port, int nBaud)
 	fd = open(szPort, O_RDWR | O_NOCTTY | O_NONBLOCK | O_NDELAY);
 	if(fd < 0) return false;
 
-	fcntl(fd, F_SETFL, FNDELAY);
+	fcntl(fd, F_SETFL, FNDELAY); // Disables delay on read = read does not block, when called and no data is available.
 
 	tcgetattr(fd, &oldtio);
 	bzero(&newtio, sizeof(newtio));
@@ -243,10 +239,14 @@ bool SerialPort::Open(const char *Port, int nBaud)
 		cfsetospeed(&newtio, B115200);
 		flag = true;
 	}
+	if(nBaud == 230400){
+		cfsetispeed(&newtio, B230400);
+		cfsetospeed(&newtio, B230400);
+		flag = true;
+	}
 	if(!flag) return false;
 
-	tcsetattr(fd, TCSAFLUSH, &newtio);
-
+	tcsetattr(fd, TCSADRAIN, &newtio); // TCSADRAIN = Wait for pending transmissions to finish and change afterwards.
 
 #endif
 
@@ -256,8 +256,6 @@ bool SerialPort::Open(const char *Port, int nBaud)
 
 bool SerialPort::Close(void)
 {
-	//	printf("Port ist %s! \n",Opened?"offen":"geschlossen");
-
 	if(!Opened) return true;
 
 #ifdef __WIN
@@ -409,3 +407,30 @@ void SerialPort::FlushData()
 		i -= k;
 	}
 }
+
+void SerialPort::SetDTR(bool activate)
+{
+	if(!Opened) return;
+
+#ifdef __WIN
+	//TODO: Implement DTR on/off for windows!
+#error Not implemented!
+#endif
+
+
+#ifdef __LINUX
+	int dtr_bits = TIOCM_DTR;
+	if(activate){
+		ioctl(fd, TIOCMBIS, &dtr_bits);
+	}else{
+		ioctl(fd, TIOCMBIC, &dtr_bits);
+	}
+#endif
+}
+
+void SerialPort::WaitTXFinish(void)
+{
+	if(!Opened) return;
+	tcdrain(fd);
+}
+

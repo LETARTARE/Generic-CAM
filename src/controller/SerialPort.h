@@ -66,7 +66,7 @@
 #include <termios.h>
 #include <string.h>
 #include <unistd.h>
-
+#include <sys/ioctl.h>
 #define _POSIX_SOURCE 1
 #endif
 
@@ -77,7 +77,7 @@ public:
 	virtual ~SerialPort();
 
 	bool Open(int nPort = 2, int nBaud = 19200);
-	bool Open(const char *Port, int nBaud = 19200);
+	bool Open(const char *Port = NULL, int nBaud = 19200);
 	bool Close(void);
 
 	int ReadData(char *, unsigned int);
@@ -88,9 +88,17 @@ public:
 	{
 		return (Opened);
 	}
+	char* GetName()
+	{
+		return (szPort);
+	}
+	void SetDTR(bool activate);
+	void WaitTXFinish(void);
 
 protected:
 	bool Opened;
+
+	char szPort[15]; ///> Name of the open port.
 
 #ifdef __WIN
 	bool WriteCommByte( unsigned char );
