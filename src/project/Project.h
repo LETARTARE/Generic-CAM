@@ -42,6 +42,8 @@
 #include "Stock.h"
 #include "Unit.h"
 
+#include "../generator/Octree.h"
+
 #include <wx/string.h>
 #include <wx/xml/xml.h>
 
@@ -75,6 +77,8 @@ public:
 
 	Toolbox toolbox;
 	Stock stock;
+
+	Octree octree;
 
 	size_t activeObject;
 	size_t activeStock;

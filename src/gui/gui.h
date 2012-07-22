@@ -336,7 +336,7 @@ class GUIStockFrame : public wxFrame
 	
 	public:
 		
-		GUIStockFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Stock"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		GUIStockFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Stock"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 638,365 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		~GUIStockFrame();
 	
 };

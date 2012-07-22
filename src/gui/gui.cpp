@@ -903,7 +903,6 @@ GUIStockFrame::GUIStockFrame( wxWindow* parent, wxWindowID id, const wxString& t
 	
 	this->SetSizer( bSizer20 );
 	this->Layout();
-	bSizer20->Fit( this );
 	
 	// Connect Events
 	this->Connect( m_menuItem34->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIStockFrame::OnClose ) );

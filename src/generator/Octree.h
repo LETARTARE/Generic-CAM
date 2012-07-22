@@ -31,6 +31,10 @@
 #ifndef OCTREE_H_
 #define OCTREE_H_
 
+#include "../3D/Vector3.h"
+
+#include <GL/gl.h>
+
 #include <wx/dynarray.h>
 
 /*!\class Octree
@@ -42,20 +46,34 @@
 class OctreeElement {
 	// Constructor / Destructor
 public:
-	OctreeElement();
+	OctreeElement(bool isSolid = false);
 	virtual ~OctreeElement();
 	// Member variables
 public:
 
+	OctreeElement* sub[8]; ///< Pointer to the 8 possible subelements.
+	bool hasSubElements; ///< Flag to speed up element lookup.
+
+	bool isSolid;
+	Vector3 colorNormal;
 
 	// Methods
 public:
+	void Split(void); ///< Splits an element into 8 subelements.
+	void Paint(void); ///< Paints the element itself and its subelements (if any).
 };
 WX_DECLARE_OBJARRAY(OctreeElement, ArrayOfOctreeElement)
 ;
 
 /*!\class Octree
- * \brief ...
+ * \brief Holds, operates on and displays volumentric data.
+ *
+ *  This class can store volumentric data. The data is stored in a structure
+ *  known as octree. That is a tree where every node connects to up to 8 subnodes.
+ *  The nodes are numbered, so that the first three bit of the index represent the
+ *  coordinate from the origin. Bit 0 is x, bit 1 is y and bit 2 is the z direction.
+ *
+ *  The octree can be set up from triangle data according to the paper
  *
  * ...
  */
@@ -69,14 +87,20 @@ public:
 	// Member variables
 public:
 
+	OctreeElement* root; ///< Pointer towards the root element.
+
+
 private:
-	ArrayOfOctreeElement oe;
+	ArrayOfOctreeElement oe; ///< This thing can go... I'm using old school pointers.
+
+	GLuint displayListIndex; ///< Variable pointing to the OpenGL display list.
+	bool displayListGenerated; ///< Flag showing if an OpenGL display list has been created.
+	bool refresh; ///< Flag to show, that the OpenGL display list has to be recreated.
 
 	// Methods
 public:
 
-
-	void Paint(void);
+	void Paint(void); ///< Paints the octree and creates the OpenGL display list.
 };
 
 #endif /* OCTREE_H_ */

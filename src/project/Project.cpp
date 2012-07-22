@@ -68,7 +68,7 @@ void Project::ClearProject(void)
 	displayGeometry = true;
 	displayBoundingBox = false;
 	displayMachine = false;
-	displayStock = true;
+	displayStock = false;
 	displayWorkpiece = false;
 	displayRun = true;
 	displayTargets = true;
@@ -296,6 +296,10 @@ void Project::Paint(void)
 	if(displayGeometry){
 		for(i = 0; i < objects.GetCount(); i++)
 			objects[i].Paint();
+
+
+		octree.Paint();
+
 	}
 	if(displayMachine) machine.Paint();
 

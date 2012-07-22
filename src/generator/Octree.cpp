@@ -33,27 +33,134 @@
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfOctreeElement)
 
-OctreeElement::OctreeElement()
+OctreeElement::OctreeElement(bool isSolid)
 {
-
+	unsigned char i;
+	for(i = 0; i < 8; i++)
+		sub[i] = NULL;
+	hasSubElements = false;
+	this->isSolid = isSolid;
+	colorNormal.Set(1.0, 1.0, 0.0);
 }
 
 OctreeElement::~OctreeElement()
 {
+	unsigned char i;
+	for(i = 0; i < 8; i++){
+		if(sub[i] != NULL) delete sub[i];
+	}
+}
 
+void OctreeElement::Split(void)
+{
+	if(hasSubElements) return;
+	unsigned char i;
+	for(i = 0; i < 8; i++){
+		sub[i] = new OctreeElement(isSolid);
+	}
+	hasSubElements = true;
+}
+
+void OctreeElement::Paint()
+{
+
+	if(hasSubElements){
+		::glPushMatrix();
+		::glScalef(0.5, 0.5, 0.5);
+
+		sub[0]->Paint();
+		::glTranslatef(1.0, 0.0, 0.0);
+		sub[1]->Paint();
+		::glTranslatef(-1.0, 1.0, 0.0);
+		sub[2]->Paint();
+		::glTranslatef(1.0, 0.0, 0.0);
+		sub[3]->Paint();
+		::glTranslatef(-1.0, -1.0, 1.0);
+		sub[4]->Paint();
+		::glTranslatef(1.0, 0.0, 0.0);
+		sub[5]->Paint();
+		::glTranslatef(-1.0, 1.0, 0.0);
+		sub[6]->Paint();
+		::glTranslatef(1.0, 0.0, 0.0);
+		sub[7]->Paint();
+
+		::glPopMatrix();
+	}else{
+
+		if(isSolid){
+			::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
+			::glBegin(GL_QUADS);
+
+			::glNormal3f(1, 0, 0);
+			::glVertex3f(1, 1, 1);
+			::glVertex3f(1, 0, 1);
+			::glVertex3f(1, 0, 0);
+			::glVertex3f(1, 1, 0);
+
+			::glNormal3f(-1, 0, 0);
+			::glVertex3f(0, 1, 1);
+			::glVertex3f(0, 1, 0);
+			::glVertex3f(0, 0, 0);
+			::glVertex3f(0, 0, 1);
+
+			::glNormal3f(0, 1, 0);
+			::glVertex3f(1, 1, 1);
+			::glVertex3f(1, 1, 0);
+			::glVertex3f(0, 1, 0);
+			::glVertex3f(0, 1, 1);
+
+			::glNormal3f(0, -1, 0);
+			::glVertex3f(1, 0, 1);
+			::glVertex3f(0, 0, 1);
+			::glVertex3f(0, 0, 0);
+			::glVertex3f(1, 0, 0);
+
+			::glNormal3f(0, 0, 1);
+			::glVertex3f(1, 1, 1);
+			::glVertex3f(0, 1, 1);
+			::glVertex3f(0, 0, 1);
+			::glVertex3f(1, 0, 1);
+
+			::glNormal3f(0, 0, -1);
+			::glVertex3f(1, 1, 0);
+			::glVertex3f(1, 0, 0);
+			::glVertex3f(0, 0, 0);
+			::glVertex3f(0, 1, 0);
+
+			::glEnd();
+		}
+	}
 }
 
 Octree::Octree()
 {
+	root = new OctreeElement(true);
 
+	root->Split();
+	root->sub[0]->isSolid = false;
+
+	displayListGenerated = false;
 }
 
 Octree::~Octree()
 {
-
+	if(root != NULL) delete root;
 }
 
-void Octree::Paint(void)
+void Octree::Paint()
 {
+	if(!displayListGenerated){
+		displayListIndex = ::glGenLists(1);
+		displayListGenerated = true;
+		refresh = true;
+	}
 
+	if(refresh){
+		::glNewList(displayListIndex, GL_COMPILE_AND_EXECUTE);
+		if(root != NULL) root->Paint();
+		::glEndList();
+		refresh = false;
+	}else{
+		::glCallList(displayListIndex);
+	}
 }
