@@ -1,0 +1,19 @@
+
+# /
+/pdf
+/bin_linux
+
+# /doc4developer/
+/doc4developer/html
+/doc4developer/latex
+
+# /doc4user/
+/doc4user/*.aux
+/doc4user/*.toc
+/doc4user/*.pdf
+/doc4user/*.backup
+/doc4user/*.dvi
+
+# /machines/
+/machines/testrobot
+/machines/staeubli_rx90
