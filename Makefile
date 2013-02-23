@@ -57,10 +57,12 @@ SOURCES += src/controller/Control3D.cpp \
 	
 # Generator object files:
 SOURCES += src/generator/Imprinter.cpp \
+	src/generator/Octree.cpp \
 	src/generator/Polygon25.cpp \
-	src/generator/TPGeneratorTest.cpp \
+	src/generator/TPGenerator.cpp \
 	src/generator/TPGeneratorFast.cpp \
-
+	src/generator/TPGeneratorTest.cpp \
+	
 # GUI object files:
 SOURCES += src/gui/AboutDialog.cpp \
 	src/gui/AnimationFrame.cpp \
@@ -94,12 +96,12 @@ SOURCES += src/project/Object.cpp \
 	src/project/Target.cpp \
 	src/project/TargetPlacement.cpp \
 	src/project/Toolbox.cpp \
-	src/project/Unit.cpp \
 	src/project/ToolPath.cpp \
+	src/project/Unit.cpp \
 	src/project/Workpiece.cpp \
 
 # simulator object files:
-# SOURCES += src/simulator/MachineSimulator.cpp \
+SOURCES += src/simulator/MachineSimulator.cpp \
 	
 	
 	

@@ -1,7 +1,15 @@
 
+*~
+genericcam
+
 # /
 /pdf
 /bin_linux
+/rawWWW
+/WWW
+/build
+/Debug_Linux
+/toolpath
 
 # /doc4developer/
 /doc4developer/html
