@@ -41,10 +41,10 @@
 // language data
 static const wxLanguage langIds[] =
 	{wxLANGUAGE_DEFAULT, wxLANGUAGE_ENGLISH, wxLANGUAGE_FRENCH,
-			wxLANGUAGE_GERMAN};
+			wxLANGUAGE_GERMAN, wxLANGUAGE_ITALIAN};
 
 const wxString langNames[] =
-	{_T("System default"), _T("English"), _T("French"), _T("German")};
+	{_T("System default"), _T("English"), _T("French"), _T("German"), _T("Italian")};
 
 // the arrays must be in sync
 wxCOMPILE_TIME_ASSERT( WXSIZEOF(langNames) == WXSIZEOF(langIds),
