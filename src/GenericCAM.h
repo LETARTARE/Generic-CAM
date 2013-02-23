@@ -51,6 +51,7 @@ public:
 protected:
 	wxLocale locale;
 	wxConfig* config;
+
 	// Methods
 public:
 	virtual bool OnInit();
