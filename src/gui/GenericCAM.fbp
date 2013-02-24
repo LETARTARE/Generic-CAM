@@ -1179,7 +1179,7 @@
             <property name="minimum_size"></property>
             <property name="name">GUIAboutDialog</property>
             <property name="pos"></property>
-            <property name="size">447,308</property>
+            <property name="size">504,329</property>
             <property name="style">wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</property>
             <property name="subclass"></property>
             <property name="title">About</property>
@@ -1252,7 +1252,7 @@
                         <property name="validator_style">wxFILTER_NONE</property>
                         <property name="validator_type">wxDefaultValidator</property>
                         <property name="validator_variable"></property>
-                        <property name="value">Generic CAM  Copyright (C) 2010  Tobias Schaefer&#x0A;&#x0A;French translation &amp; additional debugging: Jacques-Louis Tartarin&#x0A;&#x0A;Licence for Generic CAM:&#x0A;GNU General Public License version 3.0 (GPLv3)&#x0A;&#x0A;This program comes with ABSOLUTELY NO WARRANTY.&#x0A;This is free software, and you are welcome to redistribute it under certain conditions.&#x0A;&#x0A;You should have received a copy of the GNU General Public License along with this program.&#x0A;If not, see &lt;http://www.gnu.org/licenses/&gt;.</property>
+                        <property name="value">Generic CAM  Copyright (C) 2010  Tobias Schaefer&#x0A;&#x0A;French translation &amp; additional debugging: Jacques-Louis Tartarin&#x0A;Italian Translation: Sandro Dalle Nogare&#x0A;&#x0A;Licence for Generic CAM:&#x0A;GNU General Public License version 3.0 (GPLv3)&#x0A;&#x0A;This program comes with ABSOLUTELY NO WARRANTY.&#x0A;This is free software, and you are welcome to redistribute it under certain conditions.&#x0A;&#x0A;You should have received a copy of the GNU General Public License along with this program.&#x0A;If not, see &lt;http://www.gnu.org/licenses/&gt;.</property>
                         <property name="window_extra_style"></property>
                         <property name="window_name"></property>
                         <property name="window_style"></property>
@@ -2870,7 +2870,7 @@
             <property name="minimum_size"></property>
             <property name="name">GUIToolboxFrame</property>
             <property name="pos"></property>
-            <property name="size">611,-1</property>
+            <property name="size">646,765</property>
             <property name="style">wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER</property>
             <property name="subclass"></property>
             <property name="title">Toolbox</property>
