@@ -145,7 +145,7 @@ class GUIAboutDialog : public wxDialog
 	
 	public:
 		
-		GUIAboutDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 447,308 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		GUIAboutDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 504,329 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~GUIAboutDialog();
 	
 };
@@ -292,7 +292,7 @@ class GUIToolboxFrame : public wxFrame
 	
 	public:
 		
-		GUIToolboxFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolbox"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 611,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIToolboxFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolbox"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 646,765 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		~GUIToolboxFrame();
 	
 };
