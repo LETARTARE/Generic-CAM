@@ -117,7 +117,7 @@ DEPS := $(patsubst %.cpp, ${OBJDIR}/%.d, ${SOURCES})
 INCFLAGS := -I./src
 CXXFLAGS := `wx-config --cxxflags` -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/lua5.1 -O0 -g3 -Wall 
 LDFLAGS  := `wx-config --libs gl,core,base,xml` -L/usr/local/lib -L/usr/lib
-LDLIBS   := -llua5.1
+LDLIBS   := -llua5.1 -lGLU
 #REZFLAGS := `wx-config --rez-flags`
 
 ifdef FINAL
@@ -144,7 +144,7 @@ all:	$(PROJECT)
 Release: 	$(PROJECT)
 
 $(PROJECT):	$(OBJECTS)
-		$(CXX) $(LDFLAGS) -o $(PROJECT) $(OBJECTS) $(LDLIBS)
+		$(CXX) -o $(PROJECT) $(OBJECTS) $(LDLIBS) $(LDFLAGS)
 #ifdef RELEASE
 #		strip $(PROJECT)
 #endif
