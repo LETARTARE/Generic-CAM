@@ -34,7 +34,7 @@
 #ifndef _CVECTOR3_H_
 #define _CVECTOR3_H_
 
-#include <cmath>
+#include <math.h>
 #include <wx/string.h>
 #include <wx/dynarray.h>
 

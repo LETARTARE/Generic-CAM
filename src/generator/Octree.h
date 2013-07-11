@@ -22,11 +22,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #ifndef OCTREE_H_
 #define OCTREE_H_
@@ -34,44 +30,13 @@
 #include "../3D/Triangle.h"
 #include "../3D/Vector3.h"
 
+#include "OctreeInt64.h"
+
 #include <GL/gl.h>
 
 #include <stdint.h>
 
 #include <wx/dynarray.h>
-
-/*!\class OctreeElement
- * \brief Stores the data for an element.
- *
- * The subdivision (sdx, sdy, sdz)entries can later be used to improve
- * the surface on painting (-> Primal Contouring).
- */
-
-class OctreeElement {
-	// Constructor / Destructor
-public:
-	OctreeElement(bool isSolid = false);
-	virtual ~OctreeElement();
-	// Member variables
-public:
-
-	OctreeElement* sub[8]; ///< Pointer to the 8 possible subelements.
-	bool hasSubElements; ///< Flag to speed up element lookup.
-
-	bool isSolid; ///< Flag, if this Element is solid. On splitting the element, this is inherited to the 8 children.
-	Vector3 color; ///< Color of this particular element. Also inherited upon splitting.
-
-	float sdx; ///< Subdivision on the x axis (0...1)
-	float sdy; ///< Subdivision on the y axis (0...1)
-	float sdz; ///< Subdivision on the z axis (0...1)
-
-	// Methods
-public:
-	void Split(void); ///< Splits an element into 8 subelements.
-	void Paint(void); ///< Paints the element itself and its subelements (if any).
-	bool CheckIntersection(Triangle *tri, Vector3 pos, float scale);
-	void CheckTriangle(Triangle *tri, Vector3 pos, uint32_t scale);
-};
 
 /*!\class Octree
  * \brief Holds, operates on and displays volumentric data.
@@ -80,10 +45,6 @@ public:
  *  known as octree. That is a tree where every node connects to up to 8 subnodes.
  *  The nodes are numbered, so that the first three bit of the index represent the
  *  coordinate from the origin. Bit 0 is x, bit 1 is y and bit 2 is the z direction.
- *
- *  The octree can be set up from triangle data according to the paper
- *
- *  - Ju2004 - Robust Repair of Polygonal Models
  *
  *  The triangle data need not be a two-manifold. It can even have gaps and holes.
  *  It should only be designed as a thick-walled object. In case of a shell object the inside
@@ -100,19 +61,13 @@ public:
 	// Member variables
 public:
 
-	OctreeElement* root; ///< Pointer towards the root element.
+	OctreeInt64* tree; ///< Pointer towards the discrete octree.
 
-	unsigned char maxDepth; ///< maximum splitting depth of the octree.
-
-private:
-
-	GLuint displayListIndex; ///< Variable pointing to the OpenGL display list.
-	bool displayListGenerated; ///< Flag showing if an OpenGL display list has been created.
-	bool refresh; ///< Flag to show, that the OpenGL display list has to be recreated.
+	double scale; ///< scaling of the Octree.
 
 	// Methods
 public:
-	void InsertTriangle(Triangle tri);///< Insert a new triangle into the octree.
+	void InsertTriangle(Triangle tri); ///< Insert a new triangle into the octree.
 	void Paint(void); ///< Paints the octree and creates the OpenGL display list.
 };
 WX_DECLARE_OBJARRAY(Octree, ArrayOfOctree)
