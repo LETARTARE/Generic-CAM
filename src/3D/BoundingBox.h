@@ -27,7 +27,6 @@
 //$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef BOUNDINGBOX_H_
 #define BOUNDINGBOX_H_
 
@@ -62,8 +61,11 @@ public:
 	void Reset(void);
 	void Insert(const Geometry &geometry, AffineTransformMatrix &matrix);
 	void Insert(Surface &surface);
+	void Insert(const Triangle tri);
 
-	bool IsVolumeZero(void);
+	bool IsEmpty(void) const;
+	bool IsVolumeZero(void) const;
+	double GetVolume(void)const;
 
 	double GetSizeX(void)
 	{

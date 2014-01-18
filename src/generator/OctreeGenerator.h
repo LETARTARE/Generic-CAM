@@ -24,10 +24,12 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef OCTREEINT64_H_
-#define OCTREEINT64_H_
+#ifndef OCTREEGENERATOR_H_
+#define OCTREEGENERATOR_H_
 
-#include <GL/gl.h>
+#include "Octree.h"
+#include "../3D/BoundingBox.h"
+
 #include <stdint.h>
 
 /*!\class VectorInt64
@@ -40,9 +42,7 @@ public:
 	int64_t y;
 	int64_t z;
 	VectorInt64();
-
 	VectorInt64& operator=(const VectorInt64 &rhs);
-
 };
 
 /*!\class TriangleInt64
@@ -58,13 +58,10 @@ public:
 	TriangleInt64();
 };
 
-/*!\class OctreeInt64Element
- * \brief Stores the data for an element.
+/*! \class OctreeGenerator
+ *   \brief Class with functions to generate an Octree from a collection of triangles.
  *
- * The subdivision (sdx, sdy, sdz) entries can later be used to improve
- * the surface on painting (-> Primal Contouring).
- *
- *  The octree is set up from triangle data according to the paper
+ * The octree is set up from triangle data according to the paper
  *
  *  - Ju2004 - Robust Repair of Polygonal Models
  *
@@ -72,6 +69,20 @@ public:
  * (e.g. 	x towards the viewer,
  * 			y to the right and
  * 			z up.)
+ *
+ * Fast octree implementation with hole filling. The maximum number of cells
+ * is 2^20 = 1048576 along one axis.
+ *
+ * The tree has always 20 levels. The resolution of the tree is done by scaling.
+ * Level 0 is one unit long.
+ * Level 1 = 0.5 units
+ * Level 2 = 0.25 units
+ * Level 3 = 0.125 units
+ * ...
+ * Level 19 = 1.9e-6 units
+ * Level 20 = 9.5e-7 units
+ *
+ * The octree is split 20 times. For an volume of 1mx1mx1m the resolution is 0.95 micrometer.
  *
  * The edges are numbered from 0 to 11 so that:
  *
@@ -91,71 +102,26 @@ public:
  *
  */
 
-class OctreeInt64Element {
+class OctreeGenerator {
 	// Constructor / Destructor
 public:
-	OctreeInt64Element(bool isSolid = false);
-	virtual ~OctreeInt64Element();
-	// Member variables
-public:
-	OctreeInt64Element* sub[8]; ///< Pointer to the 8 possible subelements.
-	bool hasSubElements; ///< Flag to speed up element lookup.
-
-	bool isSolid; ///< Flag, if this Element is solid. On splitting the element, this is inherited to the 8 children.
-	GLfloat r; ///< Red - Color of this particular element. Also inherited upon splitting.
-	GLfloat g; ///< Red - Color of this particular element. Also inherited upon splitting.
-	GLfloat b; ///< Red - Color of this particular element. Also inherited upon splitting.
-
-	uint8_t clip; ///< Intersection of one edge.
-	uint8_t sign; ///< Sign of the clipping (1 = 1, 0 = -1).
-
-	// Methods
-public:
-	void SetColor(GLfloat r = 1.0, GLfloat g = 1.0, GLfloat b = 1.0);
-	void Split(void); ///< Splits an element into 8 subelements.
-	void Paint(void); ///< Paints the element itself and its subelements (if any).
-
-	bool CheckIntersection(TriangleInt64 *tri, VectorInt64 pos);
-	void CheckTriangle(TriangleInt64 *tri, VectorInt64 pos);
-};
-
-/*!\class OctreeInt64
- * \brief Octree based completely on integer calculation.
- *
- * Fast octree implementation with hole filling. The maximum number of cells
- * is 2^20 = 1048576 along one axis.
- *
- * The tree has always 20 levels. The resolution of the tree is done by scaling.
- * Level 0 is one unit long.
- * Level 1 = 0.5 units
- * Level 2 = 0.25 units
- * Level 3 = 0.125 units
- * ...
- * Level 19 = 1.9e-6 units
- * Level 20 = 9.5e-7 units
- *
- * The octree is split 20 times. For an volume of 1mx1mx1m the resolution is 0.95 micrometer.
- */
-
-class OctreeInt64 {
-	// Constructor / Destructor
-public:
-	OctreeInt64();
-	virtual ~OctreeInt64();
+	OctreeGenerator();
+	virtual ~OctreeGenerator();
 
 	// Member variables
 public:
-	OctreeInt64Element* root; ///< Pointer towards the root element.
+	Octree* root; ///< Pointer towards the octree class.
 
 private:
-	GLuint displayListIndex; ///< Variable pointing to the OpenGL display list.
-	bool displayListGenerated; ///< Flag showing if an OpenGL display list has been created.
-	bool refresh; ///< Flag to show, that the OpenGL display list has to be recreated.
+	BoundingBox bb;
 
 	// Methods
 public:
-	void InsertTriangle(TriangleInt64 &tri); ///< Insert a new triangle into the octree.
-	void Paint(void); ///< Paints the octree.
+	void InsertTriangle(Triangle tri); ///< Insert a new triangle into the octree
+	void InsertTriangle(TriangleInt64 &tri); ///< Insert a new triangle into the octree
+
+	void Paint(void); ///< Paints the underlying octree};
+
 };
 
-#endif /* OCTREEINT64_H_ */
+#endif /* OCTREEGENERATOR_H_ */

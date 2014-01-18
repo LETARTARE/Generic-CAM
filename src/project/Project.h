@@ -27,7 +27,6 @@
 //$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef PROJECT_H_
 #define PROJECT_H_
 
@@ -42,7 +41,7 @@
 #include "Stock.h"
 #include "Unit.h"
 
-#include "../generator/Octree.h"
+#include "../generator/OctreeGenerator.h"
 
 #include <wx/string.h>
 #include <wx/xml/xml.h>
@@ -78,7 +77,7 @@ public:
 	Toolbox toolbox;
 	Stock stock;
 
-	Octree octree;
+	OctreeGenerator octree;
 
 	size_t activeObject;
 	size_t activeStock;
@@ -116,16 +115,11 @@ public:
 	double supportWidth;
 	double supportHeight;
 
-
-
-
 protected:
 	wxXmlDocument doc;
 
 	double middleY;
 	double offsetX;
-
-
 
 	// Methods
 public:
@@ -139,9 +133,8 @@ public:
 	void GenerateToolPath(void);
 	void CollectToolPath(void);
 
-	size_t SetupMachineBed(bool flipped=false);
+	size_t SetupMachineBed(bool flipped = false);
 	void FlipRun(void);
-
 
 	void InsertDrillGrid(Run &run, double sizex, double sizey, bool flipped =
 			true);

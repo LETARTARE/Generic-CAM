@@ -27,7 +27,6 @@
 //$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include "BoundingBox.h"
 
 #include <GL/gl.h>
@@ -51,12 +50,28 @@ void BoundingBox::Reset(void)
 	xmin = ymin = zmin = DBL_MAX;
 }
 
-bool BoundingBox::IsVolumeZero(void)
+bool BoundingBox::IsEmpty(void) const
 {
 	if(xmax < xmin) return true;
 	if(ymax < ymin) return true;
 	if(zmax < zmin) return true;
 	return false;
+}
+
+bool BoundingBox::IsVolumeZero(void) const
+{
+	if(xmax <= xmin) return true;
+	if(ymax <= ymin) return true;
+	if(zmax <= zmin) return true;
+	return false;
+}
+
+double BoundingBox::GetVolume(void) const
+{
+	if(xmax <= xmin) return 0.0;
+	if(ymax <= ymin) return 0.0
+	if(zmax <= zmin) return 0.0;
+	return (xmax - xmin) * (ymax - ymin) * (zmax - zmin);
 }
 
 void BoundingBox::Insert(const Geometry &geometry,
@@ -90,6 +105,16 @@ void BoundingBox::Insert(Surface &surface)
 		if(temp.z > zmax) zmax = temp.z;
 		if(temp.z < zmin) zmin = temp.z;
 	}
+}
+
+void BoundingBox::Insert(const Triangle tri)
+{
+	if(tri.x > xmax) xmax = tri.x;
+	if(tri.x < xmin) xmin = tri.x;
+	if(tri.y > ymax) ymax = tri.y;
+	if(tri.y < ymin) ymin = tri.y;
+	if(tri.z > zmax) zmax = tri.z;
+	if(tri.z < zmin) zmin = tri.z;
 }
 
 void BoundingBox::Paint(void)

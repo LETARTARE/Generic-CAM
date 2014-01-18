@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : Octree.h
-// Purpose            :
+// Purpose            : Contains an Octree and its support functions
 // Thread Safe        : Yes
 // Platform dependent : No
-// Compiler Options   :
+// Compiler Options   : -lgl
 // Author             : Tobias Schaefer
 // Created            : 22.08.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
@@ -29,14 +29,49 @@
 
 #include "../3D/Triangle.h"
 #include "../3D/Vector3.h"
-
-#include "OctreeInt64.h"
+#include "../3D/BoundingBox.h"
 
 #include <GL/gl.h>
-
 #include <stdint.h>
 
 #include <wx/dynarray.h>
+
+/*!\class OctreeCell
+ * \brief Stores the data for an element.
+ *
+ * The subdivision (sdx, sdy, sdz) entries can later be used to improve
+ * the surface on painting (-> Primal Contouring).
+ */
+
+class OctreeCell {
+	// Constructor / Destructor
+public:
+	OctreeCell(bool isSolid = false);
+	virtual ~OctreeCell();
+	// Member variables
+public:
+	OctreeCell* sub[8]; ///< Pointers to the 8 possible subelements
+	bool hasSubElements; ///< Flag to speed up element lookup
+
+	bool isSolid; ///< Flag, if this Element is solid. On splitting the element, this is inherited to the 8 children.
+	GLfloat r; ///< Red - Color of this particular element. Also inherited upon splitting.
+	GLfloat g; ///< Red - Color of this particular element. Also inherited upon splitting.
+	GLfloat b; ///< Red - Color of this particular element. Also inherited upon splitting.
+
+	uint8_t clip; ///< Intersection of one edge.
+	uint8_t sign; ///< Sign of the clipping (1 = 1, 0 = -1).
+
+	// Methods
+public:
+	void SetColor(GLfloat r = 1.0, GLfloat g = 1.0, GLfloat b = 1.0);
+	void Split(void); ///< Splits an element into 8 subelements.
+	void Paint(void); ///< Paints the element itself and its subelements (if any).
+
+	void InsertTriangle(const Triangle tri, const BoundingBox bb);
+private:
+	void CheckTriangle(const Triangle tri, const Vector3 pos);
+	bool CheckIntersection(const Triangle tri, const Vector3 pos);
+};
 
 /*!\class Octree
  * \brief Holds, operates on and displays volumentric data.
@@ -50,6 +85,7 @@
  *  It should only be designed as a thick-walled object. In case of a shell object the inside
  *  is made solid. If the hole are too big, it is not predictable, what the reconstruction
  *  algorithm will turn up with.
+ *
  */
 
 class Octree {
@@ -60,15 +96,18 @@ public:
 
 	// Member variables
 public:
+	OctreeCell* tree; ///< Pointer towards the topmost cell
+	double scale; ///< Scaling of the Octree (size of the topmost cell)
 
-	OctreeInt64* tree; ///< Pointer towards the discrete octree.
-
-	double scale; ///< scaling of the Octree.
+private:
+	GLuint displayListIndex; ///< Variable pointing to the OpenGL display list.
+	bool displayListGenerated; ///< Flag showing if an OpenGL display list has been created.
+	bool refresh; ///< Flag to show, that the OpenGL display list has to be recreated.
 
 	// Methods
 public:
-	void InsertTriangle(Triangle tri); ///< Insert a new triangle into the octree.
 	void Paint(void); ///< Paints the octree and creates the OpenGL display list.
+
 };
 WX_DECLARE_OBJARRAY(Octree, ArrayOfOctree)
 ;
