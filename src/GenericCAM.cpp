@@ -77,7 +77,7 @@ GenericCAMApp::GenericCAMApp()
 }
 
 // The Commandline is parsed before OnInit is called.
-void GenericCAMApp::OnInitCmdLine(wxCmdLineParser& parser)
+bool GenericCAMApp::OnInitCmdLine(wxCmdLineParser& parser)
 {
 	parser.AddParam(_("<filepath of document to open>"), wxCMD_LINE_VAL_STRING,
 			wxCMD_LINE_PARAM_OPTIONAL);
