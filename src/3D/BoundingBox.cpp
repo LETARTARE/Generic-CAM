@@ -37,6 +37,9 @@ BoundingBox::BoundingBox()
 	color.Set(0.3, 0.3, 0.3);
 	alpha = 0.5;
 
+	xmax = ymax = zmax = -DBL_MAX;
+	xmin = ymin = zmin = DBL_MAX;
+
 	this->Reset();
 }
 
@@ -69,7 +72,7 @@ bool BoundingBox::IsVolumeZero(void) const
 double BoundingBox::GetVolume(void) const
 {
 	if(xmax <= xmin) return 0.0;
-	if(ymax <= ymin) return 0.0
+	if(ymax <= ymin) return 0.0;
 	if(zmax <= zmin) return 0.0;
 	return (xmax - xmin) * (ymax - ymin) * (zmax - zmin);
 }
@@ -109,12 +112,15 @@ void BoundingBox::Insert(Surface &surface)
 
 void BoundingBox::Insert(const Triangle tri)
 {
-	if(tri.x > xmax) xmax = tri.x;
-	if(tri.x < xmin) xmin = tri.x;
-	if(tri.y > ymax) ymax = tri.y;
-	if(tri.y < ymin) ymin = tri.y;
-	if(tri.z > zmax) zmax = tri.z;
-	if(tri.z < zmin) zmin = tri.z;
+	unsigned char i;
+	for(i = 0; i < 3; i++){
+		if(tri.p[i].x > xmax) xmax = tri.p[i].x;
+		if(tri.p[i].x < xmin) xmin = tri.p[i].x;
+		if(tri.p[i].y > ymax) ymax = tri.p[i].y;
+		if(tri.p[i].y < ymin) ymin = tri.p[i].y;
+		if(tri.p[i].z > zmax) zmax = tri.p[i].z;
+		if(tri.p[i].z < zmin) zmin = tri.p[i].z;
+	}
 }
 
 void BoundingBox::Paint(void)

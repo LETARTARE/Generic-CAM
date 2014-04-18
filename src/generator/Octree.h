@@ -27,33 +27,29 @@
 #ifndef OCTREE_H_
 #define OCTREE_H_
 
-#include "../3D/Triangle.h"
-#include "../3D/Vector3.h"
-#include "../3D/BoundingBox.h"
-
 #include <GL/gl.h>
 #include <stdint.h>
 
 #include <wx/dynarray.h>
 
 /*!\class OctreeCell
- * \brief Stores the data for an element.
+ * \brief Stores the data for a cell in the Octree.
  *
  * The subdivision (sdx, sdy, sdz) entries can later be used to improve
  * the surface on painting (-> Primal Contouring).
  */
 
 class OctreeCell {
+	friend class Octree;
+
 	// Constructor / Destructor
 public:
 	OctreeCell(bool isSolid = false);
 	virtual ~OctreeCell();
+
 	// Member variables
 public:
-	OctreeCell* sub[8]; ///< Pointers to the 8 possible subelements
-	bool hasSubElements; ///< Flag to speed up element lookup
 
-	bool isSolid; ///< Flag, if this Element is solid. On splitting the element, this is inherited to the 8 children.
 	GLfloat r; ///< Red - Color of this particular element. Also inherited upon splitting.
 	GLfloat g; ///< Red - Color of this particular element. Also inherited upon splitting.
 	GLfloat b; ///< Red - Color of this particular element. Also inherited upon splitting.
@@ -61,16 +57,21 @@ public:
 	uint8_t clip; ///< Intersection of one edge.
 	uint8_t sign; ///< Sign of the clipping (1 = 1, 0 = -1).
 
+protected:
+	OctreeCell* sub[8]; ///< Pointers to the 8 possible subelements
+	bool hasSubElements; ///< Flag to speed up element lookup
+	bool isSolid; ///< Flag, if this Element is solid. On splitting the element, this is inherited to the 8 children.
+
 	// Methods
 public:
 	void SetColor(GLfloat r = 1.0, GLfloat g = 1.0, GLfloat b = 1.0);
 	void Split(void); ///< Splits an element into 8 subelements.
 	void Paint(void); ///< Paints the element itself and its subelements (if any).
 
-	void InsertTriangle(const Triangle tri, const BoundingBox bb);
 private:
-	void CheckTriangle(const Triangle tri, const Vector3 pos);
-	bool CheckIntersection(const Triangle tri, const Vector3 pos);
+//	void InsertTriangle(const Triangle tri, const BoundingBox bb);
+//	void CheckTriangle(const Triangle tri, const Vector3 pos);
+//	bool CheckIntersection(const Triangle tri, const Vector3 pos);
 };
 
 /*!\class Octree
@@ -97,7 +98,8 @@ public:
 	// Member variables
 public:
 	OctreeCell* tree; ///< Pointer towards the topmost cell
-	double scale; ///< Scaling of the Octree (size of the topmost cell)
+	unsigned char depth;
+	double cellSize; ///< Size (length, width, depth) of one cell at the lowest level. Resolution of the Octree.
 
 private:
 	GLuint displayListIndex; ///< Variable pointing to the OpenGL display list.
@@ -109,7 +111,6 @@ public:
 	void Paint(void); ///< Paints the octree and creates the OpenGL display list.
 
 };
-WX_DECLARE_OBJARRAY(Octree, ArrayOfOctree)
-;
+WX_DECLARE_OBJARRAY(Octree, ArrayOfOctree);
 
 #endif /* OCTREE_H_ */

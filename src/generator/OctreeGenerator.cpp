@@ -84,7 +84,7 @@ void OctreeGenerator::InsertTriangle(Triangle tri)
 //		temp.p[i].z = llround(tri.p[i].z / scale);
 //	}
 
-	root->tree->InsertTriangle(tri, bb);
+//	root->tree->InsertTriangle(tri, bb);
 }
 
 void OctreeGenerator::InsertTriangle(TriangleInt64 &tri)
@@ -109,9 +109,9 @@ void OctreeGenerator::InsertTriangle(TriangleInt64 &tri)
 	if(tri.p[2].z > tri.bbmax.z) tri.bbmax.z = tri.p[2].z;
 
 // Calculate the normal vector of the triangle.
-	tri.CalculateNormal();
+//	tri.CalculateNormal();
 
-	Vector3 pos(0, 0, 0);
+//	Vector3 pos(0, 0, 0);
 
 //	if(tree != NULL) tree->CheckTriangle(&tri, pos);
 }

@@ -36,6 +36,11 @@
  * \brief Stores an int64_t vector with 3 elements.
  */
 
+
+#include "../3D/Triangle.h"
+#include "../3D/Vector3.h"
+#include "../3D/BoundingBox.h"
+
 class VectorInt64 {
 public:
 	int64_t x;
