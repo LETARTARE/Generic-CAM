@@ -22,10 +22,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
+
 #include "OpenGLCanvas.h"
 #include <wx/wx.h>
 #ifdef __WXMAC__
@@ -38,11 +36,9 @@
 #define TIMER_OPENGLCANVAS 1902
 //TODO: Change this to this->Connect(...) calls.
 BEGIN_EVENT_TABLE(OpenGLCanvas, wxGLCanvas)
-EVT_SIZE(OpenGLCanvas::OnSize)
-EVT_PAINT (OpenGLCanvas::OnPaint)
-EVT_ERASE_BACKGROUND (OpenGLCanvas::OnEraseBackground)
-EVT_ENTER_WINDOW( OpenGLCanvas::OnEnterWindow )
-EVT_MOUSE_EVENTS(OpenGLCanvas::OnMouseEvent)
+EVT_SIZE(OpenGLCanvas::OnSize)EVT_PAINT(OpenGLCanvas::OnPaint)EVT_ERASE_BACKGROUND(
+		OpenGLCanvas::OnEraseBackground)EVT_ENTER_WINDOW(
+		OpenGLCanvas::OnEnterWindow)EVT_MOUSE_EVENTS(OpenGLCanvas::OnMouseEvent)
 EVT_TIMER(TIMER_OPENGLCANVAS, OpenGLCanvas::OnTimer)
 END_EVENT_TABLE()
 
@@ -53,10 +49,9 @@ static int wx_gl_attribs[] =
 
 OpenGLCanvas::OpenGLCanvas(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 		const wxSize& size, long style, const wxString& name) :
-	wxGLCanvas(parent, (wxGLCanvas*) NULL, id, pos, size, style
-			| wxFULL_REPAINT_ON_RESIZE, name, wx_gl_attribs)
+		wxGLCanvas(parent, (wxGLCanvas*) NULL, id, pos, size,
+				style | wxFULL_REPAINT_ON_RESIZE, name, wx_gl_attribs)
 {
-
 
 	// int args[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
 
@@ -67,7 +62,6 @@ OpenGLCanvas::OpenGLCanvas(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 	control = NULL;
 
 	stereoMode = false;
-
 
 	//TODO: Rewrite this to support multiple instances!
 	timer.SetOwner(this, TIMER_OPENGLCANVAS);
@@ -84,12 +78,12 @@ void OpenGLCanvas::SetController(Control3D& control)
 	//wxLogMessage(_T("OpenGLCanvas: Controller inserted!"));
 }
 
-void OpenGLCanvas::OnEnterWindow(wxMouseEvent& WXUNUSED(event) )
+void OpenGLCanvas::OnEnterWindow(wxMouseEvent& WXUNUSED(event))
 {
 	SetFocus();
 }
 
-void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event) )
+void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
 	if(!IsShown()) return;
 
@@ -99,7 +93,6 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event) )
 
 	wxGLCanvas::SetCurrent();
 	wxPaintDC(this);
-
 
 	// Init OpenGL once, but after SetCurrent
 	if(!isInitialized){
@@ -116,14 +109,9 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event) )
 	/* clear color and depth buffers */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-	// <a>
-
-
 	// set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
 	int w, h;
 	GetClientSize(&w, &h);
-
 
 #ifndef __WXMOTIF__
 	if(GetContext())
@@ -131,15 +119,12 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event) )
 	{
 		SetCurrent();
 		::glViewport(0, 0, (GLint) w, (GLint) h);
-		GLdouble ar = (GLdouble) w / (GLdouble) h; // Perspective neu bestimmen
+		GLdouble ar = (GLdouble) w / (GLdouble) h; // Calculate perspective
 		::glMatrixMode(GL_PROJECTION);
 		::glLoadIdentity();
 		::gluPerspective(45, ar, 0.01, 10);
 		::glMatrixMode(GL_MODELVIEW);
 	}
-
-	//</a>
-
 
 	if(stereoMode){
 		glDrawBuffer(GL_BACK_LEFT);
@@ -153,11 +138,9 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event) )
 	::glMultMatrixd(transmat.a);
 	::glMultMatrixd(rotmat.a);
 
-
 	//	float specReflection[] = { 0.8f, 0.0f, 0.8f, 1.0f };
 	//	glMaterialfv(GL_FRONT, GL_SPECULAR, specReflection);
 	//	glMateriali(GL_FRONT, GL_SHININESS, 96);
-
 
 	//	if(m_gllist == 0){
 	//		m_gllist = glGenLists(1); // Make one (1) empty display list.
@@ -207,16 +190,13 @@ void OpenGLCanvas::InitGL()
 {
 	SetCurrent();
 
-
 	/* set viewing projection */
 	//	glMatrixMode(GL_PROJECTION);
 	//	glFrustum( -0.5f, 0.5f, -0.5f, 0.5f, 1.0f, 3.0f);
 	// Is done in OnSize(...)
-
 	//	GLfloat attenuation[] =
 	//		{1.0f, -0.01f, -.000001f};
 	//::glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, attenuation, 0);
-
 
 	::glEnable(GL_COLOR_MATERIAL);
 	::glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
@@ -238,11 +218,11 @@ void OpenGLCanvas::SetupLighting() // Eine Lampe in die Szene setzen
 	GLfloat diffuse0[] =
 		{0.7f, 0.7f, 0.7f};
 	GLfloat specular0[] =
-		{0.9f, 0.9f, 0.9f};
+		{8.0f, 8.0f, 8.0f};
 	GLfloat position0[] =
-		{-10, 20, 50, 0};
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient0);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse0);
+		{-20, 20, 50, 0};
+//	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient0);
+//	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse0);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specular0);
 	glLightfv(GL_LIGHT0, GL_POSITION, position0);
 	glEnable(GL_LIGHT0); // ... und anschalten
@@ -252,8 +232,8 @@ void OpenGLCanvas::SetupLighting() // Eine Lampe in die Szene setzen
 
 void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 {
-	if(event.ButtonDown(wxMOUSE_BTN_RIGHT) || event.ButtonDown(
-			wxMOUSE_BTN_MIDDLE)){
+	if(event.ButtonDown(wxMOUSE_BTN_RIGHT)
+			|| event.ButtonDown(wxMOUSE_BTN_MIDDLE)){
 		x = event.m_x;
 		y = event.m_y;
 	}
@@ -295,11 +275,12 @@ void OpenGLCanvas::OnTimer(wxTimerEvent& event)
 	float resMov = 10000;
 
 	rotmat = AffineTransformMatrix::RotateInterwoven(
-			(float) control->GetAxis(3) / resRot, (float) control->GetAxis(4)
-					/ resRot, (float) control->GetAxis(5) / resRot) * rotmat;
+			(float) control->GetAxis(3) / resRot,
+			(float) control->GetAxis(4) / resRot,
+			(float) control->GetAxis(5) / resRot) * rotmat;
 	transmat.TranslateGlobal((float) control->GetAxis(0) / resMov,
-			(float) control->GetAxis(1) / resMov, (float) control->GetAxis(2)
-					/ resMov);
+			(float) control->GetAxis(1) / resMov,
+			(float) control->GetAxis(2) / resMov);
 	//rotmat.RotateXY(1,0,1);
 	if(control->GetButton(0)){
 		rotmat.SetIdentity();

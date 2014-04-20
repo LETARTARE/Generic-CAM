@@ -41,6 +41,7 @@
 
 class OctreeCell {
 	friend class Octree;
+	friend class OctreeGenerator;
 
 	// Constructor / Destructor
 public:
@@ -90,6 +91,7 @@ private:
  */
 
 class Octree {
+	friend class OctreeGenerator;
 	// Constructor / Destructor
 public:
 	Octree();

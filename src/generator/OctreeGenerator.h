@@ -28,14 +28,11 @@
 #define OCTREEGENERATOR_H_
 
 #include "Octree.h"
-#include "../3D/BoundingBox.h"
-
 #include <stdint.h>
 
 /*!\class VectorInt64
  * \brief Stores an int64_t vector with 3 elements.
  */
-
 
 #include "../3D/Triangle.h"
 #include "../3D/Vector3.h"
@@ -118,14 +115,23 @@ public:
 	Octree* root; ///< Pointer towards the octree class.
 
 private:
-	BoundingBox bb;
 
 	// Methods
 public:
 	void InsertTriangle(Triangle tri); ///< Insert a new triangle into the octree
-	void InsertTriangle(TriangleInt64 &tri); ///< Insert a new triangle into the octree
+//	void InsertTriangle(TriangleInt64 &tri); ///< Insert a new triangle into the octree
 
 	void Paint(void); ///< Paints the underlying octree};
+
+private:
+	void CheckTriangle(OctreeCell * base, const Triangle tri, const Vector3 pos,
+			float scale, BoundingBox & bb, unsigned char depth);
+
+	bool CheckIntersection(const Triangle tri, const Vector3 pos, float scale,
+			BoundingBox & bb);
+
+	bool IsAlign(float tempx, float tempy, float tempz, Vector3 *t0,
+			Vector3 *t1, Vector3 *t2, float scale);
 
 };
 

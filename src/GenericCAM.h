@@ -55,7 +55,7 @@ protected:
 	// Methods
 public:
 	virtual bool OnInit();
-	virtual bool OnInitCmdLine(wxCmdLineParser& parser);
+	virtual void OnInitCmdLine(wxCmdLineParser& parser);
 	virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
 
 };

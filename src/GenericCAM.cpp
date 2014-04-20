@@ -43,9 +43,8 @@ GenericCAMApp::GenericCAMApp()
 	config = new wxConfig(_T("GenericCAM"));
 
 	unsigned int selectedLanguage = wxLocale::GetSystemLanguage();
-	if(selectedLanguage == wxLANGUAGE_UNKNOWN) selectedLanguage
-			= wxLANGUAGE_DEFAULT;
-
+	if(selectedLanguage == wxLANGUAGE_UNKNOWN) selectedLanguage =
+			wxLANGUAGE_DEFAULT;
 
 	// Read language from config.
 	wxString str;
@@ -71,17 +70,20 @@ GenericCAMApp::GenericCAMApp()
 	locale.AddCatalogLookupPathPrefix(_T("i18n"));
 	bool catalogLoaded = locale.AddCatalog(_T("GenericCAM"));
 	if(!catalogLoaded){
-		wxLogError(_T("The translation catalog for ")
-				+ locale.GetCanonicalName() + _T(" was not loaded !"));
+		wxString temp;
+		temp =
+		_T("The translation catalog for ") + locale.GetCanonicalName() +
+		_T(" was not loaded !");
+		wxLogError(temp);
 	}
 }
 
 // The Commandline is parsed before OnInit is called.
-bool GenericCAMApp::OnInitCmdLine(wxCmdLineParser& parser)
+void GenericCAMApp::OnInitCmdLine(wxCmdLineParser& parser)
 {
 	parser.AddParam(_("<filepath of document to open>"), wxCMD_LINE_VAL_STRING,
 			wxCMD_LINE_PARAM_OPTIONAL);
-	return wxApp::OnInitCmdLine(parser);
+	wxApp::OnInitCmdLine(parser);
 }
 
 bool GenericCAMApp::OnCmdLineParsed(wxCmdLineParser& parser)
@@ -107,7 +109,6 @@ bool GenericCAMApp::OnInit()
 		frame->LoadProject(loadOnStartup);
 
 	}
-
 
 	//TODO: Check, why the icon is not working under Windows / Code::Blocks.
 #ifndef __WIN32__

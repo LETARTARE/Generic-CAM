@@ -27,7 +27,6 @@
 //$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef SURFACE_H_
 #define SURFACE_H_
 
@@ -60,8 +59,7 @@ public:
 	// Methods
 public:
 };
-WX_DECLARE_OBJARRAY(SurfaceEdge, ArrayOfSurfaceEdge)
-;
+WX_DECLARE_OBJARRAY(SurfaceEdge, ArrayOfSurfaceEdge);
 
 /*!\class SurfaceTriangle
  * \brief ...
@@ -84,8 +82,7 @@ public:
 	// Methods
 public:
 };
-WX_DECLARE_OBJARRAY(SurfaceTriangle, ArrayOfSurfaceTriangle)
-;
+WX_DECLARE_OBJARRAY(SurfaceTriangle, ArrayOfSurfaceTriangle);
 
 /*!\class Surface
  * \brief ...
@@ -142,7 +139,7 @@ public:
 
 	void CalcNormals(void);
 
-	size_t GetVertexCount(void)
+	size_t GetVertexCount(void) const
 	{
 		return v.GetCount();
 	}
@@ -156,7 +153,6 @@ private:
 	double DiffSquareAndAdd(const Vector3 &a, const Vector3 &b);
 
 };
-WX_DECLARE_OBJARRAY(Surface, ArrayOfSurface)
-;
+WX_DECLARE_OBJARRAY(Surface, ArrayOfSurface);
 
 #endif /* SURFACE_H_ */
