@@ -29,7 +29,7 @@
 
 #include <GL/gl.h>
 #include <stdint.h>
-
+#include <wx/defs.h>
 #include <wx/dynarray.h>
 
 /*!\class OctreeCell

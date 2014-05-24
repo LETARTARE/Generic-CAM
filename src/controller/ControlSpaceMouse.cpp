@@ -22,9 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "ControlSpaceMouse.h"
@@ -37,6 +34,7 @@ ControlSpaceMouse::ControlSpaceMouse(void)
 {
 	InBuffer[0] = 0;
 	idx = 0;
+	isInitialized = false;
 }
 
 ControlSpaceMouse::~ControlSpaceMouse(void)
@@ -44,17 +42,24 @@ ControlSpaceMouse::~ControlSpaceMouse(void)
 
 }
 
+bool ControlSpaceMouse::Open(void)
+{
+	bool flag = Control3DAbstract::Open();
+	isInitialized = false;
+	return flag;
+}
+
 void ControlSpaceMouse::InitDevice()
 {
 	InBuffer[0] = 0;
 	idx = 0;
 
-
 	// Start of data transmission
-	//	char OutBuffer[40];
-	//	OutBuffer[0] = 0;
-	//	strcpy((char *) OutBuffer, "CB\rNT\rFTp\rFRp\rP@r@r\rMSSV\rZ\rBcC\r");
-	//	port.SendData(OutBuffer, strlen(OutBuffer));
+	char OutBuffer[40];
+	OutBuffer[0] = 0;
+	strcpy((char *) OutBuffer, "\r\rm3\r");
+	port.SendData(OutBuffer, strlen(OutBuffer));
+	isInitialized = true;
 }
 
 bool ControlSpaceMouse::ProcessPacket()
@@ -62,6 +67,12 @@ bool ControlSpaceMouse::ProcessPacket()
 	//static unsigned char spaceorb_errors[7][256] = { "EEPROM storing 0 failed", "Receive queue overflow", "Transmit queue timeout","Bad packet", "Power brown-out", "EEPROM checksum error", "Hardware fault" };
 	//unsigned char c = 0;
 	unsigned char i;
+
+	// TODO: Find a more general was to initialize the device.
+	// The initialize function is called after the first packet is received. If
+	// it is done directly after opening of the port, the device is not yet ready
+	// to receive commands.
+	if(!isInitialized) InitDevice();
 
 	if(idx < 2) return false;
 
@@ -85,7 +96,6 @@ bool ControlSpaceMouse::ProcessPacket()
 
 	if(error) return false; // Wrong characters in stream
 
-
 	switch(InBuffer[0]){
 	case 'd':
 		if(idx != 25) break;
@@ -96,10 +106,8 @@ bool ControlSpaceMouse::ProcessPacket()
 		Axis[4] = data[4] - (1 << 15);
 		Axis[5] = data[5] - (1 << 15);
 
-
 		//wxLogMessage(_T("%8u %8u %8u %8u %8u %8u"), data[0], data[1], data[2],
 		//	data[3], data[4], data[5]);
-
 
 		//		for(i = 0; i < 6; i++)
 		//			Axis[i] = (((int16_t) Axis[i]) << 16) >> 16;

@@ -36,9 +36,9 @@ WX_DEFINE_OBJARRAY(ArrayOfStockMaterial)
 StockMaterial::StockMaterial()
 {
 	materialName = _T("Default");
-	x = 0.626-0.063;
-	y = 0.435-0.008 - 0.020;
-	z = 0.0145;
+	sx = 0.626-0.063;
+	sy = 0.435-0.008 - 0.020;
+	sz = 0.0145;
 
 	matrix.TranslateGlobal(0.063,0.008,0.0);
 
@@ -64,40 +64,40 @@ void StockMaterial::Paint(void)
 	::glColor4f(color.x, color.y, color.z, 0.4);
 
 	::glNormal3f(1, 0, 0);
-	::glVertex3f(x, y, z);
-	::glVertex3f(x, 0, z);
-	::glVertex3f(x, 0, 0);
-	::glVertex3f(x, y, 0);
+	::glVertex3f(sx, sy, sz);
+	::glVertex3f(sx, 0, sz);
+	::glVertex3f(sx, 0, 0);
+	::glVertex3f(sx, sy, 0);
 
 	::glNormal3f(-1, 0, 0);
-	::glVertex3f(0, y, z);
-	::glVertex3f(0, y, 0);
+	::glVertex3f(0, sy, sz);
+	::glVertex3f(0, sy, 0);
 	::glVertex3f(0, 0, 0);
-	::glVertex3f(0, 0, z);
+	::glVertex3f(0, 0, sz);
 
 	::glNormal3f(0, 1, 0);
-	::glVertex3f(x, y, z);
-	::glVertex3f(x, y, 0);
-	::glVertex3f(0, y, 0);
-	::glVertex3f(0, y, z);
+	::glVertex3f(sx, sy, sz);
+	::glVertex3f(sx, sy, 0);
+	::glVertex3f(0, sy, 0);
+	::glVertex3f(0, sy, sz);
 
 	::glNormal3f(0, -1, 0);
-	::glVertex3f(x, 0, z);
-	::glVertex3f(0, 0, z);
+	::glVertex3f(sx, 0, sz);
+	::glVertex3f(0, 0, sz);
 	::glVertex3f(0, 0, 0);
-	::glVertex3f(x, 0, 0);
+	::glVertex3f(sx, 0, 0);
 
 	::glNormal3f(0, 0, 1);
-	::glVertex3f(x, y, z);
-	::glVertex3f(0, y, z);
-	::glVertex3f(0, 0, z);
-	::glVertex3f(x, 0, z);
+	::glVertex3f(sx, sy, sz);
+	::glVertex3f(0, sy, sz);
+	::glVertex3f(0, 0, sz);
+	::glVertex3f(sx, 0, sz);
 
 	::glNormal3f(0, 0, -1);
-	::glVertex3f(x, y, 0);
-	::glVertex3f(x, 0, 0);
+	::glVertex3f(sx, sy, 0);
+	::glVertex3f(sx, 0, 0);
 	::glVertex3f(0, 0, 0);
-	::glVertex3f(0, y, 0);
+	::glVertex3f(0, sy, 0);
 
 	::glEnd();
 

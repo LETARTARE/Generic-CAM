@@ -22,9 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -48,15 +45,16 @@ private:
 
 	// Methods
 public:
-	virtual const unsigned char ReturnID()
+	const unsigned char ReturnID()
 	{
 		return CONTROLSPACEBALL_ID;
 	}
 protected:
 
-	virtual void InitDevice();
-	virtual bool ProcessPacket();
-	virtual void DataIn(unsigned char c);
+	void InitDevice();
+
+	bool ProcessPacket();
+	void DataIn(unsigned char c);
 };
 
 #endif //_CONTROLSPACEBALL_H_

@@ -32,6 +32,8 @@
 #ifndef ABOUTDIALOG_H_
 #define ABOUTDIALOG_H_
 
+#include <wx/event.h>
+
 #include "../StdInclude.h"
 #include "gui.h"
 

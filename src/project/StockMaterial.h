@@ -22,9 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -38,9 +35,10 @@
 #include "../3D/Vector3.h"
 
 /*!\class StockMaterial
- * \brief ...
+ * \brief Definition of one piece of raw material.
  *
- * ...
+ * The material is defined as a Quadtree to speed up drawing.
+ *
  */
 
 class StockMaterial {
@@ -55,7 +53,7 @@ public:
 	Vector3 color;
 
 	wxString materialName;
-	float x, y, z;
+	float sx, sy, sz;
 	float maxSpeed;
 	float maxFeedrate;
 	float thermalConductivity;

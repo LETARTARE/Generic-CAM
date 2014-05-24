@@ -23,11 +23,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #ifndef _CONTROLSPACEORB_H_
 #define _CONTROLSPACEORB_H_
@@ -37,7 +33,6 @@
 #define CONTROLSPACEORB_MAXDATALENGTH	64
 #define CONTROLSPACEORB_ID 2
 class ControlSpaceOrb:public Control3DAbstract {
-
 
 	// Constructor /Destructor
 public:
@@ -53,14 +48,14 @@ private:
 
 	// Methods
 public:
-	virtual const unsigned char ReturnID()
+	const unsigned char ReturnID()
 	{
 		return CONTROLSPACEORB_ID;
 	}
 protected:
-	virtual void InitDevice();
-	virtual bool ProcessPacket();
-	virtual void DataIn(unsigned char c);
+	void InitDevice();
+	bool ProcessPacket();
+	void DataIn(unsigned char c);
 
 };
 

@@ -22,11 +22,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #ifndef CONTROLSPACEMOUSE_H_
 #define CONTROLSPACEMOUSE_H_
@@ -48,15 +44,16 @@ private:
 
 	// Methods
 public:
-	virtual const unsigned char ReturnID()
+	const unsigned char ReturnID()
 	{
 		return CONTROLSPACEMOUSE_ID;
 	}
 protected:
-
-	virtual void InitDevice();
-	virtual bool ProcessPacket();
-	virtual void DataIn(unsigned char c);
+	bool isInitialized;
+	void InitDevice();
+	bool Open(void);
+	bool ProcessPacket();
+	void DataIn(unsigned char c);
 };
 
 #endif /* CONTROLSPACEMOUSE_H_ */

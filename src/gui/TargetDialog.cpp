@@ -59,11 +59,11 @@ bool TargetDialog::TransferDataToWindow(void)
 	Unit temp = linkedProject->Distance;
 
 	m_textCtrlSliceThickness->SetValue(wxString::Format(_T("%.1f"),
-			temp.FromSI(linkedProject->stock.stockMaterials[0].z)));
+			temp.FromSI(linkedProject->stock.stockMaterials[0].sz)));
 
 	m_textCtrlSliceNumber->SetValue(wxString::Format(_T("%i"), (int) ceil(
 			linkedProject->objects[linkedProject->activeObject].bbox.GetSizeZ()
-					/ linkedProject->stock.stockMaterials[0].z)));
+					/ linkedProject->stock.stockMaterials[0].sz)));
 
 	m_textCtrlSlotWidth->SetValue(wxString::Format(_T("%.1f"), temp.FromSI(
 			linkedProject->slotWidth)));
@@ -88,8 +88,8 @@ bool TargetDialog::TransferDataFromWindow(void)
 void TargetDialog::OnFromStock(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
-//	linkedProject->stock.stockMaterials[0].z
-//			= linkedProject->stock.stockMaterials[linkedProject->activeStock].z;
+//	linkedProject->stock.stockMaterials[0].sz
+//			= linkedProject->stock.stockMaterials[linkedProject->activeStock].sz;
 	TransferDataToWindow();
 }
 

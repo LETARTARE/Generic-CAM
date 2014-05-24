@@ -22,31 +22,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef PROJECT_H_
 #define PROJECT_H_
 
-#include "Object.h"
-#include "Toolbox.h"
-#include "../machine/Machine.h"
-#include "Workpiece.h"
-#include "ToolPath.h"
-
-#include "Run.h"
-#include "Target.h"
-#include "Stock.h"
-#include "Unit.h"
-
-#include "../generator/OctreeGenerator.h"
-
+#include <stddef.h>
+#include <wx/defs.h>
+#include <wx/dynarray.h>
+#include <wx/filename.h>
 #include <wx/string.h>
 #include <wx/xml/xml.h>
 
-#include <wx/dynarray.h>
+#include "../3D/OctreeGenerator.h"
+#include "../3D/Quadtree.h"
+#include "../machine/Machine.h"
+#include "Object.h"
+#include "Run.h"
+#include "Stock.h"
+#include "Target.h"
+#include "Toolbox.h"
+#include "ToolPath.h"
+#include "Unit.h"
+#include "Workpiece.h"
 
 /*!\class Project
  * \brief Holds the data for an project.
@@ -70,7 +68,7 @@ public:
 	// Member variables
 public:
 	wxFileName fileName;
-	wxString projectName;
+	wxString name;
 
 	Machine machine;
 
@@ -78,6 +76,7 @@ public:
 	Stock stock;
 
 	OctreeGenerator octree;
+	Quadtree quadtree;
 
 	size_t activeObject;
 	size_t activeStock;
@@ -137,13 +136,12 @@ public:
 	void FlipRun(void);
 
 	void InsertDrillGrid(Run &run, double sizex, double sizey, bool flipped =
-			true);
+	true);
 	void GenerateTargets(void);
 
 private:
 	void XMLRemoveAllChildren(wxXmlNode* node);
 };
-WX_DECLARE_OBJARRAY(Project, ArrayOfProject)
-;
+WX_DECLARE_OBJARRAY(Project, ArrayOfProject);
 
 #endif /* PROJECT_H_ */

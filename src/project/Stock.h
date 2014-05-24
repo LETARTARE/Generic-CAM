@@ -22,9 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -48,18 +45,14 @@ public:
 	virtual ~Stock();
 	// Member variables
 public:
-
+	wxString name;
 	wxFileName fileName;
-
 	ArrayOfStockMaterial stockMaterials;
 
 private:
 
-
 	// Methods
 public:
-
-	void Paint(void);
 
 };
 

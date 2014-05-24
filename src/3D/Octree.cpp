@@ -22,17 +22,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "Octree.h"
 
-#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
-WX_DEFINE_OBJARRAY(ArrayOfOctree)
-
 #include <math.h>
+#include <stddef.h>
+#include <wx/arrimpl.cpp>
+
+// this is a magic incantation which must be done!
+WX_DEFINE_OBJARRAY(ArrayOfOctree)
 
 OctreeCell::OctreeCell(bool isSolid)
 {

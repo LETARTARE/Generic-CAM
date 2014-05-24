@@ -197,7 +197,6 @@ void OpenGLCanvas::InitGL()
 	//	GLfloat attenuation[] =
 	//		{1.0f, -0.01f, -.000001f};
 	//::glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, attenuation, 0);
-
 	::glEnable(GL_COLOR_MATERIAL);
 	::glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	::glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -214,15 +213,15 @@ void OpenGLCanvas::InitGL()
 void OpenGLCanvas::SetupLighting() // Eine Lampe in die Szene setzen
 {
 	GLfloat ambient0[] =
-		{0.4f, 0.4f, 0.4f};
+		{0.8f, 0.8f, 0.8f};
 	GLfloat diffuse0[] =
-		{0.7f, 0.7f, 0.7f};
+		{0.9f, 0.9f, 0.9f};
 	GLfloat specular0[] =
-		{8.0f, 8.0f, 8.0f};
+		{1.0f, 1.0f, 1.0f};
 	GLfloat position0[] =
 		{-20, 20, 50, 0};
-//	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient0);
-//	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse0);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient0);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse0);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specular0);
 	glLightfv(GL_LIGHT0, GL_POSITION, position0);
 	glEnable(GL_LIGHT0); // ... und anschalten

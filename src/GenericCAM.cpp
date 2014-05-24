@@ -39,8 +39,8 @@ IMPLEMENT_APP(GenericCAMApp)
 
 GenericCAMApp::GenericCAMApp()
 {
-
-	config = new wxConfig(_T("GenericCAM"));
+	frame = NULL;
+	config = new wxConfig(_T("genericcam"));
 
 	unsigned int selectedLanguage = wxLocale::GetSystemLanguage();
 	if(selectedLanguage == wxLANGUAGE_UNKNOWN) selectedLanguage =

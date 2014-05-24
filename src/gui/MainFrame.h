@@ -22,9 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef MAINFRAME_H_
@@ -76,17 +73,17 @@ public:
 
 	// Member variables
 private:
+
 	wxConfig *config;
 	wxLocale *locale;
 	Control3D control;
 	wxLogWindow* logWindow;
 
-	wxFileName lastObjectFileName;
-
-	ArrayOfProject project;
-	size_t selectedTargetPosition;
+	ArrayOfProject project; ///> List of projects. This is the link between GUI and the actual generator.
 
 	size_t activeProject;
+	wxFileName lastObjectFileName;
+	size_t selectedTargetPosition;
 
 	ObjectFrame* objectFrame;
 	StockFrame* stockFrame;
@@ -101,7 +98,6 @@ private:
 public:
 
 	void LoadProject(wxString fileName);
-
 
 private:
 	bool TransferDataToWindow(void);

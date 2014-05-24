@@ -22,9 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef CONTROL3DABSTRACT_H_
@@ -55,7 +52,7 @@ protected:
 	// Methods
 public:
 	///\brief Opens the connection to the serial port.
-	bool Open();
+	virtual bool Open();
 	///\brief Closes the connection to the serial port.
 	void Close();
 	///\brief Sets a new port address
@@ -83,7 +80,6 @@ public:
 	///\brief Returns an ID for the given 6-DOF driver.
 	virtual const unsigned char ReturnID() = 0;
 protected:
-	virtual void InitDevice();
 	virtual bool ProcessPacket() = 0;
 	virtual void DataIn(unsigned char c) = 0;
 

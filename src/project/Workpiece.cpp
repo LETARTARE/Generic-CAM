@@ -40,7 +40,7 @@ Workpiece::Workpiece(const double sizeX, const double sizeY,
 
 Workpiece::Workpiece(StockMaterial* material, const double resolution)
 {
-	this->SetupBox(material->x, material->y, material->y, resolution,
+	this->SetupBox(material->sx, material->sy, material->sy, resolution,
 			resolution);
 }
 

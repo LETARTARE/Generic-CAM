@@ -22,9 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "Control3DAbstract.h"
@@ -43,11 +40,6 @@ Control3DAbstract::Control3DAbstract()
 }
 
 Control3DAbstract::~Control3DAbstract()
-{
-
-}
-
-void Control3DAbstract::InitDevice()
 {
 
 }
