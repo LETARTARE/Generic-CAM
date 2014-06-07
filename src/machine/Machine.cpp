@@ -184,7 +184,7 @@ void Machine::Assemble()
 void Machine::EvaluateDescription(void)
 {
 	wxLogMessage(_T("Machine::InsertMachineDescription"));
-	evaluator.LinkToMachine(this);
+	evaluator.LinkToProject(this);
 	if(evaluator.EvaluateProgram())
 		initialized = true;
 	else

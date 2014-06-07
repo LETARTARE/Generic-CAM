@@ -94,7 +94,7 @@ protected:
 	// Methods
 public:
 
-	void LinkToMachine(Machine* machine);
+	void LinkToProject(Machine* machine);
 	void InsertVariable(wxString vName, float vValue);
 
 	bool EvaluateProgram();

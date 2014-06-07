@@ -72,7 +72,7 @@ LUACodeEvaluator::~LUACodeEvaluator()
 	L = NULL;
 }
 
-void LUACodeEvaluator::LinkToMachine(Machine* machine)
+void LUACodeEvaluator::LinkToProject(Machine* machine)
 {
 	linkedMachine = machine;
 }
