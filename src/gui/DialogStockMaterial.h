@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ToolboxFrame.h
-// Purpose            : A window to edit tools in the toolbox.
+// Name               : DialogStockMaterial.h
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 14.03.2010
-// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 15.06.2011
+// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,55 +22,41 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef TOOLBOXFRAME_H_
-#define TOOLBOXFRAME_H_
+#ifndef DIALOGSTOCKMATERIAL_H_
+#define DIALOGSTOCKMATERIAL_H_
 
 #include "gui.h"
 #include "../project/Project.h"
 
-class ToolboxFrame:public GUIToolboxFrame {
+/*!\class DialogStockMaterial
+ * \brief ...
+ *
+ * ...
+ */
+
+class DialogStockMaterial:public GUIStockMaterial {
 	// Constructor/ Destructor
 
 public:
-	ToolboxFrame(wxWindow* parent);
-	virtual ~ToolboxFrame();
-
+	DialogStockMaterial(wxWindow* parent);
+	virtual ~DialogStockMaterial();
 	// Member Variables
 
-	Project * linkedProject;
+	Project* linkedProject;
 
-	unsigned int selectedTool;
-	unsigned int selectedElement;
+	size_t selectedStockMaterial;
 
 	// Methods
 public:
-
-	void InsertProject(Project *project);
-	void SetController(Control3D& control);
-
 	void OnClose(wxCommandEvent& event);
-	void OnChangeStereo3D(wxCommandEvent& event);
+	void InsertProject(Project* project);
 
+private:
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
-
-
-	void OnNewTool( wxCommandEvent& event ) ;
-	void OnUpdateTool( wxCommandEvent& event ) ;
-	void OnDeleteTool( wxCommandEvent& event ) ;
-	void OnShapeNew( wxCommandEvent& event ) ;
-	void OnShapeUpdate( wxCommandEvent& event ) ;
-	void OnShapeDelete( wxCommandEvent& event ) ;
-	void OnShapeSelect( wxListEvent& event ) ;
-
-
-
 };
 
-#endif /* TOOLBOXFRAME_H_ */
+#endif /* DIALOGSTOCKMATERIAL_H_ */

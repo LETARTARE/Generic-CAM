@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : AnimationFrame.cpp
+// Name               : DialogAnimation.h
 // Purpose            : A window displaying the animation controls.
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -22,55 +22,37 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: 2010-05-22 01:40:18 +0200 (Sa, 22. Mai 2010) $
-//$Revision: 45 $
-//$LastChangedBy: tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef ANIMATIONFRAME_H_
+#define ANIMATIONFRAME_H_
 
-#include "AnimationFrame.h"
+#include "gui.h"
 
-AnimationFrame::AnimationFrame(wxWindow* parent) :
-	GUIAnimationFrame(parent)
-{
-}
+class DialogAnimation:public GUIAnimation {
+	// Constructor/ Destructor
+public:
+	DialogAnimation(wxWindow* parent);
+	virtual ~DialogAnimation();
 
-AnimationFrame::~AnimationFrame()
-{
-}
+	// Member Variables
+public:
+	Project* linkedProject;
 
-void AnimationFrame::InsertProject(Project *project)
-{
-	linkedProject = project;
-	TransferDataToWindow();
-}
+	// Methods
+public:
+	void InsertProject(Project *project);
 
-void AnimationFrame::OnClose(wxCommandEvent &event)
-{
-	Close();
-}
+	bool TransferDataToWindow(void);
+	bool TransferDataFromWindow(void);
+	void OnClose(wxCommandEvent &event);
 
-bool AnimationFrame::TransferDataToWindow(void)
-{
-	return true;
-}
-bool AnimationFrame::TransferDataFromWindow(void)
-{
-	return true;
-}
+	void OnLast(wxCommandEvent& event);
+	void OnBegin(wxCommandEvent& event);
+	void OnPlayStop(wxCommandEvent& event);
+	void OnEnd(wxCommandEvent& event);
+	void OnNext(wxCommandEvent& event);
 
-void AnimationFrame::OnLast(wxCommandEvent& event)
-{
-}
-void AnimationFrame::OnBegin(wxCommandEvent& event)
-{
-}
-void AnimationFrame::OnPlayStop(wxCommandEvent& event)
-{
-}
-void AnimationFrame::OnEnd(wxCommandEvent& event)
-{
-}
-void AnimationFrame::OnNext(wxCommandEvent& event)
-{
-}
+};
+
+#endif /* ANIMATIONFRAME_H_ */

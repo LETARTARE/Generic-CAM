@@ -22,15 +22,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "Project.h"
 #include "../Config.h"
-#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
-WX_DEFINE_OBJARRAY(ArrayOfProject)
 
 #include <GL/gl.h>
 #include <math.h>
@@ -40,7 +35,7 @@ Project::Project()
 	doc.SetFileEncoding(_T("UTF-8"));
 	//doc.SetVersion(_T(_GENERICCAM_VERSION));
 	doc.SetVersion(_T("1.0"));
-	ClearProject();
+	Clear();
 
 	middleY = 0.212;
 	offsetX = 0.100;
@@ -51,7 +46,7 @@ Project::~Project()
 {
 }
 
-void Project::ClearProject(void)
+void Project::Clear(void)
 {
 	objects.Empty();
 	runs.Empty();
@@ -198,7 +193,7 @@ bool Project::Load(wxFileName fileName)
 		return false;
 	}
 
-	ClearProject();
+	Clear();
 
 	Object* tempObject = NULL;
 	Tool* tempTool = NULL;

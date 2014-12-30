@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : StockFrame.cpp
+// Name               : DialogStockMaterial.cpp
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -22,38 +22,35 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#include "StockFrame.h"
+#include "DialogStockMaterial.h"
 
-StockFrame::StockFrame(wxWindow* parent) :
-	GUIStockFrame(parent)
+DialogStockMaterial::DialogStockMaterial(wxWindow* parent) :
+GUIStockMaterial(parent)
 {
 	linkedProject = NULL;
 	selectedStockMaterial = 0;
 
 }
 
-StockFrame::~StockFrame()
+DialogStockMaterial::~DialogStockMaterial()
 {
 }
-void StockFrame::OnClose(wxCommandEvent& event)
+void DialogStockMaterial::OnClose(wxCommandEvent& event)
 {
 	Close();
 }
 
-void StockFrame::InsertProject(Project* project)
+void DialogStockMaterial::InsertProject(Project* project)
 {
 	linkedProject = project;
 
 	TransferDataToWindow();
 }
 
-bool StockFrame::TransferDataToWindow(void)
+bool DialogStockMaterial::TransferDataToWindow(void)
 {
 	if(linkedProject == NULL) return false;
 
@@ -87,7 +84,7 @@ bool StockFrame::TransferDataToWindow(void)
 	return true;
 
 }
-bool StockFrame::TransferDataFromWindow(void)
+bool DialogStockMaterial::TransferDataFromWindow(void)
 {
 
 	return true;

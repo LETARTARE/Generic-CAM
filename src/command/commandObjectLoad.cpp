@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Object.h
-// Purpose            :
+// Name               : commandObjectLoad.cpp
+// Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 03.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 29.12.2014
+// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,57 +24,16 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "commandObjectLoad.h"
 
-#ifndef OBJECT_H_
-#define OBJECT_H_
+commandObjectLoad::commandObjectLoad()
+{
+	// TODO Auto-generated constructor stub
+	
+}
 
-#include "../3D/Geometry.h"
-#include "../3D/BoundingBox.h"
+commandObjectLoad::~commandObjectLoad()
+{
+	// TODO Auto-generated destructor stub
+}
 
-#include <wx/filename.h>
-#include <wx/dynarray.h>
-#include <wx/xml/xml.h>
-/*!\class Object
- * \brief ...
- *
- * ...
- */
-
-class Object {
-	// Constructor / Destructor
-public:
-	Object();
-	virtual ~Object();
-
-	// Member variables
-public:
-
-	AffineTransformMatrix matrix;
-
-	wxFileName fileName;
-
-	ArrayOfGeometry geometries;
-	BoundingBox bbox;
-
-private:
-
-
-	// Methods
-public:
-
-	void UpdateBoundingBox(void);
-	void Paint(void);
-
-	bool LoadObject(wxFileName fileName);
-	bool ReloadObject(void);
-
-	void ToXml(wxXmlNode* parentNode);
-	bool FromXml(wxXmlNode* node);
-
-private:
-	void XMLRemoveAllChildren(wxXmlNode* node);
-};
-WX_DECLARE_OBJARRAY(Object, ArrayOfObject)
-;
-
-#endif /* OBJECT_H_ */

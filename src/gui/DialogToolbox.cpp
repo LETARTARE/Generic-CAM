@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ToolboxFrame.cpp
+// Name               : DialogToolbox.cpp
 // Purpose            : A window to edit tools in the toolbox.
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -22,16 +22,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "DialogToolbox.h"
 
-#include "ToolboxFrame.h"
-
-ToolboxFrame::ToolboxFrame(wxWindow* parent) :
-	GUIToolboxFrame(parent)
+DialogToolbox::DialogToolbox(wxWindow* parent) :
+		GUIToolbox(parent)
 {
 	linkedProject = NULL;
 	selectedTool = 0;
@@ -40,21 +36,21 @@ ToolboxFrame::ToolboxFrame(wxWindow* parent) :
 	m_menuSettings->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
 }
 
-ToolboxFrame::~ToolboxFrame()
+DialogToolbox::~DialogToolbox()
 {
 }
 
-void ToolboxFrame::OnClose(wxCommandEvent& event)
+void DialogToolbox::OnClose(wxCommandEvent& event)
 {
 	Close();
 }
 
-void ToolboxFrame::SetController(Control3D& control)
+void DialogToolbox::SetController(Control3D& control)
 {
 	m_canvas->SetController(control);
 }
 
-void ToolboxFrame::OnChangeStereo3D(wxCommandEvent& event)
+void DialogToolbox::OnChangeStereo3D(wxCommandEvent& event)
 {
 	if(m_canvas->stereoMode == 1){
 		m_canvas->stereoMode = 0;
@@ -64,13 +60,13 @@ void ToolboxFrame::OnChangeStereo3D(wxCommandEvent& event)
 	m_menuSettings->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
 }
 
-void ToolboxFrame::InsertProject(Project *project)
+void DialogToolbox::InsertProject(Project *project)
 {
 	linkedProject = project;
 	TransferDataToWindow();
 }
 
-bool ToolboxFrame::TransferDataToWindow(void)
+bool DialogToolbox::TransferDataToWindow(void)
 {
 
 	if(linkedProject == NULL) return false;
@@ -99,31 +95,32 @@ bool ToolboxFrame::TransferDataToWindow(void)
 
 		Tool *temp = &(linkedProject->toolbox.tools[selectedTool]);
 
-		m_textCtrlShaftDiameter->SetValue(wxString::Format(_T("%f"),
-				temp->shaftDiameter));
-		m_textCtrlShaftLength->SetValue(wxString::Format(_T("%f"),
-				temp->shaftLength));
-		m_textCtrlMaxSpeed->SetValue(wxString::Format(_T("%.0f"),
-				temp->maxSpeed));
-		m_textCtrlFeedCoefficient->SetValue(wxString::Format(_T("%f"),
-				temp->feedCoefficient));
-		m_textCtrlNrOfTeeth->SetValue(wxString::Format(_T("%u"),
-				temp->nrOfTeeth));
+		m_textCtrlShaftDiameter->SetValue(
+				wxString::Format(_T("%f"), temp->shaftDiameter));
+		m_textCtrlShaftLength->SetValue(
+				wxString::Format(_T("%f"), temp->shaftLength));
+		m_textCtrlMaxSpeed->SetValue(
+				wxString::Format(_T("%.0f"), temp->maxSpeed));
+		m_textCtrlFeedCoefficient->SetValue(
+				wxString::Format(_T("%f"), temp->feedCoefficient));
+		m_textCtrlNrOfTeeth->SetValue(
+				wxString::Format(_T("%u"), temp->nrOfTeeth));
 		m_textCtrlComment->SetValue(temp->comment);
 
 		wxSize sz = m_listCtrl->GetClientSize();
 		unsigned int w = sz.x / 14;
 		m_listCtrl->ClearAll();
-		m_listCtrl->InsertColumn(0, _("Type"), wxLIST_FORMAT_LEFT, 2* w );
-		m_listCtrl->InsertColumn(1, _("Diameter"), wxLIST_FORMAT_LEFT, 3* w );
-		m_listCtrl->InsertColumn(2, _("Height"), wxLIST_FORMAT_LEFT, 3* w );
-		m_listCtrl->InsertColumn(3, _("Radius"), wxLIST_FORMAT_LEFT, 3* w );
-		m_listCtrl->InsertColumn(4, _("Cutting"), wxLIST_FORMAT_LEFT, 3* w );
+		m_listCtrl->InsertColumn(0, _("Type"), wxLIST_FORMAT_LEFT, 2 * w);
+		m_listCtrl->InsertColumn(1, _("Diameter"), wxLIST_FORMAT_LEFT, 3 * w);
+		m_listCtrl->InsertColumn(2, _("Height"), wxLIST_FORMAT_LEFT, 3 * w);
+		m_listCtrl->InsertColumn(3, _("Radius"), wxLIST_FORMAT_LEFT, 3 * w);
+		m_listCtrl->InsertColumn(4, _("Cutting"), wxLIST_FORMAT_LEFT, 3 * w);
 
 		for(j = 0; j < temp->elements.GetCount(); j++){
 
-			wxLogMessage(wxString::Format(_T("Element: %u Type %u"), j,
-					temp->elements[j].t));
+			wxLogMessage(
+					wxString::Format(_T("Element: %u Type %u"), j,
+							temp->elements[j].t));
 
 			switch(temp->elements[j].t){
 			case 0:
@@ -143,12 +140,12 @@ bool ToolboxFrame::TransferDataToWindow(void)
 				break;
 			}
 
-			m_listCtrl->SetItem(j, 1, wxString::Format(_T("%f"),
-					temp->elements[j].d));
-			m_listCtrl->SetItem(j, 2, wxString::Format(_T("%f"),
-					temp->elements[j].h));
-			m_listCtrl->SetItem(j, 3, wxString::Format(_T("%f"),
-					temp->elements[j].r));
+			m_listCtrl->SetItem(j, 1,
+					wxString::Format(_T("%f"), temp->elements[j].d));
+			m_listCtrl->SetItem(j, 2,
+					wxString::Format(_T("%f"), temp->elements[j].h));
+			m_listCtrl->SetItem(j, 3,
+					wxString::Format(_T("%f"), temp->elements[j].r));
 
 			if(temp->elements[j].cutting){
 				m_listCtrl->SetItem(j, 4, _("Yes"));
@@ -161,18 +158,21 @@ bool ToolboxFrame::TransferDataToWindow(void)
 			if(selectedElement < temp->elements.GetCount()){
 
 				m_listCtrl->SetItemState(selectedElement,
-						wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+				wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 
 				m_choiceType->Select(temp->elements[selectedElement].t);
 
-				m_textCtrlDiameter->SetValue(wxString::Format(_T("%f"),
-						temp->elements[selectedElement].d));
-				m_textCtrlHeight->SetValue(wxString::Format(_T("%f"),
-						temp->elements[selectedElement].h));
-				m_textCtrlRadius->SetValue(wxString::Format(_T("%f"),
-						temp->elements[selectedElement].r));
+				m_textCtrlDiameter->SetValue(
+						wxString::Format(_T("%f"),
+								temp->elements[selectedElement].d));
+				m_textCtrlHeight->SetValue(
+						wxString::Format(_T("%f"),
+								temp->elements[selectedElement].h));
+				m_textCtrlRadius->SetValue(
+						wxString::Format(_T("%f"),
+								temp->elements[selectedElement].r));
 
-				m_checkBoxCutting ->SetValue(
+				m_checkBoxCutting->SetValue(
 						temp->elements[selectedElement].cutting);
 
 			}
@@ -181,35 +181,35 @@ bool ToolboxFrame::TransferDataToWindow(void)
 	return true;
 }
 
-bool ToolboxFrame::TransferDataFromWindow(void)
+bool DialogToolbox::TransferDataFromWindow(void)
 {
 	return true;
 }
 
-void ToolboxFrame::OnNewTool(wxCommandEvent& event)
+void DialogToolbox::OnNewTool(wxCommandEvent& event)
 {
 }
 
-void ToolboxFrame::OnUpdateTool(wxCommandEvent& event)
+void DialogToolbox::OnUpdateTool(wxCommandEvent& event)
 {
 }
 
-void ToolboxFrame::OnDeleteTool(wxCommandEvent& event)
+void DialogToolbox::OnDeleteTool(wxCommandEvent& event)
 {
 }
 
-void ToolboxFrame::OnShapeNew(wxCommandEvent& event)
+void DialogToolbox::OnShapeNew(wxCommandEvent& event)
 {
 }
 
-void ToolboxFrame::OnShapeUpdate(wxCommandEvent& event)
+void DialogToolbox::OnShapeUpdate(wxCommandEvent& event)
 {
 }
 
-void ToolboxFrame::OnShapeDelete(wxCommandEvent& event)
+void DialogToolbox::OnShapeDelete(wxCommandEvent& event)
 {
 }
 
-void ToolboxFrame::OnShapeSelect(wxListEvent& event)
+void DialogToolbox::OnShapeSelect(wxListEvent& event)
 {
 }

@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Control6DOFDialog.h
-// Purpose            : Setup dialog for 6DOF controller.
+// Name               : DialogSetupUnits.h
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 25.07.2009
-// Copyright          : (C) 2009 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 03.07.2011
+// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,51 +22,37 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef CONTROL6DOFDIALOG_H_
-#define CONTROL6DOFDIALOG_H_
+#ifndef DIALOGSETUPUNITS_H_
+#define DIALOGSETUPUNITS_H_
 
 #include "../StdInclude.h"
-#include "../Config.h"
-#include "../controller/Control3D.h"
 #include "gui.h"
 
-class Control6DOFDialog:public GUIControl6DOFDialog {
-	// Constructor / Destructor
+/*!\class DialogSetupUnits
+ * \brief ...
+ *
+ * ...
+ */
+
+class DialogSetupUnits:public GUISetupUnits {
+	// Constructor/ Destructor
+
 public:
-	Control6DOFDialog(wxWindow* parent);
-	virtual ~Control6DOFDialog();
-
-	// Member Variables
-protected:
-	Control3D* control;
-
+	DialogSetupUnits(wxWindow* parent);
+	virtual ~DialogSetupUnits();
+	// Member variables
 private:
-	wxTimer timer;
 
-	// Member Functions
+	Project* linkedProject;
+	// Methods
+private:
+	bool TransferDataToWindow(void);
+	bool TransferDataFromWindow(void);
 public:
-	void InsertController(Control3D& control);
-
-
-private:
-	//TODO: The next function shouldn't be here!
-	Control3D *GetControl()
-	{
-		return control;
-	}
-protected:
-	void OnConnect(wxCommandEvent& event);
-	void OnDisconnect(wxCommandEvent& event);
+	void InsertProject(Project *project);
 	void OnClose(wxCommandEvent& event);
-	void OnTimer(wxTimerEvent& event);
-
-	void UpdateData();
 };
 
-#endif /* CONTROL6DOFDIALOG_H_ */
+#endif /* DIALOGSETUPUNITS_H_ */

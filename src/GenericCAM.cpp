@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : GenericCAM.cpp
-// Purpose            : Main entry point.
+// Purpose            : Main entry point
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -22,18 +22,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "GenericCAM.h"
+#include "languages.h"
 
 #ifndef __WIN32__
 #include "icon/logo.xpm"
 #endif
 
-#include "languages.h"
 // The line that starts it all.
 IMPLEMENT_APP(GenericCAMApp)
 

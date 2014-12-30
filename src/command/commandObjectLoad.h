@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : UnitDialog.cpp
-// Purpose            :
+// Name               : commandObjectLoad.h
+// Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 03.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 29.12.2014
+// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,40 +22,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef COMMANDOBJECTLOAD_H_
+#define COMMANDOBJECTLOAD_H_
 
-#include "UnitDialog.h"
+#include <wx/cmdproc.h>
 
-UnitDialog::UnitDialog(wxWindow* parent) :
-	GUIUnitDialog(parent)
-{
-}
+class commandObjectLoad:public wxCommand {
+public:
+	commandObjectLoad();
+	virtual ~commandObjectLoad();
+};
 
-UnitDialog::~UnitDialog()
-{
-}
-
-void UnitDialog::OnClose(wxCommandEvent& event)
-{
-	Close();
-}
-
-void UnitDialog::InsertProject(Project *project)
-{
-	linkedProject = project;
-	TransferDataToWindow();
-}
-
-bool UnitDialog::TransferDataToWindow(void)
-{
-	return true;
-}
-bool UnitDialog::TransferDataFromWindow(void)
-{
-
-	return true;
-}
+#endif /* COMMANDOBJECTLOAD_H_ */

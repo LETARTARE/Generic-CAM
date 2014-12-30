@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : AnimationFrame.h
-// Purpose            : A window displaying the animation controls.
+// Name               : DialogSetup6DOFController.h
+// Purpose            : Setup dialog for 6DOF controller
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 12.07.2011
-// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 25.07.2009
+// Copyright          : (C) 2009 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,41 +22,47 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: 2010-05-22 01:40:18 +0200 (Sa, 22. Mai 2010) $
-//$Revision: 45 $
-//$LastChangedBy: tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef DIALOGSETUP6DOFCONTROLLER_H_
+#define DIALOGSETUP6DOFCONTROLLER_H_
 
-#ifndef ANIMATIONFRAME_H_
-#define ANIMATIONFRAME_H_
-
+#include "../StdInclude.h"
+#include "../Config.h"
+#include "../controller/Control3D.h"
 #include "gui.h"
 
-class AnimationFrame:public GUIAnimationFrame {
-	// Constructor/ Destructor
+class DialogSetup6DOFController:public GUISetup6DOFController {
+	// Constructor / Destructor
 public:
-	AnimationFrame(wxWindow* parent);
-	virtual ~AnimationFrame();
+	DialogSetup6DOFController(wxWindow* parent);
+	virtual ~DialogSetup6DOFController();
 
 	// Member Variables
+protected:
+	Control3D* control;
+
+private:
+	wxTimer timer;
+
+	// Member Functions
 public:
-	Project* linkedProject;
+	void InsertController(Control3D& control);
 
-	// Methods
-public:
-	void InsertProject(Project *project);
+private:
+	//TODO: The next function shouldn't be here!
+	Control3D *GetControl()
+	{
+		return control;
+	}
 
-	bool TransferDataToWindow(void);
-	bool TransferDataFromWindow(void);
-	void OnClose(wxCommandEvent &event);
+protected:
+	void OnConnect(wxCommandEvent& event);
+	void OnDisconnect(wxCommandEvent& event);
+	void OnClose(wxCommandEvent& event);
+	void OnTimer(wxTimerEvent& event);
 
-	void OnLast(wxCommandEvent& event);
-	void OnBegin(wxCommandEvent& event);
-	void OnPlayStop(wxCommandEvent& event);
-	void OnEnd(wxCommandEvent& event);
-	void OnNext(wxCommandEvent& event);
-
+	bool TransferDataToWindow();
 };
 
-#endif /* ANIMATIONFRAME_H_ */
+#endif /* DIALOGSETUP6DOFCONTROLLER_H_ */

@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ErrorFrame.cpp
-// Purpose            : A window to display output and errors.
+// Name               : DialogAbout.h
+// Purpose            : The about dialog.
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 04.03.2010
+// Created            : 21.02.2010
 // Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -22,29 +22,32 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#include "ErrorFrame.h"
-#include <wx/log.h>
 
-ErrorFrame::ErrorFrame(wxWindow* parent) :
-	GUIErrorFrame(parent)
-{
-}
+#ifndef DIALOGABOUT_H_
+#define DIALOGABOUT_H_
 
-ErrorFrame::~ErrorFrame()
-{
-}
+#include <wx/event.h>
 
-void ErrorFrame::SetText(wxString text)
-{
-	this->m_textCtrl->SetValue(text);
-}
-void ErrorFrame::OnClose(wxCommandEvent &event)
-{
-	Close();
-}
+#include "../StdInclude.h"
+#include "gui.h"
+
+class DialogAbout:public GUIAbout {
+	// Constructor/ Destructor
+public:
+	DialogAbout(wxWindow* parent);
+	virtual ~DialogAbout();
+
+	// Member variables
+private:
+
+
+	// Methods
+private:
+
+	void OnClose(wxCommandEvent& event);
+};
+
+#endif /* DIALOGABOUT_H_ */

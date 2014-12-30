@@ -25,3 +25,5 @@ genericcam
 # /machines/
 /machines/testrobot
 /machines/staeubli_rx90
+/Debug_Linux
+/bin_debug

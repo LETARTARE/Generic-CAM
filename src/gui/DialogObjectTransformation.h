@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ObjectFrame.h
-// Purpose            :
+// Name               : DialogObjectTransformation.h
+// Purpose            : Dialog for manipulating objects
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -22,29 +22,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef OBJECTFRAME_H_
-#define OBJECTFRAME_H_
+#ifndef DIALOGOBJECTTRANSFORMATION_H_
+#define DIALOGOBJECTTRANSFORMATION_H_
 
 #include "gui.h"
 #include "../project/Project.h"
 
-/*!\class ObjectFrame
+/*!\class DialogObjectTransformation
  * \brief ...
  *
  * ...
  */
 
-class ObjectFrame:public GUIObjectFrame {
+class DialogObjectTransformation:public GUIObjectTransformation {
 	// Constructor/ Destructor
 public:
-	ObjectFrame(wxWindow* parent);
-	virtual ~ObjectFrame();
+	DialogObjectTransformation(wxWindow* parent);
+	virtual ~DialogObjectTransformation();
 
 	// Member Variables
 
@@ -84,4 +81,4 @@ public:
 
 };
 
-#endif /* OBJECTFRAME_H_ */
+#endif /* DIALOGOBJECTTRANSFORMATION_H_ */

@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : StockFrame.h
-// Purpose            :
+// Name               : DialogAbout.cpp
+// Purpose            : The about dialog.
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 15.06.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 21.02.2010
+// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,44 +22,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "DialogAbout.h"
 
-#ifndef STOCKFRAME_H_
-#define STOCKFRAME_H_
+DialogAbout::DialogAbout(wxWindow* parent) :
+GUIAbout(parent)
+{
+	}
 
-#include "gui.h"
-#include "../project/Project.h"
+DialogAbout::~DialogAbout()
+{
 
-/*!\class StockFrame
- * \brief ...
- *
- * ...
- */
+}
 
-class StockFrame:public GUIStockFrame {
-	// Constructor/ Destructor
-
-public:
-	StockFrame(wxWindow* parent);
-	virtual ~StockFrame();
-	// Member Variables
-
-	Project* linkedProject;
-
-	size_t selectedStockMaterial;
-
-	// Methods
-public:
-	void OnClose(wxCommandEvent& event);
-	void InsertProject(Project* project);
-
-private:
-	bool TransferDataToWindow(void);
-	bool TransferDataFromWindow(void);
-};
-
-#endif /* STOCKFRAME_H_ */
+void DialogAbout::OnClose(wxCommandEvent& event)
+{
+	Close();
+}

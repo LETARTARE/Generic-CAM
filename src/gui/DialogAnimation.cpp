@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : AboutDialog.h
-// Purpose            : The about dialog.
+// Name               : DialogAnimation.cpp
+// Purpose            : A window displaying the animation controls.
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 21.02.2010
+// Created            : 12.07.2011
 // Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -22,35 +22,52 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "DialogAnimation.h"
 
+DialogAnimation::DialogAnimation(wxWindow* parent) :
+		GUIAnimation(parent)
+{
+	linkedProject = NULL;
+}
 
-#ifndef ABOUTDIALOG_H_
-#define ABOUTDIALOG_H_
+DialogAnimation::~DialogAnimation()
+{
+}
 
-#include <wx/event.h>
+void DialogAnimation::InsertProject(Project *project)
+{
+	linkedProject = project;
+	TransferDataToWindow();
+}
 
-#include "../StdInclude.h"
-#include "gui.h"
+void DialogAnimation::OnClose(wxCommandEvent &event)
+{
+	Close();
+}
 
-class AboutDialog:public GUIAboutDialog {
-	// Constructor/ Destructor
-public:
-	AboutDialog(wxWindow* parent);
-	virtual ~AboutDialog();
+bool DialogAnimation::TransferDataToWindow(void)
+{
+	return true;
+}
+bool DialogAnimation::TransferDataFromWindow(void)
+{
+	return true;
+}
 
-	// Member variables
-private:
-
-
-	// Methods
-private:
-
-	void OnClose(wxCommandEvent& event);
-};
-
-#endif /* ABOUTDIALOG_H_ */
+void DialogAnimation::OnLast(wxCommandEvent& event)
+{
+}
+void DialogAnimation::OnBegin(wxCommandEvent& event)
+{
+}
+void DialogAnimation::OnPlayStop(wxCommandEvent& event)
+{
+}
+void DialogAnimation::OnEnd(wxCommandEvent& event)
+{
+}
+void DialogAnimation::OnNext(wxCommandEvent& event)
+{
+}

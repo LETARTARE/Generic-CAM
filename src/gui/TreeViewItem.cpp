@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : UnitDialog.h
-// Purpose            :
+// Name               : TreeViewItem.cpp
+// Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 03.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 29.12.2014
+// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,41 +22,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "TreeViewItem.h"
 
-#ifndef UNITDIALOG_H_
-#define UNITDIALOG_H_
+TreeViewItem::TreeViewItem()
+{
+	nr = 0;
+	dataType = unknown;
+}
 
-#include "../StdInclude.h"
-#include "gui.h"
+TreeViewItem::~TreeViewItem()
+{
+}
 
-/*!\class UnitDialog
- * \brief ...
- *
- * ...
- */
-
-class UnitDialog:public GUIUnitDialog {
-	// Constructor/ Destructor
-
-public:
-	UnitDialog(wxWindow* parent);
-	virtual ~UnitDialog();
-	// Member variables
-private:
-
-	Project* linkedProject;
-	// Methods
-private:
-	bool TransferDataToWindow(void);
-	bool TransferDataFromWindow(void);
-public:
-	void InsertProject(Project *project);
-	void OnClose(wxCommandEvent& event);
-};
-
-#endif /* UNITDIALOG_H_ */

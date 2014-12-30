@@ -27,16 +27,6 @@
 #ifndef PROJECT_H_
 #define PROJECT_H_
 
-#include <stddef.h>
-#include <wx/defs.h>
-#include <wx/dynarray.h>
-#include <wx/filename.h>
-#include <wx/string.h>
-#include <wx/xml/xml.h>
-
-#include "../3D/OctreeGenerator.h"
-#include "../3D/Quadtree.h"
-#include "../machine/Machine.h"
 #include "Object.h"
 #include "Run.h"
 #include "Stock.h"
@@ -45,6 +35,16 @@
 #include "ToolPath.h"
 #include "Unit.h"
 #include "Workpiece.h"
+
+#include "../3D/OctreeGenerator.h"
+#include "../3D/Quadtree.h"
+#include "../machine/Machine.h"
+
+#include <stddef.h>
+#include <wx/defs.h>
+#include <wx/filename.h>
+#include <wx/string.h>
+#include <wx/xml/xml.h>
 
 /*!\class Project
  * \brief Holds the data for an project.
@@ -57,7 +57,6 @@
  * - toolpath generators
  * - generated toolpaths
  *
- *
  */
 
 class Project {
@@ -69,6 +68,8 @@ public:
 public:
 	wxFileName fileName;
 	wxString name;
+
+	ArrayOfObject objects;
 
 	Machine machine;
 
@@ -83,7 +84,6 @@ public:
 	size_t activeTarget;
 	size_t activeRun;
 
-	ArrayOfObject objects;
 	ArrayOfTarget targets;
 	ArrayOfRun runs;
 
@@ -122,10 +122,15 @@ protected:
 
 	// Methods
 public:
-	void ClearProject(void);
-	void Paint(void);
-	bool Save(wxFileName fileName);
+	void Clear(void);
 	bool Load(wxFileName fileName);
+	bool Save(wxFileName fileName);
+
+	void ObjectAdd(wxFileName fileName);
+	void ObjectScale(size_t objNr, float x, float y, float z);
+
+
+	void Paint(void);
 
 	void Assemble(void);
 
@@ -136,12 +141,11 @@ public:
 	void FlipRun(void);
 
 	void InsertDrillGrid(Run &run, double sizex, double sizey, bool flipped =
-	true);
+			true);
 	void GenerateTargets(void);
 
 private:
 	void XMLRemoveAllChildren(wxXmlNode* node);
 };
-WX_DECLARE_OBJARRAY(Project, ArrayOfProject);
 
 #endif /* PROJECT_H_ */

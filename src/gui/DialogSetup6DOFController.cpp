@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Control6DOFDialog.cpp
-// Purpose            : Setup dialog for 6DOF controller.
+// Name               : DialogSetup6DOFController.cpp
+// Purpose            : Setup dialog for 6DOF controller
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -22,22 +22,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
-
-#include "Control6DOFDialog.h"
+#include "DialogSetup6DOFController.h"
 #include <wx/debug.h>
 
-//TODO: There must be a way to get the timer IDs dynamically.
-#define TIMER_DIALOGCONTROL6DOF 1900
-
-Control6DOFDialog::Control6DOFDialog(wxWindow* parent) :
-	GUIControl6DOFDialog(parent)
+DialogSetup6DOFController::DialogSetup6DOFController(wxWindow* parent) :
+		GUISetup6DOFController(parent)
 {
-
 	radioDeviceSelect->SetItemToolTip(0, _("Spaceball by Spacetec IMC"));
 	radioDeviceSelect->SetItemToolTip(1, _("Spaceorb by Spacetec IMC"));
 	radioDeviceSelect->SetItemToolTip(2,
@@ -45,34 +37,29 @@ Control6DOFDialog::Control6DOFDialog(wxWindow* parent) :
 
 	control = NULL;
 
-	timer.SetOwner(this, TIMER_DIALOGCONTROL6DOF);
-
-	this->Connect(wxEVT_TIMER, wxTimerEventHandler(Control6DOFDialog::OnTimer),
+	timer.SetOwner(this);
+	this->Connect(wxEVT_TIMER,
+			wxTimerEventHandler(DialogSetup6DOFController::OnTimer),
 			NULL, this);
-
 	timer.Start(100);
-
-
-	//	timer.Connect( wxEVT_TIMER, wxCommandEventHandler(Control6DOFDialog::OnTimer ), NULL, this );
-
-	//	EVT_TIMER(RINGELWOLF_TIMER_DIALOGCONTROL6DOF, Control6DOFDialog::OnTimer)
-
-
 }
 
-Control6DOFDialog::~Control6DOFDialog()
+DialogSetup6DOFController::~DialogSetup6DOFController()
 {
+	this->Disconnect(wxEVT_TIMER,
+			wxTimerEventHandler(DialogSetup6DOFController::OnTimer),
+			NULL, this);
 }
-void Control6DOFDialog::InsertController(Control3D& control)
+
+void DialogSetup6DOFController::InsertController(Control3D& control)
 {
-	if(&control != NULL){
-		this->control = &control;
-		UpdateData();
-	}
+	this->control = &control;
+	TransferDataToWindow();
 }
-void Control6DOFDialog::UpdateData()
+
+bool DialogSetup6DOFController::TransferDataToWindow()
 {
-	wxASSERT(control!=NULL);
+	if(control == NULL) return false;
 
 	if(control->IsOpen()){
 		buttonConnect->Enable(false);
@@ -102,17 +89,19 @@ void Control6DOFDialog::UpdateData()
 		radioDeviceSelect->SetSelection(1);
 		break;
 	}
+	return true;
 }
 
-void Control6DOFDialog::OnConnect(wxCommandEvent& event)
+void DialogSetup6DOFController::OnConnect(wxCommandEvent& event)
 {
-	wxASSERT(this->control!=NULL);
+	if(control == NULL) return;
 
 	unsigned char i = radioDeviceSelect->GetSelection() + 1;
 
 	if(this->control->IsOpen()){
 		this->control->Close();
-		wxLogMessage(_T("control closed (but should not be open first place)!"));
+		wxLogMessage(
+				_T("control closed (but should not be open first place)!"));
 	}
 
 	switch(i){
@@ -128,32 +117,32 @@ void Control6DOFDialog::OnConnect(wxCommandEvent& event)
 	control->SetType(i);
 	if(control->Open(textPort->GetValue())) wxLogMessage(
 			_T("Connected to 3D controller!"));
-	UpdateData();
+	TransferDataToWindow();
 }
 
-void Control6DOFDialog::OnDisconnect(wxCommandEvent& event)
+void DialogSetup6DOFController::OnDisconnect(wxCommandEvent& event)
 {
-	wxASSERT(this->control!=NULL);
+	if(control == NULL) return;
 	control->Close();
 	wxLogMessage(_T("Disconnected from 3D controller!"));
-	UpdateData();
+	TransferDataToWindow();
 }
-void Control6DOFDialog::OnClose(wxCommandEvent& event)
+void DialogSetup6DOFController::OnClose(wxCommandEvent& event)
 {
 	this->Close();
 }
 
-void Control6DOFDialog::OnTimer(wxTimerEvent& event)
+void DialogSetup6DOFController::OnTimer(wxTimerEvent& event)
 {
 	if(control == NULL) return;
 	if(!control->IsOpen()) return;
 
 	control->Pump();
+
 	m_sliderTx->SetValue(control->GetAxis(0));
 	m_sliderTy->SetValue(control->GetAxis(1));
 	m_sliderTz->SetValue(control->GetAxis(2));
 	m_sliderRx->SetValue(control->GetAxis(3));
 	m_sliderRy->SetValue(control->GetAxis(4));
 	m_sliderRz->SetValue(control->GetAxis(5));
-
 }

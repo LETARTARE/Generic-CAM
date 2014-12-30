@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ErrorFrame.h
-// Purpose            : A window to display output and errors.
+// Name               : DialogSetupUnits.cpp
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 04.03.2010
-// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 03.07.2011
+// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,29 +22,37 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "DialogSetupUnits.h"
 
-#ifndef ERRORFRAME_H_
-#define ERRORFRAME_H_
+DialogSetupUnits::DialogSetupUnits(wxWindow* parent) :
+		GUISetupUnits(parent)
+{
+	linkedProject = NULL;
+}
 
-#include "gui.h"
+DialogSetupUnits::~DialogSetupUnits()
+{
+}
 
-class ErrorFrame:public GUIErrorFrame {
-	// Constructor/ Destructor
-public:
-	ErrorFrame(wxWindow* parent);
-	virtual ~ErrorFrame();
+void DialogSetupUnits::OnClose(wxCommandEvent& event)
+{
+	Close();
+}
 
-	// Member Variables
+void DialogSetupUnits::InsertProject(Project *project)
+{
+	linkedProject = project;
+	TransferDataToWindow();
+}
 
-	// Methods
-public:
-	void SetText(wxString text);
-	void OnClose(wxCommandEvent &event);
-};
+bool DialogSetupUnits::TransferDataToWindow(void)
+{
+	return true;
+}
+bool DialogSetupUnits::TransferDataFromWindow(void)
+{
 
-#endif /* ERRORFRAME_H_ */
+	return true;
+}

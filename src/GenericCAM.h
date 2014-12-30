@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : GenericCAM.h
-// Purpose            : Main entry point.
+// Purpose            : Main entry point
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -22,9 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef GENERICCAM_H_
@@ -32,7 +29,9 @@
 
 #include "StdInclude.h"
 #include "Config.h"
+
 #include "gui/MainFrame.h"
+
 #include <wx/cmdline.h>
 #include <wx/string.h>
 #include <wx/intl.h>

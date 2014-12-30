@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ObjectFrame.cpp
-// Purpose            :
+// Name               : DialogObjectTransformation.cpp
+// Purpose            : Dialog for manipulating objects
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -22,33 +22,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
-
-#include "ObjectFrame.h"
+#include "DialogObjectTransformation.h"
 #include <math.h>
 
-ObjectFrame::ObjectFrame(wxWindow* parent) :
-	GUIObjectFrame(parent)
+DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent) :
+		GUIObjectTransformation(parent)
 {
 	linkedProject = NULL;
 
 }
 
-ObjectFrame::~ObjectFrame()
+DialogObjectTransformation::~DialogObjectTransformation()
 {
 }
 
-void ObjectFrame::InsertProject(Project *project)
+void DialogObjectTransformation::InsertProject(Project *project)
 {
 	linkedProject = project;
 	TransferDataToWindow();
 }
 
-bool ObjectFrame::TransferDataToWindow(void)
+bool DialogObjectTransformation::TransferDataToWindow(void)
 {
 	if(linkedProject == NULL) return false;
 
@@ -67,18 +63,15 @@ bool ObjectFrame::TransferDataToWindow(void)
 	Unit temp = linkedProject->Distance;
 
 	m_textCtrlSizeX->SetValue(
-			wxString::Format(
-					_T("%.3f"),
+			wxString::Format(_T("%.3f"),
 					temp.FromSI(
 							linkedProject->objects[linkedProject->activeObject].bbox.GetSizeX())));
 	m_textCtrlSizeY->SetValue(
-			wxString::Format(
-					_T("%.3f"),
+			wxString::Format(_T("%.3f"),
 					temp.FromSI(
 							linkedProject->objects[linkedProject->activeObject].bbox.GetSizeY())));
 	m_textCtrlSizeZ->SetValue(
-			wxString::Format(
-					_T("%.3f"),
+			wxString::Format(_T("%.3f"),
 					temp.FromSI(
 							linkedProject->objects[linkedProject->activeObject].bbox.GetSizeZ())));
 
@@ -91,42 +84,44 @@ bool ObjectFrame::TransferDataToWindow(void)
 
 	return true;
 }
-bool ObjectFrame::TransferDataFromWindow(void)
+bool DialogObjectTransformation::TransferDataFromWindow(void)
 {
 
 	return true;
 }
 
-void ObjectFrame::OnClose(wxCommandEvent& event)
+void DialogObjectTransformation::OnClose(wxCommandEvent& event)
 {
 	Close();
 }
 
-void ObjectFrame::OnOpen(wxCommandEvent& event)
+void DialogObjectTransformation::OnOpen(wxCommandEvent& event)
 {
 }
-void ObjectFrame::OnReLoad(wxCommandEvent& event)
+void DialogObjectTransformation::OnReLoad(wxCommandEvent& event)
 {
 }
-void ObjectFrame::OnSaveAs(wxCommandEvent& event)
+void DialogObjectTransformation::OnSaveAs(wxCommandEvent& event)
 {
 }
-void ObjectFrame::OnUpdate(wxCommandEvent& event)
+void DialogObjectTransformation::OnUpdate(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
 	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
 	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
 
 	size_t i;
-	for(i = 0; i
-			< linkedProject->objects[linkedProject->activeObject].geometries.GetCount(); i++)
+	for(i = 0;
+			i
+					< linkedProject->objects[linkedProject->activeObject].geometries.GetCount();
+			i++)
 		linkedProject->objects[linkedProject->activeObject].geometries[i].CalculateNormals();
 
 	this->GetParent()->Refresh();
 
 	TransferDataToWindow();
 }
-void ObjectFrame::OnMultiplyByTen(wxCommandEvent& event)
+void DialogObjectTransformation::OnMultiplyByTen(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
 	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
@@ -137,7 +132,7 @@ void ObjectFrame::OnMultiplyByTen(wxCommandEvent& event)
 	TransferDataToWindow();
 
 }
-void ObjectFrame::OnDivideByTen(wxCommandEvent& event)
+void DialogObjectTransformation::OnDivideByTen(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
 	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
@@ -147,7 +142,7 @@ void ObjectFrame::OnDivideByTen(wxCommandEvent& event)
 	this->GetParent()->Refresh();
 	TransferDataToWindow();
 }
-void ObjectFrame::OnScalePercent(wxCommandEvent& event)
+void DialogObjectTransformation::OnScalePercent(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
 	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
@@ -161,91 +156,91 @@ void ObjectFrame::OnScalePercent(wxCommandEvent& event)
 	this->GetParent()->Refresh();
 	TransferDataToWindow();
 }
-void ObjectFrame::ScaleUnitX(wxCommandEvent& event)
+void DialogObjectTransformation::ScaleUnitX(wxCommandEvent& event)
 {
 }
-void ObjectFrame::OnScalePercentX(wxCommandEvent& event)
+void DialogObjectTransformation::OnScalePercentX(wxCommandEvent& event)
 {
 }
-void ObjectFrame::OnScaleUnitY(wxCommandEvent& event)
+void DialogObjectTransformation::OnScaleUnitY(wxCommandEvent& event)
 {
 }
-void ObjectFrame::OnScalePercentY(wxCommandEvent& event)
+void DialogObjectTransformation::OnScalePercentY(wxCommandEvent& event)
 {
 }
-void ObjectFrame::OnScaleUnitZ(wxCommandEvent& event)
+void DialogObjectTransformation::OnScaleUnitZ(wxCommandEvent& event)
 {
 }
-void ObjectFrame::OnScalePercentZ(wxCommandEvent& event)
+void DialogObjectTransformation::OnScalePercentZ(wxCommandEvent& event)
 {
 }
 
-void ObjectFrame::OnYMinus(wxCommandEvent& event)
+void DialogObjectTransformation::OnYMinus(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
 	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
 
-	linkedProject->objects[linkedProject->activeObject].matrix
-			*= AffineTransformMatrix::RotateXYZ(0, -M_PI_2, 0);
+	linkedProject->objects[linkedProject->activeObject].matrix *=
+			AffineTransformMatrix::RotateXYZ(0, -M_PI_2, 0);
 
 	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
 	this->GetParent()->Refresh();
 	TransferDataToWindow();
 
 }
-void ObjectFrame::OnXMinus(wxCommandEvent& event)
+void DialogObjectTransformation::OnXMinus(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
 	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
 
-	linkedProject->objects[linkedProject->activeObject].matrix
-			*= AffineTransformMatrix::RotateXYZ(-M_PI_2, 0, 0);
+	linkedProject->objects[linkedProject->activeObject].matrix *=
+			AffineTransformMatrix::RotateXYZ(-M_PI_2, 0, 0);
 	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
 	this->GetParent()->Refresh();
 	TransferDataToWindow();
 }
-void ObjectFrame::OnYPlus(wxCommandEvent& event)
+void DialogObjectTransformation::OnYPlus(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
 	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-	linkedProject->objects[linkedProject->activeObject].matrix
-			*= AffineTransformMatrix::RotateXYZ(0, M_PI_2, 0);
+	linkedProject->objects[linkedProject->activeObject].matrix *=
+			AffineTransformMatrix::RotateXYZ(0, M_PI_2, 0);
 	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
 	this->GetParent()->Refresh();
 	TransferDataToWindow();
 }
-void ObjectFrame::OnZMinus(wxCommandEvent& event)
+void DialogObjectTransformation::OnZMinus(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
 	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-	linkedProject->objects[linkedProject->activeObject].matrix
-			*= AffineTransformMatrix::RotateXYZ(0, 0, -M_PI_2);
+	linkedProject->objects[linkedProject->activeObject].matrix *=
+			AffineTransformMatrix::RotateXYZ(0, 0, -M_PI_2);
 	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
 	this->GetParent()->Refresh();
 	TransferDataToWindow();
 }
-void ObjectFrame::OnZPlus(wxCommandEvent& event)
+void DialogObjectTransformation::OnZPlus(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
 	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-	linkedProject->objects[linkedProject->activeObject].matrix
-			*= AffineTransformMatrix::RotateXYZ(0, 0, M_PI_2);
+	linkedProject->objects[linkedProject->activeObject].matrix *=
+			AffineTransformMatrix::RotateXYZ(0, 0, M_PI_2);
 	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
 	this->GetParent()->Refresh();
 	TransferDataToWindow();
 }
-void ObjectFrame::OnXPlus(wxCommandEvent& event)
+void DialogObjectTransformation::OnXPlus(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
 	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-	linkedProject->objects[linkedProject->activeObject].matrix
-			*= AffineTransformMatrix::RotateXYZ(M_PI_2, 0, 0);
+	linkedProject->objects[linkedProject->activeObject].matrix *=
+			AffineTransformMatrix::RotateXYZ(M_PI_2, 0, 0);
 	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
 	this->GetParent()->Refresh();
 	TransferDataToWindow();
 }
 
-void ObjectFrame::OnAlignWithStock(wxCommandEvent& event)
+void DialogObjectTransformation::OnAlignWithStock(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
 	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
@@ -263,10 +258,10 @@ void ObjectFrame::OnAlignWithStock(wxCommandEvent& event)
 	this->GetParent()->Refresh();
 	TransferDataToWindow();
 }
-void ObjectFrame::OnAlignWithMiddle(wxCommandEvent& event)
+void DialogObjectTransformation::OnAlignWithMiddle(wxCommandEvent& event)
 {
 }
-void ObjectFrame::OnAlignWithTop(wxCommandEvent& event)
+void DialogObjectTransformation::OnAlignWithTop(wxCommandEvent& event)
 {
 }
 

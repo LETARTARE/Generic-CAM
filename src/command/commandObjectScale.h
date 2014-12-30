@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : AboutDialog.cpp
-// Purpose            : The about dialog.
+// Name               : commandObjectScale.h
+// Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 21.02.2010
-// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 29.12.2014
+// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,24 +22,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "AboutDialog.h"
+#ifndef COMMANDOBJECTSCALE_H_
+#define COMMANDOBJECTSCALE_H_
 
-AboutDialog::AboutDialog(wxWindow* parent) :
-	GUIAboutDialog(parent)
-{
-	}
+#include <wx/cmdproc.h>
 
-AboutDialog::~AboutDialog()
-{
+class commandObjectScale:public wxCommand {
+public:
+	commandObjectScale();
+	virtual ~commandObjectScale();
 
-}
+};
 
-void AboutDialog::OnClose(wxCommandEvent& event)
-{
-	Close();
-}
+#endif /* COMMANDOBJECTSCALE_H_ */

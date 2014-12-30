@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : MainFrame.h
-// Purpose            : The main window.
+// Purpose            : Main window
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -32,11 +32,10 @@
 
 #include "gui.h"
 
-#include "ToolboxFrame.h"
-#include "ObjectFrame.h"
-#include "StockFrame.h"
-#include "ErrorFrame.h"
-#include "AnimationFrame.h"
+#include "DialogToolbox.h"
+#include "DialogObjectTransformation.h"
+#include "DialogStockMaterial.h"
+#include "DialogAnimation.h"
 
 #include "../project/Unit.h"
 #include "../project/Project.h"
@@ -45,25 +44,7 @@
 
 #include <wx/config.h>
 #include <wx/log.h>
-
-class TreeItemData:public wxTreeItemData {
-public:
-	enum ItemDataType {
-		unknown = 0, geometry, connection, source, result
-	};
-
-	TreeItemData()
-	{
-		nr = 0;
-		dataType = unknown;
-	}
-	virtual ~TreeItemData()
-	{
-	}
-
-	size_t nr;
-	ItemDataType dataType;
-};
+#include <wx/cmdproc.h>
 
 class MainFrame:public GUIMainFrame {
 	// Constructor/ Destructor
@@ -79,25 +60,25 @@ private:
 	Control3D control;
 	wxLogWindow* logWindow;
 
-	ArrayOfProject project; ///> List of projects. This is the link between GUI and the actual generator.
+	wxCommandProcessor commandProcessor;
 
-	size_t activeProject;
+	Project project; ///> Link to the project
+
 	wxFileName lastObjectFileName;
 	size_t selectedTargetPosition;
 
-	ObjectFrame* objectFrame;
-	StockFrame* stockFrame;
-	ToolboxFrame* toolboxFrame;
-	AnimationFrame* animationFrame;
-	ErrorFrame* errorFrame;
+	// Pointers to all the windows.
+	DialogObjectTransformation objectFrame;
+	DialogStockMaterial stockFrame;
+	DialogToolbox toolboxFrame;
+	DialogAnimation animationFrame;
 
-	wxTimer timer;
-	float t;
+	wxTimer timer; ///> Animation timer
+	float t; // TODO: Make a seperate animation class
 
 	// Methods
 public:
-
-	void LoadProject(wxString fileName);
+	void LoadProject(wxString fileName); ///> Load a project from the command line
 
 private:
 	bool TransferDataToWindow(void);
@@ -109,14 +90,13 @@ private:
 
 	void OnCreateProject(wxCommandEvent& event);
 	void OnLoadProject(wxCommandEvent& event);
-
 	void OnSaveProject(wxCommandEvent& event);
 	void OnSaveProjectAs(wxCommandEvent& event);
+
 	void OnQuit(wxCommandEvent& event);
 
 	void OnLoadObject(wxCommandEvent& event);
 	void OnModifyObject(wxCommandEvent& event);
-	void OnGenerateTargets(wxCommandEvent& event);
 
 	void OnLoadMachine(wxCommandEvent& event);
 	void OnReloadMachine(wxCommandEvent& event);
@@ -129,8 +109,7 @@ private:
 
 	void OnGenerateToolpath(wxCommandEvent& event);
 	void OnRecollectToolpath(wxCommandEvent& event);
-	void OnCleanToolpath(wxCommandEvent&);
-
+	void OnCleanToolpath(wxCommandEvent& event);
 	void OnFlipRun(wxCommandEvent& event);
 	void OnPrepareMachinebed(wxCommandEvent& event);
 
