@@ -22,11 +22,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #include "Geometry.h"
 #include <GL/gl.h>
@@ -94,7 +90,6 @@ void Geometry::Paint(void) const
 {
 	if(!visible) return;
 	size_t i;
-
 
 	// GL_RESCALE_NORMAL is faster, but doesn't work on non-uniform scaled models
 	// GL_NORMALIZE is slower, but works always
@@ -209,9 +204,9 @@ void Geometry::FlipNormals(void)
 {
 	size_t i;
 	for(i = 0; i < triangles.GetCount(); i++){
-		triangles[i].n[0] *= -1;
-		triangles[i].n[1] *= -1;
-		triangles[i].n[2] *= -1;
+		triangles[i].n[0] = -triangles[i].n[0];
+		triangles[i].n[1] = -triangles[i].n[1];
+		triangles[i].n[2] = -triangles[i].n[2];
 	}
 }
 
@@ -220,12 +215,12 @@ void Geometry::ToXml(wxXmlNode* parentNode)
 	wxXmlNode *temp, *temp2;
 	wxXmlNode *nodeObject = NULL;
 
-
 	// Find out, if object already exists in XML tree.
 	temp = parentNode->GetChildren();
 	while(temp != NULL && nodeObject == NULL){
-		if(temp->GetName() == _T("geometry") && temp->GetPropVal(_T("name"),
-				_T("")) == objectName) nodeObject = temp;
+		if(temp->GetName() == _T("geometry")
+				&& temp->GetPropVal(_T("name"), _T("")) == objectName) nodeObject =
+				temp;
 		temp = temp->GetNext();
 	}
 	if(nodeObject == NULL){
@@ -253,7 +248,6 @@ void Geometry::ToXml(wxXmlNode* parentNode)
 	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
 			matrix.ToString());
 	temp->InsertChild(temp2, NULL);
-
 
 	// Insert new triangles
 	size_t i;

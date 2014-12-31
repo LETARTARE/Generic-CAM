@@ -24,7 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include "Object.h"
 
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
@@ -139,6 +138,18 @@ bool Object::ReloadObject(void)
 	return false;
 }
 
+bool Object::IsEmpty(void) const
+{
+	return (geometries.GetCount() == 0);
+}
+
+void Object::FlipNormals(void)
+{
+	size_t i;
+	for(i = 0; i < geometries.GetCount(); i++)
+		geometries[i].FlipNormals();
+}
+
 // Recursive tree deletion.
 void Object::XMLRemoveAllChildren(wxXmlNode* node)
 {
@@ -158,12 +169,12 @@ void Object::ToXml(wxXmlNode* parentNode)
 	wxXmlNode *temp, *temp2;
 	wxXmlNode *nodeObject = NULL;
 
-
 	// Find out, if object already exists in XML tree.
 	temp = parentNode->GetChildren();
 	while(temp != NULL && nodeObject == NULL){
-		if(temp->GetName() == _T("object") && temp->GetPropVal(_T("name"),
-				_T("")) == fileName.GetName()) nodeObject = temp;
+		if(temp->GetName() == _T("object")
+				&& temp->GetPropVal(_T("name"), _T("")) == fileName.GetName()) nodeObject =
+				temp;
 		temp = temp->GetNext();
 	}
 	if(nodeObject == NULL){
@@ -190,7 +201,6 @@ void Object::ToXml(wxXmlNode* parentNode)
 	size_t i;
 	for(i = 0; i < geometries.GetCount(); i++)
 		geometries[i].ToXml(nodeObject);
-
 
 	// Insert new matrix
 	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("matrix"));

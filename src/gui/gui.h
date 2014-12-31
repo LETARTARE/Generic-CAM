@@ -87,6 +87,8 @@ class GUIMainFrame : public wxFrame
 		virtual void OnSaveProject( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSaveProjectAs( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnQuit( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUndo( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRedo( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnLoadObject( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnModifyObject( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnLoadMachine( wxCommandEvent& event ) { event.Skip(); }
@@ -241,7 +243,7 @@ class GUIObjectTransformation : public wxFrame
 	
 	public:
 		
-		GUIObjectTransformation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
+		GUIObjectTransformation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 700,400 ), long style = wxDEFAULT_FRAME_STYLE|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
 		~GUIObjectTransformation();
 	
 };

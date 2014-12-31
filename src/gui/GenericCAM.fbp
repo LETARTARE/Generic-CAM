@@ -75,7 +75,7 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxMenuBar" expanded="0">
+            <object class="wxMenuBar" expanded="1">
                 <property name="bg"></property>
                 <property name="context_help"></property>
                 <property name="enabled">1</property>
@@ -223,7 +223,7 @@
                         <property name="permission">none</property>
                         <property name="shortcut">CTRL+Z</property>
                         <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection"></event>
+                        <event name="OnMenuSelection">OnUndo</event>
                         <event name="OnUpdateUI"></event>
                     </object>
                     <object class="wxMenuItem" expanded="1">
@@ -238,12 +238,8 @@
                         <property name="permission">none</property>
                         <property name="shortcut">CTRL+Y</property>
                         <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection"></event>
+                        <event name="OnMenuSelection">OnRedo</event>
                         <event name="OnUpdateUI"></event>
-                    </object>
-                    <object class="separator" expanded="1">
-                        <property name="name">m_separatorEdit</property>
-                        <property name="permission">none</property>
                     </object>
                 </object>
                 <object class="wxMenu" expanded="1">
@@ -1152,7 +1148,7 @@
                     <property name="statusbar">Undo</property>
                     <property name="tooltip">Undo</property>
                     <event name="OnMenuSelection"></event>
-                    <event name="OnToolClicked"></event>
+                    <event name="OnToolClicked">OnUndo</event>
                     <event name="OnToolEnter"></event>
                     <event name="OnToolRClicked"></event>
                     <event name="OnUpdateUI"></event>
@@ -1166,7 +1162,7 @@
                     <property name="statusbar">Redo</property>
                     <property name="tooltip">Redo</property>
                     <event name="OnMenuSelection"></event>
-                    <event name="OnToolClicked"></event>
+                    <event name="OnToolClicked">OnRedo</event>
                     <event name="OnToolEnter"></event>
                     <event name="OnToolRClicked"></event>
                     <event name="OnUpdateUI"></event>
@@ -1202,7 +1198,7 @@
                 </object>
             </object>
         </object>
-        <object class="Frame" expanded="0">
+        <object class="Frame" expanded="1">
             <property name="bg"></property>
             <property name="center"></property>
             <property name="context_help"></property>
@@ -1216,7 +1212,7 @@
             <property name="minimum_size"></property>
             <property name="name">GUIObjectTransformation</property>
             <property name="pos"></property>
-            <property name="size">-1,-1</property>
+            <property name="size">700,400</property>
             <property name="style">wxDEFAULT_FRAME_STYLE|wxSTAY_ON_TOP</property>
             <property name="subclass"></property>
             <property name="title">Object Editor</property>
@@ -1527,7 +1523,7 @@
                         <object class="notebookpage" expanded="1">
                             <property name="bitmap"></property>
                             <property name="label">Scale</property>
-                            <property name="select">1</property>
+                            <property name="select">0</property>
                             <object class="wxPanel" expanded="0">
                                 <property name="bg"></property>
                                 <property name="context_help"></property>
@@ -4117,7 +4113,7 @@
                         <object class="notebookpage" expanded="1">
                             <property name="bitmap"></property>
                             <property name="label">Move</property>
-                            <property name="select">0</property>
+                            <property name="select">1</property>
                             <object class="wxPanel" expanded="1">
                                 <property name="bg"></property>
                                 <property name="context_help"></property>

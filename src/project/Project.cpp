@@ -35,6 +35,7 @@ Project::Project()
 	doc.SetFileEncoding(_T("UTF-8"));
 	//doc.SetVersion(_T(_GENERICCAM_VERSION));
 	doc.SetVersion(_T("1.0"));
+
 	Clear();
 
 	middleY = 0.212;
@@ -48,11 +49,12 @@ Project::~Project()
 
 void Project::Clear(void)
 {
+	name = _("Untitled");
+
 	objects.Empty();
 	runs.Empty();
 
-	modified = false;
-	name = _("Untitled");
+	resolution = 0.0005;
 
 	activeObject = 0;
 	activeTarget = 0;
@@ -60,26 +62,24 @@ void Project::Clear(void)
 	activeRun = 0;
 
 	displayGeometry = true;
+
 	displayBoundingBox = false;
 	displayMachine = false;
 	displayStock = false;
 	displayWorkpiece = false;
-	displayRun = true;
-	displayTargets = true;
-	displayToolpath = true;
-	displayOutLines = true;
+	displayRun = false;
+	displayTargets = false;
+	displayToolpath = false;
+	displayOutLines = false;
 
-	Tolerance.Setup(_T("m"), _T("mm"), (double) 1 / 1000);
-	Distance.Setup(_T("m"), _T("mm"), (double) 1 / 1000);
-	RotationalSpeed.Setup(_T("1/s"), _T("rpm"), (double) 1 / 60);
-	LinearSpeed.Setup(_T("m/s"), _T("mm/s"), (double) 1 / 1000);
 
 	slotWidth = 0.010;
 	supportDistance = 0.05;
 	supportWidth = 0.005;
 	supportHeight = 0.005;
 
-	resolution = 0.0005;
+
+	modified = false;
 }
 
 // Recursive tree deletion.
@@ -289,7 +289,7 @@ void Project::Paint(void)
 			objects[i].Paint();
 
 //		octree.Paint();
-		quadtree.Paint();
+//		quadtree.Paint();
 
 	}
 	if(displayMachine) machine.Paint();

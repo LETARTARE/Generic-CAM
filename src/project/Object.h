@@ -24,7 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef OBJECT_H_
 #define OBJECT_H_
 
@@ -58,7 +57,6 @@ public:
 
 private:
 
-
 	// Methods
 public:
 
@@ -68,13 +66,16 @@ public:
 	bool LoadObject(wxFileName fileName);
 	bool ReloadObject(void);
 
+	void FlipNormals(void);
+
+	bool IsEmpty(void) const;
+
 	void ToXml(wxXmlNode* parentNode);
 	bool FromXml(wxXmlNode* node);
 
 private:
 	void XMLRemoveAllChildren(wxXmlNode* node);
 };
-WX_DECLARE_OBJARRAY(Object, ArrayOfObject)
-;
+WX_DECLARE_OBJARRAY(Object, ArrayOfObject);
 
 #endif /* OBJECT_H_ */

@@ -22,11 +22,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #include "Unit.h"
 
@@ -35,8 +31,14 @@ Unit::Unit()
 	factor = 1.0;
 }
 
-Unit::~Unit()
+Unit::Unit(const wxString SIName, const wxString otherName, const double factor)
 {
+	this->SIName = SIName;
+	this->otherName = otherName;
+	if(factor != 0)
+		this->factor = factor;
+	else
+		this->factor = 1.0;
 }
 
 void Unit::Setup(const wxString SIName, const wxString otherName,
@@ -49,18 +51,22 @@ void Unit::Setup(const wxString SIName, const wxString otherName,
 	else
 		this->factor = 1.0;
 }
+
 double Unit::FromSI(const double value)
 {
 	return value / factor;
 }
+
 double Unit::ToSI(const double value)
 {
 	return value * factor;
 }
+
 wxString Unit::GetSIName(void)
 {
 	return SIName;
 }
+
 wxString Unit::GetOtherName(void)
 {
 	return otherName;

@@ -102,11 +102,11 @@ void OpenGLCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
 void OpenGLCanvas::SetupLighting()
 {
 	GLfloat ambient0[] =
-		{0.8f, 0.8f, 0.8f};
+		{0.5f, 0.5f, 0.5f};
 	GLfloat diffuse0[] =
-		{0.9f, 0.9f, 0.9f};
+		{0.6f, 0.6f, 0.6f};
 	GLfloat specular0[] =
-		{1.0f, 1.0f, 1.0f};
+		{0.9f, 0.9f, 0.9f};
 	GLfloat position0[] =
 		{-20, 20, 50, 0};
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient0);

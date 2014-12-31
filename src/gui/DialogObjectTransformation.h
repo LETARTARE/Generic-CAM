@@ -24,12 +24,12 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef DIALOGOBJECTTRANSFORMATION_H_
 #define DIALOGOBJECTTRANSFORMATION_H_
 
 #include "gui.h"
 #include "../project/Project.h"
+#include "Unit.h"
 
 /*!\class DialogObjectTransformation
  * \brief ...
@@ -40,12 +40,13 @@
 class DialogObjectTransformation:public GUIObjectTransformation {
 	// Constructor/ Destructor
 public:
-	DialogObjectTransformation(wxWindow* parent);
+	DialogObjectTransformation(wxWindow* parent, Unit * distance);
 	virtual ~DialogObjectTransformation();
 
 	// Member Variables
 
 	Project* linkedProject;
+	Unit * distance;
 
 	// Methods
 public:

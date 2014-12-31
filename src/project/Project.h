@@ -33,7 +33,6 @@
 #include "Target.h"
 #include "Toolbox.h"
 #include "ToolPath.h"
-#include "Unit.h"
 #include "Workpiece.h"
 
 #include "../3D/OctreeGenerator.h"
@@ -99,11 +98,6 @@ public:
 	bool displayToolpath;
 	bool displayOutLines;
 
-	Unit Tolerance;
-	Unit Distance;
-	Unit LinearSpeed;
-	Unit RotationalSpeed;
-
 	// For target generator
 
 	double resolution;
@@ -126,8 +120,6 @@ public:
 	bool Load(wxFileName fileName);
 	bool Save(wxFileName fileName);
 
-	void ObjectAdd(wxFileName fileName);
-	void ObjectScale(size_t objNr, float x, float y, float z);
 
 
 	void Paint(void);

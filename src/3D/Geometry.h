@@ -22,11 +22,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #ifndef GEOMETRY_H_
 #define GEOMETRY_H_
@@ -76,7 +72,6 @@ public:
 	void ApplyTransformation(const AffineTransformMatrix &matrix);
 	void ApplyTransformation(void);
 
-
 	void AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c);
 	void AddTriangleTransform(const Vector3 &a, const Vector3 &b,
 			const Vector3 &c, const AffineTransformMatrix &transformMatrix);
@@ -89,7 +84,6 @@ public:
 	void AddQuadTransform(const Vector3 &a, const Vector3 &b, const Vector3 &c,
 			const Vector3 &d, const AffineTransformMatrix &transformMatrix);
 };
-WX_DECLARE_OBJARRAY(Geometry, ArrayOfGeometry)
-;
+WX_DECLARE_OBJARRAY(Geometry, ArrayOfGeometry);
 
 #endif /* GEOMETRY_H_ */

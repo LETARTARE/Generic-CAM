@@ -29,11 +29,23 @@
 
 #include <wx/cmdproc.h>
 
-class commandObjectScale:public wxCommand {
-public:
-	commandObjectScale();
-	virtual ~commandObjectScale();
+#include "../3D/AffineTransformMatrix.h"
+#include "../project/Project.h"
 
+class commandObjectTransform:public wxCommand {
+public:
+	commandObjectTransform(const wxString& name, Project * project,
+			size_t objectNr, bool flipNormals,
+			AffineTransformMatrix& matrixNew);
+	bool Do(void);
+	bool Undo(void);
+
+protected:
+	Project * project;
+	size_t objectNr;
+	bool flipNormals;
+	AffineTransformMatrix matrixNew;
+	AffineTransformMatrix matrixOld;
 };
 
 #endif /* COMMANDOBJECTSCALE_H_ */

@@ -26,14 +26,30 @@
 
 #include "commandObjectScale.h"
 
-commandObjectScale::commandObjectScale()
+commandObjectTransform::commandObjectTransform(const wxString& name,
+		Project* project, size_t objectNr, bool flipNormals,
+		AffineTransformMatrix& matrixNew) :
+		wxCommand(true, name)
 {
-	// TODO Auto-generated constructor stub
-	
+	this->project = project;
+	this->objectNr = objectNr;
+	this->flipNormals = flipNormals;
+	this->matrixNew = matrixNew;
 }
 
-commandObjectScale::~commandObjectScale()
+bool commandObjectTransform::Do(void)
 {
-	// TODO Auto-generated destructor stub
+	if(objectNr >= project->objects.GetCount()) return false;
+	matrixOld = project->objects[objectNr].matrix;
+	project->objects[objectNr].matrix = matrixNew;
+	if(flipNormals) project->objects[objectNr].FlipNormals();
+	return true;
 }
 
+bool commandObjectTransform::Undo(void)
+{
+	if(objectNr >= project->objects.GetCount()) return false;
+	project->objects[objectNr].matrix = matrixOld;
+	if(flipNormals) project->objects[objectNr].FlipNormals();
+	return true;
+}

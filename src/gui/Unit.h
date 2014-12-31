@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : Unit.h
-// Purpose            : Converts from SI to whatever and back.
+// Purpose            : Converts from SI to other measures
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -22,11 +22,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #ifndef UNIT_H_
 #define UNIT_H_
@@ -35,15 +31,14 @@
 
 /*!\class Unit
  * \brief Converts from SI to whatever and back.
- *
- * ...
  */
 
 class Unit {
 	//Constructor / Destructor
 public:
 	Unit();
-	virtual ~Unit();
+	Unit(const wxString SIName, const wxString otherName, const double factor);
+
 	//Member variables
 public:
 
@@ -59,9 +54,9 @@ public:
 			const double factor);
 	double FromSI(const double value);
 	double ToSI(const double value);
+
 	wxString GetSIName(void);
 	wxString GetOtherName(void);
-
 };
 
 #endif /* UNIT_H_ */

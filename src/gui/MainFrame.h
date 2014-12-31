@@ -27,6 +27,13 @@
 #ifndef MAINFRAME_H_
 #define MAINFRAME_H_
 
+/*!\class MainFrame
+ * \brief Main window
+ * This classs takes care of the main window. It contains a lot of file juggling for all the dialogs.
+ * The manipulation of the project itself is done via wxCommand classes. These are passed to the
+ * commandProcessor which executes them. The commandProcessor enables Undo/Redo behaviour.
+ */
+
 #include "../Config.h"
 #include "../StdInclude.h"
 
@@ -37,7 +44,7 @@
 #include "DialogStockMaterial.h"
 #include "DialogAnimation.h"
 
-#include "../project/Unit.h"
+#include "Unit.h"
 #include "../project/Project.h"
 
 #include "../controller/Control3D.h"
@@ -64,8 +71,18 @@ private:
 
 	Project project; ///> Link to the project
 
-	wxFileName lastObjectFileName;
+	wxString lastProjectDirectory;
+	wxString lastObjectDirectory;
+	wxString lastMachineDirectory;
+	wxString lastToolboxDirectory;
+	wxString lastStockDirectory;
+
 	size_t selectedTargetPosition;
+
+	Unit Tolerance;
+	Unit Distance;
+	Unit LinearSpeed;
+	Unit RotationalSpeed;
 
 	// Pointers to all the windows.
 	DialogObjectTransformation objectFrame;
@@ -94,6 +111,9 @@ private:
 	void OnSaveProjectAs(wxCommandEvent& event);
 
 	void OnQuit(wxCommandEvent& event);
+
+	void OnUndo(wxCommandEvent& event);
+	void OnRedo(wxCommandEvent& event);
 
 	void OnLoadObject(wxCommandEvent& event);
 	void OnModifyObject(wxCommandEvent& event);

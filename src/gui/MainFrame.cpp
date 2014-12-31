@@ -31,14 +31,17 @@
 #include "DialogSetupUnits.h"
 
 #include "../languages.h"
+#include "../command/commandObjectLoad.h"
+#include "../command/commandObjectScale.h"
 
 #include <wx/filename.h>
 #include <wx/textfile.h>
 #include <wx/msgdlg.h>
+#include  <wx/dir.h>
 
 MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
-		GUIMainFrame(parent), objectFrame(parent), stockFrame(parent), toolboxFrame(
-				parent), animationFrame(parent)
+		GUIMainFrame(parent), objectFrame(parent, &Distance), stockFrame(
+				parent), toolboxFrame(parent), animationFrame(parent)
 {
 
 	long style = tree->GetWindowStyle() ^ wxTR_NO_LINES;
@@ -69,7 +72,16 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	m_canvas->Connect(wxID_ANY, wxEVT_KEY_DOWN,
 			wxKeyEventHandler(MainFrame::OnKeyDown), NULL, this);
 
+	Tolerance.Setup(_T("m"), _T("mm"), (double) 1 / 1000);
+	Distance.Setup(_T("m"), _T("cm"), (double) 1 / 100);
+	RotationalSpeed.Setup(_T("1/s"), _T("rpm"), (double) 1 / 60);
+	LinearSpeed.Setup(_T("m/s"), _T("mm/s"), (double) 1 / 1000);
+
 	selectedTargetPosition = 0;
+
+	commandProcessor.SetEditMenu(m_menuEdit);
+	commandProcessor.Initialize();
+	commandProcessor.MarkAsSaved();
 
 	// Connect the project to the 3D canvas
 	m_canvas->InsertProject(&project);
@@ -106,6 +118,8 @@ bool MainFrame::TransferDataToWindow(void)
 
 	//TODO: Review the stereomode
 	m_menuView->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
+
+	this->Refresh();
 	return true;
 }
 
@@ -197,8 +211,10 @@ void MainFrame::OnCreateProject(wxCommandEvent& event)
 	//	Project temp;
 	//	project.Add(temp);
 	project.Clear();
-	SetupTree();
-	this->Refresh();
+	commandProcessor.ClearCommands();
+	commandProcessor.MarkAsSaved();
+
+	TransferDataToWindow();
 }
 
 void MainFrame::OnLoadProject(wxCommandEvent& event)
@@ -211,22 +227,24 @@ void MainFrame::OnLoadProject(wxCommandEvent& event)
 	if(dialog.ShowModal() == wxID_OK){
 		fileName = dialog.GetPath();
 		project.Load(fileName);
-		SetupTree();
+		TransferDataToWindow();
 	}
-	this->Refresh();
 }
 
 void MainFrame::LoadProject(wxString fileName)
 {
 	project.Load(fileName);
-	SetupTree();
-	this->Refresh();
+	commandProcessor.ClearCommands();
+	commandProcessor.MarkAsSaved();
+	TransferDataToWindow();
 }
 
 void MainFrame::OnSaveProject(wxCommandEvent& event)
 {
 	if(!project.fileName.IsOk()) OnSaveProjectAs(event);
 	project.Save(project.fileName);
+	commandProcessor.MarkAsSaved();
+	TransferDataToWindow();
 }
 
 void MainFrame::OnSaveProjectAs(wxCommandEvent &event)
@@ -242,6 +260,8 @@ void MainFrame::OnSaveProjectAs(wxCommandEvent &event)
 	if(dialog.ShowModal() == wxID_OK){
 		fileName = dialog.GetPath();
 		project.Save(fileName);
+		commandProcessor.MarkAsSaved();
+		TransferDataToWindow();
 	}
 }
 
@@ -250,26 +270,46 @@ void MainFrame::OnQuit(wxCommandEvent& event)
 	Close();
 }
 
+void MainFrame::OnUndo(wxCommandEvent& event)
+{
+	commandProcessor.Undo();
+	TransferDataToWindow();
+}
+
+void MainFrame::OnRedo(wxCommandEvent& event)
+{
+	commandProcessor.Redo();
+	TransferDataToWindow();
+}
+
 void MainFrame::OnLoadObject(wxCommandEvent& event)
 {
 	wxFileName fileName;
 	wxFileDialog dialog(this, _("Open..."), _T(""), _T(""),
 			_(
 					"All supported files (*.dxf; *.stl; *.gts)|*.dxf;*.stl;*.gts|DXF Files (*.dxf)|*.dxf|Stereolithography files (STL files) (*.stl)|*.stl|GTS files (*.gts)|*.gts|All files|*.*"),
-			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+			wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_MULTIPLE);
 
-	if(lastObjectFileName.IsOk()) dialog.SetFilename(
-			lastObjectFileName.GetFullPath());
+	if(wxDir::Exists(lastObjectDirectory)){
+		dialog.SetDirectory(lastObjectDirectory);
+	}else{
+		if(wxDir::Exists(lastProjectDirectory)){
+			dialog.SetDirectory(lastProjectDirectory);
+		}
+	}
+
 	if(dialog.ShowModal() == wxID_OK){
+		wxArrayString paths;
+		dialog.GetPaths(paths);
 
-		fileName = dialog.GetPath();
-		lastObjectFileName = fileName;
-
-		//wxLogMessage(_T("File Extension: ")+fileName.GetExt());
-
-		Object temp;
-		if(temp.LoadObject(fileName)){
-			project.objects.Add(temp);
+		size_t n;
+		for(n = 0; n < paths.GetCount(); n++){
+			fileName = paths[n];
+			commandProcessor.Submit(
+					new commandObjectLoad(
+							(_("Load Object: ") + fileName.GetName()),
+							&project, paths[n]));
+			if(n == 0) lastObjectDirectory = fileName.GetPath();
 		}
 		SetupTree();
 		this->Refresh();

@@ -26,14 +26,27 @@
 
 #include "commandObjectLoad.h"
 
-commandObjectLoad::commandObjectLoad()
+commandObjectLoad::commandObjectLoad(const wxString& name, Project * project,
+		const wxString& fileName) :
+		wxCommand(true, name)
 {
-	// TODO Auto-generated constructor stub
-	
+	this->project = project;
+	this->fileName = fileName;
 }
 
-commandObjectLoad::~commandObjectLoad()
+bool commandObjectLoad::Do(void)
 {
-	// TODO Auto-generated destructor stub
+	Object temp;
+	if(temp.LoadObject(fileName)){
+		temp.matrix.ScaleGlobal(0.01, 0.01, 0.01);
+		project->objects.Add(temp);
+		return true;
+	}
+	return false;
 }
 
+bool commandObjectLoad::Undo(void)
+{
+	project->objects.RemoveAt(project->objects.GetCount() - 1, 1);
+	return true;
+}

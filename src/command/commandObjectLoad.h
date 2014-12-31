@@ -29,10 +29,19 @@
 
 #include <wx/cmdproc.h>
 
+#include "../project/Project.h"
+
 class commandObjectLoad:public wxCommand {
 public:
-	commandObjectLoad();
-	virtual ~commandObjectLoad();
+	commandObjectLoad(const wxString& name, Project * project,
+			const wxString& fileName);
+
+	bool Do(void);
+	bool Undo(void);
+
+protected:
+	Project * project;
+	wxString fileName;
 };
 
 #endif /* COMMANDOBJECTLOAD_H_ */

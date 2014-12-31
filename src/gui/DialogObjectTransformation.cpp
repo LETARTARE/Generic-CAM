@@ -27,10 +27,13 @@
 #include "DialogObjectTransformation.h"
 #include <math.h>
 
-DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent) :
+
+DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent,
+		Unit * distance) :
 		GUIObjectTransformation(parent)
 {
 	linkedProject = NULL;
+	this->distance = distance;
 
 }
 
@@ -60,27 +63,25 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 	}
 	m_comboBox->SetSelection(linkedProject->activeObject);
 
-	Unit temp = linkedProject->Distance;
-
 	m_textCtrlSizeX->SetValue(
 			wxString::Format(_T("%.3f"),
-					temp.FromSI(
+					distance->FromSI(
 							linkedProject->objects[linkedProject->activeObject].bbox.GetSizeX())));
 	m_textCtrlSizeY->SetValue(
 			wxString::Format(_T("%.3f"),
-					temp.FromSI(
+					distance->FromSI(
 							linkedProject->objects[linkedProject->activeObject].bbox.GetSizeY())));
 	m_textCtrlSizeZ->SetValue(
 			wxString::Format(_T("%.3f"),
-					temp.FromSI(
+					distance->FromSI(
 							linkedProject->objects[linkedProject->activeObject].bbox.GetSizeZ())));
 
-	m_staticTextUnitX->SetLabel(temp.GetOtherName());
-	m_staticTextUnitY->SetLabel(temp.GetOtherName());
-	m_staticTextUnitZ->SetLabel(temp.GetOtherName());
-	m_staticTextUnitX2->SetLabel(temp.GetOtherName());
-	m_staticTextUnitY2->SetLabel(temp.GetOtherName());
-	m_staticTextUnitZ2->SetLabel(temp.GetOtherName());
+	m_staticTextUnitX->SetLabel(distance->GetOtherName());
+	m_staticTextUnitY->SetLabel(distance->GetOtherName());
+	m_staticTextUnitZ->SetLabel(distance->GetOtherName());
+	m_staticTextUnitX2->SetLabel(distance->GetOtherName());
+	m_staticTextUnitY2->SetLabel(distance->GetOtherName());
+	m_staticTextUnitZ2->SetLabel(distance->GetOtherName());
 
 	return true;
 }
