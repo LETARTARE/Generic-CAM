@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : TreeViewItem.h
+// Name               : TreeItem.cpp
 // Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,24 +24,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef TREEVIEWITEM_H_
-#define TREEVIEWITEM_H_
+#include "TreeItem.h"
 
-#include <wx/treectrl.h>
+TreeItem::TreeItem(ItemDataType dataType, size_t nr)
+{
+	this->nr = nr;
+	this->dataType = dataType;
+}
 
-class TreeViewItem:public wxTreeItemData {
-public:
-	TreeViewItem();
-	virtual ~TreeViewItem();
-
-public:
-
-	enum ItemDataType {
-		unknown = 0, geometry, connection, source, result // TODO: What's this?
-	};
-
-	size_t nr;
-	ItemDataType dataType;
-};
-
-#endif /* TREEVIEWITEM_H_ */

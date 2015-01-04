@@ -75,7 +75,7 @@ class GUIMainFrame : public wxFrame
 		wxMenu* m_menuHelp;
 		wxSplitterWindow* m_splitter;
 		wxPanel* m_panel1;
-		wxTreeCtrl* tree;
+		wxTreeCtrl* m_tree;
 		wxPanel* m_panel2;
 		MainCanvas* m_canvas;
 		wxStatusBar* m_statusBar;

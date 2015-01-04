@@ -44,14 +44,16 @@
 #include "DialogStockMaterial.h"
 #include "DialogAnimation.h"
 
-#include "Unit.h"
-#include "../project/Project.h"
+#include "TreeSetup.h"
 
+#include "Unit.h"
 #include "../controller/Control3D.h"
+#include "../project/Project.h"
 
 #include <wx/config.h>
 #include <wx/log.h>
 #include <wx/cmdproc.h>
+
 
 class MainFrame:public GUIMainFrame {
 	// Constructor/ Destructor
@@ -84,6 +86,8 @@ private:
 	Unit LinearSpeed;
 	Unit RotationalSpeed;
 
+	TreeSetup tree;
+
 	// Pointers to all the windows.
 	DialogObjectTransformation objectFrame;
 	DialogStockMaterial stockFrame;
@@ -100,7 +104,6 @@ public:
 private:
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
-	void SetupTree(void);
 
 	void OnTimer(wxTimerEvent& event);
 	void OnKeyDown(wxKeyEvent& event);

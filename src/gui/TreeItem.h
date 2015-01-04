@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : TreeViewItem.cpp
+// Name               : TreeItem.h
 // Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,15 +24,29 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "TreeViewItem.h"
+#ifndef TREEITEM_H_
+#define TREEITEM_H_
 
-TreeViewItem::TreeViewItem()
-{
-	nr = 0;
-	dataType = unknown;
-}
+#include <wx/treectrl.h>
 
-TreeViewItem::~TreeViewItem()
-{
-}
+enum ItemDataType {
+	itemUnknown = 0, ///> Default
+	itemProject,
+	itemGroup,
+	itemObject, ///> Object
+	itemObjectModifier,
+	itemMachine,
+	itemStock,
+	itemToolpath
+};
 
+class TreeItem:public wxTreeItemData {
+public:
+
+	TreeItem(ItemDataType dataType = itemUnknown, size_t nr = 0);
+
+	ItemDataType dataType;
+	size_t nr;
+};
+
+#endif /* TREEITEM_H_ */

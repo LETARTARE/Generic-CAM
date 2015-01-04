@@ -37,15 +37,13 @@
 #include <wx/filename.h>
 #include <wx/textfile.h>
 #include <wx/msgdlg.h>
-#include  <wx/dir.h>
+#include <wx/dir.h>
 
 MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 		GUIMainFrame(parent), objectFrame(parent, &Distance), stockFrame(
-				parent), toolboxFrame(parent), animationFrame(parent)
+				parent), toolboxFrame(parent), animationFrame(parent), tree(
+				m_tree, &project)
 {
-
-	long style = tree->GetWindowStyle() ^ wxTR_NO_LINES;
-	tree->SetWindowStyle(style);
 
 	logWindow = new wxLogWindow(this, _("Generic CAM - log window"), false,
 			true);
@@ -54,6 +52,13 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	// Setup configuration
 	this->config = config;
 	this->locale = locale;
+
+	// Read variables
+	config->Read(_T("LastProjectDirectory"), &lastProjectDirectory);
+	config->Read(_T("LastObjectDirectory"), &lastObjectDirectory);
+	config->Read(_T("LastMachineDirectory"), &lastMachineDirectory);
+	config->Read(_T("LastStockDirectory"), &lastStockDirectory);
+	config->Read(_T("LastToolboxDirectory"), &lastToolboxDirectory);
 
 	// Set the window size according to the config file
 	int w, h;
@@ -98,9 +103,11 @@ MainFrame::~MainFrame()
 			this);
 
 	// Write back the configuration
-
-	// Save the configuration of the 6DOF controller
-	control.WriteConfigTo(config);
+	config->Write(_T("LastProjectDirectory"), lastProjectDirectory);
+	config->Write(_T("LastObjectDirectory"), lastObjectDirectory);
+	config->Write(_T("LastMachineDirectory"), lastMachineDirectory);
+	config->Write(_T("LastStockDirectory"), lastStockDirectory);
+	config->Write(_T("LastToolboxDirectory"), lastToolboxDirectory);
 
 	// Save the size of the mainframe
 	int w, h;
@@ -108,13 +115,16 @@ MainFrame::~MainFrame()
 	config->Write(_T("MainFrameWidth"), (long) w);
 	config->Write(_T("MainFrameHeight"), (long) h);
 
+	// Save the configuration of the 6DOF controller
+	control.WriteConfigTo(config);
+
 	delete config; // config is written back on deletion of object
 }
 
 bool MainFrame::TransferDataToWindow(void)
 {
 	// Populate the treeview
-	SetupTree();
+	tree.Update();
 
 	//TODO: Review the stereomode
 	m_menuView->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
@@ -129,87 +139,10 @@ bool MainFrame::TransferDataFromWindow(void)
 	return true;
 }
 
-void MainFrame::SetupTree(void)
-{
-//	tree->DeleteAllItems();
-//
-//	//TreeItemData* tid;
-//
-//	wxTreeItemId rootId = tree->AddRoot(_T("TreeRoot"));
-//
-//	wxTreeItemId treeIdProject;
-//
-//	wxTreeItemId treeIdObject;
-//	wxTreeItemId treeIdGeometry;
-//	wxTreeItemId treeIdStock;
-//	wxTreeItemId treeIdMachine;
-//	wxTreeItemId treeIdToolbox;
-//	wxTreeItemId treeIdRun;
-//	wxTreeItemId treeIdRun2;
-//
-//	wxTreeItemId treeIdToolpath;
-//
-//	size_t i, j, k;
-//	for(i = 0; i < project.GetCount(); i++){
-//		treeIdProject = tree->AppendItem(rootId,
-//		_("Project: ") + project[i].name);
-//
-//		treeIdStock = tree->AppendItem(treeIdProject,
-//		_("Stock material: ") + project[i].stock.name);
-//
-//		for(j = 0; j < project[i].stock.stockMaterials.GetCount(); j++){
-//			tree->AppendItem(treeIdStock,
-//					project[i].stock.stockMaterials[j].materialName);
-//		}
-//
-//		for(j = 0; j < project[i].objects.GetCount(); j++){
-//			treeIdObject = tree->AppendItem(treeIdProject,
-//			_("Object: ") + project[i].objects[j].fileName.GetName());
-//			for(k = 0; k < project[i].objects[j].geometries.GetCount(); k++){
-//				{
-//					tree->AppendItem(treeIdObject,
-//							project[i].objects[j].geometries[k].objectName);
-//				}
-//			}
-//		}
-//
-//		treeIdMachine = tree->AppendItem(treeIdProject,
-//		_("Machine: ") + project[i].machine.fileName.GetName());
-//
-//		treeIdToolbox = tree->AppendItem(treeIdProject,
-//		_("Toolbox: ") + project[i].toolbox.fileName.GetName());
-//		for(j = 0; j < project[i].toolbox.tools.GetCount(); j++){
-//			tree->AppendItem(treeIdToolbox,
-//					project[i].toolbox.tools[j].toolName);
-//		}
-//
-//		treeIdRun = tree->AppendItem(treeIdProject, _("Run:"));
-//		for(j = 0; j < project[i].runs.GetCount(); j++){
-//			treeIdRun2 = tree->AppendItem(treeIdRun,
-//					project[i].runs[j].runName);
-//
-//			tree->AppendItem(treeIdRun2, _("Stock material"));
-//			tree->AppendItem(treeIdRun2, _("Target"));
-//			treeIdToolpath = tree->AppendItem(treeIdRun2, _("Toolpath"));
-//		}
-//
-//	}
-//
-//	//	for(i = 0; i < doc->geometry.Count(); i++){
-//	//		tid = new TreeItemData;
-//	//		tid->nr = i;
-//	//		tid->dataType = TreeItemData::geometry;
-//	//		tree->AppendItem(treeIdGeometry, doc->geometry[i].objectName, -1, -1,
-//	//				tid);
-//	//	}
-//
-//	tree->ExpandAll();
-}
-
 void MainFrame::OnCreateProject(wxCommandEvent& event)
 {
-	//	Project temp;
-	//	project.Add(temp);
+//	Project temp;
+//	project.Add(temp);
 	project.Clear();
 	commandProcessor.ClearCommands();
 	commandProcessor.MarkAsSaved();
@@ -311,7 +244,7 @@ void MainFrame::OnLoadObject(wxCommandEvent& event)
 							&project, paths[n]));
 			if(n == 0) lastObjectDirectory = fileName.GetPath();
 		}
-		SetupTree();
+		tree.Update();
 		this->Refresh();
 	}
 }
@@ -346,7 +279,7 @@ void MainFrame::OnLoadMachine(wxCommandEvent& event)
 //			error->SetText(project.machine.textOut);
 //			error->Show();
 		}
-		SetupTree();
+		tree.Update();
 		this->Refresh();
 	}
 }
@@ -357,8 +290,8 @@ void MainFrame::OnReloadMachine(wxCommandEvent& event)
 	project.machine.ReLoad();
 	project.Assemble();
 
-	//	if(!simulator.machine.fileName.IsOk()) return;
-	//	simulator.machine.ReLoad();
+//	if(!simulator.machine.fileName.IsOk()) return;
+//	simulator.machine.ReLoad();
 	if(!project.machine.textOut.IsEmpty()){
 		//wxLogMessage(_T("Displaying some text in ErrorFrame!"));
 		//TODO: Don't open a new errorframe, if the old one is not closed.
@@ -367,7 +300,7 @@ void MainFrame::OnReloadMachine(wxCommandEvent& event)
 //		error->SetText(project.machine.textOut);
 //		error->Show();
 	}
-	//	t = 0;
+//	t = 0;
 	this->Refresh();
 }
 
@@ -384,38 +317,38 @@ void MainFrame::OnLoadToolbox(wxCommandEvent& event)
 			_("Toolbox (*.xml)|*.xml|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	wxFileName fileName;
-	//	if(dialog.ShowModal() == wxID_OK){
-	//		fileName.Assign(dialog.GetPath());
-	//		if(!simulator.toolbox.LoadToolbox(fileName)){
-	//			wxLogError(_T("OnLoadToolbox: Opening of the toolbox failed!"));
-	//		}
+//	if(dialog.ShowModal() == wxID_OK){
+//		fileName.Assign(dialog.GetPath());
+//		if(!simulator.toolbox.LoadToolbox(fileName)){
+//			wxLogError(_T("OnLoadToolbox: Opening of the toolbox failed!"));
+//		}
 
-	//ctrlTextEdit->SetValue(temp);
-	//fname.Assign(dialog.GetPath());
-	//ctrlTextEdit->SetModified(false);
-	//SetWindowTitle();
+//ctrlTextEdit->SetValue(temp);
+//fname.Assign(dialog.GetPath());
+//ctrlTextEdit->SetModified(false);
+//SetWindowTitle();
 
-	//	}
+//	}
 }
 
 void MainFrame::OnSaveToolbox(wxCommandEvent &event)
 {
 
-	//TODO: Build something like this in this snippet.
-	//	wxFileDialog
-	//			dialog(
-	//					this,
-	//					_("Save as..."),
-	//					fname.GetPath(),
-	//					fname.GetFullName(),
-	//					_("LUA Files  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
-	//					wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-	//
-	//	if(dialog.ShowModal() == wxID_OK){
-	//		fname.Assign(dialog.GetPath());
-	//		SetWindowTitle();
-	//		DoSave();
-	//	}
+//TODO: Build something like this in this snippet.
+//	wxFileDialog
+//			dialog(
+//					this,
+//					_("Save as..."),
+//					fname.GetPath(),
+//					fname.GetFullName(),
+//					_("LUA Files  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
+//					wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+//
+//	if(dialog.ShowModal() == wxID_OK){
+//		fname.Assign(dialog.GetPath());
+//		SetWindowTitle();
+//		DoSave();
+//	}
 
 	wxFileDialog dialog(this, _("Save toolbox..."), _T(""), _T(""),
 			_("Toolbox (*.xml)|*.xml|All files|*.*"),
@@ -454,7 +387,7 @@ void MainFrame::OnRecollectToolpath(wxCommandEvent& event)
 
 void MainFrame::OnCleanToolpath(wxCommandEvent& event)
 {
-	//	project.CleanToolPath();
+//	project.CleanToolPath();
 	this->Refresh();
 }
 
@@ -477,9 +410,9 @@ void MainFrame::OnLoadGCodes(wxCommandEvent &event)
 					"G-Code File (*.tap *.cnc *.nc *.ngc *.txt)|*.tap;*.cnc;*.nc;*.ngc;*.txt|Text files (*.txt)|*.txt|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
-	//	if(dialog.ShowModal() == wxID_OK){
-	//		simulator.ReadGCodeFile(dialog.GetPath());
-	//	}
+//	if(dialog.ShowModal() == wxID_OK){
+//		simulator.ReadGCodeFile(dialog.GetPath());
+//	}
 }
 
 void MainFrame::OnSaveGCodes(wxCommandEvent &event)
@@ -554,10 +487,10 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 
 void MainFrame::OnTimer(wxTimerEvent& event)
 {
-	//	t += 0.100;
-	//	simulator.Step(t);
-	//	simulator.machine.Assemble();
-	//this->Refresh();
+//	t += 0.100;
+//	simulator.Step(t);
+//	simulator.machine.Assemble();
+//this->Refresh();
 }
 
 void MainFrame::OnKeyDown(wxKeyEvent& event)
@@ -568,7 +501,7 @@ void MainFrame::OnKeyDown(wxKeyEvent& event)
 		this->Close();
 	}
 
-	// Select placement
+// Select placement
 	if(k == WXK_NUMPAD_ADD
 			&& selectedTargetPosition
 					< project.runs[0].placements.GetCount() - 1) selectedTargetPosition++;
