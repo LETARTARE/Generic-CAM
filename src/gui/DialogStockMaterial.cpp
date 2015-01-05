@@ -37,7 +37,9 @@ GUIStockMaterial(parent)
 
 DialogStockMaterial::~DialogStockMaterial()
 {
+	return;
 }
+
 void DialogStockMaterial::OnClose(wxCommandEvent& event)
 {
 	Close();

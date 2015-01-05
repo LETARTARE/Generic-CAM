@@ -38,6 +38,7 @@ DialogToolbox::DialogToolbox(wxWindow* parent) :
 
 DialogToolbox::~DialogToolbox()
 {
+	return;
 }
 
 void DialogToolbox::OnClose(wxCommandEvent& event)

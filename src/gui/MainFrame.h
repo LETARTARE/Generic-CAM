@@ -54,7 +54,6 @@
 #include <wx/log.h>
 #include <wx/cmdproc.h>
 
-
 class MainFrame:public GUIMainFrame {
 	// Constructor/ Destructor
 public:
@@ -86,13 +85,13 @@ private:
 	Unit LinearSpeed;
 	Unit RotationalSpeed;
 
-	TreeSetup tree;
+	TreeSetup * tree;
 
 	// Pointers to all the windows.
-	DialogObjectTransformation objectFrame;
-	DialogStockMaterial stockFrame;
-	DialogToolbox toolboxFrame;
-	DialogAnimation animationFrame;
+	DialogObjectTransformation * objectFrame;
+	DialogStockMaterial * stockFrame;
+	DialogToolbox * toolboxFrame;
+	DialogAnimation * animationFrame;
 
 	wxTimer timer; ///> Animation timer
 	float t; // TODO: Make a seperate animation class

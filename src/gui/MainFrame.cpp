@@ -40,13 +40,11 @@
 #include <wx/dir.h>
 
 MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
-		GUIMainFrame(parent), objectFrame(parent, &Distance), stockFrame(
-				parent), toolboxFrame(parent), animationFrame(parent), tree(
-				m_tree, &project)
+		GUIMainFrame(parent)
 {
 
 	logWindow = new wxLogWindow(this, _("Generic CAM - log window"), false,
-			true);
+	true);
 	logWindow->Show();
 
 	// Setup configuration
@@ -91,6 +89,14 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	// Connect the project to the 3D canvas
 	m_canvas->InsertProject(&project);
 
+	objectFrame = new DialogObjectTransformation(this, &Distance);
+	stockFrame = new DialogStockMaterial(this);
+	toolboxFrame = new DialogToolbox(this);
+	animationFrame = new DialogAnimation(this);
+	tree = new TreeSetup(m_tree, &project);
+
+	objectFrame->Show(true);
+
 	TransferDataToWindow();
 }
 
@@ -124,7 +130,7 @@ MainFrame::~MainFrame()
 bool MainFrame::TransferDataToWindow(void)
 {
 	// Populate the treeview
-	tree.Update();
+	tree->Update();
 
 	//TODO: Review the stereomode
 	m_menuView->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
@@ -244,15 +250,15 @@ void MainFrame::OnLoadObject(wxCommandEvent& event)
 							&project, paths[n]));
 			if(n == 0) lastObjectDirectory = fileName.GetPath();
 		}
-		tree.Update();
+		tree->Update();
 		this->Refresh();
 	}
 }
 
 void MainFrame::OnModifyObject(wxCommandEvent& event)
 {
-	objectFrame.InsertProject(&project);
-	objectFrame.Show(true);
+	objectFrame->InsertProject(&project);
+	objectFrame->Show(true);
 }
 
 void MainFrame::OnLoadMachine(wxCommandEvent& event)
@@ -279,7 +285,7 @@ void MainFrame::OnLoadMachine(wxCommandEvent& event)
 //			error->SetText(project.machine.textOut);
 //			error->Show();
 		}
-		tree.Update();
+		tree->Update();
 		this->Refresh();
 	}
 }
@@ -306,9 +312,9 @@ void MainFrame::OnReloadMachine(wxCommandEvent& event)
 
 void MainFrame::OnEditToolbox(wxCommandEvent& event)
 {
-	toolboxFrame.SetController(control);
-	toolboxFrame.InsertProject(&(project));
-	toolboxFrame.Show(true);
+	toolboxFrame->SetController(control);
+	toolboxFrame->InsertProject(&(project));
+	toolboxFrame->Show(true);
 }
 
 void MainFrame::OnLoadToolbox(wxCommandEvent& event)
@@ -371,8 +377,8 @@ void MainFrame::OnSaveToolbox(wxCommandEvent &event)
 
 void MainFrame::OnEditStock(wxCommandEvent& event)
 {
-	stockFrame.InsertProject(&(project));
-	stockFrame.Show(true);
+	stockFrame->InsertProject(&(project));
+	stockFrame->Show(true);
 }
 void MainFrame::OnGenerateToolpath(wxCommandEvent& event)
 {
@@ -475,8 +481,8 @@ void MainFrame::OnSetupUnits(wxCommandEvent& event)
 
 void MainFrame::OnShowAnimationControl(wxCommandEvent& event)
 {
-	animationFrame.InsertProject(&project);
-	animationFrame.Show(true);
+	animationFrame->InsertProject(&project);
+	animationFrame->Show(true);
 }
 
 void MainFrame::OnAbout(wxCommandEvent& event)

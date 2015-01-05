@@ -34,6 +34,7 @@ DialogAnimation::DialogAnimation(wxWindow* parent) :
 
 DialogAnimation::~DialogAnimation()
 {
+	return;
 }
 
 void DialogAnimation::InsertProject(Project *project)

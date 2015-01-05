@@ -39,6 +39,7 @@ DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent,
 
 DialogObjectTransformation::~DialogObjectTransformation()
 {
+	return;
 }
 
 void DialogObjectTransformation::InsertProject(Project *project)
