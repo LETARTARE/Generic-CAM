@@ -22,9 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -47,8 +44,10 @@ public:
 
 	// Member variables
 public:
-	AffineTransformMatrix matrix; //!< Transformation of the data.
+	wxString filename;
+	AffineTransformMatrix matrix; ///> Transformation of the data
 	ArrayOfGeometry geometry;
+	wxString error; ///> Errorstring, empty if no errors occured
 
 	//Methods:
 public:

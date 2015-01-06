@@ -95,8 +95,6 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	animationFrame = new DialogAnimation(this);
 	tree = new TreeSetup(m_tree, &project);
 
-	objectFrame->Show(true);
-
 	TransferDataToWindow();
 }
 

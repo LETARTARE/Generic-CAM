@@ -101,6 +101,7 @@ bool Object::ReloadObject(void)
 		FileSTL temp;
 		if(!temp.ReadFile(fileName.GetFullPath())){
 			wxLogMessage(_("STL file not readable!"));
+			wxLogMessage(temp.error);
 			return false;
 		}else{
 			geometries.Clear();
@@ -108,10 +109,11 @@ bool Object::ReloadObject(void)
 				temp.geometry[i].ApplyTransformation();
 				g.Clear();
 				g.CopyFrom(temp.geometry[i]);
+				//TODO: Remove the calculation of normals.
 				g.CalculateNormals();
-				g.objectName = fileName.GetName();
 				geometries.Add(g);
 			}
+			if(!temp.error.IsEmpty()) wxLogMessage(temp.error);
 		}
 		UpdateBoundingBox();
 		return true;

@@ -22,22 +22,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #ifndef FILESTL_H_
 #define FILESTL_H_
 
 #include "GeometryFileAbstract.h"
 #include <wx/string.h>
+#include <wx/wfstream.h>
+#include <wx/txtstrm.h>
+#include <wx/datstrm.h>
 
 /*!\class FileSTL
  * \brief Reads in Stereolithography files.
  * STL is a very widespread file format to exchange geometry data
- * between CAD programms. This class reads a STL file and sores its
+ * between CAD programms. This class reads a STL file and stores its
  * triangles.
  */
 
@@ -50,11 +49,13 @@ public:
 	// Member variables
 public:
 
-
 	//Methods:
 public:
 	bool ReadFile(wxString fileName);
-
+	bool ReadStream(wxFFileInputStream * stream);
+private:
+	bool ReadStreamBinary(wxFFileInputStream * stream, bool hasRead5Byte = false);
+	bool ReadStreamAscii(wxFFileInputStream * stream, bool hasRead5Byte = false);
 };
 
 #endif /* FILESTL_H_ */
