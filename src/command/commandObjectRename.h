@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Control3D.h
-// Purpose            : Main class for 6DOF controller
-// Thread Safe        : Yes
-// Platform dependent : Yes
+// Name               : commandObjectRename.h
+// Purpose            : 
+// Thread Safe        : No
+// Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 01.12.2009
-// Copyright          : (C) 2009 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 08.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,46 +24,27 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef COMMANDOBJECTRENAME_H_
+#define COMMANDOBJECTRENAME_H_
 
-#ifndef CONTROL3D_H_
-#define CONTROL3D_H_
+#include <wx/cmdproc.h>
+#include <wx/string.h>
 
-#include "Control3DAbstract.h"
-#include <wx/config.h>
+#include "../project/Project.h"
 
-class Control3D {
-	// Constructor / Destructor
+class commandObjectRename:public wxCommand {
 public:
-	Control3D();
-	virtual ~Control3D();
+	commandObjectRename(const wxString& name, Project * project, int objectNr,
+			const wxString objectName);
 
-	// Member  variables
+	bool Do(void);
+	bool Undo(void);
+
 protected:
-	Control3DAbstract* controller;
-private:
-
-
-	// Methods
-public:
-	bool Open(wxString connection);
-	bool Open(void);
-	void Close(void);
-	bool IsOpen(void);
-
-	bool SetType(char id);
-	char GetType(void);
-
-	bool HasChanged(void);
-	bool IsIdle(void);
-	int GetButton(unsigned char i);
-	int GetAxis(unsigned char i);
-	wxString GetPort(void);
-	bool SetPort(wxString port);
-	bool GetConfigFrom(wxConfig *config);
-	bool WriteConfigTo(wxConfig *config);
-
-	bool Pump(void);
-
+	Project * project;
+	int objectNr;
+	wxString newName;
+	wxString oldName;
 };
 
-#endif /* CONTROL3D_H_ */
+#endif /* COMMANDOBJECTRENAME_H_ */

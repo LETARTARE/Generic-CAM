@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectScale.h
+// Name               : DisplaySettings.h
 // Purpose            : 
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 29.12.2014
-// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 07.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,28 +24,32 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDOBJECTSCALE_H_
-#define COMMANDOBJECTSCALE_H_
+#ifndef DISPLAYSETTINGS_H_
+#define DISPLAYSETTINGS_H_
 
-#include <wx/cmdproc.h>
+/*!\class DisplaySettings
+ * \brief ...
+ *
+ * ...
+ */
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../project/Project.h"
+#include <wx/config.h>
 
-class commandObjectTransform:public wxCommand {
+#include "Unit.h"
+
+class DisplaySettings {
 public:
-	commandObjectTransform(const wxString& name, Project * project,
-			size_t objectNr, bool flipNormals,
-			AffineTransformMatrix& matrixNew);
-	bool Do(void);
-	bool Undo(void);
+	DisplaySettings();
+	virtual ~DisplaySettings();
 
-protected:
-	Project * project;
-	size_t objectNr;
-	bool flipNormals;
-	AffineTransformMatrix matrixNew;
-	AffineTransformMatrix matrixOld;
+	Unit Tolerance;
+	Unit Distance;
+	Unit LinearSpeed;
+	Unit RotationalSpeed;
+
+	bool GetConfigFrom(wxConfig * config);
+	bool WriteConfigTo(wxConfig * config);
+
 };
 
-#endif /* COMMANDOBJECTSCALE_H_ */
+#endif /* DISPLAYSETTINGS_H_ */

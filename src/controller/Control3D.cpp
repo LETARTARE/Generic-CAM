@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : Control3D.cpp
-// Purpose            : Main class for 6DOF controller.
+// Purpose            : Main class for 6DOF controller
 // Thread Safe        : Yes
 // Platform dependent : Yes
 // Compiler Options   :
@@ -182,28 +182,27 @@ bool Control3D::WriteConfigTo(wxConfig *config)
 {
 	wxASSERT(config!=NULL);
 
-	if(controller != NULL){
-		switch(GetType()){
-		case CONTROLSPACEBALL_ID:
-			config->Write(_T("Control_Type"), _T("Spaceball"));
-			break;
-		case CONTROLSPACEORB_ID:
-			config->Write(_T("Control_Type"), _T("Spaceorb"));
-			break;
-		case CONTROLSPACEMOUSE_ID:
-			config->Write(_T("Control_Type"), _T("Spacemouse"));
-			break;
-		}
+	if(controller != NULL) return false;
 
-		config->Write(_T("Control_Port"), GetPort());
-
-		if(IsOpen()){
-			config->Write(_T("Control_ActivateOnStartUp"), _T("Yes"));
-		}else{
-			config->Write(_T("Control_ActivateOnStartUp"), _T("No"));
-		}
-	}else{
-		return false;
+	switch(GetType()){
+	case CONTROLSPACEBALL_ID:
+		config->Write(_T("Control_Type"), _T("Spaceball"));
+		break;
+	case CONTROLSPACEORB_ID:
+		config->Write(_T("Control_Type"), _T("Spaceorb"));
+		break;
+	case CONTROLSPACEMOUSE_ID:
+		config->Write(_T("Control_Type"), _T("Spacemouse"));
+		break;
 	}
+
+	config->Write(_T("Control_Port"), GetPort());
+
+	if(IsOpen()){
+		config->Write(_T("Control_ActivateOnStartUp"), _T("Yes"));
+	}else{
+		config->Write(_T("Control_ActivateOnStartUp"), _T("No"));
+	}
+
 	return true;
 }

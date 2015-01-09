@@ -33,13 +33,13 @@
 #include <wx/statbox.h>
 #include <wx/checkbox.h>
 #include <wx/button.h>
+#include <wx/bmpbuttn.h>
 #include <wx/notebook.h>
 #include "ToolPanel.h"
 #include <wx/choice.h>
 #include <wx/listctrl.h>
 #include "ToolCanvas.h"
 #include <wx/slider.h>
-#include <wx/bmpbuttn.h>
 #include <wx/radiobox.h>
 #include <wx/dialog.h>
 
@@ -57,7 +57,6 @@ class GUIMainFrame : public wxFrame
 		{
 			wxID_SETUPCONTROLLER = 1000,
 			wxID_VIEWSTEREO3D,
-			wxID_SETUPUNITS,
 			wxID_DISPLAYMACHINE,
 			wxID_DISPLAYMATERIAL,
 		};
@@ -138,17 +137,13 @@ class GUIObjectTransformation : public wxFrame
 	private:
 	
 	protected:
-		enum
-		{
-			wxID_SETUPUNITS = 1000,
-		};
-		
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuObject;
 		wxMenu* m_menuSettings;
 		wxComboBox* m_comboBox;
 		wxNotebook* m_notebook;
 		wxPanel* m_panelScale;
+		
 		wxStaticText* m_staticText37;
 		wxTextCtrl* m_textCtrlSizeX;
 		wxStaticText* m_staticTextUnitX;
@@ -192,15 +187,34 @@ class GUIObjectTransformation : public wxFrame
 		wxTextCtrl* m_textCtrlScalePercentZ;
 		wxStaticText* m_staticText55;
 		wxButton* m_button24;
+		
 		wxPanel* m_panelMirror;
+		
 		wxButton* m_button39;
 		wxButton* m_button40;
 		wxButton* m_button41;
+		
 		wxPanel* m_panelMove;
+		
+		wxStaticText* m_staticText62;
+		wxTextCtrl* m_textCtrlMoveStep;
+		wxStaticText* m_staticTextUnitMove;
+		
+		wxBitmapButton* m_bpButton6;
+		wxBitmapButton* m_bpButton7;
+		wxBitmapButton* m_bpButton8;
+		
+		wxBitmapButton* m_bpButton9;
+		wxBitmapButton* m_bpButton10;
+		wxBitmapButton* m_bpButton11;
+		
+		
 		wxButton* m_button18;
 		wxButton* m_button17;
 		wxButton* m_button16;
+		
 		wxPanel* m_panelRotate;
+		
 		wxButton* m_button32;
 		wxButton* m_button33;
 		wxButton* m_button28;
@@ -210,13 +224,16 @@ class GUIObjectTransformation : public wxFrame
 		
 		wxButton* m_button31;
 		
+		
 		wxStatusBar* m_statusBar;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
 		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReLoad( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSaveAs( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSetupUnits( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSelectObject( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnMultiplyByTen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDivideByTen( wxCommandEvent& event ) { event.Skip(); }
@@ -230,6 +247,12 @@ class GUIObjectTransformation : public wxFrame
 		virtual void OnFlipX( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFlipY( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFlipZ( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMoveZUp( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMoveYUp( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMoveXDown( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMoveXUp( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMoveYDown( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMoveZDown( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAlignWithTop( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAlignWithMiddle( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAlignWithStock( wxCommandEvent& event ) { event.Skip(); }
@@ -243,7 +266,7 @@ class GUIObjectTransformation : public wxFrame
 	
 	public:
 		
-		GUIObjectTransformation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 700,400 ), long style = wxDEFAULT_FRAME_STYLE|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
+		GUIObjectTransformation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 709,461 ), long style = wxDEFAULT_FRAME_STYLE|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
 		~GUIObjectTransformation();
 	
 };

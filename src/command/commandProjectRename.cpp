@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectLoad.cpp
+// Name               : commandProjectRename.cpp
 // Purpose            : 
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 29.12.2014
-// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 08.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,28 +24,25 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "commandObjectLoad.h"
+#include "commandProjectRename.h"
 
-commandObjectLoad::commandObjectLoad(const wxString& name, Project * project,
-		const wxString& fileName) :
+commandProjectRename::commandProjectRename(const wxString& name,
+		Project* project, const wxString projectName) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->fileName = fileName;
+	this->newName = projectName;
 }
 
-bool commandObjectLoad::Do(void)
+bool commandProjectRename::Do(void)
 {
-	Object temp;
-	if(temp.LoadObject(fileName)){
-		project->objects.Add(temp);
-		return true;
-	}
-	return false;
+	this->oldName = project->name;
+	project->name = this->newName;
+	return true;
 }
 
-bool commandObjectLoad::Undo(void)
+bool commandProjectRename::Undo(void)
 {
-	project->objects.RemoveAt(project->objects.GetCount() - 1, 1);
+	project->name = this->oldName;
 	return true;
 }

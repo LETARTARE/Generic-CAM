@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectLoad.cpp
+// Name               : commandObjectDelete.cpp
 // Purpose            : 
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 29.12.2014
-// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 08.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,28 +24,36 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "commandObjectLoad.h"
+#include "commandObjectDelete.h"
 
-commandObjectLoad::commandObjectLoad(const wxString& name, Project * project,
-		const wxString& fileName) :
+#include <stddef.h>
+
+commandObjectDelete::commandObjectDelete(const wxString& name, Project* project,
+		int objectNr) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->fileName = fileName;
+	this->objectNr = objectNr;
+	this->object = NULL;
 }
 
-bool commandObjectLoad::Do(void)
+bool commandObjectDelete::Do(void)
 {
-	Object temp;
-	if(temp.LoadObject(fileName)){
-		project->objects.Add(temp);
-		return true;
+	object = project->objects.Detach(objectNr);
+	return true;
+}
+
+commandObjectDelete::~commandObjectDelete()
+{
+	if(object != NULL) delete object;
+}
+
+bool commandObjectDelete::Undo(void)
+{
+	if(objectNr > project->objects.GetCount()){
+		project->objects.Add(object);
+	}else{
+		project->objects.Insert(object, objectNr);
 	}
-	return false;
-}
-
-bool commandObjectLoad::Undo(void)
-{
-	project->objects.RemoveAt(project->objects.GetCount() - 1, 1);
 	return true;
 }

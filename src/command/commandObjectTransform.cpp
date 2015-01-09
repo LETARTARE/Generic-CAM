@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectScale.cpp
+// Name               : commandObjectTransform.cpp
 // Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,7 +24,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "commandObjectScale.h"
+#include "commandObjectTransform.h"
 
 commandObjectTransform::commandObjectTransform(const wxString& name,
 		Project* project, size_t objectNr, bool flipNormals,

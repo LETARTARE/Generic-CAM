@@ -53,6 +53,7 @@ public:
 	AffineTransformMatrix matrix;
 
 	wxFileName fileName;
+	wxString name;
 
 	ArrayOfGeometry geometries;
 	BoundingBox bbox;

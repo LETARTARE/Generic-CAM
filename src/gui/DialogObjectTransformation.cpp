@@ -27,25 +27,19 @@
 #include "DialogObjectTransformation.h"
 #include <math.h>
 
-
 DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent,
-		Unit * distance) :
+		Project * project, wxCommandProcessor * commandProcessor,
+		DisplaySettings * settings) :
 		GUIObjectTransformation(parent)
 {
-	linkedProject = NULL;
-	this->distance = distance;
-
+	linkedProject = project;
+	this->commandProcessor = commandProcessor;
+	this->settings = settings;
+	TransferDataToWindow();
 }
 
 DialogObjectTransformation::~DialogObjectTransformation()
 {
-	return;
-}
-
-void DialogObjectTransformation::InsertProject(Project *project)
-{
-	linkedProject = project;
-	TransferDataToWindow();
 }
 
 bool DialogObjectTransformation::TransferDataToWindow(void)
@@ -62,67 +56,78 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 		m_comboBox->Append(_("No objects in project!"));
 		m_comboBox->Enable(false);
 	}
-	m_comboBox->SetSelection(linkedProject->activeObject);
+//	m_comboBox->SetSelection(linkedProject->activeObject);
+//
+//	m_textCtrlSizeX->SetValue(
+//			wxString::Format(_T("%.3f"),
+//					settings->Distance.FromSI(
+//							linkedProject->objects[linkedProject->activeObject].bbox.GetSizeX())));
+//	m_textCtrlSizeY->SetValue(
+//			wxString::Format(_T("%.3f"),
+//					settings->Distance.FromSI(
+//							linkedProject->objects[linkedProject->activeObject].bbox.GetSizeY())));
+//	m_textCtrlSizeZ->SetValue(
+//			wxString::Format(_T("%.3f"),
+//					settings->Distance.FromSI(
+//							linkedProject->objects[linkedProject->activeObject].bbox.GetSizeZ())));
 
-	m_textCtrlSizeX->SetValue(
-			wxString::Format(_T("%.3f"),
-					distance->FromSI(
-							linkedProject->objects[linkedProject->activeObject].bbox.GetSizeX())));
-	m_textCtrlSizeY->SetValue(
-			wxString::Format(_T("%.3f"),
-					distance->FromSI(
-							linkedProject->objects[linkedProject->activeObject].bbox.GetSizeY())));
-	m_textCtrlSizeZ->SetValue(
-			wxString::Format(_T("%.3f"),
-					distance->FromSI(
-							linkedProject->objects[linkedProject->activeObject].bbox.GetSizeZ())));
-
-	m_staticTextUnitX->SetLabel(distance->GetOtherName());
-	m_staticTextUnitY->SetLabel(distance->GetOtherName());
-	m_staticTextUnitZ->SetLabel(distance->GetOtherName());
-	m_staticTextUnitX2->SetLabel(distance->GetOtherName());
-	m_staticTextUnitY2->SetLabel(distance->GetOtherName());
-	m_staticTextUnitZ2->SetLabel(distance->GetOtherName());
+	m_staticTextUnitX->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitY->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitZ->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitX2->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitY2->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitZ2->SetLabel(settings->Distance.GetOtherName());
 
 	return true;
 }
 bool DialogObjectTransformation::TransferDataFromWindow(void)
 {
-
 	return true;
 }
 
-void DialogObjectTransformation::OnClose(wxCommandEvent& event)
-{
-	Close();
-}
+//void DialogObjectTransformation::OnUpdate(wxCommandEvent& event)
+//{
+//	if(linkedProject == NULL) return;
+//	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
+//	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
+//
+//	size_t i;
+//	for(i = 0;
+//			i
+//					< linkedProject->objects[linkedProject->activeObject].geometries.GetCount();
+//			i++)
+//		linkedProject->objects[linkedProject->activeObject].geometries[i].CalculateNormals();
+//
+//	this->GetParent()->Refresh();
+//
+//	TransferDataToWindow();
+//}
 
 void DialogObjectTransformation::OnOpen(wxCommandEvent& event)
 {
 }
+
 void DialogObjectTransformation::OnReLoad(wxCommandEvent& event)
 {
 }
+
 void DialogObjectTransformation::OnSaveAs(wxCommandEvent& event)
 {
 }
-void DialogObjectTransformation::OnUpdate(wxCommandEvent& event)
+
+void DialogObjectTransformation::OnClose(wxCommandEvent& event)
 {
-	if(linkedProject == NULL) return;
-	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
-
-	size_t i;
-	for(i = 0;
-			i
-					< linkedProject->objects[linkedProject->activeObject].geometries.GetCount();
-			i++)
-		linkedProject->objects[linkedProject->activeObject].geometries[i].CalculateNormals();
-
-	this->GetParent()->Refresh();
-
-	TransferDataToWindow();
+	this->Show(false);
 }
+void DialogObjectTransformation::OnClose(wxCloseEvent& event)
+{
+	this->Show(false);
+}
+
+void DialogObjectTransformation::OnSelectObject(wxCommandEvent& event)
+{
+}
+
 void DialogObjectTransformation::OnMultiplyByTen(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
@@ -157,24 +162,6 @@ void DialogObjectTransformation::OnScalePercent(wxCommandEvent& event)
 	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
 	this->GetParent()->Refresh();
 	TransferDataToWindow();
-}
-void DialogObjectTransformation::ScaleUnitX(wxCommandEvent& event)
-{
-}
-void DialogObjectTransformation::OnScalePercentX(wxCommandEvent& event)
-{
-}
-void DialogObjectTransformation::OnScaleUnitY(wxCommandEvent& event)
-{
-}
-void DialogObjectTransformation::OnScalePercentY(wxCommandEvent& event)
-{
-}
-void DialogObjectTransformation::OnScaleUnitZ(wxCommandEvent& event)
-{
-}
-void DialogObjectTransformation::OnScalePercentZ(wxCommandEvent& event)
-{
 }
 
 void DialogObjectTransformation::OnYMinus(wxCommandEvent& event)
@@ -231,6 +218,7 @@ void DialogObjectTransformation::OnZPlus(wxCommandEvent& event)
 	this->GetParent()->Refresh();
 	TransferDataToWindow();
 }
+
 void DialogObjectTransformation::OnXPlus(wxCommandEvent& event)
 {
 	if(linkedProject == NULL) return;
@@ -260,10 +248,71 @@ void DialogObjectTransformation::OnAlignWithStock(wxCommandEvent& event)
 	this->GetParent()->Refresh();
 	TransferDataToWindow();
 }
-void DialogObjectTransformation::OnAlignWithMiddle(wxCommandEvent& event)
+
+void DialogObjectTransformation::ScaleUnitX(wxCommandEvent& event)
 {
 }
+
+void DialogObjectTransformation::OnScalePercentX(wxCommandEvent& event)
+{
+}
+
+void DialogObjectTransformation::OnScaleUnitY(wxCommandEvent& event)
+{
+}
+
+void DialogObjectTransformation::OnScalePercentY(wxCommandEvent& event)
+{
+}
+
+void DialogObjectTransformation::OnScaleUnitZ(wxCommandEvent& event)
+{
+}
+
+void DialogObjectTransformation::OnScalePercentZ(wxCommandEvent& event)
+{
+}
+
+void DialogObjectTransformation::OnFlipX(wxCommandEvent& event)
+{
+}
+
+void DialogObjectTransformation::OnFlipY(wxCommandEvent& event)
+{
+}
+
+void DialogObjectTransformation::OnFlipZ(wxCommandEvent& event)
+{
+}
+
+void DialogObjectTransformation::OnMoveZUp(wxCommandEvent& event)
+{
+}
+
+void DialogObjectTransformation::OnMoveYUp(wxCommandEvent& event)
+{
+}
+
+void DialogObjectTransformation::OnMoveXDown(wxCommandEvent& event)
+{
+}
+
+void DialogObjectTransformation::OnMoveXUp(wxCommandEvent& event)
+{
+}
+
+void DialogObjectTransformation::OnMoveYDown(wxCommandEvent& event)
+{
+}
+
+void DialogObjectTransformation::OnMoveZDown(wxCommandEvent& event)
+{
+}
+
 void DialogObjectTransformation::OnAlignWithTop(wxCommandEvent& event)
 {
 }
 
+void DialogObjectTransformation::OnAlignWithMiddle(wxCommandEvent& event)
+{
+}

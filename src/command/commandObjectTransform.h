@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Control3D.h
-// Purpose            : Main class for 6DOF controller
+// Name               : commandObjectTransform.h
+// Purpose            : 
 // Thread Safe        : Yes
-// Platform dependent : Yes
+// Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 01.12.2009
-// Copyright          : (C) 2009 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 29.12.2014
+// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,46 +24,28 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef COMMANDOBJECTTRANSFORM_H_
+#define COMMANDOBJECTTRANSFORM_H_
 
-#ifndef CONTROL3D_H_
-#define CONTROL3D_H_
+#include <wx/cmdproc.h>
 
-#include "Control3DAbstract.h"
-#include <wx/config.h>
+#include "../3D/AffineTransformMatrix.h"
+#include "../project/Project.h"
 
-class Control3D {
-	// Constructor / Destructor
+class commandObjectTransform:public wxCommand {
 public:
-	Control3D();
-	virtual ~Control3D();
+	commandObjectTransform(const wxString& name, Project * project,
+			size_t objectNr, bool flipNormals,
+			AffineTransformMatrix& matrixNew);
+	bool Do(void);
+	bool Undo(void);
 
-	// Member  variables
 protected:
-	Control3DAbstract* controller;
-private:
-
-
-	// Methods
-public:
-	bool Open(wxString connection);
-	bool Open(void);
-	void Close(void);
-	bool IsOpen(void);
-
-	bool SetType(char id);
-	char GetType(void);
-
-	bool HasChanged(void);
-	bool IsIdle(void);
-	int GetButton(unsigned char i);
-	int GetAxis(unsigned char i);
-	wxString GetPort(void);
-	bool SetPort(wxString port);
-	bool GetConfigFrom(wxConfig *config);
-	bool WriteConfigTo(wxConfig *config);
-
-	bool Pump(void);
-
+	Project * project;
+	size_t objectNr;
+	bool flipNormals;
+	AffineTransformMatrix matrixNew;
+	AffineTransformMatrix matrixOld;
 };
 
-#endif /* CONTROL3D_H_ */
+#endif /* COMMANDOBJECTTRANSFORM_H_ */

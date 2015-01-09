@@ -30,7 +30,7 @@
 
 #include "TreeItem.h"
 
-TreeSetup::TreeSetup(wxTreeCtrl* tree, Project* project)
+TreeSetup::TreeSetup(wxTreeCtrl * tree, Project * project)
 {
 	maxId = 10;
 
@@ -45,6 +45,8 @@ TreeSetup::TreeSetup(wxTreeCtrl* tree, Project* project)
 	long style = this->tree->GetWindowStyle() ^ wxTR_NO_LINES;
 	this->tree->SetWindowStyle(style);
 
+	this->levelModified = false;
+
 	tree->DeleteAllItems();
 }
 
@@ -58,16 +60,7 @@ void TreeSetup::Reset(void)
 	tree->DeleteAllItems();
 }
 
-void TreeSetup::FinishLevel(int level)
-{
-	wxTreeItemId temp = tree->GetNextSibling(id[level]);
-	while(temp.IsOk()){
-		tree->Delete(temp);
-		temp = tree->GetNextSibling(id[level]);
-	}
-}
-
-void TreeSetup::SetLevel(int level, const wxString& name, ItemDataType type,
+void TreeSetup::SetAtLevel(int level, const wxString& name, ItemDataType type,
 		int nr)
 {
 	wxTreeItemId temp;
@@ -77,6 +70,7 @@ void TreeSetup::SetLevel(int level, const wxString& name, ItemDataType type,
 		if(!temp.IsOk()){
 			temp = tree->AppendItem(id[currentLevel - 1], name, -1, -1,
 					new TreeItem(type, nr));
+			levelModified = true;
 		}
 		id[currentLevel] = temp;
 	}
@@ -87,15 +81,18 @@ void TreeSetup::SetLevel(int level, const wxString& name, ItemDataType type,
 		if(!temp.IsOk()){
 			temp = tree->AppendItem(id[currentLevel - 1], name, -1, -1,
 					new TreeItem(type, nr));
+			levelModified = true;
 		}
 		id[currentLevel] = temp;
 	}
 	if(level > currentLevel){
 		currentLevel = level;
+		levelModified = false;
 		temp = tree->GetFirstChild(id[currentLevel - 1], cookie);
 		if(!temp.IsOk()){
 			temp = tree->AppendItem(id[currentLevel - 1], name, -1, -1,
 					new TreeItem(type, nr));
+			levelModified = true;
 		}
 		id[currentLevel] = temp;
 	}
@@ -109,28 +106,54 @@ void TreeSetup::SetLevel(int level, const wxString& name, ItemDataType type,
 	data->nr = nr;
 }
 
+void TreeSetup::FinishLevel(int level, bool autoExpand)
+{
+	wxTreeItemId temp = tree->GetNextSibling(id[level]);
+	while(temp.IsOk()){
+		tree->Delete(temp);
+		temp = tree->GetNextSibling(id[level]);
+	}
+	if(levelModified) tree->Expand(id[level - 1]);
+}
+
+bool TreeSetup::GetSelection(void)
+{
+	return tree->IsSelected(id[currentLevel]);
+}
+
+void TreeSetup::SetSelection(bool selection)
+{
+	tree->SelectItem(id[currentLevel], selection);
+}
+
 void TreeSetup::Update(void)
 {
-
 	wxTreeItemId root = tree->GetRootItem();
 	if(!root.IsOk()){
 		root = tree->AddRoot(project->name, -1, -1, new TreeItem(itemProject));
 	}
+	wxString tempName = tree->GetItemText(root);
+	if(tempName != project->name) tree->SetItemText(root, project->name);
+
+	unsigned int n;
 	id[0] = root;
 	currentLevel = 0;
 
-	SetLevel(1, _("Objects"), itemGroup, -1);
-	unsigned int n;
-	for(n = 0; n < project->objects.GetCount(); n++)
-		SetLevel(2, project->objects[n].fileName.GetName(), itemObject, n);
-
-	if(project->objects.IsEmpty()){
-		tree->DeleteChildren(id[1]);
-	}else{
-		FinishLevel(2);
+	SetAtLevel(1, _("Objects"), itemGroup, -1);
+	for(n = 0; n < project->objects.GetCount(); n++){
+		SetAtLevel(2, project->objects[n].name, itemObject, n);
+		SetSelection(project->objects[n].selected);
 	}
 
-	SetLevel(1, _("Run"), itemGroup, -1);
+	if(n == 0){
+		tree->DeleteChildren(id[1]);
+	}else{
+		FinishLevel(2, true);
+	}
+
+	SetAtLevel(1, _("Run"), itemGroup, -1);
+
+	tree->Expand(id[0]);
 
 	//	wxTreeItemId rootId = tree->AddRoot(_T("TreeRoot"));
 //

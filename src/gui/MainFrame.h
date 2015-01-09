@@ -46,13 +46,14 @@
 
 #include "TreeSetup.h"
 
-#include "Unit.h"
+#include "DisplaySettings.h"
 #include "../controller/Control3D.h"
 #include "../project/Project.h"
 
 #include <wx/config.h>
 #include <wx/log.h>
 #include <wx/cmdproc.h>
+
 
 class MainFrame:public GUIMainFrame {
 	// Constructor/ Destructor
@@ -80,10 +81,7 @@ private:
 
 	size_t selectedTargetPosition;
 
-	Unit Tolerance;
-	Unit Distance;
-	Unit LinearSpeed;
-	Unit RotationalSpeed;
+	DisplaySettings settings;
 
 	TreeSetup * tree;
 

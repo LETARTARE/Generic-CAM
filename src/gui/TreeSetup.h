@@ -48,9 +48,13 @@ public:
 
 private:
 	void Reset(void);
-	void FinishLevel(int level);
-	void SetLevel(int level, const wxString& name, ItemDataType type, int nr);
+	void SetAtLevel(int level, const wxString& name, ItemDataType type, int nr);
+	void FinishLevel(int level, bool autoExpand = false);
 
+	bool GetSelection(void);
+	void SetSelection(bool selection = true);
+
+	bool levelModified;
 	wxTreeItemIdValue cookie;
 	wxTreeItemId * id;
 	size_t maxId;

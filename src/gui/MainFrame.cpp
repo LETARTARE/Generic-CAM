@@ -32,7 +32,9 @@
 
 #include "../languages.h"
 #include "../command/commandObjectLoad.h"
-#include "../command/commandObjectScale.h"
+#include "../command/commandObjectTransform.h"
+#include "../command/commandObjectRename.h"
+#include "../command/commandProjectRename.h"
 
 #include <wx/filename.h>
 #include <wx/textfile.h>
@@ -44,7 +46,7 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 {
 
 	logWindow = new wxLogWindow(this, _("Generic CAM - log window"), false,
-	true);
+			true);
 	logWindow->Show();
 
 	// Setup configuration
@@ -75,11 +77,6 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	m_canvas->Connect(wxID_ANY, wxEVT_KEY_DOWN,
 			wxKeyEventHandler(MainFrame::OnKeyDown), NULL, this);
 
-	Tolerance.Setup(_T("m"), _T("mm"), (double) 1 / 1000);
-	Distance.Setup(_T("m"), _T("cm"), (double) 1 / 100);
-	RotationalSpeed.Setup(_T("1/s"), _T("rpm"), (double) 1 / 60);
-	LinearSpeed.Setup(_T("m/s"), _T("mm/s"), (double) 1 / 1000);
-
 	selectedTargetPosition = 0;
 
 	commandProcessor.SetEditMenu(m_menuEdit);
@@ -89,7 +86,8 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	// Connect the project to the 3D canvas
 	m_canvas->InsertProject(&project);
 
-	objectFrame = new DialogObjectTransformation(this, &Distance);
+	objectFrame = new DialogObjectTransformation(this, &project,
+			&commandProcessor, &settings);
 	stockFrame = new DialogStockMaterial(this);
 	toolboxFrame = new DialogToolbox(this);
 	animationFrame = new DialogAnimation(this);
@@ -255,7 +253,6 @@ void MainFrame::OnLoadObject(wxCommandEvent& event)
 
 void MainFrame::OnModifyObject(wxCommandEvent& event)
 {
-	objectFrame->InsertProject(&project);
 	objectFrame->Show(true);
 }
 
@@ -549,15 +546,57 @@ void MainFrame::OnKeyDown(wxKeyEvent& event)
 
 void MainFrame::OnBeginLabelEdit(wxTreeEvent& event)
 {
+	wxTreeItemId id = event.GetItem();
+	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
+
+	if(data->dataType == itemProject) return;
+	if(data->dataType == itemObject) return;
+
+	// Stop editing, if it cannot be changed.
+	event.Veto();
 }
+
 void MainFrame::OnEndLabelEdit(wxTreeEvent& event)
 {
+	wxTreeItemId id = event.GetItem();
+	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
+	wxString newName = event.GetLabel();
+	if(newName.IsEmpty()){
+		event.Veto();
+		return;
+	}
+
+	if(data->dataType == itemProject){
+		if(newName == project.name) return;
+		commandProcessor.Submit(
+				new commandProjectRename(_("Rename Project: ") + newName,
+						&project, newName));
+		return;
+	};
+	if(data->dataType == itemObject){
+		if(newName == project.objects[data->nr].name) return;
+		commandProcessor.Submit(
+				new commandObjectRename(_("Rename Object: ") + newName,
+						&project, data->nr, newName));
+		return;
+	};
+
+	event.Veto();
 }
+
 void MainFrame::OnActivateRightClickMenu(wxTreeEvent& event)
 {
 }
+
 void MainFrame::OnSelectionChanged(wxTreeEvent& event)
 {
+	wxTreeItemId id = event.GetItem();
+	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
+
+	if(data->dataType == itemObject){
+		project.objects[data->nr].selected = m_tree->IsSelected(id);
+	}
+
 }
 
 void MainFrame::OnUpdateVisibility(wxCommandEvent& event)

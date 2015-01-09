@@ -67,6 +67,7 @@ bool Object::LoadObject(wxFileName fileName)
 {
 	if(!fileName.IsOk()) return false;
 	this->fileName = fileName;
+	this->name = fileName.GetName();
 	return ReloadObject();
 }
 

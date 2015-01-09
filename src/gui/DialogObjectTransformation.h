@@ -27,8 +27,11 @@
 #ifndef DIALOGOBJECTTRANSFORMATION_H_
 #define DIALOGOBJECTTRANSFORMATION_H_
 
+#include <wx/cmdproc.h>
+
 #include "gui.h"
 #include "../project/Project.h"
+#include "DisplaySettings.h"
 #include "Unit.h"
 
 /*!\class DialogObjectTransformation
@@ -40,27 +43,28 @@
 class DialogObjectTransformation:public GUIObjectTransformation {
 	// Constructor/ Destructor
 public:
-	DialogObjectTransformation(wxWindow* parent, Unit * distance);
+	DialogObjectTransformation(wxWindow* parent, Project * project,
+			wxCommandProcessor * commandProcessor, DisplaySettings * settings);
 	virtual ~DialogObjectTransformation();
 
 	// Member Variables
 
 	Project* linkedProject;
-	Unit * distance;
+	DisplaySettings * settings;
+	wxCommandProcessor * commandProcessor;
 
 	// Methods
 public:
-	void InsertProject(Project *project);
 
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 
-	void OnClose(wxCommandEvent& event);
-
 	void OnOpen(wxCommandEvent& event);
 	void OnReLoad(wxCommandEvent& event);
 	void OnSaveAs(wxCommandEvent& event);
-	void OnUpdate(wxCommandEvent& event);
+	void OnClose(wxCloseEvent& event);
+	void OnClose(wxCommandEvent& event);
+	void OnSelectObject(wxCommandEvent& event);
 	void OnMultiplyByTen(wxCommandEvent& event);
 	void OnDivideByTen(wxCommandEvent& event);
 	void OnScalePercent(wxCommandEvent& event);
@@ -70,15 +74,24 @@ public:
 	void OnScalePercentY(wxCommandEvent& event);
 	void OnScaleUnitZ(wxCommandEvent& event);
 	void OnScalePercentZ(wxCommandEvent& event);
+	void OnFlipX(wxCommandEvent& event);
+	void OnFlipY(wxCommandEvent& event);
+	void OnFlipZ(wxCommandEvent& event);
+	void OnMoveZUp(wxCommandEvent& event);
+	void OnMoveYUp(wxCommandEvent& event);
+	void OnMoveXDown(wxCommandEvent& event);
+	void OnMoveXUp(wxCommandEvent& event);
+	void OnMoveYDown(wxCommandEvent& event);
+	void OnMoveZDown(wxCommandEvent& event);
+	void OnAlignWithTop(wxCommandEvent& event);
+	void OnAlignWithMiddle(wxCommandEvent& event);
+	void OnAlignWithStock(wxCommandEvent& event);
 	void OnYMinus(wxCommandEvent& event);
 	void OnXMinus(wxCommandEvent& event);
 	void OnYPlus(wxCommandEvent& event);
 	void OnZMinus(wxCommandEvent& event);
 	void OnZPlus(wxCommandEvent& event);
 	void OnXPlus(wxCommandEvent& event);
-	void OnAlignWithStock(wxCommandEvent& event);
-	void OnAlignWithMiddle(wxCommandEvent& event);
-	void OnAlignWithTop(wxCommandEvent& event);
 
 };
 

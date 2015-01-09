@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectLoad.cpp
+// Name               : DisplaySettings.cpp
 // Purpose            : 
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 29.12.2014
-// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 07.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,28 +24,32 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "commandObjectLoad.h"
+#include "DisplaySettings.h"
 
-commandObjectLoad::commandObjectLoad(const wxString& name, Project * project,
-		const wxString& fileName) :
-		wxCommand(true, name)
+DisplaySettings::DisplaySettings()
 {
-	this->project = project;
-	this->fileName = fileName;
+	Tolerance.Setup(_T("m"), _T("mm"), (double) 1 / 1000);
+	Distance.Setup(_T("m"), _T("cm"), (double) 1 / 100);
+	RotationalSpeed.Setup(_T("1/s"), _T("rpm"), (double) 1 / 60);
+	LinearSpeed.Setup(_T("m/s"), _T("mm/s"), (double) 1 / 1000);
 }
 
-bool commandObjectLoad::Do(void)
+DisplaySettings::~DisplaySettings()
 {
-	Object temp;
-	if(temp.LoadObject(fileName)){
-		project->objects.Add(temp);
-		return true;
-	}
-	return false;
 }
 
-bool commandObjectLoad::Undo(void)
+bool DisplaySettings::GetConfigFrom(wxConfig * config)
 {
-	project->objects.RemoveAt(project->objects.GetCount() - 1, 1);
+	wxASSERT(config!=NULL);
+	if(config == NULL) return false;
+
+	return true;
+}
+
+bool DisplaySettings::WriteConfigTo(wxConfig * config)
+{
+	wxASSERT(config!=NULL);
+	if(config == NULL) return false;
+
 	return true;
 }
