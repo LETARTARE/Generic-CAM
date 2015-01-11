@@ -28,6 +28,7 @@
 #define DIALOGSETUPUNITS_H_
 
 #include "../StdInclude.h"
+#include "DisplaySettings.h"
 #include "gui.h"
 
 /*!\class DialogSetupUnits
@@ -40,19 +41,31 @@ class DialogSetupUnits:public GUISetupUnits {
 	// Constructor/ Destructor
 
 public:
-	DialogSetupUnits(wxWindow* parent);
+	DialogSetupUnits(wxWindow* parent, DisplaySettings * settings);
 	virtual ~DialogSetupUnits();
 	// Member variables
 private:
 
-	Project* linkedProject;
+	DisplaySettings * settings;
+
+	wxArrayString unitsOfLength;
+	wxArrayString unitsOfTime;
+	wxArrayString unitsOfSpeedLinear;
+	wxArrayString unitsOfSpeedRotational;
+
+	double * factorofLength;
+	double * factorofTime;
+	double * factorofSpeedLinear;
+	double * factorofSpeedRotational;
+
 	// Methods
 private:
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
-public:
-	void InsertProject(Project *project);
+
+private:
 	void OnClose(wxCommandEvent& event);
+	void OnChangeUnit(wxCommandEvent& event);
 };
 
 #endif /* DIALOGSETUPUNITS_H_ */

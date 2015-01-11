@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectTransform.h
-// Purpose            : 
+// Name               : DialogMachineControl.h
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 29.12.2014
-// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 11.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,31 +24,32 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDOBJECTTRANSFORM_H_
-#define COMMANDOBJECTTRANSFORM_H_
+#ifndef DIALOGMACHINECONTROL_H_
+#define DIALOGMACHINECONTROL_H_
 
-#include <wx/cmdproc.h>
+/*!\class DialogMachineControl
+ * \brief ...
+ *
+ * ...
+ */
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../project/Project.h"
+#include "gui.h"
 
-class commandObjectTransform:public wxCommand {
+class DialogMachineControl:public GUIMachineControl {
 public:
-	commandObjectTransform(const wxString& name, Project * project,
-			size_t objectNr, bool flipX, bool flipY, bool flipZ,
-			bool flipNormals, AffineTransformMatrix& matrixNew);
-	bool Do(void);
-	bool Undo(void);
+	DialogMachineControl(wxWindow * parent);
+
+	bool TransferDataToWindow(void);
+	bool TransferDataFromWindow(void);
+
+private:
 
 protected:
-	Project * project;
-	size_t objectNr;
-	bool flipX;
-	bool flipY;
-	bool flipZ;
-	bool flipNormals;
-	AffineTransformMatrix matrixNew;
-	AffineTransformMatrix matrixOld;
+	
+	void OnClose(wxCloseEvent& event);
+	void OnScroll(wxScrollEvent& event);
+	void OnTrack(wxScrollEvent& event);
+	void OnTextChanged(wxCommandEvent& event);
 };
 
-#endif /* COMMANDOBJECTTRANSFORM_H_ */
+#endif /* DIALOGMACHINECONTROL_H_ */

@@ -64,11 +64,17 @@ private:
 public:
 
 	void UpdateBoundingBox(void);
+	void UpdateNormals(void);
+	void Update(void);
+
 	void Paint(void);
 
 	bool LoadObject(wxFileName fileName);
 	bool ReloadObject(void);
 
+	void FlipX(void);
+	void FlipY(void);
+	void FlipZ(void);
 	void FlipNormals(void);
 
 	bool IsEmpty(void) const;

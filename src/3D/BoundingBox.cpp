@@ -107,6 +107,16 @@ void BoundingBox::Insert(Surface &surface)
 	}
 }
 
+void BoundingBox::Insert(BoundingBox& bbox)
+{
+	if(bbox.xmin < xmin) xmin = bbox.xmin;
+	if(bbox.xmax > xmax) xmax = bbox.xmax;
+	if(bbox.ymin < ymin) ymin = bbox.ymin;
+	if(bbox.ymax > ymax) ymax = bbox.ymax;
+	if(bbox.zmin < zmin) zmin = bbox.zmin;
+	if(bbox.zmax > zmax) zmax = bbox.zmax;
+}
+
 void BoundingBox::Insert(const Triangle tri)
 {
 	unsigned char i;
@@ -176,3 +186,4 @@ void BoundingBox::Paint(void)
 	::glPopMatrix();
 
 }
+

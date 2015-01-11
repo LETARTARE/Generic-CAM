@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectTransform.h
+// Name               : IDs.h
 // Purpose            : 
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 29.12.2014
-// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 10.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,31 +24,17 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDOBJECTTRANSFORM_H_
-#define COMMANDOBJECTTRANSFORM_H_
+#ifndef IDS_H_
+#define IDS_H_
 
-#include <wx/cmdproc.h>
+/*!\class IDs
+ * \brief List of command IDs
+ * This headerfile contains a list of command IDs. These are used to comminucate
+ * from the child windows to the main window.
+ */
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../project/Project.h"
+#define ID_UPDATE			(wxID_HIGHEST+1)
+#define ID_SELECTOBJECT	 	(wxID_HIGHEST+2)
+#define ID_SELECTRUN 		(wxID_HIGHEST+3)
 
-class commandObjectTransform:public wxCommand {
-public:
-	commandObjectTransform(const wxString& name, Project * project,
-			size_t objectNr, bool flipX, bool flipY, bool flipZ,
-			bool flipNormals, AffineTransformMatrix& matrixNew);
-	bool Do(void);
-	bool Undo(void);
-
-protected:
-	Project * project;
-	size_t objectNr;
-	bool flipX;
-	bool flipY;
-	bool flipZ;
-	bool flipNormals;
-	AffineTransformMatrix matrixNew;
-	AffineTransformMatrix matrixOld;
-};
-
-#endif /* COMMANDOBJECTTRANSFORM_H_ */
+#endif /* IDS_H_ */

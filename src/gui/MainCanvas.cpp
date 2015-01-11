@@ -24,18 +24,18 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include "MainCanvas.h"
 
 MainCanvas::MainCanvas(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 		const wxSize& size, long style, const wxString& name) :
-	OpenGLCanvas(parent, id, pos, size, style, name)
+		OpenGLCanvas(parent, id, pos, size, style, name)
 {
 
-
 	displayCoordinateSystem = true;
-
-	linkedProject=NULL;
+	geometry = NULL;
+	machine = NULL;
+	stockMaterial = NULL;
+	project = NULL;
 }
 
 MainCanvas::~MainCanvas()
@@ -44,7 +44,7 @@ MainCanvas::~MainCanvas()
 
 void MainCanvas::InsertProject(Project* project)
 {
-	linkedProject = project;
+	this->project = project;
 }
 
 void MainCanvas::RenderCoordinateSystem(AffineTransformMatrix *matrix)
@@ -121,7 +121,7 @@ void MainCanvas::RenderCoordinateSystem(AffineTransformMatrix *matrix)
 
 void MainCanvas::Render()
 {
-	if(displayCoordinateSystem)RenderCoordinateSystem();
-	if(linkedProject==NULL)return;
-	linkedProject->Paint();
+	if(displayCoordinateSystem) RenderCoordinateSystem();
+	if(project == NULL) return;
+	project->Paint();
 }

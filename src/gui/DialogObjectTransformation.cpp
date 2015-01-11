@@ -26,16 +26,32 @@
 
 #include "DialogObjectTransformation.h"
 #include <math.h>
+#include "IDs.h"
+#include <wx/event.h>
+
+#include "../command/commandObjectTransform.h"
 
 DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent,
 		Project * project, wxCommandProcessor * commandProcessor,
 		DisplaySettings * settings) :
 		GUIObjectTransformation(parent)
 {
-	linkedProject = project;
+	this->project = project;
 	this->commandProcessor = commandProcessor;
 	this->settings = settings;
-	TransferDataToWindow();
+
+	scaleProportional = true;
+	scalePercent = 1;
+	scalePercentX = 1;
+	scalePercentY = 1;
+	scalePercentZ = 1;
+	scaleUnitX = 1;
+	scaleUnitY = 1;
+	scaleUnitZ = 1;
+	moveStep = 0.05;
+	rotateStep = 90;
+
+	c = 0;
 }
 
 DialogObjectTransformation::~DialogObjectTransformation()
@@ -44,32 +60,51 @@ DialogObjectTransformation::~DialogObjectTransformation()
 
 bool DialogObjectTransformation::TransferDataToWindow(void)
 {
-	if(linkedProject == NULL) return false;
+	if(!this->IsShown()) return false;
+	if(project == NULL) return false;
 
-	size_t i;
-	m_comboBox->Clear();
-	if(linkedProject->objects.GetCount() > 0){
-		for(i = 0; i < linkedProject->objects.GetCount(); i++)
-			m_comboBox->Append(linkedProject->objects[i].fileName.GetName());
-		m_comboBox->Enable();
-	}else{
-		m_comboBox->Append(_("No objects in project!"));
-		m_comboBox->Enable(false);
+	// Update Selection box
+	size_t n;
+	int selection = -1;
+	m_choiceObjectSelection->Clear();
+	for(n = 0; n < project->objects.GetCount(); n++){
+		m_choiceObjectSelection->Append(project->objects[n].name);
+		if(project->objects[n].selected){
+			if(selection == -1)
+				selection = n;
+			else
+				selection = -2;
+		}
 	}
-//	m_comboBox->SetSelection(linkedProject->activeObject);
-//
-//	m_textCtrlSizeX->SetValue(
-//			wxString::Format(_T("%.3f"),
-//					settings->Distance.FromSI(
-//							linkedProject->objects[linkedProject->activeObject].bbox.GetSizeX())));
-//	m_textCtrlSizeY->SetValue(
-//			wxString::Format(_T("%.3f"),
-//					settings->Distance.FromSI(
-//							linkedProject->objects[linkedProject->activeObject].bbox.GetSizeY())));
-//	m_textCtrlSizeZ->SetValue(
-//			wxString::Format(_T("%.3f"),
-//					settings->Distance.FromSI(
-//							linkedProject->objects[linkedProject->activeObject].bbox.GetSizeZ())));
+	if(n == 0) m_choiceObjectSelection->Append(_("No objects in project!"));
+	m_choiceObjectSelection->Enable(n > 0);
+
+	if(selection == -2){
+		m_choiceObjectSelection->Append(_("Multiple objects selected."));
+		m_choiceObjectSelection->SetSelection(n);
+	}
+	if(selection >= 0) m_choiceObjectSelection->SetSelection(selection);
+
+	// Update Units
+
+	if(selection >= 0){
+		m_textCtrlSizeX->SetValue(
+				wxString::Format(_T("%.3f"),
+						settings->Distance.FromSI(
+								project->objects[selection].bbox.GetSizeX())));
+		m_textCtrlSizeY->SetValue(
+				wxString::Format(_T("%.3f"),
+						settings->Distance.FromSI(
+								project->objects[selection].bbox.GetSizeY())));
+		m_textCtrlSizeZ->SetValue(
+				wxString::Format(_T("%.3f"),
+						settings->Distance.FromSI(
+								project->objects[selection].bbox.GetSizeZ())));
+	}else{
+		m_textCtrlSizeX->SetValue(_T("---"));
+		m_textCtrlSizeY->SetValue(_T("---"));
+		m_textCtrlSizeZ->SetValue(_T("---"));
+	}
 
 	m_staticTextUnitX->SetLabel(settings->Distance.GetOtherName());
 	m_staticTextUnitY->SetLabel(settings->Distance.GetOtherName());
@@ -77,242 +112,373 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 	m_staticTextUnitX2->SetLabel(settings->Distance.GetOtherName());
 	m_staticTextUnitY2->SetLabel(settings->Distance.GetOtherName());
 	m_staticTextUnitZ2->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitMove->SetLabel(settings->Distance.GetOtherName());
 
+	m_textCtrlScaleUnitX->SetValue(
+			wxString::Format(_T("%.3f"),
+					settings->Distance.FromSI(scaleUnitX)));
+	m_textCtrlScaleUnitY->SetValue(
+			wxString::Format(_T("%.3f"),
+					settings->Distance.FromSI(scaleUnitY)));
+	m_textCtrlScaleUnitZ->SetValue(
+			wxString::Format(_T("%.3f"),
+					settings->Distance.FromSI(scaleUnitZ)));
+
+	m_textCtrlScalePercent->SetValue(
+			wxString::Format(_T("%.1f"), scalePercent * 100));
+	m_textCtrlScalePercentX->SetValue(
+			wxString::Format(_T("%.1f"), scalePercentX * 100));
+	m_textCtrlScalePercentY->SetValue(
+			wxString::Format(_T("%.1f"), scalePercentY * 100));
+	m_textCtrlScalePercentZ->SetValue(
+			wxString::Format(_T("%.1f"), scalePercentZ * 100));
+
+	m_textCtrlMoveStep->SetValue(
+			wxString::Format(_T("%.3f"), settings->Distance.FromSI(moveStep)));
+	m_textCtrlRotateStep->SetValue(wxString::Format(_T("%.1f"), rotateStep));
+
+	m_checkBoxScaleProportionally->SetValue(scaleProportional);
+
+//	c++;
+//	wxLogMessage(
+//			wxString::Format(_T("Transfer: %u - Selection: %i"), c, selection));
+
+	this->Refresh();
 	return true;
 }
 bool DialogObjectTransformation::TransferDataFromWindow(void)
 {
+	m_textCtrlScalePercent->GetValue().ToDouble(&scalePercent);
+	m_textCtrlScalePercentX->GetValue().ToDouble(&scalePercentX);
+	m_textCtrlScalePercentY->GetValue().ToDouble(&scalePercentY);
+	m_textCtrlScalePercentZ->GetValue().ToDouble(&scalePercentZ);
+	m_textCtrlScaleUnitX->GetValue().ToDouble(&scaleUnitX);
+	m_textCtrlScaleUnitY->GetValue().ToDouble(&scaleUnitY);
+	m_textCtrlScaleUnitZ->GetValue().ToDouble(&scaleUnitZ);
+
+	m_textCtrlMoveStep->GetValue().ToDouble(&moveStep);
+	m_textCtrlRotateStep->GetValue().ToDouble(&rotateStep);
+
+	scaleProportional = m_checkBoxScaleProportionally->GetValue();
+
+	moveStep = settings->Distance.ToSI(moveStep);
+	scaleUnitX = settings->Distance.ToSI(scaleUnitX);
+	scaleUnitY = settings->Distance.ToSI(scaleUnitY);
+	scaleUnitZ = settings->Distance.ToSI(scaleUnitZ);
+
+	scalePercent /= 100;
+	scalePercentX /= 100;
+	scalePercentY /= 100;
+	scalePercentZ /= 100;
+
 	return true;
-}
-
-//void DialogObjectTransformation::OnUpdate(wxCommandEvent& event)
-//{
-//	if(linkedProject == NULL) return;
-//	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-//	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
-//
-//	size_t i;
-//	for(i = 0;
-//			i
-//					< linkedProject->objects[linkedProject->activeObject].geometries.GetCount();
-//			i++)
-//		linkedProject->objects[linkedProject->activeObject].geometries[i].CalculateNormals();
-//
-//	this->GetParent()->Refresh();
-//
-//	TransferDataToWindow();
-//}
-
-void DialogObjectTransformation::OnOpen(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnReLoad(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnSaveAs(wxCommandEvent& event)
-{
 }
 
 void DialogObjectTransformation::OnClose(wxCommandEvent& event)
 {
+	TransferDataFromWindow();
 	this->Show(false);
 }
 void DialogObjectTransformation::OnClose(wxCloseEvent& event)
 {
+	TransferDataFromWindow();
 	this->Show(false);
 }
 
 void DialogObjectTransformation::OnSelectObject(wxCommandEvent& event)
 {
+	int n = m_choiceObjectSelection->GetCurrentSelection();
+	// Return if "Multiple objects selected." was selected again.
+	if(n >= project->objects.GetCount()) return;
+
+	// Tell the main frame to update the selection in the treeview via custom command.
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_SELECTOBJECT);
+	selectEvent.SetInt(n);
+	ProcessEvent(selectEvent);
 }
 
-void DialogObjectTransformation::OnMultiplyByTen(wxCommandEvent& event)
+void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 {
-	if(linkedProject == NULL) return;
-	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-	linkedProject->objects[linkedProject->activeObject].matrix.ScaleGlobal(10,
-			10, 10);
-	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
-	this->GetParent()->Refresh();
-	TransferDataToWindow();
+	if(project == NULL) return;
+	TransferDataFromWindow();
 
-}
-void DialogObjectTransformation::OnDivideByTen(wxCommandEvent& event)
-{
-	if(linkedProject == NULL) return;
-	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-	linkedProject->objects[linkedProject->activeObject].matrix.ScaleGlobal(0.1,
-			0.1, 0.1);
-	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
-	this->GetParent()->Refresh();
-	TransferDataToWindow();
-}
-void DialogObjectTransformation::OnScalePercent(wxCommandEvent& event)
-{
-	if(linkedProject == NULL) return;
-	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
+	AffineTransformMatrix newMatrix;
+	wxString description; // of the command executed (for the Undo/Redo menu)
+	commandObjectTransform * command;
 
+	size_t n;
 	double scale;
-	m_textCtrlPercent->GetValue().ToDouble(&scale);
+	bool flipNormals = false;
+	bool flipX = false;
+	bool flipY = false;
+	bool flipZ = false;
 
-	linkedProject->objects[linkedProject->activeObject].matrix.ScaleGlobal(
-			scale / 100, scale / 100, scale / 100);
-	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
-	this->GetParent()->Refresh();
+	// Calculate a common bounding box of all selected objects.
+	BoundingBox bbox;
+	for(n = 0; n < project->objects.GetCount(); ++n){
+		if(!project->objects[n].selected) continue;
+		bbox.Insert(project->objects[n].bbox);
+	}
+
+	// Generate the commands for the modifications
+	for(n = 0; n < project->objects.GetCount(); ++n){
+		if(!project->objects[n].selected) continue;
+
+		description.Empty();
+		newMatrix = project->objects[n].matrix; // Copy old to new for a start
+
+		switch(event.GetId()){
+		case ID_MULTTEN:
+			description = project->objects[n].name + _T(": * 10");
+			newMatrix.ScaleGlobal(10, 10, 10);
+			break;
+		case ID_DIVTEN:
+			description = project->objects[n].name + _T(": / 10");
+			newMatrix.ScaleGlobal(0.1, 0.1, 0.1);
+			break;
+		case ID_SCALEPERCENT:
+			description = project->objects[n].name
+					+ wxString::Format(_T(": scale by %.1f %%"),
+							scalePercent * 100);
+			newMatrix.ScaleGlobal(scalePercent, scalePercent, scalePercent);
+			break;
+		case ID_SCALEPERCENTX:
+			description = project->objects[n].name
+					+ wxString::Format(_T(": scale X by %.1f %%"),
+							scalePercentX * 100);
+			newMatrix.ScaleGlobal(scalePercentX, 1, 1);
+			break;
+		case ID_SCALEPERCENTY:
+			description = project->objects[n].name
+					+ wxString::Format(_T(": scale Y by %.1f %%"),
+							scalePercentY * 100);
+			newMatrix.ScaleGlobal(1, scalePercentY, 1);
+			break;
+		case ID_SCALEPERCENTZ:
+			description = project->objects[n].name
+					+ wxString::Format(_T(": scale Z by %.1f %%"),
+							scalePercentZ * 100);
+			newMatrix.ScaleGlobal(1, 1, scalePercentZ);
+			break;
+
+		case ID_FLIPX:
+			description = project->objects[n].name
+					+ wxString::Format(_T(": mirroring along X axis"));
+			flipNormals = true;
+			flipX = true;
+			break;
+		case ID_FLIPY:
+			description = project->objects[n].name
+					+ wxString::Format(_T(": mirroring along Y axis"));
+			flipNormals = true;
+			flipY = true;
+			break;
+		case ID_FLIPZ:
+			description = project->objects[n].name
+					+ wxString::Format(_T(": mirroring along Z axis"));
+			flipNormals = true;
+			flipZ = true;
+			break;
+
+		case ID_MOVEXP:
+			description = project->objects[n].name
+					+ wxString::Format(
+							_T(": move along X by %.3f ")
+									+ settings->Distance.GetOtherName(),
+							settings->Distance.FromSI(moveStep));
+			newMatrix.TranslateGlobal(moveStep, 0, 0);
+			break;
+		case ID_MOVEXN:
+			description = project->objects[n].name
+					+ wxString::Format(
+							_T(": move along X by %.3f ")
+									+ settings->Distance.GetOtherName(),
+							settings->Distance.FromSI(-moveStep));
+			newMatrix.TranslateGlobal(-moveStep, 0, 0);
+			break;
+		case ID_MOVEYP:
+			description = project->objects[n].name
+					+ wxString::Format(
+							_T(": move along Y by %.3f ")
+									+ settings->Distance.GetOtherName(),
+							settings->Distance.FromSI(moveStep));
+			newMatrix.TranslateGlobal(0, moveStep, 0);
+			break;
+		case ID_MOVEYN:
+			description = project->objects[n].name
+					+ wxString::Format(
+							_T(": move along Y by %.3f ")
+									+ settings->Distance.GetOtherName(),
+							settings->Distance.FromSI(-moveStep));
+			newMatrix.TranslateGlobal(0, -moveStep, 0);
+			break;
+		case ID_MOVEZP:
+			description = project->objects[n].name
+					+ wxString::Format(
+							_T(": move along Z by %.3f ")
+									+ settings->Distance.GetOtherName(),
+							settings->Distance.FromSI(moveStep));
+			newMatrix.TranslateGlobal(0, 0, moveStep);
+			break;
+		case ID_MOVEZN:
+			description = project->objects[n].name
+					+ wxString::Format(
+							_T(": move along Z by %.3f ")
+									+ settings->Distance.GetOtherName(),
+							settings->Distance.FromSI(-moveStep));
+			newMatrix.TranslateGlobal(0, 0, -moveStep);
+			break;
+
+		case ID_ALIGNTOP:
+			if(bbox.IsVolumeZero()) break;
+			description = project->objects[n].name
+					+ wxString::Format(_T(": align top"));
+			newMatrix.TranslateGlobal(0, 0, -bbox.zmax);
+			break;
+		case ID_ALIGNMIDDLE:
+			if(bbox.IsVolumeZero()) break;
+			description = project->objects[n].name
+					+ wxString::Format(_T(": align middle"));
+			newMatrix.TranslateGlobal(0, 0, -(bbox.zmax + bbox.zmin) / 2.0);
+			break;
+		case ID_ALIGNBOTTOM:
+			if(bbox.IsVolumeZero()) break;
+			description = project->objects[n].name
+					+ wxString::Format(_T(": align bottom"));
+			newMatrix.TranslateGlobal(0, 0, -bbox.zmin);
+			break;
+
+		case ID_ROTATEXP:
+			description = project->objects[n].name
+					+ wxString::Format(_T(": rotate around X by %.0f degree"),
+							rotateStep);
+			newMatrix = newMatrix
+					* AffineTransformMatrix::RotateXYZ(rotateStep * M_PI / 180,
+							0, 0);
+			break;
+		case ID_ROTATEXN:
+			description = project->objects[n].name
+					+ wxString::Format(_T(": rotate around X by %.0f degree"),
+							-rotateStep);
+			newMatrix = newMatrix
+					* AffineTransformMatrix::RotateXYZ(-rotateStep * M_PI / 180,
+							0, 0);
+			break;
+		case ID_ROTATEYP:
+			description = project->objects[n].name
+					+ wxString::Format(_T(": rotate around Y by %.0f degree"),
+							rotateStep);
+			newMatrix = newMatrix
+					* AffineTransformMatrix::RotateXYZ(0,
+							rotateStep * M_PI / 180, 0);
+			break;
+		case ID_ROTATEYN:
+			description = project->objects[n].name
+					+ wxString::Format(_T(": rotate around Y by %.0f degree"),
+							-rotateStep);
+			newMatrix = newMatrix
+					* AffineTransformMatrix::RotateXYZ(0,
+							-rotateStep * M_PI / 180, 0);
+			break;
+		case ID_ROTATEZP:
+			description = project->objects[n].name
+					+ wxString::Format(_T(": rotate around Z by %.0f degree"),
+							rotateStep);
+			newMatrix = newMatrix
+					* AffineTransformMatrix::RotateXYZ(0, 0,
+							rotateStep * M_PI / 180);
+			break;
+		case ID_ROTATEZN:
+			description = project->objects[n].name
+					+ wxString::Format(_T(": rotate around Z by %.0f degree"),
+							-rotateStep);
+			newMatrix = newMatrix
+					* AffineTransformMatrix::RotateXYZ(0, 0,
+							-rotateStep * M_PI / 180);
+			break;
+		}
+
+		if(!description.IsEmpty()){
+
+			command = new commandObjectTransform(description, project, n, flipX,
+					flipY, flipZ, flipNormals, newMatrix);
+			commandProcessor->Submit(command);
+		}else{
+			wxLogMessage(
+					wxString::Format(
+							_T(
+									"Unknown ID_... (=%i) in DialogObjectTransformation::OnTransform(...)"),
+							event.GetId()));
+		}
+	}
+
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
+	ProcessEvent(selectEvent);
+}
+
+void DialogObjectTransformation::OnSetFactors(wxCommandEvent& event)
+{
+	TransferDataFromWindow();
+
+	// Calculate a common bounding box of all selected objects.
+	BoundingBox bbox;
+	size_t n;
+	double scale;
+	for(n = 0; n < project->objects.GetCount(); ++n){
+		if(!project->objects[n].selected) continue;
+		bbox.Insert(project->objects[n].bbox);
+	}
+
+	switch(event.GetId()){
+	case ID_SCALEUNITX:
+		if(bbox.xmin >= bbox.xmax) break;
+		scale = scaleUnitX / (bbox.xmax - bbox.xmin);
+		if(scaleProportional){
+			scalePercent = scale;
+			scalePercentX = scale;
+			scalePercentY = scale;
+			scalePercentZ = scale;
+		}else{
+			scalePercentX = scale;
+		}
+		break;
+	case ID_SCALEUNITY:
+		if(bbox.ymin >= bbox.ymax) break;
+		scale = scaleUnitY / (bbox.ymax - bbox.ymin);
+		if(scaleProportional){
+			scalePercent = scale;
+			scalePercentX = scale;
+			scalePercentY = scale;
+			scalePercentZ = scale;
+		}else{
+			scalePercentY = scale;
+		}
+		break;
+	case ID_SCALEUNITZ:
+		if(bbox.zmin >= bbox.zmax) break;
+		scale = scaleUnitZ / (bbox.zmax - bbox.zmin);
+		if(scaleProportional){
+			scalePercent = scale;
+			scalePercentX = scale;
+			scalePercentY = scale;
+			scalePercentZ = scale;
+		}else{
+			scalePercentZ = scale;
+		}
+		break;
+	}
 	TransferDataToWindow();
 }
 
-void DialogObjectTransformation::OnYMinus(wxCommandEvent& event)
+void DialogObjectTransformation::OnFlipNormals(wxCommandEvent& event)
 {
-	if(linkedProject == NULL) return;
-	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
+//	wxLogMessage(
+//			wxString::Format(_T("Propagation: %i, ID: %i"),
+//					event.ShouldPropagate(), event.GetId()));
 
-	linkedProject->objects[linkedProject->activeObject].matrix *=
-			AffineTransformMatrix::RotateXYZ(0, -M_PI_2, 0);
-
-	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
-	this->GetParent()->Refresh();
-	TransferDataToWindow();
-
-}
-void DialogObjectTransformation::OnXMinus(wxCommandEvent& event)
-{
-	if(linkedProject == NULL) return;
-	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-
-	linkedProject->objects[linkedProject->activeObject].matrix *=
-			AffineTransformMatrix::RotateXYZ(-M_PI_2, 0, 0);
-	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
-	this->GetParent()->Refresh();
-	TransferDataToWindow();
-}
-void DialogObjectTransformation::OnYPlus(wxCommandEvent& event)
-{
-	if(linkedProject == NULL) return;
-	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-	linkedProject->objects[linkedProject->activeObject].matrix *=
-			AffineTransformMatrix::RotateXYZ(0, M_PI_2, 0);
-	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
-	this->GetParent()->Refresh();
-	TransferDataToWindow();
-}
-void DialogObjectTransformation::OnZMinus(wxCommandEvent& event)
-{
-	if(linkedProject == NULL) return;
-	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-	linkedProject->objects[linkedProject->activeObject].matrix *=
-			AffineTransformMatrix::RotateXYZ(0, 0, -M_PI_2);
-	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
-	this->GetParent()->Refresh();
-	TransferDataToWindow();
-}
-void DialogObjectTransformation::OnZPlus(wxCommandEvent& event)
-{
-	if(linkedProject == NULL) return;
-	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-	linkedProject->objects[linkedProject->activeObject].matrix *=
-			AffineTransformMatrix::RotateXYZ(0, 0, M_PI_2);
-	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
-	this->GetParent()->Refresh();
-	TransferDataToWindow();
-}
-
-void DialogObjectTransformation::OnXPlus(wxCommandEvent& event)
-{
-	if(linkedProject == NULL) return;
-	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-	linkedProject->objects[linkedProject->activeObject].matrix *=
-			AffineTransformMatrix::RotateXYZ(M_PI_2, 0, 0);
-	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
-	this->GetParent()->Refresh();
-	TransferDataToWindow();
-}
-
-void DialogObjectTransformation::OnAlignWithStock(wxCommandEvent& event)
-{
-	if(linkedProject == NULL) return;
-	if(linkedProject->activeObject >= linkedProject->objects.GetCount()) return;
-
-	double shiftX =
-			-linkedProject->objects[linkedProject->activeObject].bbox.xmin;
-	double shiftY =
-			-linkedProject->objects[linkedProject->activeObject].bbox.ymin;
-	double shiftZ =
-			-linkedProject->objects[linkedProject->activeObject].bbox.zmin;
-
-	linkedProject->objects[linkedProject->activeObject].matrix.TranslateGlobal(
-			shiftX, shiftY, shiftZ);
-	linkedProject->objects[linkedProject->activeObject].UpdateBoundingBox();
-	this->GetParent()->Refresh();
-	TransferDataToWindow();
-}
-
-void DialogObjectTransformation::ScaleUnitX(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnScalePercentX(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnScaleUnitY(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnScalePercentY(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnScaleUnitZ(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnScalePercentZ(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnFlipX(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnFlipY(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnFlipZ(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnMoveZUp(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnMoveYUp(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnMoveXDown(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnMoveXUp(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnMoveYDown(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnMoveZDown(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnAlignWithTop(wxCommandEvent& event)
-{
-}
-
-void DialogObjectTransformation::OnAlignWithMiddle(wxCommandEvent& event)
-{
+	// Button event is not a command event. A new event is generated here
+	// and passed to the main frame.
+	wxCommandEvent flipEvent(wxEVT_COMMAND_MENU_SELECTED,
+	ID_OBJECTFLIPNORMALS);
+	ProcessEvent(flipEvent);
 }

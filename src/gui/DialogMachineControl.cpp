@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectTransform.h
-// Purpose            : 
+// Name               : DialogMachineControl.cpp
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 29.12.2014
-// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 11.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,31 +24,38 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDOBJECTTRANSFORM_H_
-#define COMMANDOBJECTTRANSFORM_H_
+#include "DialogMachineControl.h"
 
-#include <wx/cmdproc.h>
+DialogMachineControl::DialogMachineControl(wxWindow* parent) :
+		GUIMachineControl(parent)
+{
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../project/Project.h"
+}
 
-class commandObjectTransform:public wxCommand {
-public:
-	commandObjectTransform(const wxString& name, Project * project,
-			size_t objectNr, bool flipX, bool flipY, bool flipZ,
-			bool flipNormals, AffineTransformMatrix& matrixNew);
-	bool Do(void);
-	bool Undo(void);
+void DialogMachineControl::OnClose(wxCloseEvent& event)
+{
+	TransferDataFromWindow();
+	this->Show(false);
+}
 
-protected:
-	Project * project;
-	size_t objectNr;
-	bool flipX;
-	bool flipY;
-	bool flipZ;
-	bool flipNormals;
-	AffineTransformMatrix matrixNew;
-	AffineTransformMatrix matrixOld;
-};
+void DialogMachineControl::OnScroll(wxScrollEvent& event)
+{
+}
 
-#endif /* COMMANDOBJECTTRANSFORM_H_ */
+void DialogMachineControl::OnTrack(wxScrollEvent& event)
+{
+}
+
+bool DialogMachineControl::TransferDataToWindow(void)
+{
+	return false;
+}
+
+bool DialogMachineControl::TransferDataFromWindow(void)
+{
+	return false;
+}
+
+void DialogMachineControl::OnTextChanged(wxCommandEvent& event)
+{
+}

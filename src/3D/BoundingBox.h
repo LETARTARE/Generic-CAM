@@ -58,11 +58,12 @@ public:
 	void Reset(void);
 	void Insert(const Geometry &geometry, AffineTransformMatrix &matrix);
 	void Insert(Surface &surface);
+	void Insert(BoundingBox & bbox);
 	void Insert(const Triangle tri);
 
 	bool IsEmpty(void) const;
 	bool IsVolumeZero(void) const;
-	double GetVolume(void)const;
+	double GetVolume(void) const;
 
 	double GetSizeX(void)
 	{

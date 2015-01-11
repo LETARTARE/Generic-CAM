@@ -33,6 +33,9 @@
  * treeview is quite complicated to program. To prevent these functions from cluttering up the
  * already well filled main frame class, this classs collects all functionality concerning the
  * tree view.
+ *
+ * This class provides a minimal interface to the outside. The whole ugly mess is hidden
+ * in the depth of these private functions.
  */
 
 #include "../project/Project.h"
@@ -45,6 +48,9 @@ public:
 	virtual ~TreeSetup();
 
 	void Update(void);
+	void UpdateSelection(void);
+	void UpdateVariables(void);
+	int GetFirstSelectedObject(void);
 
 private:
 	void Reset(void);
@@ -54,9 +60,14 @@ private:
 	bool GetSelection(void);
 	void SetSelection(bool selection = true);
 
+	bool prohibitVariableUpdate;
+
 	bool levelModified;
 	wxTreeItemIdValue cookie;
 	wxTreeItemId * id;
+
+	wxTreeItemId groupObjects;
+
 	size_t maxId;
 	int currentLevel;
 

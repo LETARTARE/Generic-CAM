@@ -27,23 +27,70 @@
 #include <wx/statusbr.h>
 #include <wx/toolbar.h>
 #include <wx/frame.h>
-#include <wx/combobox.h>
+#include <wx/choice.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/statbox.h>
-#include <wx/checkbox.h>
 #include <wx/button.h>
+#include <wx/checkbox.h>
 #include <wx/bmpbuttn.h>
 #include <wx/notebook.h>
-#include "ToolPanel.h"
-#include <wx/choice.h>
 #include <wx/listctrl.h>
-#include "ToolCanvas.h"
 #include <wx/slider.h>
+#include <wx/combobox.h>
+#include "ToolPanel.h"
+#include "ToolCanvas.h"
 #include <wx/radiobox.h>
 #include <wx/dialog.h>
 
 ///////////////////////////////////////////////////////////////////////////
+
+#define ID_PROJECTRENAME 1000
+#define ID_OBJECTLOAD 1001
+#define ID_OBJECTRENAME 1002
+#define ID_OBJECTDELETE 1003
+#define ID_OBJECTMODIFY 1004
+#define ID_OBJECTFLIPNORMALS 1005
+#define ID_STOCKORGANIZE 1006
+#define ID_STOCKLOAD 1007
+#define ID_STOCKSAVE 1008
+#define ID_SETUPCONTROLLER 1009
+#define ID_VIEWSTEREO3D 1010
+#define ID_SETUPUNITS 1011
+#define ID_DISPLAYMACHINE 1012
+#define ID_DISPLAYMATERIAL 1013
+#define ID_MULTTEN 1014
+#define ID_DIVTEN 1015
+#define ID_SCALEUNITX 1016
+#define ID_SCALEUNITY 1017
+#define ID_SCALEUNITZ 1018
+#define ID_SCALEPERCENTX 1019
+#define ID_SCALEPERCENTY 1020
+#define ID_SCALEPERCENTZ 1021
+#define ID_SCALEPERCENT 1022
+#define ID_FLIPX 1023
+#define ID_FLIPY 1024
+#define ID_FLIPZ 1025
+#define ID_MOVEZP 1026
+#define ID_MOVEYP 1027
+#define ID_MOVEXN 1028
+#define ID_MOVEXP 1029
+#define ID_MOVEYN 1030
+#define ID_MOVEZN 1031
+#define ID_ALIGNTOP 1032
+#define ID_ALIGNMIDDLE 1033
+#define ID_ALIGNBOTTOM 1034
+#define ID_ROTATEYN 1035
+#define ID_ROTATEXN 1036
+#define ID_ROTATEYP 1037
+#define ID_ROTATEZN 1038
+#define ID_ROTATEZP 1039
+#define ID_ROTATEXP 1040
+#define ID_AXISX 1041
+#define ID_AXISY 1042
+#define ID_AXISZ 1043
+#define ID_BUTTONCONNECT 1044
+#define ID_BUTTONDISCONNECT 1045
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIMainFrame
@@ -53,21 +100,13 @@ class GUIMainFrame : public wxFrame
 	private:
 	
 	protected:
-		enum
-		{
-			wxID_SETUPCONTROLLER = 1000,
-			wxID_VIEWSTEREO3D,
-			wxID_DISPLAYMACHINE,
-			wxID_DISPLAYMATERIAL,
-		};
-		
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuProject;
 		wxMenu* m_menuEdit;
 		wxMenu* m_menuObject;
+		wxMenu* m_menuStock;
 		wxMenu* m_menuMachine;
 		wxMenu* m_menuToolbox;
-		wxMenu* m_menuStock;
 		wxMenu* m_menuToolpath;
 		wxMenu* m_menuSettings;
 		wxMenu* m_menuView;
@@ -82,20 +121,24 @@ class GUIMainFrame : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnCreateProject( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnProjectRename( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnLoadProject( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSaveProject( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSaveProjectAs( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnQuit( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUndo( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRedo( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnLoadObject( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnModifyObject( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnObjectLoad( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnObjectRename( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnObjectDelete( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnObjectModify( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnObjectFlipNormals( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnEditStock( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnLoadMachine( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReloadMachine( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditToolbox( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnLoadToolbox( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSaveToolbox( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnEditStock( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnGenerateToolpath( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRecollectToolpath( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCleanToolpath( wxCommandEvent& event ) { event.Skip(); }
@@ -111,14 +154,15 @@ class GUIMainFrame : public wxFrame
 		virtual void OnAbout( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnBeginLabelEdit( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnEndLabelEdit( wxTreeEvent& event ) { event.Skip(); }
+		virtual void OnActivate( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnActivateRightClickMenu( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnSelectionChanged( wxTreeEvent& event ) { event.Skip(); }
-		virtual void OnUpdateVisibility( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnToolbarButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		GUIMainFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Generic CAM"), const wxPoint& pos = wxPoint( -1,-1 ), const wxSize& size = wxSize( 803,627 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		GUIMainFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxPoint( -1,-1 ), const wxSize& size = wxSize( 803,627 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		~GUIMainFrame();
 		void m_splitterOnIdle( wxIdleEvent& )
 		{
@@ -139,11 +183,9 @@ class GUIObjectTransformation : public wxFrame
 	protected:
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuObject;
+		wxMenu* m_menuEdit;
 		wxMenu* m_menuSettings;
-		wxComboBox* m_comboBox;
-		wxNotebook* m_notebook;
-		wxPanel* m_panelScale;
-		
+		wxChoice* m_choiceObjectSelection;
 		wxStaticText* m_staticText37;
 		wxTextCtrl* m_textCtrlSizeX;
 		wxStaticText* m_staticTextUnitX;
@@ -153,46 +195,46 @@ class GUIObjectTransformation : public wxFrame
 		wxStaticText* m_staticText39;
 		wxTextCtrl* m_textCtrlSizeZ;
 		wxStaticText* m_staticTextUnitZ;
-		wxCheckBox* m_checkBoxScaleProportionally;
+		wxNotebook* m_notebook;
+		wxPanel* m_panelScale;
 		wxButton* m_buttonMultTen;
 		wxButton* m_buttonDivTen;
-		
-		wxTextCtrl* m_textCtrlPercent;
-		wxStaticText* m_staticText43;
-		wxButton* m_button15;
 		wxStaticText* m_staticText44;
 		wxTextCtrl* m_textCtrlScaleUnitX;
 		wxStaticText* m_staticTextUnitX2;
 		wxButton* m_button19;
-		
-		wxStaticText* m_staticText50;
-		wxTextCtrl* m_textCtrlScalePercentX;
-		wxStaticText* m_staticText51;
-		wxButton* m_button20;
 		wxStaticText* m_staticText46;
 		wxTextCtrl* m_textCtrlScaleUnitY;
 		wxStaticText* m_staticTextUnitY2;
 		wxButton* m_button21;
-		
-		wxStaticText* m_staticText48;
-		wxTextCtrl* m_textCtrlScalePercentY;
-		wxStaticText* m_staticText49;
-		wxButton* m_button22;
 		wxStaticText* m_staticText52;
 		wxTextCtrl* m_textCtrlScaleUnitZ;
 		wxStaticText* m_staticTextUnitZ2;
 		wxButton* m_button23;
-		
+		wxCheckBox* m_checkBoxScaleProportionally;
+		wxStaticText* m_staticText50;
+		wxTextCtrl* m_textCtrlScalePercentX;
+		wxStaticText* m_staticText51;
+		wxButton* m_button20;
+		wxStaticText* m_staticText48;
+		wxTextCtrl* m_textCtrlScalePercentY;
+		wxStaticText* m_staticText55;
+		wxButton* m_button22;
 		wxStaticText* m_staticText54;
 		wxTextCtrl* m_textCtrlScalePercentZ;
-		wxStaticText* m_staticText55;
+		wxStaticText* m_staticText43;
 		wxButton* m_button24;
-		
+		wxStaticText* m_staticText68;
+		wxTextCtrl* m_textCtrlScalePercent;
+		wxStaticText* m_staticText49;
+		wxButton* m_button15;
 		wxPanel* m_panelMirror;
 		
 		wxButton* m_button39;
 		wxButton* m_button40;
 		wxButton* m_button41;
+		
+		wxButton* m_buttonFlipNormalVectors;
 		
 		wxPanel* m_panelMove;
 		
@@ -215,6 +257,9 @@ class GUIObjectTransformation : public wxFrame
 		
 		wxPanel* m_panelRotate;
 		
+		wxStaticText* m_staticText76;
+		wxTextCtrl* m_textCtrlRotateStep;
+		wxStaticText* m_staticText77;
 		wxButton* m_button32;
 		wxButton* m_button33;
 		wxButton* m_button28;
@@ -229,45 +274,57 @@ class GUIObjectTransformation : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnReLoad( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSaveAs( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSetupUnits( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSelectObject( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnMultiplyByTen( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDivideByTen( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnScalePercent( wxCommandEvent& event ) { event.Skip(); }
-		virtual void ScaleUnitX( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnScalePercentX( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnScaleUnitY( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnScalePercentY( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnScaleUnitZ( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnScalePercentZ( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFlipX( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFlipY( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFlipZ( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnMoveZUp( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnMoveYUp( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnMoveXDown( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnMoveXUp( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnMoveYDown( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnMoveZDown( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnAlignWithTop( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnAlignWithMiddle( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnAlignWithStock( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnYMinus( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnXMinus( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnYPlus( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnZMinus( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnZPlus( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnXPlus( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTransform( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSetFactors( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFlipNormals( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
 		GUIObjectTransformation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 709,461 ), long style = wxDEFAULT_FRAME_STYLE|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
 		~GUIObjectTransformation();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class GUIStockMaterial
+///////////////////////////////////////////////////////////////////////////////
+class GUIStockMaterial : public wxFrame 
+{
+	private:
+	
+	protected:
+		wxMenuBar* m_menubar;
+		wxMenu* m_menuStock;
+		wxMenu* m_menuSettings;
+		wxListCtrl* m_listCtrl;
+		wxStaticText* m_staticText27;
+		wxTextCtrl* m_textCtrlX;
+		wxStaticText* m_staticText28;
+		wxStaticText* m_staticText29;
+		wxTextCtrl* m_textCtrlY;
+		wxStaticText* m_staticText30;
+		wxStaticText* m_staticText31;
+		wxTextCtrl* m_textCtrlZ;
+		wxStaticText* m_staticText32;
+		wxStaticText* m_staticText33;
+		wxTextCtrl* m_textCtrlMaxSpeed;
+		wxStaticText* m_staticText34;
+		wxStaticText* m_staticText35;
+		wxTextCtrl* m_textCtrlMaxFeedrate;
+		wxStaticText* m_staticText36;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		GUIStockMaterial( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Stock Material"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 638,365 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		~GUIStockMaterial();
 	
 };
 
@@ -299,7 +356,7 @@ class GUIMachineDebugger : public wxFrame
 	
 	public:
 		
-		GUIMachineDebugger( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine debugger"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 693,589 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		GUIMachineDebugger( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine debugger"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 771,594 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		~GUIMachineDebugger();
 		void m_splitter2OnIdle( wxIdleEvent& )
 		{
@@ -317,6 +374,76 @@ class GUIMachineDebugger : public wxFrame
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Class GUIMachineControl
+///////////////////////////////////////////////////////////////////////////////
+class GUIMachineControl : public wxFrame 
+{
+	private:
+	
+	protected:
+		
+		wxStaticText* m_staticText69;
+		wxSlider* m_sliderX;
+		wxStaticText* m_staticText70;
+		wxSlider* m_sliderY;
+		wxStaticText* m_staticText71;
+		wxSlider* m_sliderZ;
+		wxStaticText* m_staticText73;
+		wxTextCtrl* m_textCtrlX;
+		wxStaticText* m_staticTextUnitX;
+		wxStaticText* m_staticText75;
+		wxTextCtrl* m_textCtrlY;
+		wxStaticText* m_staticTextUnitY;
+		wxStaticText* m_staticText77;
+		wxTextCtrl* m_textCtrlZ;
+		wxStaticText* m_staticTextUnitZ;
+		wxStaticText* m_staticText78;
+		wxSlider* m_sliderA;
+		wxStaticText* m_staticText79;
+		wxSlider* m_sliderB;
+		wxStaticText* m_staticText80;
+		wxSlider* m_sliderC;
+		wxStaticText* m_staticText731;
+		wxTextCtrl* m_textCtrlA;
+		wxStaticText* m_staticTextUnitA;
+		wxStaticText* m_staticText751;
+		wxTextCtrl* m_textCtrlB;
+		wxStaticText* m_staticTextUnitB;
+		wxStaticText* m_staticText771;
+		wxTextCtrl* m_textCtrlC;
+		wxStaticText* m_staticTextUnitC;
+		wxStaticText* m_staticText81;
+		wxSlider* m_sliderU;
+		wxStaticText* m_staticText82;
+		wxSlider* m_sliderV;
+		wxStaticText* m_staticText83;
+		wxSlider* m_sliderW;
+		wxStaticText* m_staticText732;
+		wxTextCtrl* m_textCtrlU;
+		wxStaticText* m_staticTextUnitU;
+		wxStaticText* m_staticText752;
+		wxTextCtrl* m_textCtrlV;
+		wxStaticText* m_staticTextUnitV;
+		wxStaticText* m_staticText772;
+		wxTextCtrl* m_textCtrlW;
+		wxStaticText* m_staticTextUnitW;
+		
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnScroll( wxScrollEvent& event ) { event.Skip(); }
+		virtual void OnTrack( wxScrollEvent& event ) { event.Skip(); }
+		virtual void OnTextChanged( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		GUIMachineControl( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine Controller"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 537,491 ), long style = wxCAPTION|wxCLOSE_BOX|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		~GUIMachineControl();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// Class GUIToolbox
 ///////////////////////////////////////////////////////////////////////////////
 class GUIToolbox : public wxFrame 
@@ -324,12 +451,6 @@ class GUIToolbox : public wxFrame
 	private:
 	
 	protected:
-		enum
-		{
-			wxID_SETUPUNITS = 1000,
-			wxID_VIEWSTEREO3D,
-		};
-		
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuTools;
 		wxMenu* m_menuSettings;
@@ -394,50 +515,6 @@ class GUIToolbox : public wxFrame
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class GUIStockMaterial
-///////////////////////////////////////////////////////////////////////////////
-class GUIStockMaterial : public wxFrame 
-{
-	private:
-	
-	protected:
-		enum
-		{
-			wxID_SETUPUNITS = 1000,
-		};
-		
-		wxMenuBar* m_menubar;
-		wxMenu* m_menuStock;
-		wxMenu* m_menuSettings;
-		wxListCtrl* m_listCtrl;
-		wxStaticText* m_staticText27;
-		wxTextCtrl* m_textCtrlX;
-		wxStaticText* m_staticText28;
-		wxStaticText* m_staticText29;
-		wxTextCtrl* m_textCtrlY;
-		wxStaticText* m_staticText30;
-		wxStaticText* m_staticText31;
-		wxTextCtrl* m_textCtrlZ;
-		wxStaticText* m_staticText32;
-		wxStaticText* m_staticText33;
-		wxTextCtrl* m_textCtrlMaxSpeed;
-		wxStaticText* m_staticText34;
-		wxStaticText* m_staticText35;
-		wxTextCtrl* m_textCtrlMaxFeedrate;
-		wxStaticText* m_staticText36;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
-		
-	
-	public:
-		
-		GUIStockMaterial( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Stock"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 638,365 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
-		~GUIStockMaterial();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
 /// Class GUIAnimation
 ///////////////////////////////////////////////////////////////////////////////
 class GUIAnimation : public wxFrame 
@@ -481,12 +558,6 @@ class GUISetup6DOFController : public wxDialog
 	private:
 	
 	protected:
-		enum
-		{
-			ID_BUTTONCONNECT = 1000,
-			ID_BUTTONDISCONNECT,
-		};
-		
 		wxStaticText* m_staticText;
 		wxTextCtrl* textPort;
 		wxRadioBox* radioDeviceSelect;
@@ -522,7 +593,7 @@ class GUISetup6DOFController : public wxDialog
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUISetupUnits
 ///////////////////////////////////////////////////////////////////////////////
-class GUISetupUnits : public wxDialog 
+class GUISetupUnits : public wxFrame 
 {
 	private:
 	
@@ -530,18 +601,22 @@ class GUISetupUnits : public wxDialog
 		wxStaticText* m_staticText57;
 		wxChoice* m_choiceUnitLength;
 		wxStaticText* m_staticText58;
-		wxChoice* m_choiceUnitTolerances;
+		wxChoice* m_choiceUnitSpeedLinear;
 		wxStaticText* m_staticText59;
-		wxChoice* m_choiceRotationalSpeed;
+		wxChoice* m_choiceUnitSpeedRotational;
+		wxStaticText* m_staticText65;
+		wxChoice* m_choiceUnitTime;
 		wxButton* m_buttonClose;
+		wxStaticText* m_staticText64;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnChangeUnit( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		GUISetupUnits( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup Units"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
+		GUISetupUnits( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup display units"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		~GUISetupUnits();
 	
 };

@@ -50,10 +50,13 @@ commandObjectDelete::~commandObjectDelete()
 
 bool commandObjectDelete::Undo(void)
 {
-	if(objectNr > project->objects.GetCount()){
+	if(objectNr >= project->objects.GetCount()){
 		project->objects.Add(object);
 	}else{
 		project->objects.Insert(object, objectNr);
 	}
+	// If the the object was inserted back into the project,
+	// this function must not delete the object in the destructor.
+	object = NULL;
 	return true;
 }

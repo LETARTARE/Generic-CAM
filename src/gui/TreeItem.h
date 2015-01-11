@@ -32,11 +32,12 @@
 enum ItemDataType {
 	itemUnknown = 0, ///> Default
 	itemProject,
-	itemGroup,
+	itemGroupObject,
+	itemGroupStock,
+	itemGroupRun,
 	itemObject, ///> Object
-	itemObjectModifier,
-	itemMachine,
 	itemStock,
+	itemMachine,
 	itemToolpath
 };
 

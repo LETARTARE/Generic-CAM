@@ -33,7 +33,7 @@ DialogToolbox::DialogToolbox(wxWindow* parent) :
 	selectedTool = 0;
 	selectedElement = 0;
 
-	m_menuSettings->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
+	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
 }
 
 DialogToolbox::~DialogToolbox()
@@ -58,7 +58,7 @@ void DialogToolbox::OnChangeStereo3D(wxCommandEvent& event)
 	}else{
 		m_canvas->stereoMode = 1;
 	}
-	m_menuSettings->Check(wxID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
+	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
 }
 
 void DialogToolbox::InsertProject(Project *project)

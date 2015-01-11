@@ -28,10 +28,10 @@
 
 DisplaySettings::DisplaySettings()
 {
-	Tolerance.Setup(_T("m"), _T("mm"), (double) 1 / 1000);
-	Distance.Setup(_T("m"), _T("cm"), (double) 1 / 100);
+	Time.Setup(_T("s"), _T("min"), (double) 60);
+	Distance.Setup(_T("m"), _T("cm"), (double) 10e-3);
 	RotationalSpeed.Setup(_T("1/s"), _T("rpm"), (double) 1 / 60);
-	LinearSpeed.Setup(_T("m/s"), _T("mm/s"), (double) 1 / 1000);
+	LinearSpeed.Setup(_T("m/s"), _T("mm/s"), (double) 1e-3);
 }
 
 DisplaySettings::~DisplaySettings()

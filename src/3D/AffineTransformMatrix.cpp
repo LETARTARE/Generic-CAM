@@ -22,11 +22,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #include "AffineTransformMatrix.h"
 
@@ -222,7 +218,6 @@ void AffineTransformMatrix::PutMatrixTogether(void)
 	double coz = cos(rz);
 	double siz = sin(rz);
 
-
 	//Matrix calculated with Axiom:
 	// Rx := matrix[[1,0,0],[0,cox,-six],[0,six,cox]]
 	// Ry := matrix[[coy,0,siy],[0,1,0],[-siy,0,coy]]
@@ -263,8 +258,9 @@ const AffineTransformMatrix AffineTransformMatrix::Inverse() const
 	// R:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]])
 	// inverse(R)
 
-	double T11 = (a[0] * a[5] + (-a[1] * a[4])) * a[10] + ((-a[0] * a[6])
-			+ a[2] * a[4]) * a[9] + (a[1] * a[6] + (-a[2] * a[5])) * a[8];
+	double T11 = (a[0] * a[5] + (-a[1] * a[4])) * a[10]
+			+ ((-a[0] * a[6]) + a[2] * a[4]) * a[9]
+			+ (a[1] * a[6] + (-a[2] * a[5])) * a[8];
 	// T11 is the determinant of the matrix. This can not
 	// not be zero for a correct transformation matrix.
 	wxASSERT(T11!=0)
@@ -296,18 +292,21 @@ const AffineTransformMatrix AffineTransformMatrix::Inverse() const
 	b.a[0] = (T16 - T17) / T11;
 	b.a[4] = (-T14 + T15) / T11;
 	b.a[8] = (T12 - T13) / T11;
-	b.a[12] = ((-T12 + T13) * a[14] + (T14 - T15) * a[13] + (-T16 + T17)
-			* a[12]) / T11;
+	b.a[12] =
+			((-T12 + T13) * a[14] + (T14 - T15) * a[13] + (-T16 + T17) * a[12])
+					/ T11;
 	b.a[1] = (-T24 + T25) / T11;
 	b.a[5] = (T21 - T22) / T11;
 	b.a[9] = (-T18 + T19) / T11;
-	b.a[13] = ((T18 - T19) * a[14] + (-T21 + T22) * a[13] + (-T25 + T24)
-			* a[12]) / T11;
+	b.a[13] =
+			((T18 - T19) * a[14] + (-T21 + T22) * a[13] + (-T25 + T24) * a[12])
+					/ T11;
 	b.a[2] = T27 / T11;
 	b.a[6] = T28 / T11;
 	b.a[10] = T29 / T11;
-	b.a[14] = ((-T30 + T31) * a[14] + (T32 - T33) * a[13] + (-T34 + T35)
-			* a[12]) / T11;
+	b.a[14] =
+			((-T30 + T31) * a[14] + (T32 - T33) * a[13] + (-T34 + T35) * a[12])
+					/ T11;
 	b.a[2] = 0;
 	b.a[6] = 0;
 	b.a[11] = 0;
@@ -329,32 +328,32 @@ AffineTransformMatrix & AffineTransformMatrix::operator*=(
 
 	this->a[0] = c[0] * b.a[0] + c[4] * b.a[1] + c[8] * b.a[2] + c[12] * b.a[3];
 	this->a[1] = c[1] * b.a[0] + c[5] * b.a[1] + c[9] * b.a[2] + c[13] * b.a[3];
-	this->a[2] = c[2] * b.a[0] + c[6] * b.a[1] + c[10] * b.a[2] + c[14]
-			* b.a[3];
-	this->a[3] = c[3] * b.a[0] + c[7] * b.a[1] + c[11] * b.a[2] + c[15]
-			* b.a[3];
+	this->a[2] = c[2] * b.a[0] + c[6] * b.a[1] + c[10] * b.a[2]
+			+ c[14] * b.a[3];
+	this->a[3] = c[3] * b.a[0] + c[7] * b.a[1] + c[11] * b.a[2]
+			+ c[15] * b.a[3];
 	this->a[4] = c[0] * b.a[4] + c[4] * b.a[5] + c[8] * b.a[6] + c[12] * b.a[7];
 	this->a[5] = c[1] * b.a[4] + c[5] * b.a[5] + c[9] * b.a[6] + c[13] * b.a[7];
-	this->a[6] = c[2] * b.a[4] + c[6] * b.a[5] + c[10] * b.a[6] + c[14]
-			* b.a[7];
-	this->a[7] = c[3] * b.a[4] + c[7] * b.a[5] + c[11] * b.a[6] + c[15]
-			* b.a[7];
-	this->a[8] = c[0] * b.a[8] + c[4] * b.a[9] + c[8] * b.a[10] + c[12]
-			* b.a[11];
-	this->a[9] = c[1] * b.a[8] + c[5] * b.a[9] + c[9] * b.a[10] + c[13]
-			* b.a[11];
-	this->a[10] = c[2] * b.a[8] + c[6] * b.a[9] + c[10] * b.a[10] + c[14]
-			* b.a[11];
-	this->a[11] = c[3] * b.a[8] + c[7] * b.a[9] + c[11] * b.a[10] + c[15]
-			* b.a[11];
-	this->a[12] = c[0] * b.a[12] + c[4] * b.a[13] + c[8] * b.a[14] + c[12]
-			* b.a[15];
-	this->a[13] = c[1] * b.a[12] + c[5] * b.a[13] + c[9] * b.a[14] + c[13]
-			* b.a[15];
-	this->a[14] = c[2] * b.a[12] + c[6] * b.a[13] + c[10] * b.a[14] + c[14]
-			* b.a[15];
-	this->a[15] = c[3] * b.a[12] + c[7] * b.a[13] + c[11] * b.a[14] + c[15]
-			* b.a[15];
+	this->a[6] = c[2] * b.a[4] + c[6] * b.a[5] + c[10] * b.a[6]
+			+ c[14] * b.a[7];
+	this->a[7] = c[3] * b.a[4] + c[7] * b.a[5] + c[11] * b.a[6]
+			+ c[15] * b.a[7];
+	this->a[8] = c[0] * b.a[8] + c[4] * b.a[9] + c[8] * b.a[10]
+			+ c[12] * b.a[11];
+	this->a[9] = c[1] * b.a[8] + c[5] * b.a[9] + c[9] * b.a[10]
+			+ c[13] * b.a[11];
+	this->a[10] = c[2] * b.a[8] + c[6] * b.a[9] + c[10] * b.a[10]
+			+ c[14] * b.a[11];
+	this->a[11] = c[3] * b.a[8] + c[7] * b.a[9] + c[11] * b.a[10]
+			+ c[15] * b.a[11];
+	this->a[12] = c[0] * b.a[12] + c[4] * b.a[13] + c[8] * b.a[14]
+			+ c[12] * b.a[15];
+	this->a[13] = c[1] * b.a[12] + c[5] * b.a[13] + c[9] * b.a[14]
+			+ c[13] * b.a[15];
+	this->a[14] = c[2] * b.a[12] + c[6] * b.a[13] + c[10] * b.a[14]
+			+ c[14] * b.a[15];
+	this->a[15] = c[3] * b.a[12] + c[7] * b.a[13] + c[11] * b.a[14]
+			+ c[15] * b.a[15];
 
 	return *this;
 }
@@ -535,7 +534,6 @@ AffineTransformMatrix AffineTransformMatrix::RotateXYZ(double const& x,
 		double const& y, double const& z)
 {
 	AffineTransformMatrix a;
-
 
 	//Axiom code:
 	// Rx := matrix[[1,0,0,0],[0,cox,-six,0],[0,six,cox,0],[0,0,0,1]]

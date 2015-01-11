@@ -200,6 +200,35 @@ void Geometry::CalculateNormals(void)
 	}
 }
 
+void Geometry::FlipX(void)
+{
+	size_t i;
+	for(i = 0; i < triangles.GetCount(); i++){
+		triangles[i].p[0].x = -triangles[i].p[0].x;
+		triangles[i].p[1].x = -triangles[i].p[1].x;
+		triangles[i].p[2].x = -triangles[i].p[2].x;
+	}
+}
+
+void Geometry::FlipY(void)
+{
+	size_t i;
+	for(i = 0; i < triangles.GetCount(); i++){
+		triangles[i].p[0].y = -triangles[i].p[0].y;
+		triangles[i].p[1].y = -triangles[i].p[1].y;
+		triangles[i].p[2].y = -triangles[i].p[2].y;
+	}
+}
+
+void Geometry::FlipZ(void)
+{
+	size_t i;
+	for(i = 0; i < triangles.GetCount(); i++){
+		triangles[i].p[0].z = -triangles[i].p[0].z;
+		triangles[i].p[1].z = -triangles[i].p[1].z;
+		triangles[i].p[2].z = -triangles[i].p[2].z;
+	}
+}
 void Geometry::FlipNormals(void)
 {
 	size_t i;
@@ -207,6 +236,9 @@ void Geometry::FlipNormals(void)
 		triangles[i].n[0] = -triangles[i].n[0];
 		triangles[i].n[1] = -triangles[i].n[1];
 		triangles[i].n[2] = -triangles[i].n[2];
+		// Switch the order of edges by swaping vertex 1 and 2
+		// 0->1->2->0 becomes 0->2->1->0.
+		triangles[i].p[1].Swap(triangles[i].p[2]);
 	}
 }
 

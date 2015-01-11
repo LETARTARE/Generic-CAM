@@ -45,6 +45,7 @@ TreeSetup::TreeSetup(wxTreeCtrl * tree, Project * project)
 	long style = this->tree->GetWindowStyle() ^ wxTR_NO_LINES;
 	this->tree->SetWindowStyle(style);
 
+	this->prohibitVariableUpdate = false;
 	this->levelModified = false;
 
 	tree->DeleteAllItems();
@@ -121,9 +122,88 @@ bool TreeSetup::GetSelection(void)
 	return tree->IsSelected(id[currentLevel]);
 }
 
+int TreeSetup::GetFirstSelectedObject(void)
+{
+	wxTreeItemId temp;
+	TreeItem * data;
+
+	// Check if all groups are OK.
+	if(!groupObjects.IsOk()) return -1;
+
+	temp = tree->GetFirstChild(groupObjects, cookie);
+	while(temp.IsOk()){
+		data = (TreeItem*) tree->GetItemData(temp);
+		if(data != NULL && data->dataType == itemObject
+				&& tree->IsSelected(temp)) return data->nr;
+		temp = tree->GetNextSibling(temp);
+	}
+	return -1;
+}
+
 void TreeSetup::SetSelection(bool selection)
 {
-	tree->SelectItem(id[currentLevel], selection);
+	bool temp = tree->IsSelected(id[currentLevel]);
+	if(temp != selection) tree->SelectItem(id[currentLevel], selection);
+}
+
+void TreeSetup::UpdateSelection(void)
+{
+	wxTreeItemId temp;
+	bool flag;
+	TreeItem * data;
+	unsigned int N;
+
+	// Check if all groups are ok.
+	if(!groupObjects.IsOk()) return;
+
+	// Disable the function variable update. This function would otherwise
+	// be called by the main window, whenever a selection changes.
+	prohibitVariableUpdate = true;
+
+	// Updates for Objects:
+	N = project->objects.GetCount();
+
+	temp = tree->GetFirstChild(groupObjects, cookie);
+	while(temp.IsOk()){
+		data = (TreeItem*) tree->GetItemData(temp);
+		if(data != NULL && data->dataType == itemObject){
+			if(data->nr >= 0 && data->nr < N){
+				flag = tree->IsSelected(temp);
+				if(flag != project->objects[data->nr].selected){
+					tree->SelectItem(temp, project->objects[data->nr].selected);
+				}
+			}
+		}
+		temp = tree->GetNextSibling(temp);
+	}
+
+	prohibitVariableUpdate = false;
+	UpdateVariables();
+}
+
+void TreeSetup::UpdateVariables(void)
+{
+	wxTreeItemId temp;
+	TreeItem * data;
+	unsigned int N;
+
+	// The function UpdateSelection uses this flag to temporally disable variable update.
+	if(prohibitVariableUpdate) return;
+
+	if(!groupObjects.IsOk()) return;
+
+	// Updates for Objects:
+	N = project->objects.GetCount();
+	temp = tree->GetFirstChild(groupObjects, cookie);
+	while(temp.IsOk()){
+		data = (TreeItem*) tree->GetItemData(temp);
+		if(data != NULL && data->dataType == itemObject){
+			if(data->nr >= 0 && data->nr < N){
+				project->objects[data->nr].selected = tree->IsSelected(temp);
+			}
+		}
+		temp = tree->GetNextSibling(temp);
+	}
 }
 
 void TreeSetup::Update(void)
@@ -139,10 +219,10 @@ void TreeSetup::Update(void)
 	id[0] = root;
 	currentLevel = 0;
 
-	SetAtLevel(1, _("Objects"), itemGroup, -1);
+	SetAtLevel(1, _("Objects"), itemGroupObject, -1);
+	groupObjects = id[1];
 	for(n = 0; n < project->objects.GetCount(); n++){
 		SetAtLevel(2, project->objects[n].name, itemObject, n);
-		SetSelection(project->objects[n].selected);
 	}
 
 	if(n == 0){
@@ -151,7 +231,9 @@ void TreeSetup::Update(void)
 		FinishLevel(2, true);
 	}
 
-	SetAtLevel(1, _("Run"), itemGroup, -1);
+	SetAtLevel(1, _("Stock"), itemGroupStock, -1);
+
+	SetAtLevel(1, _("Run"), itemGroupRun, -1);
 
 	tree->Expand(id[0]);
 

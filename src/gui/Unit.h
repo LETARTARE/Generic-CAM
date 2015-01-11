@@ -31,6 +31,14 @@
 
 /*!\class Unit
  * \brief Converts from SI to whatever and back.
+ *
+ * Simple conversion class.
+ * The factor is the multiplier to convert into the other unit.
+ * E.g.:
+ *    1 cm = 0.01 m, factor = 1/100
+ *    1 rpm = 1/60 1/s, factor = 1/60
+ *
+ * HINT: The available type for the units are maintained in the DialogSetupUnits.
  */
 
 class Unit {
@@ -43,10 +51,9 @@ public:
 public:
 
 private:
-	double factor;
-	//wxString TypeOfUnit;
-	wxString SIName;
-	wxString otherName;
+	double factor; ///> 1 in SI = factor in whatever
+	wxString SIName; ///> The name in SI: m, m/s, 1/s, ...
+	wxString otherName; ///> The name in the "other" system: h, cm, dm, rpm, inch, mil, mm, ...
 
 	// Methods
 public:

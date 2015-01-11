@@ -48,7 +48,7 @@ public:
 	// Member Variables
 private:
 
-	Project* linkedProject;
+	Project* project;
 
 	ArrayOfGeometry* geometry;
 	Machine* machine;

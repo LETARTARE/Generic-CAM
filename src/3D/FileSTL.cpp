@@ -68,7 +68,13 @@ bool FileSTL::ReadStream(wxFFileInputStream * stream)
 		return false;
 	}
 	if(strncmp(header, "solid", 5) == 0){
-		return ReadStreamAscii(stream, true);
+
+		// Make sure, that number are written with a dot and not a comma.
+		setlocale(LC_ALL, "C");
+		bool flag = ReadStreamAscii(stream, true);
+		setlocale(LC_ALL, "");
+
+		return flag;
 	}else{
 		return ReadStreamBinary(stream, true);
 	}
@@ -165,6 +171,7 @@ bool FileSTL::ReadStreamBinary(wxFFileInputStream * stream, bool hasRead5Byte)
 
 bool FileSTL::ReadStreamAscii(wxFFileInputStream * stream, bool hasRead5Byte)
 {
+
 	wxTextInputStream textStream(*stream);
 	wxString word, line;
 
@@ -271,7 +278,7 @@ bool FileSTL::ReadStreamAscii(wxFFileInputStream * stream, bool hasRead5Byte)
 		}
 		word = textStream.ReadLine().Trim(false);
 		if(!word.StartsWith(_T("solid"))) word = textStream.ReadLine().Trim(
-		false);
+				false);
 	}
 
 	return true;

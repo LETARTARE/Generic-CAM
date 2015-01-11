@@ -113,6 +113,7 @@ void DialogSetup6DOFController::OnConnect(wxCommandEvent& event)
 		break;
 	default:
 		wxFAIL_MSG(_T("Unknown controller ID!"));
+		break;
 	}
 	control->SetType(i);
 	if(control->Open(textPort->GetValue())) wxLogMessage(

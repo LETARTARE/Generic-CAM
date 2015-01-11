@@ -68,6 +68,9 @@ public:
 
 	void CalculateNormals(void);
 	void FlipNormals(void);
+	void FlipX(void);
+	void FlipY(void);
+	void FlipZ(void);
 
 	void ApplyTransformation(const AffineTransformMatrix &matrix);
 	void ApplyTransformation(void);

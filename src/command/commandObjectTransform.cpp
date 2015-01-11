@@ -27,12 +27,15 @@
 #include "commandObjectTransform.h"
 
 commandObjectTransform::commandObjectTransform(const wxString& name,
-		Project* project, size_t objectNr, bool flipNormals,
-		AffineTransformMatrix& matrixNew) :
+		Project* project, size_t objectNr, bool flipX, bool flipY, bool flipZ,
+		bool flipNormals, AffineTransformMatrix& matrixNew) :
 		wxCommand(true, name)
 {
 	this->project = project;
 	this->objectNr = objectNr;
+	this->flipX = flipX;
+	this->flipY = flipY;
+	this->flipZ = flipZ;
 	this->flipNormals = flipNormals;
 	this->matrixNew = matrixNew;
 }
@@ -42,7 +45,11 @@ bool commandObjectTransform::Do(void)
 	if(objectNr >= project->objects.GetCount()) return false;
 	matrixOld = project->objects[objectNr].matrix;
 	project->objects[objectNr].matrix = matrixNew;
+	if(flipX) project->objects[objectNr].FlipX();
+	if(flipY) project->objects[objectNr].FlipY();
+	if(flipZ) project->objects[objectNr].FlipZ();
 	if(flipNormals) project->objects[objectNr].FlipNormals();
+	project->objects[objectNr].Update();
 	return true;
 }
 
@@ -50,6 +57,10 @@ bool commandObjectTransform::Undo(void)
 {
 	if(objectNr >= project->objects.GetCount()) return false;
 	project->objects[objectNr].matrix = matrixOld;
+	if(flipX) project->objects[objectNr].FlipX();
+	if(flipY) project->objects[objectNr].FlipY();
+	if(flipZ) project->objects[objectNr].FlipZ();
 	if(flipNormals) project->objects[objectNr].FlipNormals();
+	project->objects[objectNr].Update();
 	return true;
 }

@@ -63,6 +63,19 @@ void Object::UpdateBoundingBox(void)
 		bbox.Insert((geometries[i]), matrix);
 }
 
+void Object::UpdateNormals(void)
+{
+	size_t i;
+	for(i = 0; i < geometries.GetCount(); i++)
+		geometries[i].CalculateNormals();
+}
+
+void Object::Update(void)
+{
+	UpdateBoundingBox();
+	UpdateNormals();
+}
+
 bool Object::LoadObject(wxFileName fileName)
 {
 	if(!fileName.IsOk()) return false;
@@ -153,6 +166,24 @@ void Object::FlipNormals(void)
 	for(i = 0; i < geometries.GetCount(); i++)
 		geometries[i].FlipNormals();
 }
+void Object::FlipX(void)
+{
+	size_t i;
+	for(i = 0; i < geometries.GetCount(); i++)
+		geometries[i].FlipX();
+}
+void Object::FlipY(void)
+{
+	size_t i;
+	for(i = 0; i < geometries.GetCount(); i++)
+		geometries[i].FlipY();
+}
+void Object::FlipZ(void)
+{
+	size_t i;
+	for(i = 0; i < geometries.GetCount(); i++)
+		geometries[i].FlipZ();
+}
 
 // Recursive tree deletion.
 void Object::XMLRemoveAllChildren(wxXmlNode* node)
@@ -238,4 +269,3 @@ bool Object::FromXml(wxXmlNode* node)
 	UpdateBoundingBox();
 	return true;
 }
-

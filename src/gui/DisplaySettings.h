@@ -42,7 +42,7 @@ public:
 	DisplaySettings();
 	virtual ~DisplaySettings();
 
-	Unit Tolerance;
+	Unit Time;
 	Unit Distance;
 	Unit LinearSpeed;
 	Unit RotationalSpeed;
