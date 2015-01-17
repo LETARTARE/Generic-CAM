@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectLoad.h
+// Name               : CommandWorkpieceAssignObject.cpp
 // Purpose            : 
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 29.12.2014
-// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 16.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,24 +24,28 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDOBJECTLOAD_H_
-#define COMMANDOBJECTLOAD_H_
+#include "CommandWorkpieceAssignObject.h"
 
-#include <wx/cmdproc.h>
+CommandWorkpieceAssignObject::CommandWorkpieceAssignObject(const wxString& name,
+		Project* project, int workpieceNr, int objectNr) :
+		wxCommand(true, name)
+{
+	this->project = project;
+	this->objectNr = objectNr;
+	this->workpieceNr = workpieceNr;
+}
 
-#include "../project/Project.h"
+bool CommandWorkpieceAssignObject::Do(void)
+{
+	ObjectPlacement temp;
+	temp.objectNr = objectNr;
+	project->workpieces[workpieceNr].placements.Add(temp);
+	return true;
+}
 
-class commandObjectLoad:public wxCommand {
-public:
-	commandObjectLoad(const wxString& name, Project * project,
-			const wxString& fileName);
-
-	bool Do(void);
-	bool Undo(void);
-
-protected:
-	Project * project;
-	wxString fileName;
-};
-
-#endif /* COMMANDOBJECTLOAD_H_ */
+bool CommandWorkpieceAssignObject::Undo(void)
+{
+	project->workpieces[workpieceNr].placements.RemoveAt(
+			project->workpieces[workpieceNr].placements.GetCount() - 1);
+	return true;
+}

@@ -27,7 +27,6 @@
 //$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include "Vector3.h"
 
 #include <wx/tokenzr.h>
@@ -72,7 +71,6 @@ void Vector3::Zero(void)
 
 void Vector3::Swap(Vector3& b)
 {
-	//TODO: Rewrite to simpler version.
 	float temp;
 	temp = b.x;
 	b.x = this->x;

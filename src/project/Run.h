@@ -22,11 +22,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #ifndef RUN_H_
 #define RUN_H_
@@ -39,8 +35,6 @@
 #include "ToolPath.h"
 #include "../generator/TPGeneratorFast.h"
 #include "../generator/TPGeneratorTest.h"
-
-#include "TargetPlacement.h"
 
 #include <wx/string.h>
 #include <wx/textfile.h>
@@ -60,35 +54,30 @@ public:
 	virtual ~Run();
 	// Member variables
 public:
-	wxString runName;
+	wxString name;
+	bool selected;
 
-	bool useExtraMachine;
-	Machine machine;
-	bool useExtraToolbox;
+	int workpieceNr;
+//	ArrayOfObjectPlacement workpiecePlacements;
+
+//	Machine machine;
 	Toolbox toolbox;
 
 	ToolPath toolPath;
-	ArrayOfTargetPlacement placements;
 
-	StockMaterial stockMaterial;
-	//Workpiece workPiece;
-
-	TPGeneratorFast ToolPathGenerator;
+	TPGeneratorFast ToolPathGenerator; // TODO: A generator? Here?
 
 	// Methods
 public:
+	void Paint(void);
 	void ToXml(wxXmlNode* parentNode);
 	bool FromXml(wxXmlNode* node);
 
-	void WriteToFile(wxTextFile &f);
+	void WriteToFile(wxTextFile &f); //TODO: Here?
 
-	void SortTargets(void);
-
-
-	void Paint(void);
+	void SortTargets(void); // TODO: Autoplacing belongs to the Workpiece class!?
 
 };
-WX_DECLARE_OBJARRAY(Run, ArrayOfRun)
-;
+WX_DECLARE_OBJARRAY(Run, ArrayOfRun);
 
 #endif /* RUN_H_ */

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectTransform.cpp
+// Name               : CommandObjectTransform.cpp
 // Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,9 +24,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "commandObjectTransform.h"
+#include "CommandObjectTransform.h"
 
-commandObjectTransform::commandObjectTransform(const wxString& name,
+CommandObjectTransform::CommandObjectTransform(const wxString& name,
 		Project* project, size_t objectNr, bool flipX, bool flipY, bool flipZ,
 		bool flipNormals, AffineTransformMatrix& matrixNew) :
 		wxCommand(true, name)
@@ -40,7 +40,7 @@ commandObjectTransform::commandObjectTransform(const wxString& name,
 	this->matrixNew = matrixNew;
 }
 
-bool commandObjectTransform::Do(void)
+bool CommandObjectTransform::Do(void)
 {
 	if(objectNr >= project->objects.GetCount()) return false;
 	matrixOld = project->objects[objectNr].matrix;
@@ -53,7 +53,7 @@ bool commandObjectTransform::Do(void)
 	return true;
 }
 
-bool commandObjectTransform::Undo(void)
+bool CommandObjectTransform::Undo(void)
 {
 	if(objectNr >= project->objects.GetCount()) return false;
 	project->objects[objectNr].matrix = matrixOld;

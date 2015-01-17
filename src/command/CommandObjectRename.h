@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectDelete.cpp
+// Name               : CommandObjectRename.h
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
@@ -24,39 +24,27 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "commandObjectDelete.h"
+#ifndef COMMANDOBJECTRENAME_H_
+#define COMMANDOBJECTRENAME_H_
 
-#include <stddef.h>
+#include <wx/cmdproc.h>
+#include <wx/string.h>
 
-commandObjectDelete::commandObjectDelete(const wxString& name, Project* project,
-		int objectNr) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->objectNr = objectNr;
-	this->object = NULL;
-}
+#include "../project/Project.h"
 
-bool commandObjectDelete::Do(void)
-{
-	object = project->objects.Detach(objectNr);
-	return true;
-}
+class CommandObjectRename:public wxCommand {
+public:
+	CommandObjectRename(const wxString& name, Project * project, int objectNr,
+			const wxString objectName);
 
-commandObjectDelete::~commandObjectDelete()
-{
-	if(object != NULL) delete object;
-}
+	bool Do(void);
+	bool Undo(void);
 
-bool commandObjectDelete::Undo(void)
-{
-	if(objectNr >= project->objects.GetCount()){
-		project->objects.Add(object);
-	}else{
-		project->objects.Insert(object, objectNr);
-	}
-	// If the the object was inserted back into the project,
-	// this function must not delete the object in the destructor.
-	object = NULL;
-	return true;
-}
+protected:
+	Project * project;
+	int objectNr;
+	wxString newName;
+	wxString oldName;
+};
+
+#endif /* COMMANDOBJECTRENAME_H_ */

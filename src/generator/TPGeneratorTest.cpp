@@ -22,11 +22,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #include "TPGeneratorTest.h"
 
@@ -44,7 +40,7 @@ TPGeneratorTest::~TPGeneratorTest()
 
 }
 
-void TPGeneratorTest::GenerateToolpath(Target &target, Tool &tool)
+void TPGeneratorTest::GenerateToolpath(DexelTarget &target, Tool &tool)
 {
 	ToolPath tp;
 	MachinePosition m;
@@ -52,11 +48,11 @@ void TPGeneratorTest::GenerateToolpath(Target &target, Tool &tool)
 	if(target.IsEmpty()) return;
 
 	// TODO: Change this to reflect tool shape.
-	Target discTool;
+	DexelTarget discTool;
 	discTool.SetupDisc(0.003, target.GetSizeRX(), target.GetSizeRY());
 
-	Target temp = target;
-	Target temptop;
+	DexelTarget temp = target;
+	DexelTarget temptop;
 
 	temp.FoldRaise(discTool);
 	temp.Limit();
@@ -64,7 +60,6 @@ void TPGeneratorTest::GenerateToolpath(Target &target, Tool &tool)
 	temp.InvertTop();
 
 	double level = temp.GetSizeZ() - 0.0005;
-
 
 	// Starting point
 	//
@@ -84,7 +79,6 @@ void TPGeneratorTest::GenerateToolpath(Target &target, Tool &tool)
 
 	while(level > -0.0001){
 
-
 		// Find All polygons on one level
 		bool flag;
 		flag = true;
@@ -95,7 +89,7 @@ void TPGeneratorTest::GenerateToolpath(Target &target, Tool &tool)
 			if(pg.elements.GetCount() > 1){
 				temptop.PolygonDrop(pg, levelDrop - 0.0005);
 				pg.ApplyTransformation(tm);
-				temp.PolygonDropTarget(pg, discTool);
+				temp.PolygonDropDexelTarget(pg, discTool);
 				pg.PolygonSmooth();
 				pgs.Add(pg);
 			}
@@ -112,10 +106,10 @@ void TPGeneratorTest::GenerateToolpath(Target &target, Tool &tool)
 				pgs[i - 1].RotatePolygonStart(m.axisX, m.axisY);
 
 				if(!isMillUp){
-					d2 = (m.axisX - pgs[i - 1].elements[0].x) * (m.axisX
-							- pgs[i - 1].elements[0].x) + (m.axisY
-							- pgs[i - 1].elements[0].y) * (m.axisY
-							- pgs[i - 1].elements[0].y);
+					d2 = (m.axisX - pgs[i - 1].elements[0].x)
+							* (m.axisX - pgs[i - 1].elements[0].x)
+							+ (m.axisY - pgs[i - 1].elements[0].y)
+									* (m.axisY - pgs[i - 1].elements[0].y);
 					if(d2 > (0.008 * 0.008)){
 						// Move tool out of material to travel to next polygon.
 						m.isCutting = false;
@@ -161,7 +155,6 @@ void TPGeneratorTest::GenerateToolpath(Target &target, Tool &tool)
 		tp.positions[i].axisZ -= temp.GetSizeZ();
 	}
 	tp.matrix.TranslateGlobal(0, 0, temp.GetSizeZ());
-
 
 	//	t.InitImprinting();
 	//	t.matrix.SetIdentity();

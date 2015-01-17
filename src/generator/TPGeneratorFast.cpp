@@ -22,9 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -126,7 +123,7 @@ ToolPath TPGeneratorFast::GenerateSpiral(double x, double y, double radius)
 	return temp;
 }
 
-bool TPGeneratorFast::IsDirectlyReachable(Target &target, double sx, double sy,
+bool TPGeneratorFast::IsDirectlyReachable(DexelTarget &target, double sx, double sy,
 		double sz, double x, double y, double z)
 {
 	double dx = x - sx;
@@ -148,7 +145,7 @@ bool TPGeneratorFast::IsDirectlyReachable(Target &target, double sx, double sy,
 	return true;
 }
 
-ToolPath TPGeneratorFast::MoveSavely(Target &target, double sx, double sy,
+ToolPath TPGeneratorFast::MoveSavely(DexelTarget &target, double sx, double sy,
 		double sz, double x, double y, double z)
 {
 	ToolPath tp;
@@ -231,7 +228,7 @@ ToolPath TPGeneratorFast::MoveSavely(Target &target, double sx, double sy,
 	return tp;
 }
 
-void TPGeneratorFast::GenerateToolpath(Target &target, Tool &tool)
+void TPGeneratorFast::GenerateToolpath(DexelTarget &target, Tool &tool)
 {
 	if(target.IsEmpty()) return;
 
@@ -242,11 +239,11 @@ void TPGeneratorFast::GenerateToolpath(Target &target, Tool &tool)
 	// TODO: Change this to reflect tool shape.
 	toolDiameter = 0.0061;
 
-	Target discTool;
+	DexelTarget discTool;
 	discTool.SetupDisc(toolDiameter / 2, target.GetSizeRX(), target.GetSizeRY());
 
-	Target temp = target;
-	Target temptop;
+	DexelTarget temp = target;
+	DexelTarget temptop;
 
 	temp.FoldRaise(discTool);
 	temp.Limit();

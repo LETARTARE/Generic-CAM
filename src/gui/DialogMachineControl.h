@@ -33,11 +33,17 @@
  * ...
  */
 
+#include "../project/Project.h"
+#include "DisplaySettings.h"
 #include "gui.h"
 
 class DialogMachineControl:public GUIMachineControl {
 public:
-	DialogMachineControl(wxWindow * parent);
+	DialogMachineControl(wxWindow * parent, Project * project,
+			DisplaySettings * settings);
+
+	Project* project;
+	DisplaySettings * settings;
 
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);

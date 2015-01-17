@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectDelete.h
+// Name               : CommandWorkpieceAdd.cpp
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 08.01.2015
+// Created            : 16.01.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,25 +24,29 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDOBJECTDELETE_H_
-#define COMMANDOBJECTDELETE_H_
+#include "CommandWorkpieceAdd.h"
 
-#include <wx/cmdproc.h>
-#include <wx/string.h>
+CommandWorkpieceAdd::CommandWorkpieceAdd(const wxString& name, Project* project,
+		StockMaterial stock) :
+		wxCommand(true, name)
+{
+	this->project = project;
+	this->stock = stock;
+}
 
-#include "../project/Project.h"
+CommandWorkpieceAdd::~CommandWorkpieceAdd()
+{
+}
 
-class commandObjectDelete:public wxCommand {
-public:
-	commandObjectDelete(const wxString& name, Project * project, int objectNr);
-	virtual ~commandObjectDelete();
-	bool Do(void);
-	bool Undo(void);
+bool CommandWorkpieceAdd::Do(void)
+{
+	Workpiece temp(&stock);
+	project->workpieces.Add(temp);
+	return true;
+}
 
-protected:
-	Project * project;
-	int objectNr;
-	Object * object;
-};
-
-#endif /* COMMANDOBJECTDELETE_H_ */
+bool CommandWorkpieceAdd::Undo(void)
+{
+	project->workpieces.RemoveAt(project->workpieces.GetCount() - 1);
+	return true;
+}

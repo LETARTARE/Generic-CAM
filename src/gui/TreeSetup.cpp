@@ -114,7 +114,7 @@ void TreeSetup::FinishLevel(int level, bool autoExpand)
 		tree->Delete(temp);
 		temp = tree->GetNextSibling(id[level]);
 	}
-	if(levelModified) tree->Expand(id[level - 1]);
+	if(levelModified && autoExpand) tree->Expand(id[level - 1]);
 }
 
 bool TreeSetup::GetSelection(void)
@@ -136,6 +136,32 @@ int TreeSetup::GetFirstSelectedObject(void)
 		if(data != NULL && data->dataType == itemObject
 				&& tree->IsSelected(temp)) return data->nr;
 		temp = tree->GetNextSibling(temp);
+	}
+	return -1;
+}
+
+int TreeSetup::GetWorkpieceFromLink(int linkNr)
+{
+	int n, m;
+	int linkCounter = 0;
+	for(n = 0; n < project->workpieces.GetCount(); n++){
+		for(m = 0; m < project->workpieces[n].placements.GetCount(); m++){
+			if(linkCounter == linkNr) return n;
+			linkCounter++;
+		}
+	}
+	return -1;
+}
+
+int TreeSetup::GetObjectFromLink(int linkNr)
+{
+	int n, m;
+	int linkCounter = 0;
+	for(n = 0; n < project->workpieces.GetCount(); n++){
+		for(m = 0; m < project->workpieces[n].placements.GetCount(); m++){
+			if(linkCounter == linkNr) return m;
+			linkCounter++;
+		}
 	}
 	return -1;
 }
@@ -177,6 +203,41 @@ void TreeSetup::UpdateSelection(void)
 		temp = tree->GetNextSibling(temp);
 	}
 
+	// Updates for Workpieces:
+	N = project->workpieces.GetCount();
+
+	temp = tree->GetFirstChild(groupWorkpieces, cookie);
+	while(temp.IsOk()){
+		data = (TreeItem*) tree->GetItemData(temp);
+		if(data != NULL && data->dataType == itemWorkpiece){
+			if(data->nr >= 0 && data->nr < N){
+				flag = tree->IsSelected(temp);
+				if(flag != project->workpieces[data->nr].selected){
+					tree->SelectItem(temp,
+							project->workpieces[data->nr].selected);
+				}
+			}
+		}
+		temp = tree->GetNextSibling(temp);
+	}
+
+	// Updates for Run:
+	N = project->run.GetCount();
+
+	temp = tree->GetFirstChild(groupRun, cookie);
+	while(temp.IsOk()){
+		data = (TreeItem*) tree->GetItemData(temp);
+		if(data != NULL && data->dataType == itemRun){
+			if(data->nr >= 0 && data->nr < N){
+				flag = tree->IsSelected(temp);
+				if(flag != project->run[data->nr].selected){
+					tree->SelectItem(temp, project->run[data->nr].selected);
+				}
+			}
+		}
+		temp = tree->GetNextSibling(temp);
+	}
+
 	prohibitVariableUpdate = false;
 	UpdateVariables();
 }
@@ -204,6 +265,33 @@ void TreeSetup::UpdateVariables(void)
 		}
 		temp = tree->GetNextSibling(temp);
 	}
+
+	// Updates for Workpieces:
+	N = project->workpieces.GetCount();
+	temp = tree->GetFirstChild(groupWorkpieces, cookie);
+	while(temp.IsOk()){
+		data = (TreeItem*) tree->GetItemData(temp);
+		if(data != NULL && data->dataType == itemWorkpiece){
+			if(data->nr >= 0 && data->nr < N){
+				project->workpieces[data->nr].selected = tree->IsSelected(temp);
+			}
+		}
+		temp = tree->GetNextSibling(temp);
+	}
+
+	// Updates for Run:
+	N = project->run.GetCount();
+	temp = tree->GetFirstChild(groupRun, cookie);
+	while(temp.IsOk()){
+		data = (TreeItem*) tree->GetItemData(temp);
+		if(data != NULL && data->dataType == itemRun){
+			if(data->nr >= 0 && data->nr < N){
+				project->run[data->nr].selected = tree->IsSelected(temp);
+			}
+		}
+		temp = tree->GetNextSibling(temp);
+	}
+
 }
 
 void TreeSetup::Update(void)
@@ -215,7 +303,7 @@ void TreeSetup::Update(void)
 	wxString tempName = tree->GetItemText(root);
 	if(tempName != project->name) tree->SetItemText(root, project->name);
 
-	unsigned int n;
+	unsigned int n, m;
 	id[0] = root;
 	currentLevel = 0;
 
@@ -223,6 +311,39 @@ void TreeSetup::Update(void)
 	groupObjects = id[1];
 	for(n = 0; n < project->objects.GetCount(); n++){
 		SetAtLevel(2, project->objects[n].name, itemObject, n);
+		if(project->objects[n].geometries.GetCount() > 1){
+			for(m = 0; m < project->objects[n].geometries.GetCount(); m++){
+				SetAtLevel(3, project->objects[n].geometries[m].objectName,
+						itemSubObject, n);
+			}
+			FinishLevel(3, false);
+		}else{
+			tree->DeleteChildren(id[2]);
+		}
+	}
+	if(n == 0){
+		tree->DeleteChildren(id[1]);
+	}else{
+		FinishLevel(2, true);
+	}
+
+	SetAtLevel(1, _("Workpiece"), itemGroupWorkpiece, -1);
+	groupWorkpieces = id[1];
+	int objectNr;
+	int linkNr = 0;
+	for(n = 0; n < project->workpieces.GetCount(); n++){
+		SetAtLevel(2, project->workpieces[n].name, itemWorkpiece, n);
+		for(m = 0; m < project->workpieces[n].placements.GetCount(); m++){
+			objectNr = project->workpieces[n].placements[m].objectNr;
+			SetAtLevel(3, project->objects[objectNr].name, itemObjectLink,
+					linkNr);
+			linkNr++;
+		}
+		if(m == 0){
+			tree->DeleteChildren(id[2]);
+		}else{
+			FinishLevel(3, false);
+		}
 	}
 
 	if(n == 0){
@@ -231,80 +352,28 @@ void TreeSetup::Update(void)
 		FinishLevel(2, true);
 	}
 
-	SetAtLevel(1, _("Stock"), itemGroupStock, -1);
-
 	SetAtLevel(1, _("Run"), itemGroupRun, -1);
+	groupRun = id[1];
+	int workpieceNr;
+	for(n = 0; n < project->run.GetCount(); n++){
+		SetAtLevel(2, project->run[n].name, itemRun, n);
+		workpieceNr = project->run[n].workpieceNr;
+		if(workpieceNr >= 0)
+			SetAtLevel(3, _("Workpiece: ") + project->workpieces[m].name,
+					itemUnknown, workpieceNr);
+		else
+			SetAtLevel(3, wxString(_("Workpiece: ")) + _T("-"), itemUnknown,
+					-1);
+		SetAtLevel(3, _("Machine:"), itemMachine, 0);
+	}
+
+	if(n == 0){
+		tree->DeleteChildren(id[1]);
+	}else{
+		FinishLevel(2, true);
+	}
 
 	tree->Expand(id[0]);
 
-	//	wxTreeItemId rootId = tree->AddRoot(_T("TreeRoot"));
-//
-//	wxTreeItemId treeIdProject;
-//
-//	wxTreeItemId treeIdObject;
-//	wxTreeItemId treeIdGeometry;
-//	wxTreeItemId treeIdStock;
-//	wxTreeItemId treeIdMachine;
-//	wxTreeItemId treeIdToolbox;
-//	wxTreeItemId treeIdRun;
-//	wxTreeItemId treeIdRun2;
-//
-//	wxTreeItemId treeIdToolpath;
-//
-//	size_t i, j, k;
-//	for(i = 0; i < project.GetCount(); i++){
-//		treeIdProject = tree->AppendItem(rootId,
-//		_("Project: ") + project[i].name);
-//
-//		treeIdStock = tree->AppendItem(treeIdProject,
-//		_("Stock material: ") + project[i].stock.name);
-//
-//		for(j = 0; j < project[i].stock.stockMaterials.GetCount(); j++){
-//			tree->AppendItem(treeIdStock,
-//					project[i].stock.stockMaterials[j].materialName);
-//		}
-//
-//		for(j = 0; j < project[i].objects.GetCount(); j++){
-//			treeIdObject = tree->AppendItem(treeIdProject,
-//			_("Object: ") + project[i].objects[j].fileName.GetName());
-//			for(k = 0; k < project[i].objects[j].geometries.GetCount(); k++){
-//				{
-//					tree->AppendItem(treeIdObject,
-//							project[i].objects[j].geometries[k].objectName);
-//				}
-//			}
-//		}
-//
-//		treeIdMachine = tree->AppendItem(treeIdProject,
-//		_("Machine: ") + project[i].machine.fileName.GetName());
-//
-//		treeIdToolbox = tree->AppendItem(treeIdProject,
-//		_("Toolbox: ") + project[i].toolbox.fileName.GetName());
-//		for(j = 0; j < project[i].toolbox.tools.GetCount(); j++){
-//			tree->AppendItem(treeIdToolbox,
-//					project[i].toolbox.tools[j].toolName);
-//		}
-//
-//		treeIdRun = tree->AppendItem(treeIdProject, _("Run:"));
-//		for(j = 0; j < project[i].runs.GetCount(); j++){
-//			treeIdRun2 = tree->AppendItem(treeIdRun,
-//					project[i].runs[j].runName);
-//
-//			tree->AppendItem(treeIdRun2, _("Stock material"));
-//			tree->AppendItem(treeIdRun2, _("Target"));
-//			treeIdToolpath = tree->AppendItem(treeIdRun2, _("Toolpath"));
-//		}
-//
-//	}
-//
-//	//	for(i = 0; i < doc->geometry.Count(); i++){
-//	//		tid = new TreeItemData;
-//	//		tid->nr = i;
-//	//		tid->dataType = TreeItemData::geometry;
-//	//		tree->AppendItem(treeIdGeometry, doc->geometry[i].objectName, -1, -1,
-//	//				tid);
-//	//	}
-//
-//	tree->ExpandAll();
 }
 

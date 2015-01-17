@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectRename.cpp
+// Name               : CommandRunRemove.h
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 08.01.2015
+// Created            : 17.01.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,26 +24,26 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "commandObjectRename.h"
+#ifndef COMMANDRUNREMOVE_H_
+#define COMMANDRUNREMOVE_H_
 
-commandObjectRename::commandObjectRename(const wxString& name, Project* project,
-		int objectNr, const wxString objectName) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->objectNr = objectNr;
-	this->newName = objectName;
-}
+#include "../project/Project.h"
+#include "../project/Workpiece.h"
 
-bool commandObjectRename::Do(void)
-{
-	this->oldName = project->objects[objectNr].name;
-	project->objects[objectNr].name = this->newName;
-	return true;
-}
+#include <wx/cmdproc.h>
 
-bool commandObjectRename::Undo(void)
-{
-	project->objects[objectNr].name = this->oldName;
-	return true;
-}
+class CommandRunRemove:public wxCommand {
+public:
+	CommandRunRemove(const wxString& name, Project * project, int runNr);
+	virtual ~CommandRunRemove();
+
+	bool Do(void);
+	bool Undo(void);
+
+protected:
+	Project * project;
+	int runNr;
+	Run * run;
+};
+
+#endif /* COMMANDRUNREMOVE_H_ */

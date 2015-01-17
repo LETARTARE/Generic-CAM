@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Stock.h
-// Purpose            :
-// Thread Safe        : Yes
+// Name               : CommandProjectRename.h
+// Purpose            : 
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 03.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 08.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,36 +24,26 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef COMMANDPROJECTRENAME_H_
+#define COMMANDPROJECTRENAME_H_
 
-#ifndef STOCK_H_
-#define STOCK_H_
+#include <wx/cmdproc.h>
+#include <wx/string.h>
 
-#include "StockMaterial.h"
-#include "../3D/AffineTransformMatrix.h"
-#include <wx/filename.h>
+#include "../project/Project.h"
 
-/*!\class Stock
- * \brief ...
- *
- * ...
- */
-
-class Stock {
-	// Constructor / Destructor
+class CommandProjectRename:public wxCommand {
 public:
-	Stock();
-	virtual ~Stock();
-	// Member variables
-public:
-	wxString name;
-	wxFileName fileName;
-	ArrayOfStockMaterial stockMaterials;
+	CommandProjectRename(const wxString& name, Project * project,
+			const wxString projectName);
 
-private:
+	bool Do(void);
+	bool Undo(void);
 
-	// Methods
-public:
-
+protected:
+	Project * project;
+	wxString newName;
+	wxString oldName;
 };
 
-#endif /* STOCK_H_ */
+#endif /* COMMANDPROJECTRENAME_H_ */

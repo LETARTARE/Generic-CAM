@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : Workpiece.h
-// Purpose            : The workpiece.
+// Purpose            : The workpiece
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -22,11 +22,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: 2011-07-20 23:54:54 +0200 (Mi, 20 Jul 2011) $
-//$Revision: 76 $
-//$LastChangedBy: tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #ifndef WORKPIECE_H_
 #define WORKPIECE_H_
@@ -35,19 +31,23 @@
 #include "../project/StockMaterial.h"
 #include "../generator/Imprinter.h"
 
-class Workpiece:public Imprinter {
+#include <wx/dynarray.h>
+
+#include "ObjectPlacement.h"
+
+class Workpiece {
 	// Constructor / Destructor
 public:
-	Workpiece(const double sizeX = 0.1, const double sizeY = 0.1,
-			const double sizeZ = 0.05, const double resolutionX = 0.001,
-			const double resolutionY = 0.001);
-	Workpiece(StockMaterial* material, const double resolution = 0.001);
-
+	Workpiece();
+	Workpiece(StockMaterial* material);
 	virtual ~Workpiece();
 
 	// Member variables
 public:
+	wxString name;
+	bool selected;
 
+	ArrayOfObjectPlacement placements;
 
 	// Methods
 public:
@@ -58,5 +58,7 @@ public:
 			const double resolutionX = 0.001, const double resolutionY = 0.001);
 	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c);
 };
+
+WX_DECLARE_OBJARRAY(Workpiece, ArrayOfWorkpiece);
 
 #endif /* WORKPIECE_H_ */

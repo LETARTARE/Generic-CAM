@@ -22,16 +22,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
 
 #ifndef TPGENERATORTEST_H_
 #define TPGENERATORTEST_H_
 
-#include "../project/Target.h"
+#include "DexelTarget.h"
 #include "../3D/Polygon3.h"
 #include "../machine/Tool.h"
 /*!\class TPGeneratorTest
@@ -59,7 +56,7 @@ public:
 	//Methods:
 public:
 
-	void GenerateToolpath(Target &target, Tool &tool);
+	void GenerateToolpath(DexelTarget &target, Tool &tool);
 
 };
 

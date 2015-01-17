@@ -27,9 +27,7 @@
 #include "GenericCAM.h"
 #include "languages.h"
 
-#ifndef __WIN32__
-#include "icon/logo.xpm"
-#endif
+
 
 // The line that starts it all.
 IMPLEMENT_APP(GenericCAMApp)
@@ -107,11 +105,6 @@ bool GenericCAMApp::OnInit()
 
 	}
 
-	//TODO: Check, why the icon is not working under Windows / Code::Blocks.
-#ifndef __WIN32__
-	wxIcon iconLogo(logo_xpm);
-	frame->SetIcon(iconLogo);
-#endif
 	frame->Show(true);
 	SetTopWindow(frame);
 

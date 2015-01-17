@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectRename.h
+// Name               : DialogMachineDebugger.h
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 08.01.2015
+// Created            : 13.01.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,27 +24,43 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDOBJECTRENAME_H_
-#define COMMANDOBJECTRENAME_H_
-
-#include <wx/cmdproc.h>
-#include <wx/string.h>
+#ifndef DIALOGMACHINEDEBUGGER_H_
+#define DIALOGMACHINEDEBUGGER_H_
 
 #include "../project/Project.h"
+#include "DialogMachineControl.h"
+#include "DisplaySettings.h"
+#include "gui.h"
 
-class commandObjectRename:public wxCommand {
+/*!\class DialogMachineDebugger
+ * \brief ...
+ *
+ * ...
+ */
+
+class DialogMachineDebugger:public GUIMachineDebugger {
 public:
-	commandObjectRename(const wxString& name, Project * project, int objectNr,
-			const wxString objectName);
+	DialogMachineDebugger(wxWindow * parent, Project * project,
+			DisplaySettings * settings);
 
-	bool Do(void);
-	bool Undo(void);
+	Project* project;
+	DisplaySettings * settings;
+
+	bool TransferDataToWindow(void);
+	bool TransferDataFromWindow(void);
+
+private:
+
+	DialogMachineControl * machineControl;
 
 protected:
-	Project * project;
-	int objectNr;
-	wxString newName;
-	wxString oldName;
+
+	void OnClose(wxCloseEvent& event);
+	void OnClose(wxCommandEvent& event);
+	void OnMachineRestart(wxCommandEvent& event);
+	void OnShowController(wxCommandEvent& event);
+	void OnRestart(wxCommandEvent& event);
+
 };
 
-#endif /* COMMANDOBJECTRENAME_H_ */
+#endif /* DIALOGMACHINEDEBUGGER_H_ */

@@ -29,7 +29,7 @@
 #include "IDs.h"
 #include <wx/event.h>
 
-#include "../command/commandObjectTransform.h"
+#include "../command/CommandObjectTransform.h"
 
 DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent,
 		Project * project, wxCommandProcessor * commandProcessor,
@@ -204,7 +204,7 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 
 	AffineTransformMatrix newMatrix;
 	wxString description; // of the command executed (for the Undo/Redo menu)
-	commandObjectTransform * command;
+	CommandObjectTransform * command;
 
 	size_t n;
 	double scale;
@@ -400,7 +400,7 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 
 		if(!description.IsEmpty()){
 
-			command = new commandObjectTransform(description, project, n, flipX,
+			command = new CommandObjectTransform(description, project, n, flipX,
 					flipY, flipZ, flipNormals, newMatrix);
 			commandProcessor->Submit(command);
 		}else{

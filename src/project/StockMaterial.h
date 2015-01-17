@@ -24,7 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef STOCKMATERIAL_H_
 #define STOCKMATERIAL_H_
 
@@ -49,12 +48,14 @@ public:
 
 	// Member variables
 public:
+
 	AffineTransformMatrix matrix;
 	Vector3 color;
 
-	wxString materialName;
+	bool available; ///> Available in workshop
+	wxString name;
 	float sx, sy, sz;
-	float maxSpeed;
+	float maxToolSpeed;
 	float maxFeedrate;
 	float thermalConductivity;
 	float ignitionTemperature;

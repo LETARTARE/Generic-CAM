@@ -67,6 +67,19 @@ wxString Unit::GetSIName(void)
 	return SIName;
 }
 
+wxString Unit::TextFromSIWithUnit(const double value,
+		unsigned int digitsAfterComma)
+{
+	wxString temp = wxString::Format(_T("%%.%uf "), digitsAfterComma);
+	return wxString::Format(temp, FromSI(value)) + otherName;
+}
+
+wxString Unit::TextFromSI(const double value, unsigned int digitsAfterComma)
+{
+	wxString temp = wxString::Format(_T("%%.%uf "), digitsAfterComma);
+	return wxString::Format(temp, FromSI(value));
+}
+
 wxString Unit::GetOtherName(void)
 {
 	return otherName;

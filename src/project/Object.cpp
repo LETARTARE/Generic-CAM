@@ -26,7 +26,7 @@
 
 #include "Object.h"
 
-#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+#include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfObject)
 
 #include <wx/log.h>
@@ -125,6 +125,10 @@ bool Object::ReloadObject(void)
 				g.CopyFrom(temp.geometry[i]);
 				//TODO: Remove the calculation of normals.
 				g.CalculateNormals();
+				if(g.objectName.IsEmpty()){
+					g.objectName = fileName.GetName()
+							+ wxString::Format(_T(" - %u"), i);
+				}
 				geometries.Add(g);
 			}
 			if(!temp.error.IsEmpty()) wxLogMessage(temp.error);

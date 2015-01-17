@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandProjectRename.cpp
+// Name               : CommandObjectLoad.h
 // Purpose            : 
-// Thread Safe        : No
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 08.01.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 29.12.2014
+// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,25 +24,24 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "commandProjectRename.h"
+#ifndef COMMANDOBJECTLOAD_H_
+#define COMMANDOBJECTLOAD_H_
 
-commandProjectRename::commandProjectRename(const wxString& name,
-		Project* project, const wxString projectName) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->newName = projectName;
-}
+#include <wx/cmdproc.h>
 
-bool commandProjectRename::Do(void)
-{
-	this->oldName = project->name;
-	project->name = this->newName;
-	return true;
-}
+#include "../project/Project.h"
 
-bool commandProjectRename::Undo(void)
-{
-	project->name = this->oldName;
-	return true;
-}
+class CommandObjectLoad:public wxCommand {
+public:
+	CommandObjectLoad(const wxString& name, Project * project,
+			const wxString& fileName);
+
+	bool Do(void);
+	bool Undo(void);
+
+protected:
+	Project * project;
+	wxString fileName;
+};
+
+#endif /* COMMANDOBJECTLOAD_H_ */

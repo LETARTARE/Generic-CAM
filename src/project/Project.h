@@ -28,12 +28,11 @@
 #define PROJECT_H_
 
 #include "Object.h"
+#include "StockFile.h"
+#include "Workpiece.h"
 #include "Run.h"
-#include "Stock.h"
-#include "Target.h"
 #include "Toolbox.h"
 #include "ToolPath.h"
-#include "Workpiece.h"
 
 #include "../3D/OctreeGenerator.h"
 #include "../3D/Quadtree.h"
@@ -49,12 +48,13 @@
  * \brief Holds the data for an project.
  *
  * An GenericCAM project consists of
- * - a machine (with setup)
- * - a toolbox for the machine (at least one tool)
- * - one more objects (may be modified, sliced, inverted into mold forms, ect.)
+ * - one or more objects (may be modified, sliced, inverted into mold forms, ect.)
  * - one or more pieces of stock material
- * - toolpath generators
- * - generated toolpaths
+ * - one or more run
+ *    - a machine (with setup)
+ *    - a toolbox for the machine (at least one tool)
+ *    - toolpath generators
+ *    - generated toolpaths
  *
  */
 
@@ -69,11 +69,9 @@ public:
 	wxString name;
 
 	ArrayOfObject objects;
-
-	Machine machine;
-
-	Toolbox toolbox;
-	Stock stock;
+	StockFile stock;
+	ArrayOfWorkpiece workpieces;
+	ArrayOfRun run;
 
 	OctreeGenerator octree;
 	Quadtree quadtree;
@@ -82,9 +80,6 @@ public:
 	size_t activeStock;
 	size_t activeTarget;
 	size_t activeRun;
-
-	ArrayOfTarget targets;
-	ArrayOfRun runs;
 
 	bool modified;
 
@@ -119,8 +114,6 @@ public:
 	void Clear(void);
 	bool Load(wxFileName fileName);
 	bool Save(wxFileName fileName);
-
-
 
 	void Paint(void);
 

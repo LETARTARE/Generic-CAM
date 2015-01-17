@@ -26,10 +26,10 @@
 
 #include "DialogAnimation.h"
 
-DialogAnimation::DialogAnimation(wxWindow* parent) :
+DialogAnimation::DialogAnimation(wxWindow* parent, Project * project) :
 		GUIAnimation(parent)
 {
-	linkedProject = NULL;
+	this->project = project;
 }
 
 DialogAnimation::~DialogAnimation()
@@ -37,15 +37,10 @@ DialogAnimation::~DialogAnimation()
 	return;
 }
 
-void DialogAnimation::InsertProject(Project *project)
-{
-	linkedProject = project;
-	TransferDataToWindow();
-}
-
 void DialogAnimation::OnClose(wxCommandEvent &event)
 {
-	Close();
+	TransferDataFromWindow();
+	this->Show(false);
 }
 
 bool DialogAnimation::TransferDataToWindow(void)

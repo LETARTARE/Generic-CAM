@@ -312,6 +312,67 @@ read: "How to make chocolate Easter bunnies."
 
 \end_layout
 
+\begin_layout Subsection
+Prepare Workpiece
+\end_layout
+
+\begin_layout Standard
+Setup the material the object is machined into.
+ 
+\end_layout
+
+\begin_layout Standard
+Caution:
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset Box Doublebox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "80col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+The toolpath generator assumes that outside of the stock material is empty,
+ free space.
+ If the stock material is to small in size, it may happen that toolpath
+ are generated, that approach the stock from the side at high speeds.
+ This may result in broken drills and mills.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Select Stockpiece
+\end_layout
+
+\begin_layout Standard
+At first a piece of stock material is selected.
+\end_layout
+
+\begin_layout Subsubsection
+Select Objects
+\end_layout
+
+\begin_layout Standard
+Selects which objects are milled in this piece of material.
+ Different parts of an object may be machined into dfferent pieces of stock
+ material.
+ The selected parts are spread across the stock material.
+\end_layout
+
 \begin_layout Subsubsection
 Add Extra Objects
 \end_layout
@@ -328,41 +389,16 @@ For example this is used to add dowel holes into the stock material and
  over and machining the back of an object.
 \end_layout
 
-\begin_layout Subsection
-Define a Machine Run
-\end_layout
-
-\begin_layout Subsubsection
-Load Machine Description
+\begin_layout Paragraph
+Supports
 \end_layout
 
 \begin_layout Standard
-This one is optional.
- 
+To keep a workpiece from moving around freely, support structures are added
+ to the workpiece.
 \end_layout
 
-\begin_layout Subsubsection
-Prepare Stock Material
-\end_layout
-
-\begin_layout Standard
-Setup the material the material the object is machined into.
- 
-\end_layout
-
-\begin_layout Standard
-Caution:
-\end_layout
-
-\begin_layout Standard
-The toolpath generator assumes that outside of the stock material is empty,
- free space.
- If the stock material is to small in size it may happen that toolpath are
- generated, that approach the stock from the side in high speeds.
- This may leed to broken drills and mills.
-\end_layout
-
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Keepout Zones
 \end_layout
 
@@ -372,19 +408,36 @@ Some areas in the stock material may not be milled.
  the clamps are that keep the stock on the machinebed.
 \end_layout
 
+\begin_layout Subsection
+Define a Machine Run
+\end_layout
+
+\begin_layout Standard
+A machine run is one continuous run of a CNC machine.
+ During a run the machine may change tools, but the machine and the workpiece
+ are fixed.
+\end_layout
+
 \begin_layout Subsubsection
-Select Objects
+Select Workpiece
 \end_layout
 
 \begin_layout Standard
-Selects which objects are milled in this run.
- Different parts of an object may be machined into dfferent pieces of stock
- material.
+Each run gets a workpiece assigned.
+ A workpiece can be assigned to different runs.
+ in every run it can have a different orientation, thus for example the
+ top and bottom of an object can be machined.
+ In the second run, a workpiece starts of with the modifications of the
+ first run, thus hollowed out areas need not be machined again.
+\end_layout
+
+\begin_layout Subsubsection
+Load Machine Description
+\end_layout
+
+\begin_layout Standard
+Load a Lua file with a description of a CNC machine.
  
-\end_layout
-
-\begin_layout Standard
-The selected parts are spread across the stock material.
 \end_layout
 
 \begin_layout Subsubsection
@@ -680,7 +733,7 @@ Thermoplastics
 (I have found no feed coefficient data for different types of wood.)
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Toolpath
 \end_layout
 

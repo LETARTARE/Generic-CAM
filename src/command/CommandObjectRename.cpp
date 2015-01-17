@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandProjectRename.h
+// Name               : CommandObjectRename.cpp
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
@@ -24,26 +24,26 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDPROJECTRENAME_H_
-#define COMMANDPROJECTRENAME_H_
+#include "CommandObjectRename.h"
 
-#include <wx/cmdproc.h>
-#include <wx/string.h>
+CommandObjectRename::CommandObjectRename(const wxString& name, Project* project,
+		int objectNr, const wxString objectName) :
+		wxCommand(true, name)
+{
+	this->project = project;
+	this->objectNr = objectNr;
+	this->newName = objectName;
+}
 
-#include "../project/Project.h"
+bool CommandObjectRename::Do(void)
+{
+	this->oldName = project->objects[objectNr].name;
+	project->objects[objectNr].name = this->newName;
+	return true;
+}
 
-class commandProjectRename:public wxCommand {
-public:
-	commandProjectRename(const wxString& name, Project * project,
-			const wxString projectName);
-
-	bool Do(void);
-	bool Undo(void);
-
-protected:
-	Project * project;
-	wxString newName;
-	wxString oldName;
-};
-
-#endif /* COMMANDPROJECTRENAME_H_ */
+bool CommandObjectRename::Undo(void)
+{
+	project->objects[objectNr].name = this->oldName;
+	return true;
+}

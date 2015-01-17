@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : TargetPlacement.h
-// Purpose            :
-// Thread Safe        : Yes
+// Name               : CommandObjectDelete.h
+// Purpose            : 
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 20.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 08.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,50 +22,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef COMMANDOBJECTDELETE_H_
+#define COMMANDOBJECTDELETE_H_
 
-#ifndef TARGETPLACEMENT_H_
-#define TARGETPLACEMENT_H_
+#include <wx/cmdproc.h>
+#include <wx/string.h>
 
-/*!\class TargetPlacement
- * \brief ...
- *
- * ...
- */
+#include "../project/Project.h"
 
-#include <wx/dynarray.h>
-#include <wx/xml/xml.h>
-
-#include "../generator/Polygon25.h"
-
-class TargetPlacement {
-	// Constructor/ Destructor
+class CommandObjectDelete:public wxCommand {
 public:
-	TargetPlacement();
-	virtual ~TargetPlacement();
-	//Member variables:
-public:
-	AffineTransformMatrix matrix;
-	Polygon25 outLine;
+	CommandObjectDelete(const wxString& name, Project * project, int objectNr);
+	virtual ~CommandObjectDelete();
+	bool Do(void);
+	bool Undo(void);
 
-	bool isFlipped;
-	bool isMovable;
-	bool isKeepout;
-
-	size_t targetNumber;
-
-	//Methods:
-public:
-	void Clear(void);
-
-	void SetKeepout(double x, double y, double sizex, double sizey);
-
-	void Paint(void) const;
+protected:
+	Project * project;
+	int objectNr;
+	Object * object;
 };
-WX_DECLARE_OBJARRAY(TargetPlacement, ArrayOfTargetPlacement)
-;
-#endif /* TARGETPLACEMENT_H_ */
+
+#endif /* COMMANDOBJECTDELETE_H_ */

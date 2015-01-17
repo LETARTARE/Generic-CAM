@@ -22,11 +22,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #include "StockMaterial.h"
 #include <GL/gl.h>
@@ -35,18 +31,19 @@ WX_DEFINE_OBJARRAY(ArrayOfStockMaterial)
 
 StockMaterial::StockMaterial()
 {
-	materialName = _T("Default");
-	sx = 0.626-0.063;
-	sy = 0.435-0.008 - 0.020;
-	sz = 0.0145;
+	name = _T("Default");
 
-	matrix.TranslateGlobal(0.063,0.008,0.0);
+	sx = 0.1;
+	sy = 0.1;
+	sz = 0.1;
 
-	maxSpeed = 10000;
-	maxFeedrate = 0.05;
+	maxToolSpeed = 10000.0 / 60.0;
+	maxFeedrate = 5.0 / 60.0;
 	thermalConductivity = 100;
 	ignitionTemperature = 280 + 273.15;
+
 	color.Set(1.0, 0.8, 0.1);
+	available = false;
 }
 
 StockMaterial::~StockMaterial()

@@ -26,18 +26,32 @@
 
 #include "MainFrame.h"
 
+#include <unistd.h>
+
 #include "DialogAbout.h"
 #include "DialogSetup6DOFController.h"
 #include "DialogSetupUnits.h"
 
 #include "../languages.h"
-#include "../command/commandObjectLoad.h"
-#include "../command/commandObjectTransform.h"
-#include "../command/commandObjectRename.h"
-#include "../command/commandObjectDelete.h"
-#include "../command/commandProjectRename.h"
+#include "../command/CommandProjectRename.h"
+#include "../command/CommandObjectLoad.h"
+#include "../command/CommandObjectDelete.h"
+#include "../command/CommandObjectRename.h"
+#include "../command/CommandObjectTransform.h"
+#include "../command/CommandWorkpieceRename.h"
+#include "../command/CommandWorkpieceRemove.h"
+#include "../command/CommandRunAdd.h"
+#include "../command/CommandRunRename.h"
+#include "../command/CommandRunRemove.h"
 
 #include "IDs.h"
+#include "wx/icon.h"
+#ifndef __WIN32__
+#include "../icon/logo32.xpm"
+#include "../icon/logo48.xpm"
+#include "../icon/logo64.xpm"
+#include "../icon/logo128.xpm"
+#endif
 
 #include <wx/filename.h>
 #include <wx/textfile.h>
@@ -48,11 +62,20 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 		GUIMainFrame(parent)
 {
 
+#ifndef __WIN32__
+	//TODO: Check, why the icon is not working under Windows / Code::Blocks.
+	wxIconBundle logo;
+	logo.AddIcon(wxIcon(logo32_xpm));
+	logo.AddIcon(wxIcon(logo48_xpm));
+	logo.AddIcon(wxIcon(logo64_xpm));
+	logo.AddIcon(wxIcon(logo128_xpm));
+	SetIcons(logo);
+#endif
+
 	logWindow = new wxLogWindow(this, _("Generic CAM - log window"), false,
 			true);
-	logWindow->Show();
 
-	// Setup configuration
+// Setup configuration
 	this->config = config;
 	this->locale = locale;
 
@@ -75,7 +98,7 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	timer.SetOwner(this);
 	this->Connect(wxEVT_TIMER, wxTimerEventHandler(MainFrame::OnTimer), NULL,
 			this);
-	timer.Start(100); // ms
+	timer.Start(1000); // ms
 
 	this->Connect(ID_SELECTOBJECT, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::ObjectSelect));
@@ -95,11 +118,17 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	// Connect the project to the 3D canvas
 	m_canvas->InsertProject(&project);
 
-	objectFrame = new DialogObjectTransformation(this, &project,
+	dialogObjectModification = new DialogObjectTransformation(this, &project,
 			&commandProcessor, &settings);
-	stockFrame = new DialogStockMaterial(this);
-	toolboxFrame = new DialogToolbox(this);
-	animationFrame = new DialogAnimation(this);
+	dialogStockOverview = new DialogStockMaterial(this, &project,
+			&commandProcessor, &settings);
+	dialogStockSetup = new DialogWorkpiece(this, &project, &commandProcessor);
+	dialogRun = new DialogRun(this, &project, &commandProcessor, &settings);
+	dialogDebugger = new DialogMachineDebugger(this, &project, &settings);
+	dialogToolbox = new DialogToolbox(this, &project, &commandProcessor,
+			&settings);
+	dialogAnimation = new DialogAnimation(this, &project);
+
 	tree = new TreeSetup(m_tree, &project);
 
 	TransferDataToWindow();
@@ -145,13 +174,17 @@ bool MainFrame::TransferDataToWindow(void)
 	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
 	m_toolBar->ToggleTool(ID_DISPLAYMACHINE, project.displayMachine);
 	m_toolBar->ToggleTool(ID_DISPLAYMATERIAL, project.displayGeometry);
+	m_menuView->Check(ID_LOGSHOW, logWindow->GetFrame()->IsShown());
 
 	wxString temp = _T("Generic CAM - ");
 	if(commandProcessor.IsDirty()) temp += _T("* ");
 	temp += project.name;
 	this->SetTitle(temp);
 
-	objectFrame->TransferDataToWindow();
+	dialogObjectModification->TransferDataToWindow();
+	dialogStockOverview->TransferDataToWindow();
+	dialogStockSetup->TransferDataToWindow();
+	dialogRun->TransferDataToWindow();
 
 	Refresh();
 	return true;
@@ -171,14 +204,274 @@ void MainFrame::Update(wxCommandEvent& event)
 	TransferDataToWindow();
 }
 
-void MainFrame::OnCreateProject(wxCommandEvent& event)
+size_t MainFrame::GetFreeSystemMemory()
+{
+#ifdef __UNIX__
+	long pages = sysconf(_SC_AVPHYS_PAGES);
+	long page_size = sysconf(_SC_PAGE_SIZE);
+	return pages * page_size;
+#endif
+#ifdef __WIN__
+	MEMORYSTATUSEX status;
+	status.dwLength = sizeof(status);
+	GlobalMemoryStatusEx(&status);
+	//TODO: Change this to available memory.
+	return status.ullTotalPhys;
+#endif
+}
+
+void MainFrame::OnTimer(wxTimerEvent& event)
+{
+//	t += 0.100;
+//	simulator.Step(t);
+//	simulator.machine.Assemble();
+//	this->Refresh();
+
+	wxString temp;
+	temp = wxString::Format(_T("Free RAM: %lu MB"),
+			GetFreeSystemMemory() / 1024 / 1024);
+	m_statusBar->SetStatusText(temp, 1);
+}
+
+void MainFrame::OnKeyDown(wxKeyEvent& event)
+{
+	int k = event.GetKeyCode();
+
+	if(k == WXK_ESCAPE){
+		this->Close();
+	}
+
+// Select placement
+//	if(k == WXK_NUMPAD_ADD
+//			&& selectedTargetPosition
+//					< project.run[0].placements.GetCount() - 1) selectedTargetPosition++;
+//	if(k == WXK_NUMPAD_SUBTRACT && selectedTargetPosition > 0) selectedTargetPosition--;
+
+//	if(selectedTargetPosition
+//			< project.run[0].placements.GetCount()
+//			&& project.run[0].placements[selectedTargetPosition].isMovable){
+//
+//		if(k == WXK_UP) project.run[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
+//				0.0, 0.001, 0.0);
+//		if(k == WXK_DOWN) project.run[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
+//				0.0, -0.001, 0.0);
+//		if(k == WXK_RIGHT) project.run[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
+//				0.001, 0.0, 0.0);
+//		if(k == WXK_LEFT) project.run[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
+//				-0.001, 0.0, 0.0);
+//
+//		if(k == WXK_PAGEUP){
+//			AffineTransformMatrix temp;
+//			temp = AffineTransformMatrix::RotateXYZ(0.0, 0.0, M_PI / 16);
+//			project.run[0].placements[selectedTargetPosition].matrix =
+//					project.run[0].placements[selectedTargetPosition].matrix
+//							* temp;
+//		}
+//		if(k == WXK_PAGEDOWN){
+//			AffineTransformMatrix temp;
+//			temp = AffineTransformMatrix::RotateXYZ(0.0, 0.0, -M_PI / 16);
+//			project.run[0].placements[selectedTargetPosition].matrix =
+//					project.run[0].placements[selectedTargetPosition].matrix
+//							* temp;
+//		}
+//
+//		m_statusBar->SetStatusText(_T("Dummy text..."));
+//
+//		this->Refresh();
+//	}
+
+	event.Skip();
+}
+
+void MainFrame::OnBeginLabelEdit(wxTreeEvent& event)
+{
+	wxTreeItemId id = event.GetItem();
+	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
+
+	if(data->dataType == itemProject) return;
+	if(data->dataType == itemObject) return;
+	if(data->dataType == itemWorkpiece) return;
+	if(data->dataType == itemRun) return;
+
+	// Stop editing, if it cannot be changed.
+	event.Veto();
+}
+
+void MainFrame::OnEndLabelEdit(wxTreeEvent& event)
+{
+	wxTreeItemId id = event.GetItem();
+	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
+	wxString newName = event.GetLabel();
+	if(newName.IsEmpty()){
+		event.Veto();
+		return;
+	}
+
+	if(data->dataType == itemProject){
+		if(newName == project.name) return;
+		commandProcessor.Submit(
+				new CommandProjectRename(_("Project renamed to ") + newName,
+						&project, newName));
+		TransferDataToWindow();
+		return;
+	};
+
+	if(data->dataType == itemObject){
+		if(newName == project.objects[data->nr].name) return;
+		commandProcessor.Submit(
+				new CommandObjectRename(_("Object renamed to ") + newName,
+						&project, data->nr, newName));
+		TransferDataToWindow();
+		return;
+	};
+
+	if(data->dataType == itemWorkpiece){
+		if(newName == project.workpieces[data->nr].name) return;
+		commandProcessor.Submit(
+				new CommandWorkpieceRename(_("Workpiece renamed to ") + newName,
+						&project, data->nr, newName));
+		TransferDataToWindow();
+		return;
+	};
+
+	if(data->dataType == itemRun){
+		if(newName == project.run[data->nr].name) return;
+		commandProcessor.Submit(
+				new CommandRunRename(_("Run renamed to ") + newName, &project,
+						data->nr, newName));
+		TransferDataToWindow();
+		return;
+	};
+
+	event.Veto();
+}
+
+void MainFrame::OnActivateRightClickMenu(wxTreeEvent& event)
+{
+	wxTreeItemId id = event.GetItem();
+	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
+
+	wxMenu menu(_T(""));
+
+	if(data->dataType == itemProject){
+		menu.Append(ID_PROJECTRENAME, wxT("&Rename Project"));
+		menu.AppendSeparator();
+		menu.Append(wxID_OPEN, wxT("&Load Project"));
+		menu.Append(wxID_SAVE, wxT("&Save Project"));
+		menu.Append(wxID_SAVEAS, wxT("&Load Project As ..."));
+	}
+
+	if(data->dataType == itemGroupObject){
+		menu.Append(ID_OBJECTLOAD, wxT("&Load Object"));
+		menu.Append(ID_OBJECTMODIFY, wxT("&Show Object Dialog"));
+	}
+
+	if(data->dataType == itemObject){
+		menu.Append(ID_OBJECTMODIFY, wxT("&Modify Object"));
+		menu.Append(ID_OBJECTFLIPNORMALS, wxT("&Flip Normals"));
+		menu.Append(ID_OBJECTRENAME, wxT("&Rename Object"));
+		menu.Append(ID_OBJECTDELETE, wxT("&Delete Object"));
+		menu.Append(ID_OBJECTLOAD, wxT("&Load Object"));
+	}
+
+	if(data->dataType == itemGroupWorkpiece){
+		menu.Append(ID_STOCKORGANIZE, wxT("&Organize Stock"));
+		menu.Append(ID_WORKPIECEADD, wxT("&Add Workpiece"));
+		menu.Append(ID_WORKPIECEDELETEUNUSED, wxT("Delete &unused Workpieces"));
+	}
+	if(data->dataType == itemWorkpiece){
+		menu.Append(ID_WORKPIECEADD, wxT("&Add Workpiece"));
+		menu.Append(ID_WORKPIECEDELETE, wxT("&Delete Workpiece"));
+		menu.Append(ID_WORKPIECEDELETEUNUSED, wxT("Delete &unused Workpieces"));
+	}
+
+	if(data->dataType == itemGroupRun){
+		menu.Append(ID_RUNADD, wxT("&Add Run"));
+		menu.Append(ID_RUNEDIT, wxT("&Setup Run"));
+	}
+
+	if(data->dataType == itemRun){
+		menu.Append(ID_RUNADD, wxT("&Add Run"));
+		menu.Append(ID_RUNEDIT, wxT("&Setup Run"));
+		menu.Append(ID_RUNDELETE, wxT("&Delete Run"));
+	}
+
+	if(menu.GetMenuItemCount() > 0) PopupMenu(&menu, event.GetPoint());
+}
+
+void MainFrame::OnActivate(wxTreeEvent& event)
+{
+	wxTreeItemId id = event.GetItem();
+	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
+
+	if(data->dataType == itemGroupObject){
+		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, ID_OBJECTLOAD);
+		ProcessEvent(menuEvent);
+	}
+	if(data->dataType == itemObject){
+		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED,
+		ID_OBJECTMODIFY);
+		ProcessEvent(menuEvent);
+	}
+	if(data->dataType == itemGroupWorkpiece){
+		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, ID_WORKPIECEADD);
+		ProcessEvent(menuEvent);
+	}
+	if(data->dataType == itemGroupRun){
+		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, ID_RUNEDIT);
+		ProcessEvent(menuEvent);
+	}
+}
+
+void MainFrame::ObjectSelect(wxCommandEvent& event)
+{
+	size_t id = event.GetInt();
+	size_t n;
+	for(n = 0; n < project.objects.GetCount(); n++)
+		project.objects[n].selected = (n == id);
+
+	tree->UpdateSelection();
+	Refresh();
+}
+
+void MainFrame::OnSelectionChanged(wxTreeEvent& event)
+{
+	wxTreeItemId id = event.GetItem();
+	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
+	tree->UpdateVariables();
+
+	if(data->dataType == itemObject){
+		dialogObjectModification->TransferDataToWindow();
+	}
+
+}
+
+void MainFrame::OnSelectionChanging(wxTreeEvent& event)
+{
+	wxTreeItemId id = event.GetItem();
+	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
+	if(data->dataType == itemProject) return;
+	if(data->dataType == itemObject) return;
+	if(data->dataType == itemWorkpiece) return;
+	if(data->dataType == itemRun) return;
+
+	event.Veto();
+}
+
+void MainFrame::OnToolbarButton(wxCommandEvent& event)
+{
+	TransferDataFromWindow();
+	TransferDataToWindow();
+}
+
+void MainFrame::OnProjectNew(wxCommandEvent& event)
 {
 //	Project temp;
 //	project.Add(temp);
 	project.Clear();
 	commandProcessor.ClearCommands();
 	commandProcessor.MarkAsSaved();
-
+	commandProcessor.SetMenuStrings();
 	TransferDataToWindow();
 }
 
@@ -190,7 +483,7 @@ void MainFrame::OnProjectRename(wxCommandEvent& event)
 		if(dialog.GetValue().IsEmpty()) return;
 		if(dialog.GetValue() == project.name) return;
 
-		commandProjectRename * command = new commandProjectRename(
+		CommandProjectRename * command = new CommandProjectRename(
 		_("Project renamed to ") + dialog.GetValue(), &project,
 				dialog.GetValue());
 		commandProcessor.Submit(command);
@@ -198,7 +491,7 @@ void MainFrame::OnProjectRename(wxCommandEvent& event)
 	}
 }
 
-void MainFrame::OnLoadProject(wxCommandEvent& event)
+void MainFrame::OnProjectLoad(wxCommandEvent& event)
 {
 	wxFileName fileName;
 	wxFileDialog dialog(this, _("Open Project..."), _T(""), _T(""),
@@ -220,15 +513,15 @@ void MainFrame::LoadProject(wxString fileName)
 	TransferDataToWindow();
 }
 
-void MainFrame::OnSaveProject(wxCommandEvent& event)
+void MainFrame::OnProjectSave(wxCommandEvent& event)
 {
-	if(!project.fileName.IsOk()) OnSaveProjectAs(event);
+	if(!project.fileName.IsOk()) OnProjectSaveAs(event);
 	project.Save(project.fileName);
 	commandProcessor.MarkAsSaved();
 	TransferDataToWindow();
 }
 
-void MainFrame::OnSaveProjectAs(wxCommandEvent &event)
+void MainFrame::OnProjectSaveAs(wxCommandEvent &event)
 {
 	wxFileName fileName;
 	wxFileDialog dialog(this, _("Save Project As..."), _T(""), _T(""),
@@ -287,7 +580,7 @@ void MainFrame::OnObjectLoad(wxCommandEvent& event)
 		for(n = 0; n < paths.GetCount(); n++){
 			fileName = paths[n];
 			commandProcessor.Submit(
-					new commandObjectLoad(
+					new CommandObjectLoad(
 							(_("Load Object: ") + fileName.GetName()),
 							&project, paths[n]));
 			if(n == 0) lastObjectDirectory = fileName.GetPath();
@@ -298,7 +591,7 @@ void MainFrame::OnObjectLoad(wxCommandEvent& event)
 
 void MainFrame::OnObjectModify(wxCommandEvent& event)
 {
-	objectFrame->Show(true);
+	dialogObjectModification->Show(true);
 	TransferDataToWindow();
 }
 
@@ -314,7 +607,7 @@ void MainFrame::OnObjectRename(wxCommandEvent& event)
 		if(dialog.GetValue().IsEmpty()) return;
 		if(dialog.GetValue() == project.objects[i].name) return;
 		commandProcessor.Submit(
-				new commandObjectRename(
+				new CommandObjectRename(
 				_("Object renamed to ") + dialog.GetValue(), &project, i,
 						dialog.GetValue()));
 		TransferDataToWindow();
@@ -324,16 +617,104 @@ void MainFrame::OnObjectRename(wxCommandEvent& event)
 void MainFrame::OnObjectDelete(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
+	tree->UpdateVariables();
 	int i = tree->GetFirstSelectedObject();
 	if(i < 0 || i >= project.objects.GetCount()) return;
 	commandProcessor.Submit(
-			new commandObjectDelete(
+			new CommandObjectDelete(
 			_("Object ") + project.objects[i].name + _(" deleted."),
 					&project, i));
 	TransferDataToWindow();
 }
 
-void MainFrame::OnLoadMachine(wxCommandEvent& event)
+void MainFrame::OnObjectFlipNormals(wxCommandEvent& event)
+{
+	size_t n;
+	for(n = 0; n < project.objects.GetCount(); n++){
+		if(project.objects[n].selected){
+			AffineTransformMatrix matrix = project.objects[n].matrix;
+			CommandObjectTransform * command = new CommandObjectTransform(
+					project.objects[n].name + _(": Flipped normal vectors"),
+					&project, n, false, false, false, true, matrix);
+			commandProcessor.Submit(command);
+		}
+	}
+	TransferDataToWindow();
+}
+
+void MainFrame::OnStockEdit(wxCommandEvent& event)
+{
+	dialogStockOverview->Show(true);
+	dialogStockOverview->Initialize();
+	TransferDataToWindow();
+}
+
+void MainFrame::OnWorkpieceAdd(wxCommandEvent& event)
+{
+	dialogStockSetup->Show(true);
+	TransferDataToWindow();
+}
+
+void MainFrame::OnWorkpieceDelete(wxCommandEvent& event)
+{
+	TransferDataFromWindow();
+	tree->UpdateVariables();
+	size_t i;
+	for(i = project.workpieces.GetCount(); i > 0; i--){
+		if(project.workpieces[i - 1].selected){
+			commandProcessor.Submit(
+					new CommandWorkpieceRemove(
+							_("Remove workpiece ")
+									+ project.workpieces[i - 1].name, &project,
+							i - 1));
+		}
+	}
+	TransferDataToWindow();
+}
+
+void MainFrame::OnWorkpieceDeleteUnused(wxCommandEvent& event)
+{
+	TransferDataFromWindow();
+	size_t i;
+	for(i = project.workpieces.GetCount(); i > 0; i--){
+		if(project.workpieces[i - 1].placements.GetCount() == 0){
+			commandProcessor.Submit(
+					new CommandWorkpieceRemove(
+							_("Remove workpiece ")
+									+ project.workpieces[i - 1].name, &project,
+							i - 1));
+		}
+	}
+	TransferDataToWindow();
+}
+
+void MainFrame::OnRunAdd(wxCommandEvent& event)
+{
+	commandProcessor.Submit(
+			new CommandRunAdd(_("Add run"), &project, _T("Run")));
+	TransferDataToWindow();
+}
+
+void MainFrame::OnRunEdit(wxCommandEvent& event)
+{
+	dialogRun->Show(true);
+	TransferDataToWindow();
+}
+
+void MainFrame::OnRunDelete(wxCommandEvent& event)
+{
+	TransferDataFromWindow();
+	tree->UpdateVariables();
+	size_t i;
+	for(i = project.run.GetCount(); i > 0; i--){
+		if(project.run[i - 1].selected){
+			commandProcessor.Submit(new CommandRunRemove(
+			_("Remove run ") + project.run[i - 1].name, &project, i - 1));
+		}
+	}
+	TransferDataToWindow();
+}
+void MainFrame::OnMachineLoad(wxCommandEvent& event)
 {
 	wxFileDialog dialog(this, _("Open machine description..."), _T(""), _T(""),
 			_(
@@ -341,54 +722,58 @@ void MainFrame::OnLoadMachine(wxCommandEvent& event)
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if(dialog.ShowModal() == wxID_OK){
-		project.machine.Load(dialog.GetPath());
+//		project.machine.Load(dialog.GetPath());
 		project.Assemble();
 
 		//ctrlTextEdit->SetValue(temp);
 		//fname.Assign(dialog.GetPath());
 		//ctrlTextEdit->SetModified(false);
 		//SetWindowTitle();
-		if(!project.machine.textOut.IsEmpty()){
-			//wxLogMessage(_T("Displaying some text in ErrorFrame!"));
-			//TODO: Don't open a new errorframe, if the old one is not closed.
+//		if(!project.machine.textOut.IsEmpty()){
+		//wxLogMessage(_T("Displaying some text in ErrorFrame!"));
+		//TODO: Don't open a new errorframe, if the old one is not closed.
 
-			printf(project.machine.textOut.ToAscii());
+//			printf(project.machine.textOut.ToAscii());
 //			ErrorFrame* error = new ErrorFrame(this);
 //			error->SetText(project.machine.textOut);
 //			error->Show();
-		}
-		TransferDataToWindow();
 	}
+	TransferDataToWindow();
+//}
 }
 
-void MainFrame::OnReloadMachine(wxCommandEvent& event)
+void MainFrame::OnMachineReload(wxCommandEvent& event)
 {
 
-	project.machine.ReLoad();
+//	project.machine.ReLoad();
 	project.Assemble();
 
 //	if(!simulator.machine.fileName.IsOk()) return;
 //	simulator.machine.ReLoad();
-	if(!project.machine.textOut.IsEmpty()){
-		//wxLogMessage(_T("Displaying some text in ErrorFrame!"));
-		//TODO: Don't open a new errorframe, if the old one is not closed.
-		printf(project.machine.textOut.ToAscii());
+//	if(!project.machine.textOut.IsEmpty()){
+//wxLogMessage(_T("Displaying some text in ErrorFrame!"));
+//TODO: Don't open a new errorframe, if the old one is not closed.
+//		printf(project.machine.textOut.ToAscii());
 //		ErrorFrame* error = new ErrorFrame(this);
 //		error->SetText(project.machine.textOut);
 //		error->Show();
-	}
+//	}
 //	t = 0;
 	TransferDataToWindow();
 }
 
-void MainFrame::OnEditToolbox(wxCommandEvent& event)
+void MainFrame::OnMachineDebugger(wxCommandEvent& event)
 {
-	toolboxFrame->SetController(control);
-	toolboxFrame->InsertProject(&(project));
-	toolboxFrame->Show(true);
+	dialogDebugger->Show(true);
 }
 
-void MainFrame::OnLoadToolbox(wxCommandEvent& event)
+void MainFrame::OnToolboxEdit(wxCommandEvent& event)
+{
+	dialogToolbox->Show(true);
+	TransferDataToWindow();
+}
+
+void MainFrame::OnToolboxLoad(wxCommandEvent& event)
 {
 	wxFileDialog dialog(this, _("Open toolbox..."), _T(""), _T(""),
 			_("Toolbox (*.xml)|*.xml|All files|*.*"),
@@ -408,7 +793,7 @@ void MainFrame::OnLoadToolbox(wxCommandEvent& event)
 //	}
 }
 
-void MainFrame::OnSaveToolbox(wxCommandEvent &event)
+void MainFrame::OnToolboxSave(wxCommandEvent &event)
 {
 
 //TODO: Build something like this in this snippet.
@@ -446,11 +831,10 @@ void MainFrame::OnSaveToolbox(wxCommandEvent &event)
 	}
 }
 
-void MainFrame::OnEditStock(wxCommandEvent& event)
+void MainFrame::OnAddGenerator(wxCommandEvent& event)
 {
-	stockFrame->InsertProject(&(project));
-	stockFrame->Show(true);
 }
+
 void MainFrame::OnGenerateToolpath(wxCommandEvent& event)
 {
 	project.GenerateToolPath();
@@ -511,7 +895,7 @@ void MainFrame::OnSaveGCodes(wxCommandEvent &event)
 		}else
 			f.Create(fname.GetFullPath());
 
-		project.runs[0].WriteToFile(f);
+		project.run[0].WriteToFile(f);
 		f.Write();
 		f.Close();
 		TransferDataToWindow();
@@ -555,8 +939,30 @@ void MainFrame::OnSetupUnits(wxCommandEvent& event)
 
 void MainFrame::OnShowAnimationControl(wxCommandEvent& event)
 {
-	animationFrame->InsertProject(&project);
-	animationFrame->Show(true);
+	dialogAnimation->Show(true);
+	TransferDataToWindow();
+}
+
+void MainFrame::OnExtraWindowClose(wxCommandEvent& event)
+{
+	dialogObjectModification->Show(false);
+	dialogStockOverview->Show(false);
+	dialogStockSetup->Show(false);
+	dialogRun->Show(false);
+	dialogDebugger->Show(false);
+	dialogToolbox->Show(false);
+	dialogAnimation->Show(false);
+	TransferDataToWindow();
+}
+
+void MainFrame::OnShowLogWindow(wxCommandEvent& event)
+{
+	logWindow->Show(!(logWindow->GetFrame()->IsShown()));
+	TransferDataToWindow();
+}
+
+void MainFrame::OnViewSet(wxCommandEvent& event)
+{
 }
 
 void MainFrame::OnAbout(wxCommandEvent& event)
@@ -565,193 +971,3 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 	dialog->Show();
 }
 
-void MainFrame::OnTimer(wxTimerEvent& event)
-{
-//	t += 0.100;
-//	simulator.Step(t);
-//	simulator.machine.Assemble();
-//this->Refresh();
-}
-
-void MainFrame::OnKeyDown(wxKeyEvent& event)
-{
-	int k = event.GetKeyCode();
-
-	if(k == WXK_ESCAPE){
-		this->Close();
-	}
-
-// Select placement
-	if(k == WXK_NUMPAD_ADD
-			&& selectedTargetPosition
-					< project.runs[0].placements.GetCount() - 1) selectedTargetPosition++;
-	if(k == WXK_NUMPAD_SUBTRACT && selectedTargetPosition > 0) selectedTargetPosition--;
-
-//	if(selectedTargetPosition
-//			< project.runs[0].placements.GetCount()
-//			&& project.runs[0].placements[selectedTargetPosition].isMovable){
-//
-//		if(k == WXK_UP) project.runs[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
-//				0.0, 0.001, 0.0);
-//		if(k == WXK_DOWN) project.runs[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
-//				0.0, -0.001, 0.0);
-//		if(k == WXK_RIGHT) project.runs[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
-//				0.001, 0.0, 0.0);
-//		if(k == WXK_LEFT) project.runs[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
-//				-0.001, 0.0, 0.0);
-//
-//		if(k == WXK_PAGEUP){
-//			AffineTransformMatrix temp;
-//			temp = AffineTransformMatrix::RotateXYZ(0.0, 0.0, M_PI / 16);
-//			project.runs[0].placements[selectedTargetPosition].matrix =
-//					project.runs[0].placements[selectedTargetPosition].matrix
-//							* temp;
-//		}
-//		if(k == WXK_PAGEDOWN){
-//			AffineTransformMatrix temp;
-//			temp = AffineTransformMatrix::RotateXYZ(0.0, 0.0, -M_PI / 16);
-//			project.runs[0].placements[selectedTargetPosition].matrix =
-//					project.runs[0].placements[selectedTargetPosition].matrix
-//							* temp;
-//		}
-//
-//		m_statusBar->SetStatusText(_T("Dummy text..."));
-//
-//		this->Refresh();
-//	}
-
-	event.Skip();
-}
-
-void MainFrame::OnBeginLabelEdit(wxTreeEvent& event)
-{
-	wxTreeItemId id = event.GetItem();
-	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
-
-	if(data->dataType == itemProject) return;
-	if(data->dataType == itemObject) return;
-
-	// Stop editing, if it cannot be changed.
-	event.Veto();
-}
-
-void MainFrame::OnEndLabelEdit(wxTreeEvent& event)
-{
-	wxTreeItemId id = event.GetItem();
-	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
-	wxString newName = event.GetLabel();
-	if(newName.IsEmpty()){
-		event.Veto();
-		return;
-	}
-
-	if(data->dataType == itemProject){
-		if(newName == project.name) return;
-		commandProcessor.Submit(
-				new commandProjectRename(_("Project renamed to ") + newName,
-						&project, newName));
-		TransferDataToWindow();
-		return;
-	};
-
-	if(data->dataType == itemObject){
-		if(newName == project.objects[data->nr].name) return;
-		commandProcessor.Submit(
-				new commandObjectRename(_("Object renamed to ") + newName,
-						&project, data->nr, newName));
-		TransferDataToWindow();
-		return;
-	};
-
-	event.Veto();
-}
-
-void MainFrame::OnActivateRightClickMenu(wxTreeEvent& event)
-{
-	wxTreeItemId id = event.GetItem();
-	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
-
-	wxMenu menu(_T(""));
-
-	if(data->dataType == itemProject){
-		menu.Append(ID_PROJECTRENAME, wxT("&Rename Project"));
-		menu.AppendSeparator();
-		menu.Append(wxID_OPEN, wxT("&Load Project"));
-		menu.Append(wxID_SAVE, wxT("&Save Project"));
-		menu.Append(wxID_SAVEAS, wxT("&Load Project As ..."));
-	}
-
-	if(data->dataType == itemGroupObject){
-		menu.Append(ID_OBJECTLOAD, wxT("&Load Object"));
-		menu.Append(ID_OBJECTMODIFY, wxT("&Show Object Dialog"));
-	}
-
-	if(data->dataType == itemObject){
-		menu.Append(ID_OBJECTMODIFY, wxT("&Modify Object"));
-		menu.Append(ID_OBJECTFLIPNORMALS, wxT("&Flip Normals"));
-		menu.Append(ID_OBJECTRENAME, wxT("&Rename Object"));
-		menu.Append(ID_OBJECTDELETE, wxT("&Delete Object"));
-		menu.Append(ID_OBJECTLOAD, wxT("&Load Object"));
-	}
-
-	if(menu.GetMenuItemCount() > 0) PopupMenu(&menu, event.GetPoint());
-}
-
-void MainFrame::OnActivate(wxTreeEvent& event)
-{
-	wxTreeItemId id = event.GetItem();
-	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
-
-	if(data->dataType == itemGroupObject){
-		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, ID_OBJECTLOAD);
-		ProcessEvent(menuEvent);
-	}
-	if(data->dataType == itemObject){
-		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED,
-		ID_OBJECTMODIFY);
-		ProcessEvent(menuEvent);
-	}
-}
-
-void MainFrame::ObjectSelect(wxCommandEvent& event)
-{
-	size_t id = event.GetInt();
-	size_t n;
-	for(n = 0; n < project.objects.GetCount(); n++)
-		project.objects[n].selected = (n == id);
-
-	tree->UpdateSelection();
-	Refresh();
-}
-
-void MainFrame::OnSelectionChanged(wxTreeEvent& event)
-{
-	wxTreeItemId id = event.GetItem();
-	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
-
-	if(data->dataType == itemObject){
-		tree->UpdateVariables();
-		objectFrame->TransferDataToWindow();
-	}
-}
-
-void MainFrame::OnObjectFlipNormals(wxCommandEvent& event)
-{
-	size_t n;
-	for(n = 0; n < project.objects.GetCount(); n++){
-		if(project.objects[n].selected){
-			AffineTransformMatrix matrix = project.objects[n].matrix;
-			commandObjectTransform * command = new commandObjectTransform(
-					project.objects[n].name + _(": Flipped normal vectors"),
-					&project, n, false, false, false, true, matrix);
-			commandProcessor.Submit(command);
-		}
-	}
-	TransferDataToWindow();
-}
-
-void MainFrame::OnToolbarButton(wxCommandEvent& event)
-{
-	TransferDataFromWindow();
-	TransferDataToWindow();
-}

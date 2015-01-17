@@ -24,23 +24,28 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef TOOLBOXFRAME_H_
 #define TOOLBOXFRAME_H_
 
+#include <wx/cmdproc.h>
+
 #include "gui.h"
 #include "../project/Project.h"
+#include "DisplaySettings.h"
 
 class DialogToolbox:public GUIToolbox {
 	// Constructor/ Destructor
 
 public:
-	DialogToolbox(wxWindow* parent);
+	DialogToolbox(wxWindow* parent, Project * project,
+			wxCommandProcessor * commandProcessor, DisplaySettings * settings);
 	virtual ~DialogToolbox();
 
 	// Member Variables
 
-	Project * linkedProject;
+	Project* project;
+	wxCommandProcessor * commandProcessor;
+	DisplaySettings * settings;
 
 	unsigned int selectedTool;
 	unsigned int selectedElement;
@@ -57,16 +62,13 @@ public:
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 
-
-	void OnNewTool( wxCommandEvent& event ) ;
-	void OnUpdateTool( wxCommandEvent& event ) ;
-	void OnDeleteTool( wxCommandEvent& event ) ;
-	void OnShapeNew( wxCommandEvent& event ) ;
-	void OnShapeUpdate( wxCommandEvent& event ) ;
-	void OnShapeDelete( wxCommandEvent& event ) ;
-	void OnShapeSelect( wxListEvent& event ) ;
-
-
+	void OnNewTool(wxCommandEvent& event);
+	void OnUpdateTool(wxCommandEvent& event);
+	void OnDeleteTool(wxCommandEvent& event);
+	void OnShapeNew(wxCommandEvent& event);
+	void OnShapeUpdate(wxCommandEvent& event);
+	void OnShapeDelete(wxCommandEvent& event);
+	void OnShapeSelect(wxListEvent& event);
 
 };
 

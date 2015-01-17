@@ -34,7 +34,7 @@ DialogSetupUnits::DialogSetupUnits(wxWindow* parent, DisplaySettings * settings)
 
 	// Setup available units
 
-	factorofLength = new double[6];
+	factorofLength = new double[7];
 	unitsOfLength.Add(_T("um"));
 	factorofLength[0] = 1e-6; // m
 	unitsOfLength.Add(_T("mil"));
@@ -43,36 +43,46 @@ DialogSetupUnits::DialogSetupUnits(wxWindow* parent, DisplaySettings * settings)
 	factorofLength[2] = 1e-3; // m
 	unitsOfLength.Add(_T("cm"));
 	factorofLength[3] = 10e-3; // m
-	unitsOfLength.Add(_T("inch"));
+	unitsOfLength.Add(_T("in"));
 	factorofLength[4] = 25.4e-3; // m
+	unitsOfLength.Add(_T("ft"));
+	factorofLength[5] = 12 * 25.4e-3; // m
 	unitsOfLength.Add(_T("m"));
-	factorofLength[5] = 1; // m
+	factorofLength[6] = 1; // m
 
-	factorofSpeedLinear = new double[8];
+	factorofSpeedLinear = new double[12];
 	unitsOfSpeedLinear.Add(_T("mm/s"));
 	factorofSpeedLinear[0] = 1e-3; // m/s
 	unitsOfSpeedLinear.Add(_T("cm/s"));
 	factorofSpeedLinear[1] = 10e-3; // m/s
-	unitsOfSpeedLinear.Add(_T("inch/s"));
+	unitsOfSpeedLinear.Add(_T("in/s"));
 	factorofSpeedLinear[2] = 25.4e-3; // m/s
+	unitsOfSpeedLinear.Add(_T("ft/s"));
+	factorofSpeedLinear[3] = 12.0 * 25.4e-3; // m/s
 	unitsOfSpeedLinear.Add(_T("m/s"));
-	factorofSpeedLinear[3] = 1; // m/s
+	factorofSpeedLinear[4] = 1; // m/s
+	unitsOfSpeedLinear.Add(_T("mm/min"));
+	factorofSpeedLinear[5] = 1.0e-3 / 60; // m/s
+	unitsOfSpeedLinear.Add(_T("cm/min"));
+	factorofSpeedLinear[6] = 10.0e-3 / 60; // m/s
+	unitsOfSpeedLinear.Add(_T("in/min"));
+	factorofSpeedLinear[7] = 25.4e-3 / 60; // m/s
+	unitsOfSpeedLinear.Add(_T("ft/min"));
+	factorofSpeedLinear[8] = 12.0 * 25.4e-3 / 60; // m/s
 	unitsOfSpeedLinear.Add(_T("m/min"));
-	factorofSpeedLinear[4] = 1 / 60; // m/s
-	unitsOfSpeedLinear.Add(_T("inch/min"));
-	factorofSpeedLinear[5] = 25.4e-3 / 60; // m/s
+	factorofSpeedLinear[9] = 1.0 / 60; // m/s
 	unitsOfSpeedLinear.Add(_T("km/h"));
-	factorofSpeedLinear[6] = 1000 / 3600; // m/s
+	factorofSpeedLinear[10] = 1000.0 / 3600; // m/s
 	unitsOfSpeedLinear.Add(_T("mph"));
-	factorofSpeedLinear[7] = 0.44704; // m/s (per definition)
+	factorofSpeedLinear[11] = 0.44704; // m/s (per definition)
 
 	factorofSpeedRotational = new double[3];
 	unitsOfSpeedRotational.Add(_T("1/s"));
 	factorofSpeedRotational[0] = 1; // 1/s
 	unitsOfSpeedRotational.Add(_T("1/min"));
-	factorofSpeedRotational[1] = 1 / 60; // 1/s
+	factorofSpeedRotational[1] = 1.0 / 60; // 1/s
 	unitsOfSpeedRotational.Add(_T("rpm"));
-	factorofSpeedRotational[2] = 1 / 60; // 1/s
+	factorofSpeedRotational[2] = 1.0 / 60; // 1/s
 
 	factorofTime = new double[4];
 	unitsOfTime.Add(_T("s"));

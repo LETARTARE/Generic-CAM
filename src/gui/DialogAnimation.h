@@ -32,19 +32,19 @@
 class DialogAnimation:public GUIAnimation {
 	// Constructor/ Destructor
 public:
-	DialogAnimation(wxWindow* parent);
+	DialogAnimation(wxWindow* parent,
+			Project * project);
 	virtual ~DialogAnimation();
 
 	// Member Variables
 public:
-	Project* linkedProject;
+	Project* project;
 
 	// Methods
 public:
-	void InsertProject(Project *project);
-
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
+
 	void OnClose(wxCommandEvent &event);
 
 	void OnLast(wxCommandEvent& event);

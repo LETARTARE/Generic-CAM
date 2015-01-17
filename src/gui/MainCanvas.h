@@ -24,7 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef MAINCANVAS_H_
 #define MAINCANVAS_H_
 
@@ -34,8 +33,6 @@
 
 #include "../3D/OpenGLCanvas.h"
 #include "../project/Project.h"
-
-
 
 class MainCanvas:public OpenGLCanvas {
 	// Constructor / Destructor
@@ -53,8 +50,6 @@ private:
 	ArrayOfGeometry* geometry;
 	Machine* machine;
 	StockMaterial* stockMaterial;
-
-
 
 	bool displayCoordinateSystem;
 

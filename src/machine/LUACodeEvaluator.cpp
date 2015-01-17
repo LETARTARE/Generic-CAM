@@ -22,11 +22,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate:2011-06-16 01:34:14 +0200 (Do, 16 Jun 2011) $
-//$Revision:56 $
-//$LastChangedBy:tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #include "LUACodeEvaluator.h"
 #include "../Config.h"
@@ -47,22 +43,22 @@ LUACodeEvaluator::LUACodeEvaluator()
 	luaopen_math(L);
 	luaopen_table(L);
 	luaopen_string(L);
-	lua_register(L,"print",print_glue);
+	lua_register(L, "print", print_glue);
 
-	lua_register(L,"identity",identity_glue);
-	lua_register(L,"box",box_glue);
-	lua_register(L,"cylinder",cylinder_glue);
-	lua_register(L,"setstyle",setstyle_glue);
-	lua_register(L,"addcomponent",addcomponent_glue);
-	lua_register(L,"toolholder",toolholder_glue);
-	lua_register(L,"tableorigin",tableorigin_glue);
+	lua_register(L, "identity", identity_glue);
+	lua_register(L, "box", box_glue);
+	lua_register(L, "cylinder", cylinder_glue);
+	lua_register(L, "setstyle", setstyle_glue);
+	lua_register(L, "addcomponent", addcomponent_glue);
+	lua_register(L, "toolholder", toolholder_glue);
+	lua_register(L, "tableorigin", tableorigin_glue);
 
-	lua_register(L,"translate",translate_glue);
-	lua_register(L,"rotate",rotate_glue);
+	lua_register(L, "translate", translate_glue);
+	lua_register(L, "rotate", rotate_glue);
 
-	lua_register(L,"placecomponent",placecomponent_glue);
+	lua_register(L, "placecomponent", placecomponent_glue);
 
-	lua_register(L,"loadstl",loadstl_glue);
+	lua_register(L, "loadstl", loadstl_glue);
 }
 
 LUACodeEvaluator::~LUACodeEvaluator()
@@ -96,7 +92,6 @@ bool LUACodeEvaluator::EvaluateProgram()
 
 	linkedMachine->ClearComponents();
 
-
 	//	wxLogMessage(wxString::Format(_T("Blip: %u"),linkedMachine->components.Count()));
 	//		return NULL;
 
@@ -125,8 +120,9 @@ bool LUACodeEvaluator::EvaluateProgram()
 
 		unsigned int i;
 		for(i = 0; i < linkedMachine->components.Count(); i++){
-			wxLogMessage(wxString::Format(_T("Component %u:"), i)
-					+ linkedMachine->components[i].nameOfComponent);
+			wxLogMessage(
+					wxString::Format(_T("Component %u:"), i)
+							+ linkedMachine->components[i].nameOfComponent);
 
 		}
 
@@ -188,8 +184,8 @@ void LUACodeEvaluator::HookRoutine(lua_State * L, lua_Debug * ar)
 LUACodeEvaluator* LUACodeEvaluator::FindCallingClass(lua_State * L)
 {
 	std::list <LUACodeEvaluator*>::iterator p;
-	for(p = availableLUACodeEvaluators.begin(); p
-			!= availableLUACodeEvaluators.end(); ++p){
+	for(p = availableLUACodeEvaluators.begin();
+			p != availableLUACodeEvaluators.end(); ++p){
 		if((*p)->L == L) return *p;
 	}
 	return NULL;
@@ -213,7 +209,7 @@ int LUACodeEvaluator::print_glue(lua_State * L)
 		lua_call(L, 1, 1);
 		s = lua_tostring(L, -1); /* get result */
 		if(s == NULL) return luaL_error(L,
-				LUA_QL("tostring") " must return a string to " LUA_QL("print"));
+		LUA_QL("tostring") " must return a string to " LUA_QL("print"));
 		if(i > 1) CC->programOutput += _T("\t");
 		CC->programOutput += wxString::FromAscii(s);
 		lua_pop(L, 1); /* pop result */
@@ -242,7 +238,7 @@ int LUACodeEvaluator::addcomponent_glue(lua_State * L)
 	lua_call(L, 1, 1);
 	s = lua_tostring(L, -1); /* get result */
 	if(s == NULL) return luaL_error(L,
-			LUA_QL("tostring") " must return a string to " LUA_QL("print"));
+	LUA_QL("tostring") " must return a string to " LUA_QL("print"));
 
 	if(!CC->linkedMachine->AddComponent(wxString::FromAscii(s))){
 		return luaL_error(L, "addcomponent: part already exists!");
@@ -386,8 +382,8 @@ int LUACodeEvaluator::toolholder_glue(lua_State * L)
 	}
 	CC->linkedMachine->toolPositionRelativ.Set(CC->matrix);
 	CC->linkedMachine->toolPosition.Set(CC->matrix);
-	CC->linkedMachine->componentWithTool
-			= CC->linkedMachine->components.GetCount() - 1;
+	CC->linkedMachine->componentWithTool =
+			CC->linkedMachine->components.GetCount() - 1;
 	return 0;
 }
 int LUACodeEvaluator::tableorigin_glue(lua_State * L)
@@ -401,8 +397,8 @@ int LUACodeEvaluator::tableorigin_glue(lua_State * L)
 	}
 	CC->linkedMachine->workpiecePositionRelativ.Set(CC->matrix);
 	CC->linkedMachine->workpiecePosition.Set(CC->matrix);
-	CC->linkedMachine->componentWithMaterial
-			= CC->linkedMachine->components.Count() - 1;
+	CC->linkedMachine->componentWithMaterial =
+			CC->linkedMachine->components.Count() - 1;
 	return 0;
 }
 int LUACodeEvaluator::placecomponent_glue(lua_State * L)
@@ -425,7 +421,7 @@ int LUACodeEvaluator::placecomponent_glue(lua_State * L)
 	lua_call(L, 1, 1);
 	s = lua_tostring(L, -1); /* get result */
 	if(s == NULL) return luaL_error(L,
-			LUA_QL("tostring") " must return a string to " LUA_QL("print"));
+	LUA_QL("tostring") " must return a string to " LUA_QL("print"));
 
 	if(!CC->linkedMachine->PlaceComponent(wxString::FromAscii(s), CC->matrix)){
 		return luaL_error(L, "placecomponent: part does not exist!");
@@ -453,13 +449,13 @@ int LUACodeEvaluator::loadstl_glue(lua_State * L)
 	lua_call(L, 1, 1);
 	s = lua_tostring(L, -1); /* get result */
 	if(s == NULL) return luaL_error(L,
-			LUA_QL("tostring") " must return a string to " LUA_QL("print"));
+	LUA_QL("tostring") " must return a string to " LUA_QL("print"));
 
 	wxFileName machinedirectory(CC->linkedMachine->fileName);
 	wxFileName fileName(wxString::FromAscii(s));
 	machinedirectory.Normalize();
-	fileName.Normalize(wxPATH_NORM_DOTS | wxPATH_NORM_ENV_VARS
-			| wxPATH_NORM_TILDE);
+	fileName.Normalize(
+			wxPATH_NORM_DOTS | wxPATH_NORM_ENV_VARS | wxPATH_NORM_TILDE);
 
 	fileName.SetPath(machinedirectory.GetPathWithSep() + fileName.GetPath());
 

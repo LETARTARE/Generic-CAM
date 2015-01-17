@@ -26,10 +26,12 @@
 
 #include "DialogMachineControl.h"
 
-DialogMachineControl::DialogMachineControl(wxWindow* parent) :
+DialogMachineControl::DialogMachineControl(wxWindow* parent, Project * project,
+		DisplaySettings * settings) :
 		GUIMachineControl(parent)
 {
-
+	this->project = project;
+	this->settings = settings;
 }
 
 void DialogMachineControl::OnClose(wxCloseEvent& event)

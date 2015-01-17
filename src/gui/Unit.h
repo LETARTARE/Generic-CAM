@@ -61,6 +61,9 @@ public:
 			const double factor);
 	double FromSI(const double value);
 	double ToSI(const double value);
+	wxString TextFromSI(const double value, unsigned int digitsAfterComma = 3);
+	wxString TextFromSIWithUnit(const double value,
+			unsigned int digitsAfterComma = 3);
 
 	wxString GetSIName(void);
 	wxString GetOtherName(void);

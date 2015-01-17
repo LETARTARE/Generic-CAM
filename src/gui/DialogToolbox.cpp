@@ -26,10 +26,14 @@
 
 #include "DialogToolbox.h"
 
-DialogToolbox::DialogToolbox(wxWindow* parent) :
+DialogToolbox::DialogToolbox(wxWindow* parent, Project * project,
+		wxCommandProcessor * commandProcessor, DisplaySettings * settings) :
 		GUIToolbox(parent)
 {
-	linkedProject = NULL;
+	this->project = project;
+	this->commandProcessor = commandProcessor;
+	this->settings = settings;
+
 	selectedTool = 0;
 	selectedElement = 0;
 
@@ -38,12 +42,12 @@ DialogToolbox::DialogToolbox(wxWindow* parent) :
 
 DialogToolbox::~DialogToolbox()
 {
-	return;
 }
 
 void DialogToolbox::OnClose(wxCommandEvent& event)
 {
-	Close();
+	TransferDataFromWindow();
+	this->Show(false);
 }
 
 void DialogToolbox::SetController(Control3D& control)
@@ -61,124 +65,117 @@ void DialogToolbox::OnChangeStereo3D(wxCommandEvent& event)
 	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
 }
 
-void DialogToolbox::InsertProject(Project *project)
-{
-	linkedProject = project;
-	TransferDataToWindow();
-}
-
 bool DialogToolbox::TransferDataToWindow(void)
 {
 
-	if(linkedProject == NULL) return false;
+	if(project == NULL) return false;
 
 	size_t i, j;
 
 	m_comboBoxToolSelector->Clear();
-	if(linkedProject->toolbox.tools.GetCount() == 0){
-		m_comboBoxToolSelector->Append(_("No tools in toolbox!"));
-		m_comboBoxToolSelector->Enable(false);
-	}else{
-		for(i = 0; i < linkedProject->toolbox.tools.GetCount(); i++){
-			m_comboBoxToolSelector->Append(
-					linkedProject->toolbox.tools[i].toolName);
-		}
-		m_comboBoxToolSelector->Select(selectedTool);
-		m_comboBoxToolSelector->Enable(true);
-	}
+//	if(project->toolbox.tools.GetCount() == 0){
+//		m_comboBoxToolSelector->Append(_("No tools in toolbox!"));
+//		m_comboBoxToolSelector->Enable(false);
+//	}else{
+//		for(i = 0; i < project->toolbox.tools.GetCount(); i++){
+//			m_comboBoxToolSelector->Append(project->toolbox.tools[i].toolName);
+//		}
+//		m_comboBoxToolSelector->Select(selectedTool);
+//		m_comboBoxToolSelector->Enable(true);
+//	}
+//
+//	if(selectedTool < project->toolbox.tools.GetCount()){
+//		m_panel->InsertTool(project->toolbox.tools[selectedTool]);
+//		m_canvas->InsertTool(project->toolbox.tools[selectedTool]);
+//	}
 
-	if(selectedTool < linkedProject->toolbox.tools.GetCount()){
-		m_panel->InsertTool(linkedProject->toolbox.tools[selectedTool]);
-		m_canvas->InsertTool(linkedProject->toolbox.tools[selectedTool]);
-	}
-
-	if(selectedTool < linkedProject->toolbox.tools.GetCount()){
-
-		Tool *temp = &(linkedProject->toolbox.tools[selectedTool]);
-
-		m_textCtrlShaftDiameter->SetValue(
-				wxString::Format(_T("%f"), temp->shaftDiameter));
-		m_textCtrlShaftLength->SetValue(
-				wxString::Format(_T("%f"), temp->shaftLength));
-		m_textCtrlMaxSpeed->SetValue(
-				wxString::Format(_T("%.0f"), temp->maxSpeed));
-		m_textCtrlFeedCoefficient->SetValue(
-				wxString::Format(_T("%f"), temp->feedCoefficient));
-		m_textCtrlNrOfTeeth->SetValue(
-				wxString::Format(_T("%u"), temp->nrOfTeeth));
-		m_textCtrlComment->SetValue(temp->comment);
-
-		wxSize sz = m_listCtrl->GetClientSize();
-		unsigned int w = sz.x / 14;
-		m_listCtrl->ClearAll();
-		m_listCtrl->InsertColumn(0, _("Type"), wxLIST_FORMAT_LEFT, 2 * w);
-		m_listCtrl->InsertColumn(1, _("Diameter"), wxLIST_FORMAT_LEFT, 3 * w);
-		m_listCtrl->InsertColumn(2, _("Height"), wxLIST_FORMAT_LEFT, 3 * w);
-		m_listCtrl->InsertColumn(3, _("Radius"), wxLIST_FORMAT_LEFT, 3 * w);
-		m_listCtrl->InsertColumn(4, _("Cutting"), wxLIST_FORMAT_LEFT, 3 * w);
-
-		for(j = 0; j < temp->elements.GetCount(); j++){
-
-			wxLogMessage(
-					wxString::Format(_T("Element: %u Type %u"), j,
-							temp->elements[j].t));
-
-			switch(temp->elements[j].t){
-			case 0:
-				m_listCtrl->InsertItem(j, _T("L"));
-				break;
-			case 1:
-				m_listCtrl->InsertItem(j, _T("CDH"));
-				break;
-			case 2:
-				m_listCtrl->InsertItem(j, _T("CHD"));
-				break;
-			case 3:
-				m_listCtrl->InsertItem(j, _T("SRU"));
-				break;
-			case 4:
-				m_listCtrl->InsertItem(j, _T("SRL"));
-				break;
-			}
-
-			m_listCtrl->SetItem(j, 1,
-					wxString::Format(_T("%f"), temp->elements[j].d));
-			m_listCtrl->SetItem(j, 2,
-					wxString::Format(_T("%f"), temp->elements[j].h));
-			m_listCtrl->SetItem(j, 3,
-					wxString::Format(_T("%f"), temp->elements[j].r));
-
-			if(temp->elements[j].cutting){
-				m_listCtrl->SetItem(j, 4, _("Yes"));
-			}else{
-				m_listCtrl->SetItem(j, 4, _("No"));
-			}
-
-			m_listCtrl->SetItemState(j, 0, wxLIST_STATE_SELECTED);
-
-			if(selectedElement < temp->elements.GetCount()){
-
-				m_listCtrl->SetItemState(selectedElement,
-				wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-
-				m_choiceType->Select(temp->elements[selectedElement].t);
-
-				m_textCtrlDiameter->SetValue(
-						wxString::Format(_T("%f"),
-								temp->elements[selectedElement].d));
-				m_textCtrlHeight->SetValue(
-						wxString::Format(_T("%f"),
-								temp->elements[selectedElement].h));
-				m_textCtrlRadius->SetValue(
-						wxString::Format(_T("%f"),
-								temp->elements[selectedElement].r));
-
-				m_checkBoxCutting->SetValue(
-						temp->elements[selectedElement].cutting);
-
-			}
-		}
-	}
+//	if(selectedTool < project->toolbox.tools.GetCount()){
+//
+//		Tool *temp = &(project->toolbox.tools[selectedTool]);
+//
+//		m_textCtrlShaftDiameter->SetValue(
+//				wxString::Format(_T("%f"), temp->shaftDiameter));
+//		m_textCtrlShaftLength->SetValue(
+//				wxString::Format(_T("%f"), temp->shaftLength));
+//		m_textCtrlMaxSpeed->SetValue(
+//				wxString::Format(_T("%.0f"), temp->maxSpeed));
+//		m_textCtrlFeedCoefficient->SetValue(
+//				wxString::Format(_T("%f"), temp->feedCoefficient));
+//		m_textCtrlNrOfTeeth->SetValue(
+//				wxString::Format(_T("%u"), temp->nrOfTeeth));
+//		m_textCtrlComment->SetValue(temp->comment);
+//
+//		wxSize sz = m_listCtrl->GetClientSize();
+//		unsigned int w = sz.x / 14;
+//		m_listCtrl->ClearAll();
+//		m_listCtrl->InsertColumn(0, _("Type"), wxLIST_FORMAT_LEFT, 2 * w);
+//		m_listCtrl->InsertColumn(1, _("Diameter"), wxLIST_FORMAT_LEFT, 3 * w);
+//		m_listCtrl->InsertColumn(2, _("Height"), wxLIST_FORMAT_LEFT, 3 * w);
+//		m_listCtrl->InsertColumn(3, _("Radius"), wxLIST_FORMAT_LEFT, 3 * w);
+//		m_listCtrl->InsertColumn(4, _("Cutting"), wxLIST_FORMAT_LEFT, 3 * w);
+//
+//		for(j = 0; j < temp->elements.GetCount(); j++){
+//
+//			wxLogMessage(
+//					wxString::Format(_T("Element: %u Type %u"), j,
+//							temp->elements[j].t));
+//
+//			switch(temp->elements[j].t){
+//			case 0:
+//				m_listCtrl->InsertItem(j, _T("L"));
+//				break;
+//			case 1:
+//				m_listCtrl->InsertItem(j, _T("CDH"));
+//				break;
+//			case 2:
+//				m_listCtrl->InsertItem(j, _T("CHD"));
+//				break;
+//			case 3:
+//				m_listCtrl->InsertItem(j, _T("SRU"));
+//				break;
+//			case 4:
+//				m_listCtrl->InsertItem(j, _T("SRL"));
+//				break;
+//			}
+//
+//			m_listCtrl->SetItem(j, 1,
+//					wxString::Format(_T("%f"), temp->elements[j].d));
+//			m_listCtrl->SetItem(j, 2,
+//					wxString::Format(_T("%f"), temp->elements[j].h));
+//			m_listCtrl->SetItem(j, 3,
+//					wxString::Format(_T("%f"), temp->elements[j].r));
+//
+//			if(temp->elements[j].cutting){
+//				m_listCtrl->SetItem(j, 4, _("Yes"));
+//			}else{
+//				m_listCtrl->SetItem(j, 4, _("No"));
+//			}
+//
+//			m_listCtrl->SetItemState(j, 0, wxLIST_STATE_SELECTED);
+//
+//			if(selectedElement < temp->elements.GetCount()){
+//
+//				m_listCtrl->SetItemState(selectedElement,
+//				wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+//
+//				m_choiceType->Select(temp->elements[selectedElement].t);
+//
+//				m_textCtrlDiameter->SetValue(
+//						wxString::Format(_T("%f"),
+//								temp->elements[selectedElement].d));
+//				m_textCtrlHeight->SetValue(
+//						wxString::Format(_T("%f"),
+//								temp->elements[selectedElement].h));
+//				m_textCtrlRadius->SetValue(
+//						wxString::Format(_T("%f"),
+//								temp->elements[selectedElement].r));
+//
+//				m_checkBoxCutting->SetValue(
+//						temp->elements[selectedElement].cutting);
+//
+//			}
+//		}
+//	}
 	return true;
 }
 

@@ -52,6 +52,9 @@ public:
 	void UpdateVariables(void);
 	int GetFirstSelectedObject(void);
 
+	int GetWorkpieceFromLink(int linkNr);
+	int GetObjectFromLink(int linkNr);
+
 private:
 	void Reset(void);
 	void SetAtLevel(int level, const wxString& name, ItemDataType type, int nr);
@@ -67,6 +70,8 @@ private:
 	wxTreeItemId * id;
 
 	wxTreeItemId groupObjects;
+	wxTreeItemId groupWorkpieces;
+	wxTreeItemId groupRun;
 
 	size_t maxId;
 	int currentLevel;

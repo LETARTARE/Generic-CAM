@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Stock.cpp
-// Purpose            :
-// Thread Safe        : Yes
+// Name               : CommandRunAdd.cpp
+// Purpose            : 
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 03.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 17.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,22 +24,27 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "CommandRunAdd.h"
+#include "../project/Run.h"
 
-#include "Stock.h"
-
-Stock::Stock()
+CommandRunAdd::CommandRunAdd(const wxString& name, Project* project,
+		wxString runName) :
+		wxCommand(true, name)
 {
-	StockMaterial temp;
-	stockMaterials.Add(temp);
+	this->project = project;
+	this->runName = runName;
 }
 
-Stock::~Stock()
+bool CommandRunAdd::Do(void)
 {
+	Run temp;
+	temp.name = runName;
+	project->run.Add(temp);
+	return true;
 }
-//
-//void Stock::Paint(void)
-//{
-//	size_t i;
-//	for(i = 0; i < stockMaterials.GetCount(); i++)
-//		stockMaterials[i].Paint();
-//}
+
+bool CommandRunAdd::Undo(void)
+{
+	project->run.RemoveAt(project->run.GetCount() - 1);
+	return true;
+}

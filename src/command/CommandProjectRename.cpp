@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectTransform.h
+// Name               : CommandProjectRename.cpp
 // Purpose            : 
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 29.12.2014
-// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 08.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,31 +24,25 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDOBJECTTRANSFORM_H_
-#define COMMANDOBJECTTRANSFORM_H_
+#include "CommandProjectRename.h"
 
-#include <wx/cmdproc.h>
+CommandProjectRename::CommandProjectRename(const wxString& name,
+		Project* project, const wxString projectName) :
+		wxCommand(true, name)
+{
+	this->project = project;
+	this->newName = projectName;
+}
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../project/Project.h"
+bool CommandProjectRename::Do(void)
+{
+	this->oldName = project->name;
+	project->name = this->newName;
+	return true;
+}
 
-class commandObjectTransform:public wxCommand {
-public:
-	commandObjectTransform(const wxString& name, Project * project,
-			size_t objectNr, bool flipX, bool flipY, bool flipZ,
-			bool flipNormals, AffineTransformMatrix& matrixNew);
-	bool Do(void);
-	bool Undo(void);
-
-protected:
-	Project * project;
-	size_t objectNr;
-	bool flipX;
-	bool flipY;
-	bool flipZ;
-	bool flipNormals;
-	AffineTransformMatrix matrixNew;
-	AffineTransformMatrix matrixOld;
-};
-
-#endif /* COMMANDOBJECTTRANSFORM_H_ */
+bool CommandProjectRename::Undo(void)
+{
+	project->name = this->oldName;
+	return true;
+}

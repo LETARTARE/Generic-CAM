@@ -22,27 +22,32 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #include "Run.h"
 
 #include <float.h>
 #include <wx/log.h>
-#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+#include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfRun)
 
 Run::Run()
 {
-
+	name = _T("Run #");
+	workpieceNr = -1;
+	selected = false;
 }
 
 Run::~Run()
 {
+}
 
+void Run::Paint()
+{
+	toolPath.Paint();
+	size_t i;
+//	for(i = 0; i < placements.GetCount(); i++)
+//		placements[i].Paint();
 }
 
 void Run::ToXml(wxXmlNode* parentNode)
@@ -50,20 +55,19 @@ void Run::ToXml(wxXmlNode* parentNode)
 	wxXmlNode *temp, *temp2;
 	wxXmlNode *nodeObject = NULL;
 
-
 	// Find out, if object already exists in XML tree.
 	temp = parentNode->GetChildren();
 	while(temp != NULL && nodeObject == NULL){
-		if(temp->GetName() == _T("run") && temp->GetPropVal(_T("name"), _T(""))
-				== runName) nodeObject = temp;
+		if(temp->GetName() == _T("run")
+				&& temp->GetPropVal(_T("name"), _T("")) == name) nodeObject =
+				temp;
 		temp = temp->GetNext();
 	}
 	if(nodeObject == NULL){
 		nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("run"));
-		nodeObject->AddProperty(_T("name"), runName);
+		nodeObject->AddProperty(_T("name"), name);
 		parentNode->InsertChild(nodeObject, NULL);
 	}
-
 
 	//	// Remove the subelements, that will be updated
 	//	temp = nodeObject->GetChildren();
@@ -101,7 +105,7 @@ bool Run::FromXml(wxXmlNode* node)
 {
 	if(node->GetName() != _T("run")) return false;
 
-	runName = node->GetPropVal(_T("name"), _T(""));
+	name = node->GetPropVal(_T("name"), _T(""));
 	wxXmlNode *temp = node->GetChildren();
 	//	long tempLong;
 	//
@@ -127,43 +131,34 @@ void Run::WriteToFile(wxTextFile &f)
 
 void Run::SortTargets(void)
 {
-	size_t i, j;
-	double dmin, d;
-	Polygon25 temp, temp2;
-
-	for(i = 0; i < placements.GetCount(); i++){
-		if(placements[i].isMovable){
-			wxLogMessage(wxString::Format(_T("Moving Target %u:"), i));
-
-			temp = placements[i].outLine;
-			temp.ApplyTransformation(placements[i].matrix);
-
-			dmin = +DBL_MAX;
-			for(j = i; j > 0; j--){
-				temp2 = placements[j - 1].outLine;
-				temp2.ApplyTransformation(placements[j - 1].matrix);
-				d = temp.DistanceToPolygon(temp2, -1.0, 0.0);
-				if(d < dmin){
-					dmin = d;
-
-					wxLogMessage(wxString::Format(
-							_T("To Target %u: d= %.3f m"), j - 1, d));
-				}
-			}
-			if(dmin < 1.0){
-				placements[i].matrix.TranslateGlobal(-dmin, 0.0, 0.0);
-			}
-		}
-	}
+//	size_t i, j;
+//	double dmin, d;
+//	Polygon25 temp, temp2;
+//
+//	for(i = 0; i < placements.GetCount(); i++){
+//		if(placements[i].isMovable){
+//			wxLogMessage(wxString::Format(_T("Moving Target %u:"), i));
+//
+//			temp = placements[i].outLine;
+//			temp.ApplyTransformation(placements[i].matrix);
+//
+//			dmin = +DBL_MAX;
+//			for(j = i; j > 0; j--){
+//				temp2 = placements[j - 1].outLine;
+//				temp2.ApplyTransformation(placements[j - 1].matrix);
+//				d = temp.DistanceToPolygon(temp2, -1.0, 0.0);
+//				if(d < dmin){
+//					dmin = d;
+//
+//					wxLogMessage(wxString::Format(
+//							_T("To Target %u: d= %.3f m"), j - 1, d));
+//				}
+//			}
+//			if(dmin < 1.0){
+//				placements[i].matrix.TranslateGlobal(-dmin, 0.0, 0.0);
+//			}
+//		}
+//	}
 
 }
-
-void Run::Paint()
-{
-	toolPath.Paint();
-	size_t i;
-	for(i = 0; i < placements.GetCount(); i++)
-		placements[i].Paint();
-}
-
 

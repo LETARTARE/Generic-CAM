@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandObjectLoad.cpp
+// Name               : CommandWorkpieceRemove.cpp
 // Purpose            : 
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 29.12.2014
-// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 17.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,28 +24,37 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "commandObjectLoad.h"
+#include "CommandWorkpieceRemove.h"
 
-commandObjectLoad::commandObjectLoad(const wxString& name, Project * project,
-		const wxString& fileName) :
+CommandWorkpieceRemove::CommandWorkpieceRemove(const wxString& name,
+		Project* project, int workpieceNr) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->fileName = fileName;
+	this->workpieceNr = workpieceNr;
+	this->workpiece = NULL;
 }
 
-bool commandObjectLoad::Do(void)
+CommandWorkpieceRemove::~CommandWorkpieceRemove()
 {
-	Object temp;
-	if(temp.LoadObject(fileName)){
-		project->objects.Add(temp);
-		return true;
+	if(workpiece != NULL) delete workpiece;
+}
+
+bool CommandWorkpieceRemove::Do(void)
+{
+	workpiece = project->workpieces.Detach(workpieceNr);
+	return true;
+}
+
+bool CommandWorkpieceRemove::Undo(void)
+{
+	if(workpieceNr >= project->workpieces.GetCount()){
+		project->workpieces.Add(workpiece);
+	}else{
+		project->workpieces.Insert(workpiece, workpieceNr);
 	}
-	return false;
-}
-
-bool commandObjectLoad::Undo(void)
-{
-	project->objects.RemoveAt(project->objects.GetCount() - 1, 1);
+	// If the the workpiece was inserted back into the project,
+	// this function must not delete the workpiece in the destructor.
+	workpiece = NULL;
 	return true;
 }

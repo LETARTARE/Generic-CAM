@@ -22,16 +22,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
 
 #ifndef TPGENERATORFAST_H_
 #define TPGENERATORFAST_H_
 
-#include "../project/Target.h"
+#include "DexelTarget.h"
 #include "../3D/Polygon3.h"
 #include "../machine/Tool.h"
 
@@ -60,14 +57,14 @@ private:
 
 	//Methods:
 public:
-	void GenerateToolpath(Target &target, Tool &tool);
+	void GenerateToolpath(DexelTarget &target, Tool &tool);
 
 private:
 	ToolPath GenerateSpiral(double x, double y, double radius);
 	ToolPath GenerateDrill(double x, double y, double diameter, double depth);
-	bool IsDirectlyReachable(Target &target, double sx, double sy, double sz,
+	bool IsDirectlyReachable(DexelTarget &target, double sx, double sy, double sz,
 			double x, double y, double z);
-	ToolPath MoveSavely(Target &target, double sx, double sy, double sz,
+	ToolPath MoveSavely(DexelTarget &target, double sx, double sy, double sz,
 			double x, double y, double z);
 
 };

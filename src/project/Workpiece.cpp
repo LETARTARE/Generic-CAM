@@ -22,26 +22,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: 2011-07-20 23:54:54 +0200 (Mi, 20 Jul 2011) $
-//$Revision: 76 $
-//$LastChangedBy: tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #include "Workpiece.h"
 
+#include <wx/arrimpl.cpp>
+WX_DEFINE_OBJARRAY(ArrayOfWorkpiece)
+
 #include <GL/gl.h>
 
-Workpiece::Workpiece(const double sizeX, const double sizeY,
-		const double sizeZ, const double resolutionX, const double resolutionY) :
-	Imprinter(sizeX, sizeY, sizeZ, resolutionX, resolutionY)
+Workpiece::Workpiece()
 {
+	selected = false;
 }
 
-Workpiece::Workpiece(StockMaterial* material, const double resolution)
+Workpiece::Workpiece(StockMaterial* material)
 {
-	this->SetupBox(material->sx, material->sy, material->sy, resolution,
-			resolution);
+//	this->SetupBox(material->sx, material->sy, material->sy, resolution,
+//			resolution);
+
+	this->name = material->name;
+	selected = false;
 }
 
 Workpiece::~Workpiece()
@@ -53,20 +54,20 @@ void Workpiece::SetupBox(const double sizeX, const double sizeY,
 		const double sizeZ, const double resolutionX, const double resolutionY)
 {
 
-	Imprinter::SetupBox(sizeX, sizeY, sizeZ, resolutionX, resolutionY);
-
-	colorNormal.Set(0.8, 0.4, 0.0);
-	colorTodo.Set(0, 0, 0.8);
-	colorUnscratched.Set(0.0, 0.8, 0.1);
+//	Imprinter::SetupBox(sizeX, sizeY, sizeZ, resolutionX, resolutionY);
+//
+//	colorNormal.Set(0.8, 0.4, 0.0);
+//	colorTodo.Set(0, 0, 0.8);
+//	colorUnscratched.Set(0.0, 0.8, 0.1);
 }
 
 void Workpiece::InsertTriangle(Vector3 a, Vector3 b, Vector3 c)
 {
-	Imprinter::InsertTriangle(a, b, c);
+//	Imprinter::InsertTriangle(a, b, c);
 }
 
 void Workpiece::Paint()
 {
-	Imprinter::Paint();
+//	Imprinter::Paint();
 }
 

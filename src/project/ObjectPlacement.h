@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : TargetPlacement.cpp
+// Name               : ObjectPlacement.h
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -22,58 +22,44 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef OBJECTPLACEMENT_H_
+#define OBJECTPLACEMENT_H_
 
-#include "TargetPlacement.h"
+/*!\class ObjectPlacement
+ * \brief ...
+ *
+ * ...
+ */
 
-#include <GL/gl.h>
-#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
-WX_DEFINE_OBJARRAY(ArrayOfTargetPlacement)
+#include "../3D/AffineTransformMatrix.h"
+#include "../generator/Polygon25.h"
 
-TargetPlacement::TargetPlacement()
-{
-	isFlipped = false;
-	isMovable = true;
-	isKeepout = false;
-	targetNumber = 0;
-}
+#include <wx/dynarray.h>
+#include <wx/xml/xml.h>
 
-TargetPlacement::~TargetPlacement()
-{
-}
+class ObjectPlacement {
+public:
+	ObjectPlacement();
+	virtual ~ObjectPlacement();
 
-void TargetPlacement::Clear(void)
-{
-	isFlipped = false;
-	isMovable = true;
-	isKeepout = false;
-	targetNumber = 0;
-	outLine.Clear();
-	matrix.SetIdentity();
-}
+public:
+	AffineTransformMatrix matrix;
+	size_t objectNr;
 
-void TargetPlacement::SetKeepout(double x, double y, double sizex, double sizey)
-{
-	matrix.SetIdentity();
-	matrix.TranslateGlobal(x, y, 0.0);
-	outLine.Clear();
-	outLine.InsertPoint(0.0, 0.0, 0.0);
-	outLine.InsertPoint(sizex, 0.0, 0.0);
-	outLine.InsertPoint(sizex, sizey, 0.0);
-	outLine.InsertPoint(0.0, sizey, 0.0);
-	outLine.Close();
-	isMovable = false;
-	isKeepout = true;
-}
+//	Polygon25 outLine;
 
-void TargetPlacement::Paint(void) const
-{
-	::glPushMatrix();
-	::glMultMatrixd(matrix.a);
-	outLine.Paint();
-	::glPopMatrix();
-}
+	bool isMovable;
+	bool isKeepout;
+
+	//Methods:
+public:
+	void Clear(void);
+
+	void SetKeepout(double x, double y, double sizex, double sizey);
+
+	void Paint(void) const;
+};
+WX_DECLARE_OBJARRAY(ObjectPlacement, ArrayOfObjectPlacement);
+#endif /* OBJECTPLACEMENT_H_ */

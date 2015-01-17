@@ -24,39 +24,55 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef DIALOGSTOCKMATERIAL_H_
 #define DIALOGSTOCKMATERIAL_H_
 
+#include <wx/cmdproc.h>
+
 #include "gui.h"
 #include "../project/Project.h"
+#include "DisplaySettings.h"
 
 /*!\class DialogStockMaterial
- * \brief ...
- *
- * ...
+ * \brief Manages the heap of stock material in the workshop
  */
 
 class DialogStockMaterial:public GUIStockMaterial {
-	// Constructor/ Destructor
-
 public:
-	DialogStockMaterial(wxWindow* parent);
-	virtual ~DialogStockMaterial();
+	// Constructor/ Destructor
+	DialogStockMaterial(wxWindow* parent, Project * project,
+			wxCommandProcessor * commandProcessor, DisplaySettings * settings);
+
 	// Member Variables
+private:
+	Project* project;
+	wxCommandProcessor * commandProcessor;
+	DisplaySettings * settings;
 
-	Project* linkedProject;
+	int selectedLine;
+	bool isInitialized;
 
-	size_t selectedStockMaterial;
-
+	double sx, sy, sz;
+	wxString name;
+	double feedrate;
+	double toolSpeed;
+bool available;
 	// Methods
 public:
-	void OnClose(wxCommandEvent& event);
-	void InsertProject(Project* project);
-
-private:
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
+	void Initialize(void);
+
+protected:
+
+	void OnClose(wxCloseEvent& event);
+	void OnClose(wxCommandEvent& event);
+	void OnAddUpdate(wxCommandEvent& event);
+	void OnSize(wxSizeEvent& event);
+	void OnDelete(wxCommandEvent& event);
+	void OnActivate(wxListEvent& event);
+	void OnSelected(wxListEvent& event);
+
 };
 
 #endif /* DIALOGSTOCKMATERIAL_H_ */

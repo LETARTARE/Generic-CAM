@@ -36,6 +36,8 @@
 #include <wx/bmpbuttn.h>
 #include <wx/notebook.h>
 #include <wx/listctrl.h>
+#include <wx/grid.h>
+#include <wx/spinctrl.h>
 #include <wx/slider.h>
 #include <wx/combobox.h>
 #include "ToolPanel.h"
@@ -54,43 +56,64 @@
 #define ID_STOCKORGANIZE 1006
 #define ID_STOCKLOAD 1007
 #define ID_STOCKSAVE 1008
-#define ID_SETUPCONTROLLER 1009
-#define ID_VIEWSTEREO3D 1010
-#define ID_SETUPUNITS 1011
-#define ID_DISPLAYMACHINE 1012
-#define ID_DISPLAYMATERIAL 1013
-#define ID_MULTTEN 1014
-#define ID_DIVTEN 1015
-#define ID_SCALEUNITX 1016
-#define ID_SCALEUNITY 1017
-#define ID_SCALEUNITZ 1018
-#define ID_SCALEPERCENTX 1019
-#define ID_SCALEPERCENTY 1020
-#define ID_SCALEPERCENTZ 1021
-#define ID_SCALEPERCENT 1022
-#define ID_FLIPX 1023
-#define ID_FLIPY 1024
-#define ID_FLIPZ 1025
-#define ID_MOVEZP 1026
-#define ID_MOVEYP 1027
-#define ID_MOVEXN 1028
-#define ID_MOVEXP 1029
-#define ID_MOVEYN 1030
-#define ID_MOVEZN 1031
-#define ID_ALIGNTOP 1032
-#define ID_ALIGNMIDDLE 1033
-#define ID_ALIGNBOTTOM 1034
-#define ID_ROTATEYN 1035
-#define ID_ROTATEXN 1036
-#define ID_ROTATEYP 1037
-#define ID_ROTATEZN 1038
-#define ID_ROTATEZP 1039
-#define ID_ROTATEXP 1040
-#define ID_AXISX 1041
-#define ID_AXISY 1042
-#define ID_AXISZ 1043
-#define ID_BUTTONCONNECT 1044
-#define ID_BUTTONDISCONNECT 1045
+#define ID_WORKPIECEADD 1009
+#define ID_WORKPIECEDELETE 1010
+#define ID_WORKPIECEDELETEUNUSED 1011
+#define ID_RUNADD 1012
+#define ID_RUNEDIT 1013
+#define ID_RUNDELETE 1014
+#define ID_MACHINEDEBUGGER 1015
+#define ID_TOOLBOXEDIT 1016
+#define ID_TOOLBOXLOAD 1017
+#define ID_SETUPCONTROLLER 1018
+#define ID_VIEWSTEREO3D 1019
+#define ID_SETUPUNITS 1020
+#define ID_CLOSEEXTRAWINDOWS 1021
+#define ID_LOGSHOW 1022
+#define ID_VIEWTOP 1023
+#define ID_VIEWBOTTOM 1024
+#define ID_VIEWFRONT 1025
+#define ID_VIEWBACK 1026
+#define ID_VIEWLEFT 1027
+#define ID_VIEWRIGHT 1028
+#define ID_DISPLAYMACHINE 1029
+#define ID_DISPLAYMATERIAL 1030
+#define ID_TOOLDRILLING 1031
+#define ID_MULTTEN 1032
+#define ID_DIVTEN 1033
+#define ID_SCALEUNITX 1034
+#define ID_SCALEUNITY 1035
+#define ID_SCALEUNITZ 1036
+#define ID_SCALEPERCENTX 1037
+#define ID_SCALEPERCENTY 1038
+#define ID_SCALEPERCENTZ 1039
+#define ID_SCALEPERCENT 1040
+#define ID_FLIPX 1041
+#define ID_FLIPY 1042
+#define ID_FLIPZ 1043
+#define ID_MOVEZP 1044
+#define ID_MOVEYP 1045
+#define ID_MOVEXN 1046
+#define ID_MOVEXP 1047
+#define ID_MOVEYN 1048
+#define ID_MOVEZN 1049
+#define ID_ALIGNTOP 1050
+#define ID_ALIGNMIDDLE 1051
+#define ID_ALIGNBOTTOM 1052
+#define ID_ROTATEYN 1053
+#define ID_ROTATEXN 1054
+#define ID_ROTATEYP 1055
+#define ID_ROTATEZN 1056
+#define ID_ROTATEZP 1057
+#define ID_ROTATEXP 1058
+#define ID_WORKPIECEROTATEX 1059
+#define ID_WORKPIECEROTATEY 1060
+#define ID_WORKPIECEROTATEZ 1061
+#define ID_AXISX 1062
+#define ID_AXISY 1063
+#define ID_AXISZ 1064
+#define ID_BUTTONCONNECT 1065
+#define ID_BUTTONDISCONNECT 1066
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIMainFrame
@@ -105,6 +128,8 @@ class GUIMainFrame : public wxFrame
 		wxMenu* m_menuEdit;
 		wxMenu* m_menuObject;
 		wxMenu* m_menuStock;
+		wxMenu* m_menuWorkpiece;
+		wxMenu* m_menuRun;
 		wxMenu* m_menuMachine;
 		wxMenu* m_menuToolbox;
 		wxMenu* m_menuToolpath;
@@ -120,11 +145,11 @@ class GUIMainFrame : public wxFrame
 		wxToolBar* m_toolBar;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnCreateProject( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnProjectNew( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnProjectRename( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnLoadProject( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSaveProject( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSaveProjectAs( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnProjectLoad( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnProjectSave( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnProjectSaveAs( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnQuit( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUndo( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRedo( wxCommandEvent& event ) { event.Skip(); }
@@ -133,12 +158,19 @@ class GUIMainFrame : public wxFrame
 		virtual void OnObjectDelete( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnObjectModify( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnObjectFlipNormals( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnEditStock( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnLoadMachine( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnReloadMachine( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnEditToolbox( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnLoadToolbox( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSaveToolbox( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnStockEdit( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnWorkpieceAdd( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnWorkpieceDelete( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnWorkpieceDeleteUnused( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRunAdd( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRunEdit( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRunDelete( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMachineLoad( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMachineReload( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMachineDebugger( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnToolboxEdit( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnToolboxLoad( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnToolboxSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnGenerateToolpath( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRecollectToolpath( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCleanToolpath( wxCommandEvent& event ) { event.Skip(); }
@@ -151,13 +183,18 @@ class GUIMainFrame : public wxFrame
 		virtual void OnChangeStereo3D( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSetupUnits( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnShowAnimationControl( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnExtraWindowClose( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnShowLogWindow( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnViewSet( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAbout( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnBeginLabelEdit( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnEndLabelEdit( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnActivate( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnActivateRightClickMenu( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnSelectionChanged( wxTreeEvent& event ) { event.Skip(); }
+		virtual void OnSelectionChanging( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnToolbarButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddGenerator( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -284,7 +321,7 @@ class GUIObjectTransformation : public wxFrame
 	
 	public:
 		
-		GUIObjectTransformation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 709,461 ), long style = wxDEFAULT_FRAME_STYLE|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
+		GUIObjectTransformation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 709,468 ), long style = wxDEFAULT_FRAME_STYLE|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
 		~GUIObjectTransformation();
 	
 };
@@ -300,31 +337,120 @@ class GUIStockMaterial : public wxFrame
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuStock;
 		wxMenu* m_menuSettings;
-		wxListCtrl* m_listCtrl;
+		
+		wxStaticText* m_staticText96;
+		wxTextCtrl* m_textCtrlName;
+		
 		wxStaticText* m_staticText27;
 		wxTextCtrl* m_textCtrlX;
-		wxStaticText* m_staticText28;
+		wxStaticText* m_staticTextUnitX;
 		wxStaticText* m_staticText29;
 		wxTextCtrl* m_textCtrlY;
-		wxStaticText* m_staticText30;
+		wxStaticText* m_staticTextUnitY;
 		wxStaticText* m_staticText31;
 		wxTextCtrl* m_textCtrlZ;
-		wxStaticText* m_staticText32;
+		wxStaticText* m_staticTextUnitZ;
 		wxStaticText* m_staticText33;
 		wxTextCtrl* m_textCtrlMaxSpeed;
-		wxStaticText* m_staticText34;
+		wxStaticText* m_staticTextUnitRotationalSpeed;
 		wxStaticText* m_staticText35;
 		wxTextCtrl* m_textCtrlMaxFeedrate;
-		wxStaticText* m_staticText36;
+		wxStaticText* m_staticTextUnitLinearSpeed;
+		wxCheckBox* m_checkBoxAvailable;
+		wxButton* m_buttonStockAdd;
+		wxButton* m_buttonStockDelete;
+		wxListCtrl* m_listCtrl;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnSize( wxSizeEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddUpdate( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDelete( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnActivate( wxListEvent& event ) { event.Skip(); }
+		virtual void OnSelected( wxListEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		GUIStockMaterial( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Stock Material"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 638,365 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		GUIStockMaterial( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Overview of all Stock Material"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 765,557 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
 		~GUIStockMaterial();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class GUIWorkpiece
+///////////////////////////////////////////////////////////////////////////////
+class GUIWorkpiece : public wxFrame 
+{
+	private:
+	
+	protected:
+		wxMenuBar* m_menubar;
+		wxMenu* m_menuStock;
+		wxMenu* m_menuEdit;
+		wxStaticText* m_staticText97;
+		wxChoice* m_choiceStock;
+		wxButton* m_buttonAdd;
+		wxGrid* m_grid;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnSize( wxSizeEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddStock( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDBLClick( wxGridEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		GUIWorkpiece( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Add Objects to Workpieces"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 559,457 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
+		~GUIWorkpiece();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class GUIRun
+///////////////////////////////////////////////////////////////////////////////
+class GUIRun : public wxFrame 
+{
+	private:
+	
+	protected:
+		wxMenuBar* m_menubar;
+		wxMenu* m_menuEdit;
+		wxMenu* m_menuToolbox;
+		wxMenu* m_menuSettings;
+		wxChoice* m_choiceRun;
+		wxChoice* m_choiceWorkpiece;
+		wxButton* m_buttonRotX90;
+		wxButton* m_buttonRotY90;
+		wxButton* m_buttonRotZ90;
+		wxTextCtrl* m_textCtrlMachineName;
+		wxButton* m_buttonLoadMachine;
+		wxStaticText* m_staticText99;
+		wxListCtrl* m_listCtrlTools;
+		wxButton* m_buttonToolDelete;
+		wxChoice* m_choiceTool;
+		wxStaticText* m_staticText100;
+		wxSpinCtrl* m_spinCtrlToolSlot;
+		wxButton* m_buttonToolAdd;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRunSelect( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnWorkpieceSelect( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRotate( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnLoadMachine( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnToolRemove( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnToolAdd( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		GUIRun( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup a Machine Run"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 657,531 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
+		~GUIRun();
 	
 };
 
@@ -336,6 +462,9 @@ class GUIMachineDebugger : public wxFrame
 	private:
 	
 	protected:
+		wxMenuBar* m_menubar;
+		wxMenu* m_menuFile;
+		wxMenu* m_menuMachine;
 		wxSplitterWindow* m_splitter2;
 		wxPanel* m_panel;
 		wxSplitterWindow* m_splitter3;
@@ -347,16 +476,18 @@ class GUIMachineDebugger : public wxFrame
 		wxPanel* m_panelMachineView;
 		MainCanvas* m_canvas;
 		wxStatusBar* m_statusBar3;
-		wxMenuBar* m_menubar;
-		wxMenu* m_menuFile;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMachineRestart( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnShowController( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRestart( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		GUIMachineDebugger( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine debugger"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 771,594 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		GUIMachineDebugger( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine debugger"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 771,594 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		~GUIMachineDebugger();
 		void m_splitter2OnIdle( wxIdleEvent& )
 		{
@@ -496,6 +627,7 @@ class GUIToolbox : public wxFrame
 		ToolCanvas* m_canvas;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnChangeStereo3D( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnNewTool( wxCommandEvent& event ) { event.Skip(); }
@@ -509,7 +641,7 @@ class GUIToolbox : public wxFrame
 	
 	public:
 		
-		GUIToolbox( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolbox"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 646,765 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIToolbox( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolbox"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 646,765 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
 		~GUIToolbox();
 	
 };
@@ -536,6 +668,7 @@ class GUIAnimation : public wxFrame
 		wxBitmapButton* m_bpButtonLast;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
 		virtual void OnFirst( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPrev( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPlayStop( wxCommandEvent& event ) { event.Skip(); }
@@ -545,7 +678,7 @@ class GUIAnimation : public wxFrame
 	
 	public:
 		
-		GUIAnimation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolpath Animation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 478,187 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIAnimation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolpath Animation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 478,187 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
 		~GUIAnimation();
 	
 };
@@ -616,7 +749,7 @@ class GUISetupUnits : public wxFrame
 	
 	public:
 		
-		GUISetupUnits( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup display units"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		GUISetupUnits( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup display units"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxSTAY_ON_TOP|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		~GUISetupUnits();
 	
 };
