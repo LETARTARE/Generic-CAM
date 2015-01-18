@@ -112,8 +112,23 @@
 #define ID_AXISX 1062
 #define ID_AXISY 1063
 #define ID_AXISZ 1064
-#define ID_BUTTONCONNECT 1065
-#define ID_BUTTONDISCONNECT 1066
+#define ID_TEXTX 1065
+#define ID_TEXTY 1066
+#define ID_TEXTZ 1067
+#define ID_AXISA 1068
+#define ID_AXISB 1069
+#define ID_AXISC 1070
+#define ID_TEXTA 1071
+#define ID_TEXTB 1072
+#define ID_TEXTC 1073
+#define ID_AXISU 1074
+#define ID_AXISV 1075
+#define ID_AXISW 1076
+#define ID_TEXTU 1077
+#define ID_TEXTV 1078
+#define ID_TEXTW 1079
+#define ID_BUTTONCONNECT 1080
+#define ID_BUTTONDISCONNECT 1081
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIMainFrame
@@ -563,6 +578,7 @@ class GUIMachineControl : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnZero( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnScroll( wxScrollEvent& event ) { event.Skip(); }
 		virtual void OnTrack( wxScrollEvent& event ) { event.Skip(); }
 		virtual void OnTextChanged( wxCommandEvent& event ) { event.Skip(); }

@@ -39,14 +39,29 @@
 
 class DialogMachineControl:public GUIMachineControl {
 public:
-	DialogMachineControl(wxWindow * parent, Project * project,
-			DisplaySettings * settings);
+	DialogMachineControl(wxWindow * parent, DisplaySettings * settings);
 
-	Project* project;
 	DisplaySettings * settings;
+
+	bool TransferDataToWindowSliders(void);
+	bool TransferDataFromWindowSliders(void);
+
+	bool TransferDataToWindowTextbox(void);
 
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
+
+	double X, Y, Z;
+	double A, B, C;
+	double U, V, W;
+
+	float groupXYZLimit;
+	float groupABCLimit;
+	float groupUVWLimit;
+
+	unsigned int sliderSteps;
+	unsigned int pageSize;
+	unsigned int lineSize;
 
 private:
 
@@ -54,6 +69,7 @@ protected:
 	
 	void OnClose(wxCloseEvent& event);
 	void OnScroll(wxScrollEvent& event);
+	void OnZero(wxMouseEvent& event);
 	void OnTrack(wxScrollEvent& event);
 	void OnTextChanged(wxCommandEvent& event);
 };

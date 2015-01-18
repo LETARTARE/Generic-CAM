@@ -10225,7 +10225,7 @@
                                                 <event name="OnMouseWheel"></event>
                                                 <event name="OnPaint"></event>
                                                 <event name="OnRightDClick"></event>
-                                                <event name="OnRightDown"></event>
+                                                <event name="OnRightDown">OnZero</event>
                                                 <event name="OnRightUp"></event>
                                                 <event name="OnScroll">OnScroll</event>
                                                 <event name="OnScrollBottom"></event>
@@ -10367,7 +10367,7 @@
                                                 <event name="OnMouseWheel"></event>
                                                 <event name="OnPaint"></event>
                                                 <event name="OnRightDClick"></event>
-                                                <event name="OnRightDown"></event>
+                                                <event name="OnRightDown">OnZero</event>
                                                 <event name="OnRightUp"></event>
                                                 <event name="OnScroll">OnScroll</event>
                                                 <event name="OnScrollBottom"></event>
@@ -10509,7 +10509,7 @@
                                                 <event name="OnMouseWheel"></event>
                                                 <event name="OnPaint"></event>
                                                 <event name="OnRightDClick"></event>
-                                                <event name="OnRightDown"></event>
+                                                <event name="OnRightDown">OnZero</event>
                                                 <event name="OnRightUp"></event>
                                                 <event name="OnScroll">OnScroll</event>
                                                 <event name="OnScrollBottom"></event>
@@ -10612,7 +10612,7 @@
                                         <property name="fg"></property>
                                         <property name="font"></property>
                                         <property name="hidden">0</property>
-                                        <property name="id">wxID_ANY</property>
+                                        <property name="id">ID_TEXTX</property>
                                         <property name="maximum_size"></property>
                                         <property name="maxlength">0</property>
                                         <property name="minimum_size"></property>
@@ -10781,7 +10781,7 @@
                                         <property name="fg"></property>
                                         <property name="font"></property>
                                         <property name="hidden">0</property>
-                                        <property name="id">wxID_ANY</property>
+                                        <property name="id">ID_TEXTY</property>
                                         <property name="maximum_size"></property>
                                         <property name="maxlength">0</property>
                                         <property name="minimum_size"></property>
@@ -10950,7 +10950,7 @@
                                         <property name="fg"></property>
                                         <property name="font"></property>
                                         <property name="hidden">0</property>
-                                        <property name="id">wxID_ANY</property>
+                                        <property name="id">ID_TEXTZ</property>
                                         <property name="maximum_size"></property>
                                         <property name="maxlength">0</property>
                                         <property name="minimum_size"></property>
@@ -11153,7 +11153,7 @@
                                                 <property name="fg"></property>
                                                 <property name="font"></property>
                                                 <property name="hidden">0</property>
-                                                <property name="id">wxID_ANY</property>
+                                                <property name="id">ID_AXISA</property>
                                                 <property name="maxValue">100</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minValue">-100</property>
@@ -11201,9 +11201,9 @@
                                                 <event name="OnMouseWheel"></event>
                                                 <event name="OnPaint"></event>
                                                 <event name="OnRightDClick"></event>
-                                                <event name="OnRightDown"></event>
+                                                <event name="OnRightDown">OnZero</event>
                                                 <event name="OnRightUp"></event>
-                                                <event name="OnScroll"></event>
+                                                <event name="OnScroll">OnScroll</event>
                                                 <event name="OnScrollBottom"></event>
                                                 <event name="OnScrollChanged"></event>
                                                 <event name="OnScrollLineDown"></event>
@@ -11211,7 +11211,7 @@
                                                 <event name="OnScrollPageDown"></event>
                                                 <event name="OnScrollPageUp"></event>
                                                 <event name="OnScrollThumbRelease"></event>
-                                                <event name="OnScrollThumbTrack"></event>
+                                                <event name="OnScrollThumbTrack">OnTrack</event>
                                                 <event name="OnScrollTop"></event>
                                                 <event name="OnSetFocus"></event>
                                                 <event name="OnSize"></event>
@@ -11295,7 +11295,7 @@
                                                 <property name="fg"></property>
                                                 <property name="font"></property>
                                                 <property name="hidden">0</property>
-                                                <property name="id">wxID_ANY</property>
+                                                <property name="id">ID_AXISB</property>
                                                 <property name="maxValue">100</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minValue">-100</property>
@@ -11343,9 +11343,9 @@
                                                 <event name="OnMouseWheel"></event>
                                                 <event name="OnPaint"></event>
                                                 <event name="OnRightDClick"></event>
-                                                <event name="OnRightDown"></event>
+                                                <event name="OnRightDown">OnZero</event>
                                                 <event name="OnRightUp"></event>
-                                                <event name="OnScroll"></event>
+                                                <event name="OnScroll">OnScroll</event>
                                                 <event name="OnScrollBottom"></event>
                                                 <event name="OnScrollChanged"></event>
                                                 <event name="OnScrollLineDown"></event>
@@ -11353,7 +11353,7 @@
                                                 <event name="OnScrollPageDown"></event>
                                                 <event name="OnScrollPageUp"></event>
                                                 <event name="OnScrollThumbRelease"></event>
-                                                <event name="OnScrollThumbTrack"></event>
+                                                <event name="OnScrollThumbTrack">OnTrack</event>
                                                 <event name="OnScrollTop"></event>
                                                 <event name="OnSetFocus"></event>
                                                 <event name="OnSize"></event>
@@ -11437,7 +11437,7 @@
                                                 <property name="fg"></property>
                                                 <property name="font"></property>
                                                 <property name="hidden">0</property>
-                                                <property name="id">wxID_ANY</property>
+                                                <property name="id">ID_AXISC</property>
                                                 <property name="maxValue">100</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minValue">-100</property>
@@ -11485,9 +11485,9 @@
                                                 <event name="OnMouseWheel"></event>
                                                 <event name="OnPaint"></event>
                                                 <event name="OnRightDClick"></event>
-                                                <event name="OnRightDown"></event>
+                                                <event name="OnRightDown">OnZero</event>
                                                 <event name="OnRightUp"></event>
-                                                <event name="OnScroll"></event>
+                                                <event name="OnScroll">OnScroll</event>
                                                 <event name="OnScrollBottom"></event>
                                                 <event name="OnScrollChanged"></event>
                                                 <event name="OnScrollLineDown"></event>
@@ -11495,7 +11495,7 @@
                                                 <event name="OnScrollPageDown"></event>
                                                 <event name="OnScrollPageUp"></event>
                                                 <event name="OnScrollThumbRelease"></event>
-                                                <event name="OnScrollThumbTrack"></event>
+                                                <event name="OnScrollThumbTrack">OnTrack</event>
                                                 <event name="OnScrollTop"></event>
                                                 <event name="OnSetFocus"></event>
                                                 <event name="OnSize"></event>
@@ -11588,7 +11588,7 @@
                                         <property name="fg"></property>
                                         <property name="font"></property>
                                         <property name="hidden">0</property>
-                                        <property name="id">wxID_ANY</property>
+                                        <property name="id">ID_TEXTA</property>
                                         <property name="maximum_size"></property>
                                         <property name="maxlength">0</property>
                                         <property name="minimum_size"></property>
@@ -11630,7 +11630,7 @@
                                         <event name="OnSetFocus"></event>
                                         <event name="OnSize"></event>
                                         <event name="OnText"></event>
-                                        <event name="OnTextEnter"></event>
+                                        <event name="OnTextEnter">OnTextChanged</event>
                                         <event name="OnTextMaxLen"></event>
                                         <event name="OnTextURL"></event>
                                         <event name="OnUpdateUI"></event>
@@ -11648,7 +11648,7 @@
                                         <property name="font"></property>
                                         <property name="hidden">0</property>
                                         <property name="id">wxID_ANY</property>
-                                        <property name="label">mm</property>
+                                        <property name="label">deg</property>
                                         <property name="maximum_size"></property>
                                         <property name="minimum_size"></property>
                                         <property name="name">m_staticTextUnitA</property>
@@ -11757,7 +11757,7 @@
                                         <property name="fg"></property>
                                         <property name="font"></property>
                                         <property name="hidden">0</property>
-                                        <property name="id">wxID_ANY</property>
+                                        <property name="id">ID_TEXTB</property>
                                         <property name="maximum_size"></property>
                                         <property name="maxlength">0</property>
                                         <property name="minimum_size"></property>
@@ -11799,7 +11799,7 @@
                                         <event name="OnSetFocus"></event>
                                         <event name="OnSize"></event>
                                         <event name="OnText"></event>
-                                        <event name="OnTextEnter"></event>
+                                        <event name="OnTextEnter">OnTextChanged</event>
                                         <event name="OnTextMaxLen"></event>
                                         <event name="OnTextURL"></event>
                                         <event name="OnUpdateUI"></event>
@@ -11817,7 +11817,7 @@
                                         <property name="font"></property>
                                         <property name="hidden">0</property>
                                         <property name="id">wxID_ANY</property>
-                                        <property name="label">mm</property>
+                                        <property name="label">deg</property>
                                         <property name="maximum_size"></property>
                                         <property name="minimum_size"></property>
                                         <property name="name">m_staticTextUnitB</property>
@@ -11926,7 +11926,7 @@
                                         <property name="fg"></property>
                                         <property name="font"></property>
                                         <property name="hidden">0</property>
-                                        <property name="id">wxID_ANY</property>
+                                        <property name="id">ID_TEXTC</property>
                                         <property name="maximum_size"></property>
                                         <property name="maxlength">0</property>
                                         <property name="minimum_size"></property>
@@ -11968,7 +11968,7 @@
                                         <event name="OnSetFocus"></event>
                                         <event name="OnSize"></event>
                                         <event name="OnText"></event>
-                                        <event name="OnTextEnter"></event>
+                                        <event name="OnTextEnter">OnTextChanged</event>
                                         <event name="OnTextMaxLen"></event>
                                         <event name="OnTextURL"></event>
                                         <event name="OnUpdateUI"></event>
@@ -11986,7 +11986,7 @@
                                         <property name="font"></property>
                                         <property name="hidden">0</property>
                                         <property name="id">wxID_ANY</property>
-                                        <property name="label">mm</property>
+                                        <property name="label">deg</property>
                                         <property name="maximum_size"></property>
                                         <property name="minimum_size"></property>
                                         <property name="name">m_staticTextUnitC</property>
@@ -12129,7 +12129,7 @@
                                                 <property name="fg"></property>
                                                 <property name="font"></property>
                                                 <property name="hidden">0</property>
-                                                <property name="id">wxID_ANY</property>
+                                                <property name="id">ID_AXISU</property>
                                                 <property name="maxValue">100</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minValue">-100</property>
@@ -12177,9 +12177,9 @@
                                                 <event name="OnMouseWheel"></event>
                                                 <event name="OnPaint"></event>
                                                 <event name="OnRightDClick"></event>
-                                                <event name="OnRightDown"></event>
+                                                <event name="OnRightDown">OnZero</event>
                                                 <event name="OnRightUp"></event>
-                                                <event name="OnScroll"></event>
+                                                <event name="OnScroll">OnScroll</event>
                                                 <event name="OnScrollBottom"></event>
                                                 <event name="OnScrollChanged"></event>
                                                 <event name="OnScrollLineDown"></event>
@@ -12271,7 +12271,7 @@
                                                 <property name="fg"></property>
                                                 <property name="font"></property>
                                                 <property name="hidden">0</property>
-                                                <property name="id">wxID_ANY</property>
+                                                <property name="id">ID_AXISV</property>
                                                 <property name="maxValue">100</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minValue">-100</property>
@@ -12319,9 +12319,9 @@
                                                 <event name="OnMouseWheel"></event>
                                                 <event name="OnPaint"></event>
                                                 <event name="OnRightDClick"></event>
-                                                <event name="OnRightDown"></event>
+                                                <event name="OnRightDown">OnZero</event>
                                                 <event name="OnRightUp"></event>
-                                                <event name="OnScroll"></event>
+                                                <event name="OnScroll">OnScroll</event>
                                                 <event name="OnScrollBottom"></event>
                                                 <event name="OnScrollChanged"></event>
                                                 <event name="OnScrollLineDown"></event>
@@ -12413,7 +12413,7 @@
                                                 <property name="fg"></property>
                                                 <property name="font"></property>
                                                 <property name="hidden">0</property>
-                                                <property name="id">wxID_ANY</property>
+                                                <property name="id">ID_AXISW</property>
                                                 <property name="maxValue">100</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minValue">-100</property>
@@ -12461,9 +12461,9 @@
                                                 <event name="OnMouseWheel"></event>
                                                 <event name="OnPaint"></event>
                                                 <event name="OnRightDClick"></event>
-                                                <event name="OnRightDown"></event>
+                                                <event name="OnRightDown">OnZero</event>
                                                 <event name="OnRightUp"></event>
-                                                <event name="OnScroll"></event>
+                                                <event name="OnScroll">OnScroll</event>
                                                 <event name="OnScrollBottom"></event>
                                                 <event name="OnScrollChanged"></event>
                                                 <event name="OnScrollLineDown"></event>
@@ -12564,7 +12564,7 @@
                                         <property name="fg"></property>
                                         <property name="font"></property>
                                         <property name="hidden">0</property>
-                                        <property name="id">wxID_ANY</property>
+                                        <property name="id">ID_TEXTU</property>
                                         <property name="maximum_size"></property>
                                         <property name="maxlength">0</property>
                                         <property name="minimum_size"></property>
@@ -12606,7 +12606,7 @@
                                         <event name="OnSetFocus"></event>
                                         <event name="OnSize"></event>
                                         <event name="OnText"></event>
-                                        <event name="OnTextEnter"></event>
+                                        <event name="OnTextEnter">OnTextChanged</event>
                                         <event name="OnTextMaxLen"></event>
                                         <event name="OnTextURL"></event>
                                         <event name="OnUpdateUI"></event>
@@ -12733,7 +12733,7 @@
                                         <property name="fg"></property>
                                         <property name="font"></property>
                                         <property name="hidden">0</property>
-                                        <property name="id">wxID_ANY</property>
+                                        <property name="id">ID_TEXTV</property>
                                         <property name="maximum_size"></property>
                                         <property name="maxlength">0</property>
                                         <property name="minimum_size"></property>
@@ -12902,7 +12902,7 @@
                                         <property name="fg"></property>
                                         <property name="font"></property>
                                         <property name="hidden">0</property>
-                                        <property name="id">wxID_ANY</property>
+                                        <property name="id">ID_TEXTW</property>
                                         <property name="maximum_size"></property>
                                         <property name="maxlength">0</property>
                                         <property name="minimum_size"></property>

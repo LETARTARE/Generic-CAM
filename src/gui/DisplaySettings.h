@@ -46,6 +46,7 @@ public:
 	Unit Distance;
 	Unit LinearSpeed;
 	Unit RotationalSpeed;
+	Unit Angle;
 
 	bool GetConfigFrom(wxConfig * config);
 	bool WriteConfigTo(wxConfig * config);

@@ -32,7 +32,7 @@ DialogMachineDebugger::DialogMachineDebugger(wxWindow * parent,
 {
 	this->project = project;
 	this->settings = settings;
-	machineControl = new DialogMachineControl(this, project, settings);
+	machineControl = NULL;
 }
 
 bool DialogMachineDebugger::TransferDataToWindow(void)
@@ -48,12 +48,14 @@ bool DialogMachineDebugger::TransferDataFromWindow(void)
 void DialogMachineDebugger::OnClose(wxCloseEvent& event)
 {
 	TransferDataFromWindow();
+	machineControl->Show(false);
 	this->Show(false);
 }
 
 void DialogMachineDebugger::OnClose(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
+	machineControl->Show(false);
 	this->Show(false);
 }
 
@@ -63,7 +65,10 @@ void DialogMachineDebugger::OnMachineRestart(wxCommandEvent& event)
 
 void DialogMachineDebugger::OnShowController(wxCommandEvent& event)
 {
+	if(machineControl == NULL) machineControl = new DialogMachineControl(this,
+			settings);
 	machineControl->Show();
+	machineControl->TransferDataToWindow();
 }
 
 void DialogMachineDebugger::OnRestart(wxCommandEvent& event)
