@@ -285,14 +285,19 @@ void Project::Assemble(void)
 void Project::Paint(void)
 {
 	size_t i, j;
+
 	if(displayGeometry){
-		for(i = 0; i < objects.GetCount(); i++)
+		glLoadName(1);
+		glPushName(0);
+		for(i = 0; i < objects.GetCount(); i++){
+			::glLoadName(i + 1);
 			objects[i].Paint();
-
-//		octree.Paint();
-//		quadtree.Paint();
-
+		}
+		::glPopName();
 	}
+
+	//		octree.Paint();
+//		quadtree.Paint();
 //	if(displayMachine) machine.Paint();
 
 //	if(displayRun){

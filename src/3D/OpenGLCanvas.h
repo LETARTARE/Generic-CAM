@@ -22,11 +22,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #ifndef OPENGLCANVAS_H_
 #define OPENGLCANVAS_H_
@@ -35,37 +31,47 @@
 #include "../Config.h"
 #include "AffineTransformMatrix.h"
 #include "../controller/Control3D.h"
+#include "OpenGLPick.h"
 #include <wx/glcanvas.h>
+#include <wx/gdicmn.h>
 
 /*!\class OpenGLCanvas
- * \brief Extending wxGLCanvas with some useful features.
+ * \brief Extending wxGLCanvas with some useful features
  *
- *
+ * Features like:
+ *  * Mouse movement
+ *  * 6-DOF controller support
+ *  * Object picking
+ *  * Stereo 3D (Anaglyph- and Shutterglasses)
  */
+
 class OpenGLCanvas:public wxGLCanvas {
 	//friend class ChildFrame;
 	// Constructor / Destructor
 public:
 	OpenGLCanvas(wxWindow *parent, wxWindowID id = wxID_ANY,
 			const wxPoint& pos = wxDefaultPosition, const wxSize& size =
-					wxDefaultSize, long style = 0, const wxString& name =
-					_T("OpenGLCanvas"));
+					wxDefaultSize, long style = 0,
+			const wxString& name = _T("OpenGLCanvas"));
 	virtual ~OpenGLCanvas();
 
 	// Member Variables
 public:
 	bool stereoMode;
 
+protected:
+	AffineTransformMatrix rotmat;
+	AffineTransformMatrix transmat;
+
 private:
 	bool isInitialized;
 	GLuint m_gllist;
 
-	AffineTransformMatrix rotmat;
-	AffineTransformMatrix transmat;
+	Control3D* control; ///> Link to 6DOF-controller
+	wxTimer timer; ///> Timer for polling the controller
 
-	Control3D* control;
-	wxTimer timer;
-	int x, y;
+	int x; ///> Startpoint for mouse dragging
+	int y; ///> Startpoint for mouse dragging
 
 	// Methods
 
@@ -76,12 +82,11 @@ public:
 	virtual void InitGL();
 	virtual void SetupLighting();
 
-	// ?
-	//void prepare3DViewport(int topleft_x, int topleft_y, int bottomrigth_x, int bottomrigth_y);
-	//void prepare2DViewport(int topleft_x, int topleft_y, int bottomrigth_x, int bottomrigth_y);
-
+	bool OnPick(OpenGLPick &result, int x, int y);
+	bool OnPick(OpenGLPick &result, wxPoint pos);
 
 protected:
+
 	void OnPaint(wxPaintEvent& WXUNUSED(event));
 	void OnSize(wxSizeEvent& event);
 	void OnEraseBackground(wxEraseEvent& WXUNUSED(event));

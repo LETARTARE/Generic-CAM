@@ -88,24 +88,24 @@
 #define ID_SCALEPERCENTY 1038
 #define ID_SCALEPERCENTZ 1039
 #define ID_SCALEPERCENT 1040
-#define ID_FLIPX 1041
-#define ID_FLIPY 1042
-#define ID_FLIPZ 1043
-#define ID_MOVEZP 1044
-#define ID_MOVEYP 1045
-#define ID_MOVEXN 1046
-#define ID_MOVEXP 1047
-#define ID_MOVEYN 1048
-#define ID_MOVEZN 1049
-#define ID_ALIGNTOP 1050
-#define ID_ALIGNMIDDLE 1051
-#define ID_ALIGNBOTTOM 1052
-#define ID_ROTATEYN 1053
-#define ID_ROTATEXN 1054
-#define ID_ROTATEYP 1055
-#define ID_ROTATEZN 1056
-#define ID_ROTATEZP 1057
-#define ID_ROTATEXP 1058
+#define ID_MOVEZP 1041
+#define ID_MOVEYP 1042
+#define ID_MOVEXN 1043
+#define ID_MOVEXP 1044
+#define ID_MOVEYN 1045
+#define ID_MOVEZN 1046
+#define ID_ALIGNTOP 1047
+#define ID_ALIGNMIDDLE 1048
+#define ID_ALIGNBOTTOM 1049
+#define ID_ROTATEYN 1050
+#define ID_ROTATEXN 1051
+#define ID_ROTATEYP 1052
+#define ID_ROTATEZN 1053
+#define ID_ROTATEZP 1054
+#define ID_ROTATEXP 1055
+#define ID_FLIPX 1056
+#define ID_FLIPY 1057
+#define ID_FLIPZ 1058
 #define ID_WORKPIECEROTATEX 1059
 #define ID_WORKPIECEROTATEY 1060
 #define ID_WORKPIECEROTATEZ 1061
@@ -193,6 +193,7 @@ class GUIMainFrame : public wxFrame
 		virtual void OnActivateRightClickMenu( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnSelectionChanged( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnSelectionChanging( wxTreeEvent& event ) { event.Skip(); }
+		virtual void On3DSelect( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnToolbarButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddGenerator( wxCommandEvent& event ) { event.Skip(); }
 		
@@ -265,14 +266,6 @@ class GUIObjectTransformation : public wxFrame
 		wxTextCtrl* m_textCtrlScalePercent;
 		wxStaticText* m_staticText49;
 		wxButton* m_button15;
-		wxPanel* m_panelMirror;
-		
-		wxButton* m_button39;
-		wxButton* m_button40;
-		wxButton* m_button41;
-		
-		wxButton* m_buttonFlipNormalVectors;
-		
 		wxPanel* m_panelMove;
 		
 		wxStaticText* m_staticText62;
@@ -306,6 +299,14 @@ class GUIObjectTransformation : public wxFrame
 		
 		wxButton* m_button31;
 		
+		
+		wxPanel* m_panelMirror;
+		
+		wxButton* m_button39;
+		wxButton* m_button40;
+		wxButton* m_button41;
+		
+		wxButton* m_buttonFlipNormalVectors;
 		
 		wxStatusBar* m_statusBar;
 		

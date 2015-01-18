@@ -145,16 +145,64 @@ void OpenGLCanvas::InitGL()
 //	this->Refresh();
 }
 
+bool OpenGLCanvas::OnPick(OpenGLPick &result, int x, int y)
+{
+	return this->OnPick(result, wxPoint(x, y));
+}
+
+bool OpenGLCanvas::OnPick(OpenGLPick &result, wxPoint pos)
+{
+	if(!IsShown()) return false;
+#ifndef __WXMOTIF__
+	if(!GetContext()) return false;
+#endif
+	wxGLCanvas::SetCurrent(); // Link OpenGL to this area
+	wxPaintDC(this); // Set the clipping for this area
+	if(!isInitialized){
+		InitGL(); // Init OpenGL once, but after SetCurrent
+		isInitialized = true;
+	}
+	int w, h;
+	GetClientSize(&w, &h);
+	::glViewport(0, 0, (GLint) w, (GLint) h);
+
+	::glClear(GL_DEPTH_BUFFER_BIT);
+
+	::glSelectBuffer(result.GetBufferSize(), result.GetBuffer());
+	::glRenderMode(GL_SELECT);
+	::glInitNames();
+	::glPushName(0);
+
+	::glMatrixMode(GL_PROJECTION);
+	::glLoadIdentity();
+
+	GLint viewport[4];
+	::glGetIntegerv(GL_VIEWPORT, viewport);
+	::gluPickMatrix(pos.x, viewport[3] - pos.y, 1, 1, viewport);
+
+	GLdouble ar = (GLdouble) w / (GLdouble) h; // Calculate perspective
+	::gluPerspective(45, ar, 0.01, 10);
+	::glMatrixMode(GL_MODELVIEW);
+	::glLoadIdentity();
+	::glTranslatef(0.0, -0.0, -1.0);
+	::glMultMatrixd(transmat.a);
+	::glMultMatrixd(rotmat.a);
+	Render();
+	glFlush();
+	GLuint hits = glRenderMode(GL_RENDER);
+	result.SetHits(hits);
+	return (hits > 0);
+}
+
 void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
 	if(!IsShown()) return;
-
 #ifndef __WXMOTIF__
 	if(!GetContext()) return;
 #endif
 
-	wxGLCanvas::SetCurrent();
-	wxPaintDC(this); // TODO: Check what this does.
+	wxGLCanvas::SetCurrent(); // Link OpenGL to this area
+	wxPaintDC(this); // Set the clipping for this area
 
 	// Init OpenGL once, but after SetCurrent
 	if(!isInitialized){

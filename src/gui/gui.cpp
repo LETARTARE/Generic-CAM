@@ -387,6 +387,7 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_tree->Connect( wxEVT_COMMAND_TREE_ITEM_MENU, wxTreeEventHandler( GUIMainFrame::OnActivateRightClickMenu ), NULL, this );
 	m_tree->Connect( wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler( GUIMainFrame::OnSelectionChanged ), NULL, this );
 	m_tree->Connect( wxEVT_COMMAND_TREE_SEL_CHANGING, wxTreeEventHandler( GUIMainFrame::OnSelectionChanging ), NULL, this );
+	m_canvas->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( GUIMainFrame::On3DSelect ), NULL, this );
 	this->Connect( wxID_UNDO, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMainFrame::OnUndo ) );
 	this->Connect( wxID_REDO, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMainFrame::OnRedo ) );
 	this->Connect( ID_DISPLAYMACHINE, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMainFrame::OnToolbarButton ) );
@@ -450,6 +451,7 @@ GUIMainFrame::~GUIMainFrame()
 	m_tree->Disconnect( wxEVT_COMMAND_TREE_ITEM_MENU, wxTreeEventHandler( GUIMainFrame::OnActivateRightClickMenu ), NULL, this );
 	m_tree->Disconnect( wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler( GUIMainFrame::OnSelectionChanged ), NULL, this );
 	m_tree->Disconnect( wxEVT_COMMAND_TREE_SEL_CHANGING, wxTreeEventHandler( GUIMainFrame::OnSelectionChanging ), NULL, this );
+	m_canvas->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( GUIMainFrame::On3DSelect ), NULL, this );
 	this->Disconnect( wxID_UNDO, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMainFrame::OnUndo ) );
 	this->Disconnect( wxID_REDO, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMainFrame::OnRedo ) );
 	this->Disconnect( ID_DISPLAYMACHINE, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMainFrame::OnToolbarButton ) );
@@ -706,40 +708,6 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	m_panelScale->Layout();
 	bSizer29->Fit( m_panelScale );
 	m_notebook->AddPage( m_panelScale, _("Scale"), true );
-	m_panelMirror = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* bSizer36;
-	bSizer36 = new wxBoxSizer( wxVERTICAL );
-	
-	
-	bSizer36->Add( 0, 0, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	wxStaticBoxSizer* sbSizer10;
-	sbSizer10 = new wxStaticBoxSizer( new wxStaticBox( m_panelMirror, wxID_ANY, _("Mirror on") ), wxVERTICAL );
-	
-	m_button39 = new wxButton( m_panelMirror, ID_FLIPX, _("X axis"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer10->Add( m_button39, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
-	
-	m_button40 = new wxButton( m_panelMirror, ID_FLIPY, _("Y axis"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer10->Add( m_button40, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
-	
-	m_button41 = new wxButton( m_panelMirror, ID_FLIPZ, _("Z axis"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer10->Add( m_button41, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
-	
-	bSizer36->Add( sbSizer10, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	
-	bSizer36->Add( 0, 0, 1, wxEXPAND, 5 );
-	
-	m_buttonFlipNormalVectors = new wxButton( m_panelMirror, ID_OBJECTFLIPNORMALS, _("Flip normal vectors"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer36->Add( m_buttonFlipNormalVectors, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	
-	bSizer36->Add( 0, 0, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	m_panelMirror->SetSizer( bSizer36 );
-	m_panelMirror->Layout();
-	bSizer36->Fit( m_panelMirror );
-	m_notebook->AddPage( m_panelMirror, _("Mirror"), false );
 	m_panelMove = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer34;
 	bSizer34 = new wxBoxSizer( wxHORIZONTAL );
@@ -895,6 +863,40 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	m_panelRotate->Layout();
 	bSizer291->Fit( m_panelRotate );
 	m_notebook->AddPage( m_panelRotate, _("Rotate"), false );
+	m_panelMirror = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxBoxSizer* bSizer36;
+	bSizer36 = new wxBoxSizer( wxVERTICAL );
+	
+	
+	bSizer36->Add( 0, 0, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	wxStaticBoxSizer* sbSizer10;
+	sbSizer10 = new wxStaticBoxSizer( new wxStaticBox( m_panelMirror, wxID_ANY, _("Mirror on") ), wxVERTICAL );
+	
+	m_button39 = new wxButton( m_panelMirror, ID_FLIPX, _("X axis"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer10->Add( m_button39, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
+	m_button40 = new wxButton( m_panelMirror, ID_FLIPY, _("Y axis"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer10->Add( m_button40, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
+	m_button41 = new wxButton( m_panelMirror, ID_FLIPZ, _("Z axis"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer10->Add( m_button41, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
+	bSizer36->Add( sbSizer10, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	bSizer36->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_buttonFlipNormalVectors = new wxButton( m_panelMirror, ID_OBJECTFLIPNORMALS, _("Flip normal vectors"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer36->Add( m_buttonFlipNormalVectors, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	bSizer36->Add( 0, 0, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_panelMirror->SetSizer( bSizer36 );
+	m_panelMirror->Layout();
+	bSizer36->Fit( m_panelMirror );
+	m_notebook->AddPage( m_panelMirror, _("Mirror"), false );
 	
 	bSizer21->Add( m_notebook, 1, wxALL|wxEXPAND, 5 );
 	
@@ -916,10 +918,6 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	m_button22->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_button24->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_button15->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
-	m_button39->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
-	m_button40->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
-	m_button41->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
-	m_buttonFlipNormalVectors->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnFlipNormals ), NULL, this );
 	m_bpButton6->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_bpButton7->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_bpButton8->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
@@ -935,6 +933,10 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	m_button29->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_button30->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_button31->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
+	m_button39->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
+	m_button40->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
+	m_button41->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
+	m_buttonFlipNormalVectors->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnFlipNormals ), NULL, this );
 }
 
 GUIObjectTransformation::~GUIObjectTransformation()
@@ -953,10 +955,6 @@ GUIObjectTransformation::~GUIObjectTransformation()
 	m_button22->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_button24->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_button15->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
-	m_button39->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
-	m_button40->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
-	m_button41->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
-	m_buttonFlipNormalVectors->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnFlipNormals ), NULL, this );
 	m_bpButton6->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_bpButton7->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_bpButton8->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
@@ -972,6 +970,10 @@ GUIObjectTransformation::~GUIObjectTransformation()
 	m_button29->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_button30->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_button31->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
+	m_button39->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
+	m_button40->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
+	m_button41->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
+	m_buttonFlipNormalVectors->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnFlipNormals ), NULL, this );
 }
 
 GUIStockMaterial::GUIStockMaterial( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )

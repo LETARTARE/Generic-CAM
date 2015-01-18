@@ -22,9 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: 2010-05-02 15:21:09 +0200 (So, 02 Mai 2010) $
-//$Revision: 41 $
-//$LastChangedBy: tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef IKSOLVER_H_
