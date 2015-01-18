@@ -58,9 +58,9 @@ void DialogToolbox::SetController(Control3D& control)
 void DialogToolbox::OnChangeStereo3D(wxCommandEvent& event)
 {
 	if(m_canvas->stereoMode == 1){
-		m_canvas->stereoMode = 0;
+		m_canvas->stereoMode = stereoOff;
 	}else{
-		m_canvas->stereoMode = 1;
+		m_canvas->stereoMode = stereoAnaglyph;
 	}
 	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
 }

@@ -101,7 +101,7 @@ bool GenericCAMApp::OnInit()
 	frame = new MainFrame(NULL, &locale, config);
 
 	if(!loadOnStartup.IsEmpty()){
-		frame->LoadProject(loadOnStartup);
+		frame->ProjectLoad(loadOnStartup);
 
 	}
 

@@ -45,6 +45,10 @@
  *  * Stereo 3D (Anaglyph- and Shutterglasses)
  */
 
+enum Stereo3DType {
+	stereoOff = 0, stereoAnaglyph, stereoShutter
+};
+
 class OpenGLCanvas:public wxGLCanvas {
 	//friend class ChildFrame;
 	// Constructor / Destructor
@@ -57,7 +61,16 @@ public:
 
 	// Member Variables
 public:
-	bool stereoMode;
+	Stereo3DType stereoMode;
+	float eyeDistance;
+	float focalDistance;
+	float backgroundGrayLevel;
+	float rightEyeR;
+	float rightEyeG;
+	float rightEyeB;
+	float leftEyeR;
+	float leftEyeG;
+	float leftEyeB;
 
 protected:
 	AffineTransformMatrix rotmat;

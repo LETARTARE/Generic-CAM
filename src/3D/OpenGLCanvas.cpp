@@ -59,10 +59,18 @@ OpenGLCanvas::OpenGLCanvas(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 	isInitialized = false;
 	m_gllist = 0;
 	x = y = 0;
-
 	control = NULL;
 
-	stereoMode = false;
+	stereoMode = stereoOff;
+	eyeDistance = 0.1;
+	focalDistance = 2.0;
+	backgroundGrayLevel = 0.4;
+	rightEyeR = 0.7;
+	rightEyeG = 0.0;
+	rightEyeB = 0.0;
+	leftEyeR = 0.0;
+	leftEyeG = 0.3;
+	leftEyeB = 0.4;
 
 	timer.SetOwner(this);
 	this->Connect(wxEVT_TIMER, wxTimerEventHandler(OpenGLCanvas::OnTimer),
@@ -127,12 +135,13 @@ void OpenGLCanvas::InitGL()
 	//	GLfloat attenuation[] =
 	//		{1.0f, -0.01f, -.000001f};
 	//::glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, attenuation, 0);
+	::glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT);
 	::glEnable(GL_COLOR_MATERIAL);
-	::glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-	::glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//::glBlendFunc(GL_ONE, GL_ONE); // for Stereo Mode
 
-	::glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
+	::glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//	::glBlendFunc(GL_ONE, GL_ZERO); // disable alpha blending
+
+	::glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	::glClearDepth(1.0f);
 
 	::glEnable(GL_BLEND);
@@ -210,28 +219,29 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 		isInitialized = true;
 	}
 
-//	glMatrixMode(GL_MODELVIEW);
-//
-
-	// Setup for normal 2D view of 3D graphics
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-	glDrawBuffer(GL_BACK);
-
 	// set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
 	int w, h;
 	GetClientSize(&w, &h);
 	::glViewport(0, 0, (GLint) w, (GLint) h);
 
-//#ifndef __WXMOTIF__
-//	if(GetContext())
-//#endif
-//	{
-//		SetCurrent();
+	//	float specReflection[] = { 0.8f, 0.0f, 0.8f, 1.0f };
+	//	glMaterialfv(GL_FRONT, GL_SPECULAR, specReflection);
+	//	glMateriali(GL_FRONT, GL_SHININESS, 96);
 
 	// Clear color and depth buffers
+	glEnable(GL_COLOR_MATERIAL);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glDrawBuffer(GL_BACK);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Background
+
+	if(stereoMode == stereoAnaglyph){
+		::glEnable(GL_COLOR_MATERIAL);
+		::glColor3f(backgroundGrayLevel, backgroundGrayLevel,
+				backgroundGrayLevel);
+		::glDisable(GL_COLOR_MATERIAL);
+	}
 
 	::glMatrixMode(GL_PROJECTION);
 	::glLoadIdentity();
@@ -240,7 +250,6 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	::glLoadIdentity();
 
 	glNormal3b(0, 0, 1);
-
 	glBegin(GL_QUADS);
 	glColor3ub(50, 50, 50);
 	glVertex2i(1, 1);
@@ -253,32 +262,35 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	// Clear the depth buffer bit again. Now the rest of the
 	// image is always painted in front of the background.
 	glClear( GL_DEPTH_BUFFER_BIT);
+//	}
 
 	::glMatrixMode(GL_PROJECTION);
 	::glLoadIdentity();
 	GLdouble ar = (GLdouble) w / (GLdouble) h; // Calculate perspective
 	::gluPerspective(45, ar, 0.01, 10);
 
-//	}
-
-//	if(stereoMode){
-//		glDrawBuffer(GL_BACK_LEFT);
-//		glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
-//		::glPushMatrix();
-//		//::glRotatef();
-//		::glTranslatef(0.1, 0, 0);
-//	}
-
 	::glMatrixMode(GL_MODELVIEW);
 	::glLoadIdentity();
+
+	if(stereoMode == stereoAnaglyph){
+		::glEnable(GL_COLOR_MATERIAL);
+		::glColor3f(leftEyeR, leftEyeG, leftEyeB);
+		::glDisable(GL_COLOR_MATERIAL);
+		::glColorMask((leftEyeR <= 0.0)? GL_FALSE : GL_TRUE,
+				(leftEyeG <= 0.0)? GL_FALSE : GL_TRUE,
+				(leftEyeB <= 0.0)? GL_FALSE : GL_TRUE, GL_TRUE);
+		::glTranslatef(eyeDistance / 2, 0, 0);
+		::glRotatef(atan(eyeDistance / 2 / focalDistance) * 180 / M_PI, 0, 1,
+				0);
+	}
+	if(stereoMode == stereoShutter){
+		::glDrawBuffer(GL_BACK_LEFT);
+		::glTranslatef(eyeDistance / 2, 0, 0);
+	}
+
 	::glTranslatef(0.0, -0.0, -1.0);
 	::glMultMatrixd(transmat.a);
 	::glMultMatrixd(rotmat.a);
-
-	//	float specReflection[] = { 0.8f, 0.0f, 0.8f, 1.0f };
-	//	glMaterialfv(GL_FRONT, GL_SPECULAR, specReflection);
-	//	glMateriali(GL_FRONT, GL_SHININESS, 96);
-
 	//	if(m_gllist == 0){
 	//		m_gllist = glGenLists(1); // Make one (1) empty display list.
 	//		glNewList(m_gllist, GL_COMPILE_AND_EXECUTE);
@@ -288,22 +300,34 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	//		glCallList(m_gllist);
 	//	}
 
-//	if(stereoMode){
-//		glDrawBuffer(GL_BACK_RIGHT);
-//		::glPopMatrix();
-//		glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
-//
-//		::glTranslatef(-0.1, 0, -10);
-//
-//		::glMultMatrixd(transmat.a);
-//		::glMultMatrixd(rotmat.a);
-//
-//		glClear(GL_DEPTH_BUFFER_BIT);
-//
-//		Render();
-//		//glCallList(m_gllist);
-//
-//	}
+	if(stereoMode != stereoOff) ::glLoadIdentity();
+
+	if(stereoMode == stereoAnaglyph){
+		::glEnable(GL_COLOR_MATERIAL);
+		::glColor3f(rightEyeR, rightEyeG, rightEyeB);
+		::glDisable(GL_COLOR_MATERIAL);
+		::glColorMask((rightEyeR <= 0.0)? GL_FALSE : GL_TRUE,
+				(rightEyeG <= 0.0)? GL_FALSE : GL_TRUE,
+				(rightEyeB <= 0.0)? GL_FALSE : GL_TRUE, GL_TRUE);
+	}
+	if(stereoMode == stereoShutter){
+		::glDrawBuffer(GL_BACK_RIGHT);
+	}
+
+	if(stereoMode != stereoOff){
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		::glTranslatef(-eyeDistance / 2, 0, 0);
+		::glRotatef(-atan(eyeDistance / 2 / focalDistance) * 180 / M_PI, 0, 1,
+				0);
+		::glTranslatef(0.0, -0.0, -1.0);
+		::glMultMatrixd(transmat.a);
+		::glMultMatrixd(rotmat.a);
+		Render();
+		//glCallList(m_gllist);
+
+		::glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	}
 
 	glFlush();
 	SwapBuffers();

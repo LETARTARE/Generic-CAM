@@ -713,7 +713,7 @@
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">S&amp;ettings</property>
                     <property name="name">m_menuSettings</property>
                     <property name="permission">protected</property>
@@ -759,7 +759,7 @@
                         <property name="id">ID_VIEWSTEREO3D</property>
                         <property name="kind">wxITEM_CHECK</property>
                         <property name="label">&amp;Stereo 3D</property>
-                        <property name="name">m_menuItem22</property>
+                        <property name="name">m_menuItemSetupStereo3D</property>
                         <property name="permission">none</property>
                         <property name="shortcut"></property>
                         <property name="unchecked_bitmap"></property>
@@ -789,7 +789,7 @@
                         <property name="id">wxID_ANY</property>
                         <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">Show &amp;Animation Control</property>
-                        <property name="name">m_menuISetupAnimation</property>
+                        <property name="name">m_menuItemSetupAnimation</property>
                         <property name="permission">none</property>
                         <property name="shortcut"></property>
                         <property name="unchecked_bitmap"></property>
@@ -797,7 +797,7 @@
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">&amp;View</property>
                     <property name="name">m_menuView</property>
                     <property name="permission">protected</property>

@@ -53,8 +53,9 @@ void Project::Clear(void)
 {
 	name = _("Untitled");
 
-	objects.Empty();
 	run.Empty();
+	workpieces.Empty();
+	objects.Empty();
 
 	resolution = 0.0005;
 

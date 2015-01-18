@@ -27,6 +27,7 @@
 #include "Object.h"
 
 #include <wx/arrimpl.cpp>
+#include <wx/string.h>
 WX_DEFINE_OBJARRAY(ArrayOfObject)
 
 #include <wx/log.h>
@@ -129,6 +130,9 @@ bool Object::ReloadObject(void)
 					g.objectName = fileName.GetName()
 							+ wxString::Format(_T(" - %u"), i);
 				}
+				g.color.Set((float) rand() / (float) RAND_MAX,
+						(float) rand() / (float) RAND_MAX,
+						(float) rand() / (float) RAND_MAX);
 				geometries.Add(g);
 			}
 			if(!temp.error.IsEmpty()) wxLogMessage(temp.error);

@@ -45,18 +45,18 @@
 #include "../command/CommandRunRemove.h"
 
 #include "IDs.h"
-#include "wx/icon.h"
+#include <wx/icon.h>
+#include <wx/filename.h>
+#include <wx/textfile.h>
+#include <wx/msgdlg.h>
+#include <wx/dir.h>
+
 #ifndef __WIN32__
 #include "../icon/logo32.xpm"
 #include "../icon/logo48.xpm"
 #include "../icon/logo64.xpm"
 #include "../icon/logo128.xpm"
 #endif
-
-#include <wx/filename.h>
-#include <wx/textfile.h>
-#include <wx/msgdlg.h>
-#include <wx/dir.h>
 
 MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 		GUIMainFrame(parent)
@@ -192,7 +192,8 @@ bool MainFrame::TransferDataToWindow(void)
 
 bool MainFrame::TransferDataFromWindow(void)
 {
-	m_canvas->stereoMode = m_menuView->IsChecked(ID_VIEWSTEREO3D);
+//	m_canvas->stereoMode =
+//			m_menuView->IsChecked(ID_VIEWSTEREO3D)? stereoAnaglyph : stereoOff;
 	project.displayMachine = m_toolBar->GetToolState(ID_DISPLAYMACHINE);
 	project.displayGeometry = m_toolBar->GetToolState(ID_DISPLAYMATERIAL);
 
@@ -526,7 +527,7 @@ void MainFrame::OnProjectLoad(wxCommandEvent& event)
 	}
 }
 
-void MainFrame::LoadProject(wxString fileName)
+void MainFrame::ProjectLoad(wxString fileName)
 {
 	project.Load(fileName);
 	commandProcessor.ClearCommands();
@@ -943,12 +944,12 @@ void MainFrame::OnSetupController(wxCommandEvent& event)
 
 void MainFrame::OnChangeStereo3D(wxCommandEvent& event)
 {
-	if(m_canvas->stereoMode == 1){
-		m_canvas->stereoMode = 0;
+	if(m_canvas->stereoMode == stereoOff){
+		m_canvas->stereoMode = stereoAnaglyph;
 	}else{
-		m_canvas->stereoMode = 1;
+		m_canvas->stereoMode = stereoOff;
 	}
-	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
+	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
 	TransferDataToWindow();
 }
 

@@ -98,7 +98,7 @@ private:
 	float t; // TODO: Make a seperate animation class
 	// Methods
 public:
-	void LoadProject(wxString fileName); ///> Load a project from the command line
+	void ProjectLoad(wxString fileName); ///> Load a project from the command line
 
 private:
 	bool TransferDataToWindow(void);
