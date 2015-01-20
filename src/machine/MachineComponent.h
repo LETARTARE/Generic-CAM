@@ -22,9 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate:2011-06-16 01:34:14 +0200 (Do, 16 Jun 2011) $
-//$Revision:56 $
-//$LastChangedBy:tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef MACHINECOMPONENT_H_

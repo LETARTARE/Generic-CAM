@@ -27,6 +27,7 @@
 #ifndef DIALOGMACHINEDEBUGGER_H_
 #define DIALOGMACHINEDEBUGGER_H_
 
+#include "../machine/Machine.h"
 #include "../project/Project.h"
 #include "DialogMachineControl.h"
 #include "DisplaySettings.h"
@@ -40,10 +41,8 @@
 
 class DialogMachineDebugger:public GUIMachineDebugger {
 public:
-	DialogMachineDebugger(wxWindow * parent, Project * project,
-			DisplaySettings * settings);
-
-	Project* project;
+	DialogMachineDebugger(wxWindow * parent, DisplaySettings * settings);
+	virtual ~DialogMachineDebugger();
 	DisplaySettings * settings;
 
 	bool TransferDataToWindow(void);
@@ -53,13 +52,19 @@ private:
 
 	DialogMachineControl * machineControl;
 
+	Machine machine;
+
+
+
 protected:
+	void Update(wxCommandEvent& event);
 
 	void OnClose(wxCloseEvent& event);
+	void OnMachineLoad(wxCommandEvent& event);
+	void OnMachineSave(wxCommandEvent& event);
 	void OnClose(wxCommandEvent& event);
 	void OnMachineRestart(wxCommandEvent& event);
 	void OnShowController(wxCommandEvent& event);
-	void OnRestart(wxCommandEvent& event);
 
 };
 

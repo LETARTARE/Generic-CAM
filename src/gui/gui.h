@@ -62,73 +62,76 @@
 #define ID_RUNADD 1012
 #define ID_RUNEDIT 1013
 #define ID_RUNDELETE 1014
-#define ID_MACHINEDEBUGGER 1015
-#define ID_TOOLBOXEDIT 1016
-#define ID_TOOLBOXLOAD 1017
-#define ID_SETUPCONTROLLER 1018
-#define ID_VIEWSTEREO3D 1019
-#define ID_SETUPUNITS 1020
-#define ID_CLOSEEXTRAWINDOWS 1021
-#define ID_LOGSHOW 1022
-#define ID_VIEWTOP 1023
-#define ID_VIEWBOTTOM 1024
-#define ID_VIEWFRONT 1025
-#define ID_VIEWBACK 1026
-#define ID_VIEWLEFT 1027
-#define ID_VIEWRIGHT 1028
-#define ID_DISPLAYMACHINE 1029
-#define ID_DISPLAYMATERIAL 1030
-#define ID_TOOLDRILLING 1031
-#define ID_MULTTEN 1032
-#define ID_DIVTEN 1033
-#define ID_SCALEUNITX 1034
-#define ID_SCALEUNITY 1035
-#define ID_SCALEUNITZ 1036
-#define ID_SCALEPERCENTX 1037
-#define ID_SCALEPERCENTY 1038
-#define ID_SCALEPERCENTZ 1039
-#define ID_SCALEPERCENT 1040
-#define ID_MOVEZP 1041
-#define ID_MOVEYP 1042
-#define ID_MOVEXN 1043
-#define ID_MOVEXP 1044
-#define ID_MOVEYN 1045
-#define ID_MOVEZN 1046
-#define ID_ALIGNTOP 1047
-#define ID_ALIGNMIDDLE 1048
-#define ID_ALIGNBOTTOM 1049
-#define ID_ROTATEYN 1050
-#define ID_ROTATEXN 1051
-#define ID_ROTATEYP 1052
-#define ID_ROTATEZN 1053
-#define ID_ROTATEZP 1054
-#define ID_ROTATEXP 1055
-#define ID_FLIPX 1056
-#define ID_FLIPY 1057
-#define ID_FLIPZ 1058
-#define ID_WORKPIECEROTATEX 1059
-#define ID_WORKPIECEROTATEY 1060
-#define ID_WORKPIECEROTATEZ 1061
-#define ID_AXISX 1062
-#define ID_AXISY 1063
-#define ID_AXISZ 1064
-#define ID_TEXTX 1065
-#define ID_TEXTY 1066
-#define ID_TEXTZ 1067
-#define ID_AXISA 1068
-#define ID_AXISB 1069
-#define ID_AXISC 1070
-#define ID_TEXTA 1071
-#define ID_TEXTB 1072
-#define ID_TEXTC 1073
-#define ID_AXISU 1074
-#define ID_AXISV 1075
-#define ID_AXISW 1076
-#define ID_TEXTU 1077
-#define ID_TEXTV 1078
-#define ID_TEXTW 1079
-#define ID_BUTTONCONNECT 1080
-#define ID_BUTTONDISCONNECT 1081
+#define ID_MACHINELOAD 1015
+#define ID_MACHINERELOAD 1016
+#define ID_MACHINEDEBUGGER 1017
+#define ID_TOOLBOXEDIT 1018
+#define ID_TOOLBOXLOAD 1019
+#define ID_SETUPCONTROLLER 1020
+#define ID_VIEWSTEREO3D 1021
+#define ID_SETUPUNITS 1022
+#define ID_CLOSEEXTRAWINDOWS 1023
+#define ID_LOGSHOW 1024
+#define ID_VIEWTOP 1025
+#define ID_VIEWBOTTOM 1026
+#define ID_VIEWFRONT 1027
+#define ID_VIEWBACK 1028
+#define ID_VIEWLEFT 1029
+#define ID_VIEWRIGHT 1030
+#define ID_DISPLAYMACHINE 1031
+#define ID_DISPLAYMATERIAL 1032
+#define ID_TOOLDRILLING 1033
+#define ID_MULTTEN 1034
+#define ID_DIVTEN 1035
+#define ID_SCALEUNITX 1036
+#define ID_SCALEUNITY 1037
+#define ID_SCALEUNITZ 1038
+#define ID_SCALEPERCENTX 1039
+#define ID_SCALEPERCENTY 1040
+#define ID_SCALEPERCENTZ 1041
+#define ID_SCALEPERCENT 1042
+#define ID_MOVEZP 1043
+#define ID_MOVEYP 1044
+#define ID_MOVEXN 1045
+#define ID_MOVEXP 1046
+#define ID_MOVEYN 1047
+#define ID_MOVEZN 1048
+#define ID_ALIGNTOP 1049
+#define ID_ALIGNMIDDLE 1050
+#define ID_ALIGNBOTTOM 1051
+#define ID_ROTATEYN 1052
+#define ID_ROTATEXN 1053
+#define ID_ROTATEYP 1054
+#define ID_ROTATEZN 1055
+#define ID_ROTATEZP 1056
+#define ID_ROTATEXP 1057
+#define ID_FLIPX 1058
+#define ID_FLIPY 1059
+#define ID_FLIPZ 1060
+#define ID_WORKPIECEROTATEX 1061
+#define ID_WORKPIECEROTATEY 1062
+#define ID_WORKPIECEROTATEZ 1063
+#define wxID_LOAD 1064
+#define ID_AXISX 1065
+#define ID_AXISY 1066
+#define ID_AXISZ 1067
+#define ID_TEXTX 1068
+#define ID_TEXTY 1069
+#define ID_TEXTZ 1070
+#define ID_AXISA 1071
+#define ID_AXISB 1072
+#define ID_AXISC 1073
+#define ID_TEXTA 1074
+#define ID_TEXTB 1075
+#define ID_TEXTC 1076
+#define ID_AXISU 1077
+#define ID_AXISV 1078
+#define ID_AXISW 1079
+#define ID_TEXTU 1080
+#define ID_TEXTV 1081
+#define ID_TEXTW 1082
+#define ID_BUTTONCONNECT 1083
+#define ID_BUTTONDISCONNECT 1084
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIMainFrame
@@ -485,20 +488,21 @@ class GUIMachineDebugger : public wxFrame
 		wxPanel* m_panel;
 		wxSplitterWindow* m_splitter3;
 		wxPanel* m_panelEditor;
-		wxTextCtrl* m_textCtrl37;
+		wxTextCtrl* m_textCtrlScript;
 		wxButton* m_buttonRestart;
 		wxPanel* m_panelOutput;
-		wxTextCtrl* m_textCtrl38;
+		wxTextCtrl* m_textCtrlOutput;
 		wxPanel* m_panelMachineView;
 		MainCanvas* m_canvas;
 		wxStatusBar* m_statusBar3;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnMachineLoad( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMachineSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnMachineRestart( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnShowController( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRestart( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:

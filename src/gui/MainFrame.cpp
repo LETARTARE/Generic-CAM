@@ -124,7 +124,7 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 			&commandProcessor, &settings);
 	dialogStockSetup = new DialogWorkpiece(this, &project, &commandProcessor);
 	dialogRun = new DialogRun(this, &project, &commandProcessor, &settings);
-	dialogDebugger = new DialogMachineDebugger(this, &project, &settings);
+	dialogDebugger = new DialogMachineDebugger(this, &settings);
 	dialogToolbox = new DialogToolbox(this, &project, &commandProcessor,
 			&settings);
 	dialogAnimation = new DialogAnimation(this, &project);
@@ -385,7 +385,7 @@ void MainFrame::OnActivateRightClickMenu(wxTreeEvent& event)
 
 	if(data->dataType == itemGroupObject){
 		menu.Append(ID_OBJECTLOAD, wxT("&Load Object"));
-		menu.Append(ID_OBJECTMODIFY, wxT("&Show Object Dialog"));
+		menu.Append(ID_OBJECTMODIFY, wxT("&Modify Object"));
 	}
 
 	if(data->dataType == itemObject){
@@ -413,8 +413,8 @@ void MainFrame::OnActivateRightClickMenu(wxTreeEvent& event)
 	}
 
 	if(data->dataType == itemRun){
-		menu.Append(ID_RUNADD, wxT("&Add Run"));
 		menu.Append(ID_RUNEDIT, wxT("&Setup Run"));
+		menu.Append(ID_RUNADD, wxT("&Add Run"));
 		menu.Append(ID_RUNDELETE, wxT("&Delete Run"));
 	}
 
@@ -439,7 +439,15 @@ void MainFrame::OnActivate(wxTreeEvent& event)
 		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, ID_WORKPIECEADD);
 		ProcessEvent(menuEvent);
 	}
+	if(data->dataType == itemWorkpiece){
+		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, ID_WORKPIECEADD);
+		ProcessEvent(menuEvent);
+	}
 	if(data->dataType == itemGroupRun){
+		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, ID_RUNADD);
+		ProcessEvent(menuEvent);
+	}
+	if(data->dataType == itemRun){
 		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, ID_RUNEDIT);
 		ProcessEvent(menuEvent);
 	}
@@ -465,7 +473,9 @@ void MainFrame::OnSelectionChanged(wxTreeEvent& event)
 	if(data->dataType == itemObject){
 		dialogObjectModification->TransferDataToWindow();
 	}
-
+	if(data->dataType == itemRun){
+		dialogRun->TransferDataToWindow();
+	}
 }
 
 void MainFrame::OnSelectionChanging(wxTreeEvent& event)
@@ -745,7 +755,7 @@ void MainFrame::OnMachineLoad(wxCommandEvent& event)
 
 	if(dialog.ShowModal() == wxID_OK){
 //		project.machine.Load(dialog.GetPath());
-		project.Assemble();
+//		project.Assemble();
 
 		//ctrlTextEdit->SetValue(temp);
 		//fname.Assign(dialog.GetPath());

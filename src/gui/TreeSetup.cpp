@@ -140,6 +140,41 @@ int TreeSetup::GetFirstSelectedObject(void)
 	return -1;
 }
 
+int TreeSetup::GetFirstSelectedWorkpiece(void)
+{
+	wxTreeItemId temp;
+	TreeItem * data;
+
+	// Check if all groups are OK.
+	if(!groupWorkpieces.IsOk()) return -1;
+
+	temp = tree->GetFirstChild(groupWorkpieces, cookie);
+	while(temp.IsOk()){
+		data = (TreeItem*) tree->GetItemData(temp);
+		if(data != NULL && data->dataType == itemWorkpiece
+				&& tree->IsSelected(temp)) return data->nr;
+		temp = tree->GetNextSibling(temp);
+	}
+	return -1;
+}
+
+int TreeSetup::GetFirstSelectedRun(void)
+{
+	wxTreeItemId temp;
+	TreeItem * data;
+
+	// Check if all groups are OK.
+	if(!groupRun.IsOk()) return -1;
+
+	temp = tree->GetFirstChild(groupRun, cookie);
+	while(temp.IsOk()){
+		data = (TreeItem*) tree->GetItemData(temp);
+		if(data != NULL && data->dataType == itemRun && tree->IsSelected(temp)) return data->nr;
+		temp = tree->GetNextSibling(temp);
+	}
+	return -1;
+}
+
 int TreeSetup::GetWorkpieceFromLink(int linkNr)
 {
 	int n, m;

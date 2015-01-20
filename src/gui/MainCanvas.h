@@ -47,7 +47,7 @@ private:
 
 	Project* project;
 
-	ArrayOfGeometry* geometry;
+	Geometry* geometry;
 	Machine* machine;
 	StockMaterial* stockMaterial;
 
@@ -57,7 +57,7 @@ private:
 public:
 	void InsertProject(Project* project);
 	void InsertMachine(Machine* machine);
-	void InsertGeometry(ArrayOfGeometry* geometry);
+	void InsertGeometry(Geometry* geometry);
 	void InsertStockMaterial(StockMaterial* stockMaterial);
 
 	void RenderCoordinateSystem(AffineTransformMatrix *matrix = NULL);

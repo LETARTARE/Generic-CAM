@@ -122,6 +122,23 @@ void MainCanvas::RenderCoordinateSystem(AffineTransformMatrix *matrix)
 void MainCanvas::Render()
 {
 	if(displayCoordinateSystem) RenderCoordinateSystem();
-	if(project == NULL) return;
-	project->Paint();
+	if(project != NULL) project->Paint();
+	if(geometry != NULL) geometry->Paint();
+	if(stockMaterial != NULL) stockMaterial->Paint();
+	if(machine != NULL) machine->Paint();
+}
+
+void MainCanvas::InsertMachine(Machine* machine)
+{
+	this->machine = machine;
+}
+
+void MainCanvas::InsertGeometry(Geometry* geometry)
+{
+	this->geometry = geometry;
+}
+
+void MainCanvas::InsertStockMaterial(StockMaterial* stockMaterial)
+{
+	this->stockMaterial = stockMaterial;
 }

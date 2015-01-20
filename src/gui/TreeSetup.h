@@ -51,6 +51,8 @@ public:
 	void UpdateSelection(void);
 	void UpdateVariables(void);
 	int GetFirstSelectedObject(void);
+	int GetFirstSelectedWorkpiece(void);
+	int GetFirstSelectedRun(void);
 
 	int GetWorkpieceFromLink(int linkNr);
 	int GetObjectFromLink(int linkNr);

@@ -26,23 +26,65 @@
 
 #include "DialogMachineDebugger.h"
 
+#include <wx/textfile.h>
+
+#include "IDs.h"
+
 DialogMachineDebugger::DialogMachineDebugger(wxWindow * parent,
-		Project * project, DisplaySettings * settings) :
+		DisplaySettings * settings) :
 		GUIMachineDebugger(parent)
 {
-	this->project = project;
+
+	this->Connect(ID_UPDATE, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(DialogMachineDebugger::Update));
+
 	this->settings = settings;
-	machineControl = NULL;
+	machineControl = new DialogMachineControl(this, settings);
+
+	m_canvas->InsertMachine(&machine);
+//	machine.Load(wxFileName(_T("machines/testmachine.lua")));
+	machine.EvaluateDescription();
+	m_textCtrlScript->SetValue(machine.machineDescription);
+	TransferDataToWindow();
+}
+
+DialogMachineDebugger::~DialogMachineDebugger()
+{
+	this->Disconnect(ID_UPDATE, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(DialogMachineDebugger::Update));
+}
+
+void DialogMachineDebugger::Update(wxCommandEvent& event)
+{
+	machine.position.axisX = machineControl->X;
+	machine.position.axisY = machineControl->Y;
+	machine.position.axisZ = machineControl->Z;
+	machine.position.axisA = machineControl->A;
+	machine.position.axisB = machineControl->B;
+	machine.position.axisC = machineControl->C;
+	machine.position.axisU = machineControl->U;
+	machine.position.axisV = machineControl->V;
+	machine.position.axisW = machineControl->W;
+	machine.Assemble();
+	TransferDataToWindow();
+	this->Refresh();
 }
 
 bool DialogMachineDebugger::TransferDataToWindow(void)
 {
-	return false;
+	if(!this->IsShown()){
+		if(machineControl->IsShown()) machineControl->Show(false);
+		return false;
+	}
+	m_textCtrlOutput->SetValue(machine.textOut);
+	this->Refresh();
+	return true;
 }
 
 bool DialogMachineDebugger::TransferDataFromWindow(void)
 {
-	return false;
+	machine.machineDescription = m_textCtrlScript->GetValue();
+	return true;
 }
 
 void DialogMachineDebugger::OnClose(wxCloseEvent& event)
@@ -61,16 +103,61 @@ void DialogMachineDebugger::OnClose(wxCommandEvent& event)
 
 void DialogMachineDebugger::OnMachineRestart(wxCommandEvent& event)
 {
+	TransferDataFromWindow();
+	machine.EvaluateDescription();
+	TransferDataToWindow();
+}
+
+void DialogMachineDebugger::OnMachineLoad(wxCommandEvent& event)
+{
+	wxFileDialog dialog(this, _("Open machine description..."), _T(""), _T(""),
+			_(
+					"Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
+			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+	if(dialog.ShowModal() == wxID_OK){
+		wxFileName file(dialog.GetPath());
+		machine.Load(file);
+		machine.EvaluateDescription();
+		if(machine.IsInitialized()){
+			m_textCtrlScript->SetValue(machine.machineDescription);
+			m_textCtrlScript->SetModified(false);
+		}
+		TransferDataToWindow();
+	}
+}
+
+void DialogMachineDebugger::OnMachineSave(wxCommandEvent& event)
+{
+
+	wxFileName fileName;
+	wxFileDialog dialog(this, _("Save machine description..."), _T(""), _T(""),
+			_(
+					"Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
+			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+	if(machine.fileName.IsOk()) dialog.SetFilename(
+			machine.fileName.GetFullPath());
+
+	if(dialog.ShowModal() == wxID_OK){
+		TransferDataFromWindow();
+		wxString fileName = dialog.GetPath();
+		wxTextFile file(fileName);
+		if(file.Exists())
+			file.Open();
+		else
+			file.Create();
+		file.Clear();
+		file.AddLine(machine.machineDescription, wxTextFileType_None);
+		file.Write();
+		file.Close();
+		TransferDataToWindow();
+	}
 }
 
 void DialogMachineDebugger::OnShowController(wxCommandEvent& event)
 {
-	if(machineControl == NULL) machineControl = new DialogMachineControl(this,
-			settings);
 	machineControl->Show();
 	machineControl->TransferDataToWindow();
 }
 
-void DialogMachineDebugger::OnRestart(wxCommandEvent& event)
-{
-}
