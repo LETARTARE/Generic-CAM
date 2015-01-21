@@ -48,15 +48,7 @@ private:
 
 	DisplaySettings * settings;
 
-	wxArrayString unitsOfLength;
-	wxArrayString unitsOfTime;
-	wxArrayString unitsOfSpeedLinear;
-	wxArrayString unitsOfSpeedRotational;
 
-	double * factorofLength;
-	double * factorofTime;
-	double * factorofSpeedLinear;
-	double * factorofSpeedRotational;
 
 	// Methods
 private:

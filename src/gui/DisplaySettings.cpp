@@ -26,6 +26,8 @@
 
 #include "DisplaySettings.h"
 
+#include <wx/filename.h>
+
 DisplaySettings::DisplaySettings()
 {
 	Time.Setup(_T("s"), _T("min"), (double) 60);
@@ -33,16 +35,90 @@ DisplaySettings::DisplaySettings()
 	RotationalSpeed.Setup(_T("1/s"), _T("1/min"), (double) 1 / 60);
 	LinearSpeed.Setup(_T("m/s"), _T("cm/min"), (double) 10e-3 / 60);
 	Angle.Setup(_T("deg"), _T("deg"), (double) 1.0);
+
+	// Setup available units
+	factorofLength = new double[7];
+	unitsOfLength.Add(_T("um"));
+	factorofLength[0] = 1e-6; // m
+	unitsOfLength.Add(_T("mil"));
+	factorofLength[1] = 25.4e-6; // m
+	unitsOfLength.Add(_T("mm"));
+	factorofLength[2] = 1e-3; // m
+	unitsOfLength.Add(_T("cm"));
+	factorofLength[3] = 10e-3; // m
+	unitsOfLength.Add(_T("in"));
+	factorofLength[4] = 25.4e-3; // m
+	unitsOfLength.Add(_T("ft"));
+	factorofLength[5] = 12 * 25.4e-3; // m
+	unitsOfLength.Add(_T("m"));
+	factorofLength[6] = 1; // m
+
+	factorofSpeedLinear = new double[12];
+	unitsOfSpeedLinear.Add(_T("mm/s"));
+	factorofSpeedLinear[0] = 1e-3; // m/s
+	unitsOfSpeedLinear.Add(_T("cm/s"));
+	factorofSpeedLinear[1] = 10e-3; // m/s
+	unitsOfSpeedLinear.Add(_T("in/s"));
+	factorofSpeedLinear[2] = 25.4e-3; // m/s
+	unitsOfSpeedLinear.Add(_T("ft/s"));
+	factorofSpeedLinear[3] = 12.0 * 25.4e-3; // m/s
+	unitsOfSpeedLinear.Add(_T("m/s"));
+	factorofSpeedLinear[4] = 1; // m/s
+	unitsOfSpeedLinear.Add(_T("mm/min"));
+	factorofSpeedLinear[5] = 1.0e-3 / 60; // m/s
+	unitsOfSpeedLinear.Add(_T("cm/min"));
+	factorofSpeedLinear[6] = 10.0e-3 / 60; // m/s
+	unitsOfSpeedLinear.Add(_T("in/min"));
+	factorofSpeedLinear[7] = 25.4e-3 / 60; // m/s
+	unitsOfSpeedLinear.Add(_T("ft/min"));
+	factorofSpeedLinear[8] = 12.0 * 25.4e-3 / 60; // m/s
+	unitsOfSpeedLinear.Add(_T("m/min"));
+	factorofSpeedLinear[9] = 1.0 / 60; // m/s
+	unitsOfSpeedLinear.Add(_T("km/h"));
+	factorofSpeedLinear[10] = 1000.0 / 3600; // m/s
+	unitsOfSpeedLinear.Add(_T("mph"));
+	factorofSpeedLinear[11] = 0.44704; // m/s (per definition)
+
+	factorofSpeedRotational = new double[3];
+	unitsOfSpeedRotational.Add(_T("1/s"));
+	factorofSpeedRotational[0] = 1; // 1/s
+	unitsOfSpeedRotational.Add(_T("1/min"));
+	factorofSpeedRotational[1] = 1.0 / 60; // 1/s
+	unitsOfSpeedRotational.Add(_T("rpm"));
+	factorofSpeedRotational[2] = 1.0 / 60; // 1/s
+
+	factorofTime = new double[4];
+	unitsOfTime.Add(_T("s"));
+	factorofTime[0] = 1; // s
+	unitsOfTime.Add(_T("min"));
+	factorofTime[1] = 60; // s
+	unitsOfTime.Add(_T("h"));
+	factorofTime[2] = 3600; // s
+	unitsOfTime.Add(_T("d"));
+	factorofTime[3] = 86400; // s
+
 }
 
 DisplaySettings::~DisplaySettings()
 {
+	delete[] factorofTime;
+	delete[] factorofSpeedRotational;
+	delete[] factorofSpeedLinear;
+	delete[] factorofLength;
 }
 
 bool DisplaySettings::GetConfigFrom(wxConfig * config)
 {
 	wxASSERT(config!=NULL);
 	if(config == NULL) return false;
+
+	wxString cwd = wxFileName::GetCwd();
+
+	config->Read(_T("LastProjectDirectory"), &lastProjectDirectory, cwd);
+	config->Read(_T("LastObjectDirectory"), &lastObjectDirectory, cwd);
+	config->Read(_T("LastMachineDirectory"), &lastMachineDirectory, cwd);
+	config->Read(_T("LastStockDirectory"), &lastStockDirectory, cwd);
+	config->Read(_T("LastToolboxDirectory"), &lastToolboxDirectory, cwd);
 
 	return true;
 }
@@ -51,6 +127,12 @@ bool DisplaySettings::WriteConfigTo(wxConfig * config)
 {
 	wxASSERT(config!=NULL);
 	if(config == NULL) return false;
+
+	config->Write(_T("LastProjectDirectory"), lastProjectDirectory);
+	config->Write(_T("LastObjectDirectory"), lastObjectDirectory);
+	config->Write(_T("LastMachineDirectory"), lastMachineDirectory);
+	config->Write(_T("LastStockDirectory"), lastStockDirectory);
+	config->Write(_T("LastToolboxDirectory"), lastToolboxDirectory);
 
 	return true;
 }

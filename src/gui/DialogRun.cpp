@@ -52,6 +52,7 @@ bool DialogRun::TransferDataToWindow(void)
 	for(i = m_choiceRun->GetCount(); i > project->run.GetCount(); i--)
 		m_choiceRun->Delete(i - 1);
 
+
 	for(i = 0; i < project->workpieces.GetCount(); i++){
 		if(i >= m_choiceWorkpiece->GetCount()){
 			m_choiceWorkpiece->Append(project->workpieces[i].name);

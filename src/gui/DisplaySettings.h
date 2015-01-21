@@ -38,6 +38,8 @@
 #include "Unit.h"
 
 class DisplaySettings {
+	friend class DialogSetupUnits;
+
 public:
 	DisplaySettings();
 	virtual ~DisplaySettings();
@@ -48,8 +50,25 @@ public:
 	Unit RotationalSpeed;
 	Unit Angle;
 
+	wxString lastProjectDirectory;
+	wxString lastObjectDirectory;
+	wxString lastStockDirectory;
+	wxString lastMachineDirectory;
+	wxString lastToolboxDirectory;
+
 	bool GetConfigFrom(wxConfig * config);
 	bool WriteConfigTo(wxConfig * config);
+
+protected:
+	wxArrayString unitsOfLength;
+	wxArrayString unitsOfTime;
+	wxArrayString unitsOfSpeedLinear;
+	wxArrayString unitsOfSpeedRotational;
+
+	double * factorofLength;
+	double * factorofTime;
+	double * factorofSpeedLinear;
+	double * factorofSpeedRotational;
 
 };
 

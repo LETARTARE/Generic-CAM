@@ -32,77 +32,11 @@ DialogSetupUnits::DialogSetupUnits(wxWindow* parent, DisplaySettings * settings)
 {
 	this->settings = settings;
 
-	// Setup available units
-
-	factorofLength = new double[7];
-	unitsOfLength.Add(_T("um"));
-	factorofLength[0] = 1e-6; // m
-	unitsOfLength.Add(_T("mil"));
-	factorofLength[1] = 25.4e-6; // m
-	unitsOfLength.Add(_T("mm"));
-	factorofLength[2] = 1e-3; // m
-	unitsOfLength.Add(_T("cm"));
-	factorofLength[3] = 10e-3; // m
-	unitsOfLength.Add(_T("in"));
-	factorofLength[4] = 25.4e-3; // m
-	unitsOfLength.Add(_T("ft"));
-	factorofLength[5] = 12 * 25.4e-3; // m
-	unitsOfLength.Add(_T("m"));
-	factorofLength[6] = 1; // m
-
-	factorofSpeedLinear = new double[12];
-	unitsOfSpeedLinear.Add(_T("mm/s"));
-	factorofSpeedLinear[0] = 1e-3; // m/s
-	unitsOfSpeedLinear.Add(_T("cm/s"));
-	factorofSpeedLinear[1] = 10e-3; // m/s
-	unitsOfSpeedLinear.Add(_T("in/s"));
-	factorofSpeedLinear[2] = 25.4e-3; // m/s
-	unitsOfSpeedLinear.Add(_T("ft/s"));
-	factorofSpeedLinear[3] = 12.0 * 25.4e-3; // m/s
-	unitsOfSpeedLinear.Add(_T("m/s"));
-	factorofSpeedLinear[4] = 1; // m/s
-	unitsOfSpeedLinear.Add(_T("mm/min"));
-	factorofSpeedLinear[5] = 1.0e-3 / 60; // m/s
-	unitsOfSpeedLinear.Add(_T("cm/min"));
-	factorofSpeedLinear[6] = 10.0e-3 / 60; // m/s
-	unitsOfSpeedLinear.Add(_T("in/min"));
-	factorofSpeedLinear[7] = 25.4e-3 / 60; // m/s
-	unitsOfSpeedLinear.Add(_T("ft/min"));
-	factorofSpeedLinear[8] = 12.0 * 25.4e-3 / 60; // m/s
-	unitsOfSpeedLinear.Add(_T("m/min"));
-	factorofSpeedLinear[9] = 1.0 / 60; // m/s
-	unitsOfSpeedLinear.Add(_T("km/h"));
-	factorofSpeedLinear[10] = 1000.0 / 3600; // m/s
-	unitsOfSpeedLinear.Add(_T("mph"));
-	factorofSpeedLinear[11] = 0.44704; // m/s (per definition)
-
-	factorofSpeedRotational = new double[3];
-	unitsOfSpeedRotational.Add(_T("1/s"));
-	factorofSpeedRotational[0] = 1; // 1/s
-	unitsOfSpeedRotational.Add(_T("1/min"));
-	factorofSpeedRotational[1] = 1.0 / 60; // 1/s
-	unitsOfSpeedRotational.Add(_T("rpm"));
-	factorofSpeedRotational[2] = 1.0 / 60; // 1/s
-
-	factorofTime = new double[4];
-	unitsOfTime.Add(_T("s"));
-	factorofTime[0] = 1; // s
-	unitsOfTime.Add(_T("min"));
-	factorofTime[1] = 60; // s
-	unitsOfTime.Add(_T("h"));
-	factorofTime[2] = 3600; // s
-	unitsOfTime.Add(_T("d"));
-	factorofTime[3] = 86400; // s
-
 	TransferDataToWindow();
 }
 
 DialogSetupUnits::~DialogSetupUnits()
 {
-	delete[] factorofTime;
-	delete[] factorofSpeedRotational;
-	delete[] factorofSpeedLinear;
-	delete[] factorofLength;
 }
 
 void DialogSetupUnits::OnClose(wxCommandEvent& event)
@@ -115,27 +49,27 @@ bool DialogSetupUnits::TransferDataToWindow(void)
 	int i;
 
 	m_choiceUnitLength->Clear();
-	m_choiceUnitLength->Append(unitsOfLength);
+	m_choiceUnitLength->Append(settings->unitsOfLength);
 	i = m_choiceUnitLength->FindString(settings->Distance.GetOtherName());
 	if(i == wxNOT_FOUND) i = 6;
 	m_choiceUnitLength->SetSelection(i);
 
 	m_choiceUnitSpeedLinear->Clear();
-	m_choiceUnitSpeedLinear->Append(unitsOfSpeedLinear);
+	m_choiceUnitSpeedLinear->Append(settings->unitsOfSpeedLinear);
 	i = m_choiceUnitSpeedLinear->FindString(
 			settings->LinearSpeed.GetOtherName());
 	if(i == wxNOT_FOUND) i = 3;
 	m_choiceUnitSpeedLinear->SetSelection(i);
 
 	m_choiceUnitSpeedRotational->Clear();
-	m_choiceUnitSpeedRotational->Append(unitsOfSpeedRotational);
+	m_choiceUnitSpeedRotational->Append(settings->unitsOfSpeedRotational);
 	i = m_choiceUnitSpeedRotational->FindString(
 			settings->RotationalSpeed.GetOtherName());
 	if(i == wxNOT_FOUND) i = 0;
 	m_choiceUnitSpeedRotational->SetSelection(i);
 
 	m_choiceUnitTime->Clear();
-	m_choiceUnitTime->Append(unitsOfTime);
+	m_choiceUnitTime->Append(settings->unitsOfTime);
 	i = m_choiceUnitTime->FindString(settings->Time.GetOtherName());
 	if(i == wxNOT_FOUND) i = 0;
 	m_choiceUnitTime->SetSelection(i);
@@ -147,18 +81,21 @@ bool DialogSetupUnits::TransferDataFromWindow(void)
 	int i;
 
 	i = m_choiceUnitLength->GetSelection();
-	settings->Distance.Setup(_T("m"), unitsOfLength[i], factorofLength[i]);
+	settings->Distance.Setup(_T("m"), settings->unitsOfLength[i],
+			settings->factorofLength[i]);
 
 	i = m_choiceUnitSpeedLinear->GetSelection();
-	settings->LinearSpeed.Setup(_T("m/s"), unitsOfSpeedLinear[i],
-			factorofSpeedLinear[i]);
+	settings->LinearSpeed.Setup(_T("m/s"), settings->unitsOfSpeedLinear[i],
+			settings->factorofSpeedLinear[i]);
 
 	i = m_choiceUnitSpeedRotational->GetSelection();
-	settings->RotationalSpeed.Setup(_T("1/s"), unitsOfSpeedRotational[i],
-			factorofSpeedRotational[i]);
+	settings->RotationalSpeed.Setup(_T("1/s"),
+			settings->unitsOfSpeedRotational[i],
+			settings->factorofSpeedRotational[i]);
 
 	i = m_choiceUnitTime->GetSelection();
-	settings->Time.Setup(_T("m"), unitsOfTime[i], factorofTime[i]);
+	settings->Time.Setup(_T("m"), settings->unitsOfTime[i],
+			settings->factorofTime[i]);
 
 	return true;
 }

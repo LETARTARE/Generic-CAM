@@ -75,11 +75,7 @@ private:
 
 	Project project; ///> Link to the project
 
-	wxString lastProjectDirectory;
-	wxString lastObjectDirectory;
-	wxString lastStockDirectory;
-	wxString lastMachineDirectory;
-	wxString lastToolboxDirectory;
+
 
 	DisplaySettings settings;
 
@@ -105,6 +101,7 @@ private:
 	bool TransferDataFromWindow(void);
 
 	void ObjectSelect(wxCommandEvent& event);
+	void RunSelect(wxCommandEvent& event);
 	void Update(wxCommandEvent& event);
 
 	size_t GetFreeSystemMemory();

@@ -79,12 +79,7 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	this->config = config;
 	this->locale = locale;
 
-	// Read variables
-	config->Read(_T("LastProjectDirectory"), &lastProjectDirectory);
-	config->Read(_T("LastObjectDirectory"), &lastObjectDirectory);
-	config->Read(_T("LastMachineDirectory"), &lastMachineDirectory);
-	config->Read(_T("LastStockDirectory"), &lastStockDirectory);
-	config->Read(_T("LastToolboxDirectory"), &lastToolboxDirectory);
+	settings.GetConfigFrom(config);
 
 	// Set the window size according to the config file
 	int w, h;
@@ -102,6 +97,8 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 
 	this->Connect(ID_SELECTOBJECT, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::ObjectSelect));
+	this->Connect(ID_SELECTRUN, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(MainFrame::RunSelect));
 
 	this->Connect(ID_UPDATE, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::Update));
@@ -143,15 +140,12 @@ MainFrame::~MainFrame()
 			this);
 	this->Disconnect(ID_SELECTOBJECT, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::ObjectSelect));
+	this->Disconnect(ID_SELECTRUN, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(MainFrame::RunSelect));
 	this->Disconnect(ID_UPDATE, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::Update));
 
-	// Write back the configuration
-	config->Write(_T("LastProjectDirectory"), lastProjectDirectory);
-	config->Write(_T("LastObjectDirectory"), lastObjectDirectory);
-	config->Write(_T("LastMachineDirectory"), lastMachineDirectory);
-	config->Write(_T("LastStockDirectory"), lastStockDirectory);
-	config->Write(_T("LastToolboxDirectory"), lastToolboxDirectory);
+	settings.WriteConfigTo(config);
 
 	// Save the size of the mainframe
 	int w, h;
@@ -464,6 +458,16 @@ void MainFrame::ObjectSelect(wxCommandEvent& event)
 	Refresh();
 }
 
+void MainFrame::RunSelect(wxCommandEvent& event)
+{
+	size_t id = event.GetInt();
+	size_t n;
+	for(n = 0; n < project.run.GetCount(); n++)
+		project.run[n].selected = (n == id);
+	tree->UpdateSelection();
+	Refresh();
+}
+
 void MainFrame::OnSelectionChanged(wxTreeEvent& event)
 {
 	wxTreeItemId id = event.GetItem();
@@ -474,6 +478,13 @@ void MainFrame::OnSelectionChanged(wxTreeEvent& event)
 		dialogObjectModification->TransferDataToWindow();
 	}
 	if(data->dataType == itemRun){
+		if(m_tree->IsSelected(id)){
+			// Only allow one item selected at a time
+			size_t n;
+			for(n = 0; n < project.run.GetCount(); n++)
+				project.run[n].selected = (n == data->nr);
+			tree->UpdateSelection();
+		}
 		dialogRun->TransferDataToWindow();
 	}
 }
@@ -591,16 +602,16 @@ void MainFrame::OnRedo(wxCommandEvent& event)
 void MainFrame::OnObjectLoad(wxCommandEvent& event)
 {
 	wxFileName fileName;
-	wxFileDialog dialog(this, _("Open..."), _T(""), _T(""),
+	wxFileDialog dialog(this, _("Open Object..."), _T(""), _T(""),
 			_(
 					"All supported files (*.dxf; *.stl; *.gts)|*.dxf;*.stl;*.gts|DXF Files (*.dxf)|*.dxf|Stereolithography files (STL files) (*.stl)|*.stl|GTS files (*.gts)|*.gts|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_MULTIPLE);
 
-	if(wxDir::Exists(lastObjectDirectory)){
-		dialog.SetDirectory(lastObjectDirectory);
+	if(wxDir::Exists(settings.lastObjectDirectory)){
+		dialog.SetDirectory(settings.lastObjectDirectory);
 	}else{
-		if(wxDir::Exists(lastProjectDirectory)){
-			dialog.SetDirectory(lastProjectDirectory);
+		if(wxDir::Exists(settings.lastProjectDirectory)){
+			dialog.SetDirectory(settings.lastProjectDirectory);
 		}
 	}
 
@@ -615,7 +626,7 @@ void MainFrame::OnObjectLoad(wxCommandEvent& event)
 					new CommandObjectLoad(
 							(_("Load Object: ") + fileName.GetName()),
 							&project, paths[n]));
-			if(n == 0) lastObjectDirectory = fileName.GetPath();
+			if(n == 0) settings.lastObjectDirectory = fileName.GetPath();
 		}
 		TransferDataToWindow();
 	}
@@ -722,8 +733,10 @@ void MainFrame::OnWorkpieceDeleteUnused(wxCommandEvent& event)
 
 void MainFrame::OnRunAdd(wxCommandEvent& event)
 {
+	unsigned int i = project.run.GetCount() + 1;
 	commandProcessor.Submit(
-			new CommandRunAdd(_("Add run"), &project, _T("Run")));
+			new CommandRunAdd(_("Add run"), &project,
+					wxString::Format(_("Run #%u"), i)));
 	TransferDataToWindow();
 }
 
