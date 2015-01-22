@@ -24,7 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include "Tool.h"
 
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
@@ -35,14 +34,14 @@ WX_DEFINE_OBJARRAY(ArrayOfTool)
 #include <wx/log.h>
 
 Tool::Tool() :
-	resolution(32)
+		resolution(32)
 {
 	feedCoefficient = 0.005;
 	maxSpeed = 10000;
 	nrOfTeeth = 3;
 	shaftDiameter = 0.006;
 	shaftLength = 0.01;
-	slot = 0;
+	slot = -1;
 }
 
 Tool::~Tool()
@@ -55,13 +54,12 @@ void Tool::ToXml(wxXmlNode* parentNode)
 	wxXmlNode *temp, *temp2;
 	wxXmlNode *nodeObject = NULL;
 
-
 	// Find out, if object already exists in XML tree.
 	temp = parentNode->GetChildren();
 	while(temp != NULL && nodeObject == NULL){
 		if(temp->GetName() == _T("tool")
-				&& temp->GetPropVal(_T("name"), _T("")) == toolName) nodeObject
-				= temp;
+				&& temp->GetPropVal(_T("name"), _T("")) == toolName) nodeObject =
+				temp;
 		temp = temp->GetNext();
 	}
 	if(nodeObject == NULL){
@@ -88,7 +86,6 @@ void Tool::ToXml(wxXmlNode* parentNode)
 	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
 			wxString::Format(_T("%f"), feedCoefficient));
 	temp->InsertChild(temp2, NULL);
-
 
 	//	// Insert new triangles
 	//	size_t i;
@@ -125,7 +122,6 @@ void Tool::GenerateContour(void)
 
 	ToolContourElement* temp;
 
-
 	// Cap on top
 	temp = new ToolContourElement(false, true);
 	temp->n1.z = -1;
@@ -134,7 +130,6 @@ void Tool::GenerateContour(void)
 	temp->p2.x = xPosition;
 	temp->p2.z = -shaftLength;
 	contour.Add(temp);
-
 
 	// Top part of shaft
 	temp = new ToolContourElement(false, true);
@@ -214,7 +209,7 @@ void Tool::GenerateContour(void)
 				z = sqrt(r * r - (xPosition + x) * (xPosition + x));
 			}else{
 				r = -xPosition;
-				if(x > 2* xPosition ) x = 2* xPosition ;
+				if(x > 2 * xPosition) x = 2 * xPosition;
 				z = sqrt(r * r - (x - xPosition) * (x - xPosition));
 			}
 			elements[j].h = z;
@@ -277,10 +272,10 @@ void Tool::GenerateContour(void)
 				for(k = 0; k < n; k++){
 					float cc1 = cos(a1 + (a2 - a1) / (float) n * (float) k);
 					float ss1 = -sin(a1 + (a2 - a1) / (float) n * (float) k);
-					float cc2 = cos(a1 + (a2 - a1) / (float) n
-							* (float) (k + 1));
-					float ss2 = -sin(a1 + (a2 - a1) / (float) n * (float) (k
-							+ 1));
+					float cc2 = cos(
+							a1 + (a2 - a1) / (float) n * (float) (k + 1));
+					float ss2 = -sin(
+							a1 + (a2 - a1) / (float) n * (float) (k + 1));
 					temp = new ToolContourElement(elements[j].cutting);
 					temp->n1.x = cc1;
 					temp->n1.z = ss1;
@@ -334,8 +329,8 @@ void Tool::Paint(void)
 
 	float ss[resolution + 1], cc[resolution + 1];
 	for(i = 0; i <= resolution; i++){
-		ss[i] = sin(2* M_PI / resolution * i);
-		cc[i] = cos(2* M_PI / resolution * i);
+		ss[i] = sin(2 * M_PI / resolution * i);
+		cc[i] = cos(2 * M_PI / resolution * i);
 	}
 
 	for(i = 0; i < contour.Count(); i++){

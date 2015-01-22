@@ -46,6 +46,7 @@ public:
 
 	Unit Time;
 	Unit Distance;
+	Unit SmallDistance;
 	Unit LinearSpeed;
 	Unit RotationalSpeed;
 	Unit Angle;

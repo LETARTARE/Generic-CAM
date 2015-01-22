@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandObjectTransform.h
+// Name               : CommandRunLoadMachine.h
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 29.12.2014
-// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 21.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,31 +24,25 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDOBJECTTRANSFORM_H_
-#define COMMANDOBJECTTRANSFORM_H_
+#ifndef COMMANDRUNLOADMACHINE_H_
+#define COMMANDRUNLOADMACHINE_H_
 
 #include <wx/cmdproc.h>
 
-#include "../3D/AffineTransformMatrix.h"
 #include "../project/Project.h"
 
-class CommandObjectTransform:public wxCommand {
+class CommandRunLoadMachine:public wxCommand {
 public:
-	CommandObjectTransform(const wxString& name, Project * project,
-			size_t objectNr, bool flipX, bool flipY, bool flipZ,
-			bool flipNormals, const AffineTransformMatrix& matrixNew);
+	CommandRunLoadMachine(const wxString& name, Project * project, int runNr,
+			const wxString& fileName);
+
 	bool Do(void);
 	bool Undo(void);
 
 protected:
 	Project * project;
-	size_t objectNr;
-	bool flipX;
-	bool flipY;
-	bool flipZ;
-	bool flipNormals;
-	AffineTransformMatrix matrixNew;
-	AffineTransformMatrix matrixOld;
+	int runNr;
+	wxString fileName;
 };
 
-#endif /* COMMANDOBJECTTRANSFORM_H_ */
+#endif /* COMMANDRUNLOADMACHINE_H_ */

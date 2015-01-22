@@ -25,6 +25,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "DialogRun.h"
+#include "IDs.h"
+#include <wx/event.h>
+
+#include "../3D/AffineTransformMatrix.h"
+#include "../command/CommandRunSetWorkpiece.h"
+#include "../command/CommandRunAddTool.h"
+#include "../command/CommandRunRemoveTool.h"
+#include "../command/CommandRunWorkpieceTransform.h"
 
 DialogRun::DialogRun(wxWindow* parent, Project* project,
 		wxCommandProcessor* commandProcessor, DisplaySettings* settings) :
@@ -42,27 +50,66 @@ DialogRun::~DialogRun()
 bool DialogRun::TransferDataToWindow(void)
 {
 	size_t i;
+	int selected = -1;
+	m_choiceRun->Clear();
+	m_choiceRun->Append(_T(""));
+
 	for(i = 0; i < project->run.GetCount(); i++){
-		if(i >= m_choiceRun->GetCount()){
-			m_choiceRun->Append(project->run[i].name);
+		m_choiceRun->Append(project->run[i].name);
+		if(selected == -1 && project->run[i].selected) selected = i;
+	}
+	m_choiceRun->SetSelection(selected + 1);
+
+	m_choiceWorkpiece->Clear();
+	m_choiceWorkpiece->Append(_T(""));
+	for(i = 0; i < project->workpieces.GetCount(); i++)
+		m_choiceWorkpiece->Append(project->workpieces[i].name);
+
+	for(i = 0; i < project->toolbox.tools.GetCount(); i++){
+		if(i >= m_choiceTool->GetCount()){
+			m_choiceTool->Append(project->toolbox.tools[i].toolName);
 		}else{
-			m_choiceRun->SetString(i, project->run[i].name);
+			m_choiceTool->SetString(i, project->toolbox.tools[i].toolName);
 		}
 	}
-	for(i = m_choiceRun->GetCount(); i > project->run.GetCount(); i--)
-		m_choiceRun->Delete(i - 1);
-
-
-	for(i = 0; i < project->workpieces.GetCount(); i++){
-		if(i >= m_choiceWorkpiece->GetCount()){
-			m_choiceWorkpiece->Append(project->workpieces[i].name);
-		}else{
-			m_choiceWorkpiece->SetString(i, project->workpieces[i].name);
-		}
-	}
-	for(i = m_choiceWorkpiece->GetCount(); i > project->workpieces.GetCount();
+	for(i = m_choiceTool->GetCount(); i > project->toolbox.tools.GetCount();
 			i--)
-		m_choiceWorkpiece->Delete(i - 1);
+		m_choiceTool->Delete(i - 1);
+	if(m_choiceTool->GetSelection() < 0) m_choiceTool->SetSelection(0);
+
+	if(selected > -1){
+
+		m_choiceWorkpiece->SetSelection(project->run[selected].workpieceNr + 1);
+
+		m_textCtrlMachineName->SetValue(
+				project->run[selected].machine.fileName.GetName());
+
+		wxSize sz = m_listCtrlTools->GetClientSize();
+		unsigned int w = sz.x / 7;
+
+		m_listCtrlTools->ClearAll();
+		m_listCtrlTools->InsertColumn(0, _("Toolslot"), wxLIST_FORMAT_CENTER,
+				2 * w);
+		m_listCtrlTools->InsertColumn(1, _("Tool"), wxLIST_FORMAT_LEFT, 3 * w);
+		m_listCtrlTools->InsertColumn(2, _("Diameter"), wxLIST_FORMAT_RIGHT,
+				2 * w);
+
+		for(i = 0; i < project->run[selected].toolbox.tools.GetCount(); i++){
+			m_listCtrlTools->InsertItem(i,
+					wxString::Format(_T("%u"),
+							project->run[selected].toolbox.tools[i].slot));
+			m_listCtrlTools->SetItem(i, 1,
+					project->run[selected].toolbox.tools[i].toolName);
+			m_listCtrlTools->SetItem(i, 2,
+					settings->SmallDistance.TextFromSIWithUnit(
+							project->run[selected].toolbox.tools[i].GetMaxDiameter(),
+							1));
+		}
+	}else{
+		m_listCtrlTools->ClearAll();
+		m_textCtrlMachineName->SetValue(_T(""));
+		m_choiceWorkpiece->SetSelection(0);
+	}
 
 	return true;
 }
@@ -82,4 +129,112 @@ void DialogRun::OnClose(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
 	this->Show(false);
+}
+
+void DialogRun::OnRunSelect(wxCommandEvent& event)
+{
+	int n = m_choiceRun->GetSelection() - 1;
+	// Tell the main frame to update the selection in the treeview via custom command.
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_SELECTRUN);
+	selectEvent.SetInt(n);
+	ProcessEvent(selectEvent);
+}
+
+void DialogRun::OnWorkpieceSelect(wxCommandEvent& event)
+{
+	int selected = GetSelected();
+	if(selected < 0) return;
+	int temp = m_choiceWorkpiece->GetSelection() - 1;
+	if(temp < 0) return;
+	if(project->run[selected].workpieceNr != temp){
+		commandProcessor->Submit(
+				new CommandRunSetWorkpiece(
+						_("Set Workpiece to ")
+								+ m_choiceWorkpiece->GetString(temp + 1),
+						project, selected, temp));
+		wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
+		ProcessEvent(selectEvent);
+	}
+}
+
+void DialogRun::OnRotate(wxCommandEvent& event)
+{
+	int selected = GetSelected();
+	if(selected < 0) return;
+
+	switch(event.GetId()){
+	case ID_WORKPIECEROTATEX:
+		commandProcessor->Submit(
+				new CommandRunWorkpieceTransform(
+						_("Rotate workpiece around X axis"), project, selected,
+						AffineTransformMatrix::RotateXYZ(M_PI_2, 0, 0)));
+		break;
+	case ID_WORKPIECEROTATEY:
+		commandProcessor->Submit(
+				new CommandRunWorkpieceTransform(
+						_("Rotate workpiece around Y axis"), project, selected,
+						AffineTransformMatrix::RotateXYZ(0, M_PI_2, 0)));
+		break;
+	case ID_WORKPIECEROTATEZ:
+		commandProcessor->Submit(
+				new CommandRunWorkpieceTransform(
+						_("Rotate workpiece around Z axis"), project, selected,
+						AffineTransformMatrix::RotateXYZ(0, 0, M_PI_2)));
+		break;
+	}
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
+	ProcessEvent(selectEvent);
+}
+
+void DialogRun::OnMachineLoad(wxCommandEvent& event)
+{
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_MACHINELOAD);
+	ProcessEvent(selectEvent);
+}
+
+void DialogRun::OnToolRemove(wxCommandEvent& event)
+{
+	int selected = GetSelected();
+	if(selected < 0) return;
+	int toolNr = m_listCtrlTools->GetNextItem(-1, wxLIST_NEXT_ALL,
+	wxLIST_STATE_SELECTED);
+	if(toolNr < 0) return;
+	int slotNr = project->run[selected].toolbox.tools[toolNr].slot;
+	commandProcessor->Submit(
+			new CommandRunRemoveTool(
+					_("Removed tool from run ")
+							+ project->run[selected].toolbox.tools[toolNr].toolName,
+					project, selected, slotNr));
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
+	ProcessEvent(selectEvent);
+}
+
+int DialogRun::GetSelected(void)
+{
+	int selected = -1;
+	size_t n;
+	for(n = 0; n < project->run.GetCount(); n++){
+		if(project->run[n].selected){
+			selected = n;
+			break;
+		}
+	}
+	return selected;
+}
+
+void DialogRun::OnToolAdd(wxCommandEvent& event)
+{
+	int selected = GetSelected();
+	if(selected < 0) return;
+	int toolNr = m_choiceTool->GetSelection();
+	if(toolNr < 0) return;
+	int slotNr = m_spinCtrlToolSlot->GetValue();
+	commandProcessor->Submit(
+			new CommandRunAddTool(
+					_("Added tool to run ")
+							+ project->toolbox.tools[toolNr].toolName, project,
+					selected, toolNr, slotNr));
+	m_spinCtrlToolSlot->SetValue(slotNr + 1);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
+	ProcessEvent(selectEvent);
 }

@@ -59,8 +59,8 @@ public:
 
 	int workpieceNr;
 //	ArrayOfObjectPlacement workpiecePlacements;
-
-//	Machine machine;
+	AffineTransformMatrix workpiecePlacement;
+	Machine machine;
 	Toolbox toolbox;
 
 	ToolPath toolPath;
@@ -69,6 +69,9 @@ public:
 
 	// Methods
 public:
+
+	bool LoadGCode(wxFileName fileName);
+
 	void Paint(void);
 	void ToXml(wxXmlNode* parentNode);
 	bool FromXml(wxXmlNode* node);

@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandObjectTransform.h
+// Name               : CommandRunWorkpieceTransform.h
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 29.12.2014
-// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 21.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,31 +24,26 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDOBJECTTRANSFORM_H_
-#define COMMANDOBJECTTRANSFORM_H_
-
+#ifndef COMMANDRUNWORKPIECETRANSFORM_H_
+#define COMMANDRUNWORKPIECETRANSFORM_H_
 #include <wx/cmdproc.h>
 
 #include "../3D/AffineTransformMatrix.h"
+
 #include "../project/Project.h"
 
-class CommandObjectTransform:public wxCommand {
+class CommandRunWorkpieceTransform:public wxCommand {
 public:
-	CommandObjectTransform(const wxString& name, Project * project,
-			size_t objectNr, bool flipX, bool flipY, bool flipZ,
-			bool flipNormals, const AffineTransformMatrix& matrixNew);
+	CommandRunWorkpieceTransform(const wxString& name, Project * project,
+			size_t runNr, const AffineTransformMatrix& matrixNew);
 	bool Do(void);
 	bool Undo(void);
 
 protected:
 	Project * project;
-	size_t objectNr;
-	bool flipX;
-	bool flipY;
-	bool flipZ;
-	bool flipNormals;
+	size_t runNr;
 	AffineTransformMatrix matrixNew;
 	AffineTransformMatrix matrixOld;
 };
 
-#endif /* COMMANDOBJECTTRANSFORM_H_ */
+#endif /* COMMANDRUNWORKPIECETRANSFORM_H_ */

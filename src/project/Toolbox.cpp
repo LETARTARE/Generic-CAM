@@ -27,7 +27,6 @@
 //$LastChangedBy: tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include "Toolbox.h"
 
 #include "../Config.h"
@@ -38,12 +37,12 @@ Toolbox::Toolbox()
 //	xmlDocument->SetFileEncoding(_T("UTF-8"));
 //	xmlDocument->SetVersion(_T(_GENERICCAM_VERSION));
 
-
-	// an example Tool for the toolbox
+// an example Tool for the toolbox
 
 	Tool* temp;
 	ToolElement* e;
 
+	initialized = false;
 
 	temp = new Tool;
 
@@ -83,7 +82,6 @@ Toolbox::Toolbox()
 	temp->GenerateContour();
 
 	tools.Add(temp);
-
 
 	temp = new Tool;
 
@@ -132,8 +130,6 @@ Toolbox::Toolbox()
 
 	tools.Add(temp);
 
-
-
 }
 
 Toolbox::~Toolbox()
@@ -158,8 +154,7 @@ bool Toolbox::LoadToolbox(wxFileName& fileName)
 //
 //	this->fileName = fileName;
 
-
-	//TODO: Loading code comes here.
+//TODO: Loading code comes here.
 
 	return true;
 }
@@ -172,4 +167,11 @@ bool Toolbox::SaveToolbox(wxFileName& fileName)
 //	}
 //	this->fileName = fileName;
 	return true;
+}
+
+void Toolbox::Empty(void)
+{
+	tools.Empty();
+	initialized = false;
+	fileName.Clear();
 }

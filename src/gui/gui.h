@@ -461,7 +461,7 @@ class GUIRun : public wxFrame
 		virtual void OnRunSelect( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnWorkpieceSelect( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRotate( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnLoadMachine( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMachineLoad( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnToolRemove( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnToolAdd( wxCommandEvent& event ) { event.Skip(); }
 		

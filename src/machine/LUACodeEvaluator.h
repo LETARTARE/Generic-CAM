@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : LUACodeEvaluator.h
-// Purpose            : Wrapper for calling LUA.
-// Thread Safe        : Tricky...
+// Purpose            : Wrapper for calling LUA
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   : -llua
 // Author             : Tobias Schaefer
@@ -24,9 +24,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 //TODO: On LUA 5.2 there is no lua_open() function. It has been replaced by luaL_newstate().
-
+//TODO: This needs a copy constructor. It is in no way save to make a copy.
 
 // The evaluation of the LUA code takes place in a
 // seperate thread. This way, if the program hangs
@@ -71,7 +70,6 @@ class Machine;
  *
  */
 class LUACodeEvaluator {
-
 
 	// Constructor / Destructor
 public:

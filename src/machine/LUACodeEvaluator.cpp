@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : LUACodeEvaluator.cpp
-// Purpose            : Wrapper for calling LUA.
-// Thread Safe        : Tricky...
+// Purpose            : Wrapper for calling LUA
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   : -llua
 // Author             : Tobias Schaefer
@@ -34,6 +34,7 @@
 LUACodeEvaluator::LUACodeEvaluator()
 {
 	linkedMachine = NULL;
+	componentToManipulate = 0;
 
 	L = lua_open();
 
@@ -64,7 +65,7 @@ LUACodeEvaluator::LUACodeEvaluator()
 LUACodeEvaluator::~LUACodeEvaluator()
 {
 	availableLUACodeEvaluators.remove(this);
-	lua_close(L);
+	if(L != NULL) lua_close(L);
 	L = NULL;
 }
 

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : Machine.cpp
-// Purpose            : The machine.
-// Thread Safe        : Yes
+// Purpose            : The machine
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer

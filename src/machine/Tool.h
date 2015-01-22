@@ -53,7 +53,7 @@ public:
 	wxString comment;
 	ArrayOfToolElement elements;
 	ArrayOfToolContourElement contour;
-	unsigned int slot;
+	int slot;
 	const unsigned int resolution;
 
 	// Methods

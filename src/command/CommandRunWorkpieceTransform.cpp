@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandObjectTransform.h
+// Name               : CommandRunWorkpieceTransform.cpp
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 29.12.2014
-// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 21.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,31 +24,28 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDOBJECTTRANSFORM_H_
-#define COMMANDOBJECTTRANSFORM_H_
+#include "CommandRunWorkpieceTransform.h"
 
-#include <wx/cmdproc.h>
+CommandRunWorkpieceTransform::CommandRunWorkpieceTransform(const wxString& name,
+		Project* project, size_t runNr, const AffineTransformMatrix& matrixNew) :
+		wxCommand(true, name)
+{
+	this->project = project;
+	this->runNr = runNr;
+	this->matrixNew = matrixNew;
+}
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../project/Project.h"
+bool CommandRunWorkpieceTransform::Do(void)
+{
+	if(runNr >= project->run.GetCount()) return false;
+	matrixOld = project->run[runNr].workpiecePlacement;
+	project->run[runNr].workpiecePlacement = matrixNew;
+	return true;
+}
 
-class CommandObjectTransform:public wxCommand {
-public:
-	CommandObjectTransform(const wxString& name, Project * project,
-			size_t objectNr, bool flipX, bool flipY, bool flipZ,
-			bool flipNormals, const AffineTransformMatrix& matrixNew);
-	bool Do(void);
-	bool Undo(void);
-
-protected:
-	Project * project;
-	size_t objectNr;
-	bool flipX;
-	bool flipY;
-	bool flipZ;
-	bool flipNormals;
-	AffineTransformMatrix matrixNew;
-	AffineTransformMatrix matrixOld;
-};
-
-#endif /* COMMANDOBJECTTRANSFORM_H_ */
+bool CommandRunWorkpieceTransform::Undo(void)
+{
+	if(runNr >= project->run.GetCount()) return false;
+	project->run[runNr].workpiecePlacement = matrixOld;
+	return true;
+}

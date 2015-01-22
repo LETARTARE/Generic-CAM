@@ -27,7 +27,6 @@
 //$LastChangedBy: tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef TOOLBOX_H_
 #define TOOLBOX_H_
 
@@ -55,6 +54,7 @@ private:
 
 	// Methods
 public:
+	void Empty(void);
 	bool LoadToolbox(wxFileName& fileName);
 	bool SaveToolbox(wxFileName& fileName);
 	bool IsInitialized(void)

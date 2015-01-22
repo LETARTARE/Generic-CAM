@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : CommandObjectTransform.cpp
 // Purpose            : 
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
@@ -28,7 +28,7 @@
 
 CommandObjectTransform::CommandObjectTransform(const wxString& name,
 		Project* project, size_t objectNr, bool flipX, bool flipY, bool flipZ,
-		bool flipNormals, AffineTransformMatrix& matrixNew) :
+		bool flipNormals, const AffineTransformMatrix& matrixNew) :
 		wxCommand(true, name)
 {
 	this->project = project;

@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandObjectTransform.h
+// Name               : CommandRunRemoveTool.h
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 29.12.2014
-// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 21.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,31 +24,28 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDOBJECTTRANSFORM_H_
-#define COMMANDOBJECTTRANSFORM_H_
-
+#ifndef COMMANDRUNREMOVETOOL_H_
+#define COMMANDRUNREMOVETOOL_H_
 #include <wx/cmdproc.h>
 
-#include "../3D/AffineTransformMatrix.h"
+#include "../machine/Tool.h"
 #include "../project/Project.h"
 
-class CommandObjectTransform:public wxCommand {
+class CommandRunRemoveTool:public wxCommand {
 public:
-	CommandObjectTransform(const wxString& name, Project * project,
-			size_t objectNr, bool flipX, bool flipY, bool flipZ,
-			bool flipNormals, const AffineTransformMatrix& matrixNew);
+	CommandRunRemoveTool(const wxString& name, Project * project, int runNr,
+			int slotNr);
+	virtual ~CommandRunRemoveTool(void);
+
 	bool Do(void);
 	bool Undo(void);
 
 protected:
 	Project * project;
-	size_t objectNr;
-	bool flipX;
-	bool flipY;
-	bool flipZ;
-	bool flipNormals;
-	AffineTransformMatrix matrixNew;
-	AffineTransformMatrix matrixOld;
+	size_t runNr;
+	size_t slotNr;
+	size_t position;
+	Tool * oldTool;
 };
 
-#endif /* COMMANDOBJECTTRANSFORM_H_ */
+#endif /* COMMANDRUNREMOVETOOL_H_ */

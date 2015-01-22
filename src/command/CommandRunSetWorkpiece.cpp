@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandObjectTransform.h
+// Name               : CommandRunSetWorkpiece.cpp
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 29.12.2014
-// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 21.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,31 +24,27 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDOBJECTTRANSFORM_H_
-#define COMMANDOBJECTTRANSFORM_H_
+#include "CommandRunSetWorkpiece.h"
 
-#include <wx/cmdproc.h>
+CommandRunSetWorkpiece::CommandRunSetWorkpiece(const wxString& name,
+		Project* project, int runNr, int workpieceNr) :
+		wxCommand(true, name)
+{
+	this->project = project;
+	this->runNr = runNr;
+	this->newWorkpieceNr = workpieceNr;
+	this->oldWorkpieceNr = -1;
+}
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../project/Project.h"
+bool CommandRunSetWorkpiece::Do(void)
+{
+	this->oldWorkpieceNr = project->run[runNr].workpieceNr;
+	project->run[runNr].workpieceNr = this->newWorkpieceNr;
+	return true;
+}
 
-class CommandObjectTransform:public wxCommand {
-public:
-	CommandObjectTransform(const wxString& name, Project * project,
-			size_t objectNr, bool flipX, bool flipY, bool flipZ,
-			bool flipNormals, const AffineTransformMatrix& matrixNew);
-	bool Do(void);
-	bool Undo(void);
-
-protected:
-	Project * project;
-	size_t objectNr;
-	bool flipX;
-	bool flipY;
-	bool flipZ;
-	bool flipNormals;
-	AffineTransformMatrix matrixNew;
-	AffineTransformMatrix matrixOld;
-};
-
-#endif /* COMMANDOBJECTTRANSFORM_H_ */
+bool CommandRunSetWorkpiece::Undo(void)
+{
+	project->run[runNr].workpieceNr = this->oldWorkpieceNr;
+	return true;
+}

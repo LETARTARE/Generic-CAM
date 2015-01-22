@@ -55,9 +55,17 @@ public:
 
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
+	int GetSelected(void);
+
 
 	void OnClose(wxCloseEvent& event);
 	void OnClose(wxCommandEvent& event);
+	void OnRunSelect(wxCommandEvent& event);
+	void OnWorkpieceSelect(wxCommandEvent& event);
+	void OnRotate(wxCommandEvent& event);
+	void OnMachineLoad(wxCommandEvent& event);
+	void OnToolRemove(wxCommandEvent& event);
+	void OnToolAdd(wxCommandEvent& event);
 
 };
 

@@ -26,6 +26,7 @@
 
 #include "DialogMachineDebugger.h"
 
+#include <wx/dir.h>
 #include <wx/textfile.h>
 
 #include "IDs.h"
@@ -114,6 +115,14 @@ void DialogMachineDebugger::OnMachineLoad(wxCommandEvent& event)
 			_(
 					"Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+	if(wxDir::Exists(settings->lastMachineDirectory)){
+		dialog.SetDirectory(settings->lastMachineDirectory);
+	}else{
+		if(wxDir::Exists(settings->lastProjectDirectory)){
+			dialog.SetDirectory(settings->lastProjectDirectory);
+		}
+	}
 
 	if(dialog.ShowModal() == wxID_OK){
 		wxFileName file(dialog.GetPath());

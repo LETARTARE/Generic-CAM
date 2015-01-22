@@ -474,9 +474,6 @@ void MainFrame::OnSelectionChanged(wxTreeEvent& event)
 	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
 	tree->UpdateVariables();
 
-	if(data->dataType == itemObject){
-		dialogObjectModification->TransferDataToWindow();
-	}
 	if(data->dataType == itemRun){
 		if(m_tree->IsSelected(id)){
 			// Only allow one item selected at a time
@@ -485,8 +482,8 @@ void MainFrame::OnSelectionChanged(wxTreeEvent& event)
 				project.run[n].selected = (n == data->nr);
 			tree->UpdateSelection();
 		}
-		dialogRun->TransferDataToWindow();
 	}
+	TransferDataToWindow();
 }
 
 void MainFrame::OnSelectionChanging(wxTreeEvent& event)
@@ -541,10 +538,16 @@ void MainFrame::OnProjectLoad(wxCommandEvent& event)
 			_("Generic CAM Project (*.prj; *.xml)|*.prj;*.xml|All Files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
+	if(wxDir::Exists(settings.lastProjectDirectory)){
+		dialog.SetDirectory(settings.lastProjectDirectory);
+	}
+
 	if(dialog.ShowModal() == wxID_OK){
 		fileName = dialog.GetPath();
-		project.Load(fileName);
-		TransferDataToWindow();
+		if(project.Load(fileName)){
+			settings.lastProjectDirectory = fileName.GetPath();
+			TransferDataToWindow();
+		}
 	}
 }
 
@@ -571,14 +574,20 @@ void MainFrame::OnProjectSaveAs(wxCommandEvent &event)
 			_("Generic CAM Project (*.prj; *.xml)|*.prj;*.xml|All Files|*.*"),
 			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
-	if(!project.fileName.IsOk()) dialog.SetFilename(
+	if(wxDir::Exists(settings.lastProjectDirectory)){
+		dialog.SetDirectory(settings.lastProjectDirectory);
+	}
+
+	if(project.fileName.IsOk()) dialog.SetFilename(
 			project.fileName.GetFullPath());
 
 	if(dialog.ShowModal() == wxID_OK){
 		fileName = dialog.GetPath();
-		project.Save(fileName);
-		commandProcessor.MarkAsSaved();
-		TransferDataToWindow();
+		if(project.Save(fileName)){
+			commandProcessor.MarkAsSaved();
+			settings.lastProjectDirectory = project.fileName.GetPath();
+			TransferDataToWindow();
+		}
 	}
 }
 
@@ -761,49 +770,42 @@ void MainFrame::OnRunDelete(wxCommandEvent& event)
 }
 void MainFrame::OnMachineLoad(wxCommandEvent& event)
 {
+	int selected = tree->GetFirstSelectedRun();
+	if(selected < 0) return;
+
 	wxFileDialog dialog(this, _("Open machine description..."), _T(""), _T(""),
 			_(
 					"Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
-	if(dialog.ShowModal() == wxID_OK){
-//		project.machine.Load(dialog.GetPath());
-//		project.Assemble();
-
-		//ctrlTextEdit->SetValue(temp);
-		//fname.Assign(dialog.GetPath());
-		//ctrlTextEdit->SetModified(false);
-		//SetWindowTitle();
-//		if(!project.machine.textOut.IsEmpty()){
-		//wxLogMessage(_T("Displaying some text in ErrorFrame!"));
-		//TODO: Don't open a new errorframe, if the old one is not closed.
-
-//			printf(project.machine.textOut.ToAscii());
-//			ErrorFrame* error = new ErrorFrame(this);
-//			error->SetText(project.machine.textOut);
-//			error->Show();
+	if(wxDir::Exists(settings.lastMachineDirectory)){
+		dialog.SetDirectory(settings.lastMachineDirectory);
+	}else{
+		if(wxDir::Exists(settings.lastProjectDirectory)){
+			dialog.SetDirectory(settings.lastProjectDirectory);
+		}
 	}
-	TransferDataToWindow();
-//}
+
+	if(dialog.ShowModal() == wxID_OK){
+		wxFileName fileName(dialog.GetPath());
+		if(project.run[selected].machine.Load(fileName)){
+			settings.lastMachineDirectory = fileName.GetPath();
+		}else{
+			wxLogError(project.run[selected].machine.textOut);
+		}
+		TransferDataToWindow();
+	}
 }
 
 void MainFrame::OnMachineReload(wxCommandEvent& event)
 {
+	int selected = tree->GetFirstSelectedRun();
+	if(selected < 0) return;
 
-//	project.machine.ReLoad();
-	project.Assemble();
+	if(!project.run[selected].machine.ReLoad()){
 
-//	if(!simulator.machine.fileName.IsOk()) return;
-//	simulator.machine.ReLoad();
-//	if(!project.machine.textOut.IsEmpty()){
-//wxLogMessage(_T("Displaying some text in ErrorFrame!"));
-//TODO: Don't open a new errorframe, if the old one is not closed.
-//		printf(project.machine.textOut.ToAscii());
-//		ErrorFrame* error = new ErrorFrame(this);
-//		error->SetText(project.machine.textOut);
-//		error->Show();
-//	}
-//	t = 0;
+		wxLogError(project.run[selected].machine.textOut);
+	}
 	TransferDataToWindow();
 }
 
@@ -823,56 +825,37 @@ void MainFrame::OnToolboxLoad(wxCommandEvent& event)
 	wxFileDialog dialog(this, _("Open toolbox..."), _T(""), _T(""),
 			_("Toolbox (*.xml)|*.xml|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
-	wxFileName fileName;
-//	if(dialog.ShowModal() == wxID_OK){
-//		fileName.Assign(dialog.GetPath());
-//		if(!simulator.toolbox.LoadToolbox(fileName)){
-//			wxLogError(_T("OnLoadToolbox: Opening of the toolbox failed!"));
-//		}
-
-//ctrlTextEdit->SetValue(temp);
-//fname.Assign(dialog.GetPath());
-//ctrlTextEdit->SetModified(false);
-//SetWindowTitle();
-
-//	}
+	if(wxDir::Exists(settings.lastToolboxDirectory)){
+		dialog.SetDirectory(settings.lastToolboxDirectory);
+	}else{
+		if(wxDir::Exists(settings.lastProjectDirectory)){
+			dialog.SetDirectory(settings.lastProjectDirectory);
+		}
+	}
+	if(dialog.ShowModal() == wxID_OK){
+		wxFileName fileName(dialog.GetPath());
+		if(project.toolbox.LoadToolbox(fileName)){
+			settings.lastToolboxDirectory = fileName.GetPath();
+			TransferDataToWindow();
+		}
+	}
 }
 
 void MainFrame::OnToolboxSave(wxCommandEvent &event)
 {
-
-//TODO: Build something like this in this snippet.
-//	wxFileDialog
-//			dialog(
-//					this,
-//					_("Save as..."),
-//					fname.GetPath(),
-//					fname.GetFullName(),
-//					_("LUA Files  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
-//					wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-//
-//	if(dialog.ShowModal() == wxID_OK){
-//		fname.Assign(dialog.GetPath());
-//		SetWindowTitle();
-//		DoSave();
-//	}
-
 	wxFileDialog dialog(this, _("Save toolbox..."), _T(""), _T(""),
 			_("Toolbox (*.xml)|*.xml|All files|*.*"),
 			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-	wxFileName fileName;
+
+	if(project.toolbox.fileName.IsOk()) dialog.SetFilename(
+			project.toolbox.fileName.GetFullPath());
+
 	if(dialog.ShowModal() == wxID_OK){
+		wxFileName fileName;
 		fileName = dialog.GetPath();
-
-		//		if(!simulator.toolbox.LoadToolbox(fileName)){
-		//			wxLogError(_T("OnLoadToolbox: Opening of the toolbox failed!"));
-		//		}
-
-		//ctrlTextEdit->SetValue(temp);
-		//fname.Assign(dialog.GetPath());
-		//ctrlTextEdit->SetModified(false);
-		//SetWindowTitle();
-
+		if(project.toolbox.LoadToolbox(fileName)){
+			TransferDataToWindow();
+		}
 	}
 }
 
@@ -911,15 +894,23 @@ void MainFrame::OnPrepareMachinebed(wxCommandEvent& event)
 
 void MainFrame::OnLoadGCodes(wxCommandEvent &event)
 {
+	int selected = tree->GetFirstSelectedRun();
+	if(selected < 0) return;
+
 	wxFileDialog dialog(this, _("Open G-Code file..."), _T(""), _T(""),
 			_(
 					"G-Code File (*.tap *.cnc *.nc *.ngc *.txt)|*.tap;*.cnc;*.nc;*.ngc;*.txt|Text files (*.txt)|*.txt|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
-//	if(dialog.ShowModal() == wxID_OK){
-//		simulator.ReadGCodeFile(dialog.GetPath());
-//	}
-	TransferDataToWindow();
+	if(wxDir::Exists(settings.lastProjectDirectory)){
+		dialog.SetDirectory(settings.lastProjectDirectory);
+	}
+	if(dialog.ShowModal() == wxID_OK){
+		wxFileName fileName(dialog.GetPath());
+		if(project.run[selected].LoadGCode(fileName)){
+			TransferDataToWindow();
+		}
+	}
 }
 
 void MainFrame::OnSaveGCodes(wxCommandEvent &event)
@@ -928,19 +919,24 @@ void MainFrame::OnSaveGCodes(wxCommandEvent &event)
 			_(
 					"G-Code File (*.tap *.cnc *.nc *.ngc *.txt)|*.tap;*.cnc;*.nc;*.ngc;*.txt|Text files (*.txt)|*.txt|All files|*.*"),
 			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+	if(wxDir::Exists(settings.lastProjectDirectory)){
+		dialog.SetDirectory(settings.lastProjectDirectory);
+	}
 	if(dialog.ShowModal() == wxID_OK){
 
-		wxFileName fname;
-		fname = dialog.GetPath();
+		wxFileName fileName;
+		fileName = dialog.GetPath();
 
 		wxTextFile f;
-		if(fname.FileExists()){
-			f.Open(fname.GetFullPath());
+		if(fileName.FileExists()){
+			f.Open(fileName.GetFullPath());
 			f.Clear();
-		}else
-			f.Create(fname.GetFullPath());
-
-		project.run[0].WriteToFile(f);
+		}else{
+			f.Create(fileName.GetFullPath());
+		}
+		size_t n;
+		for(n = 0; n < project.run.GetCount(); n++)
+			project.run[n].WriteToFile(f);
 		f.Write();
 		f.Close();
 		TransferDataToWindow();
@@ -1008,6 +1004,23 @@ void MainFrame::OnShowLogWindow(wxCommandEvent& event)
 
 void MainFrame::OnViewSet(wxCommandEvent& event)
 {
+	//TODO: Canvas rotation from the outside.
+	switch(event.GetId()){
+	case ID_VIEWFRONT:
+
+		break;
+	case ID_VIEWBACK:
+		break;
+	case ID_VIEWLEFT:
+		break;
+	case ID_VIEWRIGHT:
+		break;
+	case ID_VIEWTOP:
+		break;
+	case ID_VIEWBOTTOM:
+		break;
+	}
+	TransferDataToWindow();
 }
 
 void MainFrame::OnAbout(wxCommandEvent& event)

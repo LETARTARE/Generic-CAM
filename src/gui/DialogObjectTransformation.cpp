@@ -187,7 +187,7 @@ void DialogObjectTransformation::OnClose(wxCloseEvent& event)
 
 void DialogObjectTransformation::OnSelectObject(wxCommandEvent& event)
 {
-	int n = m_choiceObjectSelection->GetCurrentSelection();
+	int n = m_choiceObjectSelection->GetSelection();
 	// Return if "Multiple objects selected." was selected again.
 	if(n >= project->objects.GetCount()) return;
 
@@ -207,7 +207,6 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 	CommandObjectTransform * command;
 
 	size_t n;
-	double scale;
 	bool flipNormals = false;
 	bool flipX = false;
 	bool flipY = false;

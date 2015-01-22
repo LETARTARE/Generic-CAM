@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunAdd.cpp
+// Name               : CommandRunRemoveTool.cpp
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 17.01.2015
+// Created            : 21.01.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,27 +24,44 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandRunAdd.h"
-#include "../project/Run.h"
+#include "CommandRunRemoveTool.h"
 
-CommandRunAdd::CommandRunAdd(const wxString& name, Project* project,
-		wxString runName) :
+CommandRunRemoveTool::CommandRunRemoveTool(const wxString& name,
+		Project* project, int runNr, int slotNr) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->runName = runName;
+	this->runNr = runNr;
+	this->slotNr = slotNr;
+	this->oldTool = NULL;
+	this->position = 0;
 }
 
-bool CommandRunAdd::Do(void)
+CommandRunRemoveTool::~CommandRunRemoveTool(void)
 {
-	Run* temp = new Run();
-	temp->name = runName;
-	project->run.Add(temp);
+	if(oldTool != NULL) delete oldTool;
+}
+
+bool CommandRunRemoveTool::Do(void)
+{
+	size_t N = project->run[runNr].toolbox.tools.GetCount();
+	for(position = 0; position < N; position++){
+		if(project->run[runNr].toolbox.tools[position].slot == this->slotNr) break;
+	}
+	if(position == N) return false;
+	oldTool = project->run[runNr].toolbox.tools.Detach(position);
 	return true;
 }
 
-bool CommandRunAdd::Undo(void)
+bool CommandRunRemoveTool::Undo(void)
 {
-	project->run.RemoveAt(project->run.GetCount() - 1);
+	if(position >= project->run[runNr].toolbox.tools.GetCount()){
+		project->run[runNr].toolbox.tools.Add(oldTool);
+	}else{
+		project->run[runNr].toolbox.tools.Insert(oldTool, runNr);
+	}
+	// If the the tool was inserted back into the project,
+	// this function must not delete the tool in the destructor.
+	oldTool = NULL;
 	return true;
 }

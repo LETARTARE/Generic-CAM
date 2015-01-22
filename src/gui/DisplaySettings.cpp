@@ -32,6 +32,7 @@ DisplaySettings::DisplaySettings()
 {
 	Time.Setup(_T("s"), _T("min"), (double) 60);
 	Distance.Setup(_T("m"), _T("cm"), (double) 10e-3);
+	SmallDistance.Setup(_T("m"), _T("mm"), (double) 1e-3);
 	RotationalSpeed.Setup(_T("1/s"), _T("1/min"), (double) 1 / 60);
 	LinearSpeed.Setup(_T("m/s"), _T("cm/min"), (double) 10e-3 / 60);
 	Angle.Setup(_T("deg"), _T("deg"), (double) 1.0);

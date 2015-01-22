@@ -36,6 +36,7 @@ Run::Run()
 	name = _T("Run #");
 	workpieceNr = -1;
 	selected = false;
+	toolbox.Empty();
 }
 
 Run::~Run()
@@ -162,3 +163,7 @@ void Run::SortTargets(void)
 
 }
 
+bool Run::LoadGCode(wxFileName fileName)
+{
+	return false;
+}

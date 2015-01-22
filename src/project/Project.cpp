@@ -59,11 +59,6 @@ void Project::Clear(void)
 
 	resolution = 0.0005;
 
-	activeObject = 0;
-	activeTarget = 0;
-	activeStock = 0;
-	activeRun = 0;
-
 	displayGeometry = true;
 
 	displayBoundingBox = false;
@@ -273,14 +268,6 @@ bool Project::Load(wxFileName fileName)
 //		temp = temp->GetNext();
 	}
 	return true;
-}
-
-void Project::Assemble(void)
-{
-//	machine.Assemble();
-//	if(machine.IsInitialized()) stock.stockMaterials[0].matrix =
-//			machine.workpiecePosition;
-
 }
 
 void Project::Paint(void)

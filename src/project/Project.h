@@ -73,13 +73,11 @@ public:
 	ArrayOfWorkpiece workpieces;
 	ArrayOfRun run;
 
+	//TODO: Does the toolbox belong to the settings/config file?
+	Toolbox toolbox;
+
 	OctreeGenerator octree;
 	Quadtree quadtree;
-
-	size_t activeObject;
-	size_t activeStock;
-	size_t activeTarget;
-	size_t activeRun;
 
 	bool modified;
 
@@ -117,7 +115,7 @@ public:
 
 	void Paint(void);
 
-	void Assemble(void);
+
 
 	void GenerateToolPath(void);
 	void CollectToolPath(void);
