@@ -48,23 +48,22 @@ public:
 
 	// Member variables
 public:
-
-	AffineTransformMatrix matrix;
-	Vector3 color;
-
-	bool available; ///> Available in workshop
 	wxString name;
 	float sx, sy, sz;
+
+	bool available; ///> Available in workshop
+
 	float maxToolSpeed;
 	float maxFeedrate;
 	float thermalConductivity;
 	float ignitionTemperature;
 
+	Vector3 color;
+
 	// Methods
 public:
-	void Paint(void);
-
+	void Paint(float alpha, bool flipNormals = false);
+	void PaintWireBox(void);
 };
-WX_DECLARE_OBJARRAY(StockMaterial, ArrayOfStockMaterial)
-;
+WX_DECLARE_OBJARRAY(StockMaterial, ArrayOfStockMaterial);
 #endif /* STOCKMATERIAL_H_ */

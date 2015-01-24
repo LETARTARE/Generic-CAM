@@ -57,6 +57,8 @@
 #include <wx/log.h>
 #include <wx/cmdproc.h>
 
+
+
 class MainFrame:public GUIMainFrame {
 	// Constructor/ Destructor
 public:
@@ -73,7 +75,7 @@ private:
 	TreeSetup * tree;
 	wxCommandProcessor commandProcessor;
 
-	Project project; ///> Link to the project
+	Project project; ///> The project is instantiated here
 
 
 

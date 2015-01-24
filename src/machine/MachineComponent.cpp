@@ -37,6 +37,8 @@ WX_DEFINE_OBJARRAY(ArrayOfMachineComponent)
 MachineComponent::MachineComponent(wxString nameOfComponent)
 {
 	this->nameOfComponent = nameOfComponent;
+	geometry.useColor = geometryColorTriangle;
+	isColorSet = false;
 }
 
 MachineComponent::~MachineComponent()
@@ -45,11 +47,17 @@ MachineComponent::~MachineComponent()
 
 void MachineComponent::SetColor(float r, float g, float b)
 {
+	if(isColorSet)
+		geometry.useColor = geometryColorTriangle;
+	else
+		geometry.useColor = geometryColorGlobal;
 	geometry.color.Set(r, g, b);
+	geometry.colorNewObjects.Set(r, g, b);
+	isColorSet = true;
 }
 
-void MachineComponent::InsertBox(AffineTransformMatrix matrix, float x,
-		float y, float z)
+void MachineComponent::InsertBox(AffineTransformMatrix matrix, float x, float y,
+		float z)
 {
 	float x2 = x / 2;
 	float y2 = y / 2;
@@ -68,7 +76,7 @@ void MachineComponent::InsertBox(AffineTransformMatrix matrix, float x,
 	geometry.AddQuadTransform(p1, p0, p4, p5, matrix);
 	geometry.AddQuadTransform(p2, p1, p5, p6, matrix);
 	geometry.AddQuadTransform(p3, p2, p6, p7, matrix);
-	geometry.AddQuadTransform(p4, p5, p6, p7, matrix);
+	geometry.AddQuadTransform(p7, p6, p5, p4, matrix);
 }
 void MachineComponent::InsertCylinder(AffineTransformMatrix matrix, float h,
 		float r)
@@ -83,8 +91,8 @@ void MachineComponent::InsertCone(AffineTransformMatrix matrix, float h,
 	unsigned char i;
 	float ss[N + 1], cc[N + 1];
 	for(i = 0; i <= N; i++){
-		ss[i] = sin(2*M_PI / N * i);
-		cc[i] = cos(2*M_PI / N * i);
+		ss[i] = sin(2 * M_PI / N * i);
+		cc[i] = cos(2 * M_PI / N * i);
 	}
 
 	Vector3 m0(0, 0, h / 2);
@@ -126,10 +134,10 @@ bool MachineComponent::InsertSTL(AffineTransformMatrix matrix, wxFileName file)
 	wxLogMessage(_T("@MachineComponent::InsertSTL: "+file.GetFullPath()));
 
 	FileSTL f;
+	f.color = geometry.colorNewObjects;
 	if(!f.ReadFile(file.GetFullPath())) return false;
 	f.geometry[0].ApplyTransformation(matrix);
-
-	geometry.CopyFrom(f.geometry[0]);
+	geometry.InsertTrianglesFrom(f.geometry[0]);
 	return true;
 }
 
@@ -139,13 +147,14 @@ bool MachineComponent::InsertDXF(AffineTransformMatrix matrix, wxFileName file,
 	wxLogMessage(_T("@MachineComponent::InsertDXF: "+file.GetFullPath()));
 
 	FileDXF f;
+	f.color = geometry.colorNewObjects;
 	if(!f.ReadFile(file.GetFullPath())) return false;
 
 	size_t i;
 	for(i = 0; i < f.geometry.GetCount(); i++){
 		if(f.geometry[i].objectName.Cmp(componentName) == 0){
 			f.geometry[i].ApplyTransformation(matrix);
-			geometry.CopyFrom(f.geometry[i]);
+			geometry.InsertTrianglesFrom(f.geometry[i]);
 		}
 	}
 	return true;

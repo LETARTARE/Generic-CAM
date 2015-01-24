@@ -27,6 +27,20 @@
 #ifndef PROJECT_H_
 #define PROJECT_H_
 
+/*!\class Project
+ * \brief Holds the data for an project.
+ *
+ * An GenericCAM project consists of
+ * - one or more objects (may be modified, sliced, inverted into mold forms, ect.)
+ * - one or more pieces of stock material
+ * - one or more run
+ *    - a machine (with setup)
+ *    - a toolbox for the machine (at least one tool)
+ *    - toolpath generators
+ *    - generated toolpaths
+ *
+ */
+
 #include "Object.h"
 #include "StockFile.h"
 #include "Workpiece.h"
@@ -44,19 +58,9 @@
 #include <wx/string.h>
 #include <wx/xml/xml.h>
 
-/*!\class Project
- * \brief Holds the data for an project.
- *
- * An GenericCAM project consists of
- * - one or more objects (may be modified, sliced, inverted into mold forms, ect.)
- * - one or more pieces of stock material
- * - one or more run
- *    - a machine (with setup)
- *    - a toolbox for the machine (at least one tool)
- *    - toolpath generators
- *    - generated toolpaths
- *
- */
+enum DisplayType {
+	displayObjects, displayWorkpieces, displayRun
+};
 
 class Project {
 	// Constructor / Destructor
@@ -73,39 +77,33 @@ public:
 	ArrayOfWorkpiece workpieces;
 	ArrayOfRun run;
 
-	//TODO: Does the toolbox belong to the settings/config file?
 	Toolbox toolbox;
 
-	OctreeGenerator octree;
-	Quadtree quadtree;
+//	OctreeGenerator octree;
+//	Quadtree quadtree;
+//	// For target generator
+//	double resolution;
+//
+//	// Slot around Objects
+//	double slotWidth;
+//	double supportDistance;
+//	double supportWidth;
+//	double supportHeight;
+//	double middleY;
+//	double offsetX;
 
-	bool modified;
+	DisplayType displayType;
 
 	bool displayGeometry;
 	bool displayMachine;
 	bool displayStock;
-	bool displayWorkpiece;
 	bool displayBoundingBox;
-	bool displayRun;
 	bool displayTargets;
 	bool displayToolpath;
 	bool displayOutLines;
 
-	// For target generator
-
-	double resolution;
-
-	// Slot around Objects
-	double slotWidth;
-	double supportDistance;
-	double supportWidth;
-	double supportHeight;
-
 protected:
 	wxXmlDocument doc;
-
-	double middleY;
-	double offsetX;
 
 	// Methods
 public:
@@ -115,8 +113,7 @@ public:
 
 	void Paint(void);
 
-
-
+	//TODO: Cleanup the following function:
 	void GenerateToolPath(void);
 	void CollectToolPath(void);
 

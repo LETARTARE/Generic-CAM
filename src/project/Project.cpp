@@ -39,10 +39,6 @@ Project::Project()
 	doc.SetVersion(_T("1.0"));
 
 	Clear();
-
-	middleY = 0.212;
-	offsetX = 0.100;
-
 }
 
 Project::~Project()
@@ -57,25 +53,15 @@ void Project::Clear(void)
 	workpieces.Empty();
 	objects.Empty();
 
-	resolution = 0.0005;
+	displayType = displayObjects;
 
 	displayGeometry = true;
-
 	displayBoundingBox = false;
 	displayMachine = false;
 	displayStock = false;
-	displayWorkpiece = false;
-	displayRun = false;
 	displayTargets = false;
 	displayToolpath = false;
 	displayOutLines = false;
-
-	slotWidth = 0.010;
-	supportDistance = 0.05;
-	supportWidth = 0.005;
-	supportHeight = 0.005;
-
-	modified = false;
 }
 
 // Recursive tree deletion.
@@ -158,7 +144,6 @@ bool Project::Save(wxFileName fileName)
 		run[i].ToXml(nodeRun);
 
 	if(!doc.Save(fileName.GetFullPath(), wxXML_NO_INDENTATION)) return false;
-	modified = false;
 	this->fileName = fileName;
 	return true;
 }
@@ -273,8 +258,12 @@ bool Project::Load(wxFileName fileName)
 void Project::Paint(void)
 {
 	size_t i, j;
+	size_t objectNr;
 
-	if(displayGeometry){
+	AffineTransformMatrix tempMatrix;
+
+	switch(displayType){
+	case displayObjects:
 		glLoadName(1);
 		glPushName(0);
 		for(i = 0; i < objects.GetCount(); i++){
@@ -282,38 +271,72 @@ void Project::Paint(void)
 			objects[i].Paint();
 		}
 		::glPopName();
+		break;
+
+	case displayWorkpieces:
+		glLoadName(2);
+		for(i = 0; i < workpieces.GetCount(); i++){
+			if(!workpieces[i].selected) continue;
+			::glPushName(i);
+
+			for(j = 0; j < workpieces[i].placements.GetCount(); j++){
+				objectNr = workpieces[i].placements[j].objectNr;
+				tempMatrix = AffineTransformMatrix::Identity();
+				tempMatrix.TranslateGlobal(-objects[objectNr].bbox.xmin,
+						-objects[objectNr].bbox.ymin,
+						-objects[objectNr].bbox.zmin);
+//				tempMatrix *= objects[objectNr].matrix;
+				::glPushMatrix();
+				::glMultMatrixd(tempMatrix.a);
+				::glMultMatrixd(workpieces[i].placements[j].matrix.a);
+				objects[objectNr].Paint();
+				::glPopMatrix();
+			}
+			workpieces[i].Paint();
+			::glPopName();
+		}
+		break;
+	case displayRun:
+		glLoadName(3);
+		for(i = 0; i < run.GetCount(); i++){
+			if(!run[i].selected) continue;
+			::glPushName(i);
+			run[i].Paint();
+			::glPushMatrix();
+			::glMultMatrixd(run[i].workpiecePlacement.a);
+
+			if(run[i].workpieceNr > -1){
+				::glPushMatrix();
+				::glMultMatrixd(run[i].machine.workpiecePosition.a);
+
+				for(j = 0;
+						j < workpieces[run[i].workpieceNr].placements.GetCount();
+						j++){
+					objectNr =
+							workpieces[run[i].workpieceNr].placements[j].objectNr;
+					tempMatrix = AffineTransformMatrix::Identity();
+					tempMatrix.TranslateGlobal(-objects[objectNr].bbox.xmin,
+							-objects[objectNr].bbox.ymin,
+							-objects[objectNr].bbox.zmin);
+					::glPushMatrix();
+					::glMultMatrixd(tempMatrix.a);
+					::glMultMatrixd(
+							workpieces[run[i].workpieceNr].placements[j].matrix.a);
+					objects[objectNr].Paint();
+					::glPopMatrix();
+				}
+
+				workpieces[run[i].workpieceNr].Paint();
+
+				::glPopMatrix();
+			}
+			::glPopMatrix();
+			::glPopName();
+		}
+		break;
 	}
-
-	//		octree.Paint();
-//		quadtree.Paint();
-//	if(displayMachine) machine.Paint();
-
-//	if(displayRun){
-//		for(i = 0; i < run.GetCount(); i++){
-//			run[i].Paint();
-//			for(j = 0; j < run[i].placements.GetCount(); j++){
-//				::glPushMatrix();
-//				::glMultMatrixd(run[i].placements[j].matrix.a);
-//
-//				if(displayOutLines) run[i].placements[j].outLine.Paint();
-//				if(displayTargets){
-//					if(!run[i].placements[j].isKeepout){
-////						targets[run[i].placements[j].targetNumber].Paint();
-//					}
-//				}
-//				::glPopMatrix();
-//
-//			}
-//
-//		}
-//	}
-
-//	if(displayStock) stock.Paint();
-	//if(displayWorkpiece) workpiece.Paint();
-	//if(displayBoundingBox) bbox.Paint();
+	::glLoadName(0);
 }
-
-//bool Project::LoadObject(wxFileName)
 
 size_t Project::SetupMachineBed(bool flipped)
 {

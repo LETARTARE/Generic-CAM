@@ -40,6 +40,10 @@
  *
  * Geometric data is stored in this class.
  */
+enum GeometryColorStyle {
+	geometryColorGlobal, geometryColorTriangle, geometryColorVertex
+};
+
 class Geometry {
 	// Constructor/ Destructor
 public:
@@ -50,6 +54,8 @@ public:
 public:
 	wxString objectName;
 	Vector3 color;
+	Vector3 colorNewObjects;
+	GeometryColorStyle useColor;
 	bool visible;
 
 	AffineTransformMatrix matrix; //!< Transformation of the data.
@@ -63,8 +69,7 @@ public:
 	void Paint(void) const;
 
 	void Clear(void);
-	void CopyFrom(const Geometry &geometry);
-	void CopyTrianglesFrom(const Geometry &geometry);
+	void InsertTrianglesFrom(const Geometry &geometry, bool recolor = false);
 
 	void CalculateNormals(void);
 	void FlipNormals(void);
@@ -76,11 +81,13 @@ public:
 	void ApplyTransformation(void);
 
 	void AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c);
-	void AddTriangleTransform(const Vector3 &a, const Vector3 &b,
-			const Vector3 &c, const AffineTransformMatrix &transformMatrix);
 	void AddTriangleWithNormals(const Vector3 &a, const Vector3 &b,
 			const Vector3 &c, const Vector3 &na, const Vector3 &nb,
 			const Vector3 &nc);
+	void AddTriangle(const Triangle &tri, bool copyNormals = true);
+
+	void AddTriangleTransform(const Vector3 &a, const Vector3 &b,
+			const Vector3 &c, const AffineTransformMatrix &transformMatrix);
 
 	void AddQuad(const Vector3 &a, const Vector3 &b, const Vector3 &c,
 			const Vector3 &d);

@@ -27,7 +27,6 @@
 //$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include "MachineSimulator.h"
 
 #include <wx/textfile.h>
@@ -54,15 +53,6 @@ MachineSimulator::MachineSimulator()
 
 	a.TranslateGlobal(-0.05, 0, 0);
 	b.TranslateGlobal(+0.05, 0.1, 0);
-
-	machine.tool = &toolbox.tools[0];
-	machine.toolpath = &toolpath;
-	//toolpath.Generate(*machine.tool, a, b);
-
-	//toolpath.SetSphere(0.335,2);
-	//toolpath.SelfTest();
-
-	//machine.workpiece.BooleanRemove(&toolpath);
 }
 
 MachineSimulator::~MachineSimulator()
@@ -81,8 +71,8 @@ void MachineSimulator::Step(float tTarget)
 		step = 0;
 	}
 
-	while(step + 1 < position.Count() && tTarget > tStep
-			+ position[step].duration){
+	while(step + 1 < position.Count()
+			&& tTarget > tStep + position[step].duration){
 		tStep += position[step].duration;
 		step++;
 	}
@@ -90,23 +80,26 @@ void MachineSimulator::Step(float tTarget)
 	if(step + 1 == position.Count()){
 		machine.position = position[step];
 	}else{
-		machine.position = position[step] + (position[step + 1]
-				- position[step]) / position[step].duration * (tTarget - tStep);
+		machine.position = position[step]
+				+ (position[step + 1] - position[step])
+						/ position[step].duration * (tTarget - tStep);
 	}
 }
 
 bool MachineSimulator::ReadGCodeFile(wxFileName fileName)
 {
 	if(!fileName.IsOk()){
-		wxLogError(_T("ReadGCodeFile: Incorrect fileName ")
-				+ fileName.GetFullPath() + _T(" !"));
+		wxLogError(
+				_T(
+						"ReadGCodeFile: Incorrect fileName ") + fileName.GetFullPath() + _T(" !"));
 		return false;
 	}
 
 	wxTextFile file;
 
 	if(!file.Open(fileName.GetFullPath())){
-		wxLogError(_T("ReadGCodeFile: Can't open ") + fileName.GetFullPath()
+		wxLogError(
+				_T("ReadGCodeFile: Can't open ") + fileName.GetFullPath()
 				+ _T(" !"));
 		return false;
 	}

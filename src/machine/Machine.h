@@ -54,13 +54,9 @@ public:
 	wxString machineDescription;
 	wxString textOut;
 
-//	Workpiece workpiece;
-
-	Tool* tool;
-	ToolPath* toolpath;
-
 	AffineTransformMatrix toolPosition;
 	AffineTransformMatrix workpiecePosition;
+
 private:
 	bool initialized;
 

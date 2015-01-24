@@ -35,9 +35,9 @@ StockFile::StockFile()
 	default1.name = _("Small board");
 	stockMaterials.Add(default1);
 	StockMaterial default2;
-	default2.sx = 4 * 25.4e-3;
+	default2.sx = 3 * 12 * 25.4e-3;
 	default2.sy = 4 * 25.4e-3;
-	default2.sz = 3 * 12 * 25.4e-3;
+	default2.sz = 4 * 25.4e-3;
 	default2.name = _("4\" by 4\", 3 feet long");
 	stockMaterials.Add(default2);
 	StockMaterial default3;
@@ -67,10 +67,3 @@ bool StockFile::WriteToFile(wxString filename)
 {
 	return true;
 }
-//
-//void StockFile::Paint(void)
-//{
-//	size_t i;
-//	for(i = 0; i < stockMaterials.GetCount(); i++)
-//		stockMaterials[i].Paint();
-//}

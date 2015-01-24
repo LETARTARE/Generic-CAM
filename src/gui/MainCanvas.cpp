@@ -30,12 +30,11 @@ MainCanvas::MainCanvas(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 		const wxSize& size, long style, const wxString& name) :
 		OpenGLCanvas(parent, id, pos, size, style, name)
 {
-
 	displayCoordinateSystem = true;
-	geometry = NULL;
-	machine = NULL;
-	stockMaterial = NULL;
+
 	project = NULL;
+	machine = NULL;
+	geometry = NULL;
 }
 
 MainCanvas::~MainCanvas()
@@ -45,6 +44,14 @@ MainCanvas::~MainCanvas()
 void MainCanvas::InsertProject(Project* project)
 {
 	this->project = project;
+}
+void MainCanvas::InsertMachine(Machine* machine)
+{
+	this->machine = machine;
+}
+void MainCanvas::InsertGeometry(Geometry* geometry)
+{
+	this->geometry = geometry;
 }
 
 void MainCanvas::RenderCoordinateSystem(AffineTransformMatrix *matrix)
@@ -123,22 +130,8 @@ void MainCanvas::Render()
 {
 	if(displayCoordinateSystem) RenderCoordinateSystem();
 	if(project != NULL) project->Paint();
-	if(geometry != NULL) geometry->Paint();
-	if(stockMaterial != NULL) stockMaterial->Paint();
 	if(machine != NULL) machine->Paint();
+	if(geometry != NULL) geometry->Paint();
 }
 
-void MainCanvas::InsertMachine(Machine* machine)
-{
-	this->machine = machine;
-}
 
-void MainCanvas::InsertGeometry(Geometry* geometry)
-{
-	this->geometry = geometry;
-}
-
-void MainCanvas::InsertStockMaterial(StockMaterial* stockMaterial)
-{
-	this->stockMaterial = stockMaterial;
-}

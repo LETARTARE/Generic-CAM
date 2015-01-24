@@ -48,12 +48,12 @@ Object::~Object()
 
 void Object::Paint(void)
 {
-	::glPushMatrix();
-	::glMultMatrixd(matrix.a);
+		::glPushMatrix();
+		::glMultMatrixd(matrix.a);
 	size_t i;
 	for(i = 0; i < geometries.GetCount(); i++)
 		geometries[i].Paint();
-	::glPopMatrix();
+::glPopMatrix();
 }
 
 void Object::UpdateBoundingBox(void)
@@ -102,7 +102,7 @@ bool Object::ReloadObject(void)
 			for(i = 0; i < temp.geometry.GetCount(); i++){
 				temp.geometry[i].ApplyTransformation();
 				g.Clear();
-				g.CopyFrom(temp.geometry[i]);
+				g.InsertTrianglesFrom(temp.geometry[i]);
 				g.objectName = fileName.GetName();
 				geometries.Add(g);
 			}
@@ -123,7 +123,7 @@ bool Object::ReloadObject(void)
 			for(i = 0; i < temp.geometry.GetCount(); i++){
 				temp.geometry[i].ApplyTransformation();
 				g.Clear();
-				g.CopyFrom(temp.geometry[i]);
+				g.InsertTrianglesFrom(temp.geometry[i]);
 				//TODO: Remove the calculation of normals.
 				g.CalculateNormals();
 				if(g.objectName.IsEmpty()){
@@ -151,7 +151,7 @@ bool Object::ReloadObject(void)
 			for(i = 0; i < temp.geometry.GetCount(); i++){
 				temp.geometry[i].ApplyTransformation();
 				g.Clear();
-				g.CopyFrom(temp.geometry[i]);
+				g.InsertTrianglesFrom(temp.geometry[i]);
 				g.objectName = temp.geometry[i].objectName;
 				geometries.Add(g);
 			}

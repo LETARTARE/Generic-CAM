@@ -26,48 +26,31 @@
 
 #include "Workpiece.h"
 
+#include <GL/gl.h>
 #include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfWorkpiece)
-
-#include <GL/gl.h>
 
 Workpiece::Workpiece()
 {
 	selected = false;
 }
 
-Workpiece::Workpiece(StockMaterial* material)
+Workpiece::Workpiece(const StockMaterial &material) :
+		StockMaterial(material)
 {
-//	this->SetupBox(material->sx, material->sy, material->sy, resolution,
-//			resolution);
-
-	this->name = material->name;
 	selected = false;
 }
 
 Workpiece::~Workpiece()
 {
-
-}
-
-void Workpiece::SetupBox(const double sizeX, const double sizeY,
-		const double sizeZ, const double resolutionX, const double resolutionY)
-{
-
-//	Imprinter::SetupBox(sizeX, sizeY, sizeZ, resolutionX, resolutionY);
-//
-//	colorNormal.Set(0.8, 0.4, 0.0);
-//	colorTodo.Set(0, 0, 0.8);
-//	colorUnscratched.Set(0.0, 0.8, 0.1);
-}
-
-void Workpiece::InsertTriangle(Vector3 a, Vector3 b, Vector3 c)
-{
-//	Imprinter::InsertTriangle(a, b, c);
 }
 
 void Workpiece::Paint()
 {
-//	Imprinter::Paint();
+	if(glIsEnabled(GL_COLOR_MATERIAL)){
+		StockMaterial::Paint(0.4, true);
+		StockMaterial::Paint(0.4, false);
+	}else{
+		StockMaterial::PaintWireBox();
+	}
 }
-

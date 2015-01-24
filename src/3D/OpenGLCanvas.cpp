@@ -148,6 +148,10 @@ void OpenGLCanvas::InitGL()
 	::glEnable(GL_POINT_SMOOTH);
 	::glEnable(GL_DEPTH_TEST);
 
+	::glFrontFace(GL_CCW);
+	::glCullFace(GL_BACK);
+	::glEnable(GL_CULL_FACE);
+
 	SetupLighting();
 
 //  Refreshing is done anyway or else OnPaint would not have been called.

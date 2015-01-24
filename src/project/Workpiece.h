@@ -35,28 +35,23 @@
 
 #include "ObjectPlacement.h"
 
-class Workpiece {
+class Workpiece:public StockMaterial {
 	// Constructor / Destructor
 public:
 	Workpiece();
-	Workpiece(StockMaterial* material);
+	Workpiece(const StockMaterial &material);
 	virtual ~Workpiece();
 
 	// Member variables
 public:
-	wxString name;
+
 	bool selected;
 
 	ArrayOfObjectPlacement placements;
 
 	// Methods
 public:
-
 	void Paint();
-
-	void SetupBox(const double sizeX, const double sizeY, const double sizeZ,
-			const double resolutionX = 0.001, const double resolutionY = 0.001);
-	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c);
 };
 
 WX_DECLARE_OBJARRAY(Workpiece, ArrayOfWorkpiece);

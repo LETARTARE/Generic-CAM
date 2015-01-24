@@ -26,6 +26,7 @@
 
 #include "StockMaterial.h"
 #include <GL/gl.h>
+#include <math.h>
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfStockMaterial)
 
@@ -50,54 +51,137 @@ StockMaterial::~StockMaterial()
 {
 }
 
-void StockMaterial::Paint(void)
+void StockMaterial::Paint(float alpha, bool flipNormals)
 {
-
-	::glPushMatrix();
-	::glMultMatrixd(matrix.a);
-
 	::glBegin(GL_QUADS);
 
-	::glColor4f(color.x, color.y, color.z, 0.4);
+	::glColor4f(color.x, color.y, color.z, alpha);
 
-	::glNormal3f(1, 0, 0);
-	::glVertex3f(sx, sy, sz);
+	if(flipNormals){
+		::glNormal3f(-1, 0, 0);
+		::glVertex3f(sx, sy, sz);
+		::glVertex3f(sx, sy, 0);
+		::glVertex3f(sx, 0, 0);
+		::glVertex3f(sx, 0, sz);
+	}else{
+		::glNormal3f(1, 0, 0);
+		::glVertex3f(sx, sy, sz);
+		::glVertex3f(sx, 0, sz);
+		::glVertex3f(sx, 0, 0);
+		::glVertex3f(sx, sy, 0);
+	}
+	if(flipNormals){
+		::glNormal3f(1, 0, 0);
+		::glVertex3f(0, sy, sz);
+		::glVertex3f(0, 0, sz);
+		::glVertex3f(0, 0, 0);
+		::glVertex3f(0, sy, 0);
+	}else{
+		::glNormal3f(-1, 0, 0);
+		::glVertex3f(0, sy, sz);
+		::glVertex3f(0, sy, 0);
+		::glVertex3f(0, 0, 0);
+		::glVertex3f(0, 0, sz);
+	}
+	if(flipNormals){
+		::glNormal3f(0, -1, 0);
+		::glVertex3f(sx, sy, sz);
+		::glVertex3f(0, sy, sz);
+		::glVertex3f(0, sy, 0);
+		::glVertex3f(sx, sy, 0);
+	}else{
+		::glNormal3f(0, 1, 0);
+		::glVertex3f(sx, sy, sz);
+		::glVertex3f(sx, sy, 0);
+		::glVertex3f(0, sy, 0);
+		::glVertex3f(0, sy, sz);
+	}
+	if(flipNormals){
+		::glNormal3f(0, 1, 0);
+		::glVertex3f(sx, 0, sz);
+		::glVertex3f(sx, 0, 0);
+		::glVertex3f(0, 0, 0);
+		::glVertex3f(0, 0, sz);
+	}else{
+		::glNormal3f(0, -1, 0);
+		::glVertex3f(sx, 0, sz);
+		::glVertex3f(0, 0, sz);
+		::glVertex3f(0, 0, 0);
+		::glVertex3f(sx, 0, 0);
+	}
+	if(flipNormals){
+		::glNormal3f(0, 0, -1);
+		::glVertex3f(sx, sy, sz);
+		::glVertex3f(sx, 0, sz);
+		::glVertex3f(0, 0, sz);
+		::glVertex3f(0, sy, sz);
+	}else{
+		::glNormal3f(0, 0, 1);
+		::glVertex3f(sx, sy, sz);
+		::glVertex3f(0, sy, sz);
+		::glVertex3f(0, 0, sz);
+		::glVertex3f(sx, 0, sz);
+	}
+	if(flipNormals){
+		::glNormal3f(0, 0, 1);
+		::glVertex3f(sx, sy, 0);
+		::glVertex3f(0, sy, 0);
+		::glVertex3f(0, 0, 0);
+		::glVertex3f(sx, 0, 0);
+	}else{
+		::glNormal3f(0, 0, -1);
+		::glVertex3f(sx, sy, 0);
+		::glVertex3f(sx, 0, 0);
+		::glVertex3f(0, 0, 0);
+		::glVertex3f(0, sy, 0);
+	}
+	::glEnd();
+}
+
+void StockMaterial::PaintWireBox(void)
+{
+	GLfloat d = M_SQRT1_2;
+
+	::glBegin(GL_LINES);
+	::glColor3f(color.x, color.y, color.z);
+	::glNormal3f(-d, -d, 0);
+	::glVertex3f(0, 0, 0);
+	::glVertex3f(0, 0, sz);
+	::glNormal3f(d, -d, 0);
+	::glVertex3f(sx, 0, 0);
 	::glVertex3f(sx, 0, sz);
+	::glNormal3f(d, d, 0);
+	::glVertex3f(sx, sy, 0);
+	::glVertex3f(sx, sy, sz);
+	::glNormal3f(-d, d, 0);
+	::glVertex3f(0, sy, 0);
+	::glVertex3f(0, sy, sz);
+
+	::glNormal3f(-d, 0, -d);
+	::glVertex3f(0, 0, 0);
+	::glVertex3f(0, sy, 0);
+	::glNormal3f(-d, 0, d);
+	::glVertex3f(0, 0, sz);
+	::glVertex3f(0, sy, sz);
+	::glNormal3f(d, 0, d);
+	::glVertex3f(sx, 0, sz);
+	::glVertex3f(sx, sy, sz);
+	::glNormal3f(d, 0, -d);
 	::glVertex3f(sx, 0, 0);
 	::glVertex3f(sx, sy, 0);
 
-	::glNormal3f(-1, 0, 0);
-	::glVertex3f(0, sy, sz);
-	::glVertex3f(0, sy, 0);
-	::glVertex3f(0, 0, 0);
-	::glVertex3f(0, 0, sz);
-
-	::glNormal3f(0, 1, 0);
-	::glVertex3f(sx, sy, sz);
-	::glVertex3f(sx, sy, 0);
-	::glVertex3f(0, sy, 0);
-	::glVertex3f(0, sy, sz);
-
-	::glNormal3f(0, -1, 0);
-	::glVertex3f(sx, 0, sz);
-	::glVertex3f(0, 0, sz);
+	::glNormal3f(0, -d, -d);
 	::glVertex3f(0, 0, 0);
 	::glVertex3f(sx, 0, 0);
-
-	::glNormal3f(0, 0, 1);
-	::glVertex3f(sx, sy, sz);
+	::glNormal3f(0, d, -d);
+	::glVertex3f(0, sy, 0);
+	::glVertex3f(sx, sy, 0);
+	::glNormal3f(0, d, d);
 	::glVertex3f(0, sy, sz);
+	::glVertex3f(sx, sy, sz);
+	::glNormal3f(0, -d, d);
 	::glVertex3f(0, 0, sz);
 	::glVertex3f(sx, 0, sz);
-
-	::glNormal3f(0, 0, -1);
-	::glVertex3f(sx, sy, 0);
-	::glVertex3f(sx, 0, 0);
-	::glVertex3f(0, 0, 0);
-	::glVertex3f(0, sy, 0);
 
 	::glEnd();
-
-	::glPopMatrix();
-
 }

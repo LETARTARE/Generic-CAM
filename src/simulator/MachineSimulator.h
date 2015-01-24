@@ -47,9 +47,6 @@ public:
 	Machine machine;
 	ArrayOfMachinePosition position;
 
-	ToolPath toolpath;
-	Toolbox toolbox;
-
 	float tStep;
 	unsigned long step;
 

@@ -101,6 +101,8 @@ bool FileSTL::ReadStreamBinary(wxFFileInputStream * stream, bool hasRead5Byte)
 	// Set up a new geometry object.
 	Geometry* g = new Geometry();
 	g->objectName = filename;
+	g->color = color;
+	g->colorNewObjects = color;
 
 	geometry.Clear(); // Clear the old geometry and
 	geometry.Add(g); //insert the new one.
@@ -121,7 +123,7 @@ bool FileSTL::ReadStreamBinary(wxFFileInputStream * stream, bool hasRead5Byte)
 
 	wxASSERT(sizeof(float)==4);
 
-	uint16_t nrOfAttributeBytes;
+	uint16_t attribute;
 
 	Triangle tri;
 	for(i = 0; i < nrOfTriangles; i++){
@@ -131,31 +133,43 @@ bool FileSTL::ReadStreamBinary(wxFFileInputStream * stream, bool hasRead5Byte)
 			error += _T("STL File ") + filename + _T(": File to short!");
 			return false;
 		}
-		nrOfAttributeBytes = binaryStream.Read16();
+		attribute = binaryStream.Read16();
 
 		if(stream->Eof()){
 			error += _T( "STL File ") + filename + _T(": File to short!");
 			return false;
 		}
 
-		tri.n[0].x = coord[0];
-		tri.n[0].y = coord[1];
-		tri.n[0].z = coord[2];
+		Vector3 color;
+		if(attribute & (1 << 15)){
+			color.x = (float) ((attribute >> 0) & 31) / 31.0;
+			color.y = (float) ((attribute >> 5) & 31) / 31.0;
+			color.z = (float) ((attribute >> 10) & 31) / 31.0;
+		}else{
+			color = geometry[nGeometry].colorNewObjects;
+		}
+
 		for(j = 0; j < 3; j++){
 			tri.p[j].x = coord[3 + j * 3];
 			tri.p[j].y = coord[4 + j * 3];
 			tri.p[j].z = coord[5 + j * 3];
+			tri.n[j].x = coord[0];
+			tri.n[j].y = coord[1];
+			tri.n[j].z = coord[2];
+			tri.c[j] = color;
 		}
 
 		// The normal vectors seem to be defect for some files.
 		// if(false)... = Calculate normals
 		// if(true)...  = Use normals from file
-		if(false){
-			geometry[nGeometry].AddTriangleWithNormals(tri.p[0], tri.p[1],
-					tri.p[2], tri.n[0], tri.n[0], tri.n[0]);
-		}else{
-			geometry[nGeometry].AddTriangle(tri.p[0], tri.p[1], tri.p[2]);
-		}
+//		if(false){
+//			geometry[nGeometry].AddTriangleWithNormals(tri.p[0], tri.p[1],
+//					tri.p[2], tri.n[0], tri.n[0], tri.n[0]);
+//		}else{
+//			geometry[nGeometry].AddTriangle(tri.p[0], tri.p[1], tri.p[2]);
+//		}
+
+		geometry[nGeometry].AddTriangle(tri, false);
 
 		//			if(i <= 1){
 		//				wxLogMessage(wxString::Format(_T("n: %.1f %.1f %.1f"),
@@ -203,6 +217,8 @@ bool FileSTL::ReadStreamAscii(wxFFileInputStream * stream, bool hasRead5Byte)
 		}else{
 			g->objectName = temp;
 		}
+		g->color = color;
+		g->colorNewObjects = color;
 		geometry.Add(g);
 		n = geometry.GetCount() - 1;
 
@@ -250,24 +266,26 @@ bool FileSTL::ReadStreamAscii(wxFFileInputStream * stream, bool hasRead5Byte)
 				return false;
 			}
 
-			tri.n[0].x = normal[0];
-			tri.n[0].y = normal[1];
-			tri.n[0].z = normal[2];
 			for(j = 0; j < 3; j++){
 				tri.p[j].x = coord[0 + j * 3];
 				tri.p[j].y = coord[1 + j * 3];
 				tri.p[j].z = coord[2 + j * 3];
+				tri.n[j].x = normal[0];
+				tri.n[j].y = normal[1];
+				tri.n[j].z = normal[2];
+				tri.c[j] = geometry[n].colorNewObjects;
 			}
 
 			// The normal vectors seem to be defect for some files.
 			// if(false)... = Calculate normals
 			// if(true)...  = Use normals from file
-			if(false){
-				geometry[n].AddTriangleWithNormals(tri.p[0], tri.p[1], tri.p[2],
-						tri.n[0], tri.n[0], tri.n[0]);
-			}else{
-				geometry[n].AddTriangle(tri.p[0], tri.p[1], tri.p[2]);
-			}
+			geometry[n].AddTriangle(tri, false);
+//			if(false){
+//				geometry[n].AddTriangleWithNormals(tri.p[0], tri.p[1], tri.p[2],
+//						tri.n[0], tri.n[0], tri.n[0]);
+//			}else{
+//				geometry[n].AddTriangle(tri.p[0], tri.p[1], tri.p[2]);
+//			}
 
 			word = textStream.ReadWord().Trim(false);
 		}

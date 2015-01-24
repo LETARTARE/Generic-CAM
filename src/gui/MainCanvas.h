@@ -49,7 +49,6 @@ private:
 
 	Geometry* geometry;
 	Machine* machine;
-	StockMaterial* stockMaterial;
 
 	bool displayCoordinateSystem;
 
@@ -58,7 +57,6 @@ public:
 	void InsertProject(Project* project);
 	void InsertMachine(Machine* machine);
 	void InsertGeometry(Geometry* geometry);
-	void InsertStockMaterial(StockMaterial* stockMaterial);
 
 	void RenderCoordinateSystem(AffineTransformMatrix *matrix = NULL);
 	void Render();

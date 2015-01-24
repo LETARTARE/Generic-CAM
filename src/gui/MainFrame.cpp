@@ -483,6 +483,22 @@ void MainFrame::OnSelectionChanged(wxTreeEvent& event)
 			tree->UpdateSelection();
 		}
 	}
+
+	switch(data->dataType){
+	case itemGroupObject:
+	case itemObject:
+		project.displayType = displayObjects;
+		break;
+	case itemGroupWorkpiece:
+	case itemWorkpiece:
+		project.displayType = displayWorkpieces;
+		break;
+	case itemGroupRun:
+	case itemRun:
+		project.displayType = displayRun;
+		break;
+	}
+
 	TransferDataToWindow();
 }
 

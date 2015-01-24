@@ -45,7 +45,9 @@ Run::~Run()
 
 void Run::Paint()
 {
-	toolPath.Paint();
+	machine.Paint();
+
+	//toolPath.Paint();
 	size_t i;
 //	for(i = 0; i < placements.GetCount(); i++)
 //		placements[i].Paint();

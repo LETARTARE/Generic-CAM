@@ -40,7 +40,7 @@ CommandWorkpieceAdd::~CommandWorkpieceAdd()
 
 bool CommandWorkpieceAdd::Do(void)
 {
-	Workpiece temp(&stock);
+	Workpiece temp(stock);
 	project->workpieces.Add(temp);
 	return true;
 }

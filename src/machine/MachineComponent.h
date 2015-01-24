@@ -48,7 +48,7 @@ public:
 	AffineTransformMatrix matrix;
 private:
 	Geometry geometry;
-
+	bool isColorSet;
 	// Methods
 public:
 	void Paint(void);
@@ -62,7 +62,6 @@ public:
 
 private:
 };
-WX_DECLARE_OBJARRAY(MachineComponent, ArrayOfMachineComponent)
-;
+WX_DECLARE_OBJARRAY(MachineComponent, ArrayOfMachineComponent);
 
 #endif /* MACHINECOMPONENT_H_ */

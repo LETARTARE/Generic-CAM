@@ -24,19 +24,18 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include "GeometryFileAbstract.h"
 
 #include <GL/gl.h>
 
 GeometryFileAbstract::GeometryFileAbstract()
 {
+	color.Set(0.8, 0.8, 0.8);
 }
 
 GeometryFileAbstract::~GeometryFileAbstract()
 {
 }
-
 
 void GeometryFileAbstract::Paint(void) const
 {

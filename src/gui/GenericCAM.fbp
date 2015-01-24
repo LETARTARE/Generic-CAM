@@ -8098,7 +8098,7 @@
             <property name="name">GUIRun</property>
             <property name="pos"></property>
             <property name="size">657,531</property>
-            <property name="style">wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP</property>
+            <property name="style">wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER</property>
             <property name="subclass"></property>
             <property name="title">Setup a Machine Run</property>
             <property name="tooltip"></property>
@@ -9200,7 +9200,7 @@
             <property name="name">GUIMachineDebugger</property>
             <property name="pos"></property>
             <property name="size">771,594</property>
-            <property name="style">wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxSYSTEM_MENU</property>
+            <property name="style">wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU</property>
             <property name="subclass"></property>
             <property name="title">Machine debugger</property>
             <property name="tooltip"></property>

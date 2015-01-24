@@ -24,7 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef GEOMETRYFILEABSTRACT_H_
 #define GEOMETRYFILEABSTRACT_H_
 
@@ -48,7 +47,7 @@ public:
 	AffineTransformMatrix matrix; ///> Transformation of the data
 	ArrayOfGeometry geometry;
 	wxString error; ///> Errorstring, empty if no errors occured
-
+	Vector3 color;
 	//Methods:
 public:
 	void Paint(void) const;

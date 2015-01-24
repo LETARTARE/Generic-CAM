@@ -33,8 +33,6 @@
 Machine::Machine()
 {
 	initialized = false;
-	tool = NULL;
-	toolpath = NULL;
 	position.Zero();
 	ClearComponents();
 }
@@ -48,12 +46,12 @@ void Machine::ToXml(wxXmlNode* parentNode)
 	wxXmlNode *temp, *temp2;
 	wxXmlNode *nodeObject = NULL;
 
-
 	// Find out, if object already exists in XML tree.
 	temp = parentNode->GetChildren();
 	while(temp != NULL && nodeObject == NULL){
-		if(temp->GetName() == _T("machine") && temp->GetPropVal(_T("name"),
-				_T("")) == fileName.GetFullName()) nodeObject = temp;
+		if(temp->GetName() == _T("machine")
+				&& temp->GetPropVal(_T("name"), _T(""))
+						== fileName.GetFullName()) nodeObject = temp;
 		temp = temp->GetNext();
 	}
 	if(nodeObject == NULL){
@@ -113,21 +111,6 @@ void Machine::Paint(void) const
 	for(i = 0; i < components.GetCount(); i++){
 		components[i].Paint();
 	}
-
-	if(tool != NULL){
-		::glPushMatrix();
-		::glMultMatrixd(toolPosition.a);
-		tool->Paint();
-		::glPopMatrix();
-	}
-	//	::glPushMatrix();
-	//	::glMultMatrixd(workpiecePosition.a);
-	//	workpiece.Paint();
-	//	::glPopMatrix();
-
-
-	//if(toolpath != NULL) toolpath->Paint();
-
 }
 
 void Machine::ClearComponents(void)
@@ -156,7 +139,6 @@ bool Machine::PlaceComponent(wxString const& nameOfComponent,
 		if(components[i].nameOfComponent.Cmp(nameOfComponent) == 0){
 			flag = true;
 			components[i].matrix.Set(matrix);
-
 
 			// Sideeffect of placing the components:
 			// The tool and the material matrices are set up.

@@ -35,7 +35,10 @@ Geometry::Geometry()
 {
 	visible = true;
 	color.Set(0.8, 0.8, 0.8);
+	colorNewObjects.Set(0.8, 0.8, 0.8);
+	useColor = geometryColorGlobal;
 }
+
 Geometry::~Geometry()
 {
 }
@@ -45,22 +48,17 @@ void Geometry::Clear(void)
 	triangles.Clear();
 }
 
-void Geometry::CopyFrom(const Geometry &geometry)
-{
-	Clear();
-	CopyTrianglesFrom(geometry);
-	this->matrix = geometry.matrix;
-	this->objectName = geometry.objectName;
-	this->visible = geometry.visible;
-	this->color = geometry.color;
-}
-
-void Geometry::CopyTrianglesFrom(const Geometry &geometry)
+void Geometry::InsertTrianglesFrom(const Geometry &geometry, bool recolor)
 {
 	size_t i;
 	Triangle temp;
 	for(i = 0; i < geometry.triangles.GetCount(); i++){
 		temp = geometry.triangles[i];
+		if(recolor){
+			temp.c[0] = colorNewObjects;
+			temp.c[1] = colorNewObjects;
+			temp.c[2] = colorNewObjects;
+		}
 		this->triangles.Add(temp);
 	}
 }
@@ -68,15 +66,8 @@ void Geometry::CopyTrianglesFrom(const Geometry &geometry)
 void Geometry::ApplyTransformation(const AffineTransformMatrix &matrix)
 {
 	size_t i;
-	for(i = 0; i < triangles.Count(); i++){
+	for(i = 0; i < triangles.Count(); i++)
 		triangles[i].ApplyTransformation(matrix);
-		//		triangles[i].p[0] = matrix.Transform(triangles[i].p[0]);
-		//		triangles[i].p[1] = matrix.Transform(triangles[i].p[1]);
-		//		triangles[i].p[2] = matrix.Transform(triangles[i].p[2]);
-		//		triangles[i].n[0] = matrix.TransformNoShift(triangles[i].n[0]);
-		//		triangles[i].n[1] = matrix.TransformNoShift(triangles[i].n[1]);
-		//		triangles[i].n[2] = matrix.TransformNoShift(triangles[i].n[2]);
-	}
 }
 
 void Geometry::ApplyTransformation(void)
@@ -89,7 +80,6 @@ void Geometry::ApplyTransformation(void)
 void Geometry::Paint(void) const
 {
 	if(!visible) return;
-	size_t i;
 
 	// GL_RESCALE_NORMAL is faster, but doesn't work on non-uniform scaled models
 	// GL_NORMALIZE is slower, but works always
@@ -104,10 +94,26 @@ void Geometry::Paint(void) const
 	::glPushMatrix();
 	::glMultMatrixd(matrix.a);
 
+	size_t i;
 	::glBegin(GL_TRIANGLES);
-	::glColor3f(color.x, color.y, color.z);
-	for(i = 0; i < triangles.Count(); i++){
-		triangles[i].Paint();
+	switch(useColor){
+	case geometryColorGlobal:
+		::glColor3f(color.x, color.y, color.z);
+		for(i = 0; i < triangles.Count(); i++)
+			triangles[i].Paint(true, false);
+		break;
+	case geometryColorTriangle:
+		for(i = 0; i < triangles.Count(); i++){
+			::glColor3f(triangles[i].c[0].x, triangles[i].c[0].y,
+					triangles[i].c[0].z);
+			triangles[i].Paint(true, false);
+		}
+		break;
+	case geometryColorVertex:
+		for(i = 0; i < triangles.Count(); i++)
+			triangles[i].Paint(true, true);
+		break;
+
 	}
 	::glEnd();
 	::glPopMatrix();
@@ -124,6 +130,7 @@ void Geometry::AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c)
 	tri->p[0] = a;
 	tri->p[1] = b;
 	tri->p[2] = c;
+	tri->c[0] = colorNewObjects;
 	tri->CalculateNormal();
 	triangles.Add(tri);
 }
@@ -139,6 +146,7 @@ void Geometry::AddTriangleWithNormals(const Vector3 &a, const Vector3 &b,
 	tri->n[0] = na;
 	tri->n[1] = nb;
 	tri->n[2] = nc;
+	tri->c[0] = colorNewObjects;
 	triangles.Add(tri);
 }
 
@@ -149,8 +157,16 @@ void Geometry::AddTriangleTransform(const Vector3 &a, const Vector3 &b,
 	tri->p[0] = transformMatrix.Transform(a);
 	tri->p[1] = transformMatrix.Transform(b);
 	tri->p[2] = transformMatrix.Transform(c);
+	tri->c[0] = colorNewObjects;
 	tri->CalculateNormal();
 	triangles.Add(tri);
+}
+
+void Geometry::AddTriangle(const Triangle& tri, bool copyNormals)
+{
+	Triangle * temp = new Triangle(tri);
+	if(!copyNormals) temp->CalculateNormal();
+	triangles.Add(temp);
 }
 
 void Geometry::AddQuad(const Vector3 &a, const Vector3 &b, const Vector3 &c,
@@ -168,6 +184,8 @@ void Geometry::AddQuad(const Vector3 &a, const Vector3 &b, const Vector3 &c,
 	tri1->n[0] = tri0->n[0];
 	tri1->n[1] = tri0->n[1];
 	tri1->n[2] = tri0->n[2];
+	tri0->c[0] = colorNewObjects;
+	tri1->c[0] = colorNewObjects;
 	triangles.Add(tri0);
 	triangles.Add(tri1);
 }
@@ -178,13 +196,15 @@ void Geometry::AddQuadTransform(const Vector3 &a, const Vector3 &b,
 {
 	Triangle* tri0 = new Triangle;
 	Triangle* tri1 = new Triangle;
+	tri0->c[0] = colorNewObjects;
 	tri0->p[0] = transformMatrix.Transform(a);
 	tri0->p[1] = transformMatrix.Transform(b);
 	tri0->p[2] = transformMatrix.Transform(c);
+	tri0->CalculateNormal();
+	tri1->c[0] = colorNewObjects;
 	tri1->p[0] = tri0->p[2];
 	tri1->p[1] = transformMatrix.Transform(d);
 	tri1->p[2] = tri0->p[0];
-	tri0->CalculateNormal();
 	tri1->n[0] = tri0->n[0];
 	tri1->n[1] = tri0->n[1];
 	tri1->n[2] = tri0->n[2];
