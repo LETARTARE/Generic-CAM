@@ -26,6 +26,7 @@
 
 #include "Project.h"
 #include "../Config.h"
+#include "../3D/BooleanBox.h"
 
 #include <GL/gl.h>
 #include <math.h>
@@ -257,6 +258,23 @@ bool Project::Load(wxFileName fileName)
 
 void Project::Paint(void)
 {
+
+	// Experimental stuff:
+//	BooleanBox x;
+//	BooleanBox y(0.4, 0.4, 0.4);
+//	y.matrix.TranslateGlobal(0.1, -0.1, 0.5);
+//	x -= y;
+//	y.matrix.TranslateGlobal(0.1, 0.1, 0.1);
+//	x -= y;
+//	BooleanBox z = x;
+//	z.matrix.TranslateGlobal(0.3, 0.3, 0.3);
+//	x -= z;
+//	::glColor4f(0.75, 0.75, 0.0, 1);
+//	x.Paint(true);
+//	::glColor4f(0.75, 0.75, 0.75, 0.4);
+//	x.Paint();
+//	y.Paint();
+
 	size_t i, j;
 	size_t objectNr;
 

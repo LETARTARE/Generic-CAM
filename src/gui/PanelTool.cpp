@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ToolPanel.cpp
+// Name               : PanelTool.cpp
 // Purpose            : 2D view of a tool.
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,49 +24,47 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
-#include "ToolPanel.h"
+#include "PanelTool.h"
 #include <wx/log.h>
 
-ToolPanel::ToolPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos,
+PanelTool::PanelTool(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 		const wxSize& size, long style) :
-	wxPanel(parent, id, pos, size, style)
+		wxPanel(parent, id, pos, size, style)
 {
 
 	this->SetBackgroundColour(wxColour(200, 200, 200));
 
 	tool = NULL;
 
-
 	// Connect Events
-	this->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler( ToolPanel::OnLeftDown ));
-	this->Connect(wxEVT_MOTION, wxMouseEventHandler( ToolPanel::OnMotion ));
-	this->Connect(wxEVT_PAINT, wxPaintEventHandler( ToolPanel::OnPaint ));
-	this->Connect(wxEVT_SIZE, wxSizeEventHandler( ToolPanel::OnSize ));
+	this->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(PanelTool::OnLeftDown));
+	this->Connect(wxEVT_MOTION, wxMouseEventHandler(PanelTool::OnMotion));
+	this->Connect(wxEVT_PAINT, wxPaintEventHandler(PanelTool::OnPaint));
+	this->Connect(wxEVT_SIZE, wxSizeEventHandler(PanelTool::OnSize));
 }
 
-ToolPanel::~ToolPanel()
+PanelTool::~PanelTool()
 {
 	// Disconnect Events
 	this->Disconnect(wxEVT_LEFT_DOWN,
-			wxMouseEventHandler( ToolPanel::OnLeftDown ));
-	this->Disconnect(wxEVT_MOTION, wxMouseEventHandler( ToolPanel::OnMotion ));
-	this->Disconnect(wxEVT_PAINT, wxPaintEventHandler( ToolPanel::OnPaint ));
-	this->Disconnect(wxEVT_SIZE, wxSizeEventHandler( ToolPanel::OnSize ));
+			wxMouseEventHandler(PanelTool::OnLeftDown));
+	this->Disconnect(wxEVT_MOTION, wxMouseEventHandler(PanelTool::OnMotion));
+	this->Disconnect(wxEVT_PAINT, wxPaintEventHandler(PanelTool::OnPaint));
+	this->Disconnect(wxEVT_SIZE, wxSizeEventHandler(PanelTool::OnSize));
 }
 
-void ToolPanel::InsertTool(Tool& t)
+void PanelTool::InsertTool(Tool& t)
 {
 	tool = &t;
 	this->Refresh();
 }
 
-void ToolPanel::OnSize(wxSizeEvent& event)
+void PanelTool::OnSize(wxSizeEvent& event)
 {
 	this->Refresh();
 }
 
-void ToolPanel::OnPaint(wxPaintEvent& event)
+void PanelTool::OnPaint(wxPaintEvent& event)
 {
 
 	if(tool == NULL) return;
@@ -76,8 +74,8 @@ void ToolPanel::OnPaint(wxPaintEvent& event)
 	wxSize sz = GetClientSize();
 
 	float scaleX = (float) sz.x / tool->GetMaxDiameter();
-	float scaleY = (float) sz.y / (tool->GetPositiveLength()
-			+ tool->GetNegativeLength());
+	float scaleY = (float) sz.y
+			/ (tool->GetPositiveLength() + tool->GetNegativeLength());
 
 	float scaleFactor = (scaleX < scaleY)? scaleX : scaleY;
 	scaleFactor *= 0.9;
@@ -87,40 +85,37 @@ void ToolPanel::OnPaint(wxPaintEvent& event)
 
 	dc.CrossHair(mx, my);
 
-
 	unsigned int i;
 
 	for(i = 0; i < tool->contour.Count(); i++){
 
 		if(tool->contour[i].isCutting)
 			dc.SetPen(*wxRED_PEN);
-		else
+			else
 			dc.SetPen(*wxBLACK_PEN);
 
-		dc.DrawLine(mx + scaleFactor * tool->contour[i].p1.x, my + scaleFactor
-				* tool->contour[i].p1.z, mx + scaleFactor
-				* tool->contour[i].p2.x, my + scaleFactor
-				* tool->contour[i].p2.z);
-		dc.DrawLine(mx - scaleFactor * tool->contour[i].p1.x, my + scaleFactor
-				* tool->contour[i].p1.z, mx - scaleFactor
-				* tool->contour[i].p2.x, my + scaleFactor
-				* tool->contour[i].p2.z);
+			dc.DrawLine(mx + scaleFactor * tool->contour[i].p1.x, my + scaleFactor
+					* tool->contour[i].p1.z, mx + scaleFactor
+					* tool->contour[i].p2.x, my + scaleFactor
+					* tool->contour[i].p2.z);
+			dc.DrawLine(mx - scaleFactor * tool->contour[i].p1.x, my + scaleFactor
+					* tool->contour[i].p1.z, mx - scaleFactor
+					* tool->contour[i].p2.x, my + scaleFactor
+					* tool->contour[i].p2.z);
+		}
+
+		//wxLogMessage((linkedField == NULL)? _T("NULL") : _T("not NULL"));
+
+		//	text = wxString::Format(_T("%u elements in tool."), tool->elements.Count());
+		//	dc.DrawText(text, 10, 10);
 	}
 
-
-	//wxLogMessage((linkedField == NULL)? _T("NULL") : _T("not NULL"));
-
-
-	//	text = wxString::Format(_T("%u elements in tool."), tool->elements.Count());
-	//	dc.DrawText(text, 10, 10);
-}
-
-void ToolPanel::OnMotion(wxMouseEvent& event)
+void PanelTool::OnMotion(wxMouseEvent& event)
 {
 	if(tool == NULL) return;
 }
 
-void ToolPanel::OnLeftDown(wxMouseEvent& event)
+void PanelTool::OnLeftDown(wxMouseEvent& event)
 {
 	if(tool == NULL) return;
 

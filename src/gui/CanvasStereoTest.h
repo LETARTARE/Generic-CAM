@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ToolPanel.h
-// Purpose            : 2D view of a tool.
+// Name               : CanvasStereoTest.h
+// Purpose            : Rotating cube for 3D-Tests
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 28.02.2010
-// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 25.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,40 +24,31 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef CANVASSTEREOTEST_H_
+#define CANVASSTEREOTEST_H_
 
-#ifndef TOOLPANEL_H_
-#define TOOLPANEL_H_
+/*!\class CanvasStereoTest
+ * \brief Displays a rotating cube
+ *
+ * ...
+ */
 
-#include <wx/panel.h>
-#include <wx/dcclient.h>
+#include <wx/wx.h>
 
-#include "../machine/Tool.h"
+#include "../3D/BooleanBox.h"
+#include "../3D/OpenGLCanvas.h"
 
-class ToolPanel:public wxPanel {
-	// Costructor/ Destructor
+class CanvasStereoTest:public OpenGLCanvas {
 public:
-	ToolPanel(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos =
-			wxDefaultPosition, const wxSize& size = wxDefaultSize, long style =
-			wxTAB_TRAVERSAL);
-	virtual ~ToolPanel();
+	CanvasStereoTest(wxWindow *parent, wxWindowID id = wxID_ANY,
+			const wxPoint& pos = wxDefaultPosition, const wxSize& size =
+					wxDefaultSize, long style = 0,
+			const wxString& name = _T(""));
+	virtual ~CanvasStereoTest();
 
-	// Member Variables
-public:
+	BooleanBox box;
 
-private:
-	Tool* tool;
-
-	//Methods
-public:
-
-	void OnPaint(wxPaintEvent& event);
-	void OnSize(wxSizeEvent &event);
-
-	void OnMotion(wxMouseEvent& event);
-	void OnLeftDown(wxMouseEvent& event);
-
-	void InsertTool(Tool& t);
-
+	void Render();
 };
 
-#endif /* TOOLPANEL_H_ */
+#endif /* CANVASSTEREOTEST_H_ */

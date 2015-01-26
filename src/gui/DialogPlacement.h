@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ObjectPlacement.h
-// Purpose            :
+// Name               : DialogPlacement.h
+// Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 20.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 24.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,44 +24,47 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef OBJECTPLACEMENT_H_
-#define OBJECTPLACEMENT_H_
+#ifndef DIALOGPLACEMENT_H_
+#define DIALOGPLACEMENT_H_
 
-/*!\class ObjectPlacement
+#include <wx/cmdproc.h>
+#include <wx/wx.h>
+
+#include "../project/Project.h"
+#include "DisplaySettings.h"
+#include "gui.h"
+
+/*!\class DialogPlacement
  * \brief ...
  *
  * ...
  */
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../generator/Polygon25.h"
-
-#include <wx/dynarray.h>
-#include <wx/xml/xml.h>
-
-class ObjectPlacement {
+class DialogPlacement:public GUIPlacement {
 public:
-	ObjectPlacement();
-	virtual ~ObjectPlacement();
+	DialogPlacement(wxWindow* parent, Project * project,
+			wxCommandProcessor * commandProcessor, DisplaySettings * settings);
 
+private:
+	Project* project;
+	DisplaySettings * settings;
+	wxCommandProcessor * commandProcessor;
+
+	// Methods
 public:
-	AffineTransformMatrix matrix;
-	size_t objectNr;
 
-//	Polygon25 outLine;
+	bool TransferDataToWindow(void);
+	bool TransferDataFromWindow(void);
 
-	bool selected;
+protected:
+	int GetSelectedWorkpiece(void);
+	int GetSelectedPlacement(int workpieceNr);
 
-	bool isMovable;
-	bool isKeepout;
+	void OnClose(wxCloseEvent& event);
+	void OnClose(wxCommandEvent& event);
+	void OnExtraAdd(wxCommandEvent& event);
+	void OnTransform(wxCommandEvent& event);
 
-	//Methods:
-public:
-	void Clear(void);
-
-	void SetKeepout(double x, double y, double sizex, double sizey);
-
-	void Paint(void) const;
 };
-WX_DECLARE_OBJARRAY(ObjectPlacement, ArrayOfObjectPlacement);
-#endif /* OBJECTPLACEMENT_H_ */
+
+#endif /* DIALOGPLACEMENT_H_ */

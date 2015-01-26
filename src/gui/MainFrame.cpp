@@ -62,6 +62,8 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 		GUIMainFrame(parent)
 {
 
+	selectedTargetPosition = 0;
+
 #ifndef __WIN32__
 	//TODO: Check, why the icon is not working under Windows / Code::Blocks.
 	wxIconBundle logo;
@@ -80,53 +82,55 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	this->locale = locale;
 
 	settings.GetConfigFrom(config);
-
 	// Set the window size according to the config file
 	int w, h;
 	w = config->Read(_T("MainFrameWidth"), 600);
 	h = config->Read(_T("MainFrameHeight"), 400);
 	SetClientSize(w, h);
-
 	control.GetConfigFrom(config);
-	m_canvas->SetController(control);
 
-	timer.SetOwner(this);
-	this->Connect(wxEVT_TIMER, wxTimerEventHandler(MainFrame::OnTimer), NULL,
-			this);
-	timer.Start(1000); // ms
+	m_canvas->SetController(control);
 
 	this->Connect(ID_SELECTOBJECT, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::ObjectSelect));
 	this->Connect(ID_SELECTRUN, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::RunSelect));
-
 	this->Connect(ID_UPDATE, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::Update));
+	this->Connect(ID_UPDATESTEREO, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(MainFrame::UpdateStereo3D));
 
+	//TODO: Why is the KeyDown event connected to the canvas?
 	m_canvas->Connect(wxID_ANY, wxEVT_KEY_DOWN,
 			wxKeyEventHandler(MainFrame::OnKeyDown), NULL, this);
-
-	selectedTargetPosition = 0;
 
 	commandProcessor.SetEditMenu(m_menuEdit);
 	commandProcessor.Initialize();
 	commandProcessor.MarkAsSaved();
 
-	// Connect the project to the 3D canvas
-	m_canvas->InsertProject(&project);
-
-	dialogObjectModification = new DialogObjectTransformation(this, &project,
+	dialogObjectTransformation = new DialogObjectTransformation(this, &project,
 			&commandProcessor, &settings);
-	dialogStockOverview = new DialogStockMaterial(this, &project,
+	dialogStockMaterial = new DialogStockMaterial(this, &project,
 			&commandProcessor, &settings);
-	dialogStockSetup = new DialogWorkpiece(this, &project, &commandProcessor);
+	dialogWorkpiece = new DialogWorkpiece(this, &project, &commandProcessor);
+	dialogPlacement = new DialogPlacement(this, &project, &commandProcessor,
+			&settings);
 	dialogRun = new DialogRun(this, &project, &commandProcessor, &settings);
 	dialogDebugger = new DialogMachineDebugger(this, &settings);
+	dialogSetupStereo3D = new DialogSetupStereo3D(this, &settings);
 	dialogToolbox = new DialogToolbox(this, &project, &commandProcessor,
 			&settings);
 	dialogAnimation = new DialogAnimation(this, &project);
 
+	// Connect the project to the 3D canvas
+	m_canvas->InsertProject(&project);
+	settings.WriteToCanvas(m_canvas);
 	tree = new TreeSetup(m_tree, &project);
+
+	timer.SetOwner(this);
+	this->Connect(wxEVT_TIMER, wxTimerEventHandler(MainFrame::OnTimer), NULL,
+			this);
+	timer.Start(1000); // ms
 
 	TransferDataToWindow();
 }
@@ -144,8 +148,11 @@ MainFrame::~MainFrame()
 			wxCommandEventHandler(MainFrame::RunSelect));
 	this->Disconnect(ID_UPDATE, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::Update));
+	this->Disconnect(ID_UPDATESTEREO, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(MainFrame::UpdateStereo3D));
 
-	settings.WriteConfigTo(config);
+	// Save the configuration of the 6DOF controller
+	control.WriteConfigTo(config);
 
 	// Save the size of the mainframe
 	int w, h;
@@ -153,8 +160,7 @@ MainFrame::~MainFrame()
 	config->Write(_T("MainFrameWidth"), (long) w);
 	config->Write(_T("MainFrameHeight"), (long) h);
 
-	// Save the configuration of the 6DOF controller
-	control.WriteConfigTo(config);
+	settings.WriteConfigTo(config);
 
 	delete config; // config is written back on deletion of object
 }
@@ -165,20 +171,21 @@ bool MainFrame::TransferDataToWindow(void)
 	tree->Update();
 
 	//TODO: Review the stereomode
-	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
+	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
 	m_toolBar->ToggleTool(ID_DISPLAYMACHINE, project.displayMachine);
 	m_toolBar->ToggleTool(ID_DISPLAYMATERIAL, project.displayGeometry);
-	m_menuView->Check(ID_LOGSHOW, logWindow->GetFrame()->IsShown());
 
 	wxString temp = _T("Generic CAM - ");
 	if(commandProcessor.IsDirty()) temp += _T("* ");
 	temp += project.name;
 	this->SetTitle(temp);
 
-	dialogObjectModification->TransferDataToWindow();
-	dialogStockOverview->TransferDataToWindow();
-	dialogStockSetup->TransferDataToWindow();
+	dialogObjectTransformation->TransferDataToWindow();
+	dialogStockMaterial->TransferDataToWindow();
+	dialogWorkpiece->TransferDataToWindow();
+	dialogPlacement->TransferDataToWindow();
 	dialogRun->TransferDataToWindow();
+	dialogSetupStereo3D->TransferDataToWindow();
 
 	Refresh();
 	return true;
@@ -197,6 +204,12 @@ bool MainFrame::TransferDataFromWindow(void)
 void MainFrame::Update(wxCommandEvent& event)
 {
 	TransferDataToWindow();
+}
+
+void MainFrame::UpdateStereo3D(wxCommandEvent& event)
+{
+	settings.WriteToCanvas(m_canvas);
+	m_canvas->Refresh();
 }
 
 size_t MainFrame::GetFreeSystemMemory()
@@ -232,9 +245,9 @@ void MainFrame::OnKeyDown(wxKeyEvent& event)
 {
 	int k = event.GetKeyCode();
 
-	if(k == WXK_ESCAPE){
-		this->Close();
-	}
+//	if(k == WXK_ESCAPE){
+//		this->Close();
+//	}
 
 // Select placement
 //	if(k == WXK_NUMPAD_ADD
@@ -659,7 +672,8 @@ void MainFrame::OnObjectLoad(wxCommandEvent& event)
 
 void MainFrame::OnObjectModify(wxCommandEvent& event)
 {
-	dialogObjectModification->Show(true);
+	dialogObjectTransformation->Show(true);
+	dialogObjectTransformation->Raise();
 	TransferDataToWindow();
 }
 
@@ -712,14 +726,23 @@ void MainFrame::OnObjectFlipNormals(wxCommandEvent& event)
 
 void MainFrame::OnStockEdit(wxCommandEvent& event)
 {
-	dialogStockOverview->Show(true);
-	dialogStockOverview->Initialize();
+	dialogStockMaterial->Show(true);
+	dialogStockMaterial->Raise();
+	dialogStockMaterial->Initialize();
+	TransferDataToWindow();
+}
+
+void MainFrame::OnWorkpieceSetup(wxCommandEvent& event)
+{
+	dialogPlacement->Show(true);
+	dialogPlacement->Raise();
 	TransferDataToWindow();
 }
 
 void MainFrame::OnWorkpieceAdd(wxCommandEvent& event)
 {
-	dialogStockSetup->Show(true);
+	dialogWorkpiece->Show(true);
+	dialogWorkpiece->Raise();
 	TransferDataToWindow();
 }
 
@@ -768,6 +791,7 @@ void MainFrame::OnRunAdd(wxCommandEvent& event)
 void MainFrame::OnRunEdit(wxCommandEvent& event)
 {
 	dialogRun->Show(true);
+	dialogRun->Raise();
 	TransferDataToWindow();
 }
 
@@ -828,11 +852,13 @@ void MainFrame::OnMachineReload(wxCommandEvent& event)
 void MainFrame::OnMachineDebugger(wxCommandEvent& event)
 {
 	dialogDebugger->Show(true);
+	dialogDebugger->Raise();
 }
 
 void MainFrame::OnToolboxEdit(wxCommandEvent& event)
 {
 	dialogToolbox->Show(true);
+	dialogToolbox->Raise();
 	TransferDataToWindow();
 }
 
@@ -970,14 +996,7 @@ void MainFrame::OnChangeLanguage(wxCommandEvent& event)
 	TransferDataToWindow();
 }
 
-void MainFrame::OnSetupController(wxCommandEvent& event)
-{
-	DialogSetup6DOFController temp(this);
-	temp.InsertController(control);
-	temp.ShowModal();
-}
-
-void MainFrame::OnChangeStereo3D(wxCommandEvent& event)
+void MainFrame::OnActivateStereo3D(wxCommandEvent& event)
 {
 	if(m_canvas->stereoMode == stereoOff){
 		m_canvas->stereoMode = stereoAnaglyph;
@@ -988,23 +1007,38 @@ void MainFrame::OnChangeStereo3D(wxCommandEvent& event)
 	TransferDataToWindow();
 }
 
+void MainFrame::OnSetupController(wxCommandEvent& event)
+{
+	DialogSetup6DOFController temp(this);
+	temp.InsertController(control);
+	temp.ShowModal();
+}
+
+void MainFrame::OnSetupStereo3D(wxCommandEvent& event)
+{
+	dialogSetupStereo3D->Show(true);
+	dialogSetupStereo3D->Raise();
+}
+
 void MainFrame::OnSetupUnits(wxCommandEvent& event)
 {
 	DialogSetupUnits * temp = new DialogSetupUnits(this, &settings);
 	temp->Show();
+	temp->Raise();
 }
 
 void MainFrame::OnShowAnimationControl(wxCommandEvent& event)
 {
 	dialogAnimation->Show(true);
+	dialogAnimation->Raise();
 	TransferDataToWindow();
 }
 
 void MainFrame::OnExtraWindowClose(wxCommandEvent& event)
 {
-	dialogObjectModification->Show(false);
-	dialogStockOverview->Show(false);
-	dialogStockSetup->Show(false);
+	dialogObjectTransformation->Show(false);
+	dialogStockMaterial->Show(false);
+	dialogWorkpiece->Show(false);
 	dialogRun->Show(false);
 	dialogDebugger->Show(false);
 	dialogToolbox->Show(false);
@@ -1014,7 +1048,8 @@ void MainFrame::OnExtraWindowClose(wxCommandEvent& event)
 
 void MainFrame::OnShowLogWindow(wxCommandEvent& event)
 {
-	logWindow->Show(!(logWindow->GetFrame()->IsShown()));
+	logWindow->Show();
+	logWindow->GetFrame()->Raise();
 	TransferDataToWindow();
 }
 
@@ -1043,5 +1078,6 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 {
 	DialogAbout * dialog = new DialogAbout(this);
 	dialog->Show();
+	dialog->Raise();
 }
 

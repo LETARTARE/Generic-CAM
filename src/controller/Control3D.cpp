@@ -182,7 +182,7 @@ bool Control3D::WriteConfigTo(wxConfig *config)
 {
 	wxASSERT(config!=NULL);
 
-	if(controller != NULL) return false;
+	if(controller == NULL) return false;
 
 	switch(GetType()){
 	case CONTROLSPACEBALL_ID:

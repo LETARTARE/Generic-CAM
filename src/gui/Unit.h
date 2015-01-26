@@ -65,6 +65,8 @@ public:
 	wxString TextFromSIWithUnit(const double value,
 			unsigned int digitsAfterComma = 3);
 
+	double SIFromString(const wxString &text);
+
 	wxString GetSIName(void);
 	wxString GetOtherName(void);
 };

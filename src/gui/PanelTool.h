@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ObjectPlacement.h
-// Purpose            :
+// Name               : PanelTool.h
+// Purpose            : 2D view of a tool.
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 20.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 28.02.2010
+// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,44 +24,40 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef OBJECTPLACEMENT_H_
-#define OBJECTPLACEMENT_H_
 
-/*!\class ObjectPlacement
- * \brief ...
- *
- * ...
- */
+#ifndef TOOLPANEL_H_
+#define TOOLPANEL_H_
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../generator/Polygon25.h"
+#include <wx/panel.h>
+#include <wx/dcclient.h>
 
-#include <wx/dynarray.h>
-#include <wx/xml/xml.h>
+#include "../machine/Tool.h"
 
-class ObjectPlacement {
+class PanelTool:public wxPanel {
+	// Costructor/ Destructor
 public:
-	ObjectPlacement();
-	virtual ~ObjectPlacement();
+	PanelTool(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos =
+			wxDefaultPosition, const wxSize& size = wxDefaultSize, long style =
+			wxTAB_TRAVERSAL);
+	virtual ~PanelTool();
 
+	// Member Variables
 public:
-	AffineTransformMatrix matrix;
-	size_t objectNr;
 
-//	Polygon25 outLine;
+private:
+	Tool* tool;
 
-	bool selected;
-
-	bool isMovable;
-	bool isKeepout;
-
-	//Methods:
+	//Methods
 public:
-	void Clear(void);
 
-	void SetKeepout(double x, double y, double sizex, double sizey);
+	void OnPaint(wxPaintEvent& event);
+	void OnSize(wxSizeEvent &event);
 
-	void Paint(void) const;
+	void OnMotion(wxMouseEvent& event);
+	void OnLeftDown(wxMouseEvent& event);
+
+	void InsertTool(Tool& t);
+
 };
-WX_DECLARE_OBJARRAY(ObjectPlacement, ArrayOfObjectPlacement);
-#endif /* OBJECTPLACEMENT_H_ */
+
+#endif /* TOOLPANEL_H_ */

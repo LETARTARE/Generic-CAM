@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ObjectPlacement.h
-// Purpose            :
+// Name               : PanelTopView.h
+// Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 20.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 24.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,44 +24,42 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef OBJECTPLACEMENT_H_
-#define OBJECTPLACEMENT_H_
+#ifndef PANELTOPVIEW_H_
+#define PANELTOPVIEW_H_
 
-/*!\class ObjectPlacement
+#include <wx/panel.h>
+#include <wx/gdicmn.h>
+
+#include "../project/Project.h"
+
+/*!\class PanelTopView
  * \brief ...
  *
  * ...
  */
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../generator/Polygon25.h"
-
-#include <wx/dynarray.h>
-#include <wx/xml/xml.h>
-
-class ObjectPlacement {
+class PanelTopView:public wxPanel {
 public:
-	ObjectPlacement();
-	virtual ~ObjectPlacement();
-
+	PanelTopView(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos =
+			wxDefaultPosition, const wxSize& size = wxDefaultSize, long style =
+			wxTAB_TRAVERSAL);
+	virtual ~PanelTopView();
+	// Member Variables
 public:
-	AffineTransformMatrix matrix;
-	size_t objectNr;
 
-//	Polygon25 outLine;
+private:
+	Project * project;
 
-	bool selected;
-
-	bool isMovable;
-	bool isKeepout;
-
-	//Methods:
+	//Methods
 public:
-	void Clear(void);
+	void InsertProject(Project * project);
 
-	void SetKeepout(double x, double y, double sizex, double sizey);
+	void OnPaint(wxPaintEvent& event);
+	void OnSize(wxSizeEvent &event);
 
-	void Paint(void) const;
+	void OnMotion(wxMouseEvent& event);
+	void OnLeftDown(wxMouseEvent& event);
+
 };
-WX_DECLARE_OBJARRAY(ObjectPlacement, ArrayOfObjectPlacement);
-#endif /* OBJECTPLACEMENT_H_ */
+
+#endif /* PANELTOPVIEW_H_ */

@@ -102,7 +102,7 @@ void DialogMachineDebugger::OnClose(wxCommandEvent& event)
 	this->Show(false);
 }
 
-void DialogMachineDebugger::OnMachineRestart(wxCommandEvent& event)
+void DialogMachineDebugger::OnScriptEvaluate(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
 	machine.EvaluateDescription();

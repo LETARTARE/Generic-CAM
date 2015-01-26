@@ -48,8 +48,6 @@ private:
 
 	DisplaySettings * settings;
 
-
-
 	// Methods
 private:
 	bool TransferDataToWindow(void);

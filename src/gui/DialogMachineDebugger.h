@@ -54,8 +54,6 @@ private:
 
 	Machine machine;
 
-
-
 protected:
 	void Update(wxCommandEvent& event);
 
@@ -63,7 +61,7 @@ protected:
 	void OnMachineLoad(wxCommandEvent& event);
 	void OnMachineSave(wxCommandEvent& event);
 	void OnClose(wxCommandEvent& event);
-	void OnMachineRestart(wxCommandEvent& event);
+	void OnScriptEvaluate(wxCommandEvent& event);
 	void OnShowController(wxCommandEvent& event);
 
 };

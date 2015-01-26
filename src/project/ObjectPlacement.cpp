@@ -24,7 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include "ObjectPlacement.h"
 
 #include <GL/gl.h>
@@ -35,6 +34,7 @@ ObjectPlacement::ObjectPlacement()
 {
 	isMovable = true;
 	isKeepout = false;
+	selected = false;
 	objectNr = 0;
 }
 

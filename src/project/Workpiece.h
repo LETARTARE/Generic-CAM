@@ -29,9 +29,10 @@
 
 #include "../3D/Vector3.h"
 #include "../project/StockMaterial.h"
-#include "../generator/Imprinter.h"
 
 #include <wx/dynarray.h>
+
+#include "../3D/BooleanBox.h"
 
 #include "ObjectPlacement.h"
 
@@ -49,9 +50,13 @@ public:
 
 	ArrayOfObjectPlacement placements;
 
+protected:
+	BooleanBox box;
+
 	// Methods
 public:
 	void Paint();
+	void Refresh();
 };
 
 WX_DECLARE_OBJARRAY(Workpiece, ArrayOfWorkpiece);

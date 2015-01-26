@@ -43,10 +43,12 @@
 #include "DialogObjectTransformation.h"
 #include "DialogStockMaterial.h"
 #include "DialogWorkpiece.h"
+#include "DialogPlacement.h"
 #include "DialogRun.h"
 #include "DialogMachineDebugger.h"
 #include "DialogToolbox.h"
 #include "DialogAnimation.h"
+#include "DialogSetupStereo3D.h"
 
 #include "../controller/Control3D.h"
 #include "../project/Project.h"
@@ -56,8 +58,6 @@
 #include <wx/config.h>
 #include <wx/log.h>
 #include <wx/cmdproc.h>
-
-
 
 class MainFrame:public GUIMainFrame {
 	// Constructor/ Destructor
@@ -77,20 +77,20 @@ private:
 
 	Project project; ///> The project is instantiated here
 
-
-
 	DisplaySettings settings;
 
 	size_t selectedTargetPosition;
 
 	// Pointers to all the windows.
-	DialogObjectTransformation * dialogObjectModification;
-	DialogStockMaterial * dialogStockOverview;
-	DialogWorkpiece * dialogStockSetup;
+	DialogObjectTransformation * dialogObjectTransformation;
+	DialogStockMaterial * dialogStockMaterial;
+	DialogWorkpiece * dialogWorkpiece;
+	DialogPlacement * dialogPlacement;
 	DialogRun * dialogRun;
 	DialogMachineDebugger * dialogDebugger;
 	DialogToolbox * dialogToolbox;
 	DialogAnimation * dialogAnimation;
+	DialogSetupStereo3D * dialogSetupStereo3D;
 
 	wxTimer timer; ///> Animation timer
 	float t; // TODO: Make a seperate animation class
@@ -105,6 +105,7 @@ private:
 	void ObjectSelect(wxCommandEvent& event);
 	void RunSelect(wxCommandEvent& event);
 	void Update(wxCommandEvent& event);
+	void UpdateStereo3D(wxCommandEvent& event);
 
 	size_t GetFreeSystemMemory();
 	void OnTimer(wxTimerEvent& event);
@@ -125,6 +126,7 @@ private:
 	void OnObjectModify(wxCommandEvent& event);
 	void OnObjectFlipNormals(wxCommandEvent& event);
 	void OnStockEdit(wxCommandEvent& event);
+	void OnWorkpieceSetup(wxCommandEvent& event);
 	void OnWorkpieceAdd(wxCommandEvent& event);
 	void OnWorkpieceDelete(wxCommandEvent& event);
 	void OnWorkpieceDeleteUnused(wxCommandEvent& event);
@@ -145,8 +147,9 @@ private:
 	void OnLoadGCodes(wxCommandEvent& event);
 	void OnSaveGCodes(wxCommandEvent& event);
 	void OnChangeLanguage(wxCommandEvent& event);
+	void OnActivateStereo3D(wxCommandEvent& event);
 	void OnSetupController(wxCommandEvent& event);
-	void OnChangeStereo3D(wxCommandEvent& event);
+	void OnSetupStereo3D(wxCommandEvent& event);
 	void OnSetupUnits(wxCommandEvent& event);
 	void OnShowAnimationControl(wxCommandEvent& event);
 	void OnExtraWindowClose(wxCommandEvent& event);

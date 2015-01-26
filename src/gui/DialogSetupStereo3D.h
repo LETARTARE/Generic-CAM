@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ObjectPlacement.h
-// Purpose            :
+// Name               : DialogSetupStereo3D.h
+// Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 20.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 25.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,44 +24,35 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef OBJECTPLACEMENT_H_
-#define OBJECTPLACEMENT_H_
+#ifndef DIALOGSETUPSTEREO3D_H_
+#define DIALOGSETUPSTEREO3D_H_
 
-/*!\class ObjectPlacement
+/*!\class DialogSetupStereo3D
  * \brief ...
  *
  * ...
  */
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../generator/Polygon25.h"
+#include "DisplaySettings.h"
+#include "gui.h"
 
-#include <wx/dynarray.h>
-#include <wx/xml/xml.h>
-
-class ObjectPlacement {
+class DialogSetupStereo3D:public GUISetupStereo3D {
 public:
-	ObjectPlacement();
-	virtual ~ObjectPlacement();
+	DialogSetupStereo3D(wxWindow* parent, DisplaySettings * settings);
 
+	DisplaySettings * settings;
+
+	// Methods
 public:
-	AffineTransformMatrix matrix;
-	size_t objectNr;
+	bool TransferDataToWindow(void);
+	bool TransferDataFromWindow(void);
 
-//	Polygon25 outLine;
-
-	bool selected;
-
-	bool isMovable;
-	bool isKeepout;
-
-	//Methods:
-public:
-	void Clear(void);
-
-	void SetKeepout(double x, double y, double sizex, double sizey);
-
-	void Paint(void) const;
+private:
+	void OnClose(wxCloseEvent& event);
+	void OnScroll(wxScrollEvent& event);
+	void OnColorChanged(wxColourPickerEvent& event);
+	void OnSwap(wxCommandEvent& event);
+	void OnTextChange(wxCommandEvent& event);
 };
-WX_DECLARE_OBJARRAY(ObjectPlacement, ArrayOfObjectPlacement);
-#endif /* OBJECTPLACEMENT_H_ */
+
+#endif /* DIALOGSETUPSTEREO3D_H_ */

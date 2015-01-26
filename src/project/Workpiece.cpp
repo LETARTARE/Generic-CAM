@@ -39,6 +39,9 @@ Workpiece::Workpiece(const StockMaterial &material) :
 		StockMaterial(material)
 {
 	selected = false;
+	box.SetSize(material.sx, material.sy, material.sz);
+	BooleanBox b(0.1, 0.1, 0.1);
+	box -= b;
 }
 
 Workpiece::~Workpiece()
@@ -48,9 +51,16 @@ Workpiece::~Workpiece()
 void Workpiece::Paint()
 {
 	if(glIsEnabled(GL_COLOR_MATERIAL)){
-		StockMaterial::Paint(0.4, true);
-		StockMaterial::Paint(0.4, false);
+		glColor3f(color.x, color.y, color.z);
+		box.Paint();
+		StockMaterial::Paint(0.2, false);
 	}else{
+		box.Paint();
 		StockMaterial::PaintWireBox();
 	}
+}
+
+void Workpiece::Refresh()
+{
+	box.SetSize(sx, sy, sz);
 }

@@ -64,13 +64,13 @@ public:
 	Stereo3DType stereoMode;
 	float eyeDistance;
 	float focalDistance;
-	float backgroundGrayLevel;
-	float rightEyeR;
-	float rightEyeG;
-	float rightEyeB;
-	float leftEyeR;
-	float leftEyeG;
-	float leftEyeB;
+	unsigned char backgroundGrayLevel;
+	unsigned char rightEyeR;
+	unsigned char rightEyeG;
+	unsigned char rightEyeB;
+	unsigned char leftEyeR;
+	unsigned char leftEyeG;
+	unsigned char leftEyeB;
 
 protected:
 	AffineTransformMatrix rotmat;

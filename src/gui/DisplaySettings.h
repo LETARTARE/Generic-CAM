@@ -35,6 +35,8 @@
 
 #include <wx/config.h>
 
+#include "../3D/OpenGLCanvas.h"
+
 #include "Unit.h"
 
 class DisplaySettings {
@@ -57,8 +59,20 @@ public:
 	wxString lastMachineDirectory;
 	wxString lastToolboxDirectory;
 
+	float eyeDistance;
+	float focalDistance;
+	unsigned char backgroundGrayLevel;
+	unsigned char rightEyeR;
+	unsigned char rightEyeG;
+	unsigned char rightEyeB;
+	unsigned char leftEyeR;
+	unsigned char leftEyeG;
+	unsigned char leftEyeB;
+
 	bool GetConfigFrom(wxConfig * config);
 	bool WriteConfigTo(wxConfig * config);
+
+	void WriteToCanvas(OpenGLCanvas * canvas);
 
 protected:
 	wxArrayString unitsOfLength;

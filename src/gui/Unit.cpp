@@ -84,3 +84,10 @@ wxString Unit::GetOtherName(void)
 {
 	return otherName;
 }
+
+double Unit::SIFromString(const wxString& text)
+{
+	double temp;
+	text.ToDouble(&temp);
+	return ToSI(temp);
+}

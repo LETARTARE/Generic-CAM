@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ObjectPlacement.h
-// Purpose            :
+// Name               : CanvasStereoTest.cpp
+// Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 20.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 25.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,44 +24,31 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef OBJECTPLACEMENT_H_
-#define OBJECTPLACEMENT_H_
+#include "CanvasStereoTest.h"
 
-/*!\class ObjectPlacement
- * \brief ...
- *
- * ...
- */
+CanvasStereoTest::CanvasStereoTest(wxWindow* parent, wxWindowID id,
+		const wxPoint& pos, const wxSize& size, long style,
+		const wxString& name) :
+		OpenGLCanvas(parent, id, pos, size, style, name)
+{
+	box.SetSize(0.4, 0.4, 0.4);
+	box -= BooleanBox(0.1, 0.1, 0.0, 0.3, 0.3, 0.4);
+	box -= BooleanBox(0.0, 0.0, 0.0, 0.3, 0.3, 0.1);
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../generator/Polygon25.h"
+}
 
-#include <wx/dynarray.h>
-#include <wx/xml/xml.h>
+CanvasStereoTest::~CanvasStereoTest()
+{
+	this->Disconnect(wxEVT_TIMER,
+			wxTimerEventHandler(CanvasStereoTest::OnTimer),
+			NULL, this);
+}
 
-class ObjectPlacement {
-public:
-	ObjectPlacement();
-	virtual ~ObjectPlacement();
-
-public:
-	AffineTransformMatrix matrix;
-	size_t objectNr;
-
-//	Polygon25 outLine;
-
-	bool selected;
-
-	bool isMovable;
-	bool isKeepout;
-
-	//Methods:
-public:
-	void Clear(void);
-
-	void SetKeepout(double x, double y, double sizex, double sizey);
-
-	void Paint(void) const;
-};
-WX_DECLARE_OBJARRAY(ObjectPlacement, ArrayOfObjectPlacement);
-#endif /* OBJECTPLACEMENT_H_ */
+void CanvasStereoTest::Render()
+{
+	::glPushMatrix();
+	::glColor3f(0.8, 0.8, 0.8);
+	::glTranslatef(-0.2, -0.2, -0.2);
+	box.Paint();
+	::glPopMatrix();
+}

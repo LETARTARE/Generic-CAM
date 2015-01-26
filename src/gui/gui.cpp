@@ -9,8 +9,10 @@
 
 #include "../icon/arrowxn.xpm"
 #include "../icon/arrowxp.xpm"
+#include "../icon/arrowyd.xpm"
 #include "../icon/arrowyn.xpm"
 #include "../icon/arrowyp.xpm"
+#include "../icon/arrowyu.xpm"
 #include "../icon/arrowzn.xpm"
 #include "../icon/arrowzp.xpm"
 #include "../icon/first.xpm"
@@ -73,8 +75,19 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menubar->Append( m_menuEdit, _("&Edit") );
 	
 	m_menuObject = new wxMenu();
+	wxMenuItem* m_menuItemObjectModify;
+	m_menuItemObjectModify = new wxMenuItem( m_menuObject, ID_OBJECTMODIFY, wxString( _("&Modify Object") ) + wxT('\t') + wxT("CTRL+M"), wxEmptyString, wxITEM_NORMAL );
+	m_menuObject->Append( m_menuItemObjectModify );
+	
+	wxMenuItem* m_menuItemObjectFlipNormals;
+	m_menuItemObjectFlipNormals = new wxMenuItem( m_menuObject, ID_OBJECTFLIPNORMALS, wxString( _("&Flip Normals") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuObject->Append( m_menuItemObjectFlipNormals );
+	
+	wxMenuItem* m_separator8;
+	m_separator8 = m_menuObject->AppendSeparator();
+	
 	wxMenuItem* m_menuItemObjectLoad;
-	m_menuItemObjectLoad = new wxMenuItem( m_menuObject, ID_OBJECTLOAD, wxString( _("&Load Object File") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemObjectLoad = new wxMenuItem( m_menuObject, ID_OBJECTLOAD, wxString( _("&Load Object File...") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuObject->Append( m_menuItemObjectLoad );
 	
 	wxMenuItem* m_menuItemObjectRename;
@@ -85,23 +98,19 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menuItemObjectDelete = new wxMenuItem( m_menuObject, ID_OBJECTDELETE, wxString( _("&Delete Object") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuObject->Append( m_menuItemObjectDelete );
 	
-	wxMenuItem* m_separator8;
-	m_separator8 = m_menuObject->AppendSeparator();
-	
-	wxMenuItem* m_menuItemObjectModify;
-	m_menuItemObjectModify = new wxMenuItem( m_menuObject, ID_OBJECTMODIFY, wxString( _("&Modify Object") ) + wxT('\t') + wxT("CTRL+M"), wxEmptyString, wxITEM_NORMAL );
-	m_menuObject->Append( m_menuItemObjectModify );
-	
-	wxMenuItem* m_menuItemObjectFlipNormals;
-	m_menuItemObjectFlipNormals = new wxMenuItem( m_menuObject, ID_OBJECTFLIPNORMALS, wxString( _("&Flip Normals") ) , wxEmptyString, wxITEM_NORMAL );
-	m_menuObject->Append( m_menuItemObjectFlipNormals );
-	
 	m_menubar->Append( m_menuObject, _("&Object") );
 	
 	m_menuStock = new wxMenu();
 	wxMenuItem* m_menuItemStockOrganize;
 	m_menuItemStockOrganize = new wxMenuItem( m_menuStock, ID_STOCKORGANIZE, wxString( _("&Organize Stock") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuStock->Append( m_menuItemStockOrganize );
+	
+	wxMenuItem* m_menuItemStockToWorkpiece;
+	m_menuItemStockToWorkpiece = new wxMenuItem( m_menuStock, ID_WORKPIECEADD, wxString( _("&Add Stock to Project") ) , _("Add stock material to project as workpiece."), wxITEM_NORMAL );
+	m_menuStock->Append( m_menuItemStockToWorkpiece );
+	
+	wxMenuItem* m_separator16;
+	m_separator16 = m_menuStock->AppendSeparator();
 	
 	wxMenuItem* m_menuItemStockLoad;
 	m_menuItemStockLoad = new wxMenuItem( m_menuStock, ID_STOCKLOAD, wxString( _("&Load Stock...") ) , wxEmptyString, wxITEM_NORMAL );
@@ -114,49 +123,49 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menubar->Append( m_menuStock, _("&Stock") );
 	
 	m_menuWorkpiece = new wxMenu();
-	wxMenuItem* m_menuItemWorkpieceAdd;
-	m_menuItemWorkpieceAdd = new wxMenuItem( m_menuWorkpiece, ID_WORKPIECEADD, wxString( _("&Add Workpiece") ) , _("Add stock material to project as workpiece."), wxITEM_NORMAL );
-	m_menuWorkpiece->Append( m_menuItemWorkpieceAdd );
+	wxMenuItem* m_menuItemWorkpieceSetup;
+	m_menuItemWorkpieceSetup = new wxMenuItem( m_menuWorkpiece, ID_WORKPIECESETUP, wxString( _("&Setup Workpiece") ) + wxT('\t') + wxT("CTRL+W"), wxEmptyString, wxITEM_NORMAL );
+	m_menuWorkpiece->Append( m_menuItemWorkpieceSetup );
 	
 	wxMenuItem* m_menuItemWorkpieceDelete;
 	m_menuItemWorkpieceDelete = new wxMenuItem( m_menuWorkpiece, ID_WORKPIECEDELETE, wxString( _("&Delete Workpiece") ) , _("Remove the selected workpiece or workpieces."), wxITEM_NORMAL );
 	m_menuWorkpiece->Append( m_menuItemWorkpieceDelete );
 	
 	wxMenuItem* m_menuItemWorkpieceDeleteUnused;
-	m_menuItemWorkpieceDeleteUnused = new wxMenuItem( m_menuWorkpiece, ID_WORKPIECEDELETEUNUSED, wxString( _("Delete &unused workpieces") ) , _("Remove all workpieces, that have no objects linked to them."), wxITEM_NORMAL );
+	m_menuItemWorkpieceDeleteUnused = new wxMenuItem( m_menuWorkpiece, ID_WORKPIECEDELETEUNUSED, wxString( _("Delete &unused Workpieces") ) , _("Remove all workpieces, that have no objects linked to them."), wxITEM_NORMAL );
 	m_menuWorkpiece->Append( m_menuItemWorkpieceDeleteUnused );
 	
 	m_menubar->Append( m_menuWorkpiece, _("&Workpiece") );
 	
 	m_menuRun = new wxMenu();
+	wxMenuItem* m_menuItemRunSetup;
+	m_menuItemRunSetup = new wxMenuItem( m_menuRun, ID_RUNEDIT, wxString( _("&Setup Run") ) + wxT('\t') + wxT("CTRL+R"), wxEmptyString, wxITEM_NORMAL );
+	m_menuRun->Append( m_menuItemRunSetup );
+	
 	wxMenuItem* m_menuItemRunAdd;
 	m_menuItemRunAdd = new wxMenuItem( m_menuRun, ID_RUNADD, wxString( _("&Add Run") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuRun->Append( m_menuItemRunAdd );
 	
-	wxMenuItem* m_menuItemRunEdit;
-	m_menuItemRunEdit = new wxMenuItem( m_menuRun, ID_RUNEDIT, wxString( _("&Edit Run") ) , wxEmptyString, wxITEM_NORMAL );
-	m_menuRun->Append( m_menuItemRunEdit );
-	
 	wxMenuItem* m_menuItemRunDelete;
-	m_menuItemRunDelete = new wxMenuItem( m_menuRun, ID_RUNDELETE, wxString( _("&Delete run") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemRunDelete = new wxMenuItem( m_menuRun, ID_RUNDELETE, wxString( _("&Delete Run") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuRun->Append( m_menuItemRunDelete );
 	
 	m_menubar->Append( m_menuRun, _("&Run") );
 	
 	m_menuMachine = new wxMenu();
 	wxMenuItem* m_menuItemMachineLoad;
-	m_menuItemMachineLoad = new wxMenuItem( m_menuMachine, ID_MACHINELOAD, wxString( _("&Load Machine...") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemMachineLoad = new wxMenuItem( m_menuMachine, ID_MACHINELOAD, wxString( _("&Load Machine...") ) , _("Load a machine for the selected run"), wxITEM_NORMAL );
 	m_menuMachine->Append( m_menuItemMachineLoad );
 	
 	wxMenuItem* m_menuItemMachineReload;
-	m_menuItemMachineReload = new wxMenuItem( m_menuMachine, ID_MACHINERELOAD, wxString( _("&Reload machine") ) + wxT('\t') + wxT("CTRL+R"), wxEmptyString, wxITEM_NORMAL );
+	m_menuItemMachineReload = new wxMenuItem( m_menuMachine, ID_MACHINERELOAD, wxString( _("&Reload Machine") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuMachine->Append( m_menuItemMachineReload );
 	
 	wxMenuItem* m_separator10;
 	m_separator10 = m_menuMachine->AppendSeparator();
 	
 	wxMenuItem* m_menuItemMachineDebugger;
-	m_menuItemMachineDebugger = new wxMenuItem( m_menuMachine, ID_MACHINEDEBUGGER, wxString( _("&Open machine debugger") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemMachineDebugger = new wxMenuItem( m_menuMachine, ID_MACHINEDEBUGGER, wxString( _("&Open Machine Debugger") ) + wxT('\t') + wxT("CTRL+D"), wxEmptyString, wxITEM_NORMAL );
 	m_menuMachine->Append( m_menuItemMachineDebugger );
 	
 	m_menubar->Append( m_menuMachine, _("&Machine") );
@@ -193,9 +202,6 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menuItem48 = new wxMenuItem( m_menuToolpath, wxID_ANY, wxString( _("&Flip Run") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuToolpath->Append( m_menuItem48 );
 	
-	wxMenuItem* m_separator7;
-	m_separator7 = m_menuToolpath->AppendSeparator();
-	
 	wxMenuItem* m_menuItem491;
 	m_menuItem491 = new wxMenuItem( m_menuToolpath, wxID_ANY, wxString( _("&Prepare Machinebed") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuToolpath->Append( m_menuItem491 );
@@ -211,12 +217,23 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menuItem441 = new wxMenuItem( m_menuToolpath, wxID_ANY, wxString( _("&Save G-Codes") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuToolpath->Append( m_menuItem441 );
 	
+	wxMenuItem* m_separator17;
+	m_separator17 = m_menuToolpath->AppendSeparator();
+	
+	wxMenuItem* m_menuItemShowAnimationControl;
+	m_menuItemShowAnimationControl = new wxMenuItem( m_menuToolpath, wxID_ANY, wxString( _("Show &Animation Control") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuToolpath->Append( m_menuItemShowAnimationControl );
+	
 	m_menubar->Append( m_menuToolpath, _("Tool&path") );
 	
 	m_menuSettings = new wxMenu();
 	wxMenuItem* m_menuItemSetupLanguage;
 	m_menuItemSetupLanguage = new wxMenuItem( m_menuSettings, wxID_ANY, wxString( _("Change Language") ) , _("Change the programs language."), wxITEM_NORMAL );
 	m_menuSettings->Append( m_menuItemSetupLanguage );
+	
+	wxMenuItem* m_menuItemActivateStereo3D;
+	m_menuItemActivateStereo3D = new wxMenuItem( m_menuSettings, ID_VIEWSTEREO3D, wxString( _("Stereo &3D") ) + wxT('\t') + wxT("CTRL+3"), wxEmptyString, wxITEM_CHECK );
+	m_menuSettings->Append( m_menuItemActivateStereo3D );
 	
 	wxMenuItem* m_separator71;
 	m_separator71 = m_menuSettings->AppendSeparator();
@@ -226,26 +243,22 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menuSettings->Append( m_menuItemSetupController );
 	
 	wxMenuItem* m_menuItemSetupStereo3D;
-	m_menuItemSetupStereo3D = new wxMenuItem( m_menuSettings, ID_VIEWSTEREO3D, wxString( _("&Stereo 3D") ) , wxEmptyString, wxITEM_CHECK );
+	m_menuItemSetupStereo3D = new wxMenuItem( m_menuSettings, wxID_ANY, wxString( _("Setup &Stereo 3D") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuSettings->Append( m_menuItemSetupStereo3D );
 	
 	wxMenuItem* m_menuItemSetupUnits;
-	m_menuItemSetupUnits = new wxMenuItem( m_menuSettings, ID_SETUPUNITS, wxString( _("Setup &Units") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemSetupUnits = new wxMenuItem( m_menuSettings, ID_SETUPUNITS, wxString( _("Setup &Units") ) + wxT('\t') + wxT("CTRL+U"), wxEmptyString, wxITEM_NORMAL );
 	m_menuSettings->Append( m_menuItemSetupUnits );
-	
-	wxMenuItem* m_menuItemSetupAnimation;
-	m_menuItemSetupAnimation = new wxMenuItem( m_menuSettings, wxID_ANY, wxString( _("Show &Animation Control") ) , wxEmptyString, wxITEM_NORMAL );
-	m_menuSettings->Append( m_menuItemSetupAnimation );
 	
 	m_menubar->Append( m_menuSettings, _("S&ettings") );
 	
 	m_menuView = new wxMenu();
 	wxMenuItem* m_menuItemCloseAdditionalWindows;
-	m_menuItemCloseAdditionalWindows = new wxMenuItem( m_menuView, ID_CLOSEEXTRAWINDOWS, wxString( _("&Close all extra windows") ) + wxT('\t') + wxT("CTRL+W"), _("Close all the dialogs. No data is lost."), wxITEM_NORMAL );
+	m_menuItemCloseAdditionalWindows = new wxMenuItem( m_menuView, ID_CLOSEEXTRAWINDOWS, wxString( _("&Close all Extra Windows") ) + wxT('\t') + wxT("CTRL+SHIFT+W"), _("Close all the dialogs. No data is lost."), wxITEM_NORMAL );
 	m_menuView->Append( m_menuItemCloseAdditionalWindows );
 	
 	wxMenuItem* m_menuItemLogShow;
-	m_menuItemLogShow = new wxMenuItem( m_menuView, ID_LOGSHOW, wxString( _("Show &Log Window") ) , wxEmptyString, wxITEM_CHECK );
+	m_menuItemLogShow = new wxMenuItem( m_menuView, ID_LOGSHOW, wxString( _("Show &Log Window") ) + wxT('\t') + wxT("CTRL+L"), wxEmptyString, wxITEM_CHECK );
 	m_menuView->Append( m_menuItemLogShow );
 	
 	wxMenuItem* m_separator11;
@@ -302,17 +315,17 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_panel1->SetSizer( bSizer19 );
 	m_panel1->Layout();
 	bSizer19->Fit( m_panel1 );
-	m_panel2 = new wxPanel( m_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_panelMainCanvas = new wxPanel( m_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizerMainCanvas;
 	bSizerMainCanvas = new wxBoxSizer( wxVERTICAL );
 	
-	m_canvas = new MainCanvas(m_panel2);
+	m_canvas = new MainCanvas(m_panelMainCanvas);
 	bSizerMainCanvas->Add( m_canvas, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_panel2->SetSizer( bSizerMainCanvas );
-	m_panel2->Layout();
-	bSizerMainCanvas->Fit( m_panel2 );
-	m_splitter->SplitVertically( m_panel1, m_panel2, 144 );
+	m_panelMainCanvas->SetSizer( bSizerMainCanvas );
+	m_panelMainCanvas->Layout();
+	bSizerMainCanvas->Fit( m_panelMainCanvas );
+	m_splitter->SplitVertically( m_panel1, m_panelMainCanvas, 144 );
 	bSizer1->Add( m_splitter, 1, wxEXPAND, 5 );
 	
 	this->SetSizer( bSizer1 );
@@ -342,17 +355,18 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	this->Connect( m_menuItemQuit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnQuit ) );
 	this->Connect( m_menuItemUndo->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnUndo ) );
 	this->Connect( m_menuItemRedo->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnRedo ) );
+	this->Connect( m_menuItemObjectModify->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnObjectModify ) );
+	this->Connect( m_menuItemObjectFlipNormals->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnObjectFlipNormals ) );
 	this->Connect( m_menuItemObjectLoad->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnObjectLoad ) );
 	this->Connect( m_menuItemObjectRename->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnObjectRename ) );
 	this->Connect( m_menuItemObjectDelete->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnObjectDelete ) );
-	this->Connect( m_menuItemObjectModify->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnObjectModify ) );
-	this->Connect( m_menuItemObjectFlipNormals->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnObjectFlipNormals ) );
 	this->Connect( m_menuItemStockOrganize->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnStockEdit ) );
-	this->Connect( m_menuItemWorkpieceAdd->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnWorkpieceAdd ) );
+	this->Connect( m_menuItemStockToWorkpiece->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnWorkpieceAdd ) );
+	this->Connect( m_menuItemWorkpieceSetup->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnWorkpieceSetup ) );
 	this->Connect( m_menuItemWorkpieceDelete->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnWorkpieceDelete ) );
 	this->Connect( m_menuItemWorkpieceDeleteUnused->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnWorkpieceDeleteUnused ) );
+	this->Connect( m_menuItemRunSetup->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnRunEdit ) );
 	this->Connect( m_menuItemRunAdd->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnRunAdd ) );
-	this->Connect( m_menuItemRunEdit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnRunEdit ) );
 	this->Connect( m_menuItemRunDelete->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnRunDelete ) );
 	this->Connect( m_menuItemMachineLoad->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnMachineLoad ) );
 	this->Connect( m_menuItemMachineReload->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnMachineReload ) );
@@ -367,11 +381,12 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	this->Connect( m_menuItem491->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnPrepareMachinebed ) );
 	this->Connect( m_menuItem16->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnLoadGCodes ) );
 	this->Connect( m_menuItem441->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSaveGCodes ) );
+	this->Connect( m_menuItemShowAnimationControl->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnShowAnimationControl ) );
 	this->Connect( m_menuItemSetupLanguage->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnChangeLanguage ) );
+	this->Connect( m_menuItemActivateStereo3D->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnActivateStereo3D ) );
 	this->Connect( m_menuItemSetupController->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSetupController ) );
-	this->Connect( m_menuItemSetupStereo3D->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnChangeStereo3D ) );
+	this->Connect( m_menuItemSetupStereo3D->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSetupStereo3D ) );
 	this->Connect( m_menuItemSetupUnits->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSetupUnits ) );
-	this->Connect( m_menuItemSetupAnimation->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnShowAnimationControl ) );
 	this->Connect( m_menuItemCloseAdditionalWindows->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnExtraWindowClose ) );
 	this->Connect( m_menuItemLogShow->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnShowLogWindow ) );
 	this->Connect( m_menuItemTop->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnViewSet ) );
@@ -406,17 +421,18 @@ GUIMainFrame::~GUIMainFrame()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnQuit ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnUndo ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnRedo ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnObjectModify ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnObjectFlipNormals ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnObjectLoad ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnObjectRename ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnObjectDelete ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnObjectModify ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnObjectFlipNormals ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnStockEdit ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnWorkpieceAdd ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnWorkpieceSetup ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnWorkpieceDelete ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnWorkpieceDeleteUnused ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnRunAdd ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnRunEdit ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnRunAdd ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnRunDelete ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnMachineLoad ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnMachineReload ) );
@@ -431,11 +447,12 @@ GUIMainFrame::~GUIMainFrame()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnPrepareMachinebed ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnLoadGCodes ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSaveGCodes ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnChangeLanguage ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSetupController ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnChangeStereo3D ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSetupUnits ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnShowAnimationControl ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnChangeLanguage ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnActivateStereo3D ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSetupController ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSetupStereo3D ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnSetupUnits ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnExtraWindowClose ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnShowLogWindow ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnViewSet ) );
@@ -1258,6 +1275,251 @@ GUIWorkpiece::~GUIWorkpiece()
 	m_grid->Disconnect( wxEVT_SIZE, wxSizeEventHandler( GUIWorkpiece::OnSize ), NULL, this );
 }
 
+GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	m_menubar8 = new wxMenuBar( 0 );
+	m_menuEdit = new wxMenu();
+	wxMenuItem* m_menuItemUndo;
+	m_menuItemUndo = new wxMenuItem( m_menuEdit, wxID_UNDO, wxString( _("&Undo") ) + wxT('\t') + wxT("CTRL+Z"), wxEmptyString, wxITEM_NORMAL );
+	m_menuEdit->Append( m_menuItemUndo );
+	
+	wxMenuItem* m_menuItemRedo;
+	m_menuItemRedo = new wxMenuItem( m_menuEdit, wxID_REDO, wxString( _("&Redo") ) + wxT('\t') + wxT("CTRL+Y"), wxEmptyString, wxITEM_NORMAL );
+	m_menuEdit->Append( m_menuItemRedo );
+	
+	wxMenuItem* m_separator14;
+	m_separator14 = m_menuEdit->AppendSeparator();
+	
+	wxMenuItem* m_menuItemClose;
+	m_menuItemClose = new wxMenuItem( m_menuEdit, wxID_CLOSE, wxString( _("&Close") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuEdit->Append( m_menuItemClose );
+	
+	m_menubar8->Append( m_menuEdit, _("&Edit") );
+	
+	m_menuExtras = new wxMenu();
+	wxMenuItem* m_menuItem83;
+	m_menuItem83 = new wxMenuItem( m_menuExtras, ID_EXTRAADDFLIPDRILLS, wxString( _("Add &Flipdrills") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuExtras->Append( m_menuItem83 );
+	m_menuItem83->Enable( false );
+	
+	wxMenuItem* m_menuItemPockets;
+	m_menuItemPockets = new wxMenuItem( m_menuExtras, wxID_ANY, wxString( _("MyMenuItem") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuExtras->Append( m_menuItemPockets );
+	
+	m_menubar8->Append( m_menuExtras, _("Extras") );
+	
+	this->SetMenuBar( m_menubar8 );
+	
+	wxBoxSizer* bSizerMain;
+	bSizerMain = new wxBoxSizer( wxVERTICAL );
+	
+	wxBoxSizer* bSizer66;
+	bSizer66 = new wxBoxSizer( wxHORIZONTAL );
+	
+	wxBoxSizer* bSizer68;
+	bSizer68 = new wxBoxSizer( wxVERTICAL );
+	
+	wxArrayString m_choiceWorkpieceChoices;
+	m_choiceWorkpiece = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceWorkpieceChoices, 0 );
+	m_choiceWorkpiece->SetSelection( 0 );
+	bSizer68->Add( m_choiceWorkpiece, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	wxArrayString m_choiceObjectChoices;
+	m_choiceObject = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceObjectChoices, 0 );
+	m_choiceObject->SetSelection( 0 );
+	bSizer68->Add( m_choiceObject, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
+	
+	bSizer68->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer69;
+	bSizer69 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticText100 = new wxStaticText( this, wxID_ANY, _("X:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText100->Wrap( -1 );
+	bSizer69->Add( m_staticText100, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlX = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer69->Add( m_textCtrlX, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextUnitX = new wxStaticText( this, wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitX->Wrap( -1 );
+	bSizer69->Add( m_staticTextUnitX, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticText102 = new wxStaticText( this, wxID_ANY, _("Y:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText102->Wrap( -1 );
+	bSizer69->Add( m_staticText102, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlY = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer69->Add( m_textCtrlY, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextUnitY = new wxStaticText( this, wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitY->Wrap( -1 );
+	bSizer69->Add( m_staticTextUnitY, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticText104 = new wxStaticText( this, wxID_ANY, _("Z:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText104->Wrap( -1 );
+	bSizer69->Add( m_staticText104, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlZ = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer69->Add( m_textCtrlZ, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextUnitZ = new wxStaticText( this, wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitZ->Wrap( -1 );
+	bSizer69->Add( m_staticTextUnitZ, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	bSizer68->Add( bSizer69, 0, 0, 5 );
+	
+	wxBoxSizer* bSizer70;
+	bSizer70 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticText106 = new wxStaticText( this, wxID_ANY, _("Angle:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText106->Wrap( -1 );
+	bSizer70->Add( m_staticText106, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlAngle = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer70->Add( m_textCtrlAngle, 0, wxALL, 5 );
+	
+	m_staticTextunitAngle = new wxStaticText( this, wxID_ANY, _("deg"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextunitAngle->Wrap( -1 );
+	bSizer70->Add( m_staticTextunitAngle, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_sliderAngle = new wxSlider( this, wxID_ANY, 50, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+	bSizer70->Add( m_sliderAngle, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	bSizer68->Add( bSizer70, 0, wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer71;
+	bSizer71 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_radioBtnBox = new wxRadioButton( this, ID_FORMBOX, _("Box"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP );
+	bSizer71->Add( m_radioBtnBox, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_radioBtnContour = new wxRadioButton( this, ID_FORMCONTOUR, _("Contour"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer71->Add( m_radioBtnContour, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	bSizer71->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_staticText108 = new wxStaticText( this, wxID_ANY, _("Distance:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText108->Wrap( -1 );
+	bSizer71->Add( m_staticText108, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrl48 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer71->Add( m_textCtrl48, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextUnitDistance = new wxStaticText( this, wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitDistance->Wrap( -1 );
+	bSizer71->Add( m_staticTextUnitDistance, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	bSizer68->Add( bSizer71, 0, wxEXPAND, 5 );
+	
+	bSizer66->Add( bSizer68, 1, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxGridSizer* gSizer1;
+	gSizer1 = new wxGridSizer( 3, 3, 0, 0 );
+	
+	
+	gSizer1->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_bpButtonYP = new wxBitmapButton( this, ID_MOVEYP, wxBitmap( arrowyu_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	gSizer1->Add( m_bpButtonYP, 0, wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	gSizer1->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_bpButtonXN = new wxBitmapButton( this, ID_MOVEXN, wxBitmap( arrowxn_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	gSizer1->Add( m_bpButtonXN, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	gSizer1->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_bpButtonXP = new wxBitmapButton( this, ID_MOVEXP, wxBitmap( arrowxp_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	gSizer1->Add( m_bpButtonXP, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	gSizer1->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_bpButtonYM = new wxBitmapButton( this, ID_MOVEYN, wxBitmap( arrowyd_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	gSizer1->Add( m_bpButtonYM, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	gSizer1->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	bSizer66->Add( gSizer1, 0, wxALL|wxALIGN_BOTTOM, 5 );
+	
+	wxBoxSizer* bSizer67;
+	bSizer67 = new wxBoxSizer( wxVERTICAL );
+	
+	m_buttonAlignTop = new wxButton( this, ID_ALIGNTOP, _("Align with Top"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer67->Add( m_buttonAlignTop, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_buttonAlignMiddle = new wxButton( this, ID_ALIGNMIDDLE, _("Align with Middle"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer67->Add( m_buttonAlignMiddle, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_buttonAlignBottom = new wxButton( this, ID_ALIGNBOTTOM, _("Align with Bottom"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer67->Add( m_buttonAlignBottom, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	bSizer66->Add( bSizer67, 0, wxALIGN_BOTTOM, 5 );
+	
+	bSizerMain->Add( bSizer66, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
+	m_topview = new PanelTopView(this);
+	bSizerMain->Add( m_topview, 1, wxALL|wxEXPAND, 5 );
+	
+	this->SetSizer( bSizerMain );
+	this->Layout();
+	
+	// Connect Events
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIPlacement::OnClose ) );
+	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIPlacement::OnClose ) );
+	this->Connect( m_menuItem83->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIPlacement::OnExtraAdd ) );
+	m_choiceWorkpiece->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectWorkpiece ), NULL, this );
+	m_choiceObject->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectObject ), NULL, this );
+	m_textCtrlX->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUIPlacement::OnChangePosition ), NULL, this );
+	m_textCtrlY->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUIPlacement::OnChangePosition ), NULL, this );
+	m_textCtrlZ->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUIPlacement::OnChangePosition ), NULL, this );
+	m_textCtrlAngle->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUIPlacement::OnChangePosition ), NULL, this );
+	m_sliderAngle->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUIPlacement::OnChangeSlider ), NULL, this );
+	m_radioBtnBox->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectForm ), NULL, this );
+	m_radioBtnContour->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectForm ), NULL, this );
+	m_textCtrl48->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUIPlacement::OnSelectForm ), NULL, this );
+	m_bpButtonYP->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
+	m_bpButtonXN->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
+	m_bpButtonXP->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
+	m_bpButtonYM->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
+	m_buttonAlignTop->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
+	m_buttonAlignMiddle->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
+	m_buttonAlignBottom->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
+}
+
+GUIPlacement::~GUIPlacement()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIPlacement::OnClose ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIPlacement::OnClose ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIPlacement::OnExtraAdd ) );
+	m_choiceWorkpiece->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectWorkpiece ), NULL, this );
+	m_choiceObject->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectObject ), NULL, this );
+	m_textCtrlX->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUIPlacement::OnChangePosition ), NULL, this );
+	m_textCtrlY->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUIPlacement::OnChangePosition ), NULL, this );
+	m_textCtrlZ->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUIPlacement::OnChangePosition ), NULL, this );
+	m_textCtrlAngle->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUIPlacement::OnChangePosition ), NULL, this );
+	m_sliderAngle->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUIPlacement::OnChangeSlider ), NULL, this );
+	m_radioBtnBox->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectForm ), NULL, this );
+	m_radioBtnContour->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectForm ), NULL, this );
+	m_textCtrl48->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUIPlacement::OnSelectForm ), NULL, this );
+	m_bpButtonYP->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
+	m_bpButtonXN->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
+	m_bpButtonXP->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
+	m_bpButtonYM->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
+	m_buttonAlignTop->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
+	m_buttonAlignMiddle->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
+	m_buttonAlignBottom->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
+}
+
 GUIRun::GUIRun( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
@@ -1428,29 +1690,29 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	m_menubar = new wxMenuBar( 0 );
 	m_menuFile = new wxMenu();
 	wxMenuItem* m_menuItemLoad;
-	m_menuItemLoad = new wxMenuItem( m_menuFile, wxID_LOAD, wxString( _("&Load Machine Description") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemLoad = new wxMenuItem( m_menuFile, wxID_LOAD, wxString( _("&Load Machine Description") ) + wxT('\t') + wxT("CTRL+L"), wxEmptyString, wxITEM_NORMAL );
 	m_menuFile->Append( m_menuItemLoad );
 	
 	wxMenuItem* m_menuItemSave;
-	m_menuItemSave = new wxMenuItem( m_menuFile, wxID_SAVE, wxString( _("&Save Machine Description") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemSave = new wxMenuItem( m_menuFile, wxID_SAVE, wxString( _("&Save Machine Description") ) + wxT('\t') + wxT("CTRL+S"), wxEmptyString, wxITEM_NORMAL );
 	m_menuFile->Append( m_menuItemSave );
 	
 	wxMenuItem* m_separator12;
 	m_separator12 = m_menuFile->AppendSeparator();
 	
 	wxMenuItem* m_menuItemClose;
-	m_menuItemClose = new wxMenuItem( m_menuFile, wxID_CLOSE, wxString( _("Close Window") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemClose = new wxMenuItem( m_menuFile, wxID_CLOSE, wxString( _("Close Window") ) + wxT('\t') + wxT("CTRL+D"), wxEmptyString, wxITEM_NORMAL );
 	m_menuFile->Append( m_menuItemClose );
 	
 	m_menubar->Append( m_menuFile, _("&File") );
 	
 	m_menuMachine = new wxMenu();
 	wxMenuItem* m_menuItemMachineRestart;
-	m_menuItemMachineRestart = new wxMenuItem( m_menuMachine, wxID_ANY, wxString( _("Restart Machine") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemMachineRestart = new wxMenuItem( m_menuMachine, wxID_ANY, wxString( _("&Evaluate Script") ) + wxT('\t') + wxT("CTRL+E"), wxEmptyString, wxITEM_NORMAL );
 	m_menuMachine->Append( m_menuItemMachineRestart );
 	
 	wxMenuItem* m_menuItemShowControl;
-	m_menuItemShowControl = new wxMenuItem( m_menuMachine, wxID_ANY, wxString( _("&Show Controller") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemShowControl = new wxMenuItem( m_menuMachine, wxID_ANY, wxString( _("&Show Controller") ) + wxT('\t') + wxT("CTRL+C"), wxEmptyString, wxITEM_NORMAL );
 	m_menuMachine->Append( m_menuItemShowControl );
 	
 	m_menubar->Append( m_menuMachine, _("&Machine") );
@@ -1474,10 +1736,10 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	wxBoxSizer* bSizer40;
 	bSizer40 = new wxBoxSizer( wxVERTICAL );
 	
-	m_textCtrlScript = new wxTextCtrl( m_panelEditor, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE );
+	m_textCtrlScript = new wxTextCtrl( m_panelEditor, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_DONTWRAP|wxTE_MULTILINE|wxTE_RICH );
 	bSizer40->Add( m_textCtrlScript, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
-	m_buttonRestart = new wxButton( m_panelEditor, wxID_ANY, _("Restart Machine"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonRestart = new wxButton( m_panelEditor, wxID_ANY, _("Evaluate"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer40->Add( m_buttonRestart, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
 	m_panelEditor->SetSizer( bSizer40 );
@@ -1487,7 +1749,7 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	wxBoxSizer* bSizer41;
 	bSizer41 = new wxBoxSizer( wxVERTICAL );
 	
-	m_textCtrlOutput = new wxTextCtrl( m_panelOutput, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE );
+	m_textCtrlOutput = new wxTextCtrl( m_panelOutput, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_DONTWRAP|wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH );
 	bSizer41->Add( m_textCtrlOutput, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
 	m_panelOutput->SetSizer( bSizer41 );
@@ -1521,9 +1783,9 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	this->Connect( m_menuItemLoad->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineLoad ) );
 	this->Connect( m_menuItemSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineSave ) );
 	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnClose ) );
-	this->Connect( m_menuItemMachineRestart->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineRestart ) );
+	this->Connect( m_menuItemMachineRestart->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ) );
 	this->Connect( m_menuItemShowControl->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnShowController ) );
-	m_buttonRestart->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIMachineDebugger::OnMachineRestart ), NULL, this );
+	m_buttonRestart->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ), NULL, this );
 }
 
 GUIMachineDebugger::~GUIMachineDebugger()
@@ -1533,9 +1795,9 @@ GUIMachineDebugger::~GUIMachineDebugger()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineLoad ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineSave ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnClose ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineRestart ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnShowController ) );
-	m_buttonRestart->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIMachineDebugger::OnMachineRestart ), NULL, this );
+	m_buttonRestart->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ), NULL, this );
 }
 
 GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -1687,7 +1949,7 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	m_staticText731->Wrap( -1 );
 	fgSizer101->Add( m_staticText731, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_textCtrlA = new wxTextCtrl( this, ID_TEXTA, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlA = new wxTextCtrl( this, ID_TEXTA, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
 	fgSizer101->Add( m_textCtrlA, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_staticTextUnitA = new wxStaticText( this, wxID_ANY, _("deg"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1698,7 +1960,7 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	m_staticText751->Wrap( -1 );
 	fgSizer101->Add( m_staticText751, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_textCtrlB = new wxTextCtrl( this, ID_TEXTB, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlB = new wxTextCtrl( this, ID_TEXTB, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
 	fgSizer101->Add( m_textCtrlB, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_staticTextUnitB = new wxStaticText( this, wxID_ANY, _("deg"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1709,7 +1971,7 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	m_staticText771->Wrap( -1 );
 	fgSizer101->Add( m_staticText771, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_textCtrlC = new wxTextCtrl( this, ID_TEXTC, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlC = new wxTextCtrl( this, ID_TEXTC, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
 	fgSizer101->Add( m_textCtrlC, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_staticTextUnitC = new wxStaticText( this, wxID_ANY, _("deg"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1773,7 +2035,7 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	m_staticText732->Wrap( -1 );
 	fgSizer102->Add( m_staticText732, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_textCtrlU = new wxTextCtrl( this, ID_TEXTU, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlU = new wxTextCtrl( this, ID_TEXTU, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
 	fgSizer102->Add( m_textCtrlU, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_staticTextUnitU = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1784,7 +2046,7 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	m_staticText752->Wrap( -1 );
 	fgSizer102->Add( m_staticText752, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_textCtrlV = new wxTextCtrl( this, ID_TEXTV, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlV = new wxTextCtrl( this, ID_TEXTV, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
 	fgSizer102->Add( m_textCtrlV, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticTextUnitV = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1795,7 +2057,7 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	m_staticText772->Wrap( -1 );
 	fgSizer102->Add( m_staticText772, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_textCtrlW = new wxTextCtrl( this, ID_TEXTW, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlW = new wxTextCtrl( this, ID_TEXTW, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
 	fgSizer102->Add( m_textCtrlW, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticTextUnitW = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1896,6 +2158,7 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	m_sliderU->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderU->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderU->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
+	m_sliderU->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUIMachineControl::OnTrack ), NULL, this );
 	m_sliderV->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( GUIMachineControl::OnZero ), NULL, this );
 	m_sliderV->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderV->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
@@ -1906,6 +2169,7 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	m_sliderV->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderV->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderV->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
+	m_sliderV->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUIMachineControl::OnTrack ), NULL, this );
 	m_sliderW->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( GUIMachineControl::OnZero ), NULL, this );
 	m_sliderW->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderW->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
@@ -1916,7 +2180,10 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	m_sliderW->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderW->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderW->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
+	m_sliderW->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUIMachineControl::OnTrack ), NULL, this );
 	m_textCtrlU->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIMachineControl::OnTextChanged ), NULL, this );
+	m_textCtrlV->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIMachineControl::OnTextChanged ), NULL, this );
+	m_textCtrlW->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIMachineControl::OnTextChanged ), NULL, this );
 }
 
 GUIMachineControl::~GUIMachineControl()
@@ -2005,6 +2272,7 @@ GUIMachineControl::~GUIMachineControl()
 	m_sliderU->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderU->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderU->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
+	m_sliderU->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUIMachineControl::OnTrack ), NULL, this );
 	m_sliderV->Disconnect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( GUIMachineControl::OnZero ), NULL, this );
 	m_sliderV->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderV->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
@@ -2015,6 +2283,7 @@ GUIMachineControl::~GUIMachineControl()
 	m_sliderV->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderV->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderV->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
+	m_sliderV->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUIMachineControl::OnTrack ), NULL, this );
 	m_sliderW->Disconnect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( GUIMachineControl::OnZero ), NULL, this );
 	m_sliderW->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderW->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
@@ -2025,7 +2294,10 @@ GUIMachineControl::~GUIMachineControl()
 	m_sliderW->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderW->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderW->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
+	m_sliderW->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUIMachineControl::OnTrack ), NULL, this );
 	m_textCtrlU->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIMachineControl::OnTextChanged ), NULL, this );
+	m_textCtrlV->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIMachineControl::OnTextChanged ), NULL, this );
+	m_textCtrlW->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIMachineControl::OnTextChanged ), NULL, this );
 }
 
 GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -2069,30 +2341,30 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	wxBoxSizer* bSizer13;
 	bSizer13 = new wxBoxSizer( wxVERTICAL );
 	
-	wxBoxSizer* bSizer14;
-	bSizer14 = new wxBoxSizer( wxHORIZONTAL );
+	wxBoxSizer* bSizerTop;
+	bSizerTop = new wxBoxSizer( wxHORIZONTAL );
 	
 	m_comboBoxToolSelector = new wxComboBox( this, wxID_ANY, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
-	bSizer14->Add( m_comboBoxToolSelector, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	bSizerTop->Add( m_comboBoxToolSelector, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
 	m_buttonToolNew = new wxButton( this, wxID_ANY, _("New"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer14->Add( m_buttonToolNew, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	bSizerTop->Add( m_buttonToolNew, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
 	m_buttonToolUpdate = new wxButton( this, wxID_ANY, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer14->Add( m_buttonToolUpdate, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizerTop->Add( m_buttonToolUpdate, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_buttonToolDelete = new wxButton( this, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer14->Add( m_buttonToolDelete, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizerTop->Add( m_buttonToolDelete, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	bSizer13->Add( bSizer14, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizer13->Add( bSizerTop, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	wxFlexGridSizer* fgSizer3;
-	fgSizer3 = new wxFlexGridSizer( 2, 2, 0, 0 );
-	fgSizer3->AddGrowableCol( 1 );
-	fgSizer3->AddGrowableRow( 0 );
-	fgSizer3->AddGrowableRow( 1 );
-	fgSizer3->SetFlexibleDirection( wxBOTH );
-	fgSizer3->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxFlexGridSizer* fgSizerMain;
+	fgSizerMain = new wxFlexGridSizer( 2, 2, 0, 0 );
+	fgSizerMain->AddGrowableCol( 1 );
+	fgSizerMain->AddGrowableRow( 0 );
+	fgSizerMain->AddGrowableRow( 1 );
+	fgSizerMain->SetFlexibleDirection( wxBOTH );
+	fgSizerMain->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxStaticBoxSizer* sbSizer1;
 	sbSizer1 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Tool definition") ), wxVERTICAL );
@@ -2176,10 +2448,10 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_textCtrlComment = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_WORDWRAP );
 	sbSizer1->Add( m_textCtrlComment, 1, wxALL|wxEXPAND, 5 );
 	
-	fgSizer3->Add( sbSizer1, 0, wxEXPAND, 5 );
+	fgSizerMain->Add( sbSizer1, 0, wxEXPAND, 5 );
 	
-	m_panel=new ToolPanel(this);
-	fgSizer3->Add( m_panel, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	m_panel=new PanelTool(this);
+	fgSizerMain->Add( m_panel, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxStaticBoxSizer* sbSizer2;
 	sbSizer2 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Tool shape") ), wxVERTICAL );
@@ -2274,12 +2546,12 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	
 	sbSizer2->Add( bSizer15, 1, wxEXPAND, 5 );
 	
-	fgSizer3->Add( sbSizer2, 0, wxEXPAND, 5 );
+	fgSizerMain->Add( sbSizer2, 0, wxEXPAND, 5 );
 	
-	m_canvas = new ToolCanvas(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
-	fgSizer3->Add( m_canvas, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	m_canvas = new ToolCanvas(this);
+	fgSizerMain->Add( m_canvas, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	bSizer13->Add( fgSizer3, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizer13->Add( fgSizerMain, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	this->SetSizer( bSizer13 );
 	this->Layout();
@@ -2578,7 +2850,7 @@ GUISetupUnits::GUISetupUnits( wxWindow* parent, wxWindowID id, const wxString& t
 	
 	wxArrayString m_choiceUnitLengthChoices;
 	m_choiceUnitLength = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitLengthChoices, 0 );
-	m_choiceUnitLength->SetSelection( 1 );
+	m_choiceUnitLength->SetSelection( 0 );
 	fgSizer6->Add( m_choiceUnitLength, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticText58 = new wxStaticText( this, wxID_ANY, _("Linear Speed"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -2587,7 +2859,7 @@ GUISetupUnits::GUISetupUnits( wxWindow* parent, wxWindowID id, const wxString& t
 	
 	wxArrayString m_choiceUnitSpeedLinearChoices;
 	m_choiceUnitSpeedLinear = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitSpeedLinearChoices, 0 );
-	m_choiceUnitSpeedLinear->SetSelection( 1 );
+	m_choiceUnitSpeedLinear->SetSelection( 0 );
 	fgSizer6->Add( m_choiceUnitSpeedLinear, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticText59 = new wxStaticText( this, wxID_ANY, _("Rotational Speed"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -2596,7 +2868,7 @@ GUISetupUnits::GUISetupUnits( wxWindow* parent, wxWindowID id, const wxString& t
 	
 	wxArrayString m_choiceUnitSpeedRotationalChoices;
 	m_choiceUnitSpeedRotational = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitSpeedRotationalChoices, 0 );
-	m_choiceUnitSpeedRotational->SetSelection( 2 );
+	m_choiceUnitSpeedRotational->SetSelection( 0 );
 	fgSizer6->Add( m_choiceUnitSpeedRotational, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticText65 = new wxStaticText( this, wxID_ANY, _("Time"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -2607,6 +2879,33 @@ GUISetupUnits::GUISetupUnits( wxWindow* parent, wxWindowID id, const wxString& t
 	m_choiceUnitTime = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitTimeChoices, 0 );
 	m_choiceUnitTime->SetSelection( 0 );
 	fgSizer6->Add( m_choiceUnitTime, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
+	m_staticText110 = new wxStaticText( this, wxID_ANY, _("Small Distance"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText110->Wrap( -1 );
+	fgSizer6->Add( m_staticText110, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxArrayString m_choiceUnitSmallDistanceChoices;
+	m_choiceUnitSmallDistance = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitSmallDistanceChoices, 0 );
+	m_choiceUnitSmallDistance->SetSelection( 0 );
+	fgSizer6->Add( m_choiceUnitSmallDistance, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticText111 = new wxStaticText( this, wxID_ANY, _("Tolerance"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText111->Wrap( -1 );
+	fgSizer6->Add( m_staticText111, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxArrayString m_choiceUnitToleranceChoices;
+	m_choiceUnitTolerance = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitToleranceChoices, 0 );
+	m_choiceUnitTolerance->SetSelection( 0 );
+	fgSizer6->Add( m_choiceUnitTolerance, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticText112 = new wxStaticText( this, wxID_ANY, _("Angle"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText112->Wrap( -1 );
+	fgSizer6->Add( m_staticText112, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxArrayString m_choiceUnitAngleChoices;
+	m_choiceUnitAngle = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitAngleChoices, 0 );
+	m_choiceUnitAngle->SetSelection( 0 );
+	fgSizer6->Add( m_choiceUnitAngle, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
 	
 	sbSizer6->Add( fgSizer6, 1, wxEXPAND, 5 );
 	
@@ -2628,6 +2927,9 @@ GUISetupUnits::GUISetupUnits( wxWindow* parent, wxWindowID id, const wxString& t
 	m_choiceUnitSpeedLinear->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUISetupUnits::OnChangeUnit ), NULL, this );
 	m_choiceUnitSpeedRotational->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUISetupUnits::OnChangeUnit ), NULL, this );
 	m_choiceUnitTime->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUISetupUnits::OnChangeUnit ), NULL, this );
+	m_choiceUnitSmallDistance->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUISetupUnits::OnChangeUnit ), NULL, this );
+	m_choiceUnitTolerance->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUISetupUnits::OnChangeUnit ), NULL, this );
+	m_choiceUnitAngle->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUISetupUnits::OnChangeUnit ), NULL, this );
 	m_buttonClose->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupUnits::OnClose ), NULL, this );
 }
 
@@ -2638,7 +2940,362 @@ GUISetupUnits::~GUISetupUnits()
 	m_choiceUnitSpeedLinear->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUISetupUnits::OnChangeUnit ), NULL, this );
 	m_choiceUnitSpeedRotational->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUISetupUnits::OnChangeUnit ), NULL, this );
 	m_choiceUnitTime->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUISetupUnits::OnChangeUnit ), NULL, this );
+	m_choiceUnitSmallDistance->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUISetupUnits::OnChangeUnit ), NULL, this );
+	m_choiceUnitTolerance->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUISetupUnits::OnChangeUnit ), NULL, this );
+	m_choiceUnitAngle->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUISetupUnits::OnChangeUnit ), NULL, this );
 	m_buttonClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupUnits::OnClose ), NULL, this );
+}
+
+GUISetupStereo3D::GUISetupStereo3D( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer80;
+	bSizer80 = new wxBoxSizer( wxHORIZONTAL );
+	
+	wxFlexGridSizer* fgSizerMain;
+	fgSizerMain = new wxFlexGridSizer( 3, 3, 0, 0 );
+	fgSizerMain->AddGrowableCol( 1 );
+	fgSizerMain->AddGrowableRow( 0 );
+	fgSizerMain->SetFlexibleDirection( wxBOTH );
+	fgSizerMain->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxBoxSizer* bSizerLeftSilders;
+	bSizerLeftSilders = new wxBoxSizer( wxVERTICAL );
+	
+	m_staticText120 = new wxStaticText( this, wxID_ANY, _("Left Eye"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText120->Wrap( -1 );
+	bSizerLeftSilders->Add( m_staticText120, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	wxBoxSizer* bSizer76;
+	bSizer76 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_sliderLR = new wxSlider( this, ID_COLORLR, 100, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
+	bSizer76->Add( m_sliderLR, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_sliderLG = new wxSlider( this, ID_COLORLG, 100, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
+	bSizer76->Add( m_sliderLG, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_sliderLB = new wxSlider( this, ID_COLORLB, 100, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
+	bSizer76->Add( m_sliderLB, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	bSizerLeftSilders->Add( bSizer76, 1, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	fgSizerMain->Add( bSizerLeftSilders, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	m_canvas = new CanvasStereoTest(this);
+	fgSizerMain->Add( m_canvas, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxBoxSizer* bSizerRightSliders;
+	bSizerRightSliders = new wxBoxSizer( wxVERTICAL );
+	
+	m_staticText1201 = new wxStaticText( this, wxID_ANY, _("Right Eye"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1201->Wrap( -1 );
+	bSizerRightSliders->Add( m_staticText1201, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	wxBoxSizer* bSizer761;
+	bSizer761 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_sliderRR = new wxSlider( this, ID_COLORRR, 100, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
+	bSizer761->Add( m_sliderRR, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_sliderRG = new wxSlider( this, ID_COLORRG, 100, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
+	bSizer761->Add( m_sliderRG, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_sliderRB = new wxSlider( this, ID_COLORRB, 100, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
+	bSizer761->Add( m_sliderRB, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	bSizerRightSliders->Add( bSizer761, 1, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	fgSizerMain->Add( bSizerRightSliders, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
+	m_colourPickerLeft = new wxColourPickerCtrl( this, ID_COLORLEFT, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
+	fgSizerMain->Add( m_colourPickerLeft, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_buttonSwapColors = new wxButton( this, wxID_ANY, _("<-   Swap Colors   ->"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizerMain->Add( m_buttonSwapColors, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_colourPickerRight = new wxColourPickerCtrl( this, ID_COLORRIGHT, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
+	fgSizerMain->Add( m_colourPickerRight, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxFlexGridSizer* fgSizerLeftText;
+	fgSizerLeftText = new wxFlexGridSizer( 3, 2, 0, 0 );
+	fgSizerLeftText->SetFlexibleDirection( wxBOTH );
+	fgSizerLeftText->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText113 = new wxStaticText( this, wxID_ANY, _("R:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText113->Wrap( -1 );
+	fgSizerLeftText->Add( m_staticText113, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlLR = new wxTextCtrl( this, ID_TEXTLR, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
+	fgSizerLeftText->Add( m_textCtrlLR, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticText1131 = new wxStaticText( this, wxID_ANY, _("G:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1131->Wrap( -1 );
+	fgSizerLeftText->Add( m_staticText1131, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlLG = new wxTextCtrl( this, ID_TEXTLG, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
+	fgSizerLeftText->Add( m_textCtrlLG, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticText11311 = new wxStaticText( this, wxID_ANY, _("B:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText11311->Wrap( -1 );
+	fgSizerLeftText->Add( m_staticText11311, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlLB = new wxTextCtrl( this, ID_TEXTLB, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
+	fgSizerLeftText->Add( m_textCtrlLB, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	fgSizerMain->Add( fgSizerLeftText, 1, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	wxBoxSizer* bSizerMiddle;
+	bSizerMiddle = new wxBoxSizer( wxVERTICAL );
+	
+	m_sliderEyeDistance = new wxSlider( this, ID_EYEDISTANCE, 100, 0, 200, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+	bSizerMiddle->Add( m_sliderEyeDistance, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	wxBoxSizer* bSizer82;
+	bSizer82 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticText125 = new wxStaticText( this, wxID_ANY, _("Eye Distance:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText125->Wrap( -1 );
+	bSizer82->Add( m_staticText125, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlEyeDistance = new wxTextCtrl( this, ID_TEXTEYEDISTANCE, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	bSizer82->Add( m_textCtrlEyeDistance, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextUnitEyeDistance = new wxStaticText( this, wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitEyeDistance->Wrap( -1 );
+	bSizer82->Add( m_staticTextUnitEyeDistance, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	bSizerMiddle->Add( bSizer82, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_sliderFocalDistance = new wxSlider( this, ID_FOCALDISTANCE, 0, -200, 200, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+	bSizerMiddle->Add( m_sliderFocalDistance, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	wxBoxSizer* bSizer83;
+	bSizer83 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticText127 = new wxStaticText( this, wxID_ANY, _("Focal Distance:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText127->Wrap( -1 );
+	bSizer83->Add( m_staticText127, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlFocalDistance = new wxTextCtrl( this, ID_TEXTFOCALDISTANCE, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	bSizer83->Add( m_textCtrlFocalDistance, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextUnitFocalDistance = new wxStaticText( this, wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitFocalDistance->Wrap( -1 );
+	bSizer83->Add( m_staticTextUnitFocalDistance, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	bSizerMiddle->Add( bSizer83, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	fgSizerMain->Add( bSizerMiddle, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	wxFlexGridSizer* fgSizerRightText;
+	fgSizerRightText = new wxFlexGridSizer( 3, 2, 0, 0 );
+	fgSizerRightText->SetFlexibleDirection( wxBOTH );
+	fgSizerRightText->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText1132 = new wxStaticText( this, wxID_ANY, _("R:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1132->Wrap( -1 );
+	fgSizerRightText->Add( m_staticText1132, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlRR = new wxTextCtrl( this, ID_TEXTRR, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
+	fgSizerRightText->Add( m_textCtrlRR, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticText11312 = new wxStaticText( this, wxID_ANY, _("G:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText11312->Wrap( -1 );
+	fgSizerRightText->Add( m_staticText11312, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlRG = new wxTextCtrl( this, ID_TEXTRG, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
+	fgSizerRightText->Add( m_textCtrlRG, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticText113111 = new wxStaticText( this, wxID_ANY, _("B:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText113111->Wrap( -1 );
+	fgSizerRightText->Add( m_staticText113111, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlRB = new wxTextCtrl( this, ID_TEXTRB, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
+	fgSizerRightText->Add( m_textCtrlRB, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	fgSizerMain->Add( fgSizerRightText, 1, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	bSizer80->Add( fgSizerMain, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	this->SetSizer( bSizer80 );
+	this->Layout();
+	
+	// Connect Events
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUISetupStereo3D::OnClose ) );
+	m_sliderLR->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_colourPickerLeft->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( GUISetupStereo3D::OnColorChanged ), NULL, this );
+	m_buttonSwapColors->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupStereo3D::OnSwap ), NULL, this );
+	m_colourPickerRight->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( GUISetupStereo3D::OnColorChanged ), NULL, this );
+	m_textCtrlLR->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
+	m_textCtrlLG->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
+	m_textCtrlLB->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
+	m_sliderEyeDistance->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_textCtrlEyeDistance->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
+	m_sliderFocalDistance->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_textCtrlFocalDistance->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
+	m_textCtrlRR->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
+	m_textCtrlRG->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
+	m_textCtrlRB->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
+}
+
+GUISetupStereo3D::~GUISetupStereo3D()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUISetupStereo3D::OnClose ) );
+	m_sliderLR->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLR->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLG->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderLB->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRR->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRG->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderRB->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_colourPickerLeft->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( GUISetupStereo3D::OnColorChanged ), NULL, this );
+	m_buttonSwapColors->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupStereo3D::OnSwap ), NULL, this );
+	m_colourPickerRight->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( GUISetupStereo3D::OnColorChanged ), NULL, this );
+	m_textCtrlLR->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
+	m_textCtrlLG->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
+	m_textCtrlLB->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
+	m_sliderEyeDistance->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderEyeDistance->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_textCtrlEyeDistance->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
+	m_sliderFocalDistance->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_sliderFocalDistance->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
+	m_textCtrlFocalDistance->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
+	m_textCtrlRR->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
+	m_textCtrlRG->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
+	m_textCtrlRB->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUISetupStereo3D::OnTextChange ), NULL, this );
 }
 
 GUIAbout::GUIAbout( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )

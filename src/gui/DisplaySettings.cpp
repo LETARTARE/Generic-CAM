@@ -98,6 +98,15 @@ DisplaySettings::DisplaySettings()
 	unitsOfTime.Add(_T("d"));
 	factorofTime[3] = 86400; // s
 
+	eyeDistance = 0.1;
+	focalDistance = 1.0;
+	backgroundGrayLevel = 90;
+	rightEyeR = 0;
+	rightEyeG = 77;
+	rightEyeB = 102;
+	leftEyeR = 179;
+	leftEyeG = 0;
+	leftEyeB = 0;
 }
 
 DisplaySettings::~DisplaySettings()
@@ -121,6 +130,28 @@ bool DisplaySettings::GetConfigFrom(wxConfig * config)
 	config->Read(_T("LastStockDirectory"), &lastStockDirectory, cwd);
 	config->Read(_T("LastToolboxDirectory"), &lastToolboxDirectory, cwd);
 
+	long lval;
+
+	config->Read(_T("Stereo3DColorLeftEyeRed"), &lval, 180l);
+	leftEyeR = lval;
+	config->Read(_T("Stereo3DColorLeftEyeGreen"), &lval, 0);
+	leftEyeG = lval;
+	config->Read(_T("Stereo3DColorLeftEyeBlue"), &lval, 0);
+	leftEyeB = lval;
+	config->Read(_T("Stereo3DColorRightEyeRed"), &lval, 0);
+	rightEyeR = lval;
+	config->Read(_T("Stereo3DColorRightEyeGreen"), &lval, 100);
+	rightEyeG = lval;
+	config->Read(_T("Stereo3DColorRightEyeBlue"), &lval, 100);
+	rightEyeB = lval;
+
+	double dval;
+
+	config->Read(_T("Stereo3DEyeDistance"), &dval, 0.1);
+	eyeDistance = dval;
+	config->Read(_T("Stereo3DFocalDistance"), &dval, 0.0);
+	focalDistance = dval;
+
 	return true;
 }
 
@@ -135,5 +166,27 @@ bool DisplaySettings::WriteConfigTo(wxConfig * config)
 	config->Write(_T("LastStockDirectory"), lastStockDirectory);
 	config->Write(_T("LastToolboxDirectory"), lastToolboxDirectory);
 
+	config->Write(_T("Stereo3DColorLeftEyeRed"), (long) leftEyeR);
+	config->Write(_T("Stereo3DColorLeftEyeGreen"), (long) leftEyeG);
+	config->Write(_T("Stereo3DColorLeftEyeBlue"), (long) leftEyeB);
+	config->Write(_T("Stereo3DColorRightEyeRed"), (long) rightEyeR);
+	config->Write(_T("Stereo3DColorRightEyeGreen"), (long) rightEyeG);
+	config->Write(_T("Stereo3DColorRightEyeBlue"), (long) rightEyeB);
+	config->Write(_T("Stereo3DEyeDistance"), (double) eyeDistance);
+	config->Write(_T("Stereo3DFocalDistance"), (double) focalDistance);
+
 	return true;
+}
+
+void DisplaySettings::WriteToCanvas(OpenGLCanvas* canvas)
+{
+	canvas->leftEyeR = this->leftEyeR;
+	canvas->leftEyeG = this->leftEyeG;
+	canvas->leftEyeB = this->leftEyeB;
+	canvas->rightEyeR = this->rightEyeR;
+	canvas->rightEyeG = this->rightEyeG;
+	canvas->rightEyeB = this->rightEyeB;
+	canvas->focalDistance = this->focalDistance;
+	canvas->eyeDistance = this->eyeDistance;
+	canvas->backgroundGrayLevel = this->backgroundGrayLevel;
 }
