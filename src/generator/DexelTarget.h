@@ -39,7 +39,7 @@
 #include <wx/xml/xml.h>
 
 #include "../project/Object.h"
-#include "../generator/Polygon25.h"
+#include "../3D/Polygon25.h"
 #include "../project/ToolPath.h"
 #include "../machine/Tool.h"
 //#include <cstddef>

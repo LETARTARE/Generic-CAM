@@ -159,7 +159,7 @@ void BooleanBox::SizeUpOccupied(unsigned int newSize)
 	bufferSizeOccupied = newSize;
 }
 
-void BooleanBox::Paint(bool flipNormals)
+void BooleanBox::Paint(bool flipNormals) const
 {
 	unsigned int ix;
 	unsigned int iy;

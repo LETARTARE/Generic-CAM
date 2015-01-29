@@ -22,11 +22,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #ifndef POLYGON25_H_
 #define POLYGON25_H_
@@ -37,22 +33,17 @@
  * ...
  */
 
+#include "Polygon3.h"
 #include <wx/dynarray.h>
-#include "../3D/Polygon3.h"
 
 class Polygon25:public Polygon3 {
-	// Constructor / Destructor
 public:
 	Polygon25();
 	virtual ~Polygon25();
-	// Member variables
-public:
-
 
 	// Methods
 public:
 	double GetLengthXY(void) const;
-
 	void PolygonFillHoles(void);
 	void PolygonSmooth(void);
 	void PolygonExpand(double r);
@@ -60,13 +51,10 @@ public:
 	bool IsElementInside(const Vector3 v);
 	double DistanceToElement(const size_t elementInPolygon, const double x,
 			const double y, const double vx, const double vy) const;
-	double
-			DistanceToPolygon(const Polygon25 &polygon, double vx, double vy) const;
-
+	double DistanceToPolygon(const Polygon25 &polygon, double vx,
+			double vy) const;
 	void RotatePolygonStart(double x, double y);
-
 };
-WX_DECLARE_OBJARRAY(Polygon25, ArrayOfPolygon25)
-;
+WX_DECLARE_OBJARRAY(Polygon25, ArrayOfPolygon25);
 
 #endif /* POLYGON25_H_ */

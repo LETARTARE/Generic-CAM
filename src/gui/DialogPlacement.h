@@ -63,6 +63,11 @@ protected:
 	void OnClose(wxCloseEvent& event);
 	void OnClose(wxCommandEvent& event);
 	void OnExtraAdd(wxCommandEvent& event);
+	void OnSelectWorkpiece(wxCommandEvent& event);
+	void OnSelectObject(wxCommandEvent& event);
+	void OnChangePosition(wxCommandEvent& event);
+	void OnChangeSlider(wxScrollEvent& event);
+	void OnSelectForm(wxCommandEvent& event);
 	void OnTransform(wxCommandEvent& event);
 
 };

@@ -133,10 +133,14 @@ void DialogRun::OnClose(wxCommandEvent& event)
 
 void DialogRun::OnRunSelect(wxCommandEvent& event)
 {
-	int n = m_choiceRun->GetSelection() - 1;
+	int id = m_choiceRun->GetSelection() - 1;
+
+	size_t n;
+	for(n = 0; n < project->run.GetCount(); n++)
+		project->run[n].selected = (n == id);
+
 	// Tell the main frame to update the selection in the treeview via custom command.
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_SELECTRUN);
-	selectEvent.SetInt(n);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHTREE);
 	ProcessEvent(selectEvent);
 }
 

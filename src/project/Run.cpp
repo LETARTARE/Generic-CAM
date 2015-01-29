@@ -37,20 +37,35 @@ Run::Run()
 	workpieceNr = -1;
 	selected = false;
 	toolbox.Empty();
+	selectedTool = 0;
 }
 
 Run::~Run()
 {
 }
 
-void Run::Paint()
+void Run::Paint(const ArrayOfObject& objects,
+		const ArrayOfWorkpiece& workpieces) const
 {
 	machine.Paint();
 
+	::glPushMatrix();
+
+	if(workpieceNr > -1){
+		::glPushMatrix();
+		::glMultMatrixd(machine.workpiecePosition.a);
+		workpieces[workpieceNr].Paint(objects);
+		::glPopMatrix();
+	}
+
+	::glPopMatrix();
+	if(selectedTool < toolbox.GetToolCount()){
+		::glPushMatrix();
+		::glMultMatrixd(machine.toolPosition.a);
+		toolbox.tools[selectedTool].Paint();
+		::glPopMatrix();
+	}
 	//toolPath.Paint();
-	size_t i;
-//	for(i = 0; i < placements.GetCount(); i++)
-//		placements[i].Paint();
 }
 
 void Run::ToXml(wxXmlNode* parentNode)

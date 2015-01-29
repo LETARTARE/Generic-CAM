@@ -51,7 +51,7 @@ StockMaterial::~StockMaterial()
 {
 }
 
-void StockMaterial::Paint(float alpha, bool flipNormals)
+void StockMaterial::Paint(float alpha, bool flipNormals) const
 {
 	::glBegin(GL_QUADS);
 
@@ -138,7 +138,7 @@ void StockMaterial::Paint(float alpha, bool flipNormals)
 	::glEnd();
 }
 
-void StockMaterial::PaintWireBox(void)
+void StockMaterial::PaintWireBox(void) const
 {
 	GLfloat d = M_SQRT1_2;
 

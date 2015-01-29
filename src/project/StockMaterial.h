@@ -62,8 +62,8 @@ public:
 
 	// Methods
 public:
-	void Paint(float alpha, bool flipNormals = false);
-	void PaintWireBox(void);
+	void Paint(float alpha, bool flipNormals = false) const;
+	void PaintWireBox(void) const;
 };
 WX_DECLARE_OBJARRAY(StockMaterial, ArrayOfStockMaterial);
 #endif /* STOCKMATERIAL_H_ */

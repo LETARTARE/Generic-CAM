@@ -33,6 +33,7 @@
 #include <wx/dynarray.h>
 
 #include "../3D/BooleanBox.h"
+#include "Object.h"
 
 #include "ObjectPlacement.h"
 
@@ -50,13 +51,13 @@ public:
 
 	ArrayOfObjectPlacement placements;
 
-protected:
 	BooleanBox box;
+protected:
 
 	// Methods
 public:
-	void Paint();
-	void Refresh();
+	void Paint(const ArrayOfObject& objects) const;
+	void Refresh(ArrayOfObject& objects);
 };
 
 WX_DECLARE_OBJARRAY(Workpiece, ArrayOfWorkpiece);

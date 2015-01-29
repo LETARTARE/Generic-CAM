@@ -63,34 +63,30 @@ enum DisplayType {
 };
 
 class Project {
-	// Constructor / Destructor
 public:
 	Project();
 	virtual ~Project();
-	// Member variables
+
 public:
+	// Project properties
 	wxFileName fileName;
 	wxString name;
 
-	ArrayOfObject objects;
+	// Supplies
 	StockFile stock;
-	ArrayOfWorkpiece workpieces;
-	ArrayOfRun run;
-
 	Toolbox toolbox;
 
-//	OctreeGenerator octree;
-//	Quadtree quadtree;
-//	// For target generator
-//	double resolution;
-//
-//	// Slot around Objects
-//	double slotWidth;
-//	double supportDistance;
-//	double supportWidth;
-//	double supportHeight;
-//	double middleY;
-//	double offsetX;
+	// Loaded and constructed items
+	ArrayOfObject objects; //!> Loaded objects
+	ArrayOfWorkpiece workpieces; //!> Workpieces with objects
+	ArrayOfRun run; //!> Machine runs on workpieces
+
+	// Experimental stuff:
+	//	OctreeGenerator octree;
+	//	Quadtree quadtree;
+
+	// For target generator
+	//	double resolution;
 
 	DisplayType displayType;
 
@@ -108,12 +104,13 @@ protected:
 	// Methods
 public:
 	void Clear(void);
+
 	bool Load(wxFileName fileName);
 	bool Save(wxFileName fileName);
 
 	void Paint(void);
 
-	//TODO: Cleanup the following function:
+	//TODO: Cleanup the following function. Move into the generators.
 	void GenerateToolPath(void);
 	void CollectToolPath(void);
 
@@ -125,6 +122,8 @@ public:
 	void GenerateTargets(void);
 
 private:
+	void PaintWorkpieceWithObjects(size_t workpieceNr);
+
 	void XMLRemoveAllChildren(wxXmlNode* node);
 };
 

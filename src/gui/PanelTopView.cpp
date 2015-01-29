@@ -56,6 +56,33 @@ void PanelTopView::InsertProject(Project* project)
 
 void PanelTopView::OnPaint(wxPaintEvent& event)
 {
+	int wpNr = GetFirstSelectedWorkpiece();
+	if(wpNr < 0) return;
+	wxPaintDC dc(this);
+	wxSize sz = GetClientSize();
+
+	dc.Clear();
+
+	float scale;
+	float x;
+	float y;
+
+	if(sz.GetWidth() / sz.GetHeight()
+			> project->workpieces[wpNr].sx / project->workpieces[wpNr].sy){
+		scale = (float) sz.GetWidth() / project->workpieces[wpNr].sx;
+		x = 0;
+		y = ((float) sz.GetHeight() - project->workpieces[wpNr].sy * scale)
+				/ 2.0;
+	}else{
+		scale = (float) sz.GetHeight() / project->workpieces[wpNr].sy;
+		y = 0;
+		x = ((float) sz.GetWidth() - project->workpieces[wpNr].sx * scale)
+				/ 2.0;
+	}
+
+	dc.DrawRoundedRectangle(x, y, x + project->workpieces[wpNr].sx * scale,
+			y + project->workpieces[wpNr].sy * scale, 10);
+
 }
 
 void PanelTopView::OnSize(wxSizeEvent& event)
@@ -68,4 +95,16 @@ void PanelTopView::OnMotion(wxMouseEvent& event)
 
 void PanelTopView::OnLeftDown(wxMouseEvent& event)
 {
+}
+
+int PanelTopView::GetFirstSelectedWorkpiece()
+{
+	if(project == NULL) return -1;
+	size_t N = project->workpieces.GetCount();
+	if(N == 0) return -1;
+	size_t n;
+	for(n = 0; n < N; n++){
+		if(project->workpieces[n].selected) return n;
+	}
+	return -1;
 }

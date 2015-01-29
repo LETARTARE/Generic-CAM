@@ -275,80 +275,34 @@ void Project::Paint(void)
 //	x.Paint();
 //	y.Paint();
 
-	size_t i, j;
-	size_t objectNr;
-
-	AffineTransformMatrix tempMatrix;
+	size_t i;
 
 	switch(displayType){
 	case displayObjects:
 		glLoadName(1);
-		glPushName(0);
 		for(i = 0; i < objects.GetCount(); i++){
-			::glLoadName(i + 1);
+			glPushName(i + 1);
 			objects[i].Paint();
+			glPopName();
 		}
-		::glPopName();
 		break;
 
 	case displayWorkpieces:
 		glLoadName(2);
 		for(i = 0; i < workpieces.GetCount(); i++){
 			if(!workpieces[i].selected) continue;
-			::glPushName(i);
-
-			for(j = 0; j < workpieces[i].placements.GetCount(); j++){
-				objectNr = workpieces[i].placements[j].objectNr;
-				tempMatrix = AffineTransformMatrix::Identity();
-				tempMatrix.TranslateGlobal(-objects[objectNr].bbox.xmin,
-						-objects[objectNr].bbox.ymin,
-						-objects[objectNr].bbox.zmin);
-//				tempMatrix *= objects[objectNr].matrix;
-				::glPushMatrix();
-				::glMultMatrixd(tempMatrix.a);
-				::glMultMatrixd(workpieces[i].placements[j].matrix.a);
-				objects[objectNr].Paint();
-				::glPopMatrix();
-			}
-			workpieces[i].Paint();
-			::glPopName();
+			glPushName(i);
+			workpieces[i].Paint(objects);
+			glPopName();
 		}
 		break;
 	case displayRun:
 		glLoadName(3);
 		for(i = 0; i < run.GetCount(); i++){
 			if(!run[i].selected) continue;
+
 			::glPushName(i);
-			run[i].Paint();
-			::glPushMatrix();
-			::glMultMatrixd(run[i].workpiecePlacement.a);
-
-			if(run[i].workpieceNr > -1){
-				::glPushMatrix();
-				::glMultMatrixd(run[i].machine.workpiecePosition.a);
-
-				for(j = 0;
-						j < workpieces[run[i].workpieceNr].placements.GetCount();
-						j++){
-					objectNr =
-							workpieces[run[i].workpieceNr].placements[j].objectNr;
-					tempMatrix = AffineTransformMatrix::Identity();
-					tempMatrix.TranslateGlobal(-objects[objectNr].bbox.xmin,
-							-objects[objectNr].bbox.ymin,
-							-objects[objectNr].bbox.zmin);
-					::glPushMatrix();
-					::glMultMatrixd(tempMatrix.a);
-					::glMultMatrixd(
-							workpieces[run[i].workpieceNr].placements[j].matrix.a);
-					objects[objectNr].Paint();
-					::glPopMatrix();
-				}
-
-				workpieces[run[i].workpieceNr].Paint();
-
-				::glPopMatrix();
-			}
-			::glPopMatrix();
+			run[i].Paint(objects, workpieces);
 			::glPopName();
 		}
 		break;

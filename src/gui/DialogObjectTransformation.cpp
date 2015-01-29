@@ -187,13 +187,16 @@ void DialogObjectTransformation::OnClose(wxCloseEvent& event)
 
 void DialogObjectTransformation::OnSelectObject(wxCommandEvent& event)
 {
-	int n = m_choiceObjectSelection->GetSelection();
+	int id = m_choiceObjectSelection->GetSelection();
 	// Return if "Multiple objects selected." was selected again.
-	if(n >= project->objects.GetCount()) return;
+	if(id >= project->objects.GetCount()) return;
+
+	size_t n;
+	for(n = 0; n < project->objects.GetCount(); n++)
+		project->objects[n].selected = (n == id);
 
 	// Tell the main frame to update the selection in the treeview via custom command.
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_SELECTOBJECT);
-	selectEvent.SetInt(n);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHTREE);
 	ProcessEvent(selectEvent);
 }
 

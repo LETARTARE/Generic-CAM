@@ -166,6 +166,11 @@ bool DialogWorkpiece::TransferDataToWindow(void)
 			i > project->stock.stockMaterials.GetCount(); i--)
 		m_choiceStock->Delete(i - 1);
 
+	if(m_choiceStock->GetSelection() < 0
+			|| m_choiceStock->GetSelection() > m_choiceStock->GetCount()){
+		m_choiceStock->SetSelection(0);
+	}
+
 	return true;
 }
 

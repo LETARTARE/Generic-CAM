@@ -40,16 +40,36 @@ Workpiece::Workpiece(const StockMaterial &material) :
 {
 	selected = false;
 	box.SetSize(material.sx, material.sy, material.sz);
-	BooleanBox b(0.1, 0.1, 0.1);
-	box -= b;
 }
 
 Workpiece::~Workpiece()
 {
 }
 
-void Workpiece::Paint()
+void Workpiece::Paint(const ArrayOfObject &objects) const
 {
+
+	AffineTransformMatrix tempMatrix;
+
+	for(size_t j = 0; j < placements.GetCount(); j++){
+		size_t objectNr = placements[j].objectNr;
+
+		float x = placements[j].matrix.a[12];
+		float y = placements[j].matrix.a[13];
+		float d = placements[j].slotWidth;
+
+		::glPushMatrix();
+		::glMultMatrixd(placements[j].matrix.a);
+
+		tempMatrix = AffineTransformMatrix::Identity();
+		//				tempMatrix *= objects[objectNr].matrix;
+		tempMatrix.TranslateGlobal(-objects[objectNr].bbox.xmin,
+				-objects[objectNr].bbox.ymin, -objects[objectNr].bbox.zmin);
+		::glMultMatrixd(tempMatrix.a);
+		objects[objectNr].Paint();
+		::glPopMatrix();
+	}
+
 	if(glIsEnabled(GL_COLOR_MATERIAL)){
 		glColor3f(color.x, color.y, color.z);
 		box.Paint();
@@ -58,9 +78,22 @@ void Workpiece::Paint()
 		box.Paint();
 		StockMaterial::PaintWireBox();
 	}
+
 }
 
-void Workpiece::Refresh()
+void Workpiece::Refresh(ArrayOfObject& objects)
 {
 	box.SetSize(sx, sy, sz);
+
+	for(size_t j = 0; j < placements.GetCount(); j++){
+		size_t objectNr = placements[j].objectNr;
+
+		float x = placements[j].matrix.a[12];
+		float y = placements[j].matrix.a[13];
+		float d = placements[j].slotWidth;
+
+		box -= BooleanBox(x - d, y - d, 0,
+				x + objects[objectNr].bbox.GetSizeX() + d,
+				y + objects[objectNr].bbox.GetSizeY() + d, sz);
+	}
 }

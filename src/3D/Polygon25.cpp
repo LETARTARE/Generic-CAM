@@ -22,11 +22,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #include "Polygon25.h"
 
@@ -151,10 +147,11 @@ bool Polygon25::IsElementInside(const Vector3 v)
 			flagTryY = true;
 			break;
 		}
-		if((elements[i].y <= v.y && elements[j].y >= v.y) || (elements[i].y
-				>= v.y && elements[j].y <= v.y)){
-			double px = ((elements[j].x - elements[i].x) * v.y + elements[i].x
-					* elements[j].y - elements[i].y * elements[j].x)
+		if((elements[i].y <= v.y && elements[j].y >= v.y)
+				|| (elements[i].y >= v.y && elements[j].y <= v.y)){
+			double px = ((elements[j].x - elements[i].x) * v.y
+					+ elements[i].x * elements[j].y
+					- elements[i].y * elements[j].x)
 					/ (elements[j].y - elements[i].y);
 			if(px > v.x) c++;
 		}
@@ -171,11 +168,12 @@ bool Polygon25::IsElementInside(const Vector3 v)
 			if(elements[i].x == v.x && elements[j].x == v.x){
 				return false;
 			}
-			if((elements[i].x <= v.x && elements[j].x >= v.x) || (elements[i].x
-					>= v.x && elements[j].x <= v.x)){
+			if((elements[i].x <= v.x && elements[j].x >= v.x)
+					|| (elements[i].x >= v.x && elements[j].x <= v.x)){
 				double py = ((elements[j].y - elements[i].y) * v.x
-						- elements[i].x * elements[j].y + elements[i].y
-						* elements[j].x) / (elements[j].x - elements[i].x);
+						- elements[i].x * elements[j].y
+						+ elements[i].y * elements[j].x)
+						/ (elements[j].x - elements[i].x);
 				if(py > v.y) c++;
 			}
 		}
@@ -244,7 +242,6 @@ void Polygon25::RotatePolygonStart(double x, double y)
 	double d;
 	double dmin = DBL_MAX;
 	size_t n = elements.GetCount();
-
 
 	// Find element with minimal distance to (x,y)
 	size_t nshift = 0;

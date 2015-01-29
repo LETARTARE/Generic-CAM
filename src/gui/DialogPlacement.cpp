@@ -25,6 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "DialogPlacement.h"
+#include "IDs.h"
 
 DialogPlacement::DialogPlacement(wxWindow* parent, Project* project,
 		wxCommandProcessor* commandProcessor, DisplaySettings* settings) :
@@ -33,6 +34,7 @@ DialogPlacement::DialogPlacement(wxWindow* parent, Project* project,
 	this->project = project;
 	this->commandProcessor = commandProcessor;
 	this->settings = settings;
+	m_topview->InsertProject(project);
 }
 
 bool DialogPlacement::TransferDataToWindow(void)
@@ -62,6 +64,10 @@ bool DialogPlacement::TransferDataToWindow(void)
 		int selp = GetSelectedPlacement(sel);
 		m_choiceObject->SetSelection(selp + 1);
 	}
+
+	m_staticTextUnitX->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitY->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitZ->SetLabel(settings->Distance.GetOtherName());
 
 	return true;
 }
@@ -108,6 +114,45 @@ int DialogPlacement::GetSelectedPlacement(int workpieceNr)
 	return -1;
 }
 
+void DialogPlacement::OnSelectWorkpiece(wxCommandEvent& event)
+{
+	int id = m_choiceWorkpiece->GetSelection() - 1;
+	size_t n;
+	for(n = 0; n < project->workpieces.GetCount(); n++)
+		project->workpieces[n].selected = (n == id);
+
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHTREE);
+	ProcessEvent(selectEvent);
+}
+
+void DialogPlacement::OnSelectObject(wxCommandEvent& event)
+{
+	int id = m_choiceWorkpiece->GetSelection() - 1;
+	if(id < 0) return;
+	int idP = m_choiceWorkpiece->GetSelection() - 1;
+	size_t n;
+	for(n = 0; n < project->workpieces.GetCount(); n++)
+		project->workpieces[n].selected = (n == id);
+
+	for(n = 0; n < project->workpieces[id].placements.GetCount(); n++)
+		project->workpieces[id].placements[n].selected = (n == idP);
+
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHTREE);
+	ProcessEvent(selectEvent);
+}
+
+void DialogPlacement::OnChangePosition(wxCommandEvent& event)
+{
+}
+
+void DialogPlacement::OnChangeSlider(wxScrollEvent& event)
+{
+}
+
+void DialogPlacement::OnSelectForm(wxCommandEvent& event)
+{
+}
+
 void DialogPlacement::OnTransform(wxCommandEvent& event)
 {
 	switch(event.GetId()){
@@ -126,4 +171,5 @@ void DialogPlacement::OnTransform(wxCommandEvent& event)
 	case ID_ALIGNBOTTOM:
 		break;
 	}
+	Refresh();
 }

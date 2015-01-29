@@ -24,7 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef TOOL_H_
 #define TOOL_H_
 
@@ -67,9 +66,8 @@ public:
 	float GetNegativeLength(void);
 	float GetMaxDiameter(void);
 
-	void Paint(void);
+	void Paint(void) const;
 };
-WX_DECLARE_OBJARRAY(Tool, ArrayOfTool)
-;
+WX_DECLARE_OBJARRAY(Tool, ArrayOfTool);
 
 #endif /* TOOL_H_ */

@@ -40,6 +40,7 @@ bool CommandWorkpieceAssignObject::Do(void)
 	ObjectPlacement temp;
 	temp.objectNr = objectNr;
 	project->workpieces[workpieceNr].placements.Add(temp);
+	project->workpieces[workpieceNr].Refresh(project->objects);
 	return true;
 }
 
@@ -47,5 +48,6 @@ bool CommandWorkpieceAssignObject::Undo(void)
 {
 	project->workpieces[workpieceNr].placements.RemoveAt(
 			project->workpieces[workpieceNr].placements.GetCount() - 1);
+	project->workpieces[workpieceNr].Refresh(project->objects);
 	return true;
 }

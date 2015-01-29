@@ -102,8 +102,7 @@ private:
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 
-	void ObjectSelect(wxCommandEvent& event);
-	void RunSelect(wxCommandEvent& event);
+	void UpdateSelection(wxCommandEvent& event);
 	void Update(wxCommandEvent& event);
 	void UpdateStereo3D(wxCommandEvent& event);
 

@@ -34,7 +34,7 @@
  */
 
 #include "../3D/AffineTransformMatrix.h"
-#include "../generator/Polygon25.h"
+#include "../3D/Polygon25.h"
 
 #include <wx/dynarray.h>
 #include <wx/xml/xml.h>
@@ -45,12 +45,20 @@ public:
 	virtual ~ObjectPlacement();
 
 public:
+	bool selected;
+
 	AffineTransformMatrix matrix;
 	size_t objectNr;
 
-//	Polygon25 outLine;
+	Polygon25 outLine;
 
-	bool selected;
+	//	// Slot around Objects
+		double slotWidth;
+	//	double supportDistance;
+	//	double supportWidth;
+	//	double supportHeight;
+	//	double middleY;
+	//	double offsetX;
 
 	bool isMovable;
 	bool isKeepout;

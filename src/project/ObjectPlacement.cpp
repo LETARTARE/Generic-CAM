@@ -32,10 +32,14 @@ WX_DEFINE_OBJARRAY(ArrayOfObjectPlacement)
 
 ObjectPlacement::ObjectPlacement()
 {
-	isMovable = true;
-	isKeepout = false;
 	selected = false;
 	objectNr = 0;
+
+	slotWidth = 0.01; // 1 cm
+
+	matrix.TranslateGlobal(0.05, 0.05, 0);
+	isMovable = true;
+	isKeepout = false;
 }
 
 ObjectPlacement::~ObjectPlacement()
@@ -44,12 +48,14 @@ ObjectPlacement::~ObjectPlacement()
 
 void ObjectPlacement::Clear(void)
 {
+
+	objectNr = 0;
+	slotWidth = 0.01;
+	matrix.SetIdentity();
+
 	isMovable = true;
 	isKeepout = false;
-	objectNr = 0;
-
-//	outLine.Clear();
-	matrix.SetIdentity();
+	//	outLine.Clear();
 }
 
 //void ObjectPlacement::SetKeepout(double x, double y, double sizex, double sizey)
@@ -68,8 +74,8 @@ void ObjectPlacement::Clear(void)
 
 void ObjectPlacement::Paint(void) const
 {
-	::glPushMatrix();
+//	::glPushMatrix();
 //	::glMultMatrixd(matrix.a);
 //	outLine.Paint();
-	::glPopMatrix();
+//	::glPopMatrix();
 }

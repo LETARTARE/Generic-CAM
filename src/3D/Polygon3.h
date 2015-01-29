@@ -24,7 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef POLYGON3_H_
 #define POLYGON3_H_
 
@@ -65,7 +64,6 @@ public:
 	void ApplyTransformation(void);
 	void ApplyTransformation(const AffineTransformMatrix &matrix);
 };
-WX_DECLARE_OBJARRAY(Polygon3, ArrayOfPolygon3)
-;
+WX_DECLARE_OBJARRAY(Polygon3, ArrayOfPolygon3);
 
 #endif /* POLYGON3_H_ */

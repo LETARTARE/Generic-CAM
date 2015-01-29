@@ -132,7 +132,7 @@ void DialogSetupStereo3D::OnScroll(wxScrollEvent& event)
 	}
 
 	TransferDataToWindow();
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATESTEREO);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHDISPLAY);
 	ProcessEvent(selectEvent);
 }
 
@@ -178,7 +178,7 @@ void DialogSetupStereo3D::OnColorChanged(wxColourPickerEvent& event)
 		break;
 	}
 	TransferDataToWindow();
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATESTEREO);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHDISPLAY);
 	ProcessEvent(selectEvent);
 }
 
@@ -222,7 +222,7 @@ void DialogSetupStereo3D::OnTextChange(wxCommandEvent& event)
 		break;
 	}
 	TransferDataToWindow();
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATESTEREO);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHDISPLAY);
 	ProcessEvent(selectEvent);
 }
 
@@ -232,6 +232,6 @@ void DialogSetupStereo3D::OnSwap(wxCommandEvent& event)
 	std::swap(settings->leftEyeG, settings->rightEyeG);
 	std::swap(settings->leftEyeB, settings->rightEyeB);
 	TransferDataToWindow();
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATESTEREO);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHDISPLAY);
 	ProcessEvent(selectEvent);
 }

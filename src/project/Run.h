@@ -56,12 +56,13 @@ public:
 public:
 	wxString name;
 	bool selected;
+	AffineTransformMatrix workpiecePlacement; ///> For flipping the workpiece to machine the other sides.
 
 	int workpieceNr;
-//	ArrayOfObjectPlacement workpiecePlacements;
-	AffineTransformMatrix workpiecePlacement;
+
 	Machine machine;
 	Toolbox toolbox;
+	int selectedTool;
 
 	ToolPath toolPath;
 
@@ -71,8 +72,8 @@ public:
 public:
 
 	bool LoadGCode(wxFileName fileName);
-
-	void Paint(void);
+	void Paint(const ArrayOfObject& objects,
+			const ArrayOfWorkpiece& workpieces) const;
 	void ToXml(wxXmlNode* parentNode);
 	bool FromXml(wxXmlNode* node);
 

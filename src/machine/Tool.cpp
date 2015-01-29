@@ -323,14 +323,14 @@ float Tool::GetMaxDiameter(void)
 	return maxD;
 }
 
-void Tool::Paint(void)
+void Tool::Paint(void) const
 {
 	unsigned int i, j;
 
 	float ss[resolution + 1], cc[resolution + 1];
 	for(i = 0; i <= resolution; i++){
-		ss[i] = sin(2 * M_PI / resolution * i);
-		cc[i] = cos(2 * M_PI / resolution * i);
+		ss[i] = sin(-2.0 * M_PI / (float) resolution * (float) i);
+		cc[i] = cos(-2.0 * M_PI / (float) resolution * (float) i);
 	}
 
 	for(i = 0; i < contour.Count(); i++){

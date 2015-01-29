@@ -40,8 +40,9 @@
 
 class PanelTopView:public wxPanel {
 public:
-	PanelTopView(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos =
-			wxDefaultPosition, const wxSize& size = wxDefaultSize, long style =
+	PanelTopView(wxWindow* parent, wxWindowID id = wxID_ANY,
+			const wxPoint& pos = wxDefaultPosition, const wxSize& size =
+					wxDefaultSize, long style =
 			wxTAB_TRAVERSAL);
 	virtual ~PanelTopView();
 	// Member Variables
@@ -59,6 +60,9 @@ public:
 
 	void OnMotion(wxMouseEvent& event);
 	void OnLeftDown(wxMouseEvent& event);
+
+private:
+	int GetFirstSelectedWorkpiece();
 
 };
 

@@ -91,13 +91,11 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 
 	m_canvas->SetController(control);
 
-	this->Connect(ID_SELECTOBJECT, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(MainFrame::ObjectSelect));
-	this->Connect(ID_SELECTRUN, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(MainFrame::RunSelect));
+	this->Connect(ID_REFRESHTREE, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(MainFrame::UpdateSelection));
 	this->Connect(ID_UPDATE, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::Update));
-	this->Connect(ID_UPDATESTEREO, wxEVT_COMMAND_MENU_SELECTED,
+	this->Connect(ID_REFRESHDISPLAY, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::UpdateStereo3D));
 
 	//TODO: Why is the KeyDown event connected to the canvas?
@@ -142,13 +140,11 @@ MainFrame::~MainFrame()
 			wxKeyEventHandler(MainFrame::OnKeyDown), NULL, this);
 	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(MainFrame::OnTimer), NULL,
 			this);
-	this->Disconnect(ID_SELECTOBJECT, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(MainFrame::ObjectSelect));
-	this->Disconnect(ID_SELECTRUN, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(MainFrame::RunSelect));
+	this->Disconnect(ID_REFRESHTREE, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(MainFrame::UpdateSelection));
 	this->Disconnect(ID_UPDATE, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::Update));
-	this->Disconnect(ID_UPDATESTEREO, wxEVT_COMMAND_MENU_SELECTED,
+	this->Disconnect(ID_REFRESHDISPLAY, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::UpdateStereo3D));
 
 	// Save the configuration of the 6DOF controller
@@ -380,23 +376,27 @@ void MainFrame::OnActivateRightClickMenu(wxTreeEvent& event)
 	wxTreeItemId id = event.GetItem();
 	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
 
+	wxLogMessage(_T("RKMenu: %u - %u"), data->dataType, data->nr);
+
 	wxMenu menu(_T(""));
 
 	if(data->dataType == itemProject){
-		menu.Append(ID_PROJECTRENAME, wxT("&Rename Project"));
-		menu.AppendSeparator();
+
 		menu.Append(wxID_OPEN, wxT("&Load Project"));
 		menu.Append(wxID_SAVE, wxT("&Save Project"));
-		menu.Append(wxID_SAVEAS, wxT("&Load Project As ..."));
+		menu.Append(wxID_SAVEAS, wxT("Save Project &As ..."));
+		menu.Append(ID_PROJECTRENAME, wxT("&Rename Project"));
 	}
 
 	if(data->dataType == itemGroupObject){
 		menu.Append(ID_OBJECTLOAD, wxT("&Load Object"));
+		menu.AppendSeparator();
 		menu.Append(ID_OBJECTMODIFY, wxT("&Modify Object"));
 	}
 
 	if(data->dataType == itemObject){
 		menu.Append(ID_OBJECTMODIFY, wxT("&Modify Object"));
+		menu.AppendSeparator();
 		menu.Append(ID_OBJECTFLIPNORMALS, wxT("&Flip Normals"));
 		menu.Append(ID_OBJECTRENAME, wxT("&Rename Object"));
 		menu.Append(ID_OBJECTDELETE, wxT("&Delete Object"));
@@ -404,23 +404,28 @@ void MainFrame::OnActivateRightClickMenu(wxTreeEvent& event)
 	}
 
 	if(data->dataType == itemGroupWorkpiece){
+		menu.Append(ID_WORKPIECEADD, wxT("&Add Workpiece (and Objects)"));
+		menu.AppendSeparator();
 		menu.Append(ID_STOCKORGANIZE, wxT("&Organize Stock"));
-		menu.Append(ID_WORKPIECEADD, wxT("&Add Workpiece"));
 		menu.Append(ID_WORKPIECEDELETEUNUSED, wxT("Delete &unused Workpieces"));
 	}
 	if(data->dataType == itemWorkpiece){
-		menu.Append(ID_WORKPIECEADD, wxT("&Add Workpiece"));
+		menu.Append(ID_WORKPIECESETUP, wxT("&Setup Workpiece"));
+		menu.AppendSeparator();
+		menu.Append(ID_WORKPIECEADD, wxT("&Add Objects to Workpiece"));
 		menu.Append(ID_WORKPIECEDELETE, wxT("&Delete Workpiece"));
 		menu.Append(ID_WORKPIECEDELETEUNUSED, wxT("Delete &unused Workpieces"));
 	}
 
 	if(data->dataType == itemGroupRun){
 		menu.Append(ID_RUNADD, wxT("&Add Run"));
+		menu.AppendSeparator();
 		menu.Append(ID_RUNEDIT, wxT("&Setup Run"));
 	}
 
 	if(data->dataType == itemRun){
 		menu.Append(ID_RUNEDIT, wxT("&Setup Run"));
+		menu.AppendSeparator();
 		menu.Append(ID_RUNADD, wxT("&Add Run"));
 		menu.Append(ID_RUNDELETE, wxT("&Delete Run"));
 	}
@@ -447,7 +452,8 @@ void MainFrame::OnActivate(wxTreeEvent& event)
 		ProcessEvent(menuEvent);
 	}
 	if(data->dataType == itemWorkpiece){
-		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, ID_WORKPIECEADD);
+		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED,
+		ID_WORKPIECESETUP);
 		ProcessEvent(menuEvent);
 	}
 	if(data->dataType == itemGroupRun){
@@ -460,23 +466,8 @@ void MainFrame::OnActivate(wxTreeEvent& event)
 	}
 }
 
-void MainFrame::ObjectSelect(wxCommandEvent& event)
+void MainFrame::UpdateSelection(wxCommandEvent& event)
 {
-	size_t id = event.GetInt();
-	size_t n;
-	for(n = 0; n < project.objects.GetCount(); n++)
-		project.objects[n].selected = (n == id);
-
-	tree->UpdateSelection();
-	Refresh();
-}
-
-void MainFrame::RunSelect(wxCommandEvent& event)
-{
-	size_t id = event.GetInt();
-	size_t n;
-	for(n = 0; n < project.run.GetCount(); n++)
-		project.run[n].selected = (n == id);
 	tree->UpdateSelection();
 	Refresh();
 }
@@ -485,6 +476,7 @@ void MainFrame::OnSelectionChanged(wxTreeEvent& event)
 {
 	wxTreeItemId id = event.GetItem();
 	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
+
 	tree->UpdateVariables();
 
 	if(data->dataType == itemRun){
@@ -522,6 +514,7 @@ void MainFrame::OnSelectionChanging(wxTreeEvent& event)
 	if(data->dataType == itemProject) return;
 	if(data->dataType == itemObject) return;
 	if(data->dataType == itemWorkpiece) return;
+	if(data->dataType == itemPlacement) return;
 	if(data->dataType == itemRun) return;
 
 	event.Veto();

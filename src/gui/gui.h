@@ -464,7 +464,7 @@ class GUIPlacement : public wxFrame
 	private:
 	
 	protected:
-		wxMenuBar* m_menubar8;
+		wxMenuBar* m_menubar;
 		wxMenu* m_menuEdit;
 		wxMenu* m_menuExtras;
 		wxChoice* m_choiceWorkpiece;
@@ -517,7 +517,7 @@ class GUIPlacement : public wxFrame
 	
 	public:
 		
-		GUIPlacement( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Objects in Workpiece Placement"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 773,726 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		GUIPlacement( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Objects in Workpiece Placement"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 773,726 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxFULL_REPAINT_ON_RESIZE|wxTAB_TRAVERSAL );
 		~GUIPlacement();
 	
 };

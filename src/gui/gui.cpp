@@ -1279,7 +1279,7 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
-	m_menubar8 = new wxMenuBar( 0 );
+	m_menubar = new wxMenuBar( 0 );
 	m_menuEdit = new wxMenu();
 	wxMenuItem* m_menuItemUndo;
 	m_menuItemUndo = new wxMenuItem( m_menuEdit, wxID_UNDO, wxString( _("&Undo") ) + wxT('\t') + wxT("CTRL+Z"), wxEmptyString, wxITEM_NORMAL );
@@ -1296,21 +1296,22 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menuItemClose = new wxMenuItem( m_menuEdit, wxID_CLOSE, wxString( _("&Close") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuEdit->Append( m_menuItemClose );
 	
-	m_menubar8->Append( m_menuEdit, _("&Edit") );
+	m_menubar->Append( m_menuEdit, _("&Edit") );
 	
 	m_menuExtras = new wxMenu();
-	wxMenuItem* m_menuItem83;
-	m_menuItem83 = new wxMenuItem( m_menuExtras, ID_EXTRAADDFLIPDRILLS, wxString( _("Add &Flipdrills") ) , wxEmptyString, wxITEM_NORMAL );
-	m_menuExtras->Append( m_menuItem83 );
-	m_menuItem83->Enable( false );
+	wxMenuItem* m_menuItemFlipDrill;
+	m_menuItemFlipDrill = new wxMenuItem( m_menuExtras, ID_EXTRAADDFLIPDRILLS, wxString( _("Add &Flipdrills") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuExtras->Append( m_menuItemFlipDrill );
+	m_menuItemFlipDrill->Enable( false );
 	
 	wxMenuItem* m_menuItemPockets;
-	m_menuItemPockets = new wxMenuItem( m_menuExtras, wxID_ANY, wxString( _("MyMenuItem") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemPockets = new wxMenuItem( m_menuExtras, wxID_ANY, wxString( _("Add &Pocket") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuExtras->Append( m_menuItemPockets );
+	m_menuItemPockets->Enable( false );
 	
-	m_menubar8->Append( m_menuExtras, _("Extras") );
+	m_menubar->Append( m_menuExtras, _("Extras") );
 	
-	this->SetMenuBar( m_menubar8 );
+	this->SetMenuBar( m_menubar );
 	
 	wxBoxSizer* bSizerMain;
 	bSizerMain = new wxBoxSizer( wxVERTICAL );
@@ -1467,7 +1468,7 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	bSizerMain->Add( bSizer66, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
 	m_topview = new PanelTopView(this);
-	bSizerMain->Add( m_topview, 1, wxALL|wxEXPAND, 5 );
+	bSizerMain->Add( m_topview, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
 	this->SetSizer( bSizerMain );
 	this->Layout();
@@ -1475,7 +1476,7 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	// Connect Events
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIPlacement::OnClose ) );
 	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIPlacement::OnClose ) );
-	this->Connect( m_menuItem83->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIPlacement::OnExtraAdd ) );
+	this->Connect( m_menuItemFlipDrill->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIPlacement::OnExtraAdd ) );
 	m_choiceWorkpiece->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectWorkpiece ), NULL, this );
 	m_choiceObject->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectObject ), NULL, this );
 	m_textCtrlX->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUIPlacement::OnChangePosition ), NULL, this );

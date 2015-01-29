@@ -46,7 +46,7 @@ public:
 	AffineTransformMatrix matrix;
 
 	/*!\brief Paint box in Open GL*/
-	void Paint(bool flipNormals = false);
+	void Paint(bool flipNormals = false) const;
 
 	/*!\brief Axis-align the cube
 	 * Rotations at 90 degrees are OK.
@@ -65,7 +65,7 @@ public:
 	 * -= does a boolean operation on two of the boxes. The
 	 * matrices in each box are used to align them.
 	 */
-	BooleanBox& operator-=(BooleanBox const& rhs);
+	BooleanBox& operator-=(const BooleanBox& rhs);
 
 	//TODO: 	void GarbageCollector(void);
 

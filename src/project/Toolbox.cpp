@@ -22,9 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: 2010-05-04 01:11:20 +0200 (Di, 04 Mai 2010) $
-//$Revision: 44 $
-//$LastChangedBy: tobiassch $
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "Toolbox.h"
