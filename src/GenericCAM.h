@@ -41,6 +41,7 @@ class GenericCAMApp:public wxApp {
 	// Constructor
 public:
 	GenericCAMApp(void);
+	virtual ~GenericCAMApp(void);
 
 	// Member variables
 public:

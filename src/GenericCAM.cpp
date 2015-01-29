@@ -27,7 +27,9 @@
 #include "GenericCAM.h"
 #include "languages.h"
 
-
+#if wxUSE_DEBUG_CONTEXT == 1
+#include  <wx/memory.h>
+#endif
 
 // The line that starts it all.
 IMPLEMENT_APP(GenericCAMApp)
@@ -71,6 +73,12 @@ GenericCAMApp::GenericCAMApp()
 		_T(" was not loaded !");
 		wxLogError(temp);
 	}
+}
+GenericCAMApp::~GenericCAMApp(void)
+{
+#if wxUSE_DEBUG_CONTEXT == 1
+	wxDebugContext::PrintStatistics(true);
+#endif
 }
 
 // The Commandline is parsed before OnInit is called.
