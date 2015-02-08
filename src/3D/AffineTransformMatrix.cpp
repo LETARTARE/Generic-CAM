@@ -307,8 +307,8 @@ const AffineTransformMatrix AffineTransformMatrix::Inverse() const
 	b.a[14] =
 			((-T30 + T31) * a[14] + (T32 - T33) * a[13] + (-T34 + T35) * a[12])
 					/ T11;
-	b.a[2] = 0;
-	b.a[6] = 0;
+	b.a[3] = 0;
+	b.a[7] = 0;
 	b.a[11] = 0;
 	b.a[15] = 1;
 	return b;
@@ -321,39 +321,38 @@ AffineTransformMatrix & AffineTransformMatrix::operator*=(
 	//Generated with this code:
 	//php -r'for($i=0;$i<4;$i++){for($j=0;$j<4;$j++){printf("this->a[%u]=",$i*4+$j);for($k=0;$k<4;$k++){printf("c[%u]*b.a[%u]%s",$k*4+$j,$i*4+$k,($k==3)?";\r\n":"+");}}}'
 
+	// The php code generates all combinations.
+	// The axiom code optimizes it a little more, because b.a[3], b.a[7] and b.a[11] are
+	// zero and b.a[15] is one.
+
+	// Axiom:
+	// this:=matrix([[c[0],c[4],c[8],c[12]],[c[1],c[5],c[9],c[13]],[c[2],c[6],c[10],c[14]],[0,0,0,1]]);
+	// b:=matrix([[ba[0],ba[4],ba[8],ba[12]],[ba[1],ba[5],ba[9],ba[13]],[ba[2],ba[6],ba[10],ba[14]],[0,0,0,1]]);
+
 	double c[16];
 	size_t i;
 	for(i = 0; i < 16; i++)
 		c[i] = this->a[i];
 
-	this->a[0] = c[0] * b.a[0] + c[4] * b.a[1] + c[8] * b.a[2] + c[12] * b.a[3];
-	this->a[1] = c[1] * b.a[0] + c[5] * b.a[1] + c[9] * b.a[2] + c[13] * b.a[3];
-	this->a[2] = c[2] * b.a[0] + c[6] * b.a[1] + c[10] * b.a[2]
-			+ c[14] * b.a[3];
-	this->a[3] = c[3] * b.a[0] + c[7] * b.a[1] + c[11] * b.a[2]
-			+ c[15] * b.a[3];
-	this->a[4] = c[0] * b.a[4] + c[4] * b.a[5] + c[8] * b.a[6] + c[12] * b.a[7];
-	this->a[5] = c[1] * b.a[4] + c[5] * b.a[5] + c[9] * b.a[6] + c[13] * b.a[7];
-	this->a[6] = c[2] * b.a[4] + c[6] * b.a[5] + c[10] * b.a[6]
-			+ c[14] * b.a[7];
-	this->a[7] = c[3] * b.a[4] + c[7] * b.a[5] + c[11] * b.a[6]
-			+ c[15] * b.a[7];
-	this->a[8] = c[0] * b.a[8] + c[4] * b.a[9] + c[8] * b.a[10]
-			+ c[12] * b.a[11];
-	this->a[9] = c[1] * b.a[8] + c[5] * b.a[9] + c[9] * b.a[10]
-			+ c[13] * b.a[11];
-	this->a[10] = c[2] * b.a[8] + c[6] * b.a[9] + c[10] * b.a[10]
-			+ c[14] * b.a[11];
-	this->a[11] = c[3] * b.a[8] + c[7] * b.a[9] + c[11] * b.a[10]
-			+ c[15] * b.a[11];
-	this->a[12] = c[0] * b.a[12] + c[4] * b.a[13] + c[8] * b.a[14]
-			+ c[12] * b.a[15];
-	this->a[13] = c[1] * b.a[12] + c[5] * b.a[13] + c[9] * b.a[14]
-			+ c[13] * b.a[15];
-	this->a[14] = c[2] * b.a[12] + c[6] * b.a[13] + c[10] * b.a[14]
-			+ c[14] * b.a[15];
-	this->a[15] = c[3] * b.a[12] + c[7] * b.a[13] + c[11] * b.a[14]
-			+ c[15] * b.a[15];
+	this->a[0] = c[0] * b.a[0] + c[4] * b.a[1] + c[8] * b.a[2];
+	this->a[1] = c[1] * b.a[0] + c[5] * b.a[1] + c[9] * b.a[2];
+	this->a[2] = c[2] * b.a[0] + c[6] * b.a[1] + c[10] * b.a[2];
+	this->a[3] = 0;
+
+	this->a[4] = c[0] * b.a[4] + c[4] * b.a[5] + c[8] * b.a[6];
+	this->a[5] = c[1] * b.a[4] + c[5] * b.a[5] + c[9] * b.a[6];
+	this->a[6] = c[2] * b.a[4] + c[6] * b.a[5] + c[10] * b.a[6];
+	this->a[7] = 0;
+
+	this->a[8] = c[0] * b.a[8] + c[4] * b.a[9] + c[8] * b.a[10];
+	this->a[9] = c[1] * b.a[8] + c[5] * b.a[9] + c[9] * b.a[10];
+	this->a[10] = c[2] * b.a[8] + c[6] * b.a[9] + c[10] * b.a[10];
+	this->a[11] = 0;
+
+	this->a[12] = c[0] * b.a[12] + c[4] * b.a[13] + c[8] * b.a[14] + c[12];
+	this->a[13] = c[1] * b.a[12] + c[5] * b.a[13] + c[9] * b.a[14] + c[13];
+	this->a[14] = c[2] * b.a[12] + c[6] * b.a[13] + c[10] * b.a[14] + c[14];
+	this->a[15] = 1;
 
 	return *this;
 }
@@ -390,8 +389,9 @@ const AffineTransformMatrix AffineTransformMatrix::operator/(
 Vector3 AffineTransformMatrix::Transform(Vector3 const& v) const
 {
 	//Axiom code:
-	//R:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]])
-	//R*matrix([[x],[y],[z],[1]])
+	// R:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]])
+	// V:=matrix([[x],[y],[z],[1]])
+	// R*V
 
 	Vector3 temp;
 	temp.x = a[0] * v.x + a[4] * v.y + a[8] * v.z + a[12];
@@ -404,8 +404,9 @@ Vector3 AffineTransformMatrix::Transform(Vector3 const& v) const
 Vector3 AffineTransformMatrix::TransformNoShift(Vector3 const& v) const
 {
 	//Axiom code:
-	//R:=matrix([[a[0],a[4],a[8],0],[a[1],a[5],a[9],0],[a[2],a[6],a[10],0],[0,0,0,1]])
-	//R*matrix([[x],[y],[z],[1]])
+	// R:=matrix([[a[0],a[4],a[8],0],[a[1],a[5],a[9],0],[a[2],a[6],a[10],0],[0,0,0,1]])
+	// V:=matrix([[x],[y],[z],[1]])
+	// R*V
 
 	Vector3 temp;
 	temp.x = a[0] * v.x + a[4] * v.y + a[8] * v.z;
@@ -425,6 +426,10 @@ AffineTransformMatrix AffineTransformMatrix::Identity()
 void AffineTransformMatrix::TranslateGlobal(double const& x, double const& y,
 		double const& z)
 {
+	// Axiom code:
+	// this:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]]);
+	// T:=matrix([[1,0,0,x],[0,1,0,y],[0,0,1,z],[0,0,0,1]]);
+	// T*this
 	a[12] += x;
 	a[13] += y;
 	a[14] += z;
@@ -434,6 +439,10 @@ void AffineTransformMatrix::TranslateGlobal(double const& x, double const& y,
 void AffineTransformMatrix::TranslateLocal(double const& x, double const& y,
 		double const& z)
 {
+	// Axiom code:
+	// this:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]]);
+	// T:=matrix([[1,0,0,x],[0,1,0,y],[0,0,1,z],[0,0,0,1]]);
+	// this*T
 	a[12] += x * a[0] + y * a[4] + z * a[8];
 	a[13] += x * a[1] + y * a[5] + z * a[9];
 	a[14] += x * a[2] + y * a[6] + z * a[10];
@@ -443,6 +452,33 @@ void AffineTransformMatrix::TranslateLocal(double const& x, double const& y,
 void AffineTransformMatrix::ScaleGlobal(double const& x, double const& y,
 		double const& z)
 {
+	// Axiom code:
+	// this:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]]);
+	// S:=matrix([[x,0,0,0],[0,y,0,0],[0,0,z,0],[0,0,0,1]]);
+	// S*this
+
+	a[0] *= x;
+	a[1] *= y;
+	a[2] *= z;
+	a[4] *= x;
+	a[5] *= y;
+	a[6] *= z;
+	a[8] *= x;
+	a[9] *= y;
+	a[10] *= z;
+	a[12] *= x;
+	a[13] *= y;
+	a[14] *= z;
+}
+
+void AffineTransformMatrix::ScaleLocal(const double& x, const double& y,
+		const double& z)
+{
+	// Axiom code:
+	// this:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]]);
+	// S:=matrix([[x,0,0,0],[0,y,0,0],[0,0,z,0],[0,0,0,1]]);
+	// this*S
+
 	a[0] *= x;
 	a[1] *= x;
 	a[2] *= x;

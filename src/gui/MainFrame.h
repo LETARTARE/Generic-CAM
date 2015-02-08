@@ -102,9 +102,9 @@ private:
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 
-	void UpdateSelection(wxCommandEvent& event);
+	void UpdateTreeSelection(wxCommandEvent& event);
 	void Update(wxCommandEvent& event);
-	void UpdateStereo3D(wxCommandEvent& event);
+	void UpdateCanvas(wxCommandEvent& event);
 
 	size_t GetFreeSystemMemory();
 	void OnTimer(wxTimerEvent& event);

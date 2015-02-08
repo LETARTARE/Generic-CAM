@@ -84,6 +84,9 @@ bool Project::Save(wxFileName fileName)
 
 	if(!fileName.IsOk()) return false;
 
+
+
+
 	wxXmlNode* root = doc.GetRoot();
 	if(root == NULL){
 		root = new wxXmlNode(wxXML_ELEMENT_NODE, _T("GenericCAMProjectFile"));

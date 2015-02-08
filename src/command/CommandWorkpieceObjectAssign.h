@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceRemoveObject.h
+// Name               : CommandWorkpieceAssignObject.h
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 17.01.2015
+// Created            : 16.01.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,18 +24,17 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDWORKPIECEREMOVEPLACEMENT_H_
-#define COMMANDWORKPIECEREMOVEPLACEMENT_H_
+#ifndef COMMANDWORKPIECEASSIGNOBJECT_H_
+#define COMMANDWORKPIECEASSIGNOBJECT_H_
 
 #include "../project/Project.h"
-#include "../project/ObjectPlacement.h"
+
 #include <wx/cmdproc.h>
 
-class CommandWorkpieceRemoveObject:public wxCommand {
+class CommandWorkpieceObjectAssign:public wxCommand {
 public:
-	CommandWorkpieceRemoveObject(const wxString& name, Project * project,
-			int workpieceNr, int placementNr);
-	virtual ~CommandWorkpieceRemoveObject();
+	CommandWorkpieceObjectAssign(const wxString& name, Project * project,
+			 int workpieceNr,int objectNr);
 
 	bool Do(void);
 	bool Undo(void);
@@ -43,8 +42,7 @@ public:
 protected:
 	Project * project;
 	int workpieceNr;
-	int placementNr;
-	ObjectPlacement * placement;
+	int objectNr;
 };
 
-#endif /* COMMANDWORKPIECEREMOVEPLACEMENT_H_ */
+#endif /* COMMANDWORKPIECEASSIGNOBJECT_H_ */

@@ -37,9 +37,10 @@ ObjectPlacement::ObjectPlacement()
 
 	slotWidth = 0.01; // 1 cm
 
-	matrix.TranslateGlobal(0.05, 0.05, 0);
+	matrix.TranslateGlobal(0.00, 0.00, 0);
 	isMovable = true;
 	isKeepout = false;
+	useContour = false;
 }
 
 ObjectPlacement::~ObjectPlacement()
@@ -58,6 +59,16 @@ void ObjectPlacement::Clear(void)
 	//	outLine.Clear();
 }
 
+void ObjectPlacement::Update(const ArrayOfObject& objects)
+{
+	bbox.Reset();
+	if(objectNr < 0 || objectNr >= objects.GetCount()) return;
+	for(int n = 0; n < objects[objectNr].geometries.GetCount(); n++){
+		bbox.Insert(objects[objectNr].geometries[n],
+				matrix * objects[objectNr].matrix);
+	}
+}
+
 //void ObjectPlacement::SetKeepout(double x, double y, double sizex, double sizey)
 //{
 //	matrix.SetIdentity();
@@ -72,10 +83,10 @@ void ObjectPlacement::Clear(void)
 //	isKeepout = true;
 //}
 
-void ObjectPlacement::Paint(void) const
-{
+//void ObjectPlacement::Paint(void) const
+//{
 //	::glPushMatrix();
 //	::glMultMatrixd(matrix.a);
 //	outLine.Paint();
 //	::glPopMatrix();
-}
+//}

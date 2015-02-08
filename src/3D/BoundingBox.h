@@ -56,10 +56,10 @@ public:
 public:
 
 	void Reset(void);
-	void Insert(const Geometry &geometry, AffineTransformMatrix &matrix);
-	void Insert(Surface &surface);
-	void Insert(BoundingBox & bbox);
-	void Insert(const Triangle tri);
+	void Insert(const Geometry &geometry, const AffineTransformMatrix &matrix);
+	void Insert(const Surface &surface);
+	void Insert(const BoundingBox &bbox);
+	void Insert(const Triangle &tri);
 
 	bool IsEmpty(void) const;
 	bool IsVolumeZero(void) const;

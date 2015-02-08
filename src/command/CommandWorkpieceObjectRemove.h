@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceAssignObject.cpp
+// Name               : CommandWorkpieceRemoveObject.h
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 16.01.2015
+// Created            : 17.01.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,30 +24,27 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandWorkpieceAssignObject.h"
+#ifndef COMMANDWORKPIECEREMOVEPLACEMENT_H_
+#define COMMANDWORKPIECEREMOVEPLACEMENT_H_
 
-CommandWorkpieceAssignObject::CommandWorkpieceAssignObject(const wxString& name,
-		Project* project, int workpieceNr, int objectNr) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->objectNr = objectNr;
-	this->workpieceNr = workpieceNr;
-}
+#include "../project/Project.h"
+#include "../project/ObjectPlacement.h"
+#include <wx/cmdproc.h>
 
-bool CommandWorkpieceAssignObject::Do(void)
-{
-	ObjectPlacement temp;
-	temp.objectNr = objectNr;
-	project->workpieces[workpieceNr].placements.Add(temp);
-	project->workpieces[workpieceNr].Refresh(project->objects);
-	return true;
-}
+class CommandWorkpieceObjectRemove:public wxCommand {
+public:
+	CommandWorkpieceObjectRemove(const wxString& name, Project * project,
+			int workpieceNr, int placementNr);
+	virtual ~CommandWorkpieceObjectRemove();
 
-bool CommandWorkpieceAssignObject::Undo(void)
-{
-	project->workpieces[workpieceNr].placements.RemoveAt(
-			project->workpieces[workpieceNr].placements.GetCount() - 1);
-	project->workpieces[workpieceNr].Refresh(project->objects);
-	return true;
-}
+	bool Do(void);
+	bool Undo(void);
+
+protected:
+	Project * project;
+	int workpieceNr;
+	int placementNr;
+	ObjectPlacement * placement;
+};
+
+#endif /* COMMANDWORKPIECEREMOVEPLACEMENT_H_ */

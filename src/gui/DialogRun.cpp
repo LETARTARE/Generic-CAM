@@ -238,7 +238,6 @@ void DialogRun::OnToolAdd(wxCommandEvent& event)
 					_("Added tool to run ")
 							+ project->toolbox.tools[toolNr].toolName, project,
 					selected, toolNr, slotNr));
-	m_spinCtrlToolSlot->SetValue(slotNr + 1);
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
 	ProcessEvent(selectEvent);
 }

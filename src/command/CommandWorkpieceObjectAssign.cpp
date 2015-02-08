@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CanvasStereoTest.cpp
+// Name               : CommandWorkpieceAssignObject.cpp
 // Purpose            : 
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 25.01.2015
+// Created            : 16.01.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,30 +24,30 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CanvasStereoTest.h"
+#include "CommandWorkpieceObjectAssign.h"
 
-CanvasStereoTest::CanvasStereoTest(wxWindow* parent, wxWindowID id,
-		const wxPoint& pos, const wxSize& size, long style,
-		const wxString& name) :
-		OpenGLCanvas(parent, id, pos, size, style, name)
+CommandWorkpieceObjectAssign::CommandWorkpieceObjectAssign(const wxString& name,
+		Project* project, int workpieceNr, int objectNr) :
+		wxCommand(true, name)
 {
-	box.SetSize(0.4, 0.4, 0.4);
-	box -= BooleanBox(0.1, 0.1, 0.0, 0.3, 0.3, 0.4);
-	box -= BooleanBox(0.0, 0.0, 0.0, 0.3, 0.3, 0.1);
+	this->project = project;
+	this->objectNr = objectNr;
+	this->workpieceNr = workpieceNr;
 }
 
-CanvasStereoTest::~CanvasStereoTest()
+bool CommandWorkpieceObjectAssign::Do(void)
 {
-	this->Disconnect(wxEVT_TIMER,
-			wxTimerEventHandler(CanvasStereoTest::OnTimer),
-			NULL, this);
+	ObjectPlacement temp;
+	temp.objectNr = objectNr;
+	project->workpieces[workpieceNr].placements.Add(temp);
+	project->workpieces[workpieceNr].Update(project->objects);
+	return true;
 }
 
-void CanvasStereoTest::Render()
+bool CommandWorkpieceObjectAssign::Undo(void)
 {
-	::glPushMatrix();
-	::glColor3f(0.8, 0.8, 0.8);
-	::glTranslatef(-0.2, -0.2, -0.2);
-	box.Paint();
-	::glPopMatrix();
+	project->workpieces[workpieceNr].placements.RemoveAt(
+			project->workpieces[workpieceNr].placements.GetCount() - 1);
+	project->workpieces[workpieceNr].Update(project->objects);
+	return true;
 }

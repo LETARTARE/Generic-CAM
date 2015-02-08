@@ -62,10 +62,10 @@ void Run::Paint(const ArrayOfObject& objects,
 	if(selectedTool < toolbox.GetToolCount()){
 		::glPushMatrix();
 		::glMultMatrixd(machine.toolPosition.a);
+		::glColor3f(0.7, 0.7, 0.7);
 		toolbox.tools[selectedTool].Paint();
 		::glPopMatrix();
 	}
-	//toolPath.Paint();
 }
 
 void Run::ToXml(wxXmlNode* parentNode)

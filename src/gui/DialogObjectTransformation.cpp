@@ -354,49 +354,43 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around X by %.0f degree"),
 							rotateStep);
-			newMatrix = newMatrix
-					* AffineTransformMatrix::RotateXYZ(rotateStep * M_PI / 180,
-							0, 0);
+			newMatrix = AffineTransformMatrix::RotateXYZ(rotateStep * M_PI / 180,
+							0, 0)*newMatrix;
 			break;
 		case ID_ROTATEXN:
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around X by %.0f degree"),
 							-rotateStep);
-			newMatrix = newMatrix
-					* AffineTransformMatrix::RotateXYZ(-rotateStep * M_PI / 180,
-							0, 0);
+			newMatrix = AffineTransformMatrix::RotateXYZ(-rotateStep * M_PI / 180,
+							0, 0)*newMatrix;
 			break;
 		case ID_ROTATEYP:
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around Y by %.0f degree"),
 							rotateStep);
-			newMatrix = newMatrix
-					* AffineTransformMatrix::RotateXYZ(0,
-							rotateStep * M_PI / 180, 0);
+			newMatrix = AffineTransformMatrix::RotateXYZ(0,
+					rotateStep * M_PI / 180, 0) * newMatrix;
 			break;
 		case ID_ROTATEYN:
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around Y by %.0f degree"),
 							-rotateStep);
-			newMatrix = newMatrix
-					* AffineTransformMatrix::RotateXYZ(0,
-							-rotateStep * M_PI / 180, 0);
+			newMatrix = AffineTransformMatrix::RotateXYZ(0,
+					-rotateStep * M_PI / 180, 0) * newMatrix;
 			break;
 		case ID_ROTATEZP:
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around Z by %.0f degree"),
 							rotateStep);
-			newMatrix = newMatrix
-					* AffineTransformMatrix::RotateXYZ(0, 0,
-							rotateStep * M_PI / 180);
+			newMatrix = AffineTransformMatrix::RotateXYZ(0, 0,
+					rotateStep * M_PI / 180) * newMatrix;
 			break;
 		case ID_ROTATEZN:
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around Z by %.0f degree"),
 							-rotateStep);
-			newMatrix = newMatrix
-					* AffineTransformMatrix::RotateXYZ(0, 0,
-							-rotateStep * M_PI / 180);
+			newMatrix = AffineTransformMatrix::RotateXYZ(0, 0,
+					-rotateStep * M_PI / 180) * newMatrix;
 			break;
 		}
 

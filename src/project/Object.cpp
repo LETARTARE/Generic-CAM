@@ -46,14 +46,14 @@ Object::~Object()
 {
 }
 
-void Object::Paint(void)
+void Object::Paint(void) const
 {
-		::glPushMatrix();
-		::glMultMatrixd(matrix.a);
+	::glPushMatrix();
+	::glMultMatrixd(matrix.a);
 	size_t i;
 	for(i = 0; i < geometries.GetCount(); i++)
 		geometries[i].Paint();
-::glPopMatrix();
+	::glPopMatrix();
 }
 
 void Object::UpdateBoundingBox(void)
@@ -61,7 +61,15 @@ void Object::UpdateBoundingBox(void)
 	size_t i;
 	bbox.Reset();
 	for(i = 0; i < geometries.GetCount(); i++)
-		bbox.Insert((geometries[i]), matrix);
+		bbox.Insert((geometries[i]), this->matrix);
+}
+
+void Object::UpdateBoundingBox(AffineTransformMatrix const &matrix)
+{
+	size_t i;
+	bbox.Reset();
+	for(i = 0; i < geometries.GetCount(); i++)
+		bbox.Insert((geometries[i]), matrix * this->matrix);
 }
 
 void Object::UpdateNormals(void)

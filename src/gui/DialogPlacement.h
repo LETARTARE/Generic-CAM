@@ -61,6 +61,7 @@ protected:
 	int GetSelectedPlacement(int workpieceNr);
 
 	void OnClose(wxCloseEvent& event);
+	void OnSize(wxSizeEvent& event);
 	void OnClose(wxCommandEvent& event);
 	void OnExtraAdd(wxCommandEvent& event);
 	void OnSelectWorkpiece(wxCommandEvent& event);

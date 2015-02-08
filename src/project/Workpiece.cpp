@@ -52,21 +52,21 @@ void Workpiece::Paint(const ArrayOfObject &objects) const
 	AffineTransformMatrix tempMatrix;
 
 	for(size_t j = 0; j < placements.GetCount(); j++){
-		size_t objectNr = placements[j].objectNr;
+		size_t objNr = placements[j].objectNr;
 
 		float x = placements[j].matrix.a[12];
 		float y = placements[j].matrix.a[13];
-		float d = placements[j].slotWidth;
-
-		::glPushMatrix();
-		::glMultMatrixd(placements[j].matrix.a);
+		float z = placements[j].matrix.a[14];
 
 		tempMatrix = AffineTransformMatrix::Identity();
-		//				tempMatrix *= objects[objectNr].matrix;
-		tempMatrix.TranslateGlobal(-objects[objectNr].bbox.xmin,
-				-objects[objectNr].bbox.ymin, -objects[objectNr].bbox.zmin);
+		tempMatrix.TranslateLocal(-placements[j].bbox.xmin,
+				-placements[j].bbox.ymin, -placements[j].bbox.zmin);
+		tempMatrix.TranslateLocal(x, y, z);
+		tempMatrix *= placements[j].matrix;
+
+		::glPushMatrix();
 		::glMultMatrixd(tempMatrix.a);
-		objects[objectNr].Paint();
+		objects[objNr].Paint();
 		::glPopMatrix();
 	}
 
@@ -81,19 +81,19 @@ void Workpiece::Paint(const ArrayOfObject &objects) const
 
 }
 
-void Workpiece::Refresh(ArrayOfObject& objects)
+void Workpiece::Update(ArrayOfObject& objects)
 {
 	box.SetSize(sx, sy, sz);
 
 	for(size_t j = 0; j < placements.GetCount(); j++){
-		size_t objectNr = placements[j].objectNr;
+		placements[j].Update(objects);
 
 		float x = placements[j].matrix.a[12];
 		float y = placements[j].matrix.a[13];
 		float d = placements[j].slotWidth;
 
 		box -= BooleanBox(x - d, y - d, 0,
-				x + objects[objectNr].bbox.GetSizeX() + d,
-				y + objects[objectNr].bbox.GetSizeY() + d, sz);
+				x + placements[j].bbox.GetSizeX() + d,
+				y + placements[j].bbox.GetSizeY() + d, sz);
 	}
 }

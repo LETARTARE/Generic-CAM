@@ -24,9 +24,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandWorkpieceRemoveObject.h"
+#include "CommandWorkpieceObjectRemove.h"
 
-CommandWorkpieceRemoveObject::CommandWorkpieceRemoveObject(const wxString& name,
+CommandWorkpieceObjectRemove::CommandWorkpieceObjectRemove(const wxString& name,
 		Project* project, int workpieceNr, int placementNr) :
 		wxCommand(true, name)
 {
@@ -36,19 +36,19 @@ CommandWorkpieceRemoveObject::CommandWorkpieceRemoveObject(const wxString& name,
 	this->placement = NULL;
 }
 
-CommandWorkpieceRemoveObject::~CommandWorkpieceRemoveObject()
+CommandWorkpieceObjectRemove::~CommandWorkpieceObjectRemove()
 {
 	if(placement != NULL) delete placement;
 }
 
-bool CommandWorkpieceRemoveObject::Do(void)
+bool CommandWorkpieceObjectRemove::Do(void)
 {
 	placement = project->workpieces[workpieceNr].placements.Detach(placementNr);
-	project->workpieces[workpieceNr].Refresh(project->objects);
+	project->workpieces[workpieceNr].Update(project->objects);
 	return true;
 }
 
-bool CommandWorkpieceRemoveObject::Undo(void)
+bool CommandWorkpieceObjectRemove::Undo(void)
 {
 	if(placementNr >= project->workpieces[workpieceNr].placements.GetCount()){
 		project->workpieces[workpieceNr].placements.Add(placement);
@@ -56,7 +56,7 @@ bool CommandWorkpieceRemoveObject::Undo(void)
 		project->workpieces[workpieceNr].placements.Insert(placement,
 				placementNr);
 	}
-	project->workpieces[workpieceNr].Refresh(project->objects);
+	project->workpieces[workpieceNr].Update(project->objects);
 	// If the the placement was inserted back into the project,
 	// this function must not delete the placement in the destructor.
 	placement = NULL;

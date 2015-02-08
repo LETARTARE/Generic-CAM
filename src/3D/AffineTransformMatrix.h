@@ -56,8 +56,6 @@
  */
 
 // http://www.parashift.com/c++-faq-lite/operator-overloading.html
-
-
 #include <wx/string.h>
 #include <wx/dynarray.h>
 #include "Vector3.h"
@@ -116,13 +114,13 @@ public:
 	void TranslateLocal(double const& x, double const& y, double const& z);
 
 	void ScaleGlobal(double const& x, double const& y, double const& z);
+	void ScaleLocal(double const& x, double const& y, double const& z);
 
 	Vector3 Transform(Vector3 const& v) const;
 	Vector3 TransformNoShift(Vector3 const& v) const;
 
 };
 
-WX_DECLARE_OBJARRAY(AffineTransformMatrix, ArrayOfAffineTransformMatrix)
-;
+WX_DECLARE_OBJARRAY(AffineTransformMatrix, ArrayOfAffineTransformMatrix);
 
 #endif /* AFFINETRANSFORMMATRIX_H_ */

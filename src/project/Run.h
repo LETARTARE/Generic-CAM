@@ -44,7 +44,9 @@
 /*!\class Run
  * \brief ...
  *
- * ...
+ * The workpiecePlacement matrix herein is for rotating the workpiece.
+ * The machine itself contains another matrix used for placing the
+ * workpiece in the machine.
  */
 
 class Run {

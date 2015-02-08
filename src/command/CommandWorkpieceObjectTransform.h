@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceAssignObject.h
-// Purpose            : 
+// Name               : CommandWorkpieceObjectTransform.h
+// Purpose            :
 // Thread Safe        : No
 // Platform dependent : No
-// Compiler Options   :
+// Compiler Options   : -lm
 // Author             : Tobias Schaefer
-// Created            : 16.01.2015
+// Created            : 30.01.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,25 +24,33 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDWORKPIECEASSIGNOBJECT_H_
-#define COMMANDWORKPIECEASSIGNOBJECT_H_
-
-#include "../project/Project.h"
+#ifndef COMMANDWORKPIECEOBJECTTRANSFORM_H_
+#define COMMANDWORKPIECEOBJECTTRANSFORM_H_
 
 #include <wx/cmdproc.h>
+#include "../project/Project.h"
+#include "../3D/AffineTransformMatrix.h"
 
-class CommandWorkpieceAssignObject:public wxCommand {
+/*!\class CommandWorkpieceObjectTransform
+ * \brief ...
+ *
+ * ...
+ */
+
+class CommandWorkpieceObjectTransform:public wxCommand {
 public:
-	CommandWorkpieceAssignObject(const wxString& name, Project * project,
-			 int workpieceNr,int objectNr);
-
+	CommandWorkpieceObjectTransform(const wxString& name, Project * project,
+			size_t workpieceNr, size_t placementNr,
+			const AffineTransformMatrix& matrixNew);
 	bool Do(void);
 	bool Undo(void);
 
 protected:
 	Project * project;
-	int workpieceNr;
-	int objectNr;
+	size_t workpieceNr;
+	size_t placementNr;
+	AffineTransformMatrix matrixNew;
+	AffineTransformMatrix matrixOld;
 };
 
-#endif /* COMMANDWORKPIECEASSIGNOBJECT_H_ */
+#endif /* COMMANDWORKPIECEOBJECTTRANSFORM_H_ */

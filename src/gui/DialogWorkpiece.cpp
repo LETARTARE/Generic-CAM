@@ -29,8 +29,8 @@
 #include <wx/grid.h>
 
 #include "../command/CommandWorkpieceAdd.h"
-#include "../command/CommandWorkpieceAssignObject.h"
-#include "../command/CommandWorkpieceRemoveObject.h"
+#include "../command/CommandWorkpieceObjectAssign.h"
+#include "../command/CommandWorkpieceObjectRemove.h"
 
 #include "IDs.h"
 
@@ -56,7 +56,7 @@ void DialogWorkpiece::OnClose(wxCommandEvent& event)
 
 void DialogWorkpiece::OnManageStock(wxCommandEvent& event)
 {
-
+	TransferDataToWindow();
 }
 
 void DialogWorkpiece::OnAddStock(wxCommandEvent& event)
@@ -83,7 +83,7 @@ void DialogWorkpiece::OnDBLClick(wxGridEvent& event)
 		if(project->workpieces[workpieceNr].placements[placementNr].objectNr
 				== objectNr){
 			commandProcessor->Submit(
-					new CommandWorkpieceRemoveObject(
+					new CommandWorkpieceObjectRemove(
 							_("Remove Object from Workpiece"), project,
 							workpieceNr, placementNr));
 			wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
@@ -92,7 +92,7 @@ void DialogWorkpiece::OnDBLClick(wxGridEvent& event)
 		}
 	}
 	commandProcessor->Submit(
-			new CommandWorkpieceAssignObject(_("Assign Object to Workpiece"),
+			new CommandWorkpieceObjectAssign(_("Assign Object to Workpiece"),
 					project, workpieceNr, objectNr));
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
 	ProcessEvent(selectEvent);

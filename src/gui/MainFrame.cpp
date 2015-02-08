@@ -92,11 +92,11 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	m_canvas->SetController(control);
 
 	this->Connect(ID_REFRESHTREE, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(MainFrame::UpdateSelection));
+			wxCommandEventHandler(MainFrame::UpdateTreeSelection));
 	this->Connect(ID_UPDATE, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::Update));
 	this->Connect(ID_REFRESHDISPLAY, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(MainFrame::UpdateStereo3D));
+			wxCommandEventHandler(MainFrame::UpdateCanvas));
 
 	//TODO: Why is the KeyDown event connected to the canvas?
 	m_canvas->Connect(wxID_ANY, wxEVT_KEY_DOWN,
@@ -141,11 +141,11 @@ MainFrame::~MainFrame()
 	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(MainFrame::OnTimer), NULL,
 			this);
 	this->Disconnect(ID_REFRESHTREE, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(MainFrame::UpdateSelection));
+			wxCommandEventHandler(MainFrame::UpdateTreeSelection));
 	this->Disconnect(ID_UPDATE, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::Update));
 	this->Disconnect(ID_REFRESHDISPLAY, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(MainFrame::UpdateStereo3D));
+			wxCommandEventHandler(MainFrame::UpdateCanvas));
 
 	// Save the configuration of the 6DOF controller
 	control.WriteConfigTo(config);
@@ -202,7 +202,7 @@ void MainFrame::Update(wxCommandEvent& event)
 	TransferDataToWindow();
 }
 
-void MainFrame::UpdateStereo3D(wxCommandEvent& event)
+void MainFrame::UpdateCanvas(wxCommandEvent& event)
 {
 	settings.WriteToCanvas(m_canvas);
 	m_canvas->Refresh();
@@ -466,7 +466,7 @@ void MainFrame::OnActivate(wxTreeEvent& event)
 	}
 }
 
-void MainFrame::UpdateSelection(wxCommandEvent& event)
+void MainFrame::UpdateTreeSelection(wxCommandEvent& event)
 {
 	tree->UpdateSelection();
 	Refresh();

@@ -75,7 +75,7 @@ double BoundingBox::GetVolume(void) const
 }
 
 void BoundingBox::Insert(const Geometry &geometry,
-		AffineTransformMatrix &matrix)
+		const AffineTransformMatrix &matrix)
 {
 	size_t i, j;
 	for(i = 0; i < geometry.triangles.GetCount(); i++){
@@ -92,7 +92,7 @@ void BoundingBox::Insert(const Geometry &geometry,
 	}
 }
 
-void BoundingBox::Insert(Surface &surface)
+void BoundingBox::Insert(const Surface &surface)
 {
 	size_t i;
 	Vector3 temp;
@@ -107,7 +107,7 @@ void BoundingBox::Insert(Surface &surface)
 	}
 }
 
-void BoundingBox::Insert(BoundingBox& bbox)
+void BoundingBox::Insert(const BoundingBox& bbox)
 {
 	if(bbox.xmin < xmin) xmin = bbox.xmin;
 	if(bbox.xmax > xmax) xmax = bbox.xmax;
@@ -117,7 +117,7 @@ void BoundingBox::Insert(BoundingBox& bbox)
 	if(bbox.zmax > zmax) zmax = bbox.zmax;
 }
 
-void BoundingBox::Insert(const Triangle tri)
+void BoundingBox::Insert(const Triangle &tri)
 {
 	unsigned char i;
 	for(i = 0; i < 3; i++){

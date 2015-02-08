@@ -114,50 +114,54 @@
 #define ID_FLIPY 1060
 #define ID_FLIPZ 1061
 #define ID_EXTRAADDFLIPDRILLS 1062
-#define ID_FORMBOX 1063
-#define ID_FORMCONTOUR 1064
-#define ID_WORKPIECEROTATEX 1065
-#define ID_WORKPIECEROTATEY 1066
-#define ID_WORKPIECEROTATEZ 1067
-#define wxID_LOAD 1068
-#define ID_AXISX 1069
-#define ID_AXISY 1070
-#define ID_AXISZ 1071
-#define ID_TEXTX 1072
-#define ID_TEXTY 1073
-#define ID_TEXTZ 1074
-#define ID_AXISA 1075
-#define ID_AXISB 1076
-#define ID_AXISC 1077
-#define ID_TEXTA 1078
-#define ID_TEXTB 1079
-#define ID_TEXTC 1080
-#define ID_AXISU 1081
-#define ID_AXISV 1082
-#define ID_AXISW 1083
-#define ID_TEXTU 1084
-#define ID_TEXTV 1085
-#define ID_TEXTW 1086
-#define ID_BUTTONCONNECT 1087
-#define ID_BUTTONDISCONNECT 1088
-#define ID_COLORLR 1089
-#define ID_COLORLG 1090
-#define ID_COLORLB 1091
-#define ID_COLORRR 1092
-#define ID_COLORRG 1093
-#define ID_COLORRB 1094
-#define ID_COLORLEFT 1095
-#define ID_COLORRIGHT 1096
-#define ID_TEXTLR 1097
-#define ID_TEXTLG 1098
-#define ID_TEXTLB 1099
-#define ID_EYEDISTANCE 1100
-#define ID_TEXTEYEDISTANCE 1101
-#define ID_FOCALDISTANCE 1102
-#define ID_TEXTFOCALDISTANCE 1103
-#define ID_TEXTRR 1104
-#define ID_TEXTRG 1105
-#define ID_TEXTRB 1106
+#define ID_POSX 1063
+#define ID_POSY 1064
+#define ID_POSZ 1065
+#define ID_ANGLE 1066
+#define ID_FORMBOX 1067
+#define ID_FORMCONTOUR 1068
+#define ID_WORKPIECEROTATEX 1069
+#define ID_WORKPIECEROTATEY 1070
+#define ID_WORKPIECEROTATEZ 1071
+#define wxID_LOAD 1072
+#define ID_AXISX 1073
+#define ID_AXISY 1074
+#define ID_AXISZ 1075
+#define ID_TEXTX 1076
+#define ID_TEXTY 1077
+#define ID_TEXTZ 1078
+#define ID_AXISA 1079
+#define ID_AXISB 1080
+#define ID_AXISC 1081
+#define ID_TEXTA 1082
+#define ID_TEXTB 1083
+#define ID_TEXTC 1084
+#define ID_AXISU 1085
+#define ID_AXISV 1086
+#define ID_AXISW 1087
+#define ID_TEXTU 1088
+#define ID_TEXTV 1089
+#define ID_TEXTW 1090
+#define ID_BUTTONCONNECT 1091
+#define ID_BUTTONDISCONNECT 1092
+#define ID_COLORLR 1093
+#define ID_COLORLG 1094
+#define ID_COLORLB 1095
+#define ID_COLORRR 1096
+#define ID_COLORRG 1097
+#define ID_COLORRB 1098
+#define ID_COLORLEFT 1099
+#define ID_COLORRIGHT 1100
+#define ID_TEXTLR 1101
+#define ID_TEXTLG 1102
+#define ID_TEXTLB 1103
+#define ID_EYEDISTANCE 1104
+#define ID_TEXTEYEDISTANCE 1105
+#define ID_FOCALDISTANCE 1106
+#define ID_TEXTFOCALDISTANCE 1107
+#define ID_TEXTRR 1108
+#define ID_TEXTRG 1109
+#define ID_TEXTRB 1110
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIMainFrame
@@ -468,7 +472,7 @@ class GUIPlacement : public wxFrame
 		wxMenu* m_menuEdit;
 		wxMenu* m_menuExtras;
 		wxChoice* m_choiceWorkpiece;
-		wxChoice* m_choiceObject;
+		wxChoice* m_choicePlacement;
 		
 		wxStaticText* m_staticText100;
 		wxTextCtrl* m_textCtrlX;
@@ -487,7 +491,7 @@ class GUIPlacement : public wxFrame
 		wxRadioButton* m_radioBtnContour;
 		
 		wxStaticText* m_staticText108;
-		wxTextCtrl* m_textCtrl48;
+		wxTextCtrl* m_textCtrlDistance;
 		wxStaticText* m_staticTextUnitDistance;
 		
 		wxBitmapButton* m_bpButtonYP;
@@ -505,6 +509,7 @@ class GUIPlacement : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnSize( wxSizeEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExtraAdd( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSelectWorkpiece( wxCommandEvent& event ) { event.Skip(); }

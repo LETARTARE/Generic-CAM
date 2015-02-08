@@ -57,7 +57,7 @@ protected:
 	// Methods
 public:
 	void Paint(const ArrayOfObject& objects) const;
-	void Refresh(ArrayOfObject& objects);
+	void Update(ArrayOfObject& objects);
 };
 
 WX_DECLARE_OBJARRAY(Workpiece, ArrayOfWorkpiece);

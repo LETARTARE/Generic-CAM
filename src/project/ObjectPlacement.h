@@ -35,6 +35,9 @@
 
 #include "../3D/AffineTransformMatrix.h"
 #include "../3D/Polygon25.h"
+#include "../3D/BoundingBox.h"
+
+#include "Object.h"
 
 #include <wx/dynarray.h>
 #include <wx/xml/xml.h>
@@ -52,8 +55,11 @@ public:
 
 	Polygon25 outLine;
 
+	BoundingBox bbox;
+
 	//	// Slot around Objects
-		double slotWidth;
+	double slotWidth;
+	bool useContour;
 	//	double supportDistance;
 	//	double supportWidth;
 	//	double supportHeight;
@@ -66,10 +72,11 @@ public:
 	//Methods:
 public:
 	void Clear(void);
+	void Update(const ArrayOfObject &objects);
 
-	void SetKeepout(double x, double y, double sizex, double sizey);
+//	void SetKeepout(double x, double y, double sizex, double sizey);
 
-	void Paint(void) const;
+//	void Paint(void) const;
 };
 WX_DECLARE_OBJARRAY(ObjectPlacement, ArrayOfObjectPlacement);
 #endif /* OBJECTPLACEMENT_H_ */

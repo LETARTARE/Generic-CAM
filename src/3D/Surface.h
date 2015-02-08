@@ -141,7 +141,7 @@ public:
 		return v.GetCount();
 	}
 
-	Vector3 GetVertex(const size_t i)
+	Vector3 GetVertex(const size_t i) const
 	{
 		return v[i];
 	}

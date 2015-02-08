@@ -64,10 +64,11 @@ private:
 public:
 
 	void UpdateBoundingBox(void);
+	void UpdateBoundingBox(AffineTransformMatrix const &matrix);
 	void UpdateNormals(void);
 	void Update(void);
 
-	void Paint(void);
+	void Paint(void) const;
 
 	bool LoadObject(wxFileName fileName);
 	bool ReloadObject(void);

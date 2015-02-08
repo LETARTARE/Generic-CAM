@@ -67,21 +67,64 @@ void PanelTopView::OnPaint(wxPaintEvent& event)
 	float x;
 	float y;
 
-	if(sz.GetWidth() / sz.GetHeight()
-			> project->workpieces[wpNr].sx / project->workpieces[wpNr].sy){
+	if(sz.GetWidth() / project->workpieces[wpNr].sx
+			< sz.GetHeight() / project->workpieces[wpNr].sy){
 		scale = (float) sz.GetWidth() / project->workpieces[wpNr].sx;
 		x = 0;
 		y = ((float) sz.GetHeight() - project->workpieces[wpNr].sy * scale)
 				/ 2.0;
 	}else{
 		scale = (float) sz.GetHeight() / project->workpieces[wpNr].sy;
-		y = 0;
 		x = ((float) sz.GetWidth() - project->workpieces[wpNr].sx * scale)
 				/ 2.0;
+		y = 0;
 	}
+	dc.DrawRoundedRectangle(x, y, (int) (project->workpieces[wpNr].sx * scale),
+			(int) (project->workpieces[wpNr].sy * scale), 10);
 
-	dc.DrawRoundedRectangle(x, y, x + project->workpieces[wpNr].sx * scale,
-			y + project->workpieces[wpNr].sy * scale, 10);
+	size_t N = project->workpieces[wpNr].placements.GetCount();
+	size_t n, m, p;
+	AffineTransformMatrix temp;
+	Vector3 p1, p2, p3;
+	for(n = 0; n < N; n++){
+		size_t objNr = project->workpieces[wpNr].placements[n].objectNr;
+		if(objNr < 0) continue;
+		for(m = 0; m < project->objects[objNr].geometries.GetCount(); m++){
+
+			temp = AffineTransformMatrix::Identity();
+			temp.TranslateLocal(x, sz.GetHeight() - y, 0);
+			temp.ScaleLocal(scale, -scale, scale);
+			temp.TranslateLocal(
+					-project->workpieces[wpNr].placements[n].bbox.xmin,
+					-project->workpieces[wpNr].placements[n].bbox.ymin,
+					-project->workpieces[wpNr].placements[n].bbox.zmin);
+			temp.TranslateLocal(
+					project->workpieces[wpNr].placements[n].matrix.a[12],
+					project->workpieces[wpNr].placements[n].matrix.a[13],
+					project->workpieces[wpNr].placements[n].matrix.a[14]);
+			temp *= project->workpieces[wpNr].placements[n].matrix;
+			temp *= project->objects[objNr].matrix;
+			temp *= project->objects[objNr].geometries[m].matrix;
+			for(p = 0;
+					p
+							< project->objects[objNr].geometries[m].triangles.GetCount();
+					p++){
+				p1 =
+						temp.Transform(
+								project->objects[objNr].geometries[m].triangles[p].p[0]);
+				p2 =
+						temp.Transform(
+								project->objects[objNr].geometries[m].triangles[p].p[1]);
+				p3 =
+						temp.Transform(
+								project->objects[objNr].geometries[m].triangles[p].p[2]);
+				dc.DrawLine(p1.x, p1.y, p2.x, p2.y);
+				dc.DrawLine(p2.x, p2.y, p3.x, p3.y);
+				dc.DrawLine(p3.x, p3.y, p1.x, p1.y);
+
+			}
+		}
+	}
 
 }
 
