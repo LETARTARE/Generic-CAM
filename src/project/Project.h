@@ -50,7 +50,6 @@
 
 #include "../3D/OctreeGenerator.h"
 #include "../3D/Quadtree.h"
-#include "../machine/Machine.h"
 
 #include <stddef.h>
 #include <wx/defs.h>
@@ -73,6 +72,7 @@ public:
 	wxString name;
 
 	// Supplies
+	// TODO: Stock and Toolbox are not part of a project, but part of the whole system.
 	StockFile stock;
 	Toolbox toolbox;
 

@@ -6,13 +6,15 @@
 
 -- Base of the machine
 translate(0, 0, 0); -- Actually this line does nothing at all.
-loadstl("testrobot/robot1.stl");
+setstyle(0,0.5,0)
+loadgeometry("6-Axis Robot/robot1.stl");
 
-
+setstyle(0.4,0.4,0.4)
 translate(3,2,0.5);
 cylinder(0.6,0.2);
 
 translate(0,0,0.3);
+setstyle(0.8,0.5,0.1)
 cylinder(0.3,0.01,0.05);
 
 translate(0,0,0.15);
@@ -23,27 +25,33 @@ toolholder(); -- This is the place where the milling tool is placed.
 
 -- Part 1
 addcomponent("Link1");
-loadstl("testrobot/robot2.stl");
+setstyle(0,0.7,0)
+loadgeometry("6-Axis Robot/robot2.stl");
 
 -- Part 2
 addcomponent("Link2");
-loadstl("testrobot/robot3.stl");
+setstyle(0,0.7,0)
+loadgeometry("6-Axis Robot/robot3.stl");
 
 -- Part 3
 addcomponent("Link3");
-loadstl("testrobot/robot4.stl");
+setstyle(0,0.7,0)
+loadgeometry("6-Axis Robot/robot4.stl");
 
 -- Part 4
 addcomponent("Link4");
-loadstl("testrobot/robot5.stl");
+setstyle(0,0.7,0)
+loadgeometry("6-Axis Robot/robot5.stl");
 
 -- Part 5
 addcomponent("Link5");
-loadstl("testrobot/robot6.stl");
+setstyle(0,0.7,0)
+loadgeometry("6-Axis Robot/robot6.stl");
 
 -- Part 6
 addcomponent("Link6");
-loadstl("testrobot/robot7.stl");
+setstyle(0,0.3,0)
+loadgeometry("6-Axis Robot/robot7.stl");
 
 translate(5.149,0,1.6);
 rotate(0,90,0);
@@ -60,12 +68,12 @@ function AssembleMachine()
 	-- Fancy robot function is to be done next.
 	-- [joint1,joint2,joint3,joint4,joint5,joint6] = RobotIK(AXIS_X,AXIS_Y,AXIS_Z,AXIS_A,AXIS_B,AXIS_C)
 	  
-     joint1 = 40;
-     joint2 = -40;
-     joint3 = 95;
-     joint4 = 100;
-     joint5 = -50;
-     joint6 = 110;
+     joint1 = AXIS_X*180;
+     joint2 = AXIS_Y*180;
+     joint3 = AXIS_Z*180;
+     joint4 = AXIS_A;
+     joint5 = AXIS_B;
+     joint6 = AXIS_C;
      
 	identity();
 	rotate(0,0,joint1);

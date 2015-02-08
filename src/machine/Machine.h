@@ -65,6 +65,13 @@ private:
 	AffineTransformMatrix toolPositionRelativ;
 	AffineTransformMatrix workpiecePositionRelativ;
 
+	bool LoadGeometryIntoComponent(const wxString &filename, int componentNr,
+			const AffineTransformMatrix &matrix);
+
+	bool LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
+			const wxString &filename, int componentNr,
+			const AffineTransformMatrix &matrix);
+
 	// Methods
 public:
 	void ToXml(wxXmlNode* parentNode);
@@ -81,7 +88,7 @@ public:
 	void EvaluateDescription(void);
 	bool ReLoad(void);
 	bool Load(wxFileName const& fileName);
-	bool IsInitialized(void)
+	bool IsInitialized(void) const
 	{
 		return initialized;
 	}

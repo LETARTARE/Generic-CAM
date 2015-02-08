@@ -4,7 +4,7 @@
 
 -- Base of the machine
 setstyle(0.9,0.5,0.1);
-loadstl("staeubli_rx90/rx90_base.stl");
+loadgeometry("Staeubli RX90/rx90_base.stl");
 
 setstyle(0.5,0.5,0.5);
 
@@ -20,28 +20,28 @@ tableorigin(); -- sets the origin of the machine.
 
 -- Part 1
 addcomponent("Link1");
-loadstl("staeubli_rx90/rx90_joint1.stl");
+loadgeometry("Staeubli RX90/rx90_joint1.stl");
 setstyle(0.9,0.5,0.1);
 
 -- Part 2
 addcomponent("Link2");
-loadstl("staeubli_rx90/rx90_joint2.stl");
+loadgeometry("Staeubli RX90/rx90_joint2.stl");
 setstyle(0.9,0.5,0.1);
 
 -- Part 3
 addcomponent("Link3");
-loadstl("staeubli_rx90/rx90_joint3.stl");
+loadgeometry("Staeubli RX90/rx90_joint3.stl");
 setstyle(0.9,0.5,0.1);
 
 -- Part 4
 addcomponent("Link4");
-loadstl("staeubli_rx90/rx90_joint4.stl");
+loadgeometry("Staeubli RX90/rx90_joint4.stl");
 setstyle(0.9,0.5,0.1);
 
 -- Part 5
 addcomponent("Link5");
 setstyle(0.6,0.6,0.6);
-loadstl("staeubli_rx90/rx90_joint5.stl");
+loadgeometry("Staeubli RX90/rx90_joint5.stl");
 
 -- Part 6
 addcomponent("Head");
@@ -50,7 +50,7 @@ translate(0,0,1.644);
 rotate(90,0,90);
 
 setstyle(0.6,0.3,0.1);
-loadstl("staeubli_rx90/millinghead.stl");
+loadgeometry("Staeubli RX90/millinghead.stl");
 
 
 
@@ -67,13 +67,15 @@ function AssembleMachine()
 
 	-- Fancy robot function is to be done next.
 	-- [joint1,joint2,joint3,joint4,joint5,joint6] = RobotIK(AXIS_X,AXIS_Y,AXIS_Z,AXIS_A,AXIS_B,AXIS_C)
-	  
-     joint1 = 25;
-     joint2 = -20;
-     joint3 = 130;
-     joint4 = -20;
-     joint5 = -20;
-     joint6 = 20;
+
+	-- For testing the joints are mapped to
+        -- the CNC axes. 
+     joint1 = AXIS_X*180;
+     joint2 = AXIS_Y*180;
+     joint3 = AXIS_Z*180;
+     joint4 = AXIS_A;
+     joint5 = AXIS_B;
+     joint6 = AXIS_C;
      
 	identity();
 	rotate(0,0,joint1);

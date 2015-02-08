@@ -392,24 +392,23 @@ void TreeSetup::Update(void)
 	int workpieceNr;
 	for(n = 0; n < project->run.GetCount(); n++){
 		SetAtLevel(2, project->run[n].name, itemRun, n);
-		workpieceNr = project->run[n].workpieceNr;
-		if(workpieceNr >= 0)
-			SetAtLevel(3,
-					_("Workpiece: ")
-							+ project->workpieces[workpieceNr].name,
-					itemUnknown, workpieceNr);
-		else
-			SetAtLevel(3, wxString(_("Workpiece: ")) + _T("-"), itemUnknown,
-					-1);
 
 		if(project->run[n].machine.IsInitialized()){
 			SetAtLevel(3,
-					_("Machine: ")
-							+ project->run[n].machine.fileName.GetName(),
+			_("Machine: ") + project->run[n].machine.fileName.GetName(),
 					itemMachine, 0);
 		}else{
 			SetAtLevel(3, _("Machine: -"), itemMachine, 0);
 		}
+
+		workpieceNr = project->run[n].workpieceNr;
+		if(workpieceNr >= 0)
+			SetAtLevel(3,
+			_("Workpiece: ") + project->workpieces[workpieceNr].name,
+					itemUnknown, workpieceNr);
+		else
+			SetAtLevel(3, wxString(_("Workpiece: ")) + _T("-"), itemUnknown,
+					-1);
 
 	}
 

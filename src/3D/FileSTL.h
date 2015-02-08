@@ -52,10 +52,10 @@ public:
 	//Methods:
 public:
 	bool ReadFile(wxString fileName);
-	bool ReadStream(wxFFileInputStream * stream);
+	bool ReadStream(wxInputStream & stream);
 private:
-	bool ReadStreamBinary(wxFFileInputStream * stream, bool hasRead5Byte = false);
-	bool ReadStreamAscii(wxFFileInputStream * stream, bool hasRead5Byte = false);
+	bool ReadStreamBinary(wxInputStream & stream, bool hasRead5Byte = false);
+	bool ReadStreamAscii(wxInputStream & stream, bool hasRead5Byte = false);
 };
 
 #endif /* FILESTL_H_ */

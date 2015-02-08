@@ -129,10 +129,10 @@ void MachineComponent::InsertCone(AffineTransformMatrix matrix, float h,
 	}
 }
 
-bool MachineComponent::InsertSTL(AffineTransformMatrix matrix, wxFileName file)
+bool MachineComponent::InsertSTL(const AffineTransformMatrix &matrix,
+		wxFileName file)
 {
-	wxLogMessage(_T("@MachineComponent::InsertSTL: "+file.GetFullPath()));
-
+//	wxLogMessage(_T("@MachineComponent::InsertSTL: "+file.GetFullPath()));
 	FileSTL f;
 	f.color = geometry.colorNewObjects;
 	if(!f.ReadFile(file.GetFullPath())) return false;
@@ -141,8 +141,21 @@ bool MachineComponent::InsertSTL(AffineTransformMatrix matrix, wxFileName file)
 	return true;
 }
 
-bool MachineComponent::InsertDXF(AffineTransformMatrix matrix, wxFileName file,
-		wxString componentName)
+bool MachineComponent::InsertSTL(const AffineTransformMatrix &matrix,
+		wxInputStream &file)
+{
+	FileSTL f;
+	f.color = geometry.colorNewObjects;
+
+	if(!f.ReadStream(file)) return false;
+
+	f.geometry[0].ApplyTransformation(matrix);
+	geometry.InsertTrianglesFrom(f.geometry[0]);
+	return true;
+}
+
+bool MachineComponent::InsertDXF(const AffineTransformMatrix &matrix,
+		wxFileName file, wxString componentName)
 {
 	wxLogMessage(_T("@MachineComponent::InsertDXF: "+file.GetFullPath()));
 

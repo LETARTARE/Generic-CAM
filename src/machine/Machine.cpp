@@ -29,6 +29,9 @@
 #include <wx/log.h>
 #include <GL/gl.h>
 #include <wx/textfile.h>
+#include <wx/txtstrm.h>
+#include <wx/wfstream.h>
+#include <wx/zipstrm.h>
 
 Machine::Machine()
 {
@@ -174,22 +177,54 @@ void Machine::EvaluateDescription(void)
 
 bool Machine::ReLoad(void)
 {
-	if(!fileName.IsOk()) return false;
-	wxTextFile file(fileName.GetFullPath());
-	if(!file.Open(wxConvLocal)){
-		if(!file.Open(wxConvFile)){
+	if(!fileName.IsFileReadable()) return false;
+
+	bool flag = false;
+	if(fileName.GetExt().CmpNoCase(_T("lua")) == 0
+			|| fileName.GetExt().CmpNoCase(_T("txt")) == 0){
+		flag = true;
+		wxTextFile file(fileName.GetFullPath());
+		if(!file.Open(wxConvLocal) && !file.Open(wxConvFile)){
 			wxLogError(_T("Opening of the file failed!"));
 			return false;
 		}
+		wxString str;
+		machineDescription.Empty();
+		for(str = file.GetFirstLine(); !file.Eof(); str = file.GetNextLine()){
+			machineDescription += str + _T("\n");
+		}
 	}
-	wxString str;
-	machineDescription.Empty();
-	for(str = file.GetFirstLine(); !file.Eof(); str = file.GetNextLine()){
-		machineDescription += str + _T("\n");
+	if(fileName.GetExt().CmpNoCase(_T("zip")) == 0){
+//		wxLogMessage(fileName.GetFullPath());
+		wxFFileInputStream in(fileName.GetFullPath());
+		wxZipInputStream inzip(in);
+		wxZipEntry* entry;
+		while((entry = inzip.GetNextEntry())){
+			wxFileName temp(entry->GetName());
+			if(temp.GetExt().CmpNoCase(_T("lua")) == 0){
+				inzip.OpenEntry(*entry);
+				wxTextInputStream textin(inzip);
+				wxString str;
+				machineDescription.Empty();
+				while(inzip.CanRead()){
+					str = textin.ReadLine();
+					machineDescription += str + _T("\n");
+				}
+				inzip.CloseEntry();
+				flag = true;
+				break;
+			}
+		}
 	}
+
+	if(!flag){
+		wxLogError(_("File format for machine descriptions not supported."));
+		return false;
+	}
+
 	EvaluateDescription();
 	//wxLogMessage(machineDescription);
-	return true;
+	return IsInitialized();
 }
 
 bool Machine::Load(wxFileName const& fileName)
@@ -197,4 +232,86 @@ bool Machine::Load(wxFileName const& fileName)
 	if(!fileName.IsOk()) return false;
 	this->fileName = fileName;
 	return ReLoad();
+}
+
+bool Machine::LoadGeometryIntoComponent(const wxString& filename,
+		int componentNr, const AffineTransformMatrix& matrix)
+{
+	wxFileName machinedirectory(this->fileName);
+	machinedirectory.Normalize(
+			wxPATH_NORM_DOTS | wxPATH_NORM_ENV_VARS | wxPATH_NORM_TILDE);
+
+	wxFileName componentFile(filename);
+	wxArrayString path = componentFile.GetDirs();
+
+	// Case 0: The lua file is inside a zip, so is the rest of the data.
+	if(machinedirectory.GetExt().CmpNoCase(_T("zip")) == 0){
+		wxLogMessage(_T("Inside Zip file."));
+		return LoadGeometryIntoComponentFromZip(machinedirectory, filename,
+				componentNr, matrix);
+	}
+
+	// Case 1: Test if there is a zip file named like the lua file.
+	wxFileName zipFile(machinedirectory);
+	zipFile.SetExt(_T("zip"));
+	if(zipFile.IsFileReadable()){
+		wxLogMessage(_T("Zip file found."));
+		return LoadGeometryIntoComponentFromZip(zipFile, filename, componentNr,
+				matrix);
+	}
+
+	// Case 2: The componentfile point directly to a directory.
+	componentFile = machinedirectory.GetPathWithSep()
+			+ componentFile.GetFullPath();
+	if(componentFile.IsFileReadable()){
+		return components[componentNr].InsertSTL(matrix, componentFile);
+	}
+
+	// Case 3: Zip file with the name of the first part of the componentname.
+	if(path.GetCount() == 0) return false;
+	zipFile.SetName(path[0]);
+	zipFile.SetExt(_T("zip"));
+	zipFile.SetPath(machinedirectory.GetPath());
+	wxLogMessage(zipFile.GetFullPath());
+	if(zipFile.IsFileReadable()){
+		wxLogMessage(_T("Extra-Zip file found."));
+		return LoadGeometryIntoComponentFromZip(zipFile, filename, componentNr,
+				matrix);
+	}
+//	wxLogMessage(_T("componentFile:") + componentFile.GetPath());
+//	wxLogMessage(_T("machineDirectory:") + machinedirectory.GetPath());
+
+	textOut += filename;
+	textOut += _T("\nFile not found at all!\n");
+	return false;
+}
+
+bool Machine::LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
+		const wxString &filename, int componentNr,
+		const AffineTransformMatrix& matrix)
+{
+	wxFileName componentFile = filename;
+	wxFileName componentFile2 = componentFile;
+	if(componentFile2.GetDirCount() > 0) componentFile2.RemoveDir(0);
+
+	wxFFileInputStream in(zipFile.GetFullPath());
+	wxZipInputStream inzip(in);
+	wxZipEntry* entry;
+	while((entry = inzip.GetNextEntry())){
+		wxFileName temp(entry->GetName());
+		if(temp == componentFile || temp == componentFile2){
+			if(temp.GetExt().CmpNoCase(_T("stl")) == 0){
+				inzip.OpenEntry(*entry);
+				components[componentNr].InsertSTL(matrix, inzip);
+				inzip.CloseEntry();
+				return true;
+			}else{
+				wxLogMessage(
+						_T(
+								"Geometries other than STL are not supported (yet)."));
+			}
+			break;
+		}
+	}
+	return false;
 }

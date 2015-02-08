@@ -59,7 +59,7 @@ LUACodeEvaluator::LUACodeEvaluator()
 
 	lua_register(L, "placecomponent", placecomponent_glue);
 
-	lua_register(L, "loadstl", loadstl_glue);
+	lua_register(L, "loadgeometry", loadgeometry_glue);
 }
 
 LUACodeEvaluator::~LUACodeEvaluator()
@@ -431,18 +431,18 @@ int LUACodeEvaluator::placecomponent_glue(lua_State * L)
 	return 0;
 }
 
-int LUACodeEvaluator::loadstl_glue(lua_State * L)
+int LUACodeEvaluator::loadgeometry_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
 	wxASSERT(CC==NULL);
 	if(lua_gettop(L) != 1){
-		lua_pushstring(L, "loadstl: parameter mismatch");
+		lua_pushstring(L, "loadgeometry: parameter mismatch");
 		lua_error(L);
 		return 0;
 	}
 	// Generate a new part for the machine.
 	int n = lua_gettop(L); /* number of arguments */
-	if(n != 1) return luaL_error(L, "loadstl needs exactly one string");
+	if(n != 1) return luaL_error(L, "loadgeometry needs exactly one string");
 
 	lua_getglobal(L, "tostring");
 	const char *s;
@@ -453,23 +453,10 @@ int LUACodeEvaluator::loadstl_glue(lua_State * L)
 	if(s == NULL) return luaL_error(L,
 	LUA_QL("tostring") " must return a string to " LUA_QL("print"));
 
-	wxFileName machinedirectory(CC->linkedMachine->fileName);
-	wxFileName fileName(wxString::FromAscii(s));
-	machinedirectory.Normalize();
-	fileName.Normalize(
-			wxPATH_NORM_DOTS | wxPATH_NORM_ENV_VARS | wxPATH_NORM_TILDE);
-
-	fileName.SetPath(machinedirectory.GetPathWithSep() + fileName.GetPath());
-
-	wxLogMessage(_T("machineDirectory:") + machinedirectory.GetPath());
-	wxLogMessage(_T("fileNameDirectory:") + fileName.GetPath());
-
-	if(!fileName.IsOk()){
-		CC->programOutput += fileName.GetFullPath();
-		return luaL_error(L, "File does not exist!");
+	if(!CC->linkedMachine->LoadGeometryIntoComponent(wxString::FromAscii(s),
+			CC->componentToManipulate, CC->matrix)){
+		CC->programOutput += wxString::FromAscii(s) + _T("\n");
+		return luaL_error(L, "Cannot load geometry!");
 	}
-
-	CC->linkedMachine->components[CC->componentToManipulate].InsertSTL(
-			CC->matrix, fileName);
 	return 0;
 }

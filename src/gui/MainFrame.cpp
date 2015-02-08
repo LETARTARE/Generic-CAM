@@ -808,7 +808,7 @@ void MainFrame::OnMachineLoad(wxCommandEvent& event)
 
 	wxFileDialog dialog(this, _("Open machine description..."), _T(""), _T(""),
 			_(
-					"Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
+					"All machine descriptions  (*.lua;*.zip)|*.lua;*.zip|Machine descriptions (LUA Files)  (*.lua)|*.lua|Packed Machine descriptions  (*.zip)|*.zip|Text files  (*.txt)|*.txt|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if(wxDir::Exists(settings.lastMachineDirectory)){

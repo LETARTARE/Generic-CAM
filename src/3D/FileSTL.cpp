@@ -53,16 +53,16 @@ bool FileSTL::ReadFile(wxString fileName)
 		return false;
 	}
 
-	return ReadStream(&inStream);
+	return ReadStream(inStream);
 }
 
-bool FileSTL::ReadStream(wxFFileInputStream * stream)
+bool FileSTL::ReadStream(wxInputStream & stream)
 {
 	// Find the header of the STL file:
 	char header[6];
 	header[5] = 0;
 
-	if(stream->Read(header, 5).LastRead() != 5){
+	if(stream.Read(header, 5).LastRead() != 5){
 		error +=
 		_T("STL File ") + filename + _T(": File contains no header.\n");
 		return false;
@@ -81,10 +81,10 @@ bool FileSTL::ReadStream(wxFFileInputStream * stream)
 
 }
 
-bool FileSTL::ReadStreamBinary(wxFFileInputStream * stream, bool hasRead5Byte)
+bool FileSTL::ReadStreamBinary(wxInputStream & stream, bool hasRead5Byte)
 {
 //	wxString temp;
-	wxDataInputStream binaryStream(*stream);
+	wxDataInputStream binaryStream(stream);
 
 	unsigned char header[81];
 	header[80] = 0;
@@ -93,7 +93,7 @@ bool FileSTL::ReadStreamBinary(wxFFileInputStream * stream, bool hasRead5Byte)
 	}else{
 		binaryStream.Read8(header, 80);
 	}
-	if(stream->Eof()){
+	if(stream.Eof()){
 		error += _T(
 				"STL File ") + filename + _T(": File contains no header.\n");
 		return false;
@@ -112,7 +112,7 @@ bool FileSTL::ReadStreamBinary(wxFFileInputStream * stream, bool hasRead5Byte)
 	// Binary STL File
 	uint32_t nrOfTriangles = binaryStream.Read32();
 
-	if(stream->Eof()){
+	if(stream.Eof()){
 		error += _T("STL File ") + filename + _T(": File to short!");
 		return false;
 	}
@@ -129,13 +129,13 @@ bool FileSTL::ReadStreamBinary(wxFFileInputStream * stream, bool hasRead5Byte)
 	for(i = 0; i < nrOfTriangles; i++){
 		binaryStream.Read32((uint32_t *) &coord, 12);
 
-		if(stream->Eof()){
+		if(stream.Eof()){
 			error += _T("STL File ") + filename + _T(": File to short!");
 			return false;
 		}
 		attribute = binaryStream.Read16();
 
-		if(stream->Eof()){
+		if(stream.Eof()){
 			error += _T( "STL File ") + filename + _T(": File to short!");
 			return false;
 		}
@@ -183,10 +183,10 @@ bool FileSTL::ReadStreamBinary(wxFFileInputStream * stream, bool hasRead5Byte)
 	return true;
 }
 
-bool FileSTL::ReadStreamAscii(wxFFileInputStream * stream, bool hasRead5Byte)
+bool FileSTL::ReadStreamAscii(wxInputStream & stream, bool hasRead5Byte)
 {
 
-	wxTextInputStream textStream(*stream);
+	wxTextInputStream textStream(stream);
 	wxString word, line;
 
 	if(!hasRead5Byte)

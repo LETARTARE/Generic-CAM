@@ -56,8 +56,9 @@ public:
 	void InsertBox(AffineTransformMatrix matrix, float x, float y, float z);
 	void InsertCylinder(AffineTransformMatrix matrix, float h, float r);
 	void InsertCone(AffineTransformMatrix matrix, float h, float r1, float r2);
-	bool InsertSTL(AffineTransformMatrix matrix, wxFileName file);
-	bool InsertDXF(AffineTransformMatrix matrix, wxFileName file,
+	bool InsertSTL(const AffineTransformMatrix &matrix, wxFileName file);
+	bool InsertSTL(const AffineTransformMatrix &matrix, wxInputStream &file);
+	bool InsertDXF(const AffineTransformMatrix &matrix, wxFileName file,
 			wxString componentName);
 
 private:

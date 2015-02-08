@@ -114,7 +114,7 @@ void DialogMachineDebugger::OnMachineLoad(wxCommandEvent& event)
 {
 	wxFileDialog dialog(this, _("Open machine description..."), _T(""), _T(""),
 			_(
-					"Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
+					"All machine descriptions  (*.lua;*.zip)|*.lua;*.zip|Machine descriptions (LUA Files)  (*.lua)|*.lua|Packed Machine descriptions  (*.zip)|*.zip|Text files  (*.txt)|*.txt|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if(wxDir::Exists(settings->lastMachineDirectory)){
@@ -128,11 +128,9 @@ void DialogMachineDebugger::OnMachineLoad(wxCommandEvent& event)
 	if(dialog.ShowModal() == wxID_OK){
 		wxFileName file(dialog.GetPath());
 		machine.Load(file);
+		m_textCtrlScript->SetValue(machine.machineDescription);
+		m_textCtrlScript->SetModified(false);
 		machine.EvaluateDescription();
-		if(machine.IsInitialized()){
-			m_textCtrlScript->SetValue(machine.machineDescription);
-			m_textCtrlScript->SetModified(false);
-		}
 		TransferDataToWindow();
 	}
 }
