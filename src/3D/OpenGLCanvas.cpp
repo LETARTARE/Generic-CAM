@@ -291,7 +291,7 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	if(stereoMode != stereoOff){
 		::glRotatef(
 				atan(eyeDistance / 2 / (focalDistance - transmat.a[14] + 1.0))
-						* 180 / M_PI, 0, 1, 0);
+						* 180.0 / M_PI, 0, 1, 0);
 		::glTranslatef(eyeDistance / 2, 0, 0);
 	}
 
@@ -326,7 +326,7 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 
 		::glRotatef(
 				-atan(eyeDistance / 2 / (focalDistance - transmat.a[14] + 1.0))
-						* 180 / M_PI, 0, 1, 0);
+						* 180.0 / M_PI, 0, 1, 0);
 		::glTranslatef(-eyeDistance / 2, 0, 0);
 		::glTranslatef(0.0, 0.0, -1.0);
 		::glMultMatrixd(transmat.a);

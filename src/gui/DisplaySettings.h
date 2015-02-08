@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : DisplaySettings.h
 // Purpose            : 
-// Thread Safe        : No
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
@@ -49,6 +49,7 @@ public:
 	Unit Time;
 	Unit Distance;
 	Unit SmallDistance;
+	Unit Tolerance;
 	Unit LinearSpeed;
 	Unit RotationalSpeed;
 	Unit Angle;
@@ -79,11 +80,13 @@ protected:
 	wxArrayString unitsOfTime;
 	wxArrayString unitsOfSpeedLinear;
 	wxArrayString unitsOfSpeedRotational;
+	wxArrayString unitsOfAngle;
 
 	double * factorofLength;
 	double * factorofTime;
 	double * factorofSpeedLinear;
 	double * factorofSpeedRotational;
+	double * factorofAngle;
 
 };
 

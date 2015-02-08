@@ -516,7 +516,7 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	
 	m_menuSettings = new wxMenu();
 	wxMenuItem* m_menuItemSetupUnits;
-	m_menuItemSetupUnits = new wxMenuItem( m_menuSettings, ID_SETUPUNITS, wxString( _("Setup &Units") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemSetupUnits = new wxMenuItem( m_menuSettings, ID_SETUPUNITS, wxString( _("Setup &Units") ) + wxT('\t') + wxT("CTRL+U"), wxEmptyString, wxITEM_NORMAL );
 	m_menuSettings->Append( m_menuItemSetupUnits );
 	
 	m_menubar->Append( m_menuSettings, _("&Settings") );
@@ -831,9 +831,9 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	m_textCtrlRotateStep = new wxTextCtrl( m_panelRotate, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	bSizer40->Add( m_textCtrlRotateStep, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText77 = new wxStaticText( m_panelRotate, wxID_ANY, _("degree"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText77->Wrap( -1 );
-	bSizer40->Add( m_staticText77, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextUnitAngle = new wxStaticText( m_panelRotate, wxID_ANY, _("deg"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitAngle->Wrap( -1 );
+	bSizer40->Add( m_staticTextUnitAngle, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	sbSizer8->Add( bSizer40, 1, wxEXPAND, 5 );
 	
@@ -1018,7 +1018,7 @@ GUIStockMaterial::GUIStockMaterial( wxWindow* parent, wxWindowID id, const wxStr
 	
 	m_menuSettings = new wxMenu();
 	wxMenuItem* m_menuItem23;
-	m_menuItem23 = new wxMenuItem( m_menuSettings, ID_SETUPUNITS, wxString( _("Setup &Units") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItem23 = new wxMenuItem( m_menuSettings, ID_SETUPUNITS, wxString( _("Setup &Units") ) + wxT('\t') + wxT("CTRL+U"), wxEmptyString, wxITEM_NORMAL );
 	m_menuSettings->Append( m_menuItem23 );
 	
 	m_menubar->Append( m_menuSettings, _("S&ettings") );
@@ -1292,24 +1292,18 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	wxMenuItem* m_separator14;
 	m_separator14 = m_menuEdit->AppendSeparator();
 	
+	wxMenuItem* m_menuItemSetupUnits;
+	m_menuItemSetupUnits = new wxMenuItem( m_menuEdit, ID_SETUPUNITS, wxString( _("Setup &Units") ) + wxT('\t') + wxT("CTRL+U"), wxEmptyString, wxITEM_NORMAL );
+	m_menuEdit->Append( m_menuItemSetupUnits );
+	
+	wxMenuItem* m_separator16;
+	m_separator16 = m_menuEdit->AppendSeparator();
+	
 	wxMenuItem* m_menuItemClose;
 	m_menuItemClose = new wxMenuItem( m_menuEdit, wxID_CLOSE, wxString( _("&Close") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuEdit->Append( m_menuItemClose );
 	
 	m_menubar->Append( m_menuEdit, _("&Edit") );
-	
-	m_menuExtras = new wxMenu();
-	wxMenuItem* m_menuItemFlipDrill;
-	m_menuItemFlipDrill = new wxMenuItem( m_menuExtras, ID_EXTRAADDFLIPDRILLS, wxString( _("Add &Flipdrills") ) , wxEmptyString, wxITEM_NORMAL );
-	m_menuExtras->Append( m_menuItemFlipDrill );
-	m_menuItemFlipDrill->Enable( false );
-	
-	wxMenuItem* m_menuItemPockets;
-	m_menuItemPockets = new wxMenuItem( m_menuExtras, wxID_ANY, wxString( _("Add &Pocket") ) , wxEmptyString, wxITEM_NORMAL );
-	m_menuExtras->Append( m_menuItemPockets );
-	m_menuItemPockets->Enable( false );
-	
-	m_menubar->Append( m_menuExtras, _("Extras") );
 	
 	this->SetMenuBar( m_menubar );
 	
@@ -1477,7 +1471,6 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIPlacement::OnClose ) );
 	this->Connect( wxEVT_SIZE, wxSizeEventHandler( GUIPlacement::OnSize ) );
 	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIPlacement::OnClose ) );
-	this->Connect( m_menuItemFlipDrill->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIPlacement::OnExtraAdd ) );
 	m_choiceWorkpiece->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectWorkpiece ), NULL, this );
 	m_choicePlacement->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectObject ), NULL, this );
 	m_textCtrlX->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIPlacement::OnChangePosition ), NULL, this );
@@ -1503,7 +1496,6 @@ GUIPlacement::~GUIPlacement()
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIPlacement::OnClose ) );
 	this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( GUIPlacement::OnSize ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIPlacement::OnClose ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIPlacement::OnExtraAdd ) );
 	m_choiceWorkpiece->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectWorkpiece ), NULL, this );
 	m_choicePlacement->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectObject ), NULL, this );
 	m_textCtrlX->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIPlacement::OnChangePosition ), NULL, this );
@@ -1691,34 +1683,41 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
 	m_menubar = new wxMenuBar( 0 );
-	m_menuFile = new wxMenu();
+	m_menuMachine = new wxMenu();
 	wxMenuItem* m_menuItemLoad;
-	m_menuItemLoad = new wxMenuItem( m_menuFile, wxID_LOAD, wxString( _("&Load Machine Description") ) + wxT('\t') + wxT("CTRL+L"), wxEmptyString, wxITEM_NORMAL );
-	m_menuFile->Append( m_menuItemLoad );
+	m_menuItemLoad = new wxMenuItem( m_menuMachine, wxID_LOAD, wxString( _("&Load Machine Description") ) + wxT('\t') + wxT("CTRL+L"), wxEmptyString, wxITEM_NORMAL );
+	m_menuMachine->Append( m_menuItemLoad );
 	
 	wxMenuItem* m_menuItemSave;
-	m_menuItemSave = new wxMenuItem( m_menuFile, wxID_SAVE, wxString( _("&Save Machine Description") ) + wxT('\t') + wxT("CTRL+S"), wxEmptyString, wxITEM_NORMAL );
-	m_menuFile->Append( m_menuItemSave );
+	m_menuItemSave = new wxMenuItem( m_menuMachine, wxID_SAVE, wxString( _("&Save Machine Description") ) + wxT('\t') + wxT("CTRL+S"), wxEmptyString, wxITEM_NORMAL );
+	m_menuMachine->Append( m_menuItemSave );
 	
-	wxMenuItem* m_separator12;
-	m_separator12 = m_menuFile->AppendSeparator();
+	wxMenuItem* m_separator18;
+	m_separator18 = m_menuMachine->AppendSeparator();
 	
-	wxMenuItem* m_menuItemClose;
-	m_menuItemClose = new wxMenuItem( m_menuFile, wxID_CLOSE, wxString( _("Close Window") ) + wxT('\t') + wxT("CTRL+D"), wxEmptyString, wxITEM_NORMAL );
-	m_menuFile->Append( m_menuItemClose );
-	
-	m_menubar->Append( m_menuFile, _("&File") );
-	
-	m_menuMachine = new wxMenu();
-	wxMenuItem* m_menuItemMachineRestart;
-	m_menuItemMachineRestart = new wxMenuItem( m_menuMachine, wxID_ANY, wxString( _("&Evaluate Script") ) + wxT('\t') + wxT("CTRL+E"), wxEmptyString, wxITEM_NORMAL );
-	m_menuMachine->Append( m_menuItemMachineRestart );
+	wxMenuItem* m_menuItemMachineReevaluateScript;
+	m_menuItemMachineReevaluateScript = new wxMenuItem( m_menuMachine, wxID_ANY, wxString( _("&Evaluate Script") ) + wxT('\t') + wxT("CTRL+E"), wxEmptyString, wxITEM_NORMAL );
+	m_menuMachine->Append( m_menuItemMachineReevaluateScript );
 	
 	wxMenuItem* m_menuItemShowControl;
-	m_menuItemShowControl = new wxMenuItem( m_menuMachine, wxID_ANY, wxString( _("&Show Controller") ) + wxT('\t') + wxT("CTRL+C"), wxEmptyString, wxITEM_NORMAL );
+	m_menuItemShowControl = new wxMenuItem( m_menuMachine, wxID_ANY, wxString( _("&Show Controller") ) + wxT('\t') + wxT("CTRL+SHIFT+C"), wxEmptyString, wxITEM_NORMAL );
 	m_menuMachine->Append( m_menuItemShowControl );
 	
+	wxMenuItem* m_separator12;
+	m_separator12 = m_menuMachine->AppendSeparator();
+	
+	wxMenuItem* m_menuItemClose;
+	m_menuItemClose = new wxMenuItem( m_menuMachine, wxID_CLOSE, wxString( _("Close Window") ) + wxT('\t') + wxT("CTRL+D"), wxEmptyString, wxITEM_NORMAL );
+	m_menuMachine->Append( m_menuItemClose );
+	
 	m_menubar->Append( m_menuMachine, _("&Machine") );
+	
+	m_menuSettings = new wxMenu();
+	wxMenuItem* m_menuItemEnable3D;
+	m_menuItemEnable3D = new wxMenuItem( m_menuSettings, wxID_ANY, wxString( _("Enable &3D") ) + wxT('\t') + wxT("CTRL+3"), wxEmptyString, wxITEM_NORMAL );
+	m_menuSettings->Append( m_menuItemEnable3D );
+	
+	m_menubar->Append( m_menuSettings, _("&Settings") );
 	
 	this->SetMenuBar( m_menubar );
 	
@@ -1785,9 +1784,9 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineDebugger::OnClose ) );
 	this->Connect( m_menuItemLoad->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineLoad ) );
 	this->Connect( m_menuItemSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineSave ) );
-	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnClose ) );
-	this->Connect( m_menuItemMachineRestart->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ) );
+	this->Connect( m_menuItemMachineReevaluateScript->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ) );
 	this->Connect( m_menuItemShowControl->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnShowController ) );
+	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnClose ) );
 	m_buttonRestart->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ), NULL, this );
 }
 
@@ -1797,15 +1796,29 @@ GUIMachineDebugger::~GUIMachineDebugger()
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineDebugger::OnClose ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineLoad ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineSave ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnClose ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnShowController ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnClose ) );
 	m_buttonRestart->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ), NULL, this );
 }
 
 GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	m_menubar9 = new wxMenuBar( 0 );
+	m_menuDialog = new wxMenu();
+	wxMenuItem* m_menuItemSetupUnits;
+	m_menuItemSetupUnits = new wxMenuItem( m_menuDialog, ID_SETUPUNITS, wxString( _("Setup &Units") ) + wxT('\t') + wxT("CTRL+U"), wxEmptyString, wxITEM_NORMAL );
+	m_menuDialog->Append( m_menuItemSetupUnits );
+	
+	wxMenuItem* m_menuItemClose;
+	m_menuItemClose = new wxMenuItem( m_menuDialog, wxID_CLOSE, wxString( _("&Close") ) + wxT('\t') + wxT("CTRL+SHIFT+C"), wxEmptyString, wxITEM_NORMAL );
+	m_menuDialog->Append( m_menuItemClose );
+	
+	m_menubar9->Append( m_menuDialog, _("&Dialog") );
+	
+	this->SetMenuBar( m_menubar9 );
 	
 	wxBoxSizer* bSizer38;
 	bSizer38 = new wxBoxSizer( wxHORIZONTAL );
@@ -2079,6 +2092,7 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	
 	// Connect Events
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineControl::OnClose ) );
+	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineControl::OnClose ) );
 	m_sliderX->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( GUIMachineControl::OnZero ), NULL, this );
 	m_sliderX->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderX->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
@@ -2193,6 +2207,7 @@ GUIMachineControl::~GUIMachineControl()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineControl::OnClose ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineControl::OnClose ) );
 	m_sliderX->Disconnect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( GUIMachineControl::OnZero ), NULL, this );
 	m_sliderX->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
 	m_sliderX->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
@@ -2330,11 +2345,11 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	
 	m_menuSettings = new wxMenu();
 	wxMenuItem* m_menuItem21;
-	m_menuItem21 = new wxMenuItem( m_menuSettings, ID_SETUPUNITS, wxString( _("Setup &Units") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItem21 = new wxMenuItem( m_menuSettings, ID_SETUPUNITS, wxString( _("Setup &Units") ) + wxT('\t') + wxT("CTRL+U"), wxEmptyString, wxITEM_NORMAL );
 	m_menuSettings->Append( m_menuItem21 );
 	
 	wxMenuItem* m_menuItem22;
-	m_menuItem22 = new wxMenuItem( m_menuSettings, ID_VIEWSTEREO3D, wxString( _("&Stereo 3D") ) , wxEmptyString, wxITEM_CHECK );
+	m_menuItem22 = new wxMenuItem( m_menuSettings, ID_VIEWSTEREO3D, wxString( _("&Stereo 3D") ) + wxT('\t') + wxT("CTRL+3"), wxEmptyString, wxITEM_CHECK );
 	m_menuSettings->Append( m_menuItem22 );
 	
 	m_menubar->Append( m_menuSettings, _("&Settings") );
@@ -2847,7 +2862,7 @@ GUISetupUnits::GUISetupUnits( wxWindow* parent, wxWindowID id, const wxString& t
 	fgSizer6->SetFlexibleDirection( wxBOTH );
 	fgSizer6->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText57 = new wxStaticText( this, wxID_ANY, _("Length Units"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText57 = new wxStaticText( this, wxID_ANY, _("Length"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText57->Wrap( -1 );
 	fgSizer6->Add( m_staticText57, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	

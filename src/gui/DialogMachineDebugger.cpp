@@ -78,6 +78,7 @@ bool DialogMachineDebugger::TransferDataToWindow(void)
 		return false;
 	}
 	m_textCtrlOutput->SetValue(machine.textOut);
+	if(machineControl->IsShown()) machineControl->TransferDataToWindow();
 	this->Refresh();
 	return true;
 }

@@ -747,7 +747,7 @@
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">S&amp;ettings</property>
                     <property name="name">m_menuSettings</property>
                     <property name="permission">protected</property>
@@ -1672,7 +1672,7 @@
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">&amp;Settings</property>
                     <property name="name">m_menuSettings</property>
                     <property name="permission">protected</property>
@@ -1686,7 +1686,7 @@
                         <property name="label">Setup &amp;Units</property>
                         <property name="name">m_menuItemSetupUnits</property>
                         <property name="permission">none</property>
-                        <property name="shortcut"></property>
+                        <property name="shortcut">CTRL+U</property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">OnSetupUnits</event>
                         <event name="OnUpdateUI"></event>
@@ -2289,7 +2289,7 @@
                     <property name="border">5</property>
                     <property name="flag">wxALL|wxEXPAND</property>
                     <property name="proportion">1</property>
-                    <object class="wxNotebook" expanded="1">
+                    <object class="wxNotebook" expanded="0">
                         <property name="bg"></property>
                         <property name="bitmapsize"></property>
                         <property name="context_help"></property>
@@ -2343,7 +2343,7 @@
                             <property name="bitmap"></property>
                             <property name="label">Scale</property>
                             <property name="select">1</property>
-                            <object class="wxPanel" expanded="1">
+                            <object class="wxPanel" expanded="0">
                                 <property name="bg"></property>
                                 <property name="context_help"></property>
                                 <property name="enabled">1</property>
@@ -5319,10 +5319,10 @@
                                                             <property name="font"></property>
                                                             <property name="hidden">0</property>
                                                             <property name="id">wxID_ANY</property>
-                                                            <property name="label">degree</property>
+                                                            <property name="label">deg</property>
                                                             <property name="maximum_size"></property>
                                                             <property name="minimum_size"></property>
-                                                            <property name="name">m_staticText77</property>
+                                                            <property name="name">m_staticTextUnitAngle</property>
                                                             <property name="permission">protected</property>
                                                             <property name="pos"></property>
                                                             <property name="size"></property>
@@ -6198,7 +6198,7 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize">OnSize</event>
             <event name="OnUpdateUI"></event>
-            <object class="wxMenuBar" expanded="0">
+            <object class="wxMenuBar" expanded="1">
                 <property name="bg"></property>
                 <property name="context_help"></property>
                 <property name="enabled">1</property>
@@ -6314,7 +6314,7 @@
                         <property name="label">Setup &amp;Units</property>
                         <property name="name">m_menuItem23</property>
                         <property name="permission">none</property>
-                        <property name="shortcut"></property>
+                        <property name="shortcut">CTRL+U</property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection"></event>
                         <event name="OnUpdateUI"></event>
@@ -8117,7 +8117,7 @@
                 </object>
             </object>
         </object>
-        <object class="Frame" expanded="1">
+        <object class="Frame" expanded="0">
             <property name="bg"></property>
             <property name="center"></property>
             <property name="context_help"></property>
@@ -8173,7 +8173,7 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize">OnSize</event>
             <event name="OnUpdateUI"></event>
-            <object class="wxMenuBar" expanded="0">
+            <object class="wxMenuBar" expanded="1">
                 <property name="bg"></property>
                 <property name="context_help"></property>
                 <property name="enabled">1</property>
@@ -8221,7 +8221,7 @@
                 <event name="OnSetFocus"></event>
                 <event name="OnSize"></event>
                 <event name="OnUpdateUI"></event>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">&amp;Edit</property>
                     <property name="name">m_menuEdit</property>
                     <property name="permission">protected</property>
@@ -8264,6 +8264,25 @@
                         <property name="checked">0</property>
                         <property name="enabled">1</property>
                         <property name="help"></property>
+                        <property name="id">ID_SETUPUNITS</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">Setup &amp;Units</property>
+                        <property name="name">m_menuItemSetupUnits</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut">CTRL+U</property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection"></event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="separator" expanded="1">
+                        <property name="name">m_separator16</property>
+                        <property name="permission">none</property>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
                         <property name="id">wxID_CLOSE</property>
                         <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">&amp;Close</property>
@@ -8272,41 +8291,6 @@
                         <property name="shortcut"></property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">OnClose</event>
-                        <event name="OnUpdateUI"></event>
-                    </object>
-                </object>
-                <object class="wxMenu" expanded="0">
-                    <property name="label">Extras</property>
-                    <property name="name">m_menuExtras</property>
-                    <property name="permission">protected</property>
-                    <object class="wxMenuItem" expanded="1">
-                        <property name="bitmap"></property>
-                        <property name="checked">0</property>
-                        <property name="enabled">0</property>
-                        <property name="help"></property>
-                        <property name="id">ID_EXTRAADDFLIPDRILLS</property>
-                        <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">Add &amp;Flipdrills</property>
-                        <property name="name">m_menuItemFlipDrill</property>
-                        <property name="permission">none</property>
-                        <property name="shortcut"></property>
-                        <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection">OnExtraAdd</event>
-                        <event name="OnUpdateUI"></event>
-                    </object>
-                    <object class="wxMenuItem" expanded="1">
-                        <property name="bitmap"></property>
-                        <property name="checked">0</property>
-                        <property name="enabled">0</property>
-                        <property name="help"></property>
-                        <property name="id">wxID_ANY</property>
-                        <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">Add &amp;Pocket</property>
-                        <property name="name">m_menuItemPockets</property>
-                        <property name="permission">none</property>
-                        <property name="shortcut"></property>
-                        <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection"></event>
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
@@ -11287,8 +11271,8 @@
                 <event name="OnSize"></event>
                 <event name="OnUpdateUI"></event>
                 <object class="wxMenu" expanded="1">
-                    <property name="label">&amp;File</property>
-                    <property name="name">m_menuFile</property>
+                    <property name="label">&amp;Machine</property>
+                    <property name="name">m_menuMachine</property>
                     <property name="permission">protected</property>
                     <object class="wxMenuItem" expanded="1">
                         <property name="bitmap"></property>
@@ -11321,6 +11305,40 @@
                         <event name="OnUpdateUI"></event>
                     </object>
                     <object class="separator" expanded="1">
+                        <property name="name">m_separator18</property>
+                        <property name="permission">none</property>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">wxID_ANY</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">&amp;Evaluate Script</property>
+                        <property name="name">m_menuItemMachineReevaluateScript</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut">CTRL+E</property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">OnScriptEvaluate</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">wxID_ANY</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">&amp;Show Controller</property>
+                        <property name="name">m_menuItemShowControl</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut">CTRL+SHIFT+C</property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">OnShowController</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="separator" expanded="1">
                         <property name="name">m_separator12</property>
                         <property name="permission">none</property>
                     </object>
@@ -11341,8 +11359,8 @@
                     </object>
                 </object>
                 <object class="wxMenu" expanded="1">
-                    <property name="label">&amp;Machine</property>
-                    <property name="name">m_menuMachine</property>
+                    <property name="label">&amp;Settings</property>
+                    <property name="name">m_menuSettings</property>
                     <property name="permission">protected</property>
                     <object class="wxMenuItem" expanded="1">
                         <property name="bitmap"></property>
@@ -11351,27 +11369,12 @@
                         <property name="help"></property>
                         <property name="id">wxID_ANY</property>
                         <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">&amp;Evaluate Script</property>
-                        <property name="name">m_menuItemMachineRestart</property>
+                        <property name="label">Enable &amp;3D</property>
+                        <property name="name">m_menuItemEnable3D</property>
                         <property name="permission">none</property>
-                        <property name="shortcut">CTRL+E</property>
+                        <property name="shortcut">CTRL+3</property>
                         <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection">OnScriptEvaluate</event>
-                        <event name="OnUpdateUI"></event>
-                    </object>
-                    <object class="wxMenuItem" expanded="1">
-                        <property name="bitmap"></property>
-                        <property name="checked">0</property>
-                        <property name="enabled">1</property>
-                        <property name="help"></property>
-                        <property name="id">wxID_ANY</property>
-                        <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">&amp;Show Controller</property>
-                        <property name="name">m_menuItemShowControl</property>
-                        <property name="permission">none</property>
-                        <property name="shortcut">CTRL+C</property>
-                        <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection">OnShowController</event>
+                        <event name="OnMenuSelection"></event>
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
@@ -12063,7 +12066,91 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxBoxSizer" expanded="0">
+            <object class="wxMenuBar" expanded="1">
+                <property name="bg"></property>
+                <property name="context_help"></property>
+                <property name="enabled">1</property>
+                <property name="fg"></property>
+                <property name="font"></property>
+                <property name="hidden">0</property>
+                <property name="id">wxID_ANY</property>
+                <property name="label">MyMenuBar</property>
+                <property name="maximum_size"></property>
+                <property name="minimum_size"></property>
+                <property name="name">m_menubar9</property>
+                <property name="permission">protected</property>
+                <property name="pos"></property>
+                <property name="size"></property>
+                <property name="style"></property>
+                <property name="subclass"></property>
+                <property name="tooltip"></property>
+                <property name="validator_data_type"></property>
+                <property name="validator_style">wxFILTER_NONE</property>
+                <property name="validator_type">wxDefaultValidator</property>
+                <property name="validator_variable"></property>
+                <property name="window_extra_style"></property>
+                <property name="window_name"></property>
+                <property name="window_style"></property>
+                <event name="OnChar"></event>
+                <event name="OnEnterWindow"></event>
+                <event name="OnEraseBackground"></event>
+                <event name="OnKeyDown"></event>
+                <event name="OnKeyUp"></event>
+                <event name="OnKillFocus"></event>
+                <event name="OnLeaveWindow"></event>
+                <event name="OnLeftDClick"></event>
+                <event name="OnLeftDown"></event>
+                <event name="OnLeftUp"></event>
+                <event name="OnMiddleDClick"></event>
+                <event name="OnMiddleDown"></event>
+                <event name="OnMiddleUp"></event>
+                <event name="OnMotion"></event>
+                <event name="OnMouseEvents"></event>
+                <event name="OnMouseWheel"></event>
+                <event name="OnPaint"></event>
+                <event name="OnRightDClick"></event>
+                <event name="OnRightDown"></event>
+                <event name="OnRightUp"></event>
+                <event name="OnSetFocus"></event>
+                <event name="OnSize"></event>
+                <event name="OnUpdateUI"></event>
+                <object class="wxMenu" expanded="1">
+                    <property name="label">&amp;Dialog</property>
+                    <property name="name">m_menuDialog</property>
+                    <property name="permission">protected</property>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">ID_SETUPUNITS</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">Setup &amp;Units</property>
+                        <property name="name">m_menuItemSetupUnits</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut">CTRL+U</property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection"></event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">wxID_CLOSE</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">&amp;Close</property>
+                        <property name="name">m_menuItemClose</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut">CTRL+SHIFT+C</property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">OnClose</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                </object>
+            </object>
+            <object class="wxBoxSizer" expanded="1">
                 <property name="minimum_size"></property>
                 <property name="name">bSizer38</property>
                 <property name="orient">wxHORIZONTAL</property>
@@ -15122,7 +15209,7 @@
                 <event name="OnSetFocus"></event>
                 <event name="OnSize"></event>
                 <event name="OnUpdateUI"></event>
-                <object class="wxMenu" expanded="1">
+                <object class="wxMenu" expanded="0">
                     <property name="label">&amp;Tools</property>
                     <property name="name">m_menuTools</property>
                     <property name="permission">protected</property>
@@ -15190,7 +15277,7 @@
                         <property name="label">Setup &amp;Units</property>
                         <property name="name">m_menuItem21</property>
                         <property name="permission">none</property>
-                        <property name="shortcut"></property>
+                        <property name="shortcut">CTRL+U</property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection"></event>
                         <event name="OnUpdateUI"></event>
@@ -15205,7 +15292,7 @@
                         <property name="label">&amp;Stereo 3D</property>
                         <property name="name">m_menuItem22</property>
                         <property name="permission">none</property>
-                        <property name="shortcut"></property>
+                        <property name="shortcut">CTRL+3</property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">OnChangeStereo3D</event>
                         <event name="OnUpdateUI"></event>
@@ -19694,7 +19781,7 @@
                 </object>
             </object>
         </object>
-        <object class="Frame" expanded="0">
+        <object class="Frame" expanded="1">
             <property name="bg">wxSYS_COLOUR_BACKGROUND</property>
             <property name="center"></property>
             <property name="context_help"></property>
@@ -19795,7 +19882,7 @@
                                         <property name="font"></property>
                                         <property name="hidden">0</property>
                                         <property name="id">wxID_ANY</property>
-                                        <property name="label">Length Units</property>
+                                        <property name="label">Length</property>
                                         <property name="maximum_size"></property>
                                         <property name="minimum_size"></property>
                                         <property name="name">m_staticText57</property>

@@ -39,7 +39,7 @@ DialogMachineControl::DialogMachineControl(wxWindow* parent,
 	U = V = W = 0.0;
 
 	groupXYZLimit = 1.0;
-	groupABCLimit = 180.0;
+	groupABCLimit = M_PI;
 	groupUVWLimit = 1.0;
 
 	sliderSteps = 201;
@@ -48,6 +48,11 @@ DialogMachineControl::DialogMachineControl(wxWindow* parent,
 }
 
 void DialogMachineControl::OnClose(wxCloseEvent& event)
+{
+	TransferDataFromWindow();
+	this->Show(false);
+}
+void DialogMachineControl::OnClose(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
 	this->Show(false);

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : DisplaySettings.cpp
 // Purpose            : 
-// Thread Safe        : No
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
@@ -30,12 +30,13 @@
 
 DisplaySettings::DisplaySettings()
 {
-	Time.Setup(_T("s"), _T("min"), (double) 60);
 	Distance.Setup(_T("m"), _T("cm"), (double) 10e-3);
-	SmallDistance.Setup(_T("m"), _T("mm"), (double) 1e-3);
-	RotationalSpeed.Setup(_T("1/s"), _T("1/min"), (double) 1 / 60);
 	LinearSpeed.Setup(_T("m/s"), _T("cm/min"), (double) 10e-3 / 60);
-	Angle.Setup(_T("deg"), _T("deg"), (double) 1.0);
+	RotationalSpeed.Setup(_T("1/s"), _T("1/min"), (double) 1 / 60);
+	Time.Setup(_T("s"), _T("min"), (double) 60);
+	SmallDistance.Setup(_T("m"), _T("mm"), (double) 1e-3);
+	Tolerance.Setup(_T("m"), _T("um"), (double) 1e-6);
+	Angle.Setup(_T("rad"), _T("deg"), (double) M_PI / 180.0);
 
 	// Setup available units
 	factorofLength = new double[7];
@@ -98,6 +99,14 @@ DisplaySettings::DisplaySettings()
 	unitsOfTime.Add(_T("d"));
 	factorofTime[3] = 86400; // s
 
+	factorofAngle = new double[3];
+	unitsOfAngle.Add(_T("rad"));
+	factorofAngle[0] = 1.0; // rad
+	unitsOfAngle.Add(_T("deg"));
+	factorofAngle[1] = M_PI / 180.0; // rad
+	unitsOfAngle.Add(_T("gon"));
+	factorofAngle[2] = M_PI / 200.0; // rad
+
 	eyeDistance = 0.1;
 	focalDistance = 1.0;
 	backgroundGrayLevel = 90;
@@ -123,30 +132,64 @@ bool DisplaySettings::GetConfigFrom(wxConfig * config)
 	if(config == NULL) return false;
 
 	wxString cwd = wxFileName::GetCwd();
-
 	config->Read(_T("LastProjectDirectory"), &lastProjectDirectory, cwd);
 	config->Read(_T("LastObjectDirectory"), &lastObjectDirectory, cwd);
 	config->Read(_T("LastMachineDirectory"), &lastMachineDirectory, cwd);
 	config->Read(_T("LastStockDirectory"), &lastStockDirectory, cwd);
 	config->Read(_T("LastToolboxDirectory"), &lastToolboxDirectory, cwd);
 
-	long lval;
+	wxString temp;
+	int i;
 
-	config->Read(_T("Stereo3DColorLeftEyeRed"), &lval, 180l);
+	config->Read(_T("UnitDistance"), &temp, _T("cm"));
+	i = unitsOfLength.Index(temp);
+	if(i != wxNOT_FOUND) Distance.Setup(_T("m"), unitsOfLength[i],
+			factorofLength[i]);
+
+	config->Read(_T("UnitLinearSpeed"), &temp, _T("cm/min"));
+	i = unitsOfSpeedLinear.Index(temp);
+	if(i != wxNOT_FOUND) LinearSpeed.Setup(_T("m/s"), unitsOfSpeedLinear[i],
+			factorofSpeedLinear[i]);
+
+	config->Read(_T("UnitRotationalSpeed"), &temp, _T("1/min"));
+	i = unitsOfSpeedRotational.Index(temp);
+	if(i != wxNOT_FOUND) RotationalSpeed.Setup(_T("1/s"),
+			unitsOfSpeedRotational[i], factorofSpeedRotational[i]);
+
+	config->Read(_T("UnitTime"), &temp, _T("min"));
+	i = unitsOfTime.Index(temp);
+	if(i != wxNOT_FOUND) Time.Setup(_T("s"), unitsOfTime[i], factorofTime[i]);
+
+	config->Read(_T("UnitSmallDistance"), &temp, _T("cm"));
+	i = unitsOfLength.Index(temp);
+	if(i != wxNOT_FOUND) SmallDistance.Setup(_T("m"), unitsOfLength[i],
+			factorofLength[i]);
+
+	config->Read(_T("UnitTolerance"), &temp, _T("um"));
+	i = unitsOfLength.Index(temp);
+	if(i != wxNOT_FOUND) Tolerance.Setup(_T("m"), unitsOfLength[i],
+			factorofLength[i]);
+
+	config->Read(_T("UnitAngle"), &temp, _T("deg"));
+	i = unitsOfAngle.Index(temp);
+	if(i != wxNOT_FOUND) Angle.Setup(_T("rad"), unitsOfAngle[i],
+			factorofAngle[i]);
+
+	long lval;
+	config->Read(_T("Stereo3DColorLeftEyeRed"), &lval, 140l);
 	leftEyeR = lval;
-	config->Read(_T("Stereo3DColorLeftEyeGreen"), &lval, 0);
+	config->Read(_T("Stereo3DColorLeftEyeGreen"), &lval, 0l);
 	leftEyeG = lval;
-	config->Read(_T("Stereo3DColorLeftEyeBlue"), &lval, 0);
+	config->Read(_T("Stereo3DColorLeftEyeBlue"), &lval, 0l);
 	leftEyeB = lval;
-	config->Read(_T("Stereo3DColorRightEyeRed"), &lval, 0);
+	config->Read(_T("Stereo3DColorRightEyeRed"), &lval, 0l);
 	rightEyeR = lval;
-	config->Read(_T("Stereo3DColorRightEyeGreen"), &lval, 100);
+	config->Read(_T("Stereo3DColorRightEyeGreen"), &lval, 70l);
 	rightEyeG = lval;
-	config->Read(_T("Stereo3DColorRightEyeBlue"), &lval, 100);
+	config->Read(_T("Stereo3DColorRightEyeBlue"), &lval, 90l);
 	rightEyeB = lval;
 
 	double dval;
-
 	config->Read(_T("Stereo3DEyeDistance"), &dval, 0.1);
 	eyeDistance = dval;
 	config->Read(_T("Stereo3DFocalDistance"), &dval, 0.0);
@@ -159,6 +202,14 @@ bool DisplaySettings::WriteConfigTo(wxConfig * config)
 {
 	wxASSERT(config!=NULL);
 	if(config == NULL) return false;
+
+	config->Write(_T("UnitDistance"), Distance.GetOtherName());
+	config->Write(_T("UnitLinearSpeed"), LinearSpeed.GetOtherName());
+	config->Write(_T("UnitRotationalSpeed"), RotationalSpeed.GetOtherName());
+	config->Write(_T("UnitTime"), Time.GetOtherName());
+	config->Write(_T("UnitSmallDistance"), SmallDistance.GetOtherName());
+	config->Write(_T("UnitTolerance"), Tolerance.GetOtherName());
+	config->Write(_T("UnitAngle"), Angle.GetOtherName());
 
 	config->Write(_T("LastProjectDirectory"), lastProjectDirectory);
 	config->Write(_T("LastObjectDirectory"), lastObjectDirectory);

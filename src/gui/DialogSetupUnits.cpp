@@ -58,7 +58,7 @@ bool DialogSetupUnits::TransferDataToWindow(void)
 	m_choiceUnitSpeedLinear->Append(settings->unitsOfSpeedLinear);
 	i = m_choiceUnitSpeedLinear->FindString(
 			settings->LinearSpeed.GetOtherName());
-	if(i == wxNOT_FOUND) i = 3;
+	if(i == wxNOT_FOUND) i = 4;
 	m_choiceUnitSpeedLinear->SetSelection(i);
 
 	m_choiceUnitSpeedRotational->Clear();
@@ -73,6 +73,25 @@ bool DialogSetupUnits::TransferDataToWindow(void)
 	i = m_choiceUnitTime->FindString(settings->Time.GetOtherName());
 	if(i == wxNOT_FOUND) i = 0;
 	m_choiceUnitTime->SetSelection(i);
+
+	m_choiceUnitSmallDistance->Clear();
+	m_choiceUnitSmallDistance->Append(settings->unitsOfLength);
+	i = m_choiceUnitSmallDistance->FindString(
+			settings->SmallDistance.GetOtherName());
+	if(i == wxNOT_FOUND) i = 6;
+	m_choiceUnitSmallDistance->SetSelection(i);
+
+	m_choiceUnitTolerance->Clear();
+	m_choiceUnitTolerance->Append(settings->unitsOfLength);
+	i = m_choiceUnitTolerance->FindString(settings->Tolerance.GetOtherName());
+	if(i == wxNOT_FOUND) i = 6;
+	m_choiceUnitTolerance->SetSelection(i);
+
+	m_choiceUnitAngle->Clear();
+	m_choiceUnitAngle->Append(settings->unitsOfAngle);
+	i = m_choiceUnitAngle->FindString(settings->Angle.GetOtherName());
+	if(i == wxNOT_FOUND) i = 0;
+	m_choiceUnitAngle->SetSelection(i);
 
 	return true;
 }
@@ -94,8 +113,20 @@ bool DialogSetupUnits::TransferDataFromWindow(void)
 			settings->factorofSpeedRotational[i]);
 
 	i = m_choiceUnitTime->GetSelection();
-	settings->Time.Setup(_T("m"), settings->unitsOfTime[i],
+	settings->Time.Setup(_T("s"), settings->unitsOfTime[i],
 			settings->factorofTime[i]);
+
+	i = m_choiceUnitSmallDistance->GetSelection();
+	settings->SmallDistance.Setup(_T("m"), settings->unitsOfLength[i],
+			settings->factorofLength[i]);
+
+	i = m_choiceUnitTolerance->GetSelection();
+	settings->Tolerance.Setup(_T("m"), settings->unitsOfLength[i],
+			settings->factorofLength[i]);
+
+	i = m_choiceUnitAngle->GetSelection();
+	settings->Angle.Setup(_T("rad"), settings->unitsOfAngle[i],
+			settings->factorofAngle[i]);
 
 	return true;
 }

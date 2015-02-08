@@ -113,55 +113,54 @@
 #define ID_FLIPX 1059
 #define ID_FLIPY 1060
 #define ID_FLIPZ 1061
-#define ID_EXTRAADDFLIPDRILLS 1062
-#define ID_POSX 1063
-#define ID_POSY 1064
-#define ID_POSZ 1065
-#define ID_ANGLE 1066
-#define ID_FORMBOX 1067
-#define ID_FORMCONTOUR 1068
-#define ID_WORKPIECEROTATEX 1069
-#define ID_WORKPIECEROTATEY 1070
-#define ID_WORKPIECEROTATEZ 1071
-#define wxID_LOAD 1072
-#define ID_AXISX 1073
-#define ID_AXISY 1074
-#define ID_AXISZ 1075
-#define ID_TEXTX 1076
-#define ID_TEXTY 1077
-#define ID_TEXTZ 1078
-#define ID_AXISA 1079
-#define ID_AXISB 1080
-#define ID_AXISC 1081
-#define ID_TEXTA 1082
-#define ID_TEXTB 1083
-#define ID_TEXTC 1084
-#define ID_AXISU 1085
-#define ID_AXISV 1086
-#define ID_AXISW 1087
-#define ID_TEXTU 1088
-#define ID_TEXTV 1089
-#define ID_TEXTW 1090
-#define ID_BUTTONCONNECT 1091
-#define ID_BUTTONDISCONNECT 1092
-#define ID_COLORLR 1093
-#define ID_COLORLG 1094
-#define ID_COLORLB 1095
-#define ID_COLORRR 1096
-#define ID_COLORRG 1097
-#define ID_COLORRB 1098
-#define ID_COLORLEFT 1099
-#define ID_COLORRIGHT 1100
-#define ID_TEXTLR 1101
-#define ID_TEXTLG 1102
-#define ID_TEXTLB 1103
-#define ID_EYEDISTANCE 1104
-#define ID_TEXTEYEDISTANCE 1105
-#define ID_FOCALDISTANCE 1106
-#define ID_TEXTFOCALDISTANCE 1107
-#define ID_TEXTRR 1108
-#define ID_TEXTRG 1109
-#define ID_TEXTRB 1110
+#define ID_POSX 1062
+#define ID_POSY 1063
+#define ID_POSZ 1064
+#define ID_ANGLE 1065
+#define ID_FORMBOX 1066
+#define ID_FORMCONTOUR 1067
+#define ID_WORKPIECEROTATEX 1068
+#define ID_WORKPIECEROTATEY 1069
+#define ID_WORKPIECEROTATEZ 1070
+#define wxID_LOAD 1071
+#define ID_AXISX 1072
+#define ID_AXISY 1073
+#define ID_AXISZ 1074
+#define ID_TEXTX 1075
+#define ID_TEXTY 1076
+#define ID_TEXTZ 1077
+#define ID_AXISA 1078
+#define ID_AXISB 1079
+#define ID_AXISC 1080
+#define ID_TEXTA 1081
+#define ID_TEXTB 1082
+#define ID_TEXTC 1083
+#define ID_AXISU 1084
+#define ID_AXISV 1085
+#define ID_AXISW 1086
+#define ID_TEXTU 1087
+#define ID_TEXTV 1088
+#define ID_TEXTW 1089
+#define ID_BUTTONCONNECT 1090
+#define ID_BUTTONDISCONNECT 1091
+#define ID_COLORLR 1092
+#define ID_COLORLG 1093
+#define ID_COLORLB 1094
+#define ID_COLORRR 1095
+#define ID_COLORRG 1096
+#define ID_COLORRB 1097
+#define ID_COLORLEFT 1098
+#define ID_COLORRIGHT 1099
+#define ID_TEXTLR 1100
+#define ID_TEXTLG 1101
+#define ID_TEXTLB 1102
+#define ID_EYEDISTANCE 1103
+#define ID_TEXTEYEDISTANCE 1104
+#define ID_FOCALDISTANCE 1105
+#define ID_TEXTFOCALDISTANCE 1106
+#define ID_TEXTRR 1107
+#define ID_TEXTRG 1108
+#define ID_TEXTRB 1109
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIMainFrame
@@ -339,7 +338,7 @@ class GUIObjectTransformation : public wxFrame
 		
 		wxStaticText* m_staticText76;
 		wxTextCtrl* m_textCtrlRotateStep;
-		wxStaticText* m_staticText77;
+		wxStaticText* m_staticTextUnitAngle;
 		wxButton* m_button32;
 		wxButton* m_button33;
 		wxButton* m_button28;
@@ -470,7 +469,6 @@ class GUIPlacement : public wxFrame
 	protected:
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuEdit;
-		wxMenu* m_menuExtras;
 		wxChoice* m_choiceWorkpiece;
 		wxChoice* m_choicePlacement;
 		
@@ -511,7 +509,6 @@ class GUIPlacement : public wxFrame
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
 		virtual void OnSize( wxSizeEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnExtraAdd( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSelectWorkpiece( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSelectObject( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnChangePosition( wxCommandEvent& event ) { event.Skip(); }
@@ -581,8 +578,8 @@ class GUIMachineDebugger : public wxFrame
 	
 	protected:
 		wxMenuBar* m_menubar;
-		wxMenu* m_menuFile;
 		wxMenu* m_menuMachine;
+		wxMenu* m_menuSettings;
 		wxSplitterWindow* m_splitter2;
 		wxPanel* m_panel;
 		wxSplitterWindow* m_splitter3;
@@ -599,9 +596,9 @@ class GUIMachineDebugger : public wxFrame
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
 		virtual void OnMachineLoad( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnMachineSave( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnScriptEvaluate( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnShowController( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -631,6 +628,8 @@ class GUIMachineControl : public wxFrame
 	private:
 	
 	protected:
+		wxMenuBar* m_menubar9;
+		wxMenu* m_menuDialog;
 		
 		wxStaticText* m_staticText69;
 		wxSlider* m_sliderX;
@@ -681,6 +680,7 @@ class GUIMachineControl : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnZero( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnScroll( wxScrollEvent& event ) { event.Skip(); }
 		virtual void OnTrack( wxScrollEvent& event ) { event.Skip(); }

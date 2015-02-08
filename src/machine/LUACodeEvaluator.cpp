@@ -145,9 +145,10 @@ bool LUACodeEvaluator::EvaluateAssembly()
 	InsertVariable(_T("AXIS_X"), linkedMachine->position.axisX);
 	InsertVariable(_T("AXIS_Y"), linkedMachine->position.axisY);
 	InsertVariable(_T("AXIS_Z"), linkedMachine->position.axisZ);
-	InsertVariable(_T("AXIS_A"), linkedMachine->position.axisA);
-	InsertVariable(_T("AXIS_B"), linkedMachine->position.axisB);
-	InsertVariable(_T("AXIS_C"), linkedMachine->position.axisC);
+	// The rotational axes are in degrees.
+	InsertVariable(_T("AXIS_A"), linkedMachine->position.axisA * 180.0 / M_PI);
+	InsertVariable(_T("AXIS_B"), linkedMachine->position.axisB * 180.0 / M_PI);
+	InsertVariable(_T("AXIS_C"), linkedMachine->position.axisC * 180.0 / M_PI);
 	InsertVariable(_T("AXIS_U"), linkedMachine->position.axisU);
 	InsertVariable(_T("AXIS_V"), linkedMachine->position.axisV);
 	InsertVariable(_T("AXIS_W"), linkedMachine->position.axisW);

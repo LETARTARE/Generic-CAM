@@ -79,11 +79,10 @@ bool DialogPlacement::TransferDataToWindow(void)
 						project->workpieces[wpNr].placements[plNr].matrix.tz));
 		m_textCtrlAngle->SetValue(
 				settings->Angle.TextFromSI(
-						project->workpieces[wpNr].placements[plNr].matrix.rz
-								* 180.0 / M_PI));
+						project->workpieces[wpNr].placements[plNr].matrix.rz));
 		m_sliderAngle->SetValue(
-				(int) round(project->workpieces[wpNr].placements[plNr].matrix.rz
-						* 180.0 / M_PI));
+				(int) round(
+						project->workpieces[wpNr].placements[plNr].matrix.rz*180.0/M_PI));
 		m_textCtrlDistance->SetValue(
 				settings->Distance.TextFromSI(
 						project->workpieces[wpNr].placements[plNr].slotWidth));
@@ -223,7 +222,7 @@ void DialogPlacement::OnChangePosition(wxCommandEvent& event)
 		break;
 	case ID_ANGLE:
 		d = settings->Angle.SIFromString(m_textCtrlAngle->GetValue());
-		temp.rz = d * M_PI / 180.0;
+		temp.rz = d;
 		temp.PutMatrixTogether();
 		description = _("Rotate around Z: ")
 				+ settings->Angle.TextFromSIWithUnit(d, 2);
@@ -254,7 +253,7 @@ void DialogPlacement::OnChangeSlider(wxScrollEvent& event)
 	wxString description;
 	float d;
 	d = (float) m_sliderAngle->GetValue();
-	temp.rz = d * M_PI / 180.0;
+	temp.rz = d *M_PI/180.0;
 	temp.PutMatrixTogether();
 	description = _("Rotate around Z: ")
 			+ settings->Angle.TextFromSIWithUnit(d, 2);

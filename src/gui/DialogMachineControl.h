@@ -68,6 +68,7 @@ private:
 protected:
 	
 	void OnClose(wxCloseEvent& event);
+	void OnClose(wxCommandEvent& event);
 	void OnScroll(wxScrollEvent& event);
 	void OnZero(wxMouseEvent& event);
 	void OnTrack(wxScrollEvent& event);

@@ -49,7 +49,7 @@ DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent,
 	scaleUnitY = 1;
 	scaleUnitZ = 1;
 	moveStep = 0.05;
-	rotateStep = 90;
+	rotateStep = M_PI_2;
 
 	c = 0;
 }
@@ -89,17 +89,14 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 
 	if(selection >= 0){
 		m_textCtrlSizeX->SetValue(
-				wxString::Format(_T("%.3f"),
-						settings->Distance.FromSI(
-								project->objects[selection].bbox.GetSizeX())));
+				settings->Distance.TextFromSI(
+						project->objects[selection].bbox.GetSizeX(), 3));
 		m_textCtrlSizeY->SetValue(
-				wxString::Format(_T("%.3f"),
-						settings->Distance.FromSI(
-								project->objects[selection].bbox.GetSizeY())));
+				settings->Distance.TextFromSI(
+						project->objects[selection].bbox.GetSizeY(), 3));
 		m_textCtrlSizeZ->SetValue(
-				wxString::Format(_T("%.3f"),
-						settings->Distance.FromSI(
-								project->objects[selection].bbox.GetSizeZ())));
+				settings->Distance.TextFromSI(
+						project->objects[selection].bbox.GetSizeZ(), 3));
 	}else{
 		m_textCtrlSizeX->SetValue(_T("---"));
 		m_textCtrlSizeY->SetValue(_T("---"));
@@ -113,16 +110,14 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 	m_staticTextUnitY2->SetLabel(settings->Distance.GetOtherName());
 	m_staticTextUnitZ2->SetLabel(settings->Distance.GetOtherName());
 	m_staticTextUnitMove->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitAngle->SetLabel(settings->Angle.GetOtherName());
 
 	m_textCtrlScaleUnitX->SetValue(
-			wxString::Format(_T("%.3f"),
-					settings->Distance.FromSI(scaleUnitX)));
+			settings->Distance.TextFromSI(scaleUnitX, 3));
 	m_textCtrlScaleUnitY->SetValue(
-			wxString::Format(_T("%.3f"),
-					settings->Distance.FromSI(scaleUnitY)));
+			settings->Distance.TextFromSI(scaleUnitY, 3));
 	m_textCtrlScaleUnitZ->SetValue(
-			wxString::Format(_T("%.3f"),
-					settings->Distance.FromSI(scaleUnitZ)));
+			settings->Distance.TextFromSI(scaleUnitZ, 3));
 
 	m_textCtrlScalePercent->SetValue(
 			wxString::Format(_T("%.1f"), scalePercent * 100));
@@ -133,9 +128,8 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 	m_textCtrlScalePercentZ->SetValue(
 			wxString::Format(_T("%.1f"), scalePercentZ * 100));
 
-	m_textCtrlMoveStep->SetValue(
-			wxString::Format(_T("%.3f"), settings->Distance.FromSI(moveStep)));
-	m_textCtrlRotateStep->SetValue(wxString::Format(_T("%.1f"), rotateStep));
+	m_textCtrlMoveStep->SetValue(settings->Distance.TextFromSI(moveStep, 3));
+	m_textCtrlRotateStep->SetValue(settings->Angle.TextFromSI(rotateStep, 2));
 
 	m_checkBoxScaleProportionally->SetValue(scaleProportional);
 
@@ -159,12 +153,13 @@ bool DialogObjectTransformation::TransferDataFromWindow(void)
 	m_textCtrlMoveStep->GetValue().ToDouble(&moveStep);
 	m_textCtrlRotateStep->GetValue().ToDouble(&rotateStep);
 
-	scaleProportional = m_checkBoxScaleProportionally->GetValue();
-
-	moveStep = settings->Distance.ToSI(moveStep);
 	scaleUnitX = settings->Distance.ToSI(scaleUnitX);
 	scaleUnitY = settings->Distance.ToSI(scaleUnitY);
 	scaleUnitZ = settings->Distance.ToSI(scaleUnitZ);
+	moveStep = settings->Distance.ToSI(moveStep);
+	rotateStep = settings->Angle.ToSI(rotateStep);
+
+	scaleProportional = m_checkBoxScaleProportionally->GetValue();
 
 	scalePercent /= 100;
 	scalePercentX /= 100;
@@ -354,43 +349,43 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around X by %.0f degree"),
 							rotateStep);
-			newMatrix = AffineTransformMatrix::RotateXYZ(rotateStep * M_PI / 180,
-							0, 0)*newMatrix;
+			newMatrix = AffineTransformMatrix::RotateXYZ(rotateStep, 0, 0)
+					* newMatrix;
 			break;
 		case ID_ROTATEXN:
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around X by %.0f degree"),
 							-rotateStep);
-			newMatrix = AffineTransformMatrix::RotateXYZ(-rotateStep * M_PI / 180,
-							0, 0)*newMatrix;
+			newMatrix = AffineTransformMatrix::RotateXYZ(-rotateStep, 0, 0)
+					* newMatrix;
 			break;
 		case ID_ROTATEYP:
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around Y by %.0f degree"),
 							rotateStep);
-			newMatrix = AffineTransformMatrix::RotateXYZ(0,
-					rotateStep * M_PI / 180, 0) * newMatrix;
+			newMatrix = AffineTransformMatrix::RotateXYZ(0, rotateStep, 0)
+					* newMatrix;
 			break;
 		case ID_ROTATEYN:
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around Y by %.0f degree"),
 							-rotateStep);
-			newMatrix = AffineTransformMatrix::RotateXYZ(0,
-					-rotateStep * M_PI / 180, 0) * newMatrix;
+			newMatrix = AffineTransformMatrix::RotateXYZ(0, -rotateStep, 0)
+					* newMatrix;
 			break;
 		case ID_ROTATEZP:
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around Z by %.0f degree"),
 							rotateStep);
-			newMatrix = AffineTransformMatrix::RotateXYZ(0, 0,
-					rotateStep * M_PI / 180) * newMatrix;
+			newMatrix = AffineTransformMatrix::RotateXYZ(0, 0, rotateStep)
+					* newMatrix;
 			break;
 		case ID_ROTATEZN:
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around Z by %.0f degree"),
 							-rotateStep);
-			newMatrix = AffineTransformMatrix::RotateXYZ(0, 0,
-					-rotateStep * M_PI / 180) * newMatrix;
+			newMatrix = AffineTransformMatrix::RotateXYZ(0, 0, -rotateStep)
+					* newMatrix;
 			break;
 		}
 
