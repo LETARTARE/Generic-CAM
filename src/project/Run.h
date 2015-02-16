@@ -33,8 +33,6 @@
 #include "StockMaterial.h"
 #include "Workpiece.h"
 #include "ToolPath.h"
-#include "../generator/TPGeneratorFast.h"
-#include "../generator/TPGeneratorTest.h"
 
 #include <wx/string.h>
 #include <wx/textfile.h>
@@ -66,9 +64,7 @@ public:
 	Toolbox toolbox;
 	int selectedTool;
 
-	ToolPath toolPath;
-
-	TPGeneratorFast ToolPathGenerator; // TODO: A generator? Here?
+	ArrayOfToolPath toolpaths;
 
 	// Methods
 public:

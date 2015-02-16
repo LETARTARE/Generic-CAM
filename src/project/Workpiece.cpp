@@ -68,6 +68,10 @@ void Workpiece::Paint(const ArrayOfObject &objects) const
 		::glMultMatrixd(tempMatrix.a);
 		objects[objNr].Paint();
 		::glPopMatrix();
+		placements[j].outline.matrix.a[12] = x;
+		placements[j].outline.matrix.a[13] = y;
+		placements[j].outline.matrix.a[14] = 0;
+		placements[j].outline.Paint();
 	}
 
 	if(glIsEnabled(GL_COLOR_MATERIAL)){

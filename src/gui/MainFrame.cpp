@@ -39,7 +39,7 @@
 #include "../command/CommandObjectRename.h"
 #include "../command/CommandObjectTransform.h"
 #include "../command/CommandWorkpieceRename.h"
-#include "../command/CommandWorkpieceRemove.h"
+#include "../command/CommandWorkpieceDelete.h"
 #include "../command/CommandRunAdd.h"
 #include "../command/CommandRunRename.h"
 #include "../command/CommandRunRemove.h"
@@ -91,10 +91,10 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 
 	m_canvas->SetController(control);
 
-	this->Connect(ID_REFRESHTREE, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(MainFrame::UpdateTreeSelection));
 	this->Connect(ID_UPDATE, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::Update));
+	this->Connect(ID_REFRESHTREE, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(MainFrame::UpdateTree));
 	this->Connect(ID_REFRESHDISPLAY, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::UpdateCanvas));
 
@@ -118,6 +118,8 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	dialogSetupStereo3D = new DialogSetupStereo3D(this, &settings);
 	dialogToolbox = new DialogToolbox(this, &project, &commandProcessor,
 			&settings);
+	dialogToolpathGenerator = new DialogToolpathGenerator(this, &project,
+			&commandProcessor, &settings);
 	dialogAnimation = new DialogAnimation(this, &project);
 
 	// Connect the project to the 3D canvas
@@ -141,7 +143,7 @@ MainFrame::~MainFrame()
 	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(MainFrame::OnTimer), NULL,
 			this);
 	this->Disconnect(ID_REFRESHTREE, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(MainFrame::UpdateTreeSelection));
+			wxCommandEventHandler(MainFrame::UpdateTree));
 	this->Disconnect(ID_UPDATE, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(MainFrame::Update));
 	this->Disconnect(ID_REFRESHDISPLAY, wxEVT_COMMAND_MENU_SELECTED,
@@ -181,6 +183,7 @@ bool MainFrame::TransferDataToWindow(void)
 	dialogWorkpiece->TransferDataToWindow();
 	dialogPlacement->TransferDataToWindow();
 	dialogRun->TransferDataToWindow();
+	dialogToolpathGenerator->TransferDataToWindow();
 	dialogSetupStereo3D->TransferDataToWindow();
 
 	Refresh();
@@ -200,6 +203,12 @@ bool MainFrame::TransferDataFromWindow(void)
 void MainFrame::Update(wxCommandEvent& event)
 {
 	TransferDataToWindow();
+}
+
+void MainFrame::UpdateTree(wxCommandEvent& event)
+{
+	tree->UpdateSelection();
+	m_tree->Refresh();
 }
 
 void MainFrame::UpdateCanvas(wxCommandEvent& event)
@@ -423,8 +432,16 @@ void MainFrame::OnActivateRightClickMenu(wxTreeEvent& event)
 		menu.Append(ID_RUNEDIT, wxT("&Setup Run"));
 	}
 
+	if(data->dataType == itemMachine){
+		menu.Append(ID_MACHINELOAD, wxT("Load &Machine"));
+		menu.Append(ID_GENERATORADD, wxT("Add &Generator"));
+		menu.AppendSeparator();
+		menu.Append(ID_MACHINERELOAD, wxT("&Reload Machine"));
+	}
+
 	if(data->dataType == itemRun){
 		menu.Append(ID_RUNEDIT, wxT("&Setup Run"));
+		menu.Append(ID_GENERATORADD, wxT("Add &Generator"));
 		menu.AppendSeparator();
 		menu.Append(ID_RUNADD, wxT("&Add Run"));
 		menu.Append(ID_RUNDELETE, wxT("&Delete Run"));
@@ -464,12 +481,6 @@ void MainFrame::OnActivate(wxTreeEvent& event)
 		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, ID_RUNEDIT);
 		ProcessEvent(menuEvent);
 	}
-}
-
-void MainFrame::UpdateTreeSelection(wxCommandEvent& event)
-{
-	tree->UpdateSelection();
-	Refresh();
 }
 
 void MainFrame::OnSelectionChanged(wxTreeEvent& event)
@@ -747,7 +758,7 @@ void MainFrame::OnWorkpieceDelete(wxCommandEvent& event)
 	for(i = project.workpieces.GetCount(); i > 0; i--){
 		if(project.workpieces[i - 1].selected){
 			commandProcessor.Submit(
-					new CommandWorkpieceRemove(
+					new CommandWorkpieceDelete(
 							_("Remove workpiece ")
 									+ project.workpieces[i - 1].name, &project,
 							i - 1));
@@ -763,7 +774,7 @@ void MainFrame::OnWorkpieceDeleteUnused(wxCommandEvent& event)
 	for(i = project.workpieces.GetCount(); i > 0; i--){
 		if(project.workpieces[i - 1].placements.GetCount() == 0){
 			commandProcessor.Submit(
-					new CommandWorkpieceRemove(
+					new CommandWorkpieceDelete(
 							_("Remove workpiece ")
 									+ project.workpieces[i - 1].name, &project,
 							i - 1));
@@ -892,6 +903,13 @@ void MainFrame::OnToolboxSave(wxCommandEvent &event)
 			TransferDataToWindow();
 		}
 	}
+}
+
+void MainFrame::OnGeneratorAdd(wxCommandEvent& event)
+{
+	dialogToolpathGenerator->Show();
+	dialogToolpathGenerator->Raise();
+	TransferDataToWindow();
 }
 
 void MainFrame::OnAddGenerator(wxCommandEvent& event)

@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunSetWorkpiece.cpp
-// Purpose            : 
-// Thread Safe        : No
+// Name               : GeneratorDexel.cpp
+// Purpose            : Base class for Dexel based generators
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 21.01.2015
+// Created            : 11.02.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,27 +24,16 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandRunSetWorkpiece.h"
+#include "GeneratorDexel.h"
 
-CommandRunSetWorkpiece::CommandRunSetWorkpiece(const wxString& name,
-		Project* project, int runNr, int workpieceNr) :
-		wxCommand(true, name)
+GeneratorDexel::GeneratorDexel()
 {
-	this->project = project;
-	this->runNr = runNr;
-	this->newWorkpieceNr = workpieceNr;
-	this->oldWorkpieceNr = -1;
+}
+GeneratorDexel::~GeneratorDexel()
+{
+}
+void GeneratorDexel::CopyFrom(const Generator * other)
+{
+	Generator::CopyFrom(other);
 }
 
-bool CommandRunSetWorkpiece::Do(void)
-{
-	this->oldWorkpieceNr = project->run[runNr].workpieceNr;
-	project->run[runNr].workpieceNr = this->newWorkpieceNr;
-	return true;
-}
-
-bool CommandRunSetWorkpiece::Undo(void)
-{
-	project->run[runNr].workpieceNr = this->oldWorkpieceNr;
-	return true;
-}

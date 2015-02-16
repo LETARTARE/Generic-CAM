@@ -33,6 +33,8 @@
 #ifndef TOOLPATH_H_
 #define TOOLPATH_H_
 
+#include "../generator/Generator.h"
+
 #include "../3D/AffineTransformMatrix.h"
 #include "../machine/MachinePosition.h"
 #include "../3D/AffineTransformMatrix.h"
@@ -49,6 +51,9 @@ public:
 
 	// Member variables
 public:
+	bool selected;
+	Generator * generator;
+
 	AffineTransformMatrix matrix;
 
 	ArrayOfMachinePosition positions;
@@ -56,8 +61,7 @@ public:
 	Vector3 colorMoving;
 	Vector3 colorCutting;
 
-MachinePosition minPosition,maxPosition;
-
+	MachinePosition minPosition, maxPosition;
 
 	// Methods
 public:
@@ -73,7 +77,6 @@ public:
 	void WriteToFile(wxTextFile &f);
 	void CalculateMinMaxValues(void);
 };
-WX_DECLARE_OBJARRAY(ToolPath, ArrayOfToolPath)
-;
+WX_DECLARE_OBJARRAY(ToolPath, ArrayOfToolPath);
 
 #endif /* TOOLPATH_H_ */

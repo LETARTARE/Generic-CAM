@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunLoadMachine.h
+// Name               : GeneratorLoadFromFile.h
 // Purpose            : 
-// Thread Safe        : No
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 21.01.2015
+// Created            : 09.02.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,25 +24,40 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDRUNLOADMACHINE_H_
-#define COMMANDRUNLOADMACHINE_H_
+#ifndef GENERATORLOADFROMFILE_H_
+#define GENERATORLOADFROMFILE_H_
 
-#include <wx/cmdproc.h>
+/*!\class GeneratorLoadFromFile
+ * \brief ...
+ *
+ * ...
+ */
 
-#include "../project/Project.h"
+#include "Generator.h"
 
-class CommandRunLoadMachine:public wxCommand {
+#include <wx/filepicker.h>
+#include <wx/panel.h>
+#include <wx/radiobox.h>
+#include <wx/stattext.h>
+#include <wx/string.h>
+
+class GeneratorLoadFromFile:public Generator {
 public:
-	CommandRunLoadMachine(const wxString& name, Project * project, int runNr,
-			const wxString& fileName);
+	GeneratorLoadFromFile();
+	virtual void CopyFrom(const Generator * other);
+	virtual ~GeneratorLoadFromFile();
 
-	bool Do(void);
-	bool Undo(void);
+	virtual wxString GetName(void) const;
+	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
+	virtual void TransferDataToPanel(void) const;
+	virtual void TransferDataFromPanel(void);
+	virtual wxString ToString(void) const;
+	virtual void FromString(const wxString & text);
+	virtual void GenerateToolpath(void);
 
-protected:
-	Project * project;
-	int runNr;
-	wxString fileName;
+private:
+	wxStaticText* m_staticTextLoadFile;
+	wxFilePickerCtrl* m_filePicker;
 };
 
-#endif /* COMMANDRUNLOADMACHINE_H_ */
+#endif /* GENERATORLOADFROMFILE_H_ */

@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceAdd.cpp
-// Purpose            : Create a new workpiece from stock material
-// Thread Safe        : No
+// Name               : CommandRunGeneratorDelete.h
+// Purpose            : 
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 16.01.2015
+// Created            : 15.02.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,29 +24,36 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandWorkpieceAdd.h"
+#ifndef COMMANDRUNDELETEGENERATOR_H_
+#define COMMANDRUNDELETEGENERATOR_H_
+#include <wx/cmdproc.h>
+#include <wx/string.h>
 
-CommandWorkpieceAdd::CommandWorkpieceAdd(const wxString& name, Project* project,
-		StockMaterial stock) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->stock = stock;
-}
+#include "../generator/Generator.h"
 
-CommandWorkpieceAdd::~CommandWorkpieceAdd()
-{
-}
+#include "../project/Project.h"
 
-bool CommandWorkpieceAdd::Do(void)
-{
-	Workpiece temp(stock);
-	project->workpieces.Add(temp);
-	return true;
-}
+/*!\class CommandRunGeneratorDelete
+ * \brief ...
+ *
+ * ...
+ */
 
-bool CommandWorkpieceAdd::Undo(void)
-{
-	project->workpieces.RemoveAt(project->workpieces.GetCount() - 1);
-	return true;
-}
+class CommandRunGeneratorDelete:public wxCommand {
+public:
+	CommandRunGeneratorDelete(const wxString& name, Project * project,
+			size_t runNr, size_t position);
+	virtual ~CommandRunGeneratorDelete(void);
+
+	bool Do(void);
+	bool Undo(void);
+
+protected:
+	Project * project;
+	int runNr;
+	size_t position;
+
+	Generator * oldGenerator;
+};
+
+#endif /* COMMANDRUNDELETEGENERATOR_H_ */

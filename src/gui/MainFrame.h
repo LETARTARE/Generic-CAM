@@ -59,6 +59,8 @@
 #include <wx/log.h>
 #include <wx/cmdproc.h>
 
+#include "DialogToolpathGenerator.h"
+
 class MainFrame:public GUIMainFrame {
 	// Constructor/ Destructor
 public:
@@ -89,6 +91,7 @@ private:
 	DialogRun * dialogRun;
 	DialogMachineDebugger * dialogDebugger;
 	DialogToolbox * dialogToolbox;
+	DialogToolpathGenerator * dialogToolpathGenerator;
 	DialogAnimation * dialogAnimation;
 	DialogSetupStereo3D * dialogSetupStereo3D;
 
@@ -102,7 +105,7 @@ private:
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 
-	void UpdateTreeSelection(wxCommandEvent& event);
+	void UpdateTree(wxCommandEvent& event);
 	void Update(wxCommandEvent& event);
 	void UpdateCanvas(wxCommandEvent& event);
 
@@ -138,6 +141,7 @@ private:
 	void OnToolboxEdit(wxCommandEvent& event);
 	void OnToolboxLoad(wxCommandEvent& event);
 	void OnToolboxSave(wxCommandEvent& event);
+	void OnGeneratorAdd(wxCommandEvent& event);
 	void OnGenerateToolpath(wxCommandEvent& event);
 	void OnRecollectToolpath(wxCommandEvent& event);
 	void OnCleanToolpath(wxCommandEvent& event);

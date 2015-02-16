@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunRemoveTool.cpp
-// Purpose            : 
+// Name               : CommandWorkpieceDelete.cpp
+// Purpose            : Delete a workpiece
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 21.01.2015
+// Created            : 17.01.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,44 +24,37 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandRunRemoveTool.h"
+#include "CommandWorkpieceDelete.h"
 
-CommandRunRemoveTool::CommandRunRemoveTool(const wxString& name,
-		Project* project, int runNr, int slotNr) :
+CommandWorkpieceDelete::CommandWorkpieceDelete(const wxString& name,
+		Project* project, int workpieceNr) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->runNr = runNr;
-	this->slotNr = slotNr;
-	this->oldTool = NULL;
-	this->position = 0;
+	this->workpieceNr = workpieceNr;
+	this->workpiece = NULL;
 }
 
-CommandRunRemoveTool::~CommandRunRemoveTool(void)
+CommandWorkpieceDelete::~CommandWorkpieceDelete()
 {
-	if(oldTool != NULL) delete oldTool;
+	if(workpiece != NULL) delete workpiece;
 }
 
-bool CommandRunRemoveTool::Do(void)
+bool CommandWorkpieceDelete::Do(void)
 {
-	size_t N = project->run[runNr].toolbox.tools.GetCount();
-	for(position = 0; position < N; position++){
-		if(project->run[runNr].toolbox.tools[position].slot == this->slotNr) break;
-	}
-	if(position == N) return false;
-	oldTool = project->run[runNr].toolbox.tools.Detach(position);
+	workpiece = project->workpieces.Detach(workpieceNr);
 	return true;
 }
 
-bool CommandRunRemoveTool::Undo(void)
+bool CommandWorkpieceDelete::Undo(void)
 {
-	if(position >= project->run[runNr].toolbox.tools.GetCount()){
-		project->run[runNr].toolbox.tools.Add(oldTool);
+	if(workpieceNr >= project->workpieces.GetCount()){
+		project->workpieces.Add(workpiece);
 	}else{
-		project->run[runNr].toolbox.tools.Insert(oldTool, runNr);
+		project->workpieces.Insert(workpiece, workpieceNr);
 	}
-	// If the the tool was inserted back into the project,
-	// this function must not delete the tool in the destructor.
-	oldTool = NULL;
+	// If the the workpiece was inserted back into the project,
+	// this function must not delete the workpiece in the destructor.
+	workpiece = NULL;
 	return true;
 }

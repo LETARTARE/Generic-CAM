@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceAdd.cpp
-// Purpose            : Create a new workpiece from stock material
-// Thread Safe        : No
+// Name               : CommandRunGeneratorUpdate.cpp
+// Purpose            : 
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 16.01.2015
+// Created            : 15.02.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,29 +24,39 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandWorkpieceAdd.h"
+#include "CommandRunGeneratorUpdate.h"
 
-CommandWorkpieceAdd::CommandWorkpieceAdd(const wxString& name, Project* project,
-		StockMaterial stock) :
+CommandRunGeneratorUpdate::CommandRunGeneratorUpdate(const wxString& name,
+		Project* project, size_t runNr, size_t position, Generator* generator) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->stock = stock;
+	this->runNr = runNr;
+	this->position = position;
+	this->newGenerator = generator;
+	this->oldGenerator = NULL;
 }
 
-CommandWorkpieceAdd::~CommandWorkpieceAdd()
+CommandRunGeneratorUpdate::~CommandRunGeneratorUpdate(void)
 {
+	if(newGenerator != NULL) delete newGenerator;
+	if(oldGenerator != NULL) delete oldGenerator;
 }
 
-bool CommandWorkpieceAdd::Do(void)
+bool CommandRunGeneratorUpdate::Do(void)
 {
-	Workpiece temp(stock);
-	project->workpieces.Add(temp);
+	oldGenerator = project->run[runNr].toolpaths[position].generator;
+	project->run[runNr].toolpaths[position].generator = newGenerator;
+	newGenerator = NULL;
+	project->run[runNr].toolpaths[position].Clear();
 	return true;
 }
 
-bool CommandWorkpieceAdd::Undo(void)
+bool CommandRunGeneratorUpdate::Undo(void)
 {
-	project->workpieces.RemoveAt(project->workpieces.GetCount() - 1);
+	newGenerator = project->run[runNr].toolpaths[position].generator;
+	project->run[runNr].toolpaths[position].generator = oldGenerator;
+	oldGenerator = NULL;
+	project->run[runNr].toolpaths[position].Clear();
 	return true;
 }

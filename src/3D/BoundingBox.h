@@ -41,6 +41,7 @@ class BoundingBox {
 	// Constructor / Destructor
 public:
 	BoundingBox();
+	BoundingBox(float x1, float y1, float z1, float x2, float y2, float z2);
 	virtual ~BoundingBox();
 
 	// Member variables
@@ -55,7 +56,7 @@ public:
 	// Methods
 public:
 
-	void Reset(void);
+	void Clear(void);
 	void Insert(const Geometry &geometry, const AffineTransformMatrix &matrix);
 	void Insert(const Surface &surface);
 	void Insert(const BoundingBox &bbox);

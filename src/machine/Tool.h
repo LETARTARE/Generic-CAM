@@ -27,6 +27,20 @@
 #ifndef TOOL_H_
 #define TOOL_H_
 
+/*!\class Tool
+ * \brief Definition of a tool
+ *
+ *
+ *  Various Stuff:
+ *
+ *	SFM = Surface Feet per Minute = edge speed of the tool
+ *	450 - 650 for HSS cutters
+ *
+ *
+ *
+ */
+
+
 #include "ToolElement.h"
 
 #include "../3D/Vector3.h"
@@ -49,6 +63,9 @@ public:
 	double maxSpeed;
 	double feedCoefficient;
 	unsigned int nrOfTeeth;
+
+
+
 	wxString comment;
 	ArrayOfToolElement elements;
 	ArrayOfToolContourElement contour;

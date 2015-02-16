@@ -136,8 +136,8 @@ bool MachineComponent::InsertSTL(const AffineTransformMatrix &matrix,
 	FileSTL f;
 	f.color = geometry.colorNewObjects;
 	if(!f.ReadFile(file.GetFullPath())) return false;
-	f.geometry[0].ApplyTransformation(matrix);
 	geometry.InsertTrianglesFrom(f.geometry[0]);
+	geometry.matrix *= matrix;
 	return true;
 }
 
@@ -149,8 +149,9 @@ bool MachineComponent::InsertSTL(const AffineTransformMatrix &matrix,
 
 	if(!f.ReadStream(file)) return false;
 
-	f.geometry[0].ApplyTransformation(matrix);
+//	f.geometry[0].ApplyTransformation(matrix);
 	geometry.InsertTrianglesFrom(f.geometry[0]);
+	geometry.matrix *= matrix;
 	return true;
 }
 

@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandRunLoadMachine.cpp
-// Purpose            : 
-// Thread Safe        : No
+// Name               : Generator.cpp
+// Purpose            : Abstract class for toolpath generators
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 21.01.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 22.08.2011
+// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,25 +24,28 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandRunLoadMachine.h"
+#include "Generator.h"
 
-CommandRunLoadMachine::CommandRunLoadMachine(const wxString& name,
-		Project* project, int runNr, const wxString& fileName) :
-		wxCommand(true, name)
+Generator::Generator()
 {
-	this->project = project;
-	this->runNr = runNr;
-	this->fileName = fileName;
+	marginBelow = 0.0;
+	marginSide = 0.0;
+
+	settings = NULL;
 }
 
-bool CommandRunLoadMachine::Do(void)
+void Generator::CopyFrom(const Generator * other)
 {
-	return project->run[runNr].machine.Load(wxFileName(fileName));
+	this->box = other->box;
+	this->marginBelow = other->marginBelow;
+	this->marginSide = other->marginSide;
 }
 
-bool CommandRunLoadMachine::Undo(void)
+Generator::~Generator()
 {
-	// TODO: Implement Machine::Clear();
-	project->run[runNr].machine.ClearComponents();
-	return true;
+}
+
+void Generator::AddToPanel(wxPanel* panel, DisplaySettings* settings)
+{
+	this->settings = settings;
 }

@@ -27,6 +27,7 @@
 #include "Run.h"
 
 #include <float.h>
+#include <GL/gl.h>
 #include <wx/log.h>
 #include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfRun)
@@ -144,7 +145,7 @@ bool Run::FromXml(wxXmlNode* node)
 
 void Run::WriteToFile(wxTextFile &f)
 {
-	toolPath.WriteToFile(f);
+//	toolPath.WriteToFile(f);
 }
 
 void Run::SortTargets(void)

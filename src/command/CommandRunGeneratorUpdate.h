@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceRemove.h
+// Name               : CommandRunGeneratorUpdate.h
 // Purpose            : 
-// Thread Safe        : No
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 17.01.2015
+// Created            : 15.02.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,27 +24,42 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDWORKPIECEREMOVE_H_
-#define COMMANDWORKPIECEREMOVE_H_
+#ifndef COMMANDRUNGENERATORUPDATE_H_
+#define COMMANDRUNGENERATORUPDATE_H_
+#include <wx/cmdproc.h>
+#include <wx/string.h>
+
+#include "../generator/Generator.h"
 
 #include "../project/Project.h"
-#include "../project/Workpiece.h"
 
-#include <wx/cmdproc.h>
+/*!\class CommandRunGeneratorUpdate
+ * \brief Update the settings of a toolpath generator
+ *
+ * The toolpath is cleared in this operation. It has to be calculated again afterwards.
+ *
+ * This command takes over the pointer passed to it. It also cares for the deletion of the
+ * generator object at the destruction of this command object or at the end of the
+ * program.
+ */
 
-class CommandWorkpieceRemove:public wxCommand {
+class CommandRunGeneratorUpdate:public wxCommand {
 public:
-	CommandWorkpieceRemove(const wxString& name, Project * project,
-			int workpieceNr);
-	virtual ~CommandWorkpieceRemove();
+	CommandRunGeneratorUpdate(const wxString& name, Project * project,
+			size_t runNr, size_t position, Generator* generator);
+	virtual ~CommandRunGeneratorUpdate(void);
 
 	bool Do(void);
 	bool Undo(void);
 
 protected:
 	Project * project;
-	int workpieceNr;
-	Workpiece * workpiece;
+	int runNr;
+	size_t position;
+
+	Generator * newGenerator;
+	Generator * oldGenerator;
+
 };
 
-#endif /* COMMANDWORKPIECEREMOVE_H_ */
+#endif /* COMMANDRUNGENERATORUPDATE_H_ */

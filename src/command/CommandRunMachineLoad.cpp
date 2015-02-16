@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunRemoveTool.h
+// Name               : commandRunLoadMachine.cpp
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
@@ -24,28 +24,25 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDRUNREMOVETOOL_H_
-#define COMMANDRUNREMOVETOOL_H_
-#include <wx/cmdproc.h>
+#include "CommandRunMachineLoad.h"
 
-#include "../machine/Tool.h"
-#include "../project/Project.h"
+CommandRunMachineLoad::CommandRunMachineLoad(const wxString& name,
+		Project* project, int runNr, const wxString& fileName) :
+		wxCommand(true, name)
+{
+	this->project = project;
+	this->runNr = runNr;
+	this->fileName = fileName;
+}
 
-class CommandRunRemoveTool:public wxCommand {
-public:
-	CommandRunRemoveTool(const wxString& name, Project * project, int runNr,
-			int slotNr);
-	virtual ~CommandRunRemoveTool(void);
+bool CommandRunMachineLoad::Do(void)
+{
+	return project->run[runNr].machine.Load(wxFileName(fileName));
+}
 
-	bool Do(void);
-	bool Undo(void);
-
-protected:
-	Project * project;
-	size_t runNr;
-	size_t slotNr;
-	size_t position;
-	Tool * oldTool;
-};
-
-#endif /* COMMANDRUNREMOVETOOL_H_ */
+bool CommandRunMachineLoad::Undo(void)
+{
+	// TODO: Implement Machine::Clear();
+	project->run[runNr].machine.ClearComponents();
+	return true;
+}

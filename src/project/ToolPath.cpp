@@ -24,7 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include "ToolPath.h"
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfToolPath)
@@ -35,12 +34,15 @@ WX_DEFINE_OBJARRAY(ArrayOfToolPath)
 
 ToolPath::ToolPath()
 {
+	selected = false;
+	generator = NULL;
 	colorMoving.Set(0.3, 0.8, 0.3);
 	colorCutting.Set(0.8, 0.3, 0.3);
 }
 
 ToolPath::~ToolPath()
 {
+	if(generator != NULL) delete generator;
 }
 
 void ToolPath::Clear(void)
@@ -115,7 +117,8 @@ void ToolPath::Paint(void)
 		else
 			::glColor3f(colorMoving.x, colorMoving.y, colorMoving.z);
 
-		::glVertex3f(positions[i].axisX, positions[i].axisY, positions[i].axisZ);
+		::glVertex3f(positions[i].axisX, positions[i].axisY,
+				positions[i].axisZ);
 	}
 
 	::glEnd();
@@ -147,43 +150,43 @@ void ToolPath::CalculateMinMaxValues(void)
 	maxPosition.axisC = -FLT_MAX;
 
 	for(i = 0; i < positions.GetCount(); i++){
-		if(positions[i].axisX > maxPosition.axisX) maxPosition.axisX
-				= positions[i].axisX;
-		if(positions[i].axisY > maxPosition.axisY) maxPosition.axisY
-				= positions[i].axisY;
-		if(positions[i].axisZ > maxPosition.axisZ) maxPosition.axisZ
-				= positions[i].axisZ;
-		if(positions[i].axisU > maxPosition.axisU) maxPosition.axisU
-				= positions[i].axisU;
-		if(positions[i].axisV > maxPosition.axisV) maxPosition.axisV
-				= positions[i].axisV;
-		if(positions[i].axisW > maxPosition.axisW) maxPosition.axisW
-				= positions[i].axisW;
-		if(positions[i].axisA > maxPosition.axisA) maxPosition.axisA
-				= positions[i].axisA;
-		if(positions[i].axisB > maxPosition.axisB) maxPosition.axisB
-				= positions[i].axisB;
-		if(positions[i].axisC > maxPosition.axisC) maxPosition.axisC
-				= positions[i].axisC;
+		if(positions[i].axisX > maxPosition.axisX) maxPosition.axisX =
+				positions[i].axisX;
+		if(positions[i].axisY > maxPosition.axisY) maxPosition.axisY =
+				positions[i].axisY;
+		if(positions[i].axisZ > maxPosition.axisZ) maxPosition.axisZ =
+				positions[i].axisZ;
+		if(positions[i].axisU > maxPosition.axisU) maxPosition.axisU =
+				positions[i].axisU;
+		if(positions[i].axisV > maxPosition.axisV) maxPosition.axisV =
+				positions[i].axisV;
+		if(positions[i].axisW > maxPosition.axisW) maxPosition.axisW =
+				positions[i].axisW;
+		if(positions[i].axisA > maxPosition.axisA) maxPosition.axisA =
+				positions[i].axisA;
+		if(positions[i].axisB > maxPosition.axisB) maxPosition.axisB =
+				positions[i].axisB;
+		if(positions[i].axisC > maxPosition.axisC) maxPosition.axisC =
+				positions[i].axisC;
 
-		if(positions[i].axisX < minPosition.axisX) minPosition.axisX
-				= positions[i].axisX;
-		if(positions[i].axisY < minPosition.axisY) minPosition.axisY
-				= positions[i].axisY;
-		if(positions[i].axisZ < minPosition.axisZ) minPosition.axisZ
-				= positions[i].axisZ;
-		if(positions[i].axisU < minPosition.axisU) minPosition.axisU
-				= positions[i].axisU;
-		if(positions[i].axisV < minPosition.axisV) minPosition.axisV
-				= positions[i].axisV;
-		if(positions[i].axisW < minPosition.axisW) minPosition.axisW
-				= positions[i].axisW;
-		if(positions[i].axisA < minPosition.axisA) minPosition.axisA
-				= positions[i].axisA;
-		if(positions[i].axisB < minPosition.axisB) minPosition.axisB
-				= positions[i].axisB;
-		if(positions[i].axisC < minPosition.axisC) minPosition.axisC
-				= positions[i].axisC;
+		if(positions[i].axisX < minPosition.axisX) minPosition.axisX =
+				positions[i].axisX;
+		if(positions[i].axisY < minPosition.axisY) minPosition.axisY =
+				positions[i].axisY;
+		if(positions[i].axisZ < minPosition.axisZ) minPosition.axisZ =
+				positions[i].axisZ;
+		if(positions[i].axisU < minPosition.axisU) minPosition.axisU =
+				positions[i].axisU;
+		if(positions[i].axisV < minPosition.axisV) minPosition.axisV =
+				positions[i].axisV;
+		if(positions[i].axisW < minPosition.axisW) minPosition.axisW =
+				positions[i].axisW;
+		if(positions[i].axisA < minPosition.axisA) minPosition.axisA =
+				positions[i].axisA;
+		if(positions[i].axisB < minPosition.axisB) minPosition.axisB =
+				positions[i].axisB;
+		if(positions[i].axisC < minPosition.axisC) minPosition.axisC =
+				positions[i].axisC;
 	}
 }
 
@@ -299,16 +302,17 @@ void ToolPath::WriteToFile(wxTextFile &f)
 	if(useWithFanucM){
 		f.AddLine(_T("S1000 (Spindle speed rpm)"), fileType);
 		f.AddLine(_T("M3 (Start spindel)"), fileType);
-		f.AddLine(_T("G4 X3 (Wait For Seconds, Parameter 3 Seconds)"), fileType);
+		f.AddLine(_T("G4 X3 (Wait For Seconds, Parameter 3 Seconds)"),
+				fileType);
 	}else{
 		f.AddLine(_T("S10000 (Spindle speed rpm)"), fileType);
 		f.AddLine(_T("M3 (Start spindel)"), fileType);
-		f.AddLine(_T("G4 P3 (Wait For Seconds, Parameter 3 Seconds)"), fileType);
+		f.AddLine(_T("G4 P3 (Wait For Seconds, Parameter 3 Seconds)"),
+				fileType);
 
 	}
 
 	size_t i;
-
 
 	// First two position are the "anti-messup".
 	for(i = 2; i < positions.GetCount(); i++){
@@ -329,9 +333,11 @@ void ToolPath::WriteToFile(wxTextFile &f)
 
 	f.AddLine(_T("M5 (Stop spindel)"), fileType);
 	if(useWithFanucM){
-		f.AddLine(_T("G4 X3 (Wait For Seconds, Parameter 3 Seconds)"), fileType);
+		f.AddLine(_T("G4 X3 (Wait For Seconds, Parameter 3 Seconds)"),
+				fileType);
 	}else{
-		f.AddLine(_T("G4 P3 (Wait For Seconds, Parameter 3 Seconds)"), fileType);
+		f.AddLine(_T("G4 P3 (Wait For Seconds, Parameter 3 Seconds)"),
+				fileType);
 	}
 	f.AddLine(_T("M2 (End programm)"), fileType);
 

@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunSetWorkpiece.h
+// Name               : Support.cpp
 // Purpose            : 
-// Thread Safe        : No
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 21.01.2015
+// Created            : 09.02.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,25 +24,16 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDRUNSETWORKPIECE_H_
-#define COMMANDRUNSETWORKPIECE_H_
+#include "Support.h"
 
-#include <wx/cmdproc.h>
+Support::Support()
+{
+	// TODO Auto-generated constructor stub
+	
+}
 
-#include "../project/Project.h"
+Support::~Support()
+{
+	// TODO Auto-generated destructor stub
+}
 
-class CommandRunSetWorkpiece:public wxCommand {
-public:
-	CommandRunSetWorkpiece(const wxString& name, Project * project, int runNr,
-			int workpieceNr);
-	bool Do(void);
-	bool Undo(void);
-
-protected:
-	Project * project;
-	int runNr;
-	int newWorkpieceNr;
-	int oldWorkpieceNr;
-};
-
-#endif /* COMMANDRUNSETWORKPIECE_H_ */

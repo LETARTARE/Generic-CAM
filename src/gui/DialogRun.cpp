@@ -29,9 +29,9 @@
 #include <wx/event.h>
 
 #include "../3D/AffineTransformMatrix.h"
-#include "../command/CommandRunSetWorkpiece.h"
-#include "../command/CommandRunAddTool.h"
-#include "../command/CommandRunRemoveTool.h"
+#include "../command/CommandRunWorkpieceAssign.h"
+#include "../command/CommandRunToolAssign.h"
+#include "../command/CommandRunToolRemove.h"
 #include "../command/CommandRunWorkpieceTransform.h"
 
 DialogRun::DialogRun(wxWindow* parent, Project* project,
@@ -152,7 +152,7 @@ void DialogRun::OnWorkpieceSelect(wxCommandEvent& event)
 	if(temp < 0) return;
 	if(project->run[selected].workpieceNr != temp){
 		commandProcessor->Submit(
-				new CommandRunSetWorkpiece(
+				new CommandRunWorkpieceAssign(
 						_("Set Workpiece to ")
 								+ m_choiceWorkpiece->GetString(temp + 1),
 						project, selected, temp));
@@ -205,7 +205,7 @@ void DialogRun::OnToolRemove(wxCommandEvent& event)
 	if(toolNr < 0) return;
 	int slotNr = project->run[selected].toolbox.tools[toolNr].slot;
 	commandProcessor->Submit(
-			new CommandRunRemoveTool(
+			new CommandRunToolRemove(
 					_("Removed tool from run ")
 							+ project->run[selected].toolbox.tools[toolNr].toolName,
 					project, selected, slotNr));
@@ -234,7 +234,7 @@ void DialogRun::OnToolAdd(wxCommandEvent& event)
 	if(toolNr < 0) return;
 	int slotNr = m_spinCtrlToolSlot->GetValue();
 	commandProcessor->Submit(
-			new CommandRunAddTool(
+			new CommandRunToolAssign(
 					_("Added tool to run ")
 							+ project->toolbox.tools[toolNr].toolName, project,
 					selected, toolNr, slotNr));

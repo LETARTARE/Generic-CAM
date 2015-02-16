@@ -56,29 +56,36 @@ void ObjectPlacement::Clear(void)
 
 	isMovable = true;
 	isKeepout = false;
-	//	outLine.Clear();
+	outline.Clear();
 }
 
 void ObjectPlacement::Update(const ArrayOfObject& objects)
 {
-	bbox.Reset();
+	bbox.Clear();
+	outline.Clear();
 	if(objectNr < 0 || objectNr >= objects.GetCount()) return;
 	for(int n = 0; n < objects[objectNr].geometries.GetCount(); n++){
 		bbox.Insert(objects[objectNr].geometries[n],
 				matrix * objects[objectNr].matrix);
 	}
+
+	outline.InsertPoint(0, 0, 0);
+	outline.InsertPoint(bbox.GetSizeX(), 0, 0);
+	outline.InsertPoint(bbox.GetSizeX(), bbox.GetSizeY(), 0);
+	outline.InsertPoint(0, bbox.GetSizeY(), 0);
+	outline.Close();
 }
 
 //void ObjectPlacement::SetKeepout(double x, double y, double sizex, double sizey)
 //{
 //	matrix.SetIdentity();
 //	matrix.TranslateGlobal(x, y, 0.0);
-//	outLine.Clear();
-//	outLine.InsertPoint(0.0, 0.0, 0.0);
-//	outLine.InsertPoint(sizex, 0.0, 0.0);
-//	outLine.InsertPoint(sizex, sizey, 0.0);
-//	outLine.InsertPoint(0.0, sizey, 0.0);
-//	outLine.Close();
+//	outline.Clear();
+//	outline.InsertPoint(0.0, 0.0, 0.0);
+//	outline.InsertPoint(sizex, 0.0, 0.0);
+//	outline.InsertPoint(sizex, sizey, 0.0);
+//	outline.InsertPoint(0.0, sizey, 0.0);
+//	outline.Close();
 //	isMovable = false;
 //	isKeepout = true;
 //}
@@ -87,6 +94,6 @@ void ObjectPlacement::Update(const ArrayOfObject& objects)
 //{
 //	::glPushMatrix();
 //	::glMultMatrixd(matrix.a);
-//	outLine.Paint();
+//	outline.Paint();
 //	::glPopMatrix();
 //}

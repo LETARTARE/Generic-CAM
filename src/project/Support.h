@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceAdd.cpp
-// Purpose            : Create a new workpiece from stock material
-// Thread Safe        : No
+// Name               : Support.h
+// Purpose            : 
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 16.01.2015
+// Created            : 09.02.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,29 +24,26 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandWorkpieceAdd.h"
+#ifndef SUPPORT_H_
+#define SUPPORT_H_
 
-CommandWorkpieceAdd::CommandWorkpieceAdd(const wxString& name, Project* project,
-		StockMaterial stock) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->stock = stock;
-}
+/*!\class Support
+ * \brief ...
+ *
+ * ...
+ */
 
-CommandWorkpieceAdd::~CommandWorkpieceAdd()
-{
-}
+#include <wx/dynarray.h>
 
-bool CommandWorkpieceAdd::Do(void)
-{
-	Workpiece temp(stock);
-	project->workpieces.Add(temp);
-	return true;
-}
+class Support {
 
-bool CommandWorkpieceAdd::Undo(void)
-{
-	project->workpieces.RemoveAt(project->workpieces.GetCount() - 1);
-	return true;
-}
+
+
+public:
+	Support();
+	virtual ~Support();
+};
+
+WX_DECLARE_OBJARRAY(Support, ArrayOfSupport);
+
+#endif /* SUPPORT_H_ */

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : CommandWorkpieceAdd.h
-// Purpose            : 
+// Purpose            : Create a new workpiece from stock material
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
@@ -26,6 +26,9 @@
 
 #ifndef COMMANDWORKPIECEADD_H_
 #define COMMANDWORKPIECEADD_H_
+
+/**\brief Create a new workpiece from stock material
+ */
 
 #include <wx/cmdproc.h>
 #include <wx/string.h>

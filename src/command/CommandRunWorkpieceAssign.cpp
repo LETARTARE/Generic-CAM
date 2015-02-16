@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : TPGenerator.cpp
-// Purpose            : Abstract class for toolpath generators
-// Thread Safe        : Yes
+// Name               : CommandRunWorkpieceAssign.cpp
+// Purpose            : 
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 22.08.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 21.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,21 +22,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "CommandRunWorkpieceAssign.h"
 
-#include "TPGenerator.h"
-
-TPGenerator::TPGenerator()
+CommandRunWorkpieceAssign::CommandRunWorkpieceAssign(const wxString& name,
+		Project* project, int runNr, int workpieceNr) :
+		wxCommand(true, name)
 {
-	// TODO Auto-generated constructor stub
-
+	this->project = project;
+	this->runNr = runNr;
+	this->newWorkpieceNr = workpieceNr;
+	this->oldWorkpieceNr = -1;
 }
 
-TPGenerator::~TPGenerator()
+bool CommandRunWorkpieceAssign::Do(void)
 {
-	// TODO Auto-generated destructor stub
+	this->oldWorkpieceNr = project->run[runNr].workpieceNr;
+	project->run[runNr].workpieceNr = this->newWorkpieceNr;
+	return true;
+}
+
+bool CommandRunWorkpieceAssign::Undo(void)
+{
+	project->run[runNr].workpieceNr = this->oldWorkpieceNr;
+	return true;
 }

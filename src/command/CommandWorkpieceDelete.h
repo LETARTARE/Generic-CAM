@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunAddTool.h
-// Purpose            : 
+// Name               : CommandWorkpieceDelete.h
+// Purpose            : Delete a workpiece
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 21.01.2015
+// Created            : 17.01.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,28 +24,27 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDRUNADDTOOL_H_
-#define COMMANDRUNADDTOOL_H_
+#ifndef COMMANDWORKPIECEREMOVE_H_
+#define COMMANDWORKPIECEREMOVE_H_
+
+#include "../project/Project.h"
+#include "../project/Workpiece.h"
 
 #include <wx/cmdproc.h>
 
-#include "../project/Project.h"
-
-class CommandRunAddTool:public wxCommand {
+class CommandWorkpieceDelete:public wxCommand {
 public:
-	CommandRunAddTool(const wxString& name, Project * project, int runNr,
-			int newToolNr, int slotNr);
-	virtual ~CommandRunAddTool(void);
+	CommandWorkpieceDelete(const wxString& name, Project * project,
+			int workpieceNr);
+	virtual ~CommandWorkpieceDelete();
 
 	bool Do(void);
 	bool Undo(void);
 
 protected:
 	Project * project;
-	int runNr;
-	size_t position;
-	Tool * newTool;
-	Tool * oldTool;
+	int workpieceNr;
+	Workpiece * workpiece;
 };
 
-#endif /* COMMANDRUNADDTOOL_H_ */
+#endif /* COMMANDWORKPIECEREMOVE_H_ */

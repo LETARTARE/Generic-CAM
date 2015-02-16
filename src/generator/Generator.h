@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ObjectPlacement.h
-// Purpose            :
+// Name               : Generator.h
+// Purpose            : Abstract class for toolpath generators
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 20.07.2011
+// Created            : 22.08.2011
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,59 +24,46 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef OBJECTPLACEMENT_H_
-#define OBJECTPLACEMENT_H_
+#ifndef GENERATOR_H_
+#define GENERATOR_H_
 
-/*!\class ObjectPlacement
- * \brief ...
+#include <wx/panel.h>
+#include <wx/string.h>
+
+#include "../3D/BoundingBox.h"
+#include "../gui/DisplaySettings.h"
+
+/*!\class Generator
+ * \brief Abstract class for toolpath generators
  *
  * ...
  */
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../3D/Polygon25.h"
-#include "../3D/BoundingBox.h"
-
-#include "Object.h"
-
-#include <wx/dynarray.h>
-#include <wx/xml/xml.h>
-
-class ObjectPlacement {
+class Generator {
+	// Constructor/ Destructor
 public:
-	ObjectPlacement();
-	virtual ~ObjectPlacement();
+	Generator();
+	virtual ~Generator();
 
+	//Member variables:
 public:
-	bool selected;
-
-	AffineTransformMatrix matrix;
-	size_t objectNr;
-
-	Polygon25 outline;
-
-	BoundingBox bbox;
-
-	//	// Slot around Objects
-	double slotWidth;
-	bool useContour;
-	//	double supportDistance;
-	//	double supportWidth;
-	//	double supportHeight;
-	//	double middleY;
-	//	double offsetX;
-
-	bool isMovable;
-	bool isKeepout;
+	BoundingBox box;
+	float marginBelow;
+	float marginSide;
+protected:
+	DisplaySettings * settings;
 
 	//Methods:
 public:
-	void Clear(void);
-	void Update(const ArrayOfObject &objects);
+	virtual wxString GetName(void) const = 0;
+	virtual void GenerateToolpath(void) = 0;
 
-//	void SetKeepout(double x, double y, double sizex, double sizey);
-
-//	void Paint(void) const;
+	virtual void AddToPanel(wxPanel * panel, DisplaySettings * settings);
+	virtual void TransferDataToPanel(void) const = 0;
+	virtual void TransferDataFromPanel(void) = 0;
+	virtual wxString ToString(void) const = 0;
+	virtual void FromString(const wxString & text) = 0;
+	virtual void CopyFrom(const Generator * other);
 };
-WX_DECLARE_OBJARRAY(ObjectPlacement, ArrayOfObjectPlacement);
-#endif /* OBJECTPLACEMENT_H_ */
+
+#endif /* GENERATOR_H_ */

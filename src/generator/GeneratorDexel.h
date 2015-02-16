@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceAdd.cpp
-// Purpose            : Create a new workpiece from stock material
-// Thread Safe        : No
+// Name               : GeneratorDexel.h
+// Purpose            : Base class for Dexel based generators
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 16.01.2015
+// Created            : 11.02.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,29 +24,23 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandWorkpieceAdd.h"
+#ifndef GENERATORDEXEL_H_
+#define GENERATORDEXEL_H_
 
-CommandWorkpieceAdd::CommandWorkpieceAdd(const wxString& name, Project* project,
-		StockMaterial stock) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->stock = stock;
-}
+#include "Generator.h"
 
-CommandWorkpieceAdd::~CommandWorkpieceAdd()
-{
-}
+/*!\class GeneratorDexel
+ * \brief Base class for all generators that use a Dexel representation
+ *
+ * The Dexel approach may not be the best one in respect to precisision, but it is
+ * the fastest one (and the easiest one to programm).
+ */
 
-bool CommandWorkpieceAdd::Do(void)
-{
-	Workpiece temp(stock);
-	project->workpieces.Add(temp);
-	return true;
-}
+class GeneratorDexel:public Generator {
+public:
+	GeneratorDexel();
+	virtual void CopyFrom(const Generator * other);
+	virtual ~GeneratorDexel();
+};
 
-bool CommandWorkpieceAdd::Undo(void)
-{
-	project->workpieces.RemoveAt(project->workpieces.GetCount() - 1);
-	return true;
-}
+#endif /* GENERATORDEXEL_H_ */

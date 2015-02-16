@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceRemove.cpp
+// Name               : CommandRunWorkpieceAssign.h
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 17.01.2015
+// Created            : 21.01.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,37 +24,25 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandWorkpieceRemove.h"
+#ifndef COMMANDRUNSETWORKPIECE_H_
+#define COMMANDRUNSETWORKPIECE_H_
 
-CommandWorkpieceRemove::CommandWorkpieceRemove(const wxString& name,
-		Project* project, int workpieceNr) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->workpieceNr = workpieceNr;
-	this->workpiece = NULL;
-}
+#include <wx/cmdproc.h>
 
-CommandWorkpieceRemove::~CommandWorkpieceRemove()
-{
-	if(workpiece != NULL) delete workpiece;
-}
+#include "../project/Project.h"
 
-bool CommandWorkpieceRemove::Do(void)
-{
-	workpiece = project->workpieces.Detach(workpieceNr);
-	return true;
-}
+class CommandRunWorkpieceAssign:public wxCommand {
+public:
+	CommandRunWorkpieceAssign(const wxString& name, Project * project, int runNr,
+			int workpieceNr);
+	bool Do(void);
+	bool Undo(void);
 
-bool CommandWorkpieceRemove::Undo(void)
-{
-	if(workpieceNr >= project->workpieces.GetCount()){
-		project->workpieces.Add(workpiece);
-	}else{
-		project->workpieces.Insert(workpiece, workpieceNr);
-	}
-	// If the the workpiece was inserted back into the project,
-	// this function must not delete the workpiece in the destructor.
-	workpiece = NULL;
-	return true;
-}
+protected:
+	Project * project;
+	int runNr;
+	int newWorkpieceNr;
+	int oldWorkpieceNr;
+};
+
+#endif /* COMMANDRUNSETWORKPIECE_H_ */

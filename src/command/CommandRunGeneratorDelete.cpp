@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceAdd.cpp
-// Purpose            : Create a new workpiece from stock material
-// Thread Safe        : No
+// Name               : CommandRunGeneratorDelete.cpp
+// Purpose            : 
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 16.01.2015
+// Created            : 15.02.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,29 +24,43 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandWorkpieceAdd.h"
+#include "CommandRunGeneratorDelete.h"
 
-CommandWorkpieceAdd::CommandWorkpieceAdd(const wxString& name, Project* project,
-		StockMaterial stock) :
+CommandRunGeneratorDelete::CommandRunGeneratorDelete(const wxString& name,
+		Project* project, size_t runNr, size_t position) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->stock = stock;
+	this->runNr = runNr;
+	this->position = position;
+	this->oldGenerator = NULL;
 }
 
-CommandWorkpieceAdd::~CommandWorkpieceAdd()
+CommandRunGeneratorDelete::~CommandRunGeneratorDelete(void)
 {
+	if(oldGenerator != NULL) delete oldGenerator;
 }
 
-bool CommandWorkpieceAdd::Do(void)
+bool CommandRunGeneratorDelete::Do(void)
 {
-	Workpiece temp(stock);
-	project->workpieces.Add(temp);
+	ToolPath * temp = project->run[runNr].toolpaths.Detach(position);
+	oldGenerator = temp->generator;
+	temp->generator = NULL;
+	delete temp;
 	return true;
 }
 
-bool CommandWorkpieceAdd::Undo(void)
+bool CommandRunGeneratorDelete::Undo(void)
 {
-	project->workpieces.RemoveAt(project->workpieces.GetCount() - 1);
+	ToolPath * temp = new ToolPath;
+	temp->generator = oldGenerator;
+
+	size_t N = project->run[runNr].toolpaths.GetCount();
+
+	if(position >= N)
+		project->run[runNr].toolpaths.Add(temp);
+	else
+		project->run[runNr].toolpaths.Insert(temp, position);
+	oldGenerator = NULL;
 	return true;
 }

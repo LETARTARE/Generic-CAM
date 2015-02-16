@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceAdd.cpp
-// Purpose            : Create a new workpiece from stock material
+// Name               : CommandRunToolRemove.h
+// Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 16.01.2015
+// Created            : 21.01.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,29 +24,28 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandWorkpieceAdd.h"
+#ifndef COMMANDRUNREMOVETOOL_H_
+#define COMMANDRUNREMOVETOOL_H_
+#include <wx/cmdproc.h>
 
-CommandWorkpieceAdd::CommandWorkpieceAdd(const wxString& name, Project* project,
-		StockMaterial stock) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->stock = stock;
-}
+#include "../machine/Tool.h"
+#include "../project/Project.h"
 
-CommandWorkpieceAdd::~CommandWorkpieceAdd()
-{
-}
+class CommandRunToolRemove:public wxCommand {
+public:
+	CommandRunToolRemove(const wxString& name, Project * project, int runNr,
+			int slotNr);
+	virtual ~CommandRunToolRemove(void);
 
-bool CommandWorkpieceAdd::Do(void)
-{
-	Workpiece temp(stock);
-	project->workpieces.Add(temp);
-	return true;
-}
+	bool Do(void);
+	bool Undo(void);
 
-bool CommandWorkpieceAdd::Undo(void)
-{
-	project->workpieces.RemoveAt(project->workpieces.GetCount() - 1);
-	return true;
-}
+protected:
+	Project * project;
+	size_t runNr;
+	size_t slotNr;
+	size_t position;
+	Tool * oldTool;
+};
+
+#endif /* COMMANDRUNREMOVETOOL_H_ */

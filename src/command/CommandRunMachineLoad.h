@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : TPGenerator.h
-// Purpose            : Abstract class for toolpath generators
-// Thread Safe        : Yes
+// Name               : CommandRunMachineLoad.h
+// Purpose            : 
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 22.08.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 21.01.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,35 +22,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate: $
-//$Revision: $
-//$LastChangedBy: $
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef COMMANDRUNLOADMACHINE_H_
+#define COMMANDRUNLOADMACHINE_H_
 
-#ifndef TPGENERATOR_H_
-#define TPGENERATOR_H_
+#include <wx/cmdproc.h>
 
-/*!\class TPGenerator
- * \brief ...
- *
- * ...
- */
+#include "../project/Project.h"
 
-class TPGenerator {
-	// Constructor/ Destructor
+class CommandRunMachineLoad:public wxCommand {
 public:
-	TPGenerator();
-	virtual ~TPGenerator();
+	CommandRunMachineLoad(const wxString& name, Project * project, int runNr,
+			const wxString& fileName);
 
-	//Member variables:
-public:
+	bool Do(void);
+	bool Undo(void);
 
-
-	//Methods:
-public:
-	virtual void GenerateToolpath(void) = 0;
-
+protected:
+	Project * project;
+	int runNr;
+	wxString fileName;
 };
 
-#endif /* TPGENERATOR_H_ */
+#endif /* COMMANDRUNLOADMACHINE_H_ */

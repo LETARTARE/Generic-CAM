@@ -4,26 +4,29 @@ genericcam
 
 # /
 /pdf
-/bin_linux
 /rawWWW
 /WWW
 /build
+/bin_linux
+/bin_debug
 /Debug_Linux
+/Debug_Linux
+
+/src/generator/temp.cpp
+/src/generator/temp.h
+
 /toolpath
 
+/machines/Hermle\ 800.zip
+
 # /doc4developer/
-/doc4developer/html
-/doc4developer/latex
+/doc/doxygen/html
+/doc/doxygen/latex
 
 # /doc4user/
-/doc4user/*.aux
-/doc4user/*.toc
-/doc4user/*.pdf
-/doc4user/*.backup
-/doc4user/*.dvi
+/doc/*.aux
+/doc/*.toc
+/doc/*.pdf
+/doc/*.backup
+/doc/*.dvi
 
-# /machines/
-/machines/testrobot
-/machines/staeubli_rx90
-/Debug_Linux
-/bin_debug

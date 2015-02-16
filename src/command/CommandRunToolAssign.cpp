@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunAddTool.cpp
+// Name               : CommandRunToolAssign.cpp
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
@@ -24,9 +24,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandRunAddTool.h"
+#include "CommandRunToolAssign.h"
 
-CommandRunAddTool::CommandRunAddTool(const wxString& name, Project* project,
+CommandRunToolAssign::CommandRunToolAssign(const wxString& name, Project* project,
 		int runNr, int newToolNr, int slotNr) :
 		wxCommand(true, name)
 {
@@ -38,13 +38,13 @@ CommandRunAddTool::CommandRunAddTool(const wxString& name, Project* project,
 	this->position = 0;
 }
 
-CommandRunAddTool::~CommandRunAddTool(void)
+CommandRunToolAssign::~CommandRunToolAssign(void)
 {
 	if(oldTool != NULL) delete oldTool;
 	if(newTool != NULL) delete newTool;
 }
 
-bool CommandRunAddTool::Do(void)
+bool CommandRunToolAssign::Do(void)
 {
 	size_t N = project->run[runNr].toolbox.tools.GetCount();
 	size_t n;
@@ -72,7 +72,7 @@ bool CommandRunAddTool::Do(void)
 	return true;
 }
 
-bool CommandRunAddTool::Undo(void)
+bool CommandRunToolAssign::Undo(void)
 {
 	newTool = project->run[runNr].toolbox.tools.Detach(position);
 	size_t N = project->run[runNr].toolbox.tools.GetCount();

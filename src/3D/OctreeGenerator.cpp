@@ -105,7 +105,7 @@ void OctreeGenerator::InsertTriangle(Triangle tri)
 	if(root == NULL) return;
 
 	BoundingBox bb;
-	bb.Reset();
+	bb.Clear();
 	bb.Insert(tri);
 	Vector3 temp(0, 0, 0);
 

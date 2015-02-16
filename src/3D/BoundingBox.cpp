@@ -37,14 +37,33 @@ BoundingBox::BoundingBox()
 	xmax = ymax = zmax = -DBL_MAX;
 	xmin = ymin = zmin = DBL_MAX;
 
-	this->Reset();
+	this->Clear();
+}
+
+BoundingBox::BoundingBox(float x1, float y1, float z1, float x2, float y2,
+		float z2)
+{
+	color.Set(0.3, 0.3, 0.3);
+	alpha = 0.5;
+
+	if(x1 > x2) std::swap(x1, x2);
+	if(y1 > y2) std::swap(y1, y2);
+	if(z1 > z2) std::swap(z1, z2);
+
+	xmin = x1;
+	ymin = y1;
+	zmin = z1;
+
+	xmax = x2;
+	ymax = y2;
+	zmax = z2;
 }
 
 BoundingBox::~BoundingBox()
 {
 }
 
-void BoundingBox::Reset(void)
+void BoundingBox::Clear(void)
 {
 	xmax = ymax = zmax = -DBL_MAX;
 	xmin = ymin = zmin = DBL_MAX;
@@ -186,4 +205,3 @@ void BoundingBox::Paint(void)
 	::glPopMatrix();
 
 }
-

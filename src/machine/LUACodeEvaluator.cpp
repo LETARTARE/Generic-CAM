@@ -56,6 +56,7 @@ LUACodeEvaluator::LUACodeEvaluator()
 
 	lua_register(L, "translate", translate_glue);
 	lua_register(L, "rotate", rotate_glue);
+	lua_register(L, "scale", scale_glue);
 
 	lua_register(L, "placecomponent", placecomponent_glue);
 
@@ -310,6 +311,31 @@ int LUACodeEvaluator::rotate_glue(lua_State * L)
 	return 0;
 }
 
+int LUACodeEvaluator::scale_glue(lua_State* L)
+{
+	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
+	wxASSERT(CC==NULL);
+	float x, y, z;
+	switch(lua_gettop(L)){
+	case 1:
+		x = luaL_checknumber(L, 1);
+		CC->matrix.ScaleGlobal(x, x, x);
+		break;
+	case 3:
+		x = luaL_checknumber(L, 1);
+		y = luaL_checknumber(L, 2);
+		z = luaL_checknumber(L, 3);
+		CC->matrix.ScaleGlobal(x, y, z);
+		break;
+	default:
+		lua_pushstring(L,
+				"scale: parameter mismatch (1 or 3 parameters expected!).");
+		lua_error(L);
+		break;
+	}
+	return 0;
+}
+
 int LUACodeEvaluator::box_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
@@ -403,6 +429,7 @@ int LUACodeEvaluator::tableorigin_glue(lua_State * L)
 			CC->linkedMachine->components.Count() - 1;
 	return 0;
 }
+
 int LUACodeEvaluator::placecomponent_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);

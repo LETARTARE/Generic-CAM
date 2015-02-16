@@ -41,6 +41,7 @@ enum ItemDataType {
 	itemObjectLink,
 	itemGroupRun,
 	itemRun,
+	itemRunWorkpiece,
 	itemMachine,
 	itemToolpath
 };

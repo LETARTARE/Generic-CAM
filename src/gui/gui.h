@@ -48,6 +48,7 @@
 #include <wx/dialog.h>
 #include "CanvasStereoTest.h"
 #include <wx/clrpicker.h>
+#include <wx/choicebk.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -72,20 +73,20 @@
 #define ID_MACHINEDEBUGGER 1018
 #define ID_TOOLBOXEDIT 1019
 #define ID_TOOLBOXLOAD 1020
-#define ID_VIEWSTEREO3D 1021
-#define ID_SETUPCONTROLLER 1022
-#define ID_SETUPUNITS 1023
-#define ID_CLOSEEXTRAWINDOWS 1024
-#define ID_LOGSHOW 1025
-#define ID_VIEWTOP 1026
-#define ID_VIEWBOTTOM 1027
-#define ID_VIEWFRONT 1028
-#define ID_VIEWBACK 1029
-#define ID_VIEWLEFT 1030
-#define ID_VIEWRIGHT 1031
-#define ID_DISPLAYMACHINE 1032
-#define ID_DISPLAYMATERIAL 1033
-#define ID_TOOLDRILLING 1034
+#define ID_GENERATORADD 1021
+#define ID_VIEWSTEREO3D 1022
+#define ID_SETUPCONTROLLER 1023
+#define ID_SETUPUNITS 1024
+#define ID_CLOSEEXTRAWINDOWS 1025
+#define ID_LOGSHOW 1026
+#define ID_VIEWTOP 1027
+#define ID_VIEWBOTTOM 1028
+#define ID_VIEWFRONT 1029
+#define ID_VIEWBACK 1030
+#define ID_VIEWLEFT 1031
+#define ID_VIEWRIGHT 1032
+#define ID_DISPLAYMACHINE 1033
+#define ID_DISPLAYMATERIAL 1034
 #define ID_MULTTEN 1035
 #define ID_DIVTEN 1036
 #define ID_SCALEUNITX 1037
@@ -161,6 +162,15 @@
 #define ID_TEXTRR 1107
 #define ID_TEXTRG 1108
 #define ID_TEXTRB 1109
+#define ID_XSTART 1110
+#define ID_XEND 1111
+#define ID_YSTART 1112
+#define ID_YEND 1113
+#define ID_ZSTART 1114
+#define ID_ZEND 1115
+#define ID_SELECTAREAOBJECT 1116
+#define ID_MARGINSIDE 1117
+#define ID_MARGINBELOW 1118
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIMainFrame
@@ -219,6 +229,7 @@ class GUIMainFrame : public wxFrame
 		virtual void OnToolboxEdit( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnToolboxLoad( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnToolboxSave( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnGeneratorAdd( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnGenerateToolpath( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRecollectToolpath( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCleanToolpath( wxCommandEvent& event ) { event.Skip(); }
@@ -244,7 +255,6 @@ class GUIMainFrame : public wxFrame
 		virtual void OnSelectionChanging( wxTreeEvent& event ) { event.Skip(); }
 		virtual void On3DSelect( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnToolbarButton( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnAddGenerator( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -955,6 +965,71 @@ class GUIAbout : public wxDialog
 		
 		GUIAbout( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 504,373 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
 		~GUIAbout();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class GUIToolpathGenerator
+///////////////////////////////////////////////////////////////////////////////
+class GUIToolpathGenerator : public wxFrame 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_staticText125;
+		wxChoice* m_choiceRun;
+		wxStaticText* m_staticText145;
+		wxChoice* m_choiceToolpath;
+		wxButton* m_buttonAddNew;
+		wxStaticText* m_staticText126;
+		wxTextCtrl* m_textCtrlX1;
+		wxStaticText* m_staticTextUnitX1;
+		wxStaticText* m_staticText130;
+		wxTextCtrl* m_textCtrlX2;
+		wxStaticText* m_staticTextUnitX2;
+		wxStaticText* m_staticText131;
+		wxTextCtrl* m_textCtrlY1;
+		wxStaticText* m_staticTextUnitY1;
+		wxStaticText* m_staticText132;
+		wxTextCtrl* m_textCtrlY2;
+		wxStaticText* m_staticTextUnitY2;
+		wxStaticText* m_staticText1315;
+		wxTextCtrl* m_textCtrlZ1;
+		wxStaticText* m_staticTextUnitZ1;
+		wxStaticText* m_staticText1312;
+		wxTextCtrl* m_textCtrlZ2;
+		wxStaticText* m_staticTextUnitZ2;
+		wxButton* m_buttonSelectAreaFromObject;
+		wxStaticText* m_staticText139;
+		wxTextCtrl* m_textCtrlMarginSide;
+		wxStaticText* m_staticTextUnitMarginSide;
+		wxStaticText* m_staticText141;
+		wxTextCtrl* m_textCtrlMarginBelow;
+		wxStaticText* m_staticTextUnitMarginBelow;
+		wxChoicebook* m_choicebookGenerator;
+		wxButton* m_buttonUpdate;
+		wxButton* m_buttonReset;
+		wxButton* m_buttonDelete;
+		wxButton* m_buttonClose;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnSelectRun( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSelectToolpath( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAdd( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnChangeText( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSelectArea( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnPageChanged( wxChoicebookEvent& event ) { event.Skip(); }
+		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnResetChanges( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDelete( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		GUIToolpathGenerator( wxWindow* parent, wxWindowID id = wxID_CLOSE, const wxString& title = _("Add / Update Toolpath Generators"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 647,782 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		~GUIToolpathGenerator();
 	
 };
 

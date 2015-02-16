@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceAdd.cpp
-// Purpose            : Create a new workpiece from stock material
-// Thread Safe        : No
+// Name               : GeneratorNone.h
+// Purpose            : 
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 16.01.2015
+// Created            : 11.02.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,29 +24,31 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandWorkpieceAdd.h"
+#ifndef GENERATORNONE_H_
+#define GENERATORNONE_H_
 
-CommandWorkpieceAdd::CommandWorkpieceAdd(const wxString& name, Project* project,
-		StockMaterial stock) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->stock = stock;
-}
+#include "Generator.h"
 
-CommandWorkpieceAdd::~CommandWorkpieceAdd()
-{
-}
+#include <wx/panel.h>
+#include <wx/string.h>
 
-bool CommandWorkpieceAdd::Do(void)
-{
-	Workpiece temp(stock);
-	project->workpieces.Add(temp);
-	return true;
-}
+/*!\class GeneratorNone
+ * \brief Empty generator
+ */
 
-bool CommandWorkpieceAdd::Undo(void)
-{
-	project->workpieces.RemoveAt(project->workpieces.GetCount() - 1);
-	return true;
-}
+class GeneratorNone:public Generator {
+public:
+	GeneratorNone();
+	virtual void CopyFrom(const Generator * other);
+	virtual ~GeneratorNone();
+
+	virtual wxString GetName(void) const;
+	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
+	virtual void TransferDataToPanel(void) const;
+	virtual void TransferDataFromPanel(void);
+	virtual wxString ToString(void) const;
+	virtual void FromString(const wxString & text);
+	virtual void GenerateToolpath(void);
+};
+
+#endif /* GENERATORNONE_H_ */

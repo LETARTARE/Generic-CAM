@@ -59,7 +59,7 @@ void Object::Paint(void) const
 void Object::UpdateBoundingBox(void)
 {
 	size_t i;
-	bbox.Reset();
+	bbox.Clear();
 	for(i = 0; i < geometries.GetCount(); i++)
 		bbox.Insert((geometries[i]), this->matrix);
 }
@@ -67,7 +67,7 @@ void Object::UpdateBoundingBox(void)
 void Object::UpdateBoundingBox(AffineTransformMatrix const &matrix)
 {
 	size_t i;
-	bbox.Reset();
+	bbox.Clear();
 	for(i = 0; i < geometries.GetCount(); i++)
 		bbox.Insert((geometries[i]), matrix * this->matrix);
 }

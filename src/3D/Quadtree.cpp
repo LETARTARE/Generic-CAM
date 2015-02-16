@@ -278,7 +278,7 @@ void Quadtree::InsertTriangle(Triangle tri)
 	if(tree == NULL) return;
 
 	BoundingBox bb;
-	bb.Reset();
+	bb.Clear();
 	bb.Insert(tri);
 
 	float cubeSize = pow(2.0, depth) * cellSize;

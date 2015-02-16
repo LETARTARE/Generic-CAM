@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceAdd.cpp
-// Purpose            : Create a new workpiece from stock material
-// Thread Safe        : No
+// Name               : CommandRunGeneratorAdd.h
+// Purpose            : 
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 16.01.2015
+// Created            : 15.02.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,29 +24,32 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandWorkpieceAdd.h"
+#ifndef COMMANDRUNADDGENERATOR_H_
+#define COMMANDRUNADDGENERATOR_H_
 
-CommandWorkpieceAdd::CommandWorkpieceAdd(const wxString& name, Project* project,
-		StockMaterial stock) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->stock = stock;
-}
+#include <wx/cmdproc.h>
+#include <wx/string.h>
+#include "../generator/Generator.h"
+#include "../project/Project.h"
 
-CommandWorkpieceAdd::~CommandWorkpieceAdd()
-{
-}
+/*!\class CommandRunGeneratorAdd
+ * \brief Command to add a toolpath / generator to a project
+ */
 
-bool CommandWorkpieceAdd::Do(void)
-{
-	Workpiece temp(stock);
-	project->workpieces.Add(temp);
-	return true;
-}
+class CommandRunGeneratorAdd:public wxCommand {
+public:
+	CommandRunGeneratorAdd(const wxString& name, Project * project, size_t runNr,
+			size_t position, Generator* generator);
+	virtual ~CommandRunGeneratorAdd(void);
 
-bool CommandWorkpieceAdd::Undo(void)
-{
-	project->workpieces.RemoveAt(project->workpieces.GetCount() - 1);
-	return true;
-}
+	bool Do(void);
+	bool Undo(void);
+
+protected:
+	Project * project;
+	int runNr;
+	size_t position;
+	Generator * newGenerator;
+};
+
+#endif /* COMMANDRUNADDGENERATOR_H_ */
