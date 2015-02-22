@@ -57,7 +57,7 @@ void GeneratorLoadFromFile::AddToPanel(wxPanel* panel,
 	wxBoxSizer* bSizer1;
 	bSizer1 = new wxBoxSizer(wxVERTICAL);
 	m_staticTextLoadFile = new wxStaticText(panel, wxID_ANY,
-			wxT("Load G-Code directly from..."), wxDefaultPosition,
+			wxT("Load G-Code from file..."), wxDefaultPosition,
 			wxDefaultSize, 0);
 	m_staticTextLoadFile->Wrap(-1);
 	bSizer1->Add(m_staticTextLoadFile, 0, wxALL, 5);
@@ -90,6 +90,10 @@ void GeneratorLoadFromFile::FromString(const wxString& text)
 {
 }
 
-void GeneratorLoadFromFile::GenerateToolpath(void)
+wxThread::ExitCode GeneratorLoadFromFile::Entry(void)
 {
+
+//	project.run[selected].LoadGCode(fileName);
+
+	return 0;
 }

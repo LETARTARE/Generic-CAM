@@ -32,6 +32,10 @@ Generator::Generator()
 	marginSide = 0.0;
 
 	settings = NULL;
+
+	toolpath = NULL;
+	toolpathGenerated = false;
+	errorOccured = false;
 }
 
 void Generator::CopyFrom(const Generator * other)
@@ -43,9 +47,79 @@ void Generator::CopyFrom(const Generator * other)
 
 Generator::~Generator()
 {
+	if(toolpath != NULL) delete toolpath;
+}
+
+bool Generator::ToolpathHasBeenGenerated(void) const
+{
+	return toolpathGenerated;
+}
+
+bool Generator::ErrorHasOccured(void) const
+{
+	return errorOccured;
 }
 
 void Generator::AddToPanel(wxPanel* panel, DisplaySettings* settings)
 {
 	this->settings = settings;
 }
+
+//void Project::GenerateToolPath(void)
+//{
+//	size_t i, j;
+//	bool isUsed;
+//	for(i = 0; i < targets.GetCount(); i++){
+//		if(targets[i].toolpath.IsEmpty()){
+//
+//			isUsed = false;
+//			for(j = 0; j < run[activeRun].placements.GetCount(); j++){
+//				if(!run[activeRun].placements[j].isKeepout
+//						&& run[activeRun].placements[j].targetNumber == i) isUsed =
+//						true;
+//			}
+//
+//			if(isUsed){
+//
+//				wxLogMessage(
+//						wxString::Format(
+//								_T("Generating toolpath for target %u:"), i));
+//
+//				run[activeRun].ToolPathGenerator.GenerateToolpath(targets[i],
+//						toolbox.tools[0]);
+//			}
+//		}
+//	}
+//	CollectToolPath();
+//}
+
+//void Project::CollectToolPath(void)
+//{
+//	size_t i, n;
+//	ToolPath temp;
+//	run[activeRun].toolPath.Clear();
+//	MachinePosition mp;
+//	if(true){ // Startup move, to prevent WinPC-NC from messing up the toolpath.
+//		mp.axisX = 0.0;
+//		mp.axisY = 0.0;
+//		mp.axisZ = this->stock.stockMaterials[activeStock].sz + 0.010;
+//		mp.isCutting = false;
+//		run[activeRun].toolPath.positions.Add(mp);
+//		mp.axisZ = this->stock.stockMaterials[activeStock].sz + 0.011;
+//		mp.isCutting = true;
+//		run[activeRun].toolPath.positions.Add(mp);
+//	}
+//
+//	for(i = 0; i < run[activeRun].placements.GetCount(); i++){
+//		if(!run[activeRun].placements[i].isKeepout){
+//			n = run[activeRun].placements[i].targetNumber;
+//			if(!targets[n].toolpath.IsEmpty()){
+//				temp = targets[n].toolpath;
+//				temp.ApplyTransformation();
+//				temp.ApplyTransformation(run[activeRun].placements[i].matrix);
+//				run[activeRun].toolPath += temp;
+//			}
+//		}
+//	}
+//}
+

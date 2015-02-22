@@ -30,13 +30,16 @@
 
 GeneratorPositioningDrills::GeneratorPositioningDrills()
 {
-	// TODO Auto-generated constructor stub
 	
+}
+
+void GeneratorPositioningDrills::CopyFrom(
+		const GeneratorPositioningDrills * other)
+{
 }
 
 GeneratorPositioningDrills::~GeneratorPositioningDrills()
 {
-	// TODO Auto-generated destructor stub
 }
 
 wxString GeneratorPositioningDrills::GetName(void) const
@@ -127,11 +130,38 @@ void GeneratorPositioningDrills::FromString(const wxString& text)
 {
 }
 
-GeneratorPositioningDrills::GeneratorPositioningDrills(
-		const GeneratorPositioningDrills& other)
+wxThread::ExitCode GeneratorPositioningDrills::Entry(void)
 {
+	return 0;
 }
 
-void GeneratorPositioningDrills::GenerateToolpath(void)
-{
-}
+//void Project::InsertDrillGrid(Run &run, double sizex, double sizey,
+//		bool flipped)
+//{
+//	Target temp;
+//	TargetPlacement tempPlace;
+//	temp.SetupDrill(toolbox.tools[0], 0.0082, 0.012);
+//	targets.Add(temp);
+//	tempPlace.outLine = temp.outLine;
+//	tempPlace.isMovable = false;
+//	tempPlace.targetNumber = targets.GetCount() - 1;
+//	tempPlace.matrix.SetIdentity();
+//	tempPlace.matrix.TranslateGlobal(offsetX, middleY - sizey / 2,
+//			run.stockMaterial.sz);
+//
+//	run.placements.Add(tempPlace);
+//	tempPlace.matrix.SetIdentity();
+//	tempPlace.matrix.TranslateGlobal(offsetX, middleY + sizey / 2,
+//			run.stockMaterial.sz);
+//	run.placements.Add(tempPlace);
+//	tempPlace.matrix.SetIdentity();
+//	if(flipped){
+//		tempPlace.matrix.TranslateGlobal(offsetX + sizex, middleY - sizey / 2,
+//				run.stockMaterial.sz);
+//	}else{
+//		tempPlace.matrix.TranslateGlobal(offsetX + sizex, middleY + sizey / 2,
+//				run.stockMaterial.sz);
+//	}
+//	run.placements.Add(tempPlace);
+//}
+

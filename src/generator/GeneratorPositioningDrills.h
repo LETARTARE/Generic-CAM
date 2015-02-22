@@ -44,16 +44,16 @@
 class GeneratorPositioningDrills:public Generator {
 public:
 	GeneratorPositioningDrills();
-	GeneratorPositioningDrills(const GeneratorPositioningDrills& other);
 	virtual ~GeneratorPositioningDrills();
 
+	virtual void CopyFrom(const GeneratorPositioningDrills * other);
 	virtual wxString GetName(void) const;
 	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
 	virtual void TransferDataToPanel(void) const;
 	virtual void TransferDataFromPanel(void);
 	virtual wxString ToString(void) const;
 	virtual void FromString(const wxString & text);
-	virtual void GenerateToolpath(void);
+	virtual wxThread::ExitCode Entry(void);
 
 private:
 	wxChoice* m_choiceSetups;

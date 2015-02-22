@@ -31,6 +31,7 @@
 
 #include <wx/panel.h>
 #include <wx/string.h>
+#include <wx/thread.h>
 
 /*!\class GeneratorNone
  * \brief Empty generator
@@ -39,16 +40,17 @@
 class GeneratorNone:public Generator {
 public:
 	GeneratorNone();
-	virtual void CopyFrom(const Generator * other);
 	virtual ~GeneratorNone();
 
 	virtual wxString GetName(void) const;
+	virtual void CopyFrom(const Generator * other);
 	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
 	virtual void TransferDataToPanel(void) const;
 	virtual void TransferDataFromPanel(void);
 	virtual wxString ToString(void) const;
 	virtual void FromString(const wxString & text);
-	virtual void GenerateToolpath(void);
+
+	virtual wxThread::ExitCode Entry(void);
 };
 
 #endif /* GENERATORNONE_H_ */

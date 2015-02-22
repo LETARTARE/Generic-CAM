@@ -89,6 +89,7 @@ void GeneratorNone::FromString(const wxString& text)
 {
 }
 
-void GeneratorNone::GenerateToolpath(void)
+wxThread::ExitCode GeneratorNone::Entry(void)
 {
+	return 0;
 }

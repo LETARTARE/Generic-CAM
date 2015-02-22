@@ -41,21 +41,22 @@
  *
  */
 
-#include "Object.h"
-#include "StockFile.h"
-#include "Workpiece.h"
-#include "Run.h"
-#include "Toolbox.h"
-#include "ToolPath.h"
-
-#include "../3D/OctreeGenerator.h"
-#include "../3D/Quadtree.h"
-
 #include <stddef.h>
 #include <wx/defs.h>
 #include <wx/filename.h>
 #include <wx/string.h>
+#include <wx/thread.h>
 #include <wx/xml/xml.h>
+
+#include "../3D/OctreeGenerator.h"
+#include "../3D/Quadtree.h"
+#include "FlipDrillPattern.h"
+#include "Object.h"
+#include "Run.h"
+#include "StockFile.h"
+#include "Toolbox.h"
+#include "ToolPath.h"
+#include "Workpiece.h"
 
 enum DisplayType {
 	displayObjects, displayWorkpieces, displayRun
@@ -70,11 +71,13 @@ public:
 	// Project properties
 	wxFileName fileName;
 	wxString name;
+	wxMutex workedOn;
 
 	// Supplies
 	// TODO: Stock and Toolbox are not part of a project, but part of the whole system.
 	StockFile stock;
 	Toolbox toolbox;
+	ArrayOfFlipDrillPattern pattern;
 
 	// Loaded and constructed items
 	ArrayOfObject objects; //!> Loaded objects
@@ -107,19 +110,9 @@ public:
 
 	bool Load(wxFileName fileName);
 	bool Save(wxFileName fileName);
+	void LoadPattern(wxString filename);
 
 	void Paint(void);
-
-	//TODO: Cleanup the following function. Move into the generators.
-	void GenerateToolPath(void);
-	void CollectToolPath(void);
-
-	size_t SetupMachineBed(bool flipped = false);
-	void FlipRun(void);
-
-	void InsertDrillGrid(Run &run, double sizex, double sizey, bool flipped =
-			true);
-	void GenerateTargets(void);
 
 private:
 	void PaintWorkpieceWithObjects(size_t workpieceNr);

@@ -53,7 +53,7 @@ public:
 	virtual void TransferDataFromPanel(void);
 	virtual wxString ToString(void) const;
 	virtual void FromString(const wxString & text);
-	virtual void GenerateToolpath(void);
+	virtual wxThread::ExitCode Entry(void);
 
 private:
 	wxStaticText* m_staticTextLoadFile;

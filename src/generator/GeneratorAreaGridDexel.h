@@ -44,7 +44,6 @@ public:
 	GeneratorAreaGridDexel();
 	virtual ~GeneratorAreaGridDexel();
 
-
 	virtual void CopyFrom(const Generator * other);
 	virtual wxString GetName(void) const;
 	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
@@ -52,7 +51,7 @@ public:
 	virtual void TransferDataFromPanel(void);
 	virtual wxString ToString(void) const;
 	virtual void FromString(const wxString & text);
-	virtual void GenerateToolpath(void);
+	virtual wxThread::ExitCode Entry(void);
 
 private:
 	wxRadioBox* m_radioBoxDirection;
