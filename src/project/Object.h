@@ -27,12 +27,15 @@
 #ifndef OBJECT_H_
 #define OBJECT_H_
 
-#include "../3D/Geometry.h"
-#include "../3D/BoundingBox.h"
-
-#include <wx/filename.h>
 #include <wx/dynarray.h>
+#include <wx/filename.h>
+#include <wx/string.h>
 #include <wx/xml/xml.h>
+
+#include "../3D/AffineTransformMatrix.h"
+#include "../3D/BoundingBox.h"
+#include "../3D/Geometry.h"
+
 /*!\class Object
  * \brief ...
  *
@@ -47,7 +50,6 @@ public:
 
 	// Member variables
 public:
-
 	bool selected;
 
 	AffineTransformMatrix matrix;

@@ -27,15 +27,13 @@
 #ifndef WORKPIECE_H_
 #define WORKPIECE_H_
 
-#include "../3D/Vector3.h"
-#include "../project/StockMaterial.h"
-
 #include <wx/dynarray.h>
 
 #include "../3D/BooleanBox.h"
+#include "../3D/Vector3.h"
 #include "Object.h"
-
 #include "ObjectPlacement.h"
+#include "StockMaterial.h"
 
 class Workpiece:public StockMaterial {
 	// Constructor / Destructor
@@ -46,7 +44,6 @@ public:
 
 	// Member variables
 public:
-
 	bool selected;
 
 	ArrayOfObjectPlacement placements;

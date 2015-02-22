@@ -163,29 +163,45 @@ void DialogRun::OnWorkpieceSelect(wxCommandEvent& event)
 
 void DialogRun::OnRotate(wxCommandEvent& event)
 {
-	int selected = GetSelected();
-	if(selected < 0) return;
+	int runNr = GetSelected();
+	if(runNr < 0) return;
+	int workpieceNr = project->run[runNr].workpieceNr;
+	if(workpieceNr < 0) return;
+
+	AffineTransformMatrix matrix = project->run[runNr].workpiecePlacement;
+	matrix.a[12] = 0.0;
+	matrix.a[13] = 0.0;
+	matrix.a[14] = 0.0;
+
+	wxString description;
 
 	switch(event.GetId()){
 	case ID_WORKPIECEROTATEX:
-		commandProcessor->Submit(
-				new CommandRunWorkpieceTransform(
-						_("Rotate workpiece around X axis"), project, selected,
-						AffineTransformMatrix::RotateXYZ(M_PI_2, 0, 0)));
+		matrix *= AffineTransformMatrix::RotateXYZ(M_PI_2, 0, 0);
+		description = _("Rotate workpiece around X axis");
 		break;
 	case ID_WORKPIECEROTATEY:
-		commandProcessor->Submit(
-				new CommandRunWorkpieceTransform(
-						_("Rotate workpiece around Y axis"), project, selected,
-						AffineTransformMatrix::RotateXYZ(0, M_PI_2, 0)));
+		matrix *= AffineTransformMatrix::RotateXYZ(0, M_PI_2, 0);
+		description = _("Rotate workpiece around Y axis");
 		break;
 	case ID_WORKPIECEROTATEZ:
-		commandProcessor->Submit(
-				new CommandRunWorkpieceTransform(
-						_("Rotate workpiece around Z axis"), project, selected,
-						AffineTransformMatrix::RotateXYZ(0, 0, M_PI_2)));
+		matrix *= AffineTransformMatrix::RotateXYZ(0, 0, M_PI_2);
+		description = _("Rotate workpiece around Z axis");
 		break;
 	}
+
+	Vector3 temp(project->workpieces[workpieceNr].sx,
+			project->workpieces[workpieceNr].sy,
+			project->workpieces[workpieceNr].sz);
+	temp = matrix.TransformNoShift(temp);
+	if(temp.x < 0.0) matrix.TranslateGlobal(-temp.x, 0, 0);
+	if(temp.y < 0.0) matrix.TranslateGlobal(0, -temp.y, 0);
+	if(temp.z < 0.0) matrix.TranslateGlobal(0, 0, -temp.z);
+
+	commandProcessor->Submit(
+			new CommandRunWorkpieceTransform(description, project, runNr,
+					matrix));
+
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
 	ProcessEvent(selectEvent);
 }

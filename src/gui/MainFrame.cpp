@@ -116,8 +116,7 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	dialogRun = new DialogRun(this, &project, &commandProcessor, &settings);
 	dialogDebugger = new DialogMachineDebugger(this, &settings);
 	dialogSetupStereo3D = new DialogSetupStereo3D(this, &settings);
-	dialogToolbox = new DialogToolbox(this, &project, &commandProcessor,
-			&settings);
+	dialogToolbox = new DialogToolbox(this, &project, &settings);
 	dialogToolpathGenerator = new DialogToolpathGenerator(this, &project,
 			&commandProcessor, &settings);
 	dialogAnimation = new DialogAnimation(this, &project);
@@ -434,14 +433,14 @@ void MainFrame::OnActivateRightClickMenu(wxTreeEvent& event)
 
 	if(data->dataType == itemMachine){
 		menu.Append(ID_MACHINELOAD, wxT("Load &Machine"));
-		menu.Append(ID_GENERATORADD, wxT("Add &Generator"));
+		menu.Append(ID_GENERATORSETUP, wxT("Setup &Generators"));
 		menu.AppendSeparator();
 		menu.Append(ID_MACHINERELOAD, wxT("&Reload Machine"));
 	}
 
 	if(data->dataType == itemRun){
 		menu.Append(ID_RUNEDIT, wxT("&Setup Run"));
-		menu.Append(ID_GENERATORADD, wxT("Add &Generator"));
+		menu.Append(ID_GENERATORSETUP, wxT("Setup &Generator"));
 		menu.AppendSeparator();
 		menu.Append(ID_RUNADD, wxT("&Add Run"));
 		menu.Append(ID_RUNDELETE, wxT("&Delete Run"));
@@ -859,6 +858,11 @@ void MainFrame::OnMachineDebugger(wxCommandEvent& event)
 	dialogDebugger->Raise();
 }
 
+
+void MainFrame::OnFlipDrillSetup(wxCommandEvent& event)
+{
+}
+
 void MainFrame::OnToolboxEdit(wxCommandEvent& event)
 {
 	dialogToolbox->Show(true);
@@ -905,95 +909,24 @@ void MainFrame::OnToolboxSave(wxCommandEvent &event)
 	}
 }
 
-void MainFrame::OnGeneratorAdd(wxCommandEvent& event)
+void MainFrame::OnGeneratorSetup(wxCommandEvent& event)
 {
 	dialogToolpathGenerator->Show();
 	dialogToolpathGenerator->Raise();
 	TransferDataToWindow();
+
 }
 
-void MainFrame::OnAddGenerator(wxCommandEvent& event)
+void MainFrame::OnGeneratorAutomatic(wxCommandEvent& event)
 {
 }
 
-void MainFrame::OnGenerateToolpath(wxCommandEvent& event)
+void MainFrame::OnGeneratorRestart(wxCommandEvent& event)
 {
-	project.GenerateToolPath();
-	TransferDataToWindow();
-}
-void MainFrame::OnRecollectToolpath(wxCommandEvent& event)
-{
-	project.CollectToolPath();
-	TransferDataToWindow();
 }
 
-void MainFrame::OnCleanToolpath(wxCommandEvent& event)
+void MainFrame::OnGeneratorSaveToolpath(wxCommandEvent& event)
 {
-//	project.CleanToolPath();
-	TransferDataToWindow();
-}
-
-void MainFrame::OnFlipRun(wxCommandEvent& event)
-{
-	project.FlipRun();
-	TransferDataToWindow();
-}
-void MainFrame::OnPrepareMachinebed(wxCommandEvent& event)
-{
-	project.SetupMachineBed();
-	project.CollectToolPath();
-	TransferDataToWindow();
-}
-
-void MainFrame::OnLoadGCodes(wxCommandEvent &event)
-{
-	int selected = tree->GetFirstSelectedRun();
-	if(selected < 0) return;
-
-	wxFileDialog dialog(this, _("Open G-Code file..."), _T(""), _T(""),
-			_(
-					"G-Code File (*.tap *.cnc *.nc *.ngc *.txt)|*.tap;*.cnc;*.nc;*.ngc;*.txt|Text files (*.txt)|*.txt|All files|*.*"),
-			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
-
-	if(wxDir::Exists(settings.lastProjectDirectory)){
-		dialog.SetDirectory(settings.lastProjectDirectory);
-	}
-	if(dialog.ShowModal() == wxID_OK){
-		wxFileName fileName(dialog.GetPath());
-		if(project.run[selected].LoadGCode(fileName)){
-			TransferDataToWindow();
-		}
-	}
-}
-
-void MainFrame::OnSaveGCodes(wxCommandEvent &event)
-{
-	wxFileDialog dialog(this, _("Save G-Code file..."), _T(""), _T(""),
-			_(
-					"G-Code File (*.tap *.cnc *.nc *.ngc *.txt)|*.tap;*.cnc;*.nc;*.ngc;*.txt|Text files (*.txt)|*.txt|All files|*.*"),
-			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-	if(wxDir::Exists(settings.lastProjectDirectory)){
-		dialog.SetDirectory(settings.lastProjectDirectory);
-	}
-	if(dialog.ShowModal() == wxID_OK){
-
-		wxFileName fileName;
-		fileName = dialog.GetPath();
-
-		wxTextFile f;
-		if(fileName.FileExists()){
-			f.Open(fileName.GetFullPath());
-			f.Clear();
-		}else{
-			f.Create(fileName.GetFullPath());
-		}
-		size_t n;
-		for(n = 0; n < project.run.GetCount(); n++)
-			project.run[n].WriteToFile(f);
-		f.Write();
-		f.Close();
-		TransferDataToWindow();
-	}
 }
 
 void MainFrame::OnChangeLanguage(wxCommandEvent& event)

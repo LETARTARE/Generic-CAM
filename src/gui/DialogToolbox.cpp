@@ -27,48 +27,28 @@
 #include "DialogToolbox.h"
 
 DialogToolbox::DialogToolbox(wxWindow* parent, Project * project,
-		wxCommandProcessor * commandProcessor, DisplaySettings * settings) :
+		DisplaySettings * settings) :
 		GUIToolbox(parent)
 {
 	this->project = project;
-	this->commandProcessor = commandProcessor;
 	this->settings = settings;
 
 	selectedTool = 0;
 	selectedElement = 0;
 
-	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
+	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
+	settings->WriteToCanvas(m_canvas);
 }
 
 DialogToolbox::~DialogToolbox()
 {
 }
 
-void DialogToolbox::OnClose(wxCommandEvent& event)
-{
-	TransferDataFromWindow();
-	this->Show(false);
-}
-
-void DialogToolbox::SetController(Control3D& control)
-{
-	m_canvas->SetController(control);
-}
-
-void DialogToolbox::OnChangeStereo3D(wxCommandEvent& event)
-{
-	if(m_canvas->stereoMode == 1){
-		m_canvas->stereoMode = stereoOff;
-	}else{
-		m_canvas->stereoMode = stereoAnaglyph;
-	}
-	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode == 1);
-}
-
 bool DialogToolbox::TransferDataToWindow(void)
 {
-
 	if(project == NULL) return false;
+
+	settings->WriteToCanvas(m_canvas);
 
 	size_t i, j;
 
@@ -184,15 +164,57 @@ bool DialogToolbox::TransferDataFromWindow(void)
 	return true;
 }
 
-void DialogToolbox::OnNewTool(wxCommandEvent& event)
+void DialogToolbox::OnClose(wxCommandEvent& event)
+{
+	this->Show(false);
+}
+
+void DialogToolbox::OnClose(wxCloseEvent& event)
+{
+	this->Show(false);
+}
+
+void DialogToolbox::SetController(Control3D& control)
+{
+	m_canvas->SetController(control);
+}
+
+void DialogToolbox::OnChangeStereo3D(wxCommandEvent& event)
+{
+	if(m_canvas->stereoMode != stereoOff){
+		m_canvas->stereoMode = stereoOff;
+	}else{
+		m_canvas->stereoMode = stereoAnaglyph;
+	}
+	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
+	settings->WriteToCanvas(m_canvas);
+}
+
+void DialogToolbox::OnToolboxLoad(wxCommandEvent& event)
 {
 }
 
-void DialogToolbox::OnUpdateTool(wxCommandEvent& event)
+void DialogToolbox::OnToolboxSave(wxCommandEvent& event)
 {
 }
 
-void DialogToolbox::OnDeleteTool(wxCommandEvent& event)
+void DialogToolbox::OnToolSelect(wxCommandEvent& event)
+{
+}
+
+void DialogToolbox::OnToolRename(wxCommandEvent& event)
+{
+}
+
+void DialogToolbox::OnToolNew(wxCommandEvent& event)
+{
+}
+
+void DialogToolbox::OnToolUpdate(wxCommandEvent& event)
+{
+}
+
+void DialogToolbox::OnToolDelete(wxCommandEvent& event)
 {
 }
 

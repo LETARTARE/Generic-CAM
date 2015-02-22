@@ -44,11 +44,11 @@
 #include <wx/combobox.h>
 #include "PanelTool.h"
 #include "ToolCanvas.h"
+#include <wx/choicebk.h>
 #include <wx/radiobox.h>
 #include <wx/dialog.h>
 #include "CanvasStereoTest.h"
 #include <wx/clrpicker.h>
-#include <wx/choicebk.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -73,104 +73,105 @@
 #define ID_MACHINEDEBUGGER 1018
 #define ID_TOOLBOXEDIT 1019
 #define ID_TOOLBOXLOAD 1020
-#define ID_GENERATORADD 1021
-#define ID_VIEWSTEREO3D 1022
-#define ID_SETUPCONTROLLER 1023
-#define ID_SETUPUNITS 1024
-#define ID_CLOSEEXTRAWINDOWS 1025
-#define ID_LOGSHOW 1026
-#define ID_VIEWTOP 1027
-#define ID_VIEWBOTTOM 1028
-#define ID_VIEWFRONT 1029
-#define ID_VIEWBACK 1030
-#define ID_VIEWLEFT 1031
-#define ID_VIEWRIGHT 1032
-#define ID_DISPLAYMACHINE 1033
-#define ID_DISPLAYMATERIAL 1034
-#define ID_MULTTEN 1035
-#define ID_DIVTEN 1036
-#define ID_SCALEUNITX 1037
-#define ID_SCALEUNITY 1038
-#define ID_SCALEUNITZ 1039
-#define ID_SCALEPERCENTX 1040
-#define ID_SCALEPERCENTY 1041
-#define ID_SCALEPERCENTZ 1042
-#define ID_SCALEPERCENT 1043
-#define ID_MOVEZP 1044
-#define ID_MOVEYP 1045
-#define ID_MOVEXN 1046
-#define ID_MOVEXP 1047
-#define ID_MOVEYN 1048
-#define ID_MOVEZN 1049
-#define ID_ALIGNTOP 1050
-#define ID_ALIGNMIDDLE 1051
-#define ID_ALIGNBOTTOM 1052
-#define ID_ROTATEYN 1053
-#define ID_ROTATEXN 1054
-#define ID_ROTATEYP 1055
-#define ID_ROTATEZN 1056
-#define ID_ROTATEZP 1057
-#define ID_ROTATEXP 1058
-#define ID_FLIPX 1059
-#define ID_FLIPY 1060
-#define ID_FLIPZ 1061
-#define ID_POSX 1062
-#define ID_POSY 1063
-#define ID_POSZ 1064
-#define ID_ANGLE 1065
-#define ID_FORMBOX 1066
-#define ID_FORMCONTOUR 1067
-#define ID_WORKPIECEROTATEX 1068
-#define ID_WORKPIECEROTATEY 1069
-#define ID_WORKPIECEROTATEZ 1070
-#define wxID_LOAD 1071
-#define ID_AXISX 1072
-#define ID_AXISY 1073
-#define ID_AXISZ 1074
-#define ID_TEXTX 1075
-#define ID_TEXTY 1076
-#define ID_TEXTZ 1077
-#define ID_AXISA 1078
-#define ID_AXISB 1079
-#define ID_AXISC 1080
-#define ID_TEXTA 1081
-#define ID_TEXTB 1082
-#define ID_TEXTC 1083
-#define ID_AXISU 1084
-#define ID_AXISV 1085
-#define ID_AXISW 1086
-#define ID_TEXTU 1087
-#define ID_TEXTV 1088
-#define ID_TEXTW 1089
-#define ID_BUTTONCONNECT 1090
-#define ID_BUTTONDISCONNECT 1091
-#define ID_COLORLR 1092
-#define ID_COLORLG 1093
-#define ID_COLORLB 1094
-#define ID_COLORRR 1095
-#define ID_COLORRG 1096
-#define ID_COLORRB 1097
-#define ID_COLORLEFT 1098
-#define ID_COLORRIGHT 1099
-#define ID_TEXTLR 1100
-#define ID_TEXTLG 1101
-#define ID_TEXTLB 1102
-#define ID_EYEDISTANCE 1103
-#define ID_TEXTEYEDISTANCE 1104
-#define ID_FOCALDISTANCE 1105
-#define ID_TEXTFOCALDISTANCE 1106
-#define ID_TEXTRR 1107
-#define ID_TEXTRG 1108
-#define ID_TEXTRB 1109
-#define ID_XSTART 1110
-#define ID_XEND 1111
-#define ID_YSTART 1112
-#define ID_YEND 1113
-#define ID_ZSTART 1114
-#define ID_ZEND 1115
-#define ID_SELECTAREAOBJECT 1116
-#define ID_MARGINSIDE 1117
-#define ID_MARGINBELOW 1118
+#define ID_GENERATORSETUP 1021
+#define wxID_GENERATORRESTART 1022
+#define ID_VIEWSTEREO3D 1023
+#define ID_SETUPCONTROLLER 1024
+#define ID_SETUPUNITS 1025
+#define ID_CLOSEEXTRAWINDOWS 1026
+#define ID_LOGSHOW 1027
+#define ID_VIEWTOP 1028
+#define ID_VIEWBOTTOM 1029
+#define ID_VIEWFRONT 1030
+#define ID_VIEWBACK 1031
+#define ID_VIEWLEFT 1032
+#define ID_VIEWRIGHT 1033
+#define ID_DISPLAYMACHINE 1034
+#define ID_DISPLAYMATERIAL 1035
+#define ID_MULTTEN 1036
+#define ID_DIVTEN 1037
+#define ID_SCALEUNITX 1038
+#define ID_SCALEUNITY 1039
+#define ID_SCALEUNITZ 1040
+#define ID_SCALEPERCENTX 1041
+#define ID_SCALEPERCENTY 1042
+#define ID_SCALEPERCENTZ 1043
+#define ID_SCALEPERCENT 1044
+#define ID_MOVEZP 1045
+#define ID_MOVEYP 1046
+#define ID_MOVEXN 1047
+#define ID_MOVEXP 1048
+#define ID_MOVEYN 1049
+#define ID_MOVEZN 1050
+#define ID_ALIGNTOP 1051
+#define ID_ALIGNMIDDLE 1052
+#define ID_ALIGNBOTTOM 1053
+#define ID_ROTATEYN 1054
+#define ID_ROTATEXN 1055
+#define ID_ROTATEYP 1056
+#define ID_ROTATEZN 1057
+#define ID_ROTATEZP 1058
+#define ID_ROTATEXP 1059
+#define ID_FLIPX 1060
+#define ID_FLIPY 1061
+#define ID_FLIPZ 1062
+#define ID_POSX 1063
+#define ID_POSY 1064
+#define ID_POSZ 1065
+#define ID_ANGLE 1066
+#define ID_FORMBOX 1067
+#define ID_FORMCONTOUR 1068
+#define ID_WORKPIECEROTATEX 1069
+#define ID_WORKPIECEROTATEY 1070
+#define ID_WORKPIECEROTATEZ 1071
+#define wxID_LOAD 1072
+#define ID_AXISX 1073
+#define ID_AXISY 1074
+#define ID_AXISZ 1075
+#define ID_TEXTX 1076
+#define ID_TEXTY 1077
+#define ID_TEXTZ 1078
+#define ID_AXISA 1079
+#define ID_AXISB 1080
+#define ID_AXISC 1081
+#define ID_TEXTA 1082
+#define ID_TEXTB 1083
+#define ID_TEXTC 1084
+#define ID_AXISU 1085
+#define ID_AXISV 1086
+#define ID_AXISW 1087
+#define ID_TEXTU 1088
+#define ID_TEXTV 1089
+#define ID_TEXTW 1090
+#define ID_XSTART 1091
+#define ID_XEND 1092
+#define ID_YSTART 1093
+#define ID_YEND 1094
+#define ID_ZSTART 1095
+#define ID_ZEND 1096
+#define ID_SELECTAREAOBJECT 1097
+#define ID_MARGINSIDE 1098
+#define ID_MARGINBELOW 1099
+#define ID_BUTTONCONNECT 1100
+#define ID_BUTTONDISCONNECT 1101
+#define ID_COLORLR 1102
+#define ID_COLORLG 1103
+#define ID_COLORLB 1104
+#define ID_COLORRR 1105
+#define ID_COLORRG 1106
+#define ID_COLORRB 1107
+#define ID_COLORLEFT 1108
+#define ID_COLORRIGHT 1109
+#define ID_TEXTLR 1110
+#define ID_TEXTLG 1111
+#define ID_TEXTLB 1112
+#define ID_EYEDISTANCE 1113
+#define ID_TEXTEYEDISTANCE 1114
+#define ID_FOCALDISTANCE 1115
+#define ID_TEXTFOCALDISTANCE 1116
+#define ID_TEXTRR 1117
+#define ID_TEXTRG 1118
+#define ID_TEXTRB 1119
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIMainFrame
@@ -194,7 +195,7 @@ class GUIMainFrame : public wxFrame
 		wxMenu* m_menuView;
 		wxMenu* m_menuHelp;
 		wxSplitterWindow* m_splitter;
-		wxPanel* m_panel1;
+		wxPanel* m_panelTree;
 		wxTreeCtrl* m_tree;
 		wxPanel* m_panelMainCanvas;
 		MainCanvas* m_canvas;
@@ -202,59 +203,56 @@ class GUIMainFrame : public wxFrame
 		wxToolBar* m_toolBar;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnProjectNew( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnProjectRename( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnProjectLoad( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnProjectSave( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnProjectSaveAs( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnQuit( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUndo( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRedo( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnObjectModify( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnObjectFlipNormals( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnObjectLoad( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnObjectRename( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnObjectDelete( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnStockEdit( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnWorkpieceAdd( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnWorkpieceSetup( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnWorkpieceDelete( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnWorkpieceDeleteUnused( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRunEdit( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRunAdd( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRunDelete( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnMachineLoad( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnMachineReload( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnMachineDebugger( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnToolboxEdit( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnToolboxLoad( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnToolboxSave( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnGeneratorAdd( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnGenerateToolpath( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRecollectToolpath( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnCleanToolpath( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFlipRun( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnPrepareMachinebed( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnLoadGCodes( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSaveGCodes( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnShowAnimationControl( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnChangeLanguage( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnActivateStereo3D( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSetupController( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSetupStereo3D( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSetupUnits( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnExtraWindowClose( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnShowLogWindow( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnViewSet( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnAbout( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnBeginLabelEdit( wxTreeEvent& event ) { event.Skip(); }
-		virtual void OnEndLabelEdit( wxTreeEvent& event ) { event.Skip(); }
-		virtual void OnActivate( wxTreeEvent& event ) { event.Skip(); }
-		virtual void OnActivateRightClickMenu( wxTreeEvent& event ) { event.Skip(); }
-		virtual void OnSelectionChanged( wxTreeEvent& event ) { event.Skip(); }
-		virtual void OnSelectionChanging( wxTreeEvent& event ) { event.Skip(); }
-		virtual void On3DSelect( wxMouseEvent& event ) { event.Skip(); }
-		virtual void OnToolbarButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnProjectNew( wxCommandEvent& event ) = 0;
+		virtual void OnProjectRename( wxCommandEvent& event ) = 0;
+		virtual void OnProjectLoad( wxCommandEvent& event ) = 0;
+		virtual void OnProjectSave( wxCommandEvent& event ) = 0;
+		virtual void OnProjectSaveAs( wxCommandEvent& event ) = 0;
+		virtual void OnQuit( wxCommandEvent& event ) = 0;
+		virtual void OnUndo( wxCommandEvent& event ) = 0;
+		virtual void OnRedo( wxCommandEvent& event ) = 0;
+		virtual void OnObjectModify( wxCommandEvent& event ) = 0;
+		virtual void OnObjectFlipNormals( wxCommandEvent& event ) = 0;
+		virtual void OnObjectLoad( wxCommandEvent& event ) = 0;
+		virtual void OnObjectRename( wxCommandEvent& event ) = 0;
+		virtual void OnObjectDelete( wxCommandEvent& event ) = 0;
+		virtual void OnStockEdit( wxCommandEvent& event ) = 0;
+		virtual void OnWorkpieceAdd( wxCommandEvent& event ) = 0;
+		virtual void OnWorkpieceSetup( wxCommandEvent& event ) = 0;
+		virtual void OnWorkpieceDelete( wxCommandEvent& event ) = 0;
+		virtual void OnWorkpieceDeleteUnused( wxCommandEvent& event ) = 0;
+		virtual void OnRunEdit( wxCommandEvent& event ) = 0;
+		virtual void OnRunAdd( wxCommandEvent& event ) = 0;
+		virtual void OnRunDelete( wxCommandEvent& event ) = 0;
+		virtual void OnMachineLoad( wxCommandEvent& event ) = 0;
+		virtual void OnMachineReload( wxCommandEvent& event ) = 0;
+		virtual void OnMachineDebugger( wxCommandEvent& event ) = 0;
+		virtual void OnFlipDrillSetup( wxCommandEvent& event ) = 0;
+		virtual void OnToolboxEdit( wxCommandEvent& event ) = 0;
+		virtual void OnToolboxLoad( wxCommandEvent& event ) = 0;
+		virtual void OnToolboxSave( wxCommandEvent& event ) = 0;
+		virtual void OnGeneratorSetup( wxCommandEvent& event ) = 0;
+		virtual void OnGeneratorAutomatic( wxCommandEvent& event ) = 0;
+		virtual void OnGeneratorRestart( wxCommandEvent& event ) = 0;
+		virtual void OnGeneratorSaveToolpath( wxCommandEvent& event ) = 0;
+		virtual void OnShowAnimationControl( wxCommandEvent& event ) = 0;
+		virtual void OnChangeLanguage( wxCommandEvent& event ) = 0;
+		virtual void OnActivateStereo3D( wxCommandEvent& event ) = 0;
+		virtual void OnSetupController( wxCommandEvent& event ) = 0;
+		virtual void OnSetupStereo3D( wxCommandEvent& event ) = 0;
+		virtual void OnSetupUnits( wxCommandEvent& event ) = 0;
+		virtual void OnExtraWindowClose( wxCommandEvent& event ) = 0;
+		virtual void OnShowLogWindow( wxCommandEvent& event ) = 0;
+		virtual void OnViewSet( wxCommandEvent& event ) = 0;
+		virtual void OnAbout( wxCommandEvent& event ) = 0;
+		virtual void OnBeginLabelEdit( wxTreeEvent& event ) = 0;
+		virtual void OnEndLabelEdit( wxTreeEvent& event ) = 0;
+		virtual void OnActivate( wxTreeEvent& event ) = 0;
+		virtual void OnActivateRightClickMenu( wxTreeEvent& event ) = 0;
+		virtual void OnSelectionChanged( wxTreeEvent& event ) = 0;
+		virtual void OnSelectionChanging( wxTreeEvent& event ) = 0;
+		virtual void On3DSelect( wxMouseEvent& event ) = 0;
+		virtual void OnToolbarButton( wxCommandEvent& event ) = 0;
 		
 	
 	public:
@@ -370,13 +368,12 @@ class GUIObjectTransformation : public wxFrame
 		wxStatusBar* m_statusBar;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSetupUnits( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSelectObject( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnTransform( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSetFactors( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFlipNormals( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnClose( wxCommandEvent& event ) = 0;
+		virtual void OnSelectObject( wxCommandEvent& event ) = 0;
+		virtual void OnTransform( wxCommandEvent& event ) = 0;
+		virtual void OnSetFactors( wxCommandEvent& event ) = 0;
+		virtual void OnFlipNormals( wxCommandEvent& event ) = 0;
 		
 	
 	public:
@@ -422,13 +419,13 @@ class GUIStockMaterial : public wxFrame
 		wxListCtrl* m_listCtrl;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnSize( wxSizeEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnAddUpdate( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDelete( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnActivate( wxListEvent& event ) { event.Skip(); }
-		virtual void OnSelected( wxListEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnSize( wxSizeEvent& event ) = 0;
+		virtual void OnClose( wxCommandEvent& event ) = 0;
+		virtual void OnAddUpdate( wxCommandEvent& event ) = 0;
+		virtual void OnDelete( wxCommandEvent& event ) = 0;
+		virtual void OnActivate( wxListEvent& event ) = 0;
+		virtual void OnSelected( wxListEvent& event ) = 0;
 		
 	
 	public:
@@ -455,11 +452,11 @@ class GUIWorkpiece : public wxFrame
 		wxGrid* m_grid;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnSize( wxSizeEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnAddStock( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDBLClick( wxGridEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnSize( wxSizeEvent& event ) = 0;
+		virtual void OnClose( wxCommandEvent& event ) = 0;
+		virtual void OnAddStock( wxCommandEvent& event ) = 0;
+		virtual void OnDBLClick( wxGridEvent& event ) = 0;
 		
 	
 	public:
@@ -516,15 +513,15 @@ class GUIPlacement : public wxFrame
 		PanelTopView * m_topview;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnSize( wxSizeEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSelectWorkpiece( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSelectObject( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnChangePosition( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnChangeSlider( wxScrollEvent& event ) { event.Skip(); }
-		virtual void OnSelectForm( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnTransform( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnSize( wxSizeEvent& event ) = 0;
+		virtual void OnClose( wxCommandEvent& event ) = 0;
+		virtual void OnSelectWorkpiece( wxCommandEvent& event ) = 0;
+		virtual void OnSelectObject( wxCommandEvent& event ) = 0;
+		virtual void OnChangePosition( wxCommandEvent& event ) = 0;
+		virtual void OnChangeSlider( wxScrollEvent& event ) = 0;
+		virtual void OnSelectForm( wxCommandEvent& event ) = 0;
+		virtual void OnTransform( wxCommandEvent& event ) = 0;
 		
 	
 	public:
@@ -562,14 +559,14 @@ class GUIRun : public wxFrame
 		wxButton* m_buttonToolAdd;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRunSelect( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnWorkpieceSelect( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRotate( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnMachineLoad( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnToolRemove( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnToolAdd( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnClose( wxCommandEvent& event ) = 0;
+		virtual void OnRunSelect( wxCommandEvent& event ) = 0;
+		virtual void OnWorkpieceSelect( wxCommandEvent& event ) = 0;
+		virtual void OnRotate( wxCommandEvent& event ) = 0;
+		virtual void OnMachineLoad( wxCommandEvent& event ) = 0;
+		virtual void OnToolRemove( wxCommandEvent& event ) = 0;
+		virtual void OnToolAdd( wxCommandEvent& event ) = 0;
 		
 	
 	public:
@@ -603,12 +600,12 @@ class GUIMachineDebugger : public wxFrame
 		wxStatusBar* m_statusBar3;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnMachineLoad( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnMachineSave( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnScriptEvaluate( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnShowController( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnMachineLoad( wxCommandEvent& event ) = 0;
+		virtual void OnMachineSave( wxCommandEvent& event ) = 0;
+		virtual void OnScriptEvaluate( wxCommandEvent& event ) = 0;
+		virtual void OnShowController( wxCommandEvent& event ) = 0;
+		virtual void OnClose( wxCommandEvent& event ) = 0;
 		
 	
 	public:
@@ -689,12 +686,12 @@ class GUIMachineControl : public wxFrame
 		
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnZero( wxMouseEvent& event ) { event.Skip(); }
-		virtual void OnScroll( wxScrollEvent& event ) { event.Skip(); }
-		virtual void OnTrack( wxScrollEvent& event ) { event.Skip(); }
-		virtual void OnTextChanged( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnClose( wxCommandEvent& event ) = 0;
+		virtual void OnZero( wxMouseEvent& event ) = 0;
+		virtual void OnScroll( wxScrollEvent& event ) = 0;
+		virtual void OnTrack( wxScrollEvent& event ) = 0;
+		virtual void OnTextChanged( wxCommandEvent& event ) = 0;
 		
 	
 	public:
@@ -731,9 +728,9 @@ class GUIToolbox : public wxFrame
 		wxStaticText* m_staticText14;
 		wxTextCtrl* m_textCtrlFeedCoefficient;
 		wxStaticText* m_staticTextUnitFeedCoefficient;
-		wxStaticText* m_staticText16;
+		wxStaticText* m_staticTextFlutes;
 		wxTextCtrl* m_textCtrlNrOfTeeth;
-		wxStaticText* m_staticText17;
+		
 		wxStaticText* m_staticText26;
 		wxTextCtrl* m_textCtrlComment;
 		PanelTool* m_panel;
@@ -750,29 +747,98 @@ class GUIToolbox : public wxFrame
 		wxStaticText* m_staticText22;
 		wxTextCtrl* m_textCtrlRadius;
 		wxStaticText* m_staticTextUnitRadius;
-		wxStaticText* m_staticText24;
+		
 		wxCheckBox* m_checkBoxCutting;
-		wxStaticText* m_staticText25;
+		
 		wxListCtrl* m_listCtrl;
 		ToolCanvas* m_canvas;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnChangeStereo3D( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnNewTool( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUpdateTool( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDeleteTool( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnShapeNew( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnShapeUpdate( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnShapeDelete( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnShapeSelect( wxListEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnToolboxLoad( wxCommandEvent& event ) = 0;
+		virtual void OnToolboxSave( wxCommandEvent& event ) = 0;
+		virtual void OnClose( wxCommandEvent& event ) = 0;
+		virtual void OnChangeStereo3D( wxCommandEvent& event ) = 0;
+		virtual void OnToolSelect( wxCommandEvent& event ) = 0;
+		virtual void OnToolRename( wxCommandEvent& event ) = 0;
+		virtual void OnToolNew( wxCommandEvent& event ) = 0;
+		virtual void OnToolUpdate( wxCommandEvent& event ) = 0;
+		virtual void OnToolDelete( wxCommandEvent& event ) = 0;
+		virtual void OnShapeNew( wxCommandEvent& event ) = 0;
+		virtual void OnShapeUpdate( wxCommandEvent& event ) = 0;
+		virtual void OnShapeDelete( wxCommandEvent& event ) = 0;
+		virtual void OnShapeSelect( wxListEvent& event ) = 0;
 		
 	
 	public:
 		
-		GUIToolbox( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolbox"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 646,765 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIToolbox( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolbox"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 687,757 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		~GUIToolbox();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class GUIToolpathGenerator
+///////////////////////////////////////////////////////////////////////////////
+class GUIToolpathGenerator : public wxFrame 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_staticText125;
+		wxChoice* m_choiceRun;
+		wxStaticText* m_staticText145;
+		wxChoice* m_choiceToolpath;
+		wxButton* m_buttonAddNew;
+		wxStaticText* m_staticText126;
+		wxTextCtrl* m_textCtrlX1;
+		wxStaticText* m_staticTextUnitX1;
+		wxStaticText* m_staticText130;
+		wxTextCtrl* m_textCtrlX2;
+		wxStaticText* m_staticTextUnitX2;
+		wxStaticText* m_staticText131;
+		wxTextCtrl* m_textCtrlY1;
+		wxStaticText* m_staticTextUnitY1;
+		wxStaticText* m_staticText132;
+		wxTextCtrl* m_textCtrlY2;
+		wxStaticText* m_staticTextUnitY2;
+		wxStaticText* m_staticText1315;
+		wxTextCtrl* m_textCtrlZ1;
+		wxStaticText* m_staticTextUnitZ1;
+		wxStaticText* m_staticText1312;
+		wxTextCtrl* m_textCtrlZ2;
+		wxStaticText* m_staticTextUnitZ2;
+		wxButton* m_buttonSelectAreaFromObject;
+		wxStaticText* m_staticText139;
+		wxTextCtrl* m_textCtrlMarginSide;
+		wxStaticText* m_staticTextUnitMarginSide;
+		wxStaticText* m_staticText141;
+		wxTextCtrl* m_textCtrlMarginBelow;
+		wxStaticText* m_staticTextUnitMarginBelow;
+		wxChoicebook* m_choicebookGenerator;
+		wxButton* m_buttonUpdate;
+		wxButton* m_buttonReset;
+		wxButton* m_buttonDelete;
+		wxButton* m_buttonClose;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnSelectRun( wxCommandEvent& event ) = 0;
+		virtual void OnSelectToolpath( wxCommandEvent& event ) = 0;
+		virtual void OnAdd( wxCommandEvent& event ) = 0;
+		virtual void OnChangeText( wxCommandEvent& event ) = 0;
+		virtual void OnSelectArea( wxCommandEvent& event ) = 0;
+		virtual void OnPageChanged( wxChoicebookEvent& event ) = 0;
+		virtual void OnUpdate( wxCommandEvent& event ) = 0;
+		virtual void OnResetChanges( wxCommandEvent& event ) = 0;
+		virtual void OnDelete( wxCommandEvent& event ) = 0;
+		virtual void OnClose( wxCommandEvent& event ) = 0;
+		
+	
+	public:
+		
+		GUIToolpathGenerator( wxWindow* parent, wxWindowID id = wxID_CLOSE, const wxString& title = _("Add / Update Toolpath Generators"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 647,782 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		~GUIToolpathGenerator();
 	
 };
 
@@ -798,12 +864,15 @@ class GUIAnimation : public wxFrame
 		wxBitmapButton* m_bpButtonLast;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnFirst( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnPrev( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnPlayStop( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnNext( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnLast( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnSelectToolpath( wxCommandEvent& event ) = 0;
+		virtual void OnChangeTime( wxCommandEvent& event ) = 0;
+		virtual void OnScroll( wxScrollEvent& event ) = 0;
+		virtual void OnFirst( wxCommandEvent& event ) = 0;
+		virtual void OnPrev( wxCommandEvent& event ) = 0;
+		virtual void OnPlayStop( wxCommandEvent& event ) = 0;
+		virtual void OnNext( wxCommandEvent& event ) = 0;
+		virtual void OnLast( wxCommandEvent& event ) = 0;
 		
 	
 	public:
@@ -841,9 +910,9 @@ class GUISetup6DOFController : public wxDialog
 		wxButton* buttonClose;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnConnect( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDisconnect( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnConnect( wxCommandEvent& event ) = 0;
+		virtual void OnDisconnect( wxCommandEvent& event ) = 0;
+		virtual void OnClose( wxCommandEvent& event ) = 0;
 		
 	
 	public:
@@ -879,8 +948,8 @@ class GUISetupUnits : public wxFrame
 		wxStaticText* m_staticText64;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnChangeUnit( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnChangeUnit( wxCommandEvent& event ) = 0;
+		virtual void OnClose( wxCommandEvent& event ) = 0;
 		
 	
 	public:
@@ -932,11 +1001,11 @@ class GUISetupStereo3D : public wxFrame
 		wxTextCtrl* m_textCtrlRB;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnScroll( wxScrollEvent& event ) { event.Skip(); }
-		virtual void OnColorChanged( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnSwap( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnTextChange( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnScroll( wxScrollEvent& event ) = 0;
+		virtual void OnColorChanged( wxColourPickerEvent& event ) = 0;
+		virtual void OnSwap( wxCommandEvent& event ) = 0;
+		virtual void OnTextChange( wxCommandEvent& event ) = 0;
 		
 	
 	public:
@@ -958,78 +1027,13 @@ class GUIAbout : public wxDialog
 		wxButton* m_button1;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) = 0;
 		
 	
 	public:
 		
 		GUIAbout( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 504,373 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
 		~GUIAbout();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class GUIToolpathGenerator
-///////////////////////////////////////////////////////////////////////////////
-class GUIToolpathGenerator : public wxFrame 
-{
-	private:
-	
-	protected:
-		wxStaticText* m_staticText125;
-		wxChoice* m_choiceRun;
-		wxStaticText* m_staticText145;
-		wxChoice* m_choiceToolpath;
-		wxButton* m_buttonAddNew;
-		wxStaticText* m_staticText126;
-		wxTextCtrl* m_textCtrlX1;
-		wxStaticText* m_staticTextUnitX1;
-		wxStaticText* m_staticText130;
-		wxTextCtrl* m_textCtrlX2;
-		wxStaticText* m_staticTextUnitX2;
-		wxStaticText* m_staticText131;
-		wxTextCtrl* m_textCtrlY1;
-		wxStaticText* m_staticTextUnitY1;
-		wxStaticText* m_staticText132;
-		wxTextCtrl* m_textCtrlY2;
-		wxStaticText* m_staticTextUnitY2;
-		wxStaticText* m_staticText1315;
-		wxTextCtrl* m_textCtrlZ1;
-		wxStaticText* m_staticTextUnitZ1;
-		wxStaticText* m_staticText1312;
-		wxTextCtrl* m_textCtrlZ2;
-		wxStaticText* m_staticTextUnitZ2;
-		wxButton* m_buttonSelectAreaFromObject;
-		wxStaticText* m_staticText139;
-		wxTextCtrl* m_textCtrlMarginSide;
-		wxStaticText* m_staticTextUnitMarginSide;
-		wxStaticText* m_staticText141;
-		wxTextCtrl* m_textCtrlMarginBelow;
-		wxStaticText* m_staticTextUnitMarginBelow;
-		wxChoicebook* m_choicebookGenerator;
-		wxButton* m_buttonUpdate;
-		wxButton* m_buttonReset;
-		wxButton* m_buttonDelete;
-		wxButton* m_buttonClose;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnSelectRun( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSelectToolpath( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnAdd( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnChangeText( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSelectArea( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnPageChanged( wxChoicebookEvent& event ) { event.Skip(); }
-		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnResetChanges( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDelete( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
-		
-	
-	public:
-		
-		GUIToolpathGenerator( wxWindow* parent, wxWindowID id = wxID_CLOSE, const wxString& title = _("Add / Update Toolpath Generators"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 647,782 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
-		~GUIToolpathGenerator();
 	
 };
 

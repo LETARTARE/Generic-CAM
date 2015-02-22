@@ -33,14 +33,16 @@
 #ifndef TOOLPATH_H_
 #define TOOLPATH_H_
 
-#include "../generator/Generator.h"
-
-#include "../3D/AffineTransformMatrix.h"
-#include "../machine/MachinePosition.h"
-#include "../3D/AffineTransformMatrix.h"
-#include "../3D/Vector3.h"
 #include <wx/dynarray.h>
 #include <wx/textfile.h>
+#include <wx/thread.h>
+
+#include "../3D/AffineTransformMatrix.h"
+#include "../3D/Vector3.h"
+#include "../generator/Generator.h"
+#include "../machine/MachinePosition.h"
+
+class Generator;
 
 class ToolPath {
 	// Constructor / Destructor

@@ -37,12 +37,6 @@ DialogAnimation::~DialogAnimation()
 	return;
 }
 
-void DialogAnimation::OnClose(wxCommandEvent &event)
-{
-	TransferDataFromWindow();
-	this->Show(false);
-}
-
 bool DialogAnimation::TransferDataToWindow(void)
 {
 	return true;
@@ -52,18 +46,39 @@ bool DialogAnimation::TransferDataFromWindow(void)
 	return true;
 }
 
-void DialogAnimation::OnLast(wxCommandEvent& event)
+void DialogAnimation::OnClose(wxCloseEvent &event)
+{
+	this->Show(false);
+}
+
+void DialogAnimation::OnSelectToolpath(wxCommandEvent& event)
 {
 }
-void DialogAnimation::OnBegin(wxCommandEvent& event)
+
+void DialogAnimation::OnChangeTime(wxCommandEvent& event)
 {
 }
+
+void DialogAnimation::OnScroll(wxScrollEvent& event)
+{
+}
+
+void DialogAnimation::OnFirst(wxCommandEvent& event)
+{
+}
+
+void DialogAnimation::OnPrev(wxCommandEvent& event)
+{
+}
+
 void DialogAnimation::OnPlayStop(wxCommandEvent& event)
 {
 }
-void DialogAnimation::OnEnd(wxCommandEvent& event)
+
+void DialogAnimation::OnNext(wxCommandEvent& event)
 {
 }
-void DialogAnimation::OnNext(wxCommandEvent& event)
+
+void DialogAnimation::OnLast(wxCommandEvent& event)
 {
 }

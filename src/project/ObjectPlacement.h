@@ -33,14 +33,16 @@
  * ...
  */
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../3D/Polygon25.h"
-#include "../3D/BoundingBox.h"
-
-#include "Object.h"
-
+#include <stddef.h>
 #include <wx/dynarray.h>
 #include <wx/xml/xml.h>
+
+#include "../3D/AffineTransformMatrix.h"
+#include "../3D/BoundingBox.h"
+#include "../3D/Polygon25.h"
+#include "Object.h"
+
+class ArrayOfObject;
 
 class ObjectPlacement {
 public:

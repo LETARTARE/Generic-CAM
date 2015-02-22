@@ -171,7 +171,6 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 		m_textCtrlMarginSide->SetValue(_T(""));
 		m_choicebookGenerator->SetSelection(0);
 	}
-
 	return true;
 }
 
@@ -414,13 +413,10 @@ void DialogToolpathGenerator::OnSelectArea(wxCommandEvent& event)
 
 void DialogToolpathGenerator::OnChangeText(wxCommandEvent& event)
 {
-	TransferDataFromWindow();
 }
 
 void DialogToolpathGenerator::OnPageChanged(wxChoicebookEvent& event)
 {
-//	TransferDataFromWindow();
-//	TransferDataToWindow();
 }
 
 void DialogToolpathGenerator::OnResetChanges(wxCommandEvent& event)

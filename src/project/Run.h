@@ -27,17 +27,22 @@
 #ifndef RUN_H_
 #define RUN_H_
 
-#include "../3D/Geometry.h"
-#include "Toolbox.h"
-#include "../machine/Machine.h"
-#include "StockMaterial.h"
-#include "Workpiece.h"
-#include "ToolPath.h"
-
+#include <wx/dynarray.h>
+#include <wx/filename.h>
 #include <wx/string.h>
 #include <wx/textfile.h>
 #include <wx/xml/xml.h>
-#include <wx/dynarray.h>
+
+#include "../3D/AffineTransformMatrix.h"
+#include "../3D/Geometry.h"
+#include "../machine/Machine.h"
+#include "StockMaterial.h"
+#include "Toolbox.h"
+#include "ToolPath.h"
+#include "Workpiece.h"
+
+class ArrayOfObject;
+class ArrayOfWorkpiece;
 
 /*!\class Run
  * \brief ...
@@ -56,6 +61,7 @@ public:
 public:
 	wxString name;
 	bool selected;
+
 	AffineTransformMatrix workpiecePlacement; ///> For flipping the workpiece to machine the other sides.
 
 	int workpieceNr;

@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : DialogAnimation.h
-// Purpose            : A window displaying the animation controls.
+// Name               : FlipDrillPattern.h
+// Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 12.07.2011
-// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 20.02.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,37 +24,34 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef ANIMATIONFRAME_H_
-#define ANIMATIONFRAME_H_
+#ifndef FLIPDRILLPATTERN_H_
+#define FLIPDRILLPATTERN_H_
 
-#include "gui.h"
+/*!\class FlipDrillPattern
+ * \brief ...
+ *
+ * ...
+ */
 
-class DialogAnimation:public GUIAnimation {
-	// Constructor/ Destructor
+#include <wx/dynarray.h>
+#include <wx/string.h>
+
+class DrillPosition {
 public:
-	DialogAnimation(wxWindow* parent, Project * project);
-	virtual ~DialogAnimation();
-
-	// Member Variables
-public:
-	Project* project;
-
-	// Methods
-public:
-	bool TransferDataToWindow(void);
-	bool TransferDataFromWindow(void);
-
-	void OnClose(wxCloseEvent& event);
-
-	void OnSelectToolpath(wxCommandEvent& event);
-	void OnChangeTime(wxCommandEvent& event);
-	void OnScroll(wxScrollEvent& event);
-
-	void OnFirst(wxCommandEvent& event);
-	void OnPrev(wxCommandEvent& event);
-	void OnPlayStop(wxCommandEvent& event);
-	void OnNext(wxCommandEvent& event);
-	void OnLast(wxCommandEvent& event);
+	DrillPosition();
+	float x;
+	float y;
+	float depth;
+	float diameter;
 };
+WX_DECLARE_OBJARRAY(DrillPosition, ArrayOfDrillPosition);
 
-#endif /* ANIMATIONFRAME_H_ */
+class FlipDrillPattern {
+public:
+	FlipDrillPattern();
+	wxString name;
+	ArrayOfDrillPosition position;
+};
+WX_DECLARE_OBJARRAY(FlipDrillPattern, ArrayOfFlipDrillPattern);
+
+#endif /* FLIPDRILLPATTERN_H_ */

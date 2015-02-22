@@ -55,6 +55,7 @@ void Run::Paint(const ArrayOfObject& objects,
 	if(workpieceNr > -1){
 		::glPushMatrix();
 		::glMultMatrixd(machine.workpiecePosition.a);
+		::glMultMatrixd(workpiecePlacement.a);
 		workpieces[workpieceNr].Paint(objects);
 		::glPopMatrix();
 	}

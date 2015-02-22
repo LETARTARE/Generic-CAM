@@ -27,11 +27,12 @@
 #ifndef TOOLBOX_H_
 #define TOOLBOX_H_
 
-#include "../machine/Tool.h"
-
-#include <wx/xml/xml.h>
-#include <wx/string.h>
+#include <stddef.h>
 #include <wx/filename.h>
+#include <wx/string.h>
+#include <wx/xml/xml.h>
+
+#include "../machine/Tool.h"
 
 class Toolbox {
 	//Constructor / Destructor
