@@ -89,7 +89,9 @@ void GeneratorNone::FromString(const wxString& text)
 {
 }
 
-wxThread::ExitCode GeneratorNone::Entry(void)
+void GeneratorNone::GenerateToolpath(void)
 {
-	return 0;
+	printf("None called.\n");
+	errorOccured = false;
+	toolpathGenerated = true;
 }

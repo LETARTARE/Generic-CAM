@@ -45,6 +45,8 @@ public:
 	// Member variables
 public:
 	bool selected;
+	bool modified;
+	volatile bool hasRunningGenerator;
 
 	ArrayOfObjectPlacement placements;
 

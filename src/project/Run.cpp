@@ -34,9 +34,10 @@ WX_DEFINE_OBJARRAY(ArrayOfRun)
 
 Run::Run()
 {
+	selected = false;
+	modified = false;
 	name = _T("Run #");
 	workpieceNr = -1;
-	selected = false;
 	toolbox.Empty();
 	selectedTool = 0;
 }

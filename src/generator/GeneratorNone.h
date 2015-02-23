@@ -50,7 +50,7 @@ public:
 	virtual wxString ToString(void) const;
 	virtual void FromString(const wxString & text);
 
-	virtual wxThread::ExitCode Entry(void);
+	virtual void GenerateToolpath(void);
 };
 
 #endif /* GENERATORNONE_H_ */

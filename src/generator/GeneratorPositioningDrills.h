@@ -53,7 +53,7 @@ public:
 	virtual void TransferDataFromPanel(void);
 	virtual wxString ToString(void) const;
 	virtual void FromString(const wxString & text);
-	virtual wxThread::ExitCode Entry(void);
+	virtual void GenerateToolpath(void);
 
 private:
 	wxChoice* m_choiceSetups;

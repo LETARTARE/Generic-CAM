@@ -75,7 +75,7 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxMenuBar" expanded="0">
+            <object class="wxMenuBar" expanded="1">
                 <property name="bg"></property>
                 <property name="context_help"></property>
                 <property name="enabled">1</property>
@@ -657,7 +657,7 @@
                         <property name="checked">1</property>
                         <property name="enabled">1</property>
                         <property name="help"></property>
-                        <property name="id">wxID_ANY</property>
+                        <property name="id">ID_GENERATORAUTOMATIC</property>
                         <property name="kind">wxITEM_CHECK</property>
                         <property name="label">&amp;Automatic Generation</property>
                         <property name="name">m_menuItemGeneratorAutomatic</property>
@@ -672,7 +672,7 @@
                         <property name="checked">0</property>
                         <property name="enabled">1</property>
                         <property name="help"></property>
-                        <property name="id">wxID_GENERATORRESTART</property>
+                        <property name="id">ID_GENERATORRESTART</property>
                         <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">&amp;Restart Generation</property>
                         <property name="name">m_menuItemGeneratorRestart</property>

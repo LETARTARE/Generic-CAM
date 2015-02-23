@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GeneratorLoadFromFile.h
+// Name               : ToolpathGeneratorThread.cpp
 // Purpose            : 
-// Thread Safe        : Yes
+// Thread Safe        : Certainly not
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 09.02.2015
+// Created            : 23.02.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,40 +24,31 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef GENERATORLOADFROMFILE_H_
-#define GENERATORLOADFROMFILE_H_
+#include "ToolpathGeneratorThread.h"
 
-/*!\class GeneratorLoadFromFile
- * \brief ...
- *
- * ...
- */
+#include "../project/Project.h"
 
-#include "Generator.h"
+ToolpathGeneratorThread::ToolpathGeneratorThread(Project* project, size_t runNr,
+		size_t toolpathNr)
+{
+	this->project = project;
+	this->runNr = runNr;
+	this->toolpathNr = toolpathNr;
+}
 
-#include <wx/filepicker.h>
-#include <wx/panel.h>
-#include <wx/radiobox.h>
-#include <wx/stattext.h>
-#include <wx/string.h>
+ToolpathGeneratorThread::~ToolpathGeneratorThread()
+{
+}
 
-class GeneratorLoadFromFile:public Generator {
-public:
-	GeneratorLoadFromFile();
-	virtual void CopyFrom(const Generator * other);
-	virtual ~GeneratorLoadFromFile();
-
-	virtual wxString GetName(void) const;
-	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
-	virtual void TransferDataToPanel(void) const;
-	virtual void TransferDataFromPanel(void);
-	virtual wxString ToString(void) const;
-	virtual void FromString(const wxString & text);
-	virtual void GenerateToolpath(void);
-
-private:
-	wxStaticText* m_staticTextLoadFile;
-	wxFilePickerCtrl* m_filePicker;
-};
-
-#endif /* GENERATORLOADFROMFILE_H_ */
+wxThread::ExitCode ToolpathGeneratorThread::Entry(void)
+{
+	assert(runNr < project->run.GetCount());
+	size_t workpieceNr = project->run[runNr].workpieceNr;
+	assert(workpieceNr >= 0);
+	assert(toolpathNr >= 0);
+	project->run[runNr].toolpaths[toolpathNr].generator->GenerateToolpath();
+	printf("...done.\n");
+	project->workpieces[workpieceNr].hasRunningGenerator = false;
+	printf("Flag reset.\n");
+	return 0;
+}

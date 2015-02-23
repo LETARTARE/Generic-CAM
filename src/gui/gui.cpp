@@ -198,12 +198,12 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_separator18 = m_menuToolpath->AppendSeparator();
 	
 	wxMenuItem* m_menuItemGeneratorAutomatic;
-	m_menuItemGeneratorAutomatic = new wxMenuItem( m_menuToolpath, wxID_ANY, wxString( _("&Automatic Generation") ) , wxEmptyString, wxITEM_CHECK );
+	m_menuItemGeneratorAutomatic = new wxMenuItem( m_menuToolpath, ID_GENERATORAUTOMATIC, wxString( _("&Automatic Generation") ) , wxEmptyString, wxITEM_CHECK );
 	m_menuToolpath->Append( m_menuItemGeneratorAutomatic );
 	m_menuItemGeneratorAutomatic->Check( true );
 	
 	wxMenuItem* m_menuItemGeneratorRestart;
-	m_menuItemGeneratorRestart = new wxMenuItem( m_menuToolpath, wxID_GENERATORRESTART, wxString( _("&Restart Generation") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemGeneratorRestart = new wxMenuItem( m_menuToolpath, ID_GENERATORRESTART, wxString( _("&Restart Generation") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuToolpath->Append( m_menuItemGeneratorRestart );
 	
 	wxMenuItem* m_separator19;

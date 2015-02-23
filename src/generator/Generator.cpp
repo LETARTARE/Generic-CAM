@@ -50,16 +50,6 @@ Generator::~Generator()
 	if(toolpath != NULL) delete toolpath;
 }
 
-bool Generator::ToolpathHasBeenGenerated(void) const
-{
-	return toolpathGenerated;
-}
-
-bool Generator::ErrorHasOccured(void) const
-{
-	return errorOccured;
-}
-
 void Generator::AddToPanel(wxPanel* panel, DisplaySettings* settings)
 {
 	this->settings = settings;

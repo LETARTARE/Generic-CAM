@@ -29,7 +29,6 @@
 
 #include <wx/panel.h>
 #include <wx/string.h>
-#include <wx/thread.h>
 
 #include "../3D/BoundingBox.h"
 #include "../gui/DisplaySettings.h"
@@ -45,7 +44,7 @@ class wxPanel;
  * ...
  */
 
-class Generator:public wxThread {
+class Generator {
 	// Constructor/ Destructor
 public:
 	Generator();
@@ -53,6 +52,9 @@ public:
 
 	//Member variables:
 public:
+	bool toolpathGenerated;
+	bool errorOccured;
+
 	BoundingBox box;
 	float marginBelow;
 	float marginSide;
@@ -61,13 +63,8 @@ protected:
 	DisplaySettings * settings;
 	ToolPath * toolpath;
 
-	bool toolpathGenerated;
-	bool errorOccured;
-
 	//Methods:
 public:
-	bool ToolpathHasBeenGenerated(void) const;
-	bool ErrorHasOccured(void) const;
 
 	virtual void CopyFrom(const Generator * other);
 
@@ -77,6 +74,8 @@ public:
 	virtual void TransferDataFromPanel(void) = 0;
 	virtual wxString ToString(void) const = 0;
 	virtual void FromString(const wxString & text) = 0;
+
+	virtual void GenerateToolpath(void) = 0;
 
 };
 

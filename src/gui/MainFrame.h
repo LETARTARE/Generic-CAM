@@ -96,7 +96,9 @@ private:
 	DialogSetupStereo3D * dialogSetupStereo3D;
 
 	wxTimer timer; ///> Animation timer
-	float t; // TODO: Make a seperate animation class
+	float t;
+	float dt;
+
 	// Methods
 public:
 	void ProjectLoad(wxString fileName); ///> Load a project from the command line

@@ -130,6 +130,7 @@ MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	this->Connect(wxEVT_TIMER, wxTimerEventHandler(MainFrame::OnTimer), NULL,
 			this);
 	timer.Start(1000); // ms
+	dt = 1.0;
 
 	TransferDataToWindow();
 }
@@ -167,7 +168,7 @@ bool MainFrame::TransferDataToWindow(void)
 	// Populate the treeview
 	tree->Update();
 
-	//TODO: Review the stereomode
+	m_menuToolpath->Check(ID_GENERATORAUTOMATIC, project.processToolpath);
 	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
 	m_toolBar->ToggleTool(ID_DISPLAYMACHINE, project.displayMachine);
 	m_toolBar->ToggleTool(ID_DISPLAYMATERIAL, project.displayGeometry);
@@ -234,15 +235,16 @@ size_t MainFrame::GetFreeSystemMemory()
 
 void MainFrame::OnTimer(wxTimerEvent& event)
 {
-//	t += 0.100;
-//	simulator.Step(t);
-//	simulator.machine.Assemble();
-//	this->Refresh();
+	t += dt;
 
 	wxString temp;
 	temp = wxString::Format(_T("Free RAM: %lu MB"),
 			GetFreeSystemMemory() / 1024 / 1024);
 	m_statusBar->SetStatusText(temp, 1);
+
+	if(project.processToolpath){
+		if(project.GenerateToolpaths()) TransferDataToWindow();
+	}
 }
 
 void MainFrame::OnKeyDown(wxKeyEvent& event)
@@ -326,7 +328,7 @@ void MainFrame::OnBeginLabelEdit(wxTreeEvent& event)
 	if(data->dataType == itemWorkpiece) return;
 	if(data->dataType == itemRun) return;
 
-	// Stop editing, if it cannot be changed.
+// Stop editing, if it cannot be changed.
 	event.Veto();
 }
 
@@ -858,7 +860,6 @@ void MainFrame::OnMachineDebugger(wxCommandEvent& event)
 	dialogDebugger->Raise();
 }
 
-
 void MainFrame::OnFlipDrillSetup(wxCommandEvent& event)
 {
 }
@@ -919,6 +920,8 @@ void MainFrame::OnGeneratorSetup(wxCommandEvent& event)
 
 void MainFrame::OnGeneratorAutomatic(wxCommandEvent& event)
 {
+	project.processToolpath = event.IsChecked();
+	TransferDataToWindow();
 }
 
 void MainFrame::OnGeneratorRestart(wxCommandEvent& event)
@@ -983,10 +986,14 @@ void MainFrame::OnExtraWindowClose(wxCommandEvent& event)
 	dialogObjectTransformation->Show(false);
 	dialogStockMaterial->Show(false);
 	dialogWorkpiece->Show(false);
+	dialogPlacement->Show(false);
 	dialogRun->Show(false);
 	dialogDebugger->Show(false);
 	dialogToolbox->Show(false);
+	dialogToolpathGenerator->Show(false);
 	dialogAnimation->Show(false);
+	dialogSetupStereo3D->Show(false);
+
 	TransferDataToWindow();
 }
 
@@ -999,7 +1006,7 @@ void MainFrame::OnShowLogWindow(wxCommandEvent& event)
 
 void MainFrame::OnViewSet(wxCommandEvent& event)
 {
-	//TODO: Canvas rotation from the outside.
+//TODO: Canvas rotation from the outside.
 	switch(event.GetId()){
 	case ID_VIEWFRONT:
 

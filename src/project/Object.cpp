@@ -40,6 +40,7 @@ WX_DEFINE_OBJARRAY(ArrayOfObject)
 Object::Object()
 {
 	selected = false;
+	modified = false;
 }
 
 Object::~Object()

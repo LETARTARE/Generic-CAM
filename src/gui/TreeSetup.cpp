@@ -407,17 +407,30 @@ void TreeSetup::Update(void)
 			_("Workpiece: ") + project->workpieces[workpieceNr].name,
 					itemRunWorkpiece, n);
 		else
-			SetAtLevel(3, wxString(_("Workpiece: ")) + _T("-"), itemRunWorkpiece,
-					n);
+			SetAtLevel(3, wxString(_("Workpiece: ")) + _T("-"),
+					itemRunWorkpiece, n);
 
 		for(m = 0; m < project->run[n].toolpaths.GetCount(); m++){
-			if(project->run[n].toolpaths[m].generator != NULL)
-				SetAtLevel(3,
-						_("Toolpath - ")
-								+ project->run[n].toolpaths[m].generator->GetName(),
-						itemToolpath, m);
-			else
-				SetAtLevel(3, wxString(_("Toolpath")), itemToolpath, m);
+			wxString temp;
+
+			if(project->run[n].toolpaths[m].generator != NULL){
+				temp =
+				_("Toolpath - ")
+						+ project->run[n].toolpaths[m].generator->GetName();
+
+				if(project->processToolpath){
+					if(!project->run[n].toolpaths[m].generator->toolpathGenerated) temp +=
+							_(" - waiting");
+				}
+				if(project->run[n].toolpaths[m].generator->toolpathGenerated) temp +=
+						_(" - generated");
+				if(project->run[n].toolpaths[m].generator->errorOccured) temp +=
+						_(" - Error");
+			}else{
+				temp = _("Toolpath - ?");
+			}
+
+			SetAtLevel(3, temp, itemToolpath, m);
 		}
 		FinishLevel(3, true);
 	}

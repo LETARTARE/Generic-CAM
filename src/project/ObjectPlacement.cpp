@@ -33,6 +33,7 @@ WX_DEFINE_OBJARRAY(ArrayOfObjectPlacement)
 ObjectPlacement::ObjectPlacement()
 {
 	selected = false;
+	modified = false;
 	objectNr = 0;
 
 	slotWidth = 0.01; // 1 cm

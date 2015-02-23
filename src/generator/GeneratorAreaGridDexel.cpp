@@ -86,8 +86,9 @@ void GeneratorAreaGridDexel::FromString(const wxString& text)
 {
 }
 
-wxThread::ExitCode GeneratorAreaGridDexel::Entry(void)
+void GeneratorAreaGridDexel::GenerateToolpath(void)
 {
-
-	return 0;
+	printf("AreaGridDexel called.\n");
+	errorOccured = false;
+	toolpathGenerated = true;
 }

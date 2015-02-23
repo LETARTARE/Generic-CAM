@@ -90,10 +90,12 @@ void GeneratorLoadFromFile::FromString(const wxString& text)
 {
 }
 
-wxThread::ExitCode GeneratorLoadFromFile::Entry(void)
+void GeneratorLoadFromFile::GenerateToolpath(void)
 {
+	printf("LoadFromFile called.\n");
+	errorOccured = false;
 
 //	project.run[selected].LoadGCode(fileName);
 
-	return 0;
+	toolpathGenerated = true;
 }

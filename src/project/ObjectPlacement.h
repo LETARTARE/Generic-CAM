@@ -51,6 +51,7 @@ public:
 
 public:
 	bool selected;
+	bool modified;
 
 	AffineTransformMatrix matrix;
 	size_t objectNr;

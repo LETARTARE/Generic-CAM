@@ -51,7 +51,7 @@ public:
 	// Member variables
 public:
 	bool selected;
-
+	bool modified;
 	AffineTransformMatrix matrix;
 
 	wxFileName fileName;

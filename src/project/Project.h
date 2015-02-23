@@ -71,7 +71,11 @@ public:
 	// Project properties
 	wxFileName fileName;
 	wxString name;
-	wxMutex workedOn;
+
+	bool processToolpath;
+	wxMutex mtx_project;
+	wxMutex mtx_generator;
+	bool interruptProcessing;
 
 	// Supplies
 	// TODO: Stock and Toolbox are not part of a project, but part of the whole system.
@@ -110,12 +114,14 @@ public:
 
 	bool Load(wxFileName fileName);
 	bool Save(wxFileName fileName);
-	void LoadPattern(wxString filename);
+	void LoadPattern(wxFileName filename);
 
 	void Paint(void);
 
+	bool GenerateToolpaths(void);
+
 private:
-	void PaintWorkpieceWithObjects(size_t workpieceNr);
+//	void PaintWorkpieceWithObjects(size_t workpieceNr);
 
 	void XMLRemoveAllChildren(wxXmlNode* node);
 };

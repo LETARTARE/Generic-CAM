@@ -27,6 +27,7 @@
 #include "Project.h"
 #include "../Config.h"
 #include "../3D/BooleanBox.h"
+#include "../generator/ToolpathGeneratorThread.h"
 
 #include <GL/gl.h>
 #include <math.h>
@@ -50,6 +51,9 @@ void Project::Clear(void)
 {
 	name = _("Untitled");
 
+	processToolpath = false;
+	interruptProcessing = false;
+
 	run.Empty();
 	workpieces.Empty();
 	objects.Empty();
@@ -63,6 +67,92 @@ void Project::Clear(void)
 	displayTargets = false;
 	displayToolpath = false;
 	displayOutLines = false;
+}
+
+bool Project::GenerateToolpaths(void)
+{
+	// Prevent the toolpath generation from being started in more than
+	// one thread.
+	if(mtx_generator.TryLock() != wxMUTEX_NO_ERROR) return false;
+
+	// Wait for the last command to finish. (For these
+	// are the only other function locking the project.)
+	mtx_project.Lock();
+
+	wxLogMessage(_T("calling generators"));
+	// Testing preconditions.
+	size_t runNr;
+	size_t toolpathNr;
+	size_t workpieceNr;
+	size_t placementNr;
+	size_t objectNr;
+
+	// Propagate modifcation flag from object to workpiece
+	for(workpieceNr = 0; workpieceNr < workpieces.GetCount(); workpieceNr++){
+		for(placementNr = 0;
+				placementNr < workpieces[workpieceNr].placements.GetCount();
+				placementNr++){
+			objectNr = workpieces[workpieceNr].placements[placementNr].objectNr;
+			if(objectNr >= 0){
+				if(objects[objectNr].modified) workpieces[workpieceNr].modified =
+						true;
+			}
+		}
+	}
+
+	// Propagate modification flag from workpiece to run to the generators
+	for(runNr = 0; runNr < run.GetCount(); runNr++){
+		workpieceNr = run[runNr].workpieceNr;
+		if(workpieceNr >= 0){
+			if(workpieces[workpieceNr].modified) run[runNr].modified = true;
+		}
+		if(run[runNr].modified){
+			for(toolpathNr = 0; toolpathNr < run[runNr].toolpaths.GetCount();
+					toolpathNr++){
+				run[runNr].toolpaths[toolpathNr].generator->toolpathGenerated =
+						false;
+			}
+		}
+	}
+
+	// Select and start the next generators to have a go
+	// The selection is done workpiece-wise, even if spread across multiple runs.
+	for(workpieceNr = 0; workpieceNr < workpieces.GetCount(); workpieceNr++){
+		if(workpieces[workpieceNr].hasRunningGenerator) continue;
+		for(runNr = 0; runNr < run.GetCount(); runNr++){
+			if(run[runNr].workpieceNr != workpieceNr) continue;
+
+			// Find the first generator, that has not generated its toolpath.
+			for(toolpathNr = 0; toolpathNr < run[runNr].toolpaths.GetCount();
+					toolpathNr++){
+				if(run[runNr].toolpaths[toolpathNr].generator->toolpathGenerated) continue;
+
+				// Generate a detached thread. on exit it signals the workpiece to be free for
+				// other generators.
+				workpieces[workpieceNr].hasRunningGenerator = true;
+				printf("Flag set.\n");
+				wxThread * thread = new ToolpathGeneratorThread(this, runNr,
+						toolpathNr);
+				if(thread->Create() != wxTHREAD_NO_ERROR){
+					workpieces[workpieceNr].hasRunningGenerator = false;
+					wxLogError(
+							_(
+									"Could not create new thread for toolpath generation."));
+				}else{
+					printf("Starting thread...\n");
+					thread->Run();
+					printf("Started.\n");
+				}
+				break;
+			}
+			if(workpieces[workpieceNr].hasRunningGenerator) break;
+		}
+	}
+
+	mtx_project.Unlock();
+
+	mtx_generator.Unlock();
+	return true;
 }
 
 // Recursive tree deletion.

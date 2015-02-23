@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GeneratorLoadFromFile.h
+// Name               : ToolpathGeneratorThread.h
 // Purpose            : 
-// Thread Safe        : Yes
+// Thread Safe        : Certainly not
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 09.02.2015
+// Created            : 23.02.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,40 +24,32 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef GENERATORLOADFROMFILE_H_
-#define GENERATORLOADFROMFILE_H_
+#ifndef TOOLPATHGENERATORTHREAD_H_
+#define TOOLPATHGENERATORTHREAD_H_
 
-/*!\class GeneratorLoadFromFile
- * \brief ...
+/*!\class ToolpathGeneratorThread
+ * \brief Thread to control the toolpath generation for a workpiece
  *
  * ...
  */
 
-#include "Generator.h"
+#include <stddef.h>
+#include <wx/thread.h>
 
-#include <wx/filepicker.h>
-#include <wx/panel.h>
-#include <wx/radiobox.h>
-#include <wx/stattext.h>
-#include <wx/string.h>
+class Project;
 
-class GeneratorLoadFromFile:public Generator {
+class ToolpathGeneratorThread:public wxThread {
 public:
-	GeneratorLoadFromFile();
-	virtual void CopyFrom(const Generator * other);
-	virtual ~GeneratorLoadFromFile();
+	ToolpathGeneratorThread(Project * project, size_t runNr, size_t toolpathNr);
+	virtual ~ToolpathGeneratorThread();
 
-	virtual wxString GetName(void) const;
-	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
-	virtual void TransferDataToPanel(void) const;
-	virtual void TransferDataFromPanel(void);
-	virtual wxString ToString(void) const;
-	virtual void FromString(const wxString & text);
-	virtual void GenerateToolpath(void);
+	virtual wxThread::ExitCode Entry(void);
 
 private:
-	wxStaticText* m_staticTextLoadFile;
-	wxFilePickerCtrl* m_filePicker;
+	Project * project;
+	size_t runNr;
+	size_t toolpathNr;
+
 };
 
-#endif /* GENERATORLOADFROMFILE_H_ */
+#endif /* TOOLPATHGENERATORTHREAD_H_ */

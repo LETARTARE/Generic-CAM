@@ -130,9 +130,11 @@ void GeneratorPositioningDrills::FromString(const wxString& text)
 {
 }
 
-wxThread::ExitCode GeneratorPositioningDrills::Entry(void)
+void GeneratorPositioningDrills::GenerateToolpath(void)
 {
-	return 0;
+	printf("PositioningDrills called.\n");
+	errorOccured = false;
+	toolpathGenerated = true;
 }
 
 //void Project::InsertDrillGrid(Run &run, double sizex, double sizey,

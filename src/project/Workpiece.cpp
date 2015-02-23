@@ -33,12 +33,16 @@ WX_DEFINE_OBJARRAY(ArrayOfWorkpiece)
 Workpiece::Workpiece()
 {
 	selected = false;
+	modified = false;
+	hasRunningGenerator = false;
 }
 
 Workpiece::Workpiece(const StockMaterial &material) :
 		StockMaterial(material)
 {
 	selected = false;
+	modified = false;
+	hasRunningGenerator = false;
 	box.SetSize(material.sx, material.sy, material.sz);
 }
 

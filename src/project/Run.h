@@ -61,6 +61,7 @@ public:
 public:
 	wxString name;
 	bool selected;
+	bool modified;
 
 	AffineTransformMatrix workpiecePlacement; ///> For flipping the workpiece to machine the other sides.
 
