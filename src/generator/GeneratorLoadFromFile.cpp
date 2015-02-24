@@ -26,10 +26,15 @@
 
 #include "GeneratorLoadFromFile.h"
 
-#include "wx/sizer.h"
-#include "wx/button.h"
+#include <wx/sizer.h>
+#include <wx/button.h>
 
-GeneratorLoadFromFile::GeneratorLoadFromFile()
+#include "../gui/DisplaySettings.h"
+#include "../project/ToolPath.h"
+
+GeneratorLoadFromFile::GeneratorLoadFromFile(Project * project, size_t runNr,
+		size_t toolpathNr) :
+		Generator(project, runNr, toolpathNr)
 {
 	m_filePicker = NULL;
 	m_staticTextLoadFile = NULL;
@@ -38,6 +43,11 @@ GeneratorLoadFromFile::GeneratorLoadFromFile()
 void GeneratorLoadFromFile::CopyFrom(const Generator * other)
 {
 	Generator::CopyFrom(other);
+
+	const GeneratorLoadFromFile * temp =
+			dynamic_cast <const GeneratorLoadFromFile*>(other);
+
+	filename = temp->filename;
 }
 
 GeneratorLoadFromFile::~GeneratorLoadFromFile()
@@ -57,8 +67,8 @@ void GeneratorLoadFromFile::AddToPanel(wxPanel* panel,
 	wxBoxSizer* bSizer1;
 	bSizer1 = new wxBoxSizer(wxVERTICAL);
 	m_staticTextLoadFile = new wxStaticText(panel, wxID_ANY,
-			wxT("Load G-Code from file..."), wxDefaultPosition,
-			wxDefaultSize, 0);
+			wxT("Load G-Code from file..."), wxDefaultPosition, wxDefaultSize,
+			0);
 	m_staticTextLoadFile->Wrap(-1);
 	bSizer1->Add(m_staticTextLoadFile, 0, wxALL, 5);
 	wxBoxSizer* bSizer2;
@@ -71,14 +81,19 @@ void GeneratorLoadFromFile::AddToPanel(wxPanel* panel,
 	panel->SetSizer(bSizer1);
 	panel->Layout();
 	bSizer1->Fit(panel);
+
+	m_filePicker->SetPath(settings->lastProjectDirectory);
 }
 
 void GeneratorLoadFromFile::TransferDataToPanel(void) const
 {
+	if(filename.IsOk()) m_filePicker->SetPath(filename.GetFullPath());
 }
 
 void GeneratorLoadFromFile::TransferDataFromPanel(void)
 {
+	filename = m_filePicker->GetPath();
+	wxLogMessage(_T("Filename: ") + filename.GetFullPath());
 }
 
 wxString GeneratorLoadFromFile::ToString(void) const
@@ -92,10 +107,20 @@ void GeneratorLoadFromFile::FromString(const wxString& text)
 
 void GeneratorLoadFromFile::GenerateToolpath(void)
 {
-	printf("LoadFromFile called.\n");
+	toolpathGenerated = false;
 	errorOccured = false;
-
-//	project.run[selected].LoadGCode(fileName);
-
+	if(!filename.IsOk()){
+		errorOccured = true;
+		output =
+		_("Load G-Code: Not a valid file: >")+filename.GetFullName()+_T("<.");
+		return;
+	}
+	if(!toolpath->ReadGCodeFile(filename)){
+		errorOccured = true;
+		output =
+				_(
+						"Load G-Code: Could not read file: >")+filename.GetFullName()+_T("<.");
+		return;
+	}
 	toolpathGenerated = true;
 }

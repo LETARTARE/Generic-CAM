@@ -32,7 +32,7 @@
 #include <wx/stattext.h>
 #include "wx/sizer.h"
 
-GeneratorNone::GeneratorNone()
+GeneratorNone::GeneratorNone(Project * project, size_t runNr, size_t toolpathNr):Generator(project,runNr,toolpathNr)
 {
 }
 

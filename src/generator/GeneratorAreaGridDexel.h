@@ -41,7 +41,7 @@
 
 class GeneratorAreaGridDexel:public GeneratorDexel {
 public:
-	GeneratorAreaGridDexel();
+	GeneratorAreaGridDexel(Project * project, size_t runNr, size_t toolpathNr);
 	virtual ~GeneratorAreaGridDexel();
 
 	virtual void CopyFrom(const Generator * other);

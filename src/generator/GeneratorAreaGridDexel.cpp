@@ -28,8 +28,8 @@
 
 #include "wx/sizer.h"
 
-GeneratorAreaGridDexel::GeneratorAreaGridDexel() :
-		GeneratorDexel()
+GeneratorAreaGridDexel::GeneratorAreaGridDexel(Project * project, size_t runNr, size_t toolpathNr) :
+		GeneratorDexel(project,runNr,toolpathNr)
 {
 	m_radioBoxDirection = NULL;
 }

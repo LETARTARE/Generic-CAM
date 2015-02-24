@@ -2764,6 +2764,32 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	
 	bSizer851->Add( sbSizer19, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	wxStaticBoxSizer* sbSizer20;
+	sbSizer20 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Tool") ), wxVERTICAL );
+	
+	wxArrayString m_choiceToolChoices;
+	m_choiceTool = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceToolChoices, 0 );
+	m_choiceTool->SetSelection( 0 );
+	sbSizer20->Add( m_choiceTool, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	wxBoxSizer* bSizer86;
+	bSizer86 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticText140 = new wxStaticText( this, wxID_ANY, _("Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText140->Wrap( -1 );
+	bSizer86->Add( m_staticText140, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlToolDiameter = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer86->Add( m_textCtrlToolDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextUnitDiameter = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitDiameter->Wrap( -1 );
+	bSizer86->Add( m_staticTextUnitDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	sbSizer20->Add( bSizer86, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	bSizer851->Add( sbSizer20, 1, wxEXPAND, 5 );
+	
 	bSizerMain->Add( bSizer851, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxStaticBoxSizer* sbSizer18;
@@ -2773,6 +2799,9 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	sbSizer18->Add( m_choicebookGenerator, 1, wxEXPAND | wxALL, 5 );
 	
 	bSizerMain->Add( sbSizer18, 1, wxEXPAND, 5 );
+	
+	m_textCtrlInfo = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	bSizerMain->Add( m_textCtrlInfo, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxBoxSizer* bSizerButtons;
 	bSizerButtons = new wxBoxSizer( wxHORIZONTAL );

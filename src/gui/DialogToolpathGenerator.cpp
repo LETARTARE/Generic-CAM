@@ -38,22 +38,23 @@
 #include "../generator/GeneratorAreaGridDexel.h"
 #define N_GENERATORS 		4
 
-Generator* DialogToolpathGenerator::NewGenerator(int generatorNr)
+Generator* DialogToolpathGenerator::NewGenerator(int generatorNr, size_t runNr,
+		size_t toolpathNr)
 {
 	assert(generatorNr < N_GENERATORS);
 
 	switch(generatorNr){
 	case 0:
-		return new GeneratorNone;
+		return new GeneratorNone(project, runNr, toolpathNr);
 		break;
 	case 1:
-		return new GeneratorPositioningDrills;
+		return new GeneratorPositioningDrills(project, runNr, toolpathNr);
 		break;
 	case 2:
-		return new GeneratorLoadFromFile;
+		return new GeneratorLoadFromFile(project, runNr, toolpathNr);
 		break;
 	case 3:
-		return new GeneratorAreaGridDexel;
+		return new GeneratorAreaGridDexel(project, runNr, toolpathNr);
 		break;
 	}
 	return NULL;
@@ -76,7 +77,7 @@ DialogToolpathGenerator::DialogToolpathGenerator(wxWindow* parent,
 	size_t i;
 	generators = new Generator*[N_GENERATORS];
 	for(i = 0; i < N_GENERATORS; i++)
-		generators[i] = NewGenerator(i);
+		generators[i] = NewGenerator(i, 0, 0);
 
 	// Assign pages to the choicebook for every generator
 	wxString generatorName;
@@ -156,6 +157,14 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 				settings->Distance.TextFromSI(marginBelow, 3));
 		m_textCtrlMarginSide->SetValue(
 				settings->Distance.TextFromSI(marginSides, 3));
+
+		Generator * temp =
+				project->run[selectedRun].toolpaths[selectedToolpath].generator;
+		if(temp != NULL){
+			m_textCtrlInfo->SetValue(temp->output);
+		}else{
+			m_textCtrlInfo->SetValue(_T(""));
+		}
 
 		// Transfer other choicepages
 		int pageNr = m_choicebookGenerator->GetSelection();
@@ -300,7 +309,8 @@ void DialogToolpathGenerator::OnAdd(wxCommandEvent& event)
 	commandProcessor->Submit(
 			new CommandRunGeneratorAdd(
 			_("Add generator to run ") + project->run[runNr].name,
-					project, runNr, toolpathNr + 1, new GeneratorNone));
+					project, runNr, toolpathNr + 1,
+					new GeneratorNone(project, runNr, toolpathNr)));
 
 	// Select the newly added generator.
 	for(size_t i = 0; i < project->run[runNr].toolpaths.GetCount(); i++){
@@ -351,7 +361,7 @@ void DialogToolpathGenerator::OnUpdate(wxCommandEvent& event)
 	if(runNr < 0 || toolpathNr < 0) return;
 	int generatorNr = m_choicebookGenerator->GetSelection();
 
-	Generator * temp = NewGenerator(generatorNr);
+	Generator * temp = NewGenerator(generatorNr, runNr, toolpathNr);
 	temp->CopyFrom(generators[generatorNr]);
 	temp->box = box;
 	temp->marginBelow = marginBelow;

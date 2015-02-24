@@ -39,7 +39,8 @@
 
 class GeneratorNone:public Generator {
 public:
-	GeneratorNone();
+	GeneratorNone(Project * project,
+			size_t runNr, size_t toolpathNr);
 	virtual ~GeneratorNone();
 
 	virtual wxString GetName(void) const;

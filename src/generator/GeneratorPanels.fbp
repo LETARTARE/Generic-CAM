@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <wxFormBuilder_Project>
     <FileVersion major="1" minor="9" />
-    <object class="Project" expanded="0">
+    <object class="Project" expanded="1">
         <property name="class_decoration"></property>
         <property name="code_generation">C++</property>
         <property name="disconnect_events">1</property>
@@ -33,7 +33,7 @@
             <property name="minimum_size"></property>
             <property name="name">Frame</property>
             <property name="pos"></property>
-            <property name="size">500,492</property>
+            <property name="size">583,551</property>
             <property name="style">wxDEFAULT_FRAME_STYLE</property>
             <property name="subclass"></property>
             <property name="title">Generator...</property>
@@ -84,7 +84,7 @@
                     <property name="border">5</property>
                     <property name="flag">wxEXPAND | wxALL</property>
                     <property name="proportion">1</property>
-                    <object class="wxChoicebook" expanded="0">
+                    <object class="wxChoicebook" expanded="1">
                         <property name="bg"></property>
                         <property name="context_help"></property>
                         <property name="enabled">1</property>
@@ -922,7 +922,7 @@
                         <object class="choicebookpage" expanded="1">
                             <property name="label">Load from File</property>
                             <property name="select">0</property>
-                            <object class="wxPanel" expanded="0">
+                            <object class="wxPanel" expanded="1">
                                 <property name="bg"></property>
                                 <property name="context_help"></property>
                                 <property name="enabled">1</property>

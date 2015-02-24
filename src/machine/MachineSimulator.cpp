@@ -86,57 +86,5 @@ void MachineSimulator::Step(float tTarget)
 	}
 }
 
-bool MachineSimulator::ReadGCodeFile(wxFileName fileName)
-{
-	if(!fileName.IsOk()){
-		wxLogError(
-				_T(
-						"ReadGCodeFile: Incorrect fileName ") + fileName.GetFullPath() + _T(" !"));
-		return false;
-	}
 
-	wxTextFile file;
-
-	if(!file.Open(fileName.GetFullPath())){
-		wxLogError(
-				_T("ReadGCodeFile: Can't open ") + fileName.GetFullPath()
-				+ _T(" !"));
-		return false;
-	}
-
-	wxString temp;
-	if(file.Eof()){
-		wxLogError(_T("ReadGCodeFile: File is empty! (a)"));
-		return false;
-	}
-	temp = file.GetFirstLine();
-	if(temp.IsEmpty()){
-		wxLogError(_T("ReadGCodeFile: File is empty! (b)"));
-		return false;
-	}
-
-	MachinePosition* pos = new MachinePosition;
-	position.Clear();
-
-	if(pos->ParseGCodeLine(temp)){
-		position.Add(pos);
-		pos = new MachinePosition;
-		*pos = position[position.Count() - 1];
-	}
-	while(!file.Eof()){
-		temp = file.GetNextLine();
-		if(pos->ParseGCodeLine(temp)){
-			position.Add(pos);
-			pos = new MachinePosition;
-			//TODO: Check if there is a command like position.End()
-			*pos = position[position.Count() - 1];
-		}
-	}
-	position.Add(pos);
-	file.Close();
-	step = 0;
-	tStep = 0;
-
-	return true;
-}
 

@@ -27,16 +27,15 @@
 #ifndef GENERATOR_H_
 #define GENERATOR_H_
 
+#include <stddef.h>
 #include <wx/panel.h>
 #include <wx/string.h>
 
 #include "../3D/BoundingBox.h"
 #include "../gui/DisplaySettings.h"
-#include "../project/ToolPath.h"
 
-class DisplaySettings;
+class Project;
 class ToolPath;
-class wxPanel;
 
 /*!\class Generator
  * \brief Abstract class for toolpath generators
@@ -45,15 +44,17 @@ class wxPanel;
  */
 
 class Generator {
+	friend class DialogToolpathGenerator;
 	// Constructor/ Destructor
 public:
-	Generator();
+	Generator(Project * project, size_t runNr, size_t toolpathNr);
 	virtual ~Generator();
 
 	//Member variables:
 public:
 	bool toolpathGenerated;
 	bool errorOccured;
+	wxString output;
 
 	BoundingBox box;
 	float marginBelow;
@@ -62,6 +63,9 @@ public:
 protected:
 	DisplaySettings * settings;
 	ToolPath * toolpath;
+	Project * project;
+	size_t runNr;
+	size_t toolpathNr;
 
 	//Methods:
 public:

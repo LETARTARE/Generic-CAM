@@ -38,7 +38,7 @@
 
 class GeneratorDexel:public Generator {
 public:
-	GeneratorDexel();
+	GeneratorDexel(Project * project, size_t runNr, size_t toolpathNr);
 	virtual void CopyFrom(const Generator * other);
 	virtual ~GeneratorDexel();
 };

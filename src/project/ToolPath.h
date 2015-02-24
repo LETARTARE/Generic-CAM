@@ -34,6 +34,7 @@
 #define TOOLPATH_H_
 
 #include <wx/dynarray.h>
+#include <wx/filename.h>
 #include <wx/textfile.h>
 #include <wx/thread.h>
 
@@ -65,6 +66,8 @@ public:
 
 	MachinePosition minPosition, maxPosition;
 
+	wxString info;
+
 	// Methods
 public:
 
@@ -77,6 +80,7 @@ public:
 	void Paint(void);
 	void CleanPath(double tolerance = 0.0002);
 	void WriteToFile(wxTextFile &f);
+	bool ReadGCodeFile(wxFileName fileName);
 	void CalculateMinMaxValues(void);
 };
 WX_DECLARE_OBJARRAY(ToolPath, ArrayOfToolPath);

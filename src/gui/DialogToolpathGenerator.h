@@ -69,7 +69,7 @@ public:
 
 private:
 	Generator ** generators;
-	Generator * NewGenerator(int generatorNr);
+	Generator * NewGenerator(int generatorNr, size_t runNr, size_t toolpathNr);
 	int GetSelectedToolpath(int runNr);
 	int GetGeneratorNr(int runNr, int toolpathNr);
 

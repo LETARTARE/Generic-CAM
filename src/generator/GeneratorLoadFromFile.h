@@ -33,17 +33,21 @@
  * ...
  */
 
-#include "Generator.h"
-
+#include <stddef.h>
+#include <wx/filename.h>
 #include <wx/filepicker.h>
 #include <wx/panel.h>
 #include <wx/radiobox.h>
 #include <wx/stattext.h>
 #include <wx/string.h>
 
+#include "Generator.h"
+
+class wxFilePickerCtrl;
+
 class GeneratorLoadFromFile:public Generator {
 public:
-	GeneratorLoadFromFile();
+	GeneratorLoadFromFile(Project * project, size_t runNr, size_t toolpathNr);
 	virtual void CopyFrom(const Generator * other);
 	virtual ~GeneratorLoadFromFile();
 
@@ -56,6 +60,9 @@ public:
 	virtual void GenerateToolpath(void);
 
 private:
+
+	wxFileName filename;
+
 	wxStaticText* m_staticTextLoadFile;
 	wxFilePickerCtrl* m_filePicker;
 };

@@ -25,15 +25,25 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "Generator.h"
+#include "../project/Project.h"
 
-Generator::Generator()
+Generator::Generator(Project * project, size_t runNr, size_t toolpathNr)
 {
 	marginBelow = 0.0;
 	marginSide = 0.0;
 
 	settings = NULL;
 
-	toolpath = NULL;
+	this->project = project;
+	this->runNr = runNr;
+	this->toolpathNr = toolpathNr;
+	if(runNr >= project->run.GetCount()
+			|| toolpathNr >= project->run[runNr].toolpaths.GetCount()){
+		this->toolpath = NULL;
+	}else{
+		this->toolpath = &(project->run[runNr].toolpaths[toolpathNr]);
+	}
+
 	toolpathGenerated = false;
 	errorOccured = false;
 }
@@ -47,7 +57,6 @@ void Generator::CopyFrom(const Generator * other)
 
 Generator::~Generator()
 {
-	if(toolpath != NULL) delete toolpath;
 }
 
 void Generator::AddToPanel(wxPanel* panel, DisplaySettings* settings)

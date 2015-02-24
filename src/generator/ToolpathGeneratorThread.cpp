@@ -47,8 +47,6 @@ wxThread::ExitCode ToolpathGeneratorThread::Entry(void)
 	assert(workpieceNr >= 0);
 	assert(toolpathNr >= 0);
 	project->run[runNr].toolpaths[toolpathNr].generator->GenerateToolpath();
-	printf("...done.\n");
 	project->workpieces[workpieceNr].hasRunningGenerator = false;
-	printf("Flag reset.\n");
 	return 0;
 }

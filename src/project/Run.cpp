@@ -58,6 +58,9 @@ void Run::Paint(const ArrayOfObject& objects,
 		::glMultMatrixd(machine.workpiecePosition.a);
 		::glMultMatrixd(workpiecePlacement.a);
 		workpieces[workpieceNr].Paint(objects);
+		for(int n = 0; n < toolpaths.GetCount(); n++){
+			toolpaths[n].Paint();
+		}
 		::glPopMatrix();
 	}
 
@@ -69,6 +72,7 @@ void Run::Paint(const ArrayOfObject& objects,
 		toolbox.tools[selectedTool].Paint();
 		::glPopMatrix();
 	}
+
 }
 
 void Run::ToXml(wxXmlNode* parentNode)

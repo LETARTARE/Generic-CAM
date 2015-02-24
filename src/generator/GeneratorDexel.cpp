@@ -26,7 +26,7 @@
 
 #include "GeneratorDexel.h"
 
-GeneratorDexel::GeneratorDexel()
+GeneratorDexel::GeneratorDexel(Project * project, size_t runNr, size_t toolpathNr):Generator(project,runNr,toolpathNr)
 {
 }
 GeneratorDexel::~GeneratorDexel()

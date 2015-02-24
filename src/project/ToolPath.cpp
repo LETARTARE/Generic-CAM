@@ -343,3 +343,55 @@ void ToolPath::WriteToFile(wxTextFile &f)
 
 	setlocale(LC_ALL, "");
 }
+
+bool ToolPath::ReadGCodeFile(wxFileName fileName)
+{
+	if(!fileName.IsOk()){
+		info =
+				_T(
+						"ReadGCodeFile: Incorrect fileName ") + fileName.GetFullPath() + _T(" !");
+		return false;
+	}
+
+	wxTextFile file;
+
+	if(!file.Open(fileName.GetFullPath())){
+		info =
+		_T("ReadGCodeFile: Can't open ") + fileName.GetFullPath()
+		+ _T(" !");
+		return false;
+	}
+
+	wxString temp;
+	if(file.Eof()){
+		info = _T("ReadGCodeFile: File is empty!");
+		return false;
+	}
+	temp = file.GetFirstLine();
+	if(temp.IsEmpty()){
+		info = _T("ReadGCodeFile: File is empty!");
+		return false;
+	}
+
+	MachinePosition* pos = new MachinePosition;
+	positions.Clear();
+
+	if(pos->ParseGCodeLine(temp)){
+		positions.Add(pos);
+		pos = new MachinePosition;
+		*pos = positions[positions.Count() - 1];
+	}
+	while(!file.Eof()){
+		temp = file.GetNextLine();
+		if(pos->ParseGCodeLine(temp)){
+			positions.Add(pos);
+			pos = new MachinePosition;
+			*pos = positions[positions.Count() - 1];
+		}
+	}
+	positions.Add(pos);
+	file.Close();
+	info.Empty();
+	return true;
+}
+

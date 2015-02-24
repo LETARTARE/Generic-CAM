@@ -816,7 +816,12 @@ class GUIToolpathGenerator : public wxFrame
 		wxStaticText* m_staticText141;
 		wxTextCtrl* m_textCtrlMarginBelow;
 		wxStaticText* m_staticTextUnitMarginBelow;
+		wxChoice* m_choiceTool;
+		wxStaticText* m_staticText140;
+		wxTextCtrl* m_textCtrlToolDiameter;
+		wxStaticText* m_staticTextUnitDiameter;
 		wxChoicebook* m_choicebookGenerator;
+		wxTextCtrl* m_textCtrlInfo;
 		wxButton* m_buttonUpdate;
 		wxButton* m_buttonReset;
 		wxButton* m_buttonDelete;
@@ -838,7 +843,7 @@ class GUIToolpathGenerator : public wxFrame
 	
 	public:
 		
-		GUIToolpathGenerator( wxWindow* parent, wxWindowID id = wxID_CLOSE, const wxString& title = _("Add / Update Toolpath Generators"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 647,782 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		GUIToolpathGenerator( wxWindow* parent, wxWindowID id = wxID_CLOSE, const wxString& title = _("Add / Update Toolpath Generators"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 826,802 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		~GUIToolpathGenerator();
 	
 };

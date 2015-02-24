@@ -78,7 +78,6 @@ public:
 	bool interruptProcessing;
 
 	// Supplies
-	// TODO: Stock and Toolbox are not part of a project, but part of the whole system.
 	StockFile stock;
 	Toolbox toolbox;
 	ArrayOfFlipDrillPattern pattern;

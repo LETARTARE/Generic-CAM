@@ -67,6 +67,10 @@ void Project::Clear(void)
 	displayTargets = false;
 	displayToolpath = false;
 	displayOutLines = false;
+
+	FlipDrillPattern temp;
+	temp.name = _T("Testpattern 1");
+	pattern.Add(temp);
 }
 
 bool Project::GenerateToolpaths(void)
@@ -79,13 +83,12 @@ bool Project::GenerateToolpaths(void)
 	// are the only other function locking the project.)
 	mtx_project.Lock();
 
-	wxLogMessage(_T("calling generators"));
 	// Testing preconditions.
 	size_t runNr;
 	size_t toolpathNr;
-	size_t workpieceNr;
+	int workpieceNr;
 	size_t placementNr;
-	size_t objectNr;
+	int objectNr;
 
 	// Propagate modifcation flag from object to workpiece
 	for(workpieceNr = 0; workpieceNr < workpieces.GetCount(); workpieceNr++){
@@ -130,7 +133,6 @@ bool Project::GenerateToolpaths(void)
 				// Generate a detached thread. on exit it signals the workpiece to be free for
 				// other generators.
 				workpieces[workpieceNr].hasRunningGenerator = true;
-				printf("Flag set.\n");
 				wxThread * thread = new ToolpathGeneratorThread(this, runNr,
 						toolpathNr);
 				if(thread->Create() != wxTHREAD_NO_ERROR){
@@ -139,9 +141,7 @@ bool Project::GenerateToolpaths(void)
 							_(
 									"Could not create new thread for toolpath generation."));
 				}else{
-					printf("Starting thread...\n");
 					thread->Run();
-					printf("Started.\n");
 				}
 				break;
 			}
@@ -226,7 +226,6 @@ bool Project::Save(wxFileName fileName)
 	for(i = 0; i < objects.GetCount(); i++)
 		objects[i].ToXml(nodeObject);
 //	machine.ToXml(nodeMachine);
-	//TODO: Rework the tool system!
 
 	XMLRemoveAllChildren(nodeTarget);
 	//	for(i = 0; i < targets.GetCount(); i++)
@@ -303,7 +302,6 @@ bool Project::Load(wxFileName fileName)
 		//			wxLogMessage(_T("Machine node found!"));
 //		}
 //		if(temp->GetName() == _T("Tools")){
-		//TODO: Rework tool system!
 		//			temp2 = temp->GetChildren();
 		//			while(temp2 != NULL){
 		//				tempObject = new Object();

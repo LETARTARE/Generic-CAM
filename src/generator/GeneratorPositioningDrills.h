@@ -43,7 +43,8 @@
 
 class GeneratorPositioningDrills:public Generator {
 public:
-	GeneratorPositioningDrills();
+	GeneratorPositioningDrills(Project * project, size_t runNr,
+			size_t toolpathNr);
 	virtual ~GeneratorPositioningDrills();
 
 	virtual void CopyFrom(const GeneratorPositioningDrills * other);
@@ -65,6 +66,10 @@ private:
 	wxTextCtrl* m_textCtrlHoleDepth;
 	wxStaticText* m_staticTextUnitDepth;
 	wxStaticText* m_staticTextInfo;
+
+	float depth;
+	float diameter;
+
 };
 
 #endif /* GENERATORPOSITIONINGDRILLS_H_ */

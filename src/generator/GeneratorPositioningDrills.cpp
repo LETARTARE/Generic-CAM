@@ -28,7 +28,9 @@
 
 #include "wx/sizer.h"
 
-GeneratorPositioningDrills::GeneratorPositioningDrills()
+GeneratorPositioningDrills::GeneratorPositioningDrills(Project * project,
+		size_t runNr, size_t toolpathNr) :
+		Generator(project, runNr, toolpathNr)
 {
 	
 }
@@ -111,14 +113,25 @@ void GeneratorPositioningDrills::AddToPanel(wxPanel* panel,
 	panel->SetSizer(bSizer);
 	panel->Layout();
 	bSizer->Fit(panel);
+
 }
 
 void GeneratorPositioningDrills::TransferDataToPanel(void) const
 {
+	m_staticTextUnitDepth->SetLabel(settings->SmallDistance.GetOtherName());
+	m_staticTextUnitDiameter->SetLabel(settings->SmallDistance.GetOtherName());
+
+	m_textCtrlHoleDepth->SetValue(settings->SmallDistance.TextFromSI(depth, 3));
+	m_textCtrlHoleDiameter->SetValue(
+			settings->SmallDistance.TextFromSI(diameter, 3));
 }
 
 void GeneratorPositioningDrills::TransferDataFromPanel(void)
 {
+	depth = settings->SmallDistance.SIFromString(
+			m_textCtrlHoleDepth->GetValue());
+	diameter = settings->SmallDistance.SIFromString(
+			m_textCtrlHoleDiameter->GetValue());
 }
 
 wxString GeneratorPositioningDrills::ToString(void) const
