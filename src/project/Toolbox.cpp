@@ -172,3 +172,31 @@ void Toolbox::Empty(void)
 	initialized = false;
 	fileName.Clear();
 }
+
+size_t Toolbox::GetToolCount(void) const
+{
+	return tools.GetCount();
+}
+
+Tool* Toolbox::GetToolInSlot(size_t slotNr)
+{
+	size_t n;
+	for(n = 0; n < tools.GetCount(); n++){
+		if(tools[n].slot == slotNr) return &(tools[n]);
+	}
+	return NULL;
+}
+
+bool Toolbox::IsInitialized(void) const
+{
+	return initialized;
+}
+
+int Toolbox::GetIndexOfSlot(size_t slotNr) const
+{
+	size_t n;
+	for(n = 0; n < tools.GetCount(); n++){
+		if(tools[n].slot == slotNr) return n;
+	}
+	return -1;
+}

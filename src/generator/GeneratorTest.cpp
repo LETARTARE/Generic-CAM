@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : TPGeneratorTest.cpp
+// Name               : GeneratorTest.cpp
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,28 +24,82 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "TPGeneratorTest.h"
+#include "GeneratorTest.h"
 
 #include <math.h>
 #include <wx/log.h>
+#include <wx/wxchar.h>
 
-TPGeneratorTest::TPGeneratorTest()
+#include "../3D/AffineTransformMatrix.h"
+#include "../3D/Polygon25.h"
+#include "../3D/Vector3.h"
+#include "../machine/MachinePosition.h"
+#include "../project/Project.h"
+#include "../project/ToolPath.h"
+#include "DexelTarget.h"
+
+GeneratorTest::GeneratorTest(Project * project, size_t runNr, size_t toolpathNr) :
+		GeneratorDexel(project, runNr, toolpathNr)
 {
 	freeHeightAboveMaterial = 0.002;
 	levelDrop = 0.020;
 }
 
-TPGeneratorTest::~TPGeneratorTest()
+GeneratorTest::~GeneratorTest()
 {
 
 }
 
-void TPGeneratorTest::GenerateToolpath(DexelTarget &target, Tool &tool)
+void GeneratorTest::CopyFrom(const Generator* other)
 {
+	GeneratorDexel::CopyFrom(other);
+}
+
+wxString GeneratorTest::GetName(void) const
+{
+	return _T("Test Generator (using Dexel)");
+}
+
+void GeneratorTest::AddToPanel(wxPanel* panel, DisplaySettings* settings)
+{
+	Generator::AddToPanel(panel, settings);
+}
+
+void GeneratorTest::TransferDataToPanel(void) const
+{
+}
+
+void GeneratorTest::TransferDataFromPanel(void)
+{
+}
+
+wxString GeneratorTest::ToString(void) const
+{
+	return _T("");
+}
+
+void GeneratorTest::FromString(const wxString& text)
+{
+}
+
+void GeneratorTest::GenerateToolpath()
+{
+	output.Empty();
+
+	size_t slotNr = project->run[runNr].toolpaths[toolpathNr].generator->slotNr;
+	Tool * tool = project->run[runNr].toolbox.GetToolInSlot(slotNr);
+	if(tool == NULL) output = _T("Tool empty.");
+
 	ToolPath tp;
 	MachinePosition m;
 
-	if(target.IsEmpty()) return;
+	GenerateTarget();
+
+	if(target.IsEmpty()){
+		output = _T("DexelTarget empty.");
+		errorOccured = true;
+		return;
+	}
 
 	// TODO: Change this to reflect tool shape.
 	DexelTarget discTool;

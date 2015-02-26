@@ -1211,6 +1211,5 @@ void DexelTarget::Paint(void)
 	supportLine.Paint();
 	::glColor3f(0.9, 0.9, 0.1);
 	outLine.Paint();
-
 }
 

@@ -36,7 +36,10 @@
 #include "../generator/GeneratorPositioningDrills.h"
 #include "../generator/GeneratorLoadFromFile.h"
 #include "../generator/GeneratorAreaGridDexel.h"
-#define N_GENERATORS 		4
+#include "../generator/GeneratorFast.h"
+#include "../generator/GeneratorTest.h"
+
+#define N_GENERATORS 		6
 
 Generator* DialogToolpathGenerator::NewGenerator(int generatorNr, size_t runNr,
 		size_t toolpathNr)
@@ -56,6 +59,12 @@ Generator* DialogToolpathGenerator::NewGenerator(int generatorNr, size_t runNr,
 	case 3:
 		return new GeneratorAreaGridDexel(project, runNr, toolpathNr);
 		break;
+	case 4:
+		return new GeneratorFast(project, runNr, toolpathNr);
+		break;
+	case 5:
+		return new GeneratorTest(project, runNr, toolpathNr);
+		break;
 	}
 	return NULL;
 }
@@ -72,6 +81,8 @@ DialogToolpathGenerator::DialogToolpathGenerator(wxWindow* parent,
 	marginSides = 0.0;
 	marginBelow = 0.0;
 	box.Clear();
+	slotNr = 0;
+	freeHeight = 0.001;
 
 	// Create a list of all available generators
 	size_t i;
@@ -133,6 +144,18 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 		m_choiceToolpath->SetSelection(selectedToolpath + 1);
 	}
 
+	m_choiceTool->Clear();
+	m_choiceTool->Append(_T(""));
+	if(selectedRun >= 0){
+		for(int n = 0; n < project->run[selectedRun].toolbox.GetToolCount();
+				n++){
+			m_choiceTool->Append(
+					wxString::Format(_T("T%u - "),
+							project->run[selectedRun].toolbox.tools[n].slot)
+							+ project->run[selectedRun].toolbox.tools[n].toolName);
+		}
+	}
+
 	m_staticTextUnitX1->SetLabel(settings->Distance.GetOtherName());
 	m_staticTextUnitY1->SetLabel(settings->Distance.GetOtherName());
 	m_staticTextUnitZ1->SetLabel(settings->Distance.GetOtherName());
@@ -143,8 +166,12 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 			settings->SmallDistance.GetOtherName());
 	m_staticTextUnitMarginSide->SetLabel(
 			settings->SmallDistance.GetOtherName());
+	m_staticTextUnitDiameter->SetLabel(settings->SmallDistance.GetOtherName());
+	m_staticTextUnitFreeHeight->SetLabel(
+			settings->SmallDistance.GetOtherName());
 
 	if(selectedRun >= 0 && selectedToolpath >= 0){
+
 		m_textCtrlX1->SetValue(settings->Distance.TextFromSI(box.xmin, 3));
 		m_textCtrlY1->SetValue(settings->Distance.TextFromSI(box.ymin, 3));
 		m_textCtrlZ1->SetValue(settings->Distance.TextFromSI(box.zmin, 3));
@@ -158,6 +185,9 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 		m_textCtrlMarginSide->SetValue(
 				settings->Distance.TextFromSI(marginSides, 3));
 
+		m_textCtrlFreeHeight->SetValue(
+				settings->SmallDistance.TextFromSI(freeHeight));
+
 		Generator * temp =
 				project->run[selectedRun].toolpaths[selectedToolpath].generator;
 		if(temp != NULL){
@@ -166,10 +196,22 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 			m_textCtrlInfo->SetValue(_T(""));
 		}
 
+		Tool * tool = project->run[selectedRun].toolbox.GetToolInSlot(slotNr);
+		if(tool != NULL){
+			m_textCtrlToolDiameter->SetValue(
+					settings->SmallDistance.TextFromSI(tool->GetMaxDiameter()));
+		}else{
+			m_textCtrlToolDiameter->SetValue(_T(""));
+		}
+		m_choiceTool->SetSelection(
+				project->run[selectedRun].toolbox.GetIndexOfSlot(slotNr) + 1);
+
 		// Transfer other choicepages
 		int pageNr = m_choicebookGenerator->GetSelection();
 		generators[pageNr]->TransferDataToPanel();
 	}else{
+		m_choiceTool->SetSelection(0);
+
 		m_textCtrlX1->SetValue(_T(""));
 		m_textCtrlY1->SetValue(_T(""));
 		m_textCtrlZ1->SetValue(_T(""));
@@ -178,6 +220,9 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 		m_textCtrlZ2->SetValue(_T(""));
 		m_textCtrlMarginBelow->SetValue(_T(""));
 		m_textCtrlMarginSide->SetValue(_T(""));
+		m_textCtrlToolDiameter->SetValue(_T(""));
+		m_textCtrlFreeHeight->SetValue(_T(""));
+		m_textCtrlInfo->SetValue(_T(""));
 		m_choicebookGenerator->SetSelection(0);
 	}
 	return true;
@@ -197,6 +242,16 @@ bool DialogToolpathGenerator::TransferDataFromWindow(void)
 			m_textCtrlMarginBelow->GetValue());
 	marginSides = settings->Distance.SIFromString(
 			m_textCtrlMarginSide->GetValue());
+	freeHeight = settings->SmallDistance.SIFromString(
+			m_textCtrlFreeHeight->GetValue());
+
+	int runNr = m_choiceRun->GetSelection() - 1;
+	int toolNr = m_choiceTool->GetSelection() - 1;
+	if(runNr >= 0 && toolNr >= 0){
+		slotNr = project->run[runNr].toolbox.tools[toolNr].slot;
+	}else{
+		slotNr = 0;
+	}
 	return true;
 }
 
@@ -220,6 +275,21 @@ int DialogToolpathGenerator::GetSelectedToolpath(int runNr)
 		if(project->run[runNr].toolpaths[n].selected) return n;
 
 	return -1;
+}
+
+void DialogToolpathGenerator::OnSelectTool(wxCommandEvent& event)
+{
+	int runNr = m_choiceRun->GetSelection() - 1;
+	int toolNr = m_choiceTool->GetSelection() - 1;
+	if(runNr >= 0 && toolNr >= 0){
+		slotNr = project->run[runNr].toolbox.tools[toolNr].slot;
+		m_textCtrlToolDiameter->SetValue(
+				settings->SmallDistance.TextFromSI(
+						project->run[runNr].toolbox.tools[toolNr].GetMaxDiameter()));
+	}else{
+		slotNr = 0;
+		m_textCtrlToolDiameter->SetValue(_T(""));
+	}
 }
 
 int DialogToolpathGenerator::GetGeneratorNr(int runNr, int toolpathNr)
@@ -257,6 +327,9 @@ void DialogToolpathGenerator::OnSelectRun(wxCommandEvent& event)
 				project->run[runNr].toolpaths[toolpathNr].generator->marginBelow;
 		marginSides =
 				project->run[runNr].toolpaths[toolpathNr].generator->marginSide;
+		slotNr = project->run[runNr].toolpaths[toolpathNr].generator->slotNr;
+		freeHeight =
+				project->run[runNr].toolpaths[toolpathNr].generator->freeHeight;
 
 		m_choicebookGenerator->SetSelection(generatorNr);
 	}
@@ -287,6 +360,10 @@ void DialogToolpathGenerator::OnSelectToolpath(wxCommandEvent& event)
 				project->run[runNr].toolpaths[toolpathNr].generator->marginBelow;
 		marginSides =
 				project->run[runNr].toolpaths[toolpathNr].generator->marginSide;
+		slotNr = project->run[runNr].toolpaths[toolpathNr].generator->slotNr;
+		freeHeight =
+				project->run[runNr].toolpaths[toolpathNr].generator->freeHeight;
+
 		m_choicebookGenerator->SetSelection(generatorNr);
 	}
 
@@ -322,6 +399,9 @@ void DialogToolpathGenerator::OnAdd(wxCommandEvent& event)
 			project->run[runNr].toolpaths[toolpathNr + 1].generator->marginBelow;
 	marginSides =
 			project->run[runNr].toolpaths[toolpathNr + 1].generator->marginSide;
+	slotNr = project->run[runNr].toolpaths[toolpathNr + 1].generator->slotNr;
+	freeHeight =
+			project->run[runNr].toolpaths[toolpathNr + 1].generator->freeHeight;
 	m_choicebookGenerator->SetSelection(0);
 
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
@@ -346,6 +426,16 @@ void DialogToolpathGenerator::OnDelete(wxCommandEvent& event)
 	if(generatorNr >= 0){
 		Generator * temp = generators[generatorNr];
 		temp->CopyFrom(project->run[runNr].toolpaths[toolpathNr].generator);
+
+		box = project->run[runNr].toolpaths[toolpathNr].generator->box;
+		marginBelow =
+				project->run[runNr].toolpaths[toolpathNr].generator->marginBelow;
+		marginSides =
+				project->run[runNr].toolpaths[toolpathNr].generator->marginSide;
+		slotNr = project->run[runNr].toolpaths[toolpathNr].generator->slotNr;
+		freeHeight =
+				project->run[runNr].toolpaths[toolpathNr].generator->freeHeight;
+
 		m_choicebookGenerator->SetSelection(generatorNr);
 	}
 
@@ -366,6 +456,8 @@ void DialogToolpathGenerator::OnUpdate(wxCommandEvent& event)
 	temp->box = box;
 	temp->marginBelow = marginBelow;
 	temp->marginSide = marginSides;
+	temp->slotNr = slotNr;
+	temp->freeHeight = freeHeight;
 
 	commandProcessor->Submit(
 			new CommandRunGeneratorUpdate(
@@ -444,7 +536,9 @@ void DialogToolpathGenerator::OnResetChanges(wxCommandEvent& event)
 			project->run[runNr].toolpaths[toolpathNr].generator->marginBelow;
 	marginSides =
 			project->run[runNr].toolpaths[toolpathNr].generator->marginSide;
-
+	slotNr = project->run[runNr].toolpaths[toolpathNr].generator->slotNr;
+	freeHeight =
+			project->run[runNr].toolpaths[toolpathNr].generator->freeHeight;
 	TransferDataToWindow();
 }
 

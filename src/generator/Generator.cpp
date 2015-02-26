@@ -25,12 +25,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "Generator.h"
+
+#include <GL/gl.h>
+
 #include "../project/Project.h"
 
 Generator::Generator(Project * project, size_t runNr, size_t toolpathNr)
 {
 	marginBelow = 0.0;
 	marginSide = 0.0;
+
+	freeHeight = 0.001;
+	slotNr = 0;
 
 	settings = NULL;
 
@@ -53,6 +59,8 @@ void Generator::CopyFrom(const Generator * other)
 	this->box = other->box;
 	this->marginBelow = other->marginBelow;
 	this->marginSide = other->marginSide;
+	this->slotNr = other->slotNr;
+	this->freeHeight = other->freeHeight;
 }
 
 Generator::~Generator()
@@ -62,6 +70,14 @@ Generator::~Generator()
 void Generator::AddToPanel(wxPanel* panel, DisplaySettings* settings)
 {
 	this->settings = settings;
+}
+
+void Generator::Paint(void)
+{
+	::glBegin(GL_LINE);
+	::glVertex3f(box.xmin, box.ymin, box.zmin);
+	::glVertex3f(box.xmax, box.ymax, box.zmax);
+	::glEnd();
 }
 
 //void Project::GenerateToolPath(void)

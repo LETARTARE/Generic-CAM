@@ -60,6 +60,7 @@ void Run::Paint(const ArrayOfObject& objects,
 		workpieces[workpieceNr].Paint(objects);
 		for(int n = 0; n < toolpaths.GetCount(); n++){
 			toolpaths[n].Paint();
+			if(toolpaths[n].generator != NULL) toolpaths[n].generator->Paint();
 		}
 		::glPopMatrix();
 	}

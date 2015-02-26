@@ -47,7 +47,7 @@ public:
 			size_t toolpathNr);
 	virtual ~GeneratorPositioningDrills();
 
-	virtual void CopyFrom(const GeneratorPositioningDrills * other);
+	virtual void CopyFrom(const Generator * other);
 	virtual wxString GetName(void) const;
 	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
 	virtual void TransferDataToPanel(void) const;
@@ -69,6 +69,7 @@ private:
 
 	float depth;
 	float diameter;
+	int selectedPattern;
 
 };
 

@@ -27,6 +27,8 @@
 #include "GenericCAM.h"
 #include "languages.h"
 
+#include "wx/richtext/richtextxml.h"
+
 #if wxUSE_DEBUG_CONTEXT == 1
 #include  <wx/memory.h>
 #endif
@@ -115,6 +117,13 @@ bool GenericCAMApp::OnInit()
 
 	frame->Show(true);
 	SetTopWindow(frame);
+
+	// Show release notes
+	wxRichTextBuffer::AddHandler(new wxRichTextXMLHandler);
+	StartupText * temp = new StartupText(frame);
+	temp->m_richText->LoadFile(_T("releasenote.xml"),
+	wxRICHTEXT_TYPE_XML);
+	temp->Show();
 
 	return true;
 }

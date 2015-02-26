@@ -27,6 +27,9 @@
 #ifndef GENERATORDEXEL_H_
 #define GENERATORDEXEL_H_
 
+#include <stddef.h>
+
+#include "DexelTarget.h"
 #include "Generator.h"
 
 /*!\class GeneratorDexel
@@ -41,6 +44,14 @@ public:
 	GeneratorDexel(Project * project, size_t runNr, size_t toolpathNr);
 	virtual void CopyFrom(const Generator * other);
 	virtual ~GeneratorDexel();
+	virtual void Paint(void);
+
+protected:
+
+	void GenerateTarget(void);
+
+	DexelTarget target;
+
 };
 
 #endif /* GENERATORDEXEL_H_ */

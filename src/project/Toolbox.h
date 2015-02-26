@@ -55,14 +55,11 @@ public:
 	void Empty(void);
 	bool LoadToolbox(wxFileName& fileName);
 	bool SaveToolbox(wxFileName& fileName);
-	bool IsInitialized(void)
-	{
-		return initialized;
-	}
-	size_t GetToolCount(void) const
-	{
-		return tools.GetCount();
-	}
+	bool IsInitialized(void) const;
+	size_t GetToolCount(void) const;
+	Tool * GetToolInSlot(size_t slotNr);
+	int GetIndexOfSlot(size_t slotNr) const;
+
 };
 
 #endif /* TOOLBOX_H_ */

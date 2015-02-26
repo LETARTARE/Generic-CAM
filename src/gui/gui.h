@@ -49,6 +49,7 @@
 #include <wx/dialog.h>
 #include "CanvasStereoTest.h"
 #include <wx/clrpicker.h>
+#include <wx/richtext/richtextctrl.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -791,35 +792,38 @@ class GUIToolpathGenerator : public wxFrame
 		wxStaticText* m_staticText145;
 		wxChoice* m_choiceToolpath;
 		wxButton* m_buttonAddNew;
-		wxStaticText* m_staticText126;
+		wxStaticText* m_staticTextX;
 		wxTextCtrl* m_textCtrlX1;
 		wxStaticText* m_staticTextUnitX1;
 		wxStaticText* m_staticText130;
 		wxTextCtrl* m_textCtrlX2;
 		wxStaticText* m_staticTextUnitX2;
-		wxStaticText* m_staticText131;
+		wxStaticText* m_staticTextY;
 		wxTextCtrl* m_textCtrlY1;
 		wxStaticText* m_staticTextUnitY1;
 		wxStaticText* m_staticText132;
 		wxTextCtrl* m_textCtrlY2;
 		wxStaticText* m_staticTextUnitY2;
-		wxStaticText* m_staticText1315;
+		wxStaticText* m_staticTextZ;
 		wxTextCtrl* m_textCtrlZ1;
 		wxStaticText* m_staticTextUnitZ1;
 		wxStaticText* m_staticText1312;
 		wxTextCtrl* m_textCtrlZ2;
 		wxStaticText* m_staticTextUnitZ2;
 		wxButton* m_buttonSelectAreaFromObject;
-		wxStaticText* m_staticText139;
+		wxStaticText* m_staticTextSide;
 		wxTextCtrl* m_textCtrlMarginSide;
 		wxStaticText* m_staticTextUnitMarginSide;
-		wxStaticText* m_staticText141;
+		wxStaticText* m_staticTextBelow;
 		wxTextCtrl* m_textCtrlMarginBelow;
 		wxStaticText* m_staticTextUnitMarginBelow;
 		wxChoice* m_choiceTool;
-		wxStaticText* m_staticText140;
+		wxStaticText* m_staticTextDiameter;
 		wxTextCtrl* m_textCtrlToolDiameter;
 		wxStaticText* m_staticTextUnitDiameter;
+		wxStaticText* m_staticTextFreeHeight;
+		wxTextCtrl* m_textCtrlFreeHeight;
+		wxStaticText* m_staticTextUnitFreeHeight;
 		wxChoicebook* m_choicebookGenerator;
 		wxTextCtrl* m_textCtrlInfo;
 		wxButton* m_buttonUpdate;
@@ -834,6 +838,7 @@ class GUIToolpathGenerator : public wxFrame
 		virtual void OnAdd( wxCommandEvent& event ) = 0;
 		virtual void OnChangeText( wxCommandEvent& event ) = 0;
 		virtual void OnSelectArea( wxCommandEvent& event ) = 0;
+		virtual void OnSelectTool( wxCommandEvent& event ) = 0;
 		virtual void OnPageChanged( wxChoicebookEvent& event ) = 0;
 		virtual void OnUpdate( wxCommandEvent& event ) = 0;
 		virtual void OnResetChanges( wxCommandEvent& event ) = 0;
@@ -1040,6 +1045,23 @@ class GUIAbout : public wxDialog
 		
 		GUIAbout( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 504,373 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
 		~GUIAbout();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class StartupText
+///////////////////////////////////////////////////////////////////////////////
+class StartupText : public wxFrame 
+{
+	private:
+	
+	protected:
+	
+	public:
+		wxRichTextCtrl* m_richText;
+		
+		StartupText( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Release Info"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 629,481 ), long style = wxCAPTION|wxCLOSE_BOX|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
+		~StartupText();
 	
 };
 

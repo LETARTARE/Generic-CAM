@@ -26,7 +26,9 @@
 
 #include "GeneratorDexel.h"
 
-GeneratorDexel::GeneratorDexel(Project * project, size_t runNr, size_t toolpathNr):Generator(project,runNr,toolpathNr)
+GeneratorDexel::GeneratorDexel(Project * project, size_t runNr,
+		size_t toolpathNr) :
+		Generator(project, runNr, toolpathNr)
 {
 }
 GeneratorDexel::~GeneratorDexel()
@@ -37,13 +39,18 @@ void GeneratorDexel::CopyFrom(const Generator * other)
 	Generator::CopyFrom(other);
 }
 
+void GeneratorDexel::Paint(void)
+{
+	target.Paint();
+}
 
+void GeneratorDexel::GenerateTarget(void)
+{
 
+	target.SetupBox(box.GetSizeX(), box.GetSizeY(), box.GetSizeZ(), 0.001,
+			0.001);
 
-
-//void GeneratorDexel::GenerateTargets(void)
-//{
-//	Target temp, temp2;
+//	DexelTarget temp, temp2;
 //	TargetPlacement tempPlace;
 //	Run* run = new Run;
 //
@@ -241,6 +248,5 @@ void GeneratorDexel::CopyFrom(const Generator * other)
 //		tempPlace.matrix.TranslateGlobal(temp.GetSizeX(), 0.0, 0.0);
 //		run[0].placements.Add(tempPlace);
 //	}
-//}
-
+}
 

@@ -61,6 +61,7 @@ public:
 	void OnAdd(wxCommandEvent& event);
 	void OnChangeText(wxCommandEvent& event);
 	void OnSelectArea(wxCommandEvent& event);
+	void OnSelectTool(wxCommandEvent& event);
 	void OnPageChanged(wxChoicebookEvent& event);
 	void OnUpdate(wxCommandEvent& event);
 	void OnResetChanges(wxCommandEvent& event);
@@ -76,7 +77,8 @@ private:
 	BoundingBox box;
 	float marginSides;
 	float marginBelow;
-
+	size_t slotNr;
+	float freeHeight;
 };
 
 #endif /* DIALOGTOOLPATHGENERATOR_H_ */

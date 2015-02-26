@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : TPGeneratorFast.cpp
+// Name               : GeneratorFast.cpp
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,11 +24,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
-#include "TPGeneratorFast.h"
+#include "GeneratorFast.h"
 #include <math.h>
 
-TPGeneratorFast::TPGeneratorFast()
+#include "../project/Project.h"
+
+GeneratorFast::GeneratorFast(Project * project, size_t runNr, size_t toolpathNr) :
+		GeneratorDexel(project, runNr, toolpathNr)
 {
 	freeHeightAboveMaterial = 0.002;
 	maxSingleStep = 0.020;
@@ -38,11 +40,11 @@ TPGeneratorFast::TPGeneratorFast()
 	toolDiameter = 0.0061;
 }
 
-TPGeneratorFast::~TPGeneratorFast()
+GeneratorFast::~GeneratorFast()
 {
 }
 
-ToolPath TPGeneratorFast::GenerateDrill(double x, double y, double diameter,
+ToolPath GeneratorFast::GenerateDrill(double x, double y, double diameter,
 		double depth)
 {
 	ToolPath temp;
@@ -94,7 +96,7 @@ ToolPath TPGeneratorFast::GenerateDrill(double x, double y, double diameter,
 	return temp;
 }
 
-ToolPath TPGeneratorFast::GenerateSpiral(double x, double y, double radius)
+ToolPath GeneratorFast::GenerateSpiral(double x, double y, double radius)
 {
 	ToolPath temp;
 	MachinePosition mp;
@@ -123,8 +125,8 @@ ToolPath TPGeneratorFast::GenerateSpiral(double x, double y, double radius)
 	return temp;
 }
 
-bool TPGeneratorFast::IsDirectlyReachable(DexelTarget &target, double sx, double sy,
-		double sz, double x, double y, double z)
+bool GeneratorFast::IsDirectlyReachable(DexelTarget &target, double sx,
+		double sy, double sz, double x, double y, double z)
 {
 	double dx = x - sx;
 	double dy = y - sy;
@@ -145,7 +147,39 @@ bool TPGeneratorFast::IsDirectlyReachable(DexelTarget &target, double sx, double
 	return true;
 }
 
-ToolPath TPGeneratorFast::MoveSavely(DexelTarget &target, double sx, double sy,
+void GeneratorFast::CopyFrom(const Generator* other)
+{
+	GeneratorDexel::CopyFrom(other);
+}
+
+wxString GeneratorFast::GetName(void) const
+{
+	return _T("Fast Generator (using Dexel)");
+}
+
+void GeneratorFast::AddToPanel(wxPanel* panel, DisplaySettings* settings)
+{
+	Generator::AddToPanel(panel, settings);
+}
+
+void GeneratorFast::TransferDataToPanel(void) const
+{
+}
+
+void GeneratorFast::TransferDataFromPanel(void)
+{
+}
+
+wxString GeneratorFast::ToString(void) const
+{
+	return _T("");
+}
+
+void GeneratorFast::FromString(const wxString& text)
+{
+}
+
+ToolPath GeneratorFast::MoveSavely(DexelTarget &target, double sx, double sy,
 		double sz, double x, double y, double z)
 {
 	ToolPath tp;
@@ -228,19 +262,30 @@ ToolPath TPGeneratorFast::MoveSavely(DexelTarget &target, double sx, double sy,
 	return tp;
 }
 
-void TPGeneratorFast::GenerateToolpath(DexelTarget &target, Tool &tool)
+void GeneratorFast::GenerateToolpath(void)
 {
-	if(target.IsEmpty()) return;
+	output.Empty();
+
+	size_t slotNr = project->run[runNr].toolpaths[toolpathNr].generator->slotNr;
+	Tool tool = *(project->run[runNr].toolbox.GetToolInSlot(slotNr));
+
+	GenerateTarget();
+
+	if(target.IsEmpty()){
+		output = _T("DexelTarget empty.");
+		errorOccured = true;
+		return;
+	}
 
 	ToolPath tp;
 	MachinePosition mp;
-
 
 	// TODO: Change this to reflect tool shape.
 	toolDiameter = 0.0061;
 
 	DexelTarget discTool;
-	discTool.SetupDisc(toolDiameter / 2, target.GetSizeRX(), target.GetSizeRY());
+	discTool.SetupDisc(toolDiameter / 2, target.GetSizeRX(),
+			target.GetSizeRY());
 
 	DexelTarget temp = target;
 	DexelTarget temptop;
@@ -263,7 +308,6 @@ void TPGeneratorFast::GenerateToolpath(DexelTarget &target, Tool &tool)
 	size_t i;
 	ArrayOfMachinePosition mpa = target.toolpathFlipped.positions;
 
-
 	// Begin drop&raise cycle
 
 	double dmin = temptop.GetMinLevel();
@@ -273,7 +317,6 @@ void TPGeneratorFast::GenerateToolpath(DexelTarget &target, Tool &tool)
 	temptop.GenerateDistanceMap(level, true);
 
 	double px, py, pz;
-
 
 	// Removed other side from flipped designs
 	if(!mpa.IsEmpty()){
@@ -304,7 +347,6 @@ void TPGeneratorFast::GenerateToolpath(DexelTarget &target, Tool &tool)
 		while(temptop.FindNextDistance(cx, cy)){
 			temptop.FindStartCutting(cx, cy);
 
-
 			//		if(!IsDirectlyReachable(temp, mp.axisX, mp.axisY, mp.axisZ, cx * rx
 			//				+ rx2, cy * ry + ry2, level)) break;
 
@@ -330,8 +372,8 @@ void TPGeneratorFast::GenerateToolpath(DexelTarget &target, Tool &tool)
 			for(i = 0; i < poly.elements.GetCount(); i++){
 
 				temptop.FoldLowerDistance(
-						round((poly.elements[i].x - rx2) / rx), round(
-								(poly.elements[i].y - ry2) / ry), discTool);
+						round((poly.elements[i].x - rx2) / rx),
+						round((poly.elements[i].y - ry2) / ry), discTool);
 
 				if(i == 0){
 					tp += MoveSavely(temp, mp.axisX, mp.axisY, mp.axisZ,
@@ -362,7 +404,6 @@ void TPGeneratorFast::GenerateToolpath(DexelTarget &target, Tool &tool)
 		if(level < temptop.GetSizeZ()){
 			temptop.RaiseDistanceMap(level, true);
 
-
 			// Removed other side from flipped designs
 			if(!mpa.IsEmpty()){
 				for(i = 0; i < mpa.GetCount(); i++){
@@ -387,12 +428,10 @@ void TPGeneratorFast::GenerateToolpath(DexelTarget &target, Tool &tool)
 	//
 	//	tp += temptp;
 
-
 	// Move out of material
 	mp.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
 	mp.isCutting = false;
 	tp.positions.Add(mp);
-
 
 	//target = temptop;
 

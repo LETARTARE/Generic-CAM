@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : TPGeneratorTest.h
+// Name               : GeneratorTest.h
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,28 +24,39 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef GENERATORTEST_H_
+#define GENERATORTEST_H_
 
-#ifndef TPGENERATORTEST_H_
-#define TPGENERATORTEST_H_
+#include <stddef.h>
+#include <wx/string.h>
 
-#include "DexelTarget.h"
-#include "../3D/Polygon3.h"
 #include "../machine/Tool.h"
-/*!\class TPGeneratorTest
+#include "GeneratorDexel.h"
+
+/*!\class GeneratorTest
  * \brief ...
  *
  * ...
  */
 
-class TPGeneratorTest {
+class GeneratorTest:public GeneratorDexel {
 	// Constructor/ Destructor
 public:
-	TPGeneratorTest();
-	virtual ~TPGeneratorTest();
+	GeneratorTest(Project * project, size_t runNr, size_t toolpathNr);
+	virtual ~GeneratorTest();
+
+	virtual void CopyFrom(const Generator * other);
+	virtual wxString GetName(void) const;
+	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
+	virtual void TransferDataToPanel(void) const;
+	virtual void TransferDataFromPanel(void);
+	virtual wxString ToString(void) const;
+	virtual void FromString(const wxString & text);
+
+	virtual void GenerateToolpath(void);
 
 	//Member variables:
 public:
-
 
 	// Generic Toolpath parameters
 	double freeHeightAboveMaterial;
@@ -53,11 +64,6 @@ public:
 	// Toolpath generation parameter (extract from tool?)
 	double levelDrop;
 
-	//Methods:
-public:
-
-	void GenerateToolpath(DexelTarget &target, Tool &tool);
-
 };
 
-#endif /* TPGENERATORTEST_H_ */
+#endif /* GENERATORTEST_H_ */

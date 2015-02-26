@@ -46,7 +46,7 @@
 									<listOptionValue builtIn="false" value="lua5.1"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1318683508" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths"/>
-								<option id="gnu.cpp.link.option.flags.284247766" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="`wx-config --libs gl,core,base,xml,adv`" valueType="string"/>
+								<option id="gnu.cpp.link.option.flags.284247766" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="`wx-config --libs richtext,gl,core,base,xml,adv`" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1271724444" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -78,10 +78,6 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.1074777317.696212062" name="temp.cpp" rcbsApplicability="disable" resourcePath="src/generator/temp.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1358257702.74273867">
-						<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1358257702.74273867" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1358257702"/>
-					</fileInfo>
-					<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.1074777317.169785533" name="temp.h" rcbsApplicability="disable" resourcePath="src/generator/temp.h" toolsToInvoke=""/>
 					<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.1074777317.1021935980" name="OctreeInt64.h" rcbsApplicability="disable" resourcePath="src/3D/OctreeInt64.h" toolsToInvoke=""/>
 					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1074777317.2015335246" name="/" resourcePath="src/controller">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.1655461989" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">

@@ -26,18 +26,40 @@
 
 #include "GeneratorPositioningDrills.h"
 
-#include "wx/sizer.h"
+#include <stddef.h>
+#include <wx/choice.h>
+#include <wx/radiobox.h>
+#include <wx/stattext.h>
+#include <wx/sizer.h>
+
+#include "../gui/DisplaySettings.h"
+#include "../gui/Unit.h"
+#include "../project/FlipDrillPattern.h"
+#include "../project/Project.h"
 
 GeneratorPositioningDrills::GeneratorPositioningDrills(Project * project,
 		size_t runNr, size_t toolpathNr) :
 		Generator(project, runNr, toolpathNr)
 {
 	
+	selectedPattern = -1;
+	diameter = 0.0;
+	depth = 0.0;
+
 }
 
-void GeneratorPositioningDrills::CopyFrom(
-		const GeneratorPositioningDrills * other)
+void GeneratorPositioningDrills::CopyFrom(const Generator * other)
 {
+	Generator::CopyFrom(other);
+
+	const GeneratorPositioningDrills * temp =
+			dynamic_cast <const GeneratorPositioningDrills*>(other);
+
+	selectedPattern = temp->selectedPattern;
+	diameter = temp->diameter;
+	depth = temp->depth;
+
+	wxLogMessage(wxString::Format(_T("CopyFrom: %i"), selectedPattern));
 }
 
 GeneratorPositioningDrills::~GeneratorPositioningDrills()
@@ -114,6 +136,8 @@ void GeneratorPositioningDrills::AddToPanel(wxPanel* panel,
 	panel->Layout();
 	bSizer->Fit(panel);
 
+	m_choiceSetups->Append(_T(""));
+	m_choiceSetups->SetSelection(0);
 }
 
 void GeneratorPositioningDrills::TransferDataToPanel(void) const
@@ -124,6 +148,17 @@ void GeneratorPositioningDrills::TransferDataToPanel(void) const
 	m_textCtrlHoleDepth->SetValue(settings->SmallDistance.TextFromSI(depth, 3));
 	m_textCtrlHoleDiameter->SetValue(
 			settings->SmallDistance.TextFromSI(diameter, 3));
+
+	m_choiceSetups->Clear();
+	m_choiceSetups->Append(_T(""));
+	for(size_t n = 0; n < project->pattern.GetCount(); n++){
+		m_choiceSetups->Append(project->pattern[n].name);
+	}
+	m_choiceSetups->SetSelection(selectedPattern + 1);
+	wxLogMessage(
+			_T("to Window ")
+					+ wxString::Format(_T("%i / %i"), selectedPattern,
+							project->pattern.GetCount()));
 }
 
 void GeneratorPositioningDrills::TransferDataFromPanel(void)
@@ -132,6 +167,9 @@ void GeneratorPositioningDrills::TransferDataFromPanel(void)
 			m_textCtrlHoleDepth->GetValue());
 	diameter = settings->SmallDistance.SIFromString(
 			m_textCtrlHoleDiameter->GetValue());
+	selectedPattern = m_choiceSetups->GetSelection() - 1;
+	wxLogMessage(
+	_T("from Window ") + wxString::Format(_T("%i"), selectedPattern));
 }
 
 wxString GeneratorPositioningDrills::ToString(void) const

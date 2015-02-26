@@ -48,6 +48,7 @@ void GeneratorLoadFromFile::CopyFrom(const Generator * other)
 			dynamic_cast <const GeneratorLoadFromFile*>(other);
 
 	filename = temp->filename;
+	wxLogMessage(_T("CopyFrom: ") + filename.GetFullName());
 }
 
 GeneratorLoadFromFile::~GeneratorLoadFromFile()

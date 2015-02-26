@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : TPGeneratorFast.h
+// Name               : GeneratorFast.h
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,24 +24,34 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef GENERATORFAST_H_
+#define GENERATORFAST_H_
 
-#ifndef TPGENERATORFAST_H_
-#define TPGENERATORFAST_H_
+#include "GeneratorDexel.h"
 
-#include "DexelTarget.h"
 #include "../3D/Polygon3.h"
 #include "../machine/Tool.h"
 
-/*!\class TPGeneratorFast
+/*!\class GeneratorFast
  * \brief ...
  *
  * ...
  */
-class TPGeneratorFast {
+class GeneratorFast:public GeneratorDexel {
 	// Constructor/ Destructor
 public:
-	TPGeneratorFast();
-	virtual ~TPGeneratorFast();
+	GeneratorFast(Project * project, size_t runNr, size_t toolpathNr);
+	virtual ~GeneratorFast();
+
+	virtual void CopyFrom(const Generator * other);
+	virtual wxString GetName(void) const;
+	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
+	virtual void TransferDataToPanel(void) const;
+	virtual void TransferDataFromPanel(void);
+	virtual wxString ToString(void) const;
+	virtual void FromString(const wxString & text);
+
+	virtual void GenerateToolpath(void);
 
 	//Member variables:
 public:
@@ -56,17 +66,15 @@ private:
 	double toolDiameter;
 
 	//Methods:
-public:
-	void GenerateToolpath(DexelTarget &target, Tool &tool);
 
 private:
 	ToolPath GenerateSpiral(double x, double y, double radius);
 	ToolPath GenerateDrill(double x, double y, double diameter, double depth);
-	bool IsDirectlyReachable(DexelTarget &target, double sx, double sy, double sz,
-			double x, double y, double z);
+	bool IsDirectlyReachable(DexelTarget &target, double sx, double sy,
+			double sz, double x, double y, double z);
 	ToolPath MoveSavely(DexelTarget &target, double sx, double sy, double sz,
 			double x, double y, double z);
 
 };
 
-#endif /* TPGENERATORFAST_H_ */
+#endif /* GENERATORFAST_H_ */

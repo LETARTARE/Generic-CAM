@@ -24,7 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include "Imprinter.h"
 #include <float.h>
 #include <math.h>
@@ -57,17 +56,19 @@ void ImprinterElement::Swap(ImprinterElement& b)
 	b.Set(temp);
 }
 
-Imprinter::Imprinter(const double sizeX, const double sizeY,
-		const double sizeZ, const double resolutionX, const double resolutionY)
+Imprinter::Imprinter(const double sizeX, const double sizeY, const double sizeZ,
+		const double resolutionX, const double resolutionY)
 {
 	field = NULL;
 	nx = ny = N = 0;
 	sx = sy = sz = 0.0;
 	rx = ry = 1.0;
 
+	refresh = false;
+
 	displayBox = false;
 	displayListGenerated = false;
-
+	displayListIndex = 0;
 	displayField = false;
 
 	displayUpUp = false;
@@ -89,12 +90,15 @@ Imprinter::Imprinter(const Imprinter& ip)
 	this->colorUnscratched = ip.colorUnscratched;
 	this->displayBox = ip.displayBox;
 	this->displayListGenerated = false;
+	this->displayListIndex = 0;
 	this->displayField = ip.displayField;
 
 	this->displayUpUp = ip.displayUpUp;
 	this->displayUpDown = ip.displayUpDown;
 	this->displayDownUp = ip.displayDownUp;
 	this->displayDownDown = ip.displayDownDown;
+
+	this->refresh = false;
 
 	if(ip.N == 0) return;
 	this->SetupBox(ip.sx, ip.sy, ip.sz, ip.rx, ip.ry);
@@ -222,7 +226,6 @@ bool Imprinter::SetupBox(const double sizeX, const double sizeY,
 	sy = sizeY;
 	sz = sizeZ;
 
-
 	// Every element describes the middle of a rx*ry sized element.
 	for(size_t i = 0; i < N; i++){
 		field[i].upperLimit = sz;
@@ -255,8 +258,8 @@ void Imprinter::SetupSphere(double radius, const double resolutionX,
 	for(j = 0; j < ny; j++){
 		px = rx / 2;
 		for(i = 0; i < nx; i++){
-			d = (px - centerX) * (px - centerX) + (py - centerY) * (py
-					- centerY);
+			d = (px - centerX) * (px - centerX)
+					+ (py - centerY) * (py - centerY);
 			d = radius * radius - d;
 			if(d >= 0.0)
 				d = sqrt(d);
@@ -290,8 +293,8 @@ void Imprinter::SetupCylinder(double radius, double height,
 	for(j = 0; j < ny; j++){
 		px = rx / 2;
 		for(i = 0; i < nx; i++){
-			d = (px - centerX) * (px - centerX) + (py - centerY) * (py
-					- centerY);
+			d = (px - centerX) * (px - centerX)
+					+ (py - centerY) * (py - centerY);
 			if(d <= radius * radius){
 				field[p].upperLimit = height;
 				field[p].lowerLimit = 0.0;
@@ -326,8 +329,8 @@ void Imprinter::SetupDisc(double radius, const double resolutionX,
 	for(j = 0; j < ny; j++){
 		px = rx / 2;
 		for(i = 0; i < nx; i++){
-			d = (px - centerX) * (px - centerX) + (py - centerY) * (py
-					- centerY);
+			d = (px - centerX) * (px - centerX)
+					+ (py - centerY) * (py - centerY);
 			if(d <= radius * radius){
 				field[p].upperLimit = 5 * FLT_EPSILON;
 				field[p].lowerLimit = 0.0;
@@ -359,7 +362,6 @@ void Imprinter::FoldRaise(const Imprinter &b)
 	cx = b.nx / 2;
 	cy = b.ny / 2;
 
-
 	// Init
 	for(i = 0; i < N; i++){
 		field[i].upperLimitUpside = field[i].upperLimit;
@@ -386,14 +388,14 @@ void Imprinter::FoldRaise(const Imprinter &b)
 								h = field[p].upperLimit
 										+ b.field[pb].upperLimit;
 
-								if(h > field[ph].upperLimitUpside) field[ph].upperLimitUpside
-										= h;
+								if(h > field[ph].upperLimitUpside) field[ph].upperLimitUpside =
+										h;
 
 								h = field[p].lowerLimit
 										+ b.field[pb].lowerLimit;
 
-								if(h < field[ph].lowerLimitUpside) field[ph].lowerLimitUpside
-										= h;
+								if(h < field[ph].lowerLimitUpside) field[ph].lowerLimitUpside =
+										h;
 							}
 						}
 						pb++;
@@ -405,7 +407,6 @@ void Imprinter::FoldRaise(const Imprinter &b)
 			p++;
 		}
 	}
-
 
 	// Finish
 	for(i = 0; i < N; i++){
@@ -421,7 +422,6 @@ void Imprinter::FoldReplace(const Imprinter &b)
 	size_t cx, cy;
 	cx = b.nx / 2;
 	cy = b.ny / 2;
-
 
 	// Init
 	for(i = 0; i < N; i++){
@@ -442,10 +442,10 @@ void Imprinter::FoldReplace(const Imprinter &b)
 									&& jb + j < ny + cy){
 								ph = i + ib - cx + (j + jb - cy) * nx;
 
-								field[ph].upperLimitUpside
-										= b.field[pb].upperLimit;
-								field[ph].lowerLimitUpside
-										= b.field[pb].lowerLimit;
+								field[ph].upperLimitUpside =
+										b.field[pb].upperLimit;
+								field[ph].lowerLimitUpside =
+										b.field[pb].lowerLimit;
 							}
 						}
 						pb++;
@@ -457,7 +457,6 @@ void Imprinter::FoldReplace(const Imprinter &b)
 			p++;
 		}
 	}
-
 
 	// Finish
 	for(i = 0; i < N; i++){
@@ -478,8 +477,8 @@ void Imprinter::FoldLower(int x, int y, double z, const Imprinter &b)
 	for(jb = 0; jb < b.ny; jb++){
 		for(ib = 0; ib < b.nx; ib++){
 			if(b.field[pb].IsVisible()){
-				if(ib + x >= cx && ib + x < nx + cx && jb + y >= cy && jb + y
-						< ny + cy){
+				if(ib + x >= cx && ib + x < nx + cx && jb + y >= cy
+						&& jb + y < ny + cy){
 					ph = x + ib - cx + (y + jb - cy) * nx;
 
 					if(field[ph].upperLimit > b.field[pb].lowerLimit + z){
@@ -536,7 +535,6 @@ bool Imprinter::IsFilledAbove(int x, int y, double height)
 {
 	if(x < 0 || y < 0 || x >= nx || y >= ny) return false;
 	size_t p = x + y * nx;
-
 
 	//	ImprinterElement temp;
 	//	temp = field[p];
@@ -656,24 +654,24 @@ void Imprinter::CleanOutlier(void)
 
 			j = i - nx - 1;
 
-			varu = fabs(field[i].upperLimit - sumu) + fabs(
-					field[i + 1].upperLimit - sumu) + fabs(
-					field[i + 2].upperLimit - sumu);
-			varl = fabs(field[i].lowerLimit - suml) + fabs(
-					field[i + 1].lowerLimit - suml) + fabs(
-					field[i + 2].lowerLimit - suml);
+			varu = fabs(field[i].upperLimit - sumu)
+					+ fabs(field[i + 1].upperLimit - sumu)
+					+ fabs(field[i + 2].upperLimit - sumu);
+			varl = fabs(field[i].lowerLimit - suml)
+					+ fabs(field[i + 1].lowerLimit - suml)
+					+ fabs(field[i + 2].lowerLimit - suml);
 			j += nx;
-			varu += fabs(field[i].upperLimit - sumu) + fabs(
-					field[i + 2].upperLimit - sumu);
-			varl += fabs(field[i].lowerLimit - suml) + fabs(
-					field[i + 2].lowerLimit - suml);
+			varu += fabs(field[i].upperLimit - sumu)
+					+ fabs(field[i + 2].upperLimit - sumu);
+			varl += fabs(field[i].lowerLimit - suml)
+					+ fabs(field[i + 2].lowerLimit - suml);
 			j += nx;
-			varu += fabs(field[i].upperLimit - sumu) + fabs(
-					field[i + 1].upperLimit - sumu) + fabs(
-					field[i + 2].upperLimit - sumu);
-			varl += fabs(field[i].lowerLimit - suml) + fabs(
-					field[i + 1].lowerLimit - suml) + fabs(
-					field[i + 2].lowerLimit - suml);
+			varu += fabs(field[i].upperLimit - sumu)
+					+ fabs(field[i + 1].upperLimit - sumu)
+					+ fabs(field[i + 2].upperLimit - sumu);
+			varl += fabs(field[i].lowerLimit - suml)
+					+ fabs(field[i + 1].lowerLimit - suml)
+					+ fabs(field[i + 2].lowerLimit - suml);
 
 			varu /= 8.0;
 			varl /= 8.0;
@@ -792,24 +790,20 @@ void Imprinter::InsertTriangle(Vector3 a, Vector3 b, Vector3 c, face_t facetype)
 {
 	double maxz = sz;
 
-
 	// Sort Vertices by y
 	if(a.y > b.y) a.Swap(b);
 	if(b.y > c.y) b.Swap(c);
 	if(a.y > b.y) a.Swap(b);
-
 
 	// Project triangle geometry
 	int ay = round(a.y / ry); // Starting Point
 	int by = round(b.y / ry); // Middle Point
 	int cy = round(c.y / ry); // End Point
 
-
 	double lx, lz;
 	double sx, sz;
 	double dlx, dlz;
 	double dsx, dsz;
-
 
 	// Starting positions;
 	lx = a.x;
@@ -874,7 +868,6 @@ void Imprinter::InsertTriangle(Vector3 a, Vector3 b, Vector3 c, face_t facetype)
 	double xz;
 	double dxz;
 
-
 	// Loop over y:
 	for(i = ay; i <= ey; i++){
 		pxl = round(lx / rx);
@@ -902,22 +895,21 @@ void Imprinter::InsertTriangle(Vector3 a, Vector3 b, Vector3 c, face_t facetype)
 		}
 		if(pxs >= nx) pxs = nx - 1;
 
-
 		// Loop over x:
 		for(j = pxl; j <= pxs; j++){
 
 			switch(facetype){
 
 			case Imprinter::other:
-				if(xz > field[i * nx + j].upperLimit) field[i * nx + j].upperLimit
-						= xz;
+				if(xz > field[i * nx + j].upperLimit) field[i * nx + j].upperLimit =
+						xz;
 				break;
 
 			case Imprinter::facing_down:
 
 				if(xz >= maxz){
-					if(xz < field[i * nx + j].lowerLimitUpside) field[i * nx
-							+ j].lowerLimitUpside = xz;
+					if(xz < field[i * nx + j].lowerLimitUpside) field[i * nx + j].lowerLimitUpside =
+							xz;
 
 				}else{
 					if(xz <= 0.0){
@@ -925,8 +917,8 @@ void Imprinter::InsertTriangle(Vector3 a, Vector3 b, Vector3 c, face_t facetype)
 								* nx + j].lowerLimitDownside = xz;
 
 					}else{
-						if(xz < field[i * nx + j].lowerLimit) field[i * nx + j].lowerLimit
-								= xz;
+						if(xz < field[i * nx + j].lowerLimit) field[i * nx + j].lowerLimit =
+								xz;
 					}
 				}
 
@@ -935,8 +927,8 @@ void Imprinter::InsertTriangle(Vector3 a, Vector3 b, Vector3 c, face_t facetype)
 			case Imprinter::facing_up: // Facing up
 
 				if(xz >= maxz){
-					if(xz < field[i * nx + j].upperLimitUpside) field[i * nx
-							+ j].upperLimitUpside = xz;
+					if(xz < field[i * nx + j].upperLimitUpside) field[i * nx + j].upperLimitUpside =
+							xz;
 
 				}else{
 					if(xz <= 0.0){
@@ -944,14 +936,13 @@ void Imprinter::InsertTriangle(Vector3 a, Vector3 b, Vector3 c, face_t facetype)
 								* nx + j].upperLimitDownside = xz;
 
 					}else{
-						if(xz > field[i * nx + j].upperLimit) field[i * nx + j].upperLimit
-								= xz;
+						if(xz > field[i * nx + j].upperLimit) field[i * nx + j].upperLimit =
+								xz;
 					}
 				}
 
 				break;
 			case Imprinter::facing_side: // Side (nz==0)
-
 
 				//TODO: Ignore this case?
 				//				if(xz >= maxz){
@@ -990,7 +981,6 @@ void Imprinter::InsertTriangle(Vector3 a, Vector3 b, Vector3 c, face_t facetype)
 		sx += dsx;
 		sz += dsz;
 
-
 		// Switch to the second short edge
 		if(i == by){
 			if(by < cy){
@@ -1009,7 +999,6 @@ void Imprinter::InsertTriangle(Vector3 a, Vector3 b, Vector3 c, face_t facetype)
 void Imprinter::FinishImprint(void)
 {
 	for(size_t i = 0; i < N; i++){
-
 
 		//		if(field[i].upperLimit < field[i].lowerLimit)// Inside is switched
 		//		{

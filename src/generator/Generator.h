@@ -60,6 +60,9 @@ public:
 	float marginBelow;
 	float marginSide;
 
+	size_t slotNr;
+	float freeHeight;
+
 protected:
 	DisplaySettings * settings;
 	ToolPath * toolpath;
@@ -78,7 +81,7 @@ public:
 	virtual void TransferDataFromPanel(void) = 0;
 	virtual wxString ToString(void) const = 0;
 	virtual void FromString(const wxString & text) = 0;
-
+	virtual void Paint(void);
 	virtual void GenerateToolpath(void) = 0;
 
 };
