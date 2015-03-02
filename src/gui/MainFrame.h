@@ -145,6 +145,7 @@ private:
 	void OnToolboxLoad(wxCommandEvent& event);
 	void OnToolboxSave(wxCommandEvent& event);
 	void OnGeneratorSetup(wxCommandEvent& event);
+	void OnGeneratorStart(wxCommandEvent& event);
 	void OnGeneratorAutomatic(wxCommandEvent& event);
 	void OnGeneratorRestart(wxCommandEvent& event);
 	void OnGeneratorSaveToolpath(wxCommandEvent& event);

@@ -83,51 +83,19 @@ bool Project::GenerateToolpaths(void)
 	// are the only other function locking the project.)
 	mtx_project.Lock();
 
-	// Testing preconditions.
-	size_t runNr;
-	size_t toolpathNr;
-	int workpieceNr;
-	size_t placementNr;
-	int objectNr;
-
-	// Propagate modifcation flag from object to workpiece
-	for(workpieceNr = 0; workpieceNr < workpieces.GetCount(); workpieceNr++){
-		for(placementNr = 0;
-				placementNr < workpieces[workpieceNr].placements.GetCount();
-				placementNr++){
-			objectNr = workpieces[workpieceNr].placements[placementNr].objectNr;
-			if(objectNr >= 0){
-				if(objects[objectNr].modified) workpieces[workpieceNr].modified =
-						true;
-			}
-		}
-	}
-
-	// Propagate modification flag from workpiece to run to the generators
-	for(runNr = 0; runNr < run.GetCount(); runNr++){
-		workpieceNr = run[runNr].workpieceNr;
-		if(workpieceNr >= 0){
-			if(workpieces[workpieceNr].modified) run[runNr].modified = true;
-		}
-		if(run[runNr].modified){
-			for(toolpathNr = 0; toolpathNr < run[runNr].toolpaths.GetCount();
-					toolpathNr++){
-				run[runNr].toolpaths[toolpathNr].generator->toolpathGenerated =
-						false;
-			}
-		}
-	}
+	PropagateChanges();
 
 	// Select and start the next generators to have a go
 	// The selection is done workpiece-wise, even if spread across multiple runs.
-	for(workpieceNr = 0; workpieceNr < workpieces.GetCount(); workpieceNr++){
+	for(size_t workpieceNr = 0; workpieceNr < workpieces.GetCount();
+			workpieceNr++){
 		if(workpieces[workpieceNr].hasRunningGenerator) continue;
-		for(runNr = 0; runNr < run.GetCount(); runNr++){
+		for(size_t runNr = 0; runNr < run.GetCount(); runNr++){
 			if(run[runNr].workpieceNr != workpieceNr) continue;
 
 			// Find the first generator, that has not generated its toolpath.
-			for(toolpathNr = 0; toolpathNr < run[runNr].toolpaths.GetCount();
-					toolpathNr++){
+			for(size_t toolpathNr = 0;
+					toolpathNr < run[runNr].toolpaths.GetCount(); toolpathNr++){
 				if(run[runNr].toolpaths[toolpathNr].generator->toolpathGenerated) continue;
 
 				// Generate a detached thread. on exit it signals the workpiece to be free for
@@ -398,6 +366,40 @@ void Project::Paint(void)
 	::glLoadName(0);
 }
 
+void Project::PropagateChanges(void)
+{
+	// Testing preconditions.
+	// Propagate modifcation flag from object to workpiece
+	for(size_t workpieceNr = 0; workpieceNr < workpieces.GetCount();
+			workpieceNr++){
+		for(size_t placementNr = 0;
+				placementNr < workpieces[workpieceNr].placements.GetCount();
+				placementNr++){
+			int objectNr =
+					workpieces[workpieceNr].placements[placementNr].objectNr;
+			if(objectNr >= 0){
+				if(objects[objectNr].modified) workpieces[workpieceNr].modified =
+				true;
+			}
+		}
+	}
+
+	// Propagate modification flag from workpiece to run to the generators
+	for(size_t runNr = 0; runNr < run.GetCount(); runNr++){
+		int workpieceNr = run[runNr].workpieceNr;
+		if(workpieceNr >= 0){
+			if(workpieces[workpieceNr].modified) run[runNr].modified = true;
+		}
+		if(run[runNr].modified){
+			for(size_t toolpathNr = 0;
+					toolpathNr < run[runNr].toolpaths.GetCount(); toolpathNr++){
+				run[runNr].toolpaths[toolpathNr].generator->toolpathGenerated =
+				false;
+			}
+		}
+	}
+
+}
 //void Project::FlipRun(void)
 //{
 //	size_t n = run[activeRun].placements.GetCount();

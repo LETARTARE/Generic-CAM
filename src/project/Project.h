@@ -117,6 +117,7 @@ public:
 
 	void Paint(void);
 
+	void PropagateChanges(void);
 	bool GenerateToolpaths(void);
 
 private:

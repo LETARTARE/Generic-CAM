@@ -191,16 +191,20 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	m_menuToolpath = new wxMenu();
 	wxMenuItem* m_menuItemGeneratorSetup;
-	m_menuItemGeneratorSetup = new wxMenuItem( m_menuToolpath, ID_GENERATORSETUP, wxString( _("&Setup Generators") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemGeneratorSetup = new wxMenuItem( m_menuToolpath, ID_GENERATORSETUP, wxString( _("&Setup Generators") ) + wxT('\t') + wxT("CTRL+G"), wxEmptyString, wxITEM_NORMAL );
 	m_menuToolpath->Append( m_menuItemGeneratorSetup );
 	
 	wxMenuItem* m_separator18;
 	m_separator18 = m_menuToolpath->AppendSeparator();
 	
+	wxMenuItem* m_menuItemGeneratorStart;
+	m_menuItemGeneratorStart = new wxMenuItem( m_menuToolpath, ID_GENERATORSTART, wxString( _("Start &Generators") ) , _("Start the generation of any ungenerated toolpaths."), wxITEM_NORMAL );
+	m_menuToolpath->Append( m_menuItemGeneratorStart );
+	
 	wxMenuItem* m_menuItemGeneratorAutomatic;
 	m_menuItemGeneratorAutomatic = new wxMenuItem( m_menuToolpath, ID_GENERATORAUTOMATIC, wxString( _("&Automatic Generation") ) , wxEmptyString, wxITEM_CHECK );
 	m_menuToolpath->Append( m_menuItemGeneratorAutomatic );
-	m_menuItemGeneratorAutomatic->Check( true );
+	m_menuItemGeneratorAutomatic->Enable( false );
 	
 	wxMenuItem* m_menuItemGeneratorRestart;
 	m_menuItemGeneratorRestart = new wxMenuItem( m_menuToolpath, ID_GENERATORRESTART, wxString( _("&Restart Generation") ) , wxEmptyString, wxITEM_NORMAL );
@@ -372,6 +376,7 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	this->Connect( m_menuItemToolboxLoad->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnToolboxLoad ) );
 	this->Connect( m_menuItemToolboxSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnToolboxSave ) );
 	this->Connect( m_menuItemGeneratorSetup->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnGeneratorSetup ) );
+	this->Connect( m_menuItemGeneratorStart->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnGeneratorStart ) );
 	this->Connect( m_menuItemGeneratorAutomatic->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnGeneratorAutomatic ) );
 	this->Connect( m_menuItemGeneratorRestart->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnGeneratorRestart ) );
 	this->Connect( m_menuItemGeneratorSaveToolpath->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnGeneratorSaveToolpath ) );
@@ -436,6 +441,7 @@ GUIMainFrame::~GUIMainFrame()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnToolboxLoad ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnToolboxSave ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnGeneratorSetup ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnGeneratorStart ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnGeneratorAutomatic ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnGeneratorRestart ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMainFrame::OnGeneratorSaveToolpath ) );
