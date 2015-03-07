@@ -27,6 +27,8 @@
 #ifndef BOUNDINGBOX_H_
 #define BOUNDINGBOX_H_
 
+#include <wx/txtstrm.h>
+
 #include "../3D/Vector3.h"
 #include "../3D/Geometry.h"
 #include "../3D/Surface.h"
@@ -82,6 +84,8 @@ public:
 		return zmax - zmin;
 	}
 
+	void ToStream(wxTextOutputStream & stream);
+	bool FromStream(wxTextInputStream & stream);
 	void Paint(void);
 };
 

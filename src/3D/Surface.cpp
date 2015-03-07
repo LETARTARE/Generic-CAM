@@ -123,7 +123,7 @@ void Surface::CopyFrom(const Geometry &geometry)
 	Clear();
 	CopyTrianglesFrom(geometry);
 	this->matrix = geometry.matrix;
-	this->objectName = geometry.objectName;
+	this->objectName = geometry.name;
 	this->visible = geometry.visible;
 	this->color = geometry.color;
 	wxLogMessage(wxString::Format(_T("V: %u E: %u T: %u"), v.GetCount(),

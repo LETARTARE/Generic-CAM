@@ -30,8 +30,7 @@
 #include <wx/dynarray.h>
 #include <wx/filename.h>
 #include <wx/string.h>
-#include <wx/textfile.h>
-#include <wx/xml/xml.h>
+#include <wx/txtstrm.h>
 
 #include "../3D/AffineTransformMatrix.h"
 #include "../3D/Geometry.h"
@@ -76,15 +75,15 @@ public:
 	// Methods
 public:
 
-	bool LoadGCode(wxFileName fileName);
 	void Paint(const ArrayOfObject& objects,
 			const ArrayOfWorkpiece& workpieces) const;
 	void ToXml(wxXmlNode* parentNode);
 	bool FromXml(wxXmlNode* node);
 
-	void WriteToFile(wxTextFile &f); //TODO: Here?
+	void ToStream(wxTextOutputStream & stream);
+	bool FromStream(wxTextInputStream & stream, int runNr,Project * project);
 
-	void SortTargets(void); // TODO: Autoplacing belongs to the Workpiece class!?
+	void ToolpathToStream(wxTextOutputStream & stream);
 
 };
 WX_DECLARE_OBJARRAY(Run, ArrayOfRun);

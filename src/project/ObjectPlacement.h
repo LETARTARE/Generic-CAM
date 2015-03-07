@@ -35,6 +35,7 @@
 
 #include <stddef.h>
 #include <wx/dynarray.h>
+#include <wx/wfstream.h>
 #include <wx/xml/xml.h>
 
 #include "../3D/AffineTransformMatrix.h"
@@ -76,6 +77,9 @@ public:
 public:
 	void Clear(void);
 	void Update(const ArrayOfObject &objects);
+
+	void ToStream(wxTextOutputStream & stream);
+	bool FromStream(wxTextInputStream & stream);
 
 //	void SetKeepout(double x, double y, double sizex, double sizey);
 

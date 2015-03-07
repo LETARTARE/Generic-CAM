@@ -58,6 +58,8 @@
 // http://www.parashift.com/c++-faq-lite/operator-overloading.html
 #include <wx/string.h>
 #include <wx/dynarray.h>
+#include <wx/txtstrm.h>
+
 #include "Vector3.h"
 
 class AffineTransformMatrix {
@@ -84,6 +86,9 @@ public:
 
 	wxString ToString();
 	void FromString(wxString const& string);
+
+	void ToStream(wxTextOutputStream & stream);
+	void FromStream(wxTextInputStream & stream);
 
 	AffineTransformMatrix& operator=(const AffineTransformMatrix &b);
 	void Set(AffineTransformMatrix const& b);

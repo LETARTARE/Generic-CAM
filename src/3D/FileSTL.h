@@ -53,6 +53,7 @@ public:
 public:
 	bool ReadFile(wxString fileName);
 	bool ReadStream(wxInputStream & stream);
+	static void WriteStream(wxOutputStream & stream, Geometry & g);
 private:
 	bool ReadStreamBinary(wxInputStream & stream, bool hasRead5Byte = false);
 	bool ReadStreamAscii(wxInputStream & stream, bool hasRead5Byte = false);

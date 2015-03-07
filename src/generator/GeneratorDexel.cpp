@@ -26,6 +26,8 @@
 
 #include "GeneratorDexel.h"
 
+#include "../project/Project.h"
+
 GeneratorDexel::GeneratorDexel(Project * project, size_t runNr,
 		size_t toolpathNr) :
 		Generator(project, runNr, toolpathNr)
@@ -41,7 +43,10 @@ void GeneratorDexel::CopyFrom(const Generator * other)
 
 void GeneratorDexel::Paint(void)
 {
+	glPushMatrix();
+	glTranslatef(box.xmin, box.ymin, box.zmin);
 	target.Paint();
+	glPopMatrix();
 }
 
 void GeneratorDexel::GenerateTarget(void)
@@ -49,6 +54,37 @@ void GeneratorDexel::GenerateTarget(void)
 
 	target.SetupBox(box.GetSizeX(), box.GetSizeY(), box.GetSizeZ(), 0.001,
 			0.001);
+
+	AffineTransformMatrix tempMatrix;
+
+	int workpieceNr = project->run[runNr].workpieceNr;
+	for(int placementNr = 0;
+			placementNr < project->workpieces[workpieceNr].placements.GetCount();
+			placementNr++){
+
+		size_t objNr =
+				project->workpieces[workpieceNr].placements[placementNr].objectNr;
+
+		float x =
+				project->workpieces[workpieceNr].placements[placementNr].matrix.a[12];
+		float y =
+				project->workpieces[workpieceNr].placements[placementNr].matrix.a[13];
+		float z =
+				project->workpieces[workpieceNr].placements[placementNr].matrix.a[14];
+
+		tempMatrix = AffineTransformMatrix::Identity();
+		tempMatrix.TranslateGlobal(-box.xmin, -box.ymin, -box.zmin);
+		tempMatrix.TranslateLocal(
+				-project->workpieces[workpieceNr].placements[placementNr].bbox.xmin,
+				-project->workpieces[workpieceNr].placements[placementNr].bbox.ymin,
+				-project->workpieces[workpieceNr].placements[placementNr].bbox.zmin);
+		tempMatrix.TranslateLocal(x, y, z);
+		tempMatrix *=
+				project->workpieces[workpieceNr].placements[placementNr].matrix;
+
+		target.InsertObject(project->objects[objNr], tempMatrix);
+		target.CleanOutlier();
+	}
 
 //	DexelTarget temp, temp2;
 //	TargetPlacement tempPlace;

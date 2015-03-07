@@ -30,6 +30,8 @@
 #include <GL/gl.h>
 #include <wx/log.h>
 #include <wx/arrimpl.cpp>
+
+#include "../generator/GeneratorCollection.h"
 WX_DEFINE_OBJARRAY(ArrayOfRun)
 
 Run::Run()
@@ -150,45 +152,67 @@ bool Run::FromXml(wxXmlNode* node)
 	return true;
 }
 
-void Run::WriteToFile(wxTextFile &f)
+void Run::ToolpathToStream(wxTextOutputStream & stream)
 {
-//	toolPath.WriteToFile(f);
+//	toolPath.ToolpathToStream(f);
 }
 
-void Run::SortTargets(void)
+void Run::ToStream(wxTextOutputStream& stream)
 {
-//	size_t i, j;
-//	double dmin, d;
-//	Polygon25 temp, temp2;
-//
-//	for(i = 0; i < placements.GetCount(); i++){
-//		if(placements[i].isMovable){
-//			wxLogMessage(wxString::Format(_T("Moving Target %u:"), i));
-//
-//			temp = placements[i].outLine;
-//			temp.ApplyTransformation(placements[i].matrix);
-//
-//			dmin = +DBL_MAX;
-//			for(j = i; j > 0; j--){
-//				temp2 = placements[j - 1].outLine;
-//				temp2.ApplyTransformation(placements[j - 1].matrix);
-//				d = temp.DistanceToPolygon(temp2, -1.0, 0.0);
-//				if(d < dmin){
-//					dmin = d;
-//
-//					wxLogMessage(wxString::Format(
-//							_T("To Target %u: d= %.3f m"), j - 1, d));
-//				}
-//			}
-//			if(dmin < 1.0){
-//				placements[i].matrix.TranslateGlobal(-dmin, 0.0, 0.0);
-//			}
-//		}
-//	}
-
+	stream << _T("Name:") << endl;
+	stream << name << endl;
+	stream << _T("Workpiece: ");
+	stream << wxString::Format(_T("%i"), workpieceNr);
+	stream << endl;
+	toolbox.ToStream(stream);
+	size_t n;
+	GeneratorCollection gc;
+	stream << _T("Generators: ");
+	stream << wxString::Format(_T("%u"), toolpaths.GetCount());
+	stream << endl;
+	int g;
+	for(n = 0; n < toolpaths.GetCount(); n++){
+		toolpaths[n].ToStream(stream);
+		stream << _T("Generator:") << endl;
+		g = gc.FindGenerator(toolpaths[n].generator);
+		stream << gc.GetName(g) << endl;
+		toolpaths[n].generator->ToStream(stream);
+	}
 }
 
-bool Run::LoadGCode(wxFileName fileName)
+bool Run::FromStream(wxTextInputStream& stream, int runNr, Project * project)
 {
-	return false;
+	wxString temp;
+	temp = stream.ReadLine();
+	if(temp.Cmp(_T("Name:")) != 0) return false;
+	name = stream.ReadLine();
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Workpiece:")) != 0) return false;
+	workpieceNr = stream.Read32S();
+	if(!toolbox.FromStream(stream)) return false;
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Generators:")) != 0) return false;
+	size_t N = stream.Read32();
+	size_t n;
+	size_t toolpathIndex;
+	int generatorNr;
+	ToolPath toolpath;
+	toolpaths.Clear();
+	GeneratorCollection gc;
+	for(n = 0; n < N; n++){
+		toolpath.FromStream(stream);
+		toolpaths.Add(toolpath);
+		toolpathIndex = toolpaths.GetCount() - 1;
+		temp = stream.ReadLine();
+		if(temp.Cmp(_T("Generator:")) != 0) return false;
+		temp = stream.ReadLine();
+		generatorNr = gc.FindGenerator(temp);
+		toolpaths[toolpathIndex].generator = gc.NewGenerator(generatorNr,
+				project, runNr, n);
+		toolpaths[toolpathIndex].generator->FromStream(stream);
+		printf(toolpaths[toolpathIndex].generator->GetName().ToAscii());
+		printf("\n");
+	}
+	return true;
 }
+

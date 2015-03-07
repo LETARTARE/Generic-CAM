@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Toolbox.h
-// Purpose            : Holds a collection of tools.
-// Thread Safe        : Yes
+// Name               : GeneratorCollection.h
+// Purpose            : Collection of Generators
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 16.03.2010
-// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 06.03.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,42 +24,36 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef TOOLBOX_H_
-#define TOOLBOX_H_
+#ifndef GENERATORCOLLECTION_H_
+#define GENERATORCOLLECTION_H_
 
 #include <stddef.h>
-#include <wx/filename.h>
-#include <wx/string.h>
-#include <wx/xml/xml.h>
 
-#include "../machine/Tool.h"
+#include "Generator.h"
 
-class Toolbox {
-	//Constructor / Destructor
+/*!\class GeneratorCollection
+ * \brief Collection of all available Generator
+ *
+ * ...
+ */
+
+class GeneratorCollection {
+	friend class DialogToolpathGenerator;
 public:
-	Toolbox();
-	virtual ~Toolbox();
+	static Generator * NewGenerator(int generatorNr, Project * project,
+			size_t runNr, size_t toolpathNr);
+	static size_t GetCount();
+	wxString GetName(int generatorNr) const;
+	int FindGenerator(Generator * generator) const;
+	int FindGenerator(const wxString& name) const;
 
-	//Member variables
-public:
-	wxFileName fileName;
-	ArrayOfTool tools;
+	GeneratorCollection();
+	GeneratorCollection(Project * project);
+	GeneratorCollection(const GeneratorCollection& other);
+	virtual ~GeneratorCollection();
 
 private:
-	bool initialized;
-
-	// Methods
-public:
-	void Empty(void);
-	bool LoadToolbox(wxFileName& fileName);
-	bool SaveToolbox(wxFileName& fileName);
-	void ToStream(wxTextOutputStream & stream);
-	bool FromStream(wxTextInputStream & stream);
-	bool IsInitialized(void) const;
-	size_t GetToolCount(void) const;
-	Tool * GetToolInSlot(size_t slotNr);
-	int GetIndexOfSlot(size_t slotNr) const;
-
+	Generator ** generators;
 };
 
-#endif /* TOOLBOX_H_ */
+#endif /* GENERATORCOLLECTION_H_ */

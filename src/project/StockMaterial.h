@@ -64,6 +64,8 @@ public:
 public:
 	void Paint(float alpha, bool flipNormals = false) const;
 	void PaintWireBox(void) const;
+	void ToStream(wxTextOutputStream & stream);
+	bool FromStream(wxTextInputStream & stream);
 };
 WX_DECLARE_OBJARRAY(StockMaterial, ArrayOfStockMaterial);
 #endif /* STOCKMATERIAL_H_ */

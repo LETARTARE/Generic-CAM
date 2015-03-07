@@ -139,6 +139,21 @@ void AffineTransformMatrix::FromString(wxString const& string)
 	PutMatrixTogether();
 }
 
+void AffineTransformMatrix::ToStream(wxTextOutputStream& stream)
+{
+	for(int n = 0; n < 16; n++){
+		if(n > 0) stream << _T(" ");
+		stream.WriteDouble(a[n]);
+	}
+}
+
+void AffineTransformMatrix::FromStream(wxTextInputStream& stream)
+{
+	for(int n = 0; n < 16; n++)
+		a[n] = stream.ReadDouble();
+	TakeMatrixApart();
+}
+
 //! Calculate rx,ry,rz,tx,ty,tz and sx,sy,sz from the matrix.
 void AffineTransformMatrix::TakeMatrixApart(void)
 {

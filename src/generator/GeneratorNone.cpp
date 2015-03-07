@@ -80,15 +80,6 @@ void GeneratorNone::TransferDataFromPanel(void)
 {
 }
 
-wxString GeneratorNone::ToString(void) const
-{
-	return _T("");
-}
-
-void GeneratorNone::FromString(const wxString& text)
-{
-}
-
 void GeneratorNone::GenerateToolpath(void)
 {
 	printf("None called.\n");

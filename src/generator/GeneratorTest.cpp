@@ -73,15 +73,6 @@ void GeneratorTest::TransferDataFromPanel(void)
 {
 }
 
-wxString GeneratorTest::ToString(void) const
-{
-	return _T("");
-}
-
-void GeneratorTest::FromString(const wxString& text)
-{
-}
-
 void GeneratorTest::GenerateToolpath()
 {
 	output.Empty();

@@ -46,7 +46,6 @@
 #include <wx/filename.h>
 #include <wx/string.h>
 #include <wx/thread.h>
-#include <wx/xml/xml.h>
 
 #include "../3D/OctreeGenerator.h"
 #include "../3D/Quadtree.h"
@@ -104,9 +103,6 @@ public:
 	bool displayToolpath;
 	bool displayOutLines;
 
-protected:
-	wxXmlDocument doc;
-
 	// Methods
 public:
 	void Clear(void);
@@ -120,10 +116,6 @@ public:
 	void PropagateChanges(void);
 	bool GenerateToolpaths(void);
 
-private:
-//	void PaintWorkpieceWithObjects(size_t workpieceNr);
-
-	void XMLRemoveAllChildren(wxXmlNode* node);
 };
 
 #endif /* PROJECT_H_ */

@@ -30,7 +30,7 @@
 #include <wx/dynarray.h>
 #include <wx/filename.h>
 #include <wx/string.h>
-#include <wx/xml/xml.h>
+#include <wx/txtstrm.h>
 
 #include "../3D/AffineTransformMatrix.h"
 #include "../3D/BoundingBox.h"
@@ -82,11 +82,9 @@ public:
 
 	bool IsEmpty(void) const;
 
-	void ToXml(wxXmlNode* parentNode);
-	bool FromXml(wxXmlNode* node);
+	void ToStream(wxTextOutputStream & stream, int n);
+	bool FromStream(wxTextInputStream & stream);
 
-private:
-	void XMLRemoveAllChildren(wxXmlNode* node);
 };
 WX_DECLARE_OBJARRAY(Object, ArrayOfObject);
 

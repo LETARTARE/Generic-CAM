@@ -40,6 +40,21 @@ ToolPath::ToolPath()
 	colorCutting.Set(0.8, 0.3, 0.3);
 }
 
+ToolPath::ToolPath(const ToolPath& other)
+{
+	// Performance issues if called. Too many object have ToolPath objects.
+	printf("Copy constructor on ToolPath called.\n");
+	selected = false;
+	generator = NULL;
+	colorMoving = other.colorMoving;
+	colorCutting = other.colorCutting;
+	matrix = other.matrix;
+	info = other.info;
+	positions = other.positions;
+	minPosition = other.minPosition;
+	maxPosition = other.maxPosition;
+}
+
 ToolPath::~ToolPath()
 {
 	if(generator != NULL) delete generator;
@@ -395,3 +410,17 @@ bool ToolPath::ReadGCodeFile(wxFileName fileName)
 	return true;
 }
 
+void ToolPath::ToStream(wxTextOutputStream& stream)
+{
+	stream << _T("Matrix: ");
+	matrix.ToStream(stream);
+	stream << endl;
+}
+
+bool ToolPath::FromStream(wxTextInputStream& stream)
+{
+	wxString temp = stream.ReadWord();
+	if(temp.Cmp(_T("Matrix:")) != 0) return false;
+	matrix.FromStream(stream);
+	return true;
+}

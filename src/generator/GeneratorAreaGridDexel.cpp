@@ -77,15 +77,6 @@ void GeneratorAreaGridDexel::TransferDataFromPanel(void)
 {
 }
 
-wxString GeneratorAreaGridDexel::ToString(void) const
-{
-	return _T("");
-}
-
-void GeneratorAreaGridDexel::FromString(const wxString& text)
-{
-}
-
 void GeneratorAreaGridDexel::GenerateToolpath(void)
 {
 	printf("AreaGridDexel called.\n");

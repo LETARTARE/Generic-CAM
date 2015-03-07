@@ -69,7 +69,7 @@ bool FileGTS::ReadFile(wxString fileName)
 
 	// Set up a new geometry object.
 	Geometry* g = new Geometry();
-	g->objectName = fileName;
+	g->name = fileName;
 
 	geometry.Clear(); // Clear the old geometry and
 	geometry.Add(g); //insert the new one.

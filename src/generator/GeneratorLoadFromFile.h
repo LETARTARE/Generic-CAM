@@ -55,8 +55,6 @@ public:
 	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
 	virtual void TransferDataToPanel(void) const;
 	virtual void TransferDataFromPanel(void);
-	virtual wxString ToString(void) const;
-	virtual void FromString(const wxString & text);
 	virtual void GenerateToolpath(void);
 
 private:

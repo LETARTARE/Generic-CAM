@@ -40,7 +40,6 @@
  *
  */
 
-
 #include "ToolElement.h"
 
 #include "../3D/Vector3.h"
@@ -48,6 +47,7 @@
 #include <wx/string.h>
 #include <wx/xml/xml.h>
 #include <wx/dynarray.h>
+#include <wx/txtstrm.h>
 
 class Tool {
 	// Constructor / Destructor
@@ -58,15 +58,12 @@ public:
 	// Member variables
 public:
 	wxString toolName;
+	wxString comment;
 	double shaftDiameter;
 	double shaftLength;
 	double maxSpeed;
 	double feedCoefficient;
 	unsigned int nrOfTeeth;
-
-
-
-	wxString comment;
 	ArrayOfToolElement elements;
 	ArrayOfToolContourElement contour;
 	int slot;
@@ -74,8 +71,8 @@ public:
 
 	// Methods
 public:
-	void ToXml(wxXmlNode* parentNode);
-	void FromXml(wxXmlNode* node);
+	void ToStream(wxTextOutputStream & stream);
+	bool FromStream(wxTextInputStream & stream);
 
 	void GenerateContour(void);
 

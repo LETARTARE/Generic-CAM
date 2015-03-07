@@ -52,7 +52,7 @@ public:
 
 	// Member variables
 public:
-	wxString objectName;
+	wxString name;
 	Vector3 color;
 	Vector3 colorNewObjects;
 	GeometryColorStyle useColor;

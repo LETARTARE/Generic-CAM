@@ -63,6 +63,40 @@ LUACodeEvaluator::LUACodeEvaluator()
 	lua_register(L, "loadgeometry", loadgeometry_glue);
 }
 
+LUACodeEvaluator::LUACodeEvaluator(const LUACodeEvaluator& other)
+{
+	// Reminder, that something inefficient is happening.
+	printf("Copy constructor on LUACodeEvaluator called.\n");
+
+	linkedMachine = other.linkedMachine;
+	componentToManipulate = other.componentToManipulate;
+	L = lua_open();
+
+	availableLUACodeEvaluators.push_back(this);
+
+	luaopen_base(L);
+	luaopen_math(L);
+	luaopen_table(L);
+	luaopen_string(L);
+	lua_register(L, "print", print_glue);
+
+	lua_register(L, "identity", identity_glue);
+	lua_register(L, "box", box_glue);
+	lua_register(L, "cylinder", cylinder_glue);
+	lua_register(L, "setstyle", setstyle_glue);
+	lua_register(L, "addcomponent", addcomponent_glue);
+	lua_register(L, "toolholder", toolholder_glue);
+	lua_register(L, "tableorigin", tableorigin_glue);
+
+	lua_register(L, "translate", translate_glue);
+	lua_register(L, "rotate", rotate_glue);
+	lua_register(L, "scale", scale_glue);
+
+	lua_register(L, "placecomponent", placecomponent_glue);
+
+	lua_register(L, "loadgeometry", loadgeometry_glue);
+}
+
 LUACodeEvaluator::~LUACodeEvaluator()
 {
 	availableLUACodeEvaluators.remove(this);
@@ -487,3 +521,4 @@ int LUACodeEvaluator::loadgeometry_glue(lua_State * L)
 	}
 	return 0;
 }
+

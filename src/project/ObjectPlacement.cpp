@@ -77,6 +77,38 @@ void ObjectPlacement::Update(const ArrayOfObject& objects)
 	outline.Close();
 }
 
+void ObjectPlacement::ToStream(wxTextOutputStream& stream)
+{
+	stream << _T("Object: ");
+	stream << wxString::Format(_T("%i"), objectNr);
+	stream << endl;
+	stream << _T("Matrix: ");
+	matrix.ToStream(stream);
+	stream << endl;
+	stream << _T("Parameter: ");
+	stream << slotWidth << _T(" ");
+	stream << (useContour? 1 : 0) << _T(" ");
+	stream << (isMovable? 1 : 0) << _T(" ");
+	stream << (isKeepout? 1 : 0) << endl;
+}
+
+bool ObjectPlacement::FromStream(wxTextInputStream& stream)
+{
+	wxString temp;
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Object:")) != 0) return false;
+	objectNr = stream.Read32S();
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Matrix:")) != 0) return false;
+	matrix.FromStream(stream);
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Parameter:")) != 0) return false;
+	stream >> slotWidth;
+	useContour = (stream.Read8() == 1);
+	isMovable = (stream.Read8() == 1);
+	isKeepout = (stream.Read8() == 1);
+	return true;
+}
 //void ObjectPlacement::SetKeepout(double x, double y, double sizex, double sizey)
 //{
 //	matrix.SetIdentity();

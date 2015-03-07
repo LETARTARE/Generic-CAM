@@ -131,7 +131,7 @@ public:
 	void InitImprinting(void);
 	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c, face_t facetype =
 			other);
-	void InsertGeometrie(const Geometry *geometry, AffineTransformMatrix shift);
+	void InsertGeometrie(const Geometry *geometry, const AffineTransformMatrix & shift);
 	void FinishImprint(void);
 
 	void SetupSphere(double radius, const double resolutionX = 0.001,

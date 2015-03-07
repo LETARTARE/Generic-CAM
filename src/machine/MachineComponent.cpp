@@ -166,7 +166,7 @@ bool MachineComponent::InsertDXF(const AffineTransformMatrix &matrix,
 
 	size_t i;
 	for(i = 0; i < f.geometry.GetCount(); i++){
-		if(f.geometry[i].objectName.Cmp(componentName) == 0){
+		if(f.geometry[i].name.Cmp(componentName) == 0){
 			f.geometry[i].ApplyTransformation(matrix);
 			geometry.InsertTrianglesFrom(f.geometry[i]);
 		}

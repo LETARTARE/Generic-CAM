@@ -31,15 +31,16 @@
 
 #include <GL/gl.h>
 #include <math.h>
+#include <wx/txtstrm.h>
+#include <wx/wfstream.h>
+#include <wx/zipstrm.h>
+
+#include "../3D/FileSTL.h"
 
 //TODO: Rewrite the XML load/store to LUA script store/load.
 
 Project::Project()
 {
-	doc.SetFileEncoding(_T("UTF-8"));
-	//doc.SetVersion(_T(_GENERICCAM_VERSION));
-	doc.SetVersion(_T("1.0"));
-
 	Clear();
 }
 
@@ -123,192 +124,147 @@ bool Project::GenerateToolpaths(void)
 	return true;
 }
 
-// Recursive tree deletion.
-void Project::XMLRemoveAllChildren(wxXmlNode* node)
-{
-	wxXmlNode *temp, *temp2;
-	temp = node->GetChildren();
-	while(temp != NULL){
-		XMLRemoveAllChildren(temp);
-		temp2 = temp;
-		temp = temp->GetNext();
-		node->RemoveChild(temp2);
-		delete (temp2);
-	}
-}
-
 bool Project::Save(wxFileName fileName)
 {
 
 	if(!fileName.IsOk()) return false;
 
-	wxXmlNode* root = doc.GetRoot();
-	if(root == NULL){
-		root = new wxXmlNode(wxXML_ELEMENT_NODE, _T("GenericCAMProjectFile"));
-		doc.SetRoot(root);
+	wxFFileOutputStream out(fileName.GetFullPath());
+	wxZipOutputStream zip(out);
+	wxTextOutputStream txt(zip);
+
+	zip.PutNextEntry(_T("project.txt"));
+	txt << _T("Name:") << endl;
+	txt << this->name << endl;
+
+	txt << wxString::Format(_T("Objects: %u"), objects.GetCount()) << endl;
+	for(int n = 0; n < objects.GetCount(); n++){
+		txt << wxString::Format(_T("Object: %u"), n) << endl;
+		objects[n].ToStream(txt, n);
 	}
 
-	wxXmlNode *nodeObject = NULL;
-	wxXmlNode *nodeMachine = NULL;
-	wxXmlNode *nodeTool = NULL;
-	wxXmlNode *nodeTarget = NULL;
-	wxXmlNode *nodeRun = NULL;
-
-	wxXmlNode *temp;
-
-	temp = root->GetChildren();
-
-	// Check if there are already all necessary nodes in the document.
-	while(temp != NULL){
-		if(temp->GetName() == _T("Objects")) nodeObject = temp;
-		if(temp->GetName() == _T("Machine")) nodeMachine = temp;
-		if(temp->GetName() == _T("Tools")) nodeTool = temp;
-		if(temp->GetName() == _T("Targets")) nodeTarget = temp;
-		if(temp->GetName() == _T("Runs")) nodeRun = temp;
-		temp = temp->GetNext();
+	txt << wxString::Format(_T("Workpieces: %u"), workpieces.GetCount())
+			<< endl;
+	for(int n = 0; n < workpieces.GetCount(); n++){
+		txt << wxString::Format(_T("Workpiece: %u"), n) << endl;
+		workpieces[n].ToStream(txt);
 	}
-	// If a node is missing, generate it!
-	if(nodeObject == NULL){
-		nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("Objects"));
-		root->InsertChild(nodeObject, NULL);
-	}
-	if(nodeMachine == NULL){
-		nodeMachine = new wxXmlNode(wxXML_ELEMENT_NODE, _T("Machine"));
-		root->InsertChildAfter(nodeMachine, nodeObject);
-	}
-	if(nodeTool == NULL){
-		nodeTool = new wxXmlNode(wxXML_ELEMENT_NODE, _T("Tools"));
-		root->InsertChildAfter(nodeTool, nodeMachine);
-	}
-	if(nodeTarget == NULL){
-		nodeTarget = new wxXmlNode(wxXML_ELEMENT_NODE, _T("Targets"));
-		root->InsertChildAfter(nodeTarget, nodeTool);
-	}
-	if(nodeRun == NULL){
-		nodeRun = new wxXmlNode(wxXML_ELEMENT_NODE, _T("Runs"));
-		root->InsertChildAfter(nodeRun, nodeTarget);
+	txt << wxString::Format(_T("Run: %u"), run.GetCount()) << endl;
+	for(int n = 0; n < run.GetCount(); n++){
+		txt << wxString::Format(_T("Run: %u"), n) << endl;
+		run[n].ToStream(txt);
 	}
 
-	// Insert Data into the nodes.
-	size_t i;
-	for(i = 0; i < objects.GetCount(); i++)
-		objects[i].ToXml(nodeObject);
-//	machine.ToXml(nodeMachine);
+	for(int n = 0; n < objects.GetCount(); n++){
+		for(int m = 0; m < objects[n].geometries.GetCount(); m++){
+			wxString tempName = wxString::Format(
+					_T("object_%u_geometry_%u.stl"), n, m);
+			zip.PutNextEntry(tempName);
+			FileSTL::WriteStream(zip, objects[n].geometries[m]);
+		}
+	}
 
-	XMLRemoveAllChildren(nodeTarget);
-	//	for(i = 0; i < targets.GetCount(); i++)
-	//		targets[i].ToXml(nodeTarget);
-	for(i = 0; i < run.GetCount(); i++)
-		run[i].ToXml(nodeRun);
-
-	if(!doc.Save(fileName.GetFullPath(), wxXML_NO_INDENTATION)) return false;
-	this->fileName = fileName;
 	return true;
 }
 
 bool Project::Load(wxFileName fileName)
 {
-	wxXmlDocument* tempTree = new wxXmlDocument();
-	//tempTree->SetFileEncoding(_T("UTF-8"));
-	//tempTree->SetVersion(_T(_GENERICCAM_VERSION));
+	if(!fileName.IsOk()) return false;
 
-	if(!tempTree->Load(fileName.GetFullPath(), wxT("UTF-8"))){
-		delete tempTree;
-		wxLogWarning(
-				_T(
-						"Project::Load: Coud not load ") + fileName.GetFullPath() + _T(" file!"));
-		return false;
-	}
-	// Swap XML trees
-	this->doc = *tempTree;
-
-	// Take the tree apart
-	wxXmlNode *temp = doc.GetRoot();
-	if(temp == NULL){
-		wxLogWarning(_T("File contains no data (i.e. no root)!"));
-		return false;
-	}
-	if(temp->GetName() != _T("GenericCAMProjectFile")){
-		wxLogWarning(_T("Not a Generic CAM datafile!"));
-		return false;
-	}
+	wxFFileInputStream in(fileName.GetFullPath());
+	wxZipInputStream zip(in);
+	wxTextInputStream txt(zip);
 
 	Clear();
 
-	Object* tempObject = NULL;
-//	Tool* tempTool = NULL;
-//	Target* tempTarget = NULL;
-	Run* tempRun = NULL;
+	in.SeekI(0, wxFromStart);
+	wxZipEntry* entry;
+	while((entry = zip.GetNextEntry()))
+		if(entry->GetName().Cmp(_T("project.txt")) == 0) break;
+	if(entry == NULL) return false;
 
-	wxXmlNode *temp2;
+	zip.OpenEntry(*entry);
 
-	temp = temp->GetChildren();
-	while(temp != NULL){
-
-		//		wxLogMessage(_T("Node found: ") + temp->GetName());
-
-		if(temp->GetName() == _T("Objects")){
-			temp2 = temp->GetChildren();
-			while(temp2 != NULL){
-				//				wxLogMessage(_T("Objects node found: ") + temp2->GetName());
-				tempObject = new Object();
-				if(tempObject->FromXml(temp2))
-					objects.Add(tempObject);
-				else
-					delete tempObject;
-
-				temp2 = temp2->GetNext();
-			}
-			//			wxLogMessage(_T("Objects node found!"));
-		}
-//		if(temp->GetName() == _T("Machine")){
-//			temp2 = temp->GetChildren();
-//			while(temp2 != NULL){
-//				machine.FromXml(temp2);
-//				temp2 = temp2->GetNext();
-//			}
-		//			wxLogMessage(_T("Machine node found!"));
-//		}
-//		if(temp->GetName() == _T("Tools")){
-		//			temp2 = temp->GetChildren();
-		//			while(temp2 != NULL){
-		//				tempObject = new Object();
-		//				tempObject->FromXml(temp2);
-		//				objects.Add(tempObject);
-		//				temp2 = temp2->GetNext();
-		//			}
-		//			wxLogMessage(_T("Tools node found!"));
-//		}
-		//		if(temp->GetName() == _T("Targets")){
-		//			temp2 = temp->GetChildren();
-		//			while(temp2 != NULL){
-		//				tempTarget = new Target();
-		//				if(tempTarget->FromXml(temp2))
-		//					targets.Add(tempTarget);
-		//				else
-		//					delete tempTarget;
-		//				temp2 = temp2->GetNext();
-		//			}
-		//
-		//
-		//			//			wxLogMessage(_T("Targets node found!"));
-		//		}
-//
-//		if(temp->GetName() == _T("Runs")){
-//			temp2 = temp->GetChildren();
-//			while(temp2 != NULL){
-//				tempRun = new Run();
-//				if(tempRun->FromXml(temp2))
-//					run.Add(tempRun);
-//				else
-//					delete tempRun;
-//				temp2 = temp2->GetNext();
-//			}
-//
-//			//			wxLogMessage(_T("Runs node found!"));
-//		}
-//		temp = temp->GetNext();
+	wxString temp;
+	size_t N, n, m;
+	temp = txt.ReadLine();
+	if(temp.Cmp(_T("Name:")) != 0) return false;
+	name = txt.ReadLine();
+	temp = txt.ReadWord();
+	if(temp.Cmp(_T("Objects:")) != 0) return false;
+	N = txt.Read32();
+	objects.Clear();
+	Object object;
+	for(n = 0; n < N; n++){
+		temp = txt.ReadWord();
+		if(temp.Cmp(_T("Object:")) != 0) return false;
+		m = txt.Read32();
+		if(m != n) return false;
+		object.FromStream(txt);
+		objects.Add(object);
 	}
+
+	temp = txt.ReadWord();
+	if(temp.Cmp(_T("Workpieces:")) != 0) return false;
+	N = txt.Read32();
+	workpieces.Clear();
+	Workpiece workpiece;
+	for(n = 0; n < N; n++){
+		temp = txt.ReadWord();
+		if(temp.Cmp(_T("Workpiece:")) != 0) return false;
+		m = txt.Read32();
+		if(m != n) return false;
+		workpiece.FromStream(txt);
+		workpieces.Add(workpiece);
+	}
+
+	temp = txt.ReadWord();
+	if(temp.Cmp(_T("Run:")) != 0) return false;
+	N = txt.Read32();
+	run.Clear();
+	Run * tempRun;
+	for(n = 0; n < N; n++){
+		temp = txt.ReadWord();
+		if(temp.Cmp(_T("Run:")) != 0) return false;
+		m = txt.Read32();
+		if(m != n) return false;
+		tempRun = new Run();
+		tempRun->FromStream(txt, n, this);
+		run.Add(tempRun);
+	}
+	zip.CloseEntry();
+
+	// Load objects
+	//TODO: Rewind zip
+
+	while((entry = zip.GetNextEntry())){
+		temp = entry->GetName();
+		if(!temp.StartsWith(wxT("object_"), &temp)) continue;
+		long p;
+		temp.BeforeFirst('_').ToLong(&p);
+		n = p;
+		temp = temp.AfterFirst('_');
+		if(!temp.StartsWith(wxT("geometry_"), &temp)) continue;
+		temp.BeforeFirst('.').ToLong(&p);
+		m = p;
+		temp = temp.AfterFirst('.');
+		if(!temp.StartsWith(wxT("stl"))) continue;
+
+		if(n < 0 || n >= objects.GetCount()) continue;
+		if(m < 0 || m >= objects[n].geometries.GetCount()) continue;
+
+		FileSTL stl;
+		zip.OpenEntry(*entry);
+		stl.ReadStream(zip);
+		objects[n].geometries[m].triangles = stl.geometry[0].triangles;
+		zip.CloseEntry();
+	}
+
+	for(n = 0; n < objects.GetCount(); n++)
+		objects[n].Update();
+	for(n = 0; n < workpieces.GetCount(); n++)
+		workpieces[n].Update(objects);
+
 	return true;
 }
 
@@ -379,7 +335,7 @@ void Project::PropagateChanges(void)
 					workpieces[workpieceNr].placements[placementNr].objectNr;
 			if(objectNr >= 0){
 				if(objects[objectNr].modified) workpieces[workpieceNr].modified =
-				true;
+						true;
 			}
 		}
 	}
@@ -394,7 +350,7 @@ void Project::PropagateChanges(void)
 			for(size_t toolpathNr = 0;
 					toolpathNr < run[runNr].toolpaths.GetCount(); toolpathNr++){
 				run[runNr].toolpaths[toolpathNr].generator->toolpathGenerated =
-				false;
+						false;
 			}
 		}
 	}

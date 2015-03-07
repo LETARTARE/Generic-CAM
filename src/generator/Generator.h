@@ -30,6 +30,7 @@
 #include <stddef.h>
 #include <wx/panel.h>
 #include <wx/string.h>
+#include <wx/txtstrm.h>
 
 #include "../3D/BoundingBox.h"
 #include "../gui/DisplaySettings.h"
@@ -45,6 +46,7 @@ class ToolPath;
 
 class Generator {
 	friend class DialogToolpathGenerator;
+	friend class GeneratorCollection;
 	// Constructor/ Destructor
 public:
 	Generator(Project * project, size_t runNr, size_t toolpathNr);
@@ -75,15 +77,19 @@ public:
 
 	virtual void CopyFrom(const Generator * other);
 
-	virtual wxString GetName(void) const = 0;
+	virtual wxString GetName(void) const
+	{
+		return _T("Base Class");
+	}
 	virtual void AddToPanel(wxPanel * panel, DisplaySettings * settings);
 	virtual void TransferDataToPanel(void) const = 0;
 	virtual void TransferDataFromPanel(void) = 0;
-	virtual wxString ToString(void) const = 0;
-	virtual void FromString(const wxString & text) = 0;
+	virtual void ToStream(wxTextOutputStream & stream);
+	virtual bool FromStream(wxTextInputStream & stream);
 	virtual void Paint(void);
 	virtual void GenerateToolpath(void) = 0;
 
-};
+}
+;
 
 #endif /* GENERATOR_H_ */

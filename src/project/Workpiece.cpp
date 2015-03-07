@@ -78,14 +78,14 @@ void Workpiece::Paint(const ArrayOfObject &objects) const
 		placements[j].outline.Paint();
 	}
 
-	if(glIsEnabled(GL_COLOR_MATERIAL)){
-		glColor3f(color.x, color.y, color.z);
-		box.Paint();
-		StockMaterial::Paint(0.2, false);
-	}else{
-		box.Paint();
-		StockMaterial::PaintWireBox();
-	}
+//	if(glIsEnabled(GL_COLOR_MATERIAL)){
+//		glColor3f(color.x, color.y, color.z);
+//		box.Paint();
+//		StockMaterial::Paint(0.2, false);
+//	}else{
+//		box.Paint();
+//		StockMaterial::PaintWireBox();
+//	}
 
 }
 
@@ -104,4 +104,70 @@ void Workpiece::Update(ArrayOfObject& objects)
 				x + placements[j].bbox.GetSizeX() + d,
 				y + placements[j].bbox.GetSizeY() + d, sz);
 	}
+}
+
+void Workpiece::SortTargets(void)
+{
+//	size_t i, j;
+//	double dmin, d;
+//	Polygon25 temp, temp2;
+//
+//	for(i = 0; i < placements.GetCount(); i++){
+//		if(placements[i].isMovable){
+//			wxLogMessage(wxString::Format(_T("Moving Target %u:"), i));
+//
+//			temp = placements[i].outLine;
+//			temp.ApplyTransformation(placements[i].matrix);
+//
+//			dmin = +DBL_MAX;
+//			for(j = i; j > 0; j--){
+//				temp2 = placements[j - 1].outLine;
+//				temp2.ApplyTransformation(placements[j - 1].matrix);
+//				d = temp.DistanceToPolygon(temp2, -1.0, 0.0);
+//				if(d < dmin){
+//					dmin = d;
+//
+//					wxLogMessage(wxString::Format(
+//							_T("To Target %u: d= %.3f m"), j - 1, d));
+//				}
+//			}
+//			if(dmin < 1.0){
+//				placements[i].matrix.TranslateGlobal(-dmin, 0.0, 0.0);
+//			}
+//		}
+//	}
+
+}
+void Workpiece::ToStream(wxTextOutputStream& stream)
+{
+	stream << _T("Stockmaterial:") << endl;
+	StockMaterial::ToStream(stream);
+	stream << _T("Placements: ");
+	stream << wxString::Format(_T("%u"), placements.GetCount());
+	stream << endl;
+	size_t n;
+	for(n = 0; n < placements.GetCount(); n++){
+		placements[n].ToStream(stream);
+	}
+
+}
+
+bool Workpiece::FromStream(wxTextInputStream& stream)
+{
+	wxString temp = stream.ReadLine();
+	if(temp.Cmp(_T("Stockmaterial:")) != 0) return false;
+	bool flag = StockMaterial::FromStream(stream);
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Placements:")) != 0) return false;
+	size_t N = stream.Read32();
+	size_t n;
+	flag = true;
+	ObjectPlacement placement;
+	placements.Clear();
+	for(n = 0; n < N; n++){
+		flag = placement.FromStream(stream);
+		if(!flag) break;
+		placements.Add(placement);
+	}
+	return flag;
 }

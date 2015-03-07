@@ -74,6 +74,7 @@ class LUACodeEvaluator {
 	// Constructor / Destructor
 public:
 	LUACodeEvaluator();
+	LUACodeEvaluator(const LUACodeEvaluator & other);
 	virtual ~LUACodeEvaluator();
 
 	// Member Variables

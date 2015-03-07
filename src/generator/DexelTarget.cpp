@@ -85,12 +85,13 @@ bool DexelTarget::FromXml(wxXmlNode* node)
 	return true;
 }
 
-void DexelTarget::InsertObject(Object &object)
+void DexelTarget::InsertObject(Object &object,
+		const AffineTransformMatrix & shift)
 {
 	InitImprinting();
 	size_t i;
 	for(i = 0; i < object.geometries.GetCount(); i++){
-		InsertGeometrie(&(object.geometries[i]), object.matrix);
+		InsertGeometrie(&(object.geometries[i]), shift * object.matrix);
 	}
 	FinishImprint();
 }

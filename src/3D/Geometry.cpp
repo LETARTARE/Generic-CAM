@@ -271,13 +271,13 @@ void Geometry::ToXml(wxXmlNode* parentNode)
 	temp = parentNode->GetChildren();
 	while(temp != NULL && nodeObject == NULL){
 		if(temp->GetName() == _T("geometry")
-				&& temp->GetPropVal(_T("name"), _T("")) == objectName) nodeObject =
+				&& temp->GetPropVal(_T("name"), _T("")) == name) nodeObject =
 				temp;
 		temp = temp->GetNext();
 	}
 	if(nodeObject == NULL){
 		nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("geometry"));
-		nodeObject->AddProperty(_T("name"), objectName);
+		nodeObject->AddProperty(_T("name"), name);
 		parentNode->InsertChild(nodeObject, NULL);
 	}
 
@@ -315,7 +315,7 @@ void Geometry::ToXml(wxXmlNode* parentNode)
 bool Geometry::FromXml(wxXmlNode* node)
 {
 	if(node->GetName() != _T("geometry")) return false;
-	objectName = node->GetPropVal(_T("name"), _T(""));
+	name = node->GetPropVal(_T("name"), _T(""));
 	wxXmlNode *temp = node->GetChildren();
 
 	triangles.Empty();

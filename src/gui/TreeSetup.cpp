@@ -348,7 +348,7 @@ void TreeSetup::Update(void)
 		SetAtLevel(2, project->objects[n].name, itemObject, n);
 		if(project->objects[n].geometries.GetCount() > 1){
 			for(m = 0; m < project->objects[n].geometries.GetCount(); m++){
-				SetAtLevel(3, project->objects[n].geometries[m].objectName,
+				SetAtLevel(3, project->objects[n].geometries[m].name,
 						itemSubObject, n);
 			}
 			FinishLevel(3, false);

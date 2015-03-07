@@ -112,7 +112,7 @@ bool Object::ReloadObject(void)
 				temp.geometry[i].ApplyTransformation();
 				g.Clear();
 				g.InsertTrianglesFrom(temp.geometry[i]);
-				g.objectName = fileName.GetName();
+				g.name = fileName.GetName();
 				geometries.Add(g);
 			}
 		}
@@ -135,8 +135,8 @@ bool Object::ReloadObject(void)
 				g.InsertTrianglesFrom(temp.geometry[i]);
 				//TODO: Remove the calculation of normals.
 				g.CalculateNormals();
-				if(g.objectName.IsEmpty()){
-					g.objectName = fileName.GetName()
+				if(g.name.IsEmpty()){
+					g.name = fileName.GetName()
 							+ wxString::Format(_T(" - %u"), i);
 				}
 				g.color.Set((float) rand() / (float) RAND_MAX,
@@ -161,7 +161,7 @@ bool Object::ReloadObject(void)
 				temp.geometry[i].ApplyTransformation();
 				g.Clear();
 				g.InsertTrianglesFrom(temp.geometry[i]);
-				g.objectName = temp.geometry[i].objectName;
+				g.name = temp.geometry[i].name;
 				geometries.Add(g);
 			}
 		}
@@ -202,87 +202,69 @@ void Object::FlipZ(void)
 		geometries[i].FlipZ();
 }
 
-// Recursive tree deletion.
-void Object::XMLRemoveAllChildren(wxXmlNode* node)
+void Object::ToStream(wxTextOutputStream& stream, int n)
 {
-	wxXmlNode *temp, *temp2;
-	temp = node->GetChildren();
-	while(temp != NULL){
-		XMLRemoveAllChildren(temp);
-		temp2 = temp;
-		temp = temp->GetNext();
-		node->RemoveChild(temp2);
-		delete (temp2);
+	stream << _T("Name:") << endl;
+	stream << name << endl;
+	stream << _T("Matrix: ");
+	matrix.ToStream(stream);
+	stream << endl;
+	stream << _T("Geometries: ");
+	stream << wxString::Format(_T("%u"), geometries.GetCount());
+	stream << endl;
+	for(int m = 0; m < geometries.GetCount(); m++){
+		stream << _T("Geometry: ");
+		stream << wxString::Format(_T("%u"), m);
+		stream << endl;
+		stream << _T("Name:") << endl;
+		stream << geometries[m].name << endl;
+		stream << _T("Filename:") << endl;
+		stream << wxString::Format(_T("object_%u_geometry_%u.stl"), n, m)
+				<< endl;
+		stream << _T("Matrix: ");
+		geometries[m].matrix.ToStream(stream);
+		stream << endl;
+		stream << _T("Color: ");
+		stream << geometries[m].color.x << _T(" ");
+		stream << geometries[m].color.y << _T(" ");
+		stream << geometries[m].color.z << endl;
 	}
 }
 
-void Object::ToXml(wxXmlNode* parentNode)
+bool Object::FromStream(wxTextInputStream& stream)
 {
-	wxXmlNode *temp, *temp2;
-	wxXmlNode *nodeObject = NULL;
-
-	// Find out, if object already exists in XML tree.
-	temp = parentNode->GetChildren();
-	while(temp != NULL && nodeObject == NULL){
-		if(temp->GetName() == _T("object")
-				&& temp->GetPropVal(_T("name"), _T("")) == fileName.GetName()) nodeObject =
-				temp;
-		temp = temp->GetNext();
+	wxString temp;
+	temp = stream.ReadLine();
+	if(temp.Cmp(_T("Name:")) != 0) return false;
+	name = stream.ReadLine();
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Matrix:")) != 0) return false;
+	matrix.FromStream(stream);
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Geometries:")) != 0) return false;
+	size_t N = stream.Read32();
+	size_t n;
+	Geometry geometry;
+	geometries.Clear();
+	for(n = 0; n < N; n++){
+		temp = stream.ReadWord();
+		if(temp.Cmp(_T("Geometry:")) != 0) return false;
+		if(n != stream.Read32()) return false;
+		temp = stream.ReadLine();
+		if(temp.Cmp(_T("Name:")) != 0) return false;
+		geometry.name = stream.ReadLine();
+		temp = stream.ReadLine();
+		if(temp.Cmp(_T("Filename:")) != 0) return false;
+		temp = stream.ReadLine();
+		temp = stream.ReadWord();
+		if(temp.Cmp(_T("Matrix:")) != 0) return false;
+		geometry.matrix.FromStream(stream);
+		temp = stream.ReadWord();
+		if(temp.Cmp(_T("Color:")) != 0) return false;
+		geometry.color.x = stream.ReadDouble();
+		geometry.color.y = stream.ReadDouble();
+		geometry.color.z = stream.ReadDouble();
+		geometries.Add(geometry);
 	}
-	if(nodeObject == NULL){
-		nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("object"));
-		nodeObject->AddProperty(_T("name"), fileName.GetName());
-		parentNode->InsertChild(nodeObject, NULL);
-	}
-
-	// Remove the subelements, that will be updated
-	temp = nodeObject->GetChildren();
-	while(temp != NULL){
-		temp2 = NULL;
-		if(temp->GetName() == _T("geometry")) temp2 = temp;
-		if(temp->GetName() == _T("matrix")) temp2 = temp;
-		temp = temp->GetNext();
-		if(temp2 != NULL){
-			XMLRemoveAllChildren(temp2);
-			nodeObject->RemoveChild(temp2);
-			delete (temp2);
-		}
-	}
-
-	// Insert new geometries
-	size_t i;
-	for(i = 0; i < geometries.GetCount(); i++)
-		geometries[i].ToXml(nodeObject);
-
-	// Insert new matrix
-	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("matrix"));
-	nodeObject->InsertChild(temp, NULL);
-	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
-			matrix.ToString());
-	temp->InsertChild(temp2, NULL);
-}
-
-bool Object::FromXml(wxXmlNode* node)
-{
-	if(node->GetName() != _T("object")) return false;
-
-	fileName.SetName(node->GetPropVal(_T("name"), _T("")));
-	wxXmlNode *temp = node->GetChildren();
-	Geometry * geometry;
-
-	while(temp != NULL){
-		if(temp->GetName() == _T("geometry")){
-			geometry = new Geometry();
-			if(geometry->FromXml(temp))
-				geometries.Add(geometry);
-			else
-				delete geometry;
-		}
-		if(temp->GetName() == _T("matrix")) matrix.FromString(
-				temp->GetNodeContent());
-
-		temp = temp->GetNext();
-	}
-	UpdateBoundingBox();
 	return true;
 }

@@ -172,14 +172,7 @@ void GeneratorPositioningDrills::TransferDataFromPanel(void)
 	_T("from Window ") + wxString::Format(_T("%i"), selectedPattern));
 }
 
-wxString GeneratorPositioningDrills::ToString(void) const
-{
-	return _T("");
-}
 
-void GeneratorPositioningDrills::FromString(const wxString& text)
-{
-}
 
 void GeneratorPositioningDrills::GenerateToolpath(void)
 {

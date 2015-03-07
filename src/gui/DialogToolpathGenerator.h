@@ -38,7 +38,7 @@
 #include <wx/cmdproc.h>
 
 #include "../project/Project.h"
-#include "../generator/Generator.h"
+#include "../generator/GeneratorCollection.h"
 
 #include "DisplaySettings.h"
 
@@ -69,8 +69,9 @@ public:
 	void OnClose(wxCommandEvent& event);
 
 private:
-	Generator ** generators;
-	Generator * NewGenerator(int generatorNr, size_t runNr, size_t toolpathNr);
+
+	GeneratorCollection gc;
+
 	int GetSelectedToolpath(int runNr);
 	int GetGeneratorNr(int runNr, int toolpathNr);
 

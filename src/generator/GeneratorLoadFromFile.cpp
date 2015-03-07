@@ -97,14 +97,6 @@ void GeneratorLoadFromFile::TransferDataFromPanel(void)
 	wxLogMessage(_T("Filename: ") + filename.GetFullPath());
 }
 
-wxString GeneratorLoadFromFile::ToString(void) const
-{
-	return _T("");
-}
-
-void GeneratorLoadFromFile::FromString(const wxString& text)
-{
-}
 
 void GeneratorLoadFromFile::GenerateToolpath(void)
 {

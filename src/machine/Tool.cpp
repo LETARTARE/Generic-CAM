@@ -49,70 +49,6 @@ Tool::~Tool()
 
 }
 
-void Tool::ToXml(wxXmlNode* parentNode)
-{
-	wxXmlNode *temp, *temp2;
-	wxXmlNode *nodeObject = NULL;
-
-	// Find out, if object already exists in XML tree.
-	temp = parentNode->GetChildren();
-	while(temp != NULL && nodeObject == NULL){
-		if(temp->GetName() == _T("tool")
-				&& temp->GetPropVal(_T("name"), _T("")) == toolName) nodeObject =
-				temp;
-		temp = temp->GetNext();
-	}
-	if(nodeObject == NULL){
-		nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("tool"));
-		nodeObject->AddProperty(_T("name"), toolName);
-		parentNode->InsertChild(nodeObject, NULL);
-	}
-
-	// Remove the subelements, that will be updated
-	temp = nodeObject->GetChildren();
-	while(temp != NULL){
-		temp2 = NULL;
-		if(temp->GetName() == _T("feedcoefficient")) temp2 = temp;
-		if(temp->GetName() == _T("tri")) temp2 = temp;
-		temp = temp->GetNext();
-		if(temp2 != NULL){
-			nodeObject->RemoveChild(temp2);
-			delete (temp2);
-		}
-	}
-
-	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("feedcoefficient"));
-	nodeObject->InsertChild(temp, NULL);
-	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
-			wxString::Format(_T("%f"), feedCoefficient));
-	temp->InsertChild(temp2, NULL);
-
-	//	// Insert new triangles
-	//	size_t i;
-	//	for(i = 0; i < triangles.GetCount(); i++){
-	//		temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("tri"));
-	//		nodeObject->InsertChild(temp, NULL);
-	//		temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
-	//				triangles[i].ToString());
-	//		temp->InsertChild(temp2, NULL);
-	//	}
-}
-
-void Tool::FromXml(wxXmlNode* node)
-{
-	toolName = node->GetPropVal(_T("name"), _T(""));
-
-	wxXmlNode *temp = node->GetChildren();
-	while(temp != NULL){
-		if(temp->GetName() == _T("feedcoefficient")){
-			temp->GetNodeContent().ToDouble(&feedCoefficient);
-
-		}
-
-		temp = temp->GetNext();
-	}
-}
-
 void Tool::GenerateContour(void)
 {
 	contour.Clear();
@@ -321,6 +257,65 @@ float Tool::GetMaxDiameter(void)
 		if(elements[i].d > maxD) maxD = elements[i].d;
 	}
 	return maxD;
+}
+
+void Tool::ToStream(wxTextOutputStream & stream)
+{
+	stream << _T("Tool:") << endl;
+	stream << toolName << endl;
+	stream << _T("Comment:") << endl;
+	wxString temp = comment;
+	temp.Replace(wxT("\n"), wxT("\\n"));
+	temp.Replace(wxT("\r"), wxT("\\r"));
+	stream << temp << endl;
+	stream << _T("Parameter: ");
+	stream << shaftDiameter << _T(" ");
+	stream << shaftLength << _T(" ");
+	stream << maxSpeed << _T(" ");
+	stream << feedCoefficient << _T(" ");
+	stream << nrOfTeeth << _T(" ");
+	stream << slot << endl;
+	stream << _T("Elements: ");
+	stream << wxString::Format(_T("%u"), elements.GetCount());
+	stream << endl;
+	for(size_t n = 0; n < elements.GetCount(); n++){
+		stream << elements[n].ToString() << endl;
+	}
+}
+
+bool Tool::FromStream(wxTextInputStream& stream)
+{
+	wxString temp;
+	temp = stream.ReadLine();
+	if(temp.Cmp(_T("Tool:")) != 0) return false;
+	toolName = stream.ReadLine();
+	temp = stream.ReadLine();
+	if(temp.Cmp(_T("Comment:")) != 0) return false;
+	temp = stream.ReadLine();
+	temp.Replace(wxT("\\n"), wxT("\n"));
+	temp.Replace(wxT("\\r"), wxT("\r"));
+	comment = temp;
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Parameter:")) != 0) return false;
+	stream >> shaftDiameter;
+	stream >> shaftLength;
+	stream >> maxSpeed;
+	stream >> feedCoefficient;
+	stream >> nrOfTeeth;
+	stream >> slot;
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Elements:")) != 0) return false;
+	size_t N = stream.Read32();
+	size_t n;
+	ToolElement element;
+	elements.Clear();
+	for(n = 0; n < N; n++){
+		temp = stream.ReadLine();
+		element.FromString(temp);
+		elements.Add(element);
+	}
+	GenerateContour();
+	return true;
 }
 
 void Tool::Paint(void) const

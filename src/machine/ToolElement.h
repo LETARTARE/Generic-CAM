@@ -57,7 +57,7 @@ class ToolElement {
 	// Constructor / Destructor
 public:
 	ToolElement();
-	ToolElement(wxString string);
+	ToolElement(const wxString & string);
 	virtual ~ToolElement();
 
 	// Member variables

@@ -185,3 +185,49 @@ void StockMaterial::PaintWireBox(void) const
 
 	::glEnd();
 }
+
+void StockMaterial::ToStream(wxTextOutputStream& stream)
+{
+	Vector3 color;
+	stream << _T("Name:") << endl;
+	stream << name << endl;
+	stream << _T("Size: ");
+	stream << sx << _T(" ");
+	stream << sy << _T(" ");
+	stream << sz << endl;
+	stream << _T("Parameter: ");
+	stream << maxToolSpeed << _T(" ");
+	stream << maxFeedrate << _T(" ");
+	stream << thermalConductivity << _T(" ");
+	stream << ignitionTemperature << endl;
+	stream << _T("Color: ");
+	stream << color.x << _T(" ");
+	stream << color.y << _T(" ");
+	stream << color.z << _T(" ");
+	stream << endl;
+}
+
+bool StockMaterial::FromStream(wxTextInputStream& stream)
+{
+	wxString temp;
+	temp = stream.ReadLine();
+	if(temp.Cmp(_T("Name:")) != 0) return false;
+	name = stream.ReadLine();
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Size:")) != 0) return false;
+	stream >> sx;
+	stream >> sy;
+	stream >> sz;
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Parameter:")) != 0) return false;
+	stream >> maxToolSpeed;
+	stream >> maxFeedrate;
+	stream >> thermalConductivity;
+	stream >> ignitionTemperature;
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Color:")) != 0) return false;
+	stream >> color.x;
+	stream >> color.y;
+	stream >> color.z;
+	return true;
+}

@@ -64,17 +64,17 @@ Imprinter::Imprinter(const double sizeX, const double sizeY, const double sizeZ,
 	sx = sy = sz = 0.0;
 	rx = ry = 1.0;
 
-	refresh = false;
+	refresh = true;
 
 	displayBox = false;
 	displayListGenerated = false;
 	displayListIndex = 0;
-	displayField = false;
+	displayField = true;
 
-	displayUpUp = false;
-	displayUpDown = false;
-	displayDownUp = false;
-	displayDownDown = false;
+	displayUpUp = true;
+	displayUpDown = true;
+	displayDownUp = true;
+	displayDownDown = true;
 
 	this->SetupBox(sizeX, sizeY, sizeZ, resolutionX, resolutionY);
 }
@@ -98,7 +98,7 @@ Imprinter::Imprinter(const Imprinter& ip)
 	this->displayDownUp = ip.displayDownUp;
 	this->displayDownDown = ip.displayDownDown;
 
-	this->refresh = false;
+	this->refresh = true;
 
 	if(ip.N == 0) return;
 	this->SetupBox(ip.sx, ip.sy, ip.sz, ip.rx, ip.ry);
@@ -137,6 +137,7 @@ bool Imprinter::SetupField(const size_t sizeX, const size_t sizeY,
 	N = nx * ny;
 
 	field = new ImprinterElement[N];
+	refresh = true;
 	return true;
 }
 
@@ -145,6 +146,7 @@ void Imprinter::ClearField(void)
 	if(field != NULL) delete[] field;
 	field = NULL;
 	nx = ny = N = 0;
+	refresh = true;
 }
 
 Imprinter& Imprinter::operator=(const Imprinter &b)
@@ -183,6 +185,7 @@ Imprinter& Imprinter::operator=(const Imprinter &b)
 		for(i = 0; i < b.N; i++)
 			this->field[i] = b.field[i];
 	}
+	refresh = true;
 	return *this;
 }
 
@@ -193,6 +196,7 @@ Imprinter & Imprinter::operator+=(const Imprinter &a)
 	for(i = 0; i < N; i++){
 		if(!(this->field[i].IsVisible())) this->field[i] = a.field[i];
 	}
+	refresh = true;
 	return *this;
 }
 
@@ -235,6 +239,7 @@ bool Imprinter::SetupBox(const double sizeX, const double sizeY,
 	colorNormal.Set(0.8, 0.4, 0.0);
 	colorTodo.Set(0, 0, 0.8);
 	colorUnscratched.Set(0.0, 0.8, 0.1);
+	refresh = true;
 	return true;
 }
 
@@ -273,6 +278,7 @@ void Imprinter::SetupSphere(double radius, const double resolutionX,
 		}
 		py += ry;
 	}
+	refresh = true;
 
 }
 void Imprinter::SetupCylinder(double radius, double height,
@@ -308,6 +314,7 @@ void Imprinter::SetupCylinder(double radius, double height,
 		}
 		py += ry;
 	}
+	refresh = true;
 }
 void Imprinter::SetupDisc(double radius, const double resolutionX,
 		const double resolutionY)
@@ -343,6 +350,7 @@ void Imprinter::SetupDisc(double radius, const double resolutionX,
 		}
 		py += ry;
 	}
+	refresh = true;
 }
 
 void Imprinter::Limit(void)
@@ -352,7 +360,7 @@ void Imprinter::Limit(void)
 		if(field[i].lowerLimit < 0.0) field[i].lowerLimit = 0.0;
 		if(field[i].upperLimit > sz) field[i].upperLimit = sz;
 	}
-
+	refresh = true;
 }
 
 void Imprinter::FoldRaise(const Imprinter &b)
@@ -414,7 +422,7 @@ void Imprinter::FoldRaise(const Imprinter &b)
 		field[i].lowerLimit = field[i].lowerLimitUpside;
 
 	}
-
+	refresh = true;
 }
 void Imprinter::FoldReplace(const Imprinter &b)
 {
@@ -463,7 +471,7 @@ void Imprinter::FoldReplace(const Imprinter &b)
 		field[i].upperLimit = field[i].upperLimitUpside;
 		field[i].lowerLimit = field[i].lowerLimitUpside;
 	}
-
+	refresh = true;
 }
 
 void Imprinter::FoldLower(int x, int y, double z, const Imprinter &b)
@@ -493,6 +501,7 @@ void Imprinter::FoldLower(int x, int y, double z, const Imprinter &b)
 			pb++;
 		}
 	}
+	refresh = true;
 }
 
 void Imprinter::HardInvert(void)
@@ -507,6 +516,7 @@ void Imprinter::HardInvert(void)
 			field[i].lowerLimit = 0.0;
 		}
 	}
+	refresh = true;
 }
 
 void Imprinter::MaxFilling(void)
@@ -521,6 +531,7 @@ void Imprinter::MaxFilling(void)
 			field[i].lowerLimit = sz;
 		}
 	}
+	refresh = true;
 }
 
 bool Imprinter::IsFilled(int x, int y, double height)
@@ -691,7 +702,7 @@ void Imprinter::CleanOutlier(void)
 
 		}
 	}
-
+	refresh = true;
 }
 
 void Imprinter::InvertTop(void)
@@ -712,6 +723,7 @@ void Imprinter::InvertTop(void)
 			field[i].upperLimit = sz;
 		}
 	}
+	refresh = true;
 }
 
 void Imprinter::InvertZ(void)
@@ -723,6 +735,7 @@ void Imprinter::InvertZ(void)
 		field[i].upperLimit = sz - field[i].lowerLimit;
 		field[i].lowerLimit = sz - temp;
 	}
+	refresh = true;
 }
 
 void Imprinter::FlipX(void)
@@ -741,6 +754,7 @@ void Imprinter::FlipX(void)
 		}
 	}
 	InvertZ();
+	refresh = true;
 }
 void Imprinter::FlipY(void)
 {
@@ -774,6 +788,7 @@ void Imprinter::InitImprinting(void)
 		field[i].upperLimitDownside = -FLT_MAX;
 		field[i].lowerLimitDownside = -FLT_MAX;
 	}
+	refresh = true;
 }
 
 void Imprinter::InitOutSides(void)
@@ -784,6 +799,7 @@ void Imprinter::InitOutSides(void)
 		field[i].upperLimitDownside = 0;
 		field[i].lowerLimitDownside = 0;
 	}
+	refresh = true;
 }
 
 void Imprinter::InsertTriangle(Vector3 a, Vector3 b, Vector3 c, face_t facetype)
@@ -994,6 +1010,7 @@ void Imprinter::InsertTriangle(Vector3 a, Vector3 b, Vector3 c, face_t facetype)
 			sz = b.z;
 		}
 	}
+	refresh = true;
 }
 
 void Imprinter::FinishImprint(void)
@@ -1022,10 +1039,11 @@ void Imprinter::FinishImprint(void)
 			field[i].upperLimit = 0.0;
 		}
 	}
+	refresh = true;
 }
 
 void Imprinter::InsertGeometrie(const Geometry *geometry,
-		AffineTransformMatrix shift)
+		const AffineTransformMatrix & shift)
 {
 	size_t i;
 	AffineTransformMatrix m = geometry->matrix;
@@ -1043,6 +1061,7 @@ void Imprinter::InsertGeometrie(const Geometry *geometry,
 				Imprinter::facing_up);
 
 	}
+	refresh = true;
 }
 
 void Imprinter::Paint()

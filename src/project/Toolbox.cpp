@@ -200,3 +200,35 @@ int Toolbox::GetIndexOfSlot(size_t slotNr) const
 	}
 	return -1;
 }
+
+void Toolbox::ToStream(wxTextOutputStream& stream)
+{
+	stream << _T("Toolbox:") << endl;
+	stream << fileName.GetFullPath() << endl;
+	stream << _T("Tools: ");
+	stream << wxString::Format(_T("%u"), tools.GetCount()) << endl;
+	for(size_t n = 0; n < tools.GetCount(); n++){
+		tools[n].ToStream(stream);
+	}
+}
+
+bool Toolbox::FromStream(wxTextInputStream& stream)
+{
+	wxString temp;
+	temp = stream.ReadLine();
+	if(temp.Cmp(_T("Toolbox:")) != 0) return false;
+	fileName = stream.ReadLine();
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Tools:")) != 0) return false;
+	size_t N = stream.Read32();
+	size_t n;
+	Tool tool;
+	bool flag = true;
+	tools.Clear();
+	for(n = 0; n < N; n++){
+		flag = tool.FromStream(stream);
+		if(!flag) break;
+		tools.Add(tool);
+	}
+	return flag;
+}

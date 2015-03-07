@@ -50,12 +50,11 @@ ToolElement::ToolElement()
 	t = 0;
 }
 
-ToolElement::ToolElement(wxString string)
+ToolElement::ToolElement(const wxString & string)
 
 {
 	this->FromString(string);
 }
-
 
 ToolElement::~ToolElement()
 {
@@ -87,10 +86,11 @@ void ToolElement::FromString(wxString const &string)
 			r = temp;
 			break;
 		case 1:
-			t=token[0];
+			t = token[0] - '0';
 			break;
 		case 0:
-			if(token=='C')cutting=true; else cutting=false;
+			cutting = (token == 'C');
+			break;
 		}
 	}
 }

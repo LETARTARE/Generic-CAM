@@ -50,6 +50,7 @@ class ToolPath {
 
 public:
 	ToolPath();
+	ToolPath(const ToolPath & other);
 	virtual ~ToolPath();
 
 	// Member variables
@@ -80,6 +81,9 @@ public:
 	void Paint(void);
 	void CleanPath(double tolerance = 0.0002);
 	void WriteToFile(wxTextFile &f);
+	void ToStream(wxTextOutputStream & stream);
+	bool FromStream(wxTextInputStream & stream);
+
 	bool ReadGCodeFile(wxFileName fileName);
 	void CalculateMinMaxValues(void);
 };

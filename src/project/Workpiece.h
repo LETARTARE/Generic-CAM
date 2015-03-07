@@ -28,6 +28,7 @@
 #define WORKPIECE_H_
 
 #include <wx/dynarray.h>
+#include <wx/txtstrm.h>
 
 #include "../3D/BooleanBox.h"
 #include "../3D/Vector3.h"
@@ -55,8 +56,13 @@ protected:
 
 	// Methods
 public:
+
+	void ToStream(wxTextOutputStream & stream);
+	bool FromStream(wxTextInputStream & stream);
+
 	void Paint(const ArrayOfObject& objects) const;
 	void Update(ArrayOfObject& objects);
+	void SortTargets(void);
 };
 
 WX_DECLARE_OBJARRAY(Workpiece, ArrayOfWorkpiece);

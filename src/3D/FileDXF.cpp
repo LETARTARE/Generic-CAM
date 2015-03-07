@@ -123,7 +123,7 @@ void FileDXF::ProcessCode(long codeNr, wxString code)
 			v.Empty();
 			Geometry* g = new Geometry();
 			g->matrix.TranslateGlobal(x, y, z);
-			g->objectName = blockName;
+			g->name = blockName;
 			geometry.Add(g);
 			lastGeometry = geometry.Count() - 1;
 		}
@@ -151,7 +151,7 @@ void FileDXF::ProcessCode(long codeNr, wxString code)
 		if(objectType.Cmp(_T("INSERT")) == 0){
 			size_t i;
 			for(i = 0; i < geometry.GetCount(); i++){
-				if(geometry[i].objectName.Cmp(blockName) == 0){
+				if(geometry[i].name.Cmp(blockName) == 0){
 					geometry[i].matrix.ScaleGlobal(sx, sy, sz);
 					geometry[i].matrix.TranslateGlobal(x, y, z);
 				}

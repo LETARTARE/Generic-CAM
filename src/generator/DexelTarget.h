@@ -64,7 +64,7 @@ public:
 	void ToXml(wxXmlNode* parentNode);
 	bool FromXml(wxXmlNode* node);
 
-	void InsertObject(Object &object);
+	void InsertObject(Object &object, const AffineTransformMatrix & shift);
 
 	int NextDir(int sx, int sy, double height, int olddir);
 	int NextDir(int sx, int sy, int olddir);

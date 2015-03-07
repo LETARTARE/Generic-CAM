@@ -43,7 +43,7 @@ Generator::Generator(Project * project, size_t runNr, size_t toolpathNr)
 	this->project = project;
 	this->runNr = runNr;
 	this->toolpathNr = toolpathNr;
-	if(runNr >= project->run.GetCount()
+	if(project == NULL || runNr >= project->run.GetCount()
 			|| toolpathNr >= project->run[runNr].toolpaths.GetCount()){
 		this->toolpath = NULL;
 	}else{
@@ -80,6 +80,25 @@ void Generator::Paint(void)
 	::glEnd();
 }
 
+void Generator::ToStream(wxTextOutputStream& stream)
+{
+	box.ToStream(stream);
+	stream << marginBelow << _T(" ") << marginSide << endl;
+	stream << (int) slotNr << _T(" ") << freeHeight << endl;
+	stream << (int) runNr << _T(" ") << (int) toolpathNr << endl;
+}
+
+bool Generator::FromStream(wxTextInputStream& stream)
+{
+	if(!box.FromStream(stream)) return false;
+	stream >> marginBelow;
+	stream >> marginSide;
+	slotNr = stream.Read32();
+	stream >> freeHeight;
+	runNr = stream.Read32();
+	toolpathNr = stream.Read32();
+	return true;
+}
 //void Project::GenerateToolPath(void)
 //{
 //	size_t i, j;

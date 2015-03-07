@@ -568,11 +568,19 @@ void MainFrame::OnProjectRename(wxCommandEvent& event)
 	}
 }
 
+void MainFrame::ProjectLoad(wxString fileName)
+{
+	project.Load(fileName);
+	commandProcessor.ClearCommands();
+	commandProcessor.MarkAsSaved();
+	TransferDataToWindow();
+}
+
 void MainFrame::OnProjectLoad(wxCommandEvent& event)
 {
 	wxFileName fileName;
 	wxFileDialog dialog(this, _("Open Project..."), _T(""), _T(""),
-			_("Generic CAM Project (*.prj; *.xml)|*.prj;*.xml|All Files|*.*"),
+			_("Generic CAM Project (*.prj; *.zip)|*.prj;*.zip|All Files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if(wxDir::Exists(settings.lastProjectDirectory)){
@@ -588,14 +596,6 @@ void MainFrame::OnProjectLoad(wxCommandEvent& event)
 	}
 }
 
-void MainFrame::ProjectLoad(wxString fileName)
-{
-	project.Load(fileName);
-	commandProcessor.ClearCommands();
-	commandProcessor.MarkAsSaved();
-	TransferDataToWindow();
-}
-
 void MainFrame::OnProjectSave(wxCommandEvent& event)
 {
 	if(!project.fileName.IsOk()) OnProjectSaveAs(event);
@@ -608,7 +608,8 @@ void MainFrame::OnProjectSaveAs(wxCommandEvent &event)
 {
 	wxFileName fileName;
 	wxFileDialog dialog(this, _("Save Project As..."), _T(""), _T(""),
-			_("Generic CAM Project (*.prj; *.xml)|*.prj;*.xml|All Files|*.*"),
+			_(
+					"Generic CAM Project (*.prj)|*.prj|Zip File (*.zip)|*.zip|All Files|*.*"),
 			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 	if(wxDir::Exists(settings.lastProjectDirectory)){

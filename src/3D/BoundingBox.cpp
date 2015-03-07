@@ -205,3 +205,32 @@ void BoundingBox::Paint(void)
 	::glPopMatrix();
 
 }
+
+void BoundingBox::ToStream(wxTextOutputStream& stream)
+{
+	stream << _T("BoundingBox:") << endl;
+	stream << xmin << _T(" ") << xmax << _T(" ");
+	stream << ymin << _T(" ") << ymax << _T(" ");
+	stream << zmin << _T(" ") << zmax << endl;
+	stream << color.x << _T(" ");
+	stream << color.y << _T(" ");
+	stream << color.z << endl;
+	stream << alpha << endl;
+}
+
+bool BoundingBox::FromStream(wxTextInputStream& stream)
+{
+	wxString temp = stream.ReadWord();
+	if(temp.Cmp(_T("BoundingBox:")) != 0) return false;
+	stream >> xmin;
+	stream >> xmax;
+	stream >> ymin;
+	stream >> ymax;
+	stream >> zmin;
+	stream >> zmax;
+	stream >> color.x;
+	stream >> color.y;
+	stream >> color.z;
+	stream >> alpha;
+	return true;
+}
