@@ -52,14 +52,18 @@ void GeneratorDexel::Paint(void)
 void GeneratorDexel::GenerateTarget(void)
 {
 
-	target.SetupBox(box.GetSizeX(), box.GetSizeY(), box.GetSizeZ(), 0.001,
-			0.001);
+	double resX = 0.001;
+	double resY = 0.001;
+
+	target.SetupBox(box.GetSizeX(), box.GetSizeY(), box.GetSizeZ(), resX, resY);
+	target.InitImprinting();
 
 	AffineTransformMatrix tempMatrix;
 
 	int workpieceNr = project->run[runNr].workpieceNr;
 	for(int placementNr = 0;
-			placementNr < project->workpieces[workpieceNr].placements.GetCount();
+			placementNr
+					< (int) project->workpieces[workpieceNr].placements.GetCount();
 			placementNr++){
 
 		size_t objNr =
@@ -83,10 +87,12 @@ void GeneratorDexel::GenerateTarget(void)
 				project->workpieces[workpieceNr].placements[placementNr].matrix;
 
 		target.InsertObject(project->objects[objNr], tempMatrix);
-		target.CleanOutlier();
 	}
 
-//	DexelTarget temp, temp2;
+	target.FinishImprint();
+//		target.CleanOutlier();
+
+//	, temp2;
 //	TargetPlacement tempPlace;
 //	Run* run = new Run;
 //

@@ -123,7 +123,7 @@ bool GenericCAMApp::OnInit()
 	StartupText * temp = new StartupText(frame);
 	temp->m_richText->LoadFile(_T("releasenote.xml"),
 	wxRICHTEXT_TYPE_XML);
-	temp->Show();
+//	temp->Show();
 
 	return true;
 }

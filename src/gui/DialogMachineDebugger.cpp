@@ -46,6 +46,8 @@ DialogMachineDebugger::DialogMachineDebugger(wxWindow * parent,
 //	machine.Load(wxFileName(_T("machines/testmachine.lua")));
 	machine.EvaluateDescription();
 	m_textCtrlScript->SetValue(machine.machineDescription);
+
+	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
 	TransferDataToWindow();
 }
 
@@ -73,6 +75,7 @@ void DialogMachineDebugger::Update(wxCommandEvent& event)
 
 bool DialogMachineDebugger::TransferDataToWindow(void)
 {
+	settings->WriteToCanvas(m_canvas);
 	if(!this->IsShown()){
 		if(machineControl->IsShown()) machineControl->Show(false);
 		return false;
@@ -169,3 +172,14 @@ void DialogMachineDebugger::OnShowController(wxCommandEvent& event)
 	machineControl->TransferDataToWindow();
 }
 
+void DialogMachineDebugger::OnChangeStereo3D(wxCommandEvent& event)
+{
+	if(m_canvas->stereoMode != stereoOff){
+		m_canvas->stereoMode = stereoOff;
+	}else{
+		m_canvas->stereoMode = stereoAnaglyph;
+	}
+	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
+	settings->WriteToCanvas(m_canvas);
+	m_canvas->Refresh();
+}

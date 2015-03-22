@@ -610,6 +610,7 @@ class GUIMachineDebugger : public wxFrame
 		virtual void OnScriptEvaluate( wxCommandEvent& event ) = 0;
 		virtual void OnShowController( wxCommandEvent& event ) = 0;
 		virtual void OnClose( wxCommandEvent& event ) = 0;
+		virtual void OnChangeStereo3D( wxCommandEvent& event ) = 0;
 		
 	
 	public:
@@ -768,6 +769,7 @@ class GUIToolbox : public wxFrame
 		virtual void OnToolNew( wxCommandEvent& event ) = 0;
 		virtual void OnToolUpdate( wxCommandEvent& event ) = 0;
 		virtual void OnToolDelete( wxCommandEvent& event ) = 0;
+		virtual void OnEnter( wxCommandEvent& event ) = 0;
 		virtual void OnShapeNew( wxCommandEvent& event ) = 0;
 		virtual void OnShapeUpdate( wxCommandEvent& event ) = 0;
 		virtual void OnShapeDelete( wxCommandEvent& event ) = 0;

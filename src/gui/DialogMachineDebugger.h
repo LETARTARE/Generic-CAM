@@ -63,6 +63,7 @@ protected:
 	void OnClose(wxCommandEvent& event);
 	void OnScriptEvaluate(wxCommandEvent& event);
 	void OnShowController(wxCommandEvent& event);
+	void OnChangeStereo3D(wxCommandEvent& event);
 
 };
 

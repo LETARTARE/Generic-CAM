@@ -185,7 +185,9 @@ bool MainFrame::TransferDataToWindow(void)
 	dialogStockMaterial->TransferDataToWindow();
 	dialogWorkpiece->TransferDataToWindow();
 	dialogPlacement->TransferDataToWindow();
+	dialogToolbox->TransferDataToWindow();
 	dialogRun->TransferDataToWindow();
+	dialogDebugger->TransferDataToWindow();
 	dialogToolpathGenerator->TransferDataToWindow();
 	dialogSetupStereo3D->TransferDataToWindow();
 

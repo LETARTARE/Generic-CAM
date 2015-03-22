@@ -37,7 +37,7 @@ GeneratorFast::GeneratorFast(Project * project, size_t runNr, size_t toolpathNr)
 	raiseStep = 0.005;
 	dropStep = 0.008;
 
-	toolDiameter = 0.0061;
+	toolDiameter = 0.0;
 }
 
 GeneratorFast::~GeneratorFast()
@@ -267,7 +267,12 @@ void GeneratorFast::GenerateToolpath(void)
 	output.Empty();
 
 	size_t slotNr = project->run[runNr].toolpaths[toolpathNr].generator->slotNr;
-	Tool tool = *(project->run[runNr].toolbox.GetToolInSlot(slotNr));
+	Tool * tool = project->run[runNr].toolbox.GetToolInSlot(slotNr);
+	if(tool == NULL){
+		output = _T("Tool empty.");
+		errorOccured = true;
+		return;
+	}
 
 	GenerateTarget();
 
@@ -280,12 +285,10 @@ void GeneratorFast::GenerateToolpath(void)
 	ToolPath tp;
 	MachinePosition mp;
 
-	// TODO: Change this to reflect tool shape.
-	toolDiameter = 0.0061;
+	toolDiameter = tool->GetMaxDiameter();
 
 	DexelTarget discTool;
-	discTool.SetupDisc(toolDiameter / 2, target.GetSizeRX(),
-			target.GetSizeRY());
+	discTool.SetupTool(*tool, target.GetSizeRX(), target.GetSizeRY());
 
 	DexelTarget temp = target;
 	DexelTarget temptop;
@@ -313,7 +316,7 @@ void GeneratorFast::GenerateToolpath(void)
 	double dmin = temptop.GetMinLevel();
 	double level = dmin + raiseStep;
 
-	temptop.InitOutSides();
+	temptop.InitOutSides(); // TODO: Check if definition is right?
 	temptop.GenerateDistanceMap(level, true);
 
 	double px, py, pz;

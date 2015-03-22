@@ -24,7 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef IMPRINTER_H_
 #define IMPRINTER_H_
 
@@ -47,12 +46,13 @@ public:
 	virtual ~ImprinterElement();
 	// Member variables
 public:
-	float upperLimit;
-	float lowerLimit;
-	float upperLimitUpside;
-	float lowerLimitUpside;
-	float upperLimitDownside;
-	float lowerLimitDownside;
+	float up;
+	float down;
+
+	float aboveDown;
+	float belowUp;
+	float aboveUp;
+	float belowDown;
 
 	// TODO: ...later...
 	//	float normal; // 0..Pi/2<
@@ -85,10 +85,10 @@ public:
 
 	bool displayField;
 
-	bool displayUpUp;
-	bool displayUpDown;
-	bool displayDownUp;
-	bool displayDownDown;
+	bool displayAboveDown;
+	bool displayBelowUp;
+	bool displayAboveUp;
+	bool displayBelowDown;
 
 	bool refresh;
 
@@ -129,9 +129,10 @@ public:
 	size_t MemoryUsageInBytes(void);
 	void InitOutSides(void);
 	void InitImprinting(void);
-	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c, face_t facetype =
-			other);
-	void InsertGeometrie(const Geometry *geometry, const AffineTransformMatrix & shift);
+	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c,
+			face_t facetype = other);
+	void InsertGeometrie(const Geometry *geometry,
+			const AffineTransformMatrix & shift);
 	void FinishImprint(void);
 
 	void SetupSphere(double radius, const double resolutionX = 0.001,

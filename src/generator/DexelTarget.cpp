@@ -43,57 +43,55 @@ DexelTarget::~DexelTarget()
 {
 }
 
-void DexelTarget::ToXml(wxXmlNode* parentNode)
-{
-	wxXmlNode *temp, *temp2;
-	wxXmlNode *nodeObject = NULL;
+//void DexelTarget::ToXml(wxXmlNode* parentNode)
+//{
+//	wxXmlNode *temp, *temp2;
+//	wxXmlNode *nodeObject = NULL;
+//
+//	nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("target"));
+//	//		nodeObject->AddProperty(_T("name"), objectName);
+//	parentNode->InsertChild(nodeObject, NULL);
 
-	nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("target"));
-	//		nodeObject->AddProperty(_T("name"), objectName);
-	parentNode->InsertChild(nodeObject, NULL);
+// Insert new matrix
+//	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("matrix"));
+//	nodeObject->InsertChild(temp, NULL);
+//	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
+//			matrix.ToString());
+//	temp->InsertChild(temp2, NULL);
 
-	// Insert new matrix
-	//	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("matrix"));
-	//	nodeObject->InsertChild(temp, NULL);
-	//	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
-	//			matrix.ToString());
-	//	temp->InsertChild(temp2, NULL);
+// Insert outline
+//	size_t i;
+//	for(i = 0; i < triangles.GetCount(); i++){
+//		temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("tri"));
+//		nodeObject->InsertChild(temp, NULL);
+//		temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
+//				triangles[i].ToString());
+//		temp->InsertChild(temp2, NULL);
+//	}
+//}
 
-	// Insert outline
-	//	size_t i;
-	//	for(i = 0; i < triangles.GetCount(); i++){
-	//		temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("tri"));
-	//		nodeObject->InsertChild(temp, NULL);
-	//		temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
-	//				triangles[i].ToString());
-	//		temp->InsertChild(temp2, NULL);
-	//	}
-}
-
-bool DexelTarget::FromXml(wxXmlNode* node)
-{
-	if(node->GetName() != _T("target")) return false;
-	//	objectName = node->GetPropVal(_T("name"), _T(""));
-
-	wxXmlNode *temp = node->GetChildren();
-
-	while(temp != NULL){
-		//		if(temp->GetName() == _T("matrix")) matrix.FromString(
-		//				temp->GetNodeContent());
-		temp = temp->GetNext();
-	}
-	return true;
-}
+//bool DexelTarget::FromXml(wxXmlNode* node)
+//{
+//	if(node->GetName() != _T("target")) return false;
+//	//	objectName = node->GetPropVal(_T("name"), _T(""));
+//
+//	wxXmlNode *temp = node->GetChildren();
+//
+//	while(temp != NULL){
+//		//		if(temp->GetName() == _T("matrix")) matrix.FromString(
+//		//				temp->GetNodeContent());
+//		temp = temp->GetNext();
+//	}
+//	return true;
+//}
 
 void DexelTarget::InsertObject(Object &object,
 		const AffineTransformMatrix & shift)
 {
-	InitImprinting();
 	size_t i;
 	for(i = 0; i < object.geometries.GetCount(); i++){
 		InsertGeometrie(&(object.geometries[i]), shift * object.matrix);
 	}
-	FinishImprint();
 }
 
 //Moves on the outside
@@ -181,15 +179,15 @@ const Polygon25 DexelTarget::GeneratePolygon(int stx, int sty)
 
 	while(!IsVisible(stx + 1, sty)){
 		stx++;
-		if(stx + 2 >= nx){
+		if(stx + 2 >= (int) nx){
 			stx = -1;
 			sty++;
-			if(sty >= ny) break;
+			if(sty >= (int) ny) break;
 		}
 	}
 
 	temp.Close();
-	if(sty == ny) return temp;
+	if(sty == (int) ny) return temp;
 
 	int x = stx;
 	int y = sty;
@@ -258,7 +256,7 @@ void DexelTarget::DocumentField(int x, int y, double height)
 	wxString tp;
 	for(j = -3; j <= 3; j++){
 		tp = wxString::Format(_T("x:%3i y%3i:"), x, y - j);
-		for(int i = -3; i <= 3; i++){
+		for(i = -3; i <= 3; i++){
 			if(IsFilledAbove(x + i, y - j, height))
 				tp += _T("# ");
 			else
@@ -269,21 +267,40 @@ void DexelTarget::DocumentField(int x, int y, double height)
 }
 
 //On the inside
+void DexelTarget::DocumentField(int x, int y)
+{
+	int i, j;
+	wxString tp;
+	for(j = -3; j <= 3; j++){
+		tp = wxString::Format(_T("x:%3i y%3i:"), x, y - j);
+		for(i = -3; i <= 3; i++){
+			if(HasToBeCut(x + i, y - j))
+				tp += _T("X ");
+			else
+				if(IsInsideWorkingArea(x + i, y - j))
+					tp += _T("_ ");
+				else
+					tp += _T("0 ");
+		}
+		wxLogMessage(tp);
+	}
+}
+
 const Polygon25 DexelTarget::GeneratePolygon(int stx, int sty, double height)
 {
 	Polygon25 temp;
 
 	while(!IsFilledAbove(stx + 1, sty, height)){
 		stx++;
-		if(stx + 2 >= nx){
+		if(stx + 2 >= (int) nx){
 			stx = -1;
 			sty++;
-			if(sty >= ny) break;
+			if(sty >= (int) ny) break;
 		}
 	}
 
 	temp.Close();
-	if(sty == ny) return temp;
+	if(sty == (int) ny) return temp;
 	stx++;
 	int x = stx;
 	int y = sty;
@@ -297,7 +314,7 @@ const Polygon25 DexelTarget::GeneratePolygon(int stx, int sty, double height)
 		if(dir == -1){
 			wxLogError(_T("DexelTarget::GeneratePolygon: Lost wall contact!"));
 			DocumentField(x, y, height);
-			this->field[x + y * nx].upperLimit = -0.0001;
+			this->field[x + y * nx].up = -0.0001;
 			return temp;
 		}
 
@@ -460,7 +477,6 @@ void DexelTarget::PolygonDrop(Polygon3 &polygon, double level)
 
 void DexelTarget::VectorDrop(double &x, double &y, double &z, double level)
 {
-	size_t i;
 	double d;
 	d = this->GetLevel(x, y);
 	z -= level;
@@ -500,12 +516,12 @@ void DexelTarget::FillOutsidePolygon(Polygon3 &polygon)
 	for(i = 0; i < this->ny; i++){
 		if(right[i] < left[i]) right[i] = left[i];
 		for(j = 0; j < left[i]; j++){
-			this->field[p + j].lowerLimit = 0.0;
-			this->field[p + j].upperLimit = this->sz;
+			this->field[p + j].down = 0.0;
+			this->field[p + j].up = this->sz;
 		}
 		for(j = right[i]; j < this->nx; j++){
-			this->field[p + j].lowerLimit = 0.0;
-			this->field[p + j].upperLimit = this->sz;
+			this->field[p + j].down = 0.0;
+			this->field[p + j].up = this->sz;
 		}
 		p += this->nx;
 	}
@@ -635,7 +651,7 @@ double DexelTarget::GetMinLevel(void)
 	double d = FLT_MAX;
 	size_t i;
 	for(i = 0; i < N; i++)
-		if(field[i].lowerLimit < d) d = field[i].lowerLimit;
+		if(field[i].down < d) d = field[i].down;
 	return d;
 }
 
@@ -646,8 +662,8 @@ double DexelTarget::GetMaxUpsideLevel(int &x, int &y)
 	x = -1;
 	y = -1;
 	for(i = 0; i < N; i++)
-		if(field[i].upperLimitUpside > d){
-			d = field[i].upperLimitUpside;
+		if(field[i].aboveDown > d){
+			d = field[i].aboveDown;
 			x = i % nx;
 			y = floor(i / nx);
 		}
@@ -659,30 +675,30 @@ void DexelTarget::GenerateDistanceMap(double height, bool invert)
 	size_t i, j, k;
 	if(invert){
 		for(i = 0; i < N; i++){
-			if(field[i].lowerLimit > height){
-				field[i].upperLimitUpside = 0.000;
+			if(field[i].down > height){
+				field[i].aboveDown = 0.000;
 			}else{
-				field[i].upperLimitUpside = -1.000;
+				field[i].aboveDown = -1.000;
 			}
 		}
 	}else{
 		for(i = 0; i < N; i++){
-			if(field[i].upperLimit > height){
-				field[i].upperLimitUpside = 0.000;
+			if(field[i].up > height){
+				field[i].aboveDown = 0.000;
 			}else{
-				field[i].upperLimitUpside = -1.000;
+				field[i].aboveDown = -1.000;
 			}
 		}
 	}
 
 	for(i = 0; i < N; i++){
-		if(field[i].upperLimitUpside < -0.5) // = inside of area
+		if(field[i].aboveDown < -0.5) // = inside of area
 				{
-			field[i].lowerLimitDownside = height - 0.0005;
-			field[i].upperLimitDownside = 0.000;
+			field[i].belowDown = height - 0.0005;
+			field[i].aboveUp = 0.000;
 		}else{
-			field[i].lowerLimitDownside = -0.001;
-			field[i].upperLimitDownside = -0.001;
+			field[i].belowDown = -0.001;
+			field[i].aboveUp = -0.001;
 		}
 	}
 
@@ -695,47 +711,47 @@ void DexelTarget::GenerateDistanceMap(double height, bool invert)
 	while(flag){
 		flag = false;
 		for(i = 0; i < N; i++)
-			field[i].lowerLimitUpside = field[i].upperLimitUpside;
+			field[i].belowUp = field[i].aboveDown;
 		for(i = 0; i < N; i++){
 			if(!IsOnOuterBorder(i)){
-				if(field[i].lowerLimitUpside < -0.5){
+				if(field[i].belowUp < -0.5){
 					d = FLT_MAX;
 
-					if(field[i + 1].lowerLimitUpside > -0.5
-							&& field[i + 1].lowerLimitUpside + rx < d) d =
-							field[i + 1].lowerLimitUpside + rx;
-					if(field[i - 1].lowerLimitUpside > -0.5
-							&& field[i - 1].lowerLimitUpside + rx < d) d =
-							field[i - 1].lowerLimitUpside + rx;
-					if(field[i + nx].lowerLimitUpside > -0.5
-							&& field[i + nx].lowerLimitUpside + ry < d) d =
-							field[i + nx].lowerLimitUpside + ry;
-					if(field[i - nx].lowerLimitUpside > -0.5
-							&& field[i - nx].lowerLimitUpside + ry < d) d =
-							field[i - nx].lowerLimitUpside + ry;
+					if(field[i + 1].belowUp > -0.5
+							&& field[i + 1].belowUp + rx < d) d =
+							field[i + 1].belowUp + rx;
+					if(field[i - 1].belowUp > -0.5
+							&& field[i - 1].belowUp + rx < d) d =
+							field[i - 1].belowUp + rx;
+					if(field[i + nx].belowUp > -0.5
+							&& field[i + nx].belowUp + ry < d) d =
+							field[i + nx].belowUp + ry;
+					if(field[i - nx].belowUp > -0.5
+							&& field[i - nx].belowUp + ry < d) d =
+							field[i - nx].belowUp + ry;
 
-					//					if(field[i + nx + 1].lowerLimitUpside > -0.5 && field[i
-					//							+ nx + 1].lowerLimitUpside + r2 < d) d = field[i
-					//							+ nx + 1].lowerLimitUpside + r2;
-					//					if(field[i + nx - 1].lowerLimitUpside > -0.5 && field[i
-					//							+ nx - 1].lowerLimitUpside + r2 < d) d = field[i
-					//							+ nx - 1].lowerLimitUpside + r2;
-					//					if(field[i - nx + 1].lowerLimitUpside > -0.5 && field[i
-					//							- nx + 1].lowerLimitUpside + r2 < d) d = field[i
-					//							- nx + 1].lowerLimitUpside + r2;
-					//					if(field[i - nx - 1].lowerLimitUpside > -0.5 && field[i
-					//							- nx - 1].lowerLimitUpside + r2 < d) d = field[i
-					//							- nx - 1].lowerLimitUpside + r2;
+					//					if(field[i + nx + 1].belowUp > -0.5 && field[i
+					//							+ nx + 1].belowUp + r2 < d) d = field[i
+					//							+ nx + 1].belowUp + r2;
+					//					if(field[i + nx - 1].belowUp > -0.5 && field[i
+					//							+ nx - 1].belowUp + r2 < d) d = field[i
+					//							+ nx - 1].belowUp + r2;
+					//					if(field[i - nx + 1].belowUp > -0.5 && field[i
+					//							- nx + 1].belowUp + r2 < d) d = field[i
+					//							- nx + 1].belowUp + r2;
+					//					if(field[i - nx - 1].belowUp > -0.5 && field[i
+					//							- nx - 1].belowUp + r2 < d) d = field[i
+					//							- nx - 1].belowUp + r2;
 
 					if(d < 1000.0){
-						field[i].upperLimitUpside = d;
+						field[i].aboveDown = d;
 						flag = true;
 					}
 
-					// Mark outline in upperLimitDownside
+					// Mark outline in aboveUp
 					if(firstRound){
 						if(d < 1000.0){
-							field[i].upperLimitDownside = height;
+							field[i].aboveUp = height;
 						}
 					}
 
@@ -747,7 +763,7 @@ void DexelTarget::GenerateDistanceMap(double height, bool invert)
 	}
 
 	for(i = 0; i < N; i++)
-		field[i].upperLimitUpside += sz;
+		field[i].aboveDown += sz;
 
 }
 
@@ -756,43 +772,42 @@ void DexelTarget::RaiseDistanceMap(double height, bool invert)
 	size_t i, j, k;
 	if(invert){
 		for(i = 0; i < N; i++){
-			if(field[i].lowerLimit > height){
-				field[i].upperLimitUpside = 0.000;
+			if(field[i].down > height){
+				field[i].aboveDown = 0.000;
 			}else{
-				field[i].upperLimitUpside = -1.000;
+				field[i].aboveDown = -1.000;
 			}
 		}
 	}else{
 		for(i = 0; i < N; i++){
-			if(field[i].upperLimit > height){
-				field[i].upperLimitUpside = 0.000;
+			if(field[i].up > height){
+				field[i].aboveDown = 0.000;
 			}else{
-				field[i].upperLimitUpside = -1.000;
+				field[i].aboveDown = -1.000;
 			}
 		}
 	}
 
 	for(i = 0; i < N; i++){
-		if(field[i].upperLimitUpside < -0.5) // = inside of area
+		if(field[i].aboveDown < -0.5) // = inside of area
 				{
-			if(field[i].lowerLimitDownside < 0.0) field[i].lowerLimitDownside =
-					height - 0.0005;
-			field[i].upperLimitDownside = 0.000;
+			if(field[i].belowDown < 0.0) field[i].belowDown = height - 0.0005;
+			field[i].aboveUp = 0.000;
 		}
 	}
 	bool flag;
 	for(i = 0; i < N; i++){
 		if(!IsOnOuterBorder(i)){
-			if(field[i].upperLimitUpside < -0.5){
+			if(field[i].aboveDown < -0.5){
 				flag = false;
-				if(field[i + 1].upperLimitUpside > -0.5) flag = true;
-				if(field[i - 1].upperLimitUpside > -0.5) flag = true;
-				if(field[i + nx].upperLimitUpside > -0.5) flag = true;
-				if(field[i - nx].upperLimitUpside > -0.5) flag = true;
+				if(field[i + 1].aboveDown > -0.5) flag = true;
+				if(field[i - 1].aboveDown > -0.5) flag = true;
+				if(field[i + nx].aboveDown > -0.5) flag = true;
+				if(field[i - nx].aboveDown > -0.5) flag = true;
 
-				// Mark outline in upperLimitDownside
-				if(flag && field[i].lowerLimitDownside > 0.0){
-					field[i].upperLimitDownside = height;
+				// Mark outline in aboveUp
+				if(flag && field[i].belowDown > 0.0){
+					field[i].aboveUp = height;
 				}
 			}
 		}
@@ -808,8 +823,8 @@ void DexelTarget::FoldLowerDistance(int x, int y, const DexelTarget &b)
 
 	if(x >= 0 && x < nx && y >= 0 && y < ny){
 		ph = x + nx * y;
-		if(field[ph].upperLimitDownside > 0.0001){
-			field[ph].upperLimitDownside = 0.0;
+		if(field[ph].aboveUp > 0.0001){
+			field[ph].aboveUp = 0.0;
 		}
 	}
 	pb = 0;
@@ -820,8 +835,8 @@ void DexelTarget::FoldLowerDistance(int x, int y, const DexelTarget &b)
 						&& jb + y < ny + cy){
 					ph = x + ib - cx + (y + jb - cy) * nx;
 
-					if(field[ph].lowerLimitDownside > 0.0001){
-						field[ph].lowerLimitDownside = 0.0;
+					if(field[ph].belowDown > 0.0001){
+						field[ph].belowDown = 0.0;
 					}
 				}
 			}
@@ -841,8 +856,7 @@ bool DexelTarget::FindNextDistance(int &x, int&y)
 	p = 0;
 	for(j = 0; j < ny; j++)
 		for(i = 0; i < nx; i++){
-			if(field[p].lowerLimitDownside > 0.0001
-					|| field[p].upperLimitDownside > 0.0001){
+			if(field[p].belowDown > 0.0001 || field[p].aboveUp > 0.0001){
 				dc = ((double) i - (double) x) * ((double) i - (double) x)
 						+ ((double) j - (double) y) * ((double) j - (double) y);
 				if(dc < d){
@@ -863,40 +877,40 @@ bool DexelTarget::FindNextDistance(int &x, int&y)
 
 bool DexelTarget::IsInsideWorkingArea(int x, int y)
 {
-	if(x < 0 || x >= nx) return false;
-	if(y < 0 || y >= ny) return false;
+	if(x < 0 || x >= (int) nx) return false;
+	if(y < 0 || y >= (int) ny) return false;
 	size_t p = x + y * nx;
 
-	if(field[p].upperLimitDownside > -0.0001) return true;
+	if(field[p].aboveUp > -0.0001) return true;
 	return false;
 
 }
 
 bool DexelTarget::HadBeenCut(int x, int y)
 {
-	if(x < 0 || x >= nx) return false;
-	if(y < 0 || y >= ny) return false;
+	if(x < 0 || x >= (int) nx) return false;
+	if(y < 0 || y >= (int) ny) return false;
 	size_t p = x + y * nx;
 
 	//Outside working area ?
-	if(field[p].upperLimitDownside < -0.0001) return false;
+	if(field[p].aboveUp < -0.0001) return false;
 
 	//On border uncut?
-	if(field[p].upperLimitDownside > -0.0) return false;
+	if(field[p].aboveUp > -0.0) return false;
 
 	//Material left?
-	if(field[p].lowerLimitDownside > 0.0) return false;
+	if(field[p].belowDown > 0.0) return false;
 
 	return true;
 }
 
 bool DexelTarget::HasToBeCut(int x, int y)
 {
-	if(x < 0 || x >= nx) return false;
-	if(y < 0 || y >= ny) return false;
+	if(x < 0 || x >= (int) nx) return false;
+	if(y < 0 || y >= (int) ny) return false;
 	size_t p = x + y * nx;
-	if(field[p].lowerLimitDownside > 0.0001) return true;
-	if(field[p].upperLimitDownside > 0.0001) return true;
+	if(field[p].belowDown > 0.0001) return true;
+	if(field[p].aboveUp > 0.0001) return true;
 	return false;
 }
 
@@ -1050,25 +1064,6 @@ int DexelTarget::NextDirForwardDistance(int sx, int sy, int olddir)
 	return -1;
 }
 
-void DexelTarget::DocumentField(int x, int y)
-{
-	int i, j;
-	wxString tp;
-	for(j = -3; j <= 3; j++){
-		tp = wxString::Format(_T("x:%3i y%3i:"), x, y - j);
-		for(int i = -3; i <= 3; i++){
-			if(HasToBeCut(x + i, y - j))
-				tp += _T("X ");
-			else
-				if(IsInsideWorkingArea(x + i, y - j))
-					tp += _T("_ ");
-				else
-					tp += _T("0 ");
-		}
-		wxLogMessage(tp);
-	}
-}
-
 bool DexelTarget::FindStartCutting(int &x, int &y)
 {
 	int sx = x;
@@ -1201,6 +1196,62 @@ Polygon25 DexelTarget::FindCut(int &x, int &y)
 	}
 
 	return temp;
+}
+
+void DexelTarget::SetupTool(const Tool& tool, const double resolutionX,
+		const double resolutionY)
+{
+	double radius = tool.GetMaxDiameter();
+	double depth = tool.GetPositiveLength();
+
+	size_t cellsX = ceil(radius / resolutionX) * 2 + 1;
+	size_t cellsY = ceil(radius / resolutionY) * 2 + 1;
+	if(!SetupField(cellsX, cellsY, resolutionX, resolutionY)) return;
+	double centerX = (ceil(radius / resolutionX) + 0.5) * this->rx;
+	double centerY = (ceil(radius / resolutionY) + 0.5) * this->ry;
+
+	size_t i, j, p;
+	double px, py;
+	double d;
+	p = 0;
+	py = ry / 2;
+	for(j = 0; j < ny; j++){
+		px = rx / 2;
+		for(i = 0; i < nx; i++){
+			d = (px - centerX) * (px - centerX)
+					+ (py - centerY) * (py - centerY);
+			if(d >= 0.0)
+				d = sqrt(d);
+			else
+				d = 0;
+
+			field[p].down = d;
+			field[p].up = -FLT_MAX;
+			px += rx;
+			p++;
+		}
+		py += ry;
+	}
+
+	double h;
+
+	for(i = 0; i < tool.contour.GetCount(); i++){
+		h = tool.contour[i].p1.x - tool.contour[i].p2.x;
+		if(h <= 0) continue;
+		for(j = 0; j < this->N; j++){
+			if(field[j].down < tool.contour[i].p2.x
+					|| field[j].down > tool.contour[i].p1.x) continue;
+			d = (tool.contour[i].p1.z - tool.contour[i].p2.z)
+					* (field[j].down - tool.contour[i].p1.x) / h;
+			d += tool.contour[i].p2.z;
+			d -= depth;
+			if(d > field[j].up) field[j].up = d;
+		}
+	}
+	for(j = 0; j < this->N; j++)
+		field[j].down = -depth;
+
+	refresh = true;
 }
 
 void DexelTarget::Paint(void)

@@ -59,11 +59,11 @@ void Run::Paint(const ArrayOfObject& objects,
 		::glPushMatrix();
 		::glMultMatrixd(machine.workpiecePosition.a);
 		::glMultMatrixd(workpiecePlacement.a);
-		workpieces[workpieceNr].Paint(objects);
 		for(int n = 0; n < toolpaths.GetCount(); n++){
 			toolpaths[n].Paint();
 			if(toolpaths[n].generator != NULL) toolpaths[n].generator->Paint();
 		}
+		workpieces[workpieceNr].Paint(objects);
 		::glPopMatrix();
 	}
 
@@ -207,6 +207,7 @@ bool Run::FromStream(wxTextInputStream& stream, int runNr, Project * project)
 		if(temp.Cmp(_T("Generator:")) != 0) return false;
 		temp = stream.ReadLine();
 		generatorNr = gc.FindGenerator(temp);
+		if(generatorNr < 0) generatorNr = 0;
 		toolpaths[toolpathIndex].generator = gc.NewGenerator(generatorNr,
 				project, runNr, n);
 		toolpaths[toolpathIndex].generator->FromStream(stream);

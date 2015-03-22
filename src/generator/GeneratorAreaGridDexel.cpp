@@ -28,8 +28,11 @@
 
 #include "wx/sizer.h"
 
-GeneratorAreaGridDexel::GeneratorAreaGridDexel(Project * project, size_t runNr, size_t toolpathNr) :
-		GeneratorDexel(project,runNr,toolpathNr)
+#include "../project/Project.h"
+
+GeneratorAreaGridDexel::GeneratorAreaGridDexel(Project * project, size_t runNr,
+		size_t toolpathNr) :
+		GeneratorDexel(project, runNr, toolpathNr)
 {
 	m_radioBoxDirection = NULL;
 }
@@ -82,4 +85,29 @@ void GeneratorAreaGridDexel::GenerateToolpath(void)
 	printf("AreaGridDexel called.\n");
 	errorOccured = false;
 	toolpathGenerated = true;
+	output.Empty();
+
+	size_t slotNr = project->run[runNr].toolpaths[toolpathNr].generator->slotNr;
+	Tool * tool = project->run[runNr].toolbox.GetToolInSlot(slotNr);
+	if(tool == NULL){
+		output = _T("Tool empty.");
+		errorOccured = true;
+		return;
+	}
+
+	ToolPath tp;
+	MachinePosition m;
+
+	GenerateTarget();
+
+	if(target.IsEmpty()){
+		output = _T("DexelTarget empty.");
+		errorOccured = true;
+		return;
+	}
+
+	DexelTarget temp;
+	temp.SetupTool(*tool, target.GetSizeRX(), target.GetSizeRY());
+	target.FoldRaise(temp);
+
 }

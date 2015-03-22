@@ -201,9 +201,6 @@ void BoundingBox::Paint(void)
 	::glVertex3f(xmin - overlap, ymax + overlap, zmin);
 
 	::glEnd();
-
-	::glPopMatrix();
-
 }
 
 void BoundingBox::ToStream(wxTextOutputStream& stream)

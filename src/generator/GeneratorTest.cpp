@@ -79,10 +79,11 @@ void GeneratorTest::GenerateToolpath()
 
 	size_t slotNr = project->run[runNr].toolpaths[toolpathNr].generator->slotNr;
 	Tool * tool = project->run[runNr].toolbox.GetToolInSlot(slotNr);
-	if(tool == NULL) output = _T("Tool empty.");
-
-	ToolPath tp;
-	MachinePosition m;
+	if(tool == NULL){
+		output = _T("Tool empty.");
+		errorOccured = true;
+		return;
+	}
 
 	GenerateTarget();
 
@@ -92,9 +93,12 @@ void GeneratorTest::GenerateToolpath()
 		return;
 	}
 
+	ToolPath tp;
+	MachinePosition m;
+
 	// TODO: Change this to reflect tool shape.
 	DexelTarget discTool;
-	discTool.SetupDisc(0.003, target.GetSizeRX(), target.GetSizeRY());
+	discTool.SetupTool(*tool, target.GetSizeRX(), target.GetSizeRY());
 
 	DexelTarget temp = target;
 	DexelTarget temptop;

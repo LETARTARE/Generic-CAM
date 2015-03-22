@@ -78,14 +78,14 @@ void Workpiece::Paint(const ArrayOfObject &objects) const
 		placements[j].outline.Paint();
 	}
 
-//	if(glIsEnabled(GL_COLOR_MATERIAL)){
-//		glColor3f(color.x, color.y, color.z);
-//		box.Paint();
-//		StockMaterial::Paint(0.2, false);
-//	}else{
-//		box.Paint();
-//		StockMaterial::PaintWireBox();
-//	}
+	glColor3f(color.x, color.y, color.z);
+	if(glIsEnabled(GL_COLOR_MATERIAL)){
+		box.Paint();
+		StockMaterial::Paint(0.2, false);
+	}else{
+		box.Paint();
+		StockMaterial::PaintWireBox();
+	}
 
 }
 

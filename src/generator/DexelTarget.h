@@ -24,7 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef DEXELTARGET_H_
 #define DEXELTARGET_H_
 
@@ -61,8 +60,8 @@ public:
 
 	//Methods:
 public:
-	void ToXml(wxXmlNode* parentNode);
-	bool FromXml(wxXmlNode* node);
+//	void ToXml(wxXmlNode* parentNode);
+//	bool FromXml(wxXmlNode* node);
 
 	void InsertObject(Object &object, const AffineTransformMatrix & shift);
 
@@ -72,7 +71,10 @@ public:
 	const Polygon25 GeneratePolygon(int sx, int sy);
 	const Polygon25 GenerateConvexOutline(void);
 
-	void DocumentField(int x,int y,double height);
+	void SetupTool(const Tool & tool, const double resolutionX,
+			const double resolutionY);
+
+	void DocumentField(int x, int y, double height);
 	void DocumentField(int x, int y);
 	void GenerateDistanceMap(double height, bool invert = false);
 	void RaiseDistanceMap(double height, bool invert);
@@ -106,7 +108,6 @@ public:
 
 	void Paint(void);
 };
-WX_DECLARE_OBJARRAY(DexelTarget, ArrayOfDexelTarget)
-;
+WX_DECLARE_OBJARRAY(DexelTarget, ArrayOfDexelTarget);
 
 #endif /* DEXELTARGET_H_ */

@@ -76,7 +76,6 @@ protected:
 public:
 
 	virtual void CopyFrom(const Generator * other);
-
 	virtual wxString GetName(void) const
 	{
 		return _T("Base Class");

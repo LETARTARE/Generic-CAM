@@ -34,7 +34,7 @@
 #include "../generator/GeneratorFast.h"
 #include "../generator/GeneratorTest.h"
 
-#define N_GENERATORS 		6
+#define N_GENERATORS 		5
 
 Generator* GeneratorCollection::NewGenerator(int generatorNr, Project * project,
 		size_t runNr, size_t toolpathNr)
@@ -50,13 +50,13 @@ Generator* GeneratorCollection::NewGenerator(int generatorNr, Project * project,
 	case 2:
 		return new GeneratorLoadFromFile(project, runNr, toolpathNr);
 		break;
+//	case 3:
+//		return new GeneratorAreaGridDexel(project, runNr, toolpathNr);
+//		break;
 	case 3:
-		return new GeneratorAreaGridDexel(project, runNr, toolpathNr);
-		break;
-	case 4:
 		return new GeneratorFast(project, runNr, toolpathNr);
 		break;
-	case 5:
+	case 4:
 		return new GeneratorTest(project, runNr, toolpathNr);
 		break;
 	}
