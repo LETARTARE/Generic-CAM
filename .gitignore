@@ -18,6 +18,7 @@ genericcam
 /toolpath
 
 /machines/Hermle\ 800.zip
+/*.zip
 
 # /doc4developer/
 /doc/doxygen/html

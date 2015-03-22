@@ -22,17 +22,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #include "ToolCanvas.h"
 
 ToolCanvas::ToolCanvas(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 		const wxSize& size, long style, const wxString& name) :
-	OpenGLCanvas(parent, id, pos, size, style, name)
+		OpenGLCanvas(parent, id, pos, size, style, name)
 {
 	tool = NULL;
 
@@ -51,19 +47,19 @@ void ToolCanvas::RenderCoordinateSystem(void)
 {
 	glBegin( GL_LINES);
 
-	glColor3b(255, 0, 0);
+	glColor3f(1.0, 0, 0);
 	glNormal3f(-1, 0, 0);
 	glVertex3f(-1, 0, 0);
 	glNormal3f(1, 0, 0);
 	glVertex3f(1, 0, 0);
 
-	glColor3b(0, 255, 0);
+	glColor3f(0, 1.0, 0);
 	glNormal3f(0, -1, 0);
 	glVertex3f(0, -1, 0);
 	glNormal3f(0, 1, 0);
 	glVertex3f(0, 1, 0);
 
-	glColor3b(0, 0, 255);
+	glColor3f(0, 0, 1.0);
 	glNormal3f(0, 0, -1);
 	glVertex3f(0, 0, -1);
 	glNormal3f(0, 0, 1);
@@ -74,7 +70,7 @@ void ToolCanvas::RenderCoordinateSystem(void)
 
 void ToolCanvas::Render()
 {
-	float scaleFactor = 50.0;
+	float scaleFactor = 10.0;
 	RenderCoordinateSystem();
 #if defined (__WIN32__)
 	::glEnable(GL_NORMALIZE);
@@ -82,6 +78,7 @@ void ToolCanvas::Render()
 	::glEnable( GL_RESCALE_NORMAL);
 #endif
 	::glScalef(scaleFactor, scaleFactor, scaleFactor);
+	::glColor3f(0.7, 0.7, 0.7);
 	if(tool != NULL) tool->Paint();
 #if defined (__WIN32__)
 	::glDisable(GL_NORMALIZE);

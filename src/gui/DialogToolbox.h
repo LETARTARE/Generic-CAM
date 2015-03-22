@@ -44,8 +44,11 @@ public:
 	Project* project;
 	DisplaySettings * settings;
 
-	unsigned int selectedTool;
-	unsigned int selectedElement;
+	int selectedTool;
+	int selectedElement;
+
+	Tool tempTool;
+	ToolElement tempElement;
 
 	// Methods
 public:
@@ -59,6 +62,7 @@ public:
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 
+	void OnEnter(wxCommandEvent& event);
 	void OnToolboxLoad(wxCommandEvent& event);
 	void OnToolboxSave(wxCommandEvent& event);
 	void OnToolSelect(wxCommandEvent& event);

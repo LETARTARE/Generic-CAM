@@ -33,8 +33,10 @@ WX_DEFINE_OBJARRAY(ArrayOfTool)
 #include <math.h>
 #include <wx/log.h>
 
-Tool::Tool() :
-		resolution(32)
+unsigned int Tool::resolution = 32;
+
+Tool::Tool()
+
 {
 	feedCoefficient = 0.005;
 	maxSpeed = 10000;
@@ -231,7 +233,7 @@ void Tool::GenerateContour(void)
 	}
 }
 
-float Tool::GetPositiveLength(void)
+float Tool::GetPositiveLength(void) const
 {
 	float maxLength = 0.0;
 	float zPosition = 0.0;
@@ -244,12 +246,12 @@ float Tool::GetPositiveLength(void)
 	return maxLength;
 }
 
-float Tool::GetNegativeLength(void)
+float Tool::GetNegativeLength(void) const
 {
 	return shaftLength;
 }
 
-float Tool::GetMaxDiameter(void)
+float Tool::GetMaxDiameter(void) const
 {
 	float maxD = shaftDiameter;
 	unsigned int i;

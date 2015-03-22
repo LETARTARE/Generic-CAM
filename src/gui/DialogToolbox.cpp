@@ -35,9 +35,13 @@ DialogToolbox::DialogToolbox(wxWindow* parent, Project * project,
 
 	selectedTool = 0;
 	selectedElement = 0;
-
+	if(selectedTool < project->toolbox.tools.GetCount()){
+		tempTool = project->toolbox.tools[selectedTool];
+		if(selectedElement < tempTool.elements.GetCount()) tempElement =
+				tempTool.elements[selectedElement];
+	}
 	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
-	settings->WriteToCanvas(m_canvas);
+	TransferDataToWindow();
 }
 
 DialogToolbox::~DialogToolbox()
@@ -48,120 +52,151 @@ bool DialogToolbox::TransferDataToWindow(void)
 {
 	if(project == NULL) return false;
 
-	settings->WriteToCanvas(m_canvas);
-
 	size_t i, j;
 
 	m_comboBoxToolSelector->Clear();
-//	if(project->toolbox.tools.GetCount() == 0){
-//		m_comboBoxToolSelector->Append(_("No tools in toolbox!"));
-//		m_comboBoxToolSelector->Enable(false);
-//	}else{
-//		for(i = 0; i < project->toolbox.tools.GetCount(); i++){
-//			m_comboBoxToolSelector->Append(project->toolbox.tools[i].toolName);
-//		}
-//		m_comboBoxToolSelector->Select(selectedTool);
-//		m_comboBoxToolSelector->Enable(true);
-//	}
-//
-//	if(selectedTool < project->toolbox.tools.GetCount()){
-//		m_panel->InsertTool(project->toolbox.tools[selectedTool]);
-//		m_canvas->InsertTool(project->toolbox.tools[selectedTool]);
-//	}
+	if(project->toolbox.tools.GetCount() == 0){
+		m_comboBoxToolSelector->Append(_("No tools in toolbox!"));
+		m_comboBoxToolSelector->Enable(false);
+	}else{
+		for(i = 0; i < project->toolbox.tools.GetCount(); i++){
+			m_comboBoxToolSelector->Append(project->toolbox.tools[i].toolName);
+		}
+		m_comboBoxToolSelector->SetValue(tempTool.toolName);
+		m_comboBoxToolSelector->Enable(true);
+	}
 
-//	if(selectedTool < project->toolbox.tools.GetCount()){
-//
-//		Tool *temp = &(project->toolbox.tools[selectedTool]);
-//
-//		m_textCtrlShaftDiameter->SetValue(
-//				wxString::Format(_T("%f"), temp->shaftDiameter));
-//		m_textCtrlShaftLength->SetValue(
-//				wxString::Format(_T("%f"), temp->shaftLength));
-//		m_textCtrlMaxSpeed->SetValue(
-//				wxString::Format(_T("%.0f"), temp->maxSpeed));
-//		m_textCtrlFeedCoefficient->SetValue(
-//				wxString::Format(_T("%f"), temp->feedCoefficient));
-//		m_textCtrlNrOfTeeth->SetValue(
-//				wxString::Format(_T("%u"), temp->nrOfTeeth));
-//		m_textCtrlComment->SetValue(temp->comment);
-//
-//		wxSize sz = m_listCtrl->GetClientSize();
-//		unsigned int w = sz.x / 14;
-//		m_listCtrl->ClearAll();
-//		m_listCtrl->InsertColumn(0, _("Type"), wxLIST_FORMAT_LEFT, 2 * w);
-//		m_listCtrl->InsertColumn(1, _("Diameter"), wxLIST_FORMAT_LEFT, 3 * w);
-//		m_listCtrl->InsertColumn(2, _("Height"), wxLIST_FORMAT_LEFT, 3 * w);
-//		m_listCtrl->InsertColumn(3, _("Radius"), wxLIST_FORMAT_LEFT, 3 * w);
-//		m_listCtrl->InsertColumn(4, _("Cutting"), wxLIST_FORMAT_LEFT, 3 * w);
-//
-//		for(j = 0; j < temp->elements.GetCount(); j++){
-//
+	tempTool.GenerateContour();
+	m_panel->InsertTool(tempTool);
+	m_canvas->InsertTool(tempTool);
+	settings->WriteToCanvas(m_canvas);
+	m_canvas->Refresh();
+
+	m_textCtrlShaftDiameter->SetValue(
+			settings->SmallDistance.TextFromSI(tempTool.shaftDiameter));
+	m_textCtrlShaftLength->SetValue(
+			settings->SmallDistance.TextFromSI(tempTool.shaftLength));
+	m_textCtrlMaxSpeed->SetValue(
+			settings->RotationalSpeed.TextFromSI(tempTool.maxSpeed, 0));
+	m_textCtrlFeedCoefficient->SetValue(
+			settings->SmallDistance.TextFromSI(tempTool.feedCoefficient));
+	m_textCtrlNrOfTeeth->SetValue(
+			wxString::Format(_T("%u"), tempTool.nrOfTeeth));
+	m_textCtrlComment->SetValue(tempTool.comment);
+
+	m_staticTextUnitShaftDiameter->SetLabel(
+			settings->SmallDistance.GetOtherName());
+	m_staticTextUnitShaftLength->SetLabel(
+			settings->SmallDistance.GetOtherName());
+	m_staticTextUnitMaxSpeed->SetLabel(
+			settings->RotationalSpeed.GetOtherName());
+	m_staticTextUnitFeedCoefficient->SetLabel(
+			settings->SmallDistance.GetOtherName());
+
+	wxSize sz = m_listCtrl->GetClientSize();
+	unsigned int w = sz.x / 14;
+	m_listCtrl->ClearAll();
+	m_listCtrl->InsertColumn(0, _("Type"), wxLIST_FORMAT_LEFT, 2 * w);
+	m_listCtrl->InsertColumn(1, _("Diameter"), wxLIST_FORMAT_LEFT, 3 * w);
+	m_listCtrl->InsertColumn(2, _("Height"), wxLIST_FORMAT_LEFT, 3 * w);
+	m_listCtrl->InsertColumn(3, _("Radius"), wxLIST_FORMAT_LEFT, 3 * w);
+	m_listCtrl->InsertColumn(4, _("Cutting"), wxLIST_FORMAT_LEFT, 3 * w);
+
+	for(j = 0; j < tempTool.elements.GetCount(); j++){
+
 //			wxLogMessage(
 //					wxString::Format(_T("Element: %u Type %u"), j,
 //							temp->elements[j].t));
-//
-//			switch(temp->elements[j].t){
-//			case 0:
-//				m_listCtrl->InsertItem(j, _T("L"));
-//				break;
-//			case 1:
-//				m_listCtrl->InsertItem(j, _T("CDH"));
-//				break;
-//			case 2:
-//				m_listCtrl->InsertItem(j, _T("CHD"));
-//				break;
-//			case 3:
-//				m_listCtrl->InsertItem(j, _T("SRU"));
-//				break;
-//			case 4:
-//				m_listCtrl->InsertItem(j, _T("SRL"));
-//				break;
-//			}
-//
-//			m_listCtrl->SetItem(j, 1,
-//					wxString::Format(_T("%f"), temp->elements[j].d));
-//			m_listCtrl->SetItem(j, 2,
-//					wxString::Format(_T("%f"), temp->elements[j].h));
-//			m_listCtrl->SetItem(j, 3,
-//					wxString::Format(_T("%f"), temp->elements[j].r));
-//
-//			if(temp->elements[j].cutting){
-//				m_listCtrl->SetItem(j, 4, _("Yes"));
-//			}else{
-//				m_listCtrl->SetItem(j, 4, _("No"));
-//			}
-//
-//			m_listCtrl->SetItemState(j, 0, wxLIST_STATE_SELECTED);
-//
-//			if(selectedElement < temp->elements.GetCount()){
-//
-//				m_listCtrl->SetItemState(selectedElement,
-//				wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-//
-//				m_choiceType->Select(temp->elements[selectedElement].t);
-//
-//				m_textCtrlDiameter->SetValue(
-//						wxString::Format(_T("%f"),
-//								temp->elements[selectedElement].d));
-//				m_textCtrlHeight->SetValue(
-//						wxString::Format(_T("%f"),
-//								temp->elements[selectedElement].h));
-//				m_textCtrlRadius->SetValue(
-//						wxString::Format(_T("%f"),
-//								temp->elements[selectedElement].r));
-//
-//				m_checkBoxCutting->SetValue(
-//						temp->elements[selectedElement].cutting);
-//
-//			}
-//		}
-//	}
+
+		switch(tempTool.elements[j].t){
+		case 0:
+			m_listCtrl->InsertItem(j, _T("L"));
+			break;
+		case 1:
+			m_listCtrl->InsertItem(j, _T("CDH"));
+			break;
+		case 2:
+			m_listCtrl->InsertItem(j, _T("CHD"));
+			break;
+		case 3:
+			m_listCtrl->InsertItem(j, _T("SRU"));
+			break;
+		case 4:
+			m_listCtrl->InsertItem(j, _T("SRL"));
+			break;
+		}
+
+		m_listCtrl->SetItem(j, 1,
+				settings->SmallDistance.TextFromSI(tempTool.elements[j].d));
+		m_listCtrl->SetItem(j, 2,
+				settings->SmallDistance.TextFromSI(tempTool.elements[j].h));
+		m_listCtrl->SetItem(j, 3,
+				settings->SmallDistance.TextFromSI(tempTool.elements[j].r));
+
+		if(tempTool.elements[j].cutting){
+			m_listCtrl->SetItem(j, 4, _("Yes"));
+		}else{
+			m_listCtrl->SetItem(j, 4, _("No"));
+		}
+
+		m_listCtrl->SetItemState(j,
+				(j == selectedElement)? wxLIST_STATE_SELECTED : 0,
+				wxLIST_STATE_SELECTED);
+
+//		m_listCtrl->SetItemState(selectedElement,
+//		wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+
+	}
+	m_choiceType->Select(tempElement.t);
+
+	m_textCtrlDiameter->SetValue(
+			settings->SmallDistance.TextFromSI(tempElement.d));
+	m_textCtrlHeight->SetValue(
+			settings->SmallDistance.TextFromSI(tempElement.h));
+	m_textCtrlRadius->SetValue(
+			settings->SmallDistance.TextFromSI(tempElement.r));
+
+	m_staticTextUnitDiameter->SetLabel(settings->SmallDistance.GetOtherName());
+	m_staticTextUnitHeight->SetLabel(settings->SmallDistance.GetOtherName());
+	m_staticTextUnitRadius->SetLabel(settings->SmallDistance.GetOtherName());
+
+	m_checkBoxCutting->SetValue(tempElement.cutting);
+
 	return true;
 }
 
 bool DialogToolbox::TransferDataFromWindow(void)
 {
+	tempTool.toolName = m_comboBoxToolSelector->GetValue();
+	tempTool.shaftDiameter = settings->SmallDistance.SIFromString(
+			m_textCtrlShaftDiameter->GetValue());
+	tempTool.shaftLength = settings->SmallDistance.SIFromString(
+			m_textCtrlShaftLength->GetValue());
+	tempTool.maxSpeed = settings->RotationalSpeed.SIFromString(
+			m_textCtrlMaxSpeed->GetValue());
+	tempTool.feedCoefficient = settings->SmallDistance.SIFromString(
+			m_textCtrlFeedCoefficient->GetValue());
+	tempTool.nrOfTeeth = settings->SmallDistance.SIFromString(
+			m_textCtrlNrOfTeeth->GetValue());
+	tempTool.comment = m_textCtrlComment->GetValue();
+
+	tempElement.t = m_choiceType->GetSelection();
+	tempElement.d = settings->SmallDistance.SIFromString(
+			m_textCtrlDiameter->GetValue());
+	tempElement.h = settings->SmallDistance.SIFromString(
+			m_textCtrlHeight->GetValue());
+	tempElement.r = settings->SmallDistance.SIFromString(
+			m_textCtrlRadius->GetValue());
+
+	tempElement.cutting = m_checkBoxCutting->GetValue();
+
 	return true;
+}
+
+void DialogToolbox::OnEnter(wxCommandEvent& event)
+{
+	TransferDataFromWindow();
+	TransferDataToWindow();
 }
 
 void DialogToolbox::OnClose(wxCommandEvent& event)
@@ -188,6 +223,7 @@ void DialogToolbox::OnChangeStereo3D(wxCommandEvent& event)
 	}
 	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
 	settings->WriteToCanvas(m_canvas);
+	m_canvas->Refresh();
 }
 
 void DialogToolbox::OnToolboxLoad(wxCommandEvent& event)
@@ -200,36 +236,97 @@ void DialogToolbox::OnToolboxSave(wxCommandEvent& event)
 
 void DialogToolbox::OnToolSelect(wxCommandEvent& event)
 {
+//	if(selectedTool == event.GetSelection()) return;
+	TransferDataFromWindow();
+	selectedTool = event.GetSelection();
+	if(selectedTool < project->toolbox.tools.GetCount()){
+		tempTool = project->toolbox.tools[selectedTool];
+		selectedElement = 0;
+		if(tempTool.elements.GetCount() > 0) tempElement = tempTool.elements[0];
+	}
+	TransferDataToWindow();
 }
 
 void DialogToolbox::OnToolRename(wxCommandEvent& event)
 {
+	TransferDataFromWindow();
+	tempTool.toolName = event.GetString();
+	TransferDataToWindow();
 }
 
 void DialogToolbox::OnToolNew(wxCommandEvent& event)
 {
+	TransferDataFromWindow();
+	if(!tempTool.toolName.IsEmpty()){
+		tempTool.toolName = _("Copy of ") + tempTool.toolName;
+	}
+	project->toolbox.tools.Add(tempTool);
+	selectedTool = project->toolbox.tools.GetCount() - 1;
+	TransferDataToWindow();
 }
 
 void DialogToolbox::OnToolUpdate(wxCommandEvent& event)
 {
+	TransferDataFromWindow();
+	if(selectedTool >= project->toolbox.tools.GetCount()) return;
+	project->toolbox.tools[selectedTool] = tempTool;
+	TransferDataToWindow();
 }
 
 void DialogToolbox::OnToolDelete(wxCommandEvent& event)
 {
-}
-
-void DialogToolbox::OnShapeNew(wxCommandEvent& event)
-{
-}
-
-void DialogToolbox::OnShapeUpdate(wxCommandEvent& event)
-{
-}
-
-void DialogToolbox::OnShapeDelete(wxCommandEvent& event)
-{
+	if(selectedTool < 0) return;
+	if(selectedTool >= project->toolbox.tools.GetCount()) return;
+	project->toolbox.tools.RemoveAt(selectedTool, 1);
+	selectedTool--;
+	if(selectedTool < 0) selectedTool = 0;
+	if(selectedTool < project->toolbox.tools.GetCount()){
+		tempTool = project->toolbox.tools[selectedTool];
+		selectedElement = 0;
+		if(tempTool.elements.GetCount() > 0) tempElement = tempTool.elements[0];
+	}
+	TransferDataToWindow();
 }
 
 void DialogToolbox::OnShapeSelect(wxListEvent& event)
 {
+	if(event.GetIndex() == selectedElement) return;
+	TransferDataFromWindow();
+	selectedElement = event.GetIndex();
+	if(selectedElement < tempTool.elements.GetCount()){
+		tempElement = tempTool.elements[selectedElement];
+	}
+	TransferDataToWindow();
+}
+
+void DialogToolbox::OnShapeNew(wxCommandEvent& event)
+{
+	TransferDataFromWindow();
+	if(selectedElement < tempTool.elements.GetCount() - 1){
+		tempTool.elements.Insert(tempElement, selectedElement + 1);
+	}else{
+		tempTool.elements.Add(tempElement);
+	}
+	selectedElement++;
+	TransferDataToWindow();
+}
+
+void DialogToolbox::OnShapeUpdate(wxCommandEvent& event)
+{
+	TransferDataFromWindow();
+	tempTool.elements[selectedElement] = tempElement;
+	TransferDataToWindow();
+}
+
+void DialogToolbox::OnShapeDelete(wxCommandEvent& event)
+{
+	if(selectedElement < 0) return;
+	if(selectedElement >= tempTool.elements.GetCount()) return;
+	TransferDataFromWindow();
+	tempTool.elements.RemoveAt(selectedElement, 1);
+	selectedElement--;
+	if(selectedElement < 0) selectedElement = 0;
+	if(selectedElement < tempTool.elements.GetCount()) tempElement =
+			tempTool.elements[selectedElement];
+	TransferDataToWindow();
 }
