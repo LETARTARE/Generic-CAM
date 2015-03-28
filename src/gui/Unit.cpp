@@ -26,9 +26,12 @@
 
 #include "Unit.h"
 
+#include <lua.hpp>
+
 Unit::Unit()
 {
 	factor = 1.0;
+	useEvaluator = true;
 }
 
 Unit::Unit(const wxString SIName, const wxString otherName, const double factor)
@@ -85,9 +88,25 @@ wxString Unit::GetOtherName(void)
 	return otherName;
 }
 
-double Unit::SIFromString(const wxString& text)
+double Unit::SIFromString(const wxString& text, bool useEvaluator)
 {
 	double temp;
+	if(useEvaluator){
+		lua_State *L = lua_open();
+		luaopen_base(L);
+		luaopen_math(L);
+		luaopen_string(L);
+		if(luaL_loadstring(L, text.ToAscii())){
+			text.ToDouble(&temp);
+			return ToSI(temp);
+		}
+		if(lua_pcall(L, 0, 0, 0)){
+			text.ToDouble(&temp);
+			return ToSI(temp);
+		}
+		temp = lua_tonumber(L, -1);
+		return ToSI(temp);
+	}
 	text.ToDouble(&temp);
 	return ToSI(temp);
 }
