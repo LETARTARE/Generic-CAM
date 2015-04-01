@@ -226,14 +226,6 @@ void DialogToolbox::OnChangeStereo3D(wxCommandEvent& event)
 	m_canvas->Refresh();
 }
 
-void DialogToolbox::OnToolboxLoad(wxCommandEvent& event)
-{
-}
-
-void DialogToolbox::OnToolboxSave(wxCommandEvent& event)
-{
-}
-
 void DialogToolbox::OnToolSelect(wxCommandEvent& event)
 {
 //	if(selectedTool == event.GetSelection()) return;

@@ -449,6 +449,8 @@ void MainFrame::OnActivateRightClickMenu(wxTreeEvent& event)
 		menu.Append(ID_RUNEDIT, wxT("&Setup Run"));
 		menu.Append(ID_GENERATORSETUP, wxT("Setup &Generator"));
 		menu.AppendSeparator();
+		menu.Append(ID_TOOLPATHSAVE, wxT("Save &Toolpath"));
+		menu.AppendSeparator();
 		menu.Append(ID_RUNADD, wxT("&Add Run"));
 		menu.Append(ID_RUNDELETE, wxT("&Delete Run"));
 	}
@@ -904,9 +906,13 @@ void MainFrame::OnToolboxSave(wxCommandEvent &event)
 			_("Toolbox (*.xml)|*.xml|All files|*.*"),
 			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
-	if(project.toolbox.fileName.IsOk()) dialog.SetFilename(
-			project.toolbox.fileName.GetFullPath());
-
+	if(project.toolbox.fileName.IsOk()){
+		dialog.SetFilename(project.toolbox.fileName.GetFullPath());
+	}else{
+		if(wxDir::Exists(settings.lastToolboxDirectory)){
+			dialog.SetDirectory(settings.lastToolboxDirectory);
+		}
+	}
 	if(dialog.ShowModal() == wxID_OK){
 		wxFileName fileName;
 		fileName = dialog.GetPath();
@@ -978,6 +984,8 @@ void MainFrame::OnGeneratorRestart(wxCommandEvent& event)
 
 void MainFrame::OnGeneratorSaveToolpath(wxCommandEvent& event)
 {
+
+
 }
 
 void MainFrame::OnChangeLanguage(wxCommandEvent& event)

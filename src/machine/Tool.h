@@ -67,7 +67,7 @@ public:
 	ArrayOfToolElement elements;
 	ArrayOfToolContourElement contour;
 	int slot;
-	const unsigned int resolution;
+	static unsigned int resolution;
 
 	// Methods
 public:
@@ -76,9 +76,9 @@ public:
 
 	void GenerateContour(void);
 
-	float GetPositiveLength(void);
-	float GetNegativeLength(void);
-	float GetMaxDiameter(void);
+	float GetPositiveLength(void) const;
+	float GetNegativeLength(void) const;
+	float GetMaxDiameter(void) const;
 
 	void Paint(void) const;
 };

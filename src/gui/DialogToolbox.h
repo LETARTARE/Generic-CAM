@@ -63,8 +63,6 @@ public:
 	bool TransferDataFromWindow(void);
 
 	void OnEnter(wxCommandEvent& event);
-	void OnToolboxLoad(wxCommandEvent& event);
-	void OnToolboxSave(wxCommandEvent& event);
 	void OnToolSelect(wxCommandEvent& event);
 	void OnToolRename(wxCommandEvent& event);
 	void OnToolNew(wxCommandEvent& event);

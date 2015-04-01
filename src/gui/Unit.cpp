@@ -27,11 +27,11 @@
 #include "Unit.h"
 
 #include <lua.hpp>
+#include <wx/log.h>
 
 Unit::Unit()
 {
 	factor = 1.0;
-	useEvaluator = true;
 }
 
 Unit::Unit(const wxString SIName, const wxString otherName, const double factor)
@@ -96,11 +96,14 @@ double Unit::SIFromString(const wxString& text, bool useEvaluator)
 		luaopen_base(L);
 		luaopen_math(L);
 		luaopen_string(L);
-		if(luaL_loadstring(L, text.ToAscii())){
+		if(luaL_loadstring(L, (_T("return (") + text + _T(")")).ToAscii())){
 			text.ToDouble(&temp);
 			return ToSI(temp);
 		}
-		if(lua_pcall(L, 0, 0, 0)){
+		if(lua_pcall(L, 0, 1, 0)){
+			wxLogError(
+					_T("Error parsing input: ")
+							+ wxString::FromAscii(lua_tostring(L, -1)));
 			text.ToDouble(&temp);
 			return ToSI(temp);
 		}

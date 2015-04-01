@@ -184,7 +184,7 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menuToolbox->Append( m_menuItemToolboxLoad );
 	
 	wxMenuItem* m_menuItemToolboxSave;
-	m_menuItemToolboxSave = new wxMenuItem( m_menuToolbox, wxID_ANY, wxString( _("&Save Toolbox...") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemToolboxSave = new wxMenuItem( m_menuToolbox, ID_TOOLBOXSAVE, wxString( _("&Save Toolbox...") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuToolbox->Append( m_menuItemToolboxSave );
 	
 	m_menubar->Append( m_menuToolbox, _("&Toolbox") );
@@ -214,7 +214,7 @@ GUIMainFrame::GUIMainFrame( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_separator19 = m_menuToolpath->AppendSeparator();
 	
 	wxMenuItem* m_menuItemGeneratorSaveToolpath;
-	m_menuItemGeneratorSaveToolpath = new wxMenuItem( m_menuToolpath, wxID_ANY, wxString( _("Save &Toolpath") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemGeneratorSaveToolpath = new wxMenuItem( m_menuToolpath, ID_TOOLPATHSAVE, wxString( _("Save &Toolpath") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuToolpath->Append( m_menuItemGeneratorSaveToolpath );
 	
 	wxMenuItem* m_separator5;
@@ -2325,12 +2325,12 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_menubar = new wxMenuBar( 0 );
 	m_menuTools = new wxMenu();
 	wxMenuItem* m_menuItemToolboxLoad;
-	m_menuItemToolboxLoad = new wxMenuItem( m_menuTools, wxID_ANY, wxString( _("&Load Toolbox") ) + wxT('\t') + wxT("CTRL+L"), wxEmptyString, wxITEM_NORMAL );
+	m_menuItemToolboxLoad = new wxMenuItem( m_menuTools, ID_TOOLBOXLOAD, wxString( _("&Load Toolbox") ) + wxT('\t') + wxT("CTRL+L"), wxEmptyString, wxITEM_NORMAL );
 	m_menuTools->Append( m_menuItemToolboxLoad );
 	m_menuItemToolboxLoad->Enable( false );
 	
 	wxMenuItem* m_menuItemToolboxSave;
-	m_menuItemToolboxSave = new wxMenuItem( m_menuTools, wxID_ANY, wxString( _("&Save Toolbox") ) + wxT('\t') + wxT("CTRL+S"), wxEmptyString, wxITEM_NORMAL );
+	m_menuItemToolboxSave = new wxMenuItem( m_menuTools, ID_TOOLBOXSAVE, wxString( _("&Save Toolbox") ) + wxT('\t') + wxT("CTRL+S"), wxEmptyString, wxITEM_NORMAL );
 	m_menuTools->Append( m_menuItemToolboxSave );
 	m_menuItemToolboxSave->Enable( false );
 	
@@ -2573,8 +2573,6 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	
 	// Connect Events
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIToolbox::OnClose ) );
-	this->Connect( m_menuItemToolboxLoad->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnToolboxLoad ) );
-	this->Connect( m_menuItemToolboxSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnToolboxSave ) );
 	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnClose ) );
 	this->Connect( m_menuItemStereo3D->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnChangeStereo3D ) );
 	m_comboBoxToolSelector->Connect( wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler( GUIToolbox::OnToolSelect ), NULL, this );
@@ -2598,8 +2596,6 @@ GUIToolbox::~GUIToolbox()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIToolbox::OnClose ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnToolboxLoad ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnToolboxSave ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnClose ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnChangeStereo3D ) );
 	m_comboBoxToolSelector->Disconnect( wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler( GUIToolbox::OnToolSelect ), NULL, this );
