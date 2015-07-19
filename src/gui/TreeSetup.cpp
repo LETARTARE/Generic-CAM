@@ -160,17 +160,47 @@ int TreeSetup::GetFirstSelectedWorkpiece(void)
 
 int TreeSetup::GetFirstSelectedRun(void)
 {
+	wxTreeItemId temprun;
 	wxTreeItemId temp;
 	TreeItem * data;
 
 	// Check if all groups are OK.
 	if(!groupRun.IsOk()) return -1;
 
-	temp = tree->GetFirstChild(groupRun, cookie);
-	while(temp.IsOk()){
-		data = (TreeItem*) tree->GetItemData(temp);
-		if(data != NULL && data->dataType == itemRun && tree->IsSelected(temp)) return data->nr;
-		temp = tree->GetNextSibling(temp);
+	temprun = tree->GetFirstChild(groupRun, cookie);
+	while(temprun.IsOk()){
+		temp = tree->GetFirstChild(temprun, cookie);
+		data = (TreeItem*) tree->GetItemData(temprun);
+		if(data != NULL && data->dataType == itemRun){
+			while(temp.IsOk()){
+				if(tree->IsSelected(temp)) return data->nr;
+				temp = tree->GetNextSibling(temp);
+			}
+		}
+		temprun = tree->GetNextSibling(temprun);
+	}
+	return -1;
+}
+
+int TreeSetup::GetFirstSelectedToolpath(void)
+{
+	wxTreeItemId temprun;
+	wxTreeItemId temp;
+	TreeItem * data;
+
+	// Check if all groups are OK.
+	if(!groupRun.IsOk()) return -1;
+
+	temprun = tree->GetFirstChild(groupRun, cookie);
+	while(temprun.IsOk()){
+		temp = tree->GetFirstChild(temprun, cookie);
+		while(temp.IsOk()){
+			data = (TreeItem*) tree->GetItemData(temp);
+			if(data != NULL && data->dataType == itemToolpath
+					&& tree->IsSelected(temp)) return data->nr;
+			temp = tree->GetNextSibling(temp);
+		}
+		temprun = tree->GetNextSibling(temprun);
 	}
 	return -1;
 }

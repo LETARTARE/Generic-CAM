@@ -831,7 +831,7 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	
 	m_staticTextUnitAngle = new wxStaticText( m_panelRotate, wxID_ANY, _("deg"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitAngle->Wrap( -1 );
-	bSizer40->Add( m_staticTextUnitAngle, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer40->Add( m_staticTextUnitAngle, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
 	sbSizer8->Add( bSizer40, 1, wxEXPAND, 5 );
 	

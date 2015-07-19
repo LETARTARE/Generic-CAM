@@ -440,7 +440,7 @@ void GeneratorFast::GenerateToolpath(void)
 
 	//tp.CleanPath(0.0003);
 
-	target.toolpath = tp;
+	*toolpath = tp;
 	target.refresh = true;
 	return;
 	//

@@ -519,6 +519,7 @@ void MainFrame::OnSelectionChanged(wxTreeEvent& event)
 		break;
 	case itemGroupRun:
 	case itemRun:
+	case itemToolpath:
 		project.displayType = displayRun;
 		break;
 	}
@@ -535,6 +536,7 @@ void MainFrame::OnSelectionChanging(wxTreeEvent& event)
 	if(data->dataType == itemWorkpiece) return;
 	if(data->dataType == itemPlacement) return;
 	if(data->dataType == itemRun) return;
+	if(data->dataType == itemToolpath) return;
 
 	event.Veto();
 }
@@ -905,7 +907,6 @@ void MainFrame::OnToolboxSave(wxCommandEvent &event)
 	wxFileDialog dialog(this, _("Save toolbox..."), _T(""), _T(""),
 			_("Toolbox (*.xml)|*.xml|All files|*.*"),
 			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-
 	if(project.toolbox.fileName.IsOk()){
 		dialog.SetFilename(project.toolbox.fileName.GetFullPath());
 	}else{
@@ -916,7 +917,7 @@ void MainFrame::OnToolboxSave(wxCommandEvent &event)
 	if(dialog.ShowModal() == wxID_OK){
 		wxFileName fileName;
 		fileName = dialog.GetPath();
-		if(project.toolbox.LoadToolbox(fileName)){
+		if(project.toolbox.SaveToolbox(fileName)){
 			TransferDataToWindow();
 		}
 	}
@@ -985,7 +986,29 @@ void MainFrame::OnGeneratorRestart(wxCommandEvent& event)
 void MainFrame::OnGeneratorSaveToolpath(wxCommandEvent& event)
 {
 
+	int i = tree->GetFirstSelectedRun();
+	int j = tree->GetFirstSelectedToolpath();
+	if(i < 0 || i >= project.run.GetCount()) return;
+	if(j < 0 || j >= project.run[i].toolpaths.GetCount()) return;
 
+	wxFileDialog dialog(this, _("Save toolpath..."), _T(""), _T(""),
+			_("G-Code file (*.nc)|*.nc|All files|*.*"),
+			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+	if(wxDir::Exists(settings.lastToolpathDirectory)){
+		dialog.SetDirectory(settings.lastToolpathDirectory);
+	}
+	if(dialog.ShowModal() == wxID_OK){
+		wxFileName fileName;
+		fileName = dialog.GetPath();
+		settings.lastToolpathDirectory = fileName.GetPath();
+
+		wxTextFile file(fileName.GetFullPath());
+		file.Open();
+		file.Clear();
+		project.run[i].toolpaths[j].WriteToFile(file);
+		file.Write();
+	}
 }
 
 void MainFrame::OnChangeLanguage(wxCommandEvent& event)

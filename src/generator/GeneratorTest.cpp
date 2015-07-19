@@ -210,5 +210,6 @@ void GeneratorTest::GenerateToolpath()
 	//t.matrix.TranslateGlobal(t.GetSizeX(), 0, 0);
 	//targets.Add(t);
 
-	target.toolpath = tp;
+	*toolpath = tp;
+
 }

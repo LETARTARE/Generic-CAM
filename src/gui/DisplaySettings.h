@@ -59,6 +59,7 @@ public:
 	wxString lastStockDirectory;
 	wxString lastMachineDirectory;
 	wxString lastToolboxDirectory;
+	wxString lastToolpathDirectory;
 
 	float eyeDistance;
 	float focalDistance;

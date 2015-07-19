@@ -137,6 +137,7 @@ bool DisplaySettings::GetConfigFrom(wxConfig * config)
 	config->Read(_T("LastMachineDirectory"), &lastMachineDirectory, cwd);
 	config->Read(_T("LastStockDirectory"), &lastStockDirectory, cwd);
 	config->Read(_T("LastToolboxDirectory"), &lastToolboxDirectory, cwd);
+	config->Read(_T("LastToolpathDirectory"), &lastToolpathDirectory, cwd);
 
 	wxString temp;
 	int i;
@@ -216,6 +217,7 @@ bool DisplaySettings::WriteConfigTo(wxConfig * config)
 	config->Write(_T("LastMachineDirectory"), lastMachineDirectory);
 	config->Write(_T("LastStockDirectory"), lastStockDirectory);
 	config->Write(_T("LastToolboxDirectory"), lastToolboxDirectory);
+	config->Write(_T("LastToolpathDirectory"), lastToolpathDirectory);
 
 	config->Write(_T("Stereo3DColorLeftEyeRed"), (long) leftEyeR);
 	config->Write(_T("Stereo3DColorLeftEyeGreen"), (long) leftEyeG);

@@ -53,6 +53,7 @@ public:
 	int GetFirstSelectedObject(void);
 	int GetFirstSelectedWorkpiece(void);
 	int GetFirstSelectedRun(void);
+	int GetFirstSelectedToolpath(void);
 
 	int GetWorkpieceFromLink(int linkNr);
 	int GetObjectFromLink(int linkNr);
