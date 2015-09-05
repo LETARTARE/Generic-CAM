@@ -147,7 +147,7 @@ void DialogStockMaterial::OnClose(wxCommandEvent& event)
 	TransferDataFromWindow();
 	this->Show(false);
 }
-void DialogStockMaterial::OnClose(wxCloseEvent& event)
+void DialogStockMaterial::OnXClose(wxCloseEvent& event)
 {
 	TransferDataFromWindow();
 	this->Show(false);

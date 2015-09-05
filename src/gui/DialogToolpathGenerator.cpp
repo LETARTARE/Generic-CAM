@@ -207,7 +207,7 @@ bool DialogToolpathGenerator::TransferDataFromWindow(void)
 	return true;
 }
 
-void DialogToolpathGenerator::OnClose(wxCloseEvent& event)
+void DialogToolpathGenerator::OnXClose(wxCloseEvent& event)
 {
 	this->Hide();
 }

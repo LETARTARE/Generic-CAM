@@ -48,7 +48,7 @@ public:
 	bool TransferDataFromWindow(void);
 
 private:
-	void OnClose(wxCloseEvent& event);
+	void OnXClose(wxCloseEvent& event);
 	void OnScroll(wxScrollEvent& event);
 	void OnColorChanged(wxColourPickerEvent& event);
 	void OnSwap(wxCommandEvent& event);

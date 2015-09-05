@@ -936,41 +936,16 @@ void MainFrame::OnGeneratorStart(wxCommandEvent& event)
 
 	project.PropagateChanges();
 
-	size_t maxNr = 0;
 	size_t count = 0;
-	for(size_t workpieceNr = 0; workpieceNr < project.workpieces.GetCount();
-			workpieceNr++){
-		if(project.workpieces[workpieceNr].hasRunningGenerator) continue;
-		for(size_t runNr = 0; runNr < project.run.GetCount(); runNr++){
-			if(project.run[runNr].workpieceNr != workpieceNr) continue;
-			maxNr += project.run[runNr].toolpaths.GetCount();
-		}
-	}
+	size_t maxNr = project.ToolpathToGenerate();
 
 	wxProgressDialog dialog(_T("Generating Toolpaths"), _T(""), maxNr, this);
 	dialog.Show();
 
-	for(size_t workpieceNr = 0; workpieceNr < project.workpieces.GetCount();
-			workpieceNr++){
-		if(project.workpieces[workpieceNr].hasRunningGenerator) continue;
-		for(size_t runNr = 0; runNr < project.run.GetCount(); runNr++){
-			if(project.run[runNr].workpieceNr != workpieceNr) continue;
-			for(size_t toolpathNr = 0;
-					toolpathNr < project.run[runNr].toolpaths.GetCount();
-					toolpathNr++){
-				count++;
-				dialog.Update(count,
-						project.workpieces[workpieceNr].name + _T(" - ")
-								+ project.run[runNr].toolpaths[toolpathNr].generator->GetName());
-				if(project.run[runNr].toolpaths[toolpathNr].generator->toolpathGenerated) continue;
-				// Generate a detached thread. on exit it signals the workpiece to be free for
-				// other generators.
-				project.run[runNr].toolpaths[toolpathNr].generator->GenerateToolpath();
-				project.workpieces[workpieceNr].hasRunningGenerator = false;
-			}
-		}
+	count++;
+	while(project.ToolpathGenerate()){
+		dialog.Update(count, project.TollPathGenerateCurrent());
 	}
-
 }
 
 void MainFrame::OnGeneratorAutomatic(wxCommandEvent& event)

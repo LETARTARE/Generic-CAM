@@ -65,7 +65,7 @@ public:
 
 protected:
 
-	void OnClose(wxCloseEvent& event);
+	void OnXClose(wxCloseEvent& event);
 	void OnClose(wxCommandEvent& event);
 	void OnAddUpdate(wxCommandEvent& event);
 	void OnSize(wxSizeEvent& event);

@@ -55,7 +55,7 @@ public:
 	void SetController(Control3D& control);
 
 	void OnClose(wxCommandEvent& event);
-	void OnClose(wxCloseEvent& event);
+	void OnXClose(wxCloseEvent& event);
 
 	void OnChangeStereo3D(wxCommandEvent& event);
 

@@ -57,7 +57,7 @@ private:
 protected:
 	void Update(wxCommandEvent& event);
 
-	void OnClose(wxCloseEvent& event);
+	void OnXClose(wxCloseEvent& event);
 	void OnMachineLoad(wxCommandEvent& event);
 	void OnMachineSave(wxCommandEvent& event);
 	void OnClose(wxCommandEvent& event);

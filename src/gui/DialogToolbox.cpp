@@ -204,7 +204,7 @@ void DialogToolbox::OnClose(wxCommandEvent& event)
 	this->Show(false);
 }
 
-void DialogToolbox::OnClose(wxCloseEvent& event)
+void DialogToolbox::OnXClose(wxCloseEvent& event)
 {
 	this->Show(false);
 }

@@ -44,7 +44,7 @@ public:
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 
-	void OnClose(wxCloseEvent& event);
+	void OnXClose(wxCloseEvent& event);
 
 	void OnSelectToolpath(wxCommandEvent& event);
 	void OnChangeTime(wxCommandEvent& event);

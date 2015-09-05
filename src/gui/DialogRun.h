@@ -58,7 +58,7 @@ public:
 	int GetSelected(void);
 
 
-	void OnClose(wxCloseEvent& event);
+	void OnXClose(wxCloseEvent& event);
 	void OnClose(wxCommandEvent& event);
 	void OnRunSelect(wxCommandEvent& event);
 	void OnWorkpieceSelect(wxCommandEvent& event);

@@ -47,7 +47,7 @@ DialogMachineControl::DialogMachineControl(wxWindow* parent,
 	lineSize = 1;
 }
 
-void DialogMachineControl::OnClose(wxCloseEvent& event)
+void DialogMachineControl::OnXClose(wxCloseEvent& event)
 {
 	TransferDataFromWindow();
 	this->Show(false);

@@ -28,6 +28,8 @@
 
 #include "../project/Project.h"
 
+#if(_GENERICCAM_USEMULTITHREADING == 1)
+
 ToolpathGeneratorThread::ToolpathGeneratorThread(Project* project, size_t runNr,
 		size_t toolpathNr)
 {
@@ -50,3 +52,5 @@ wxThread::ExitCode ToolpathGeneratorThread::Entry(void)
 	project->workpieces[workpieceNr].hasRunningGenerator = false;
 	return 0;
 }
+
+#endif

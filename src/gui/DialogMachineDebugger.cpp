@@ -92,7 +92,7 @@ bool DialogMachineDebugger::TransferDataFromWindow(void)
 	return true;
 }
 
-void DialogMachineDebugger::OnClose(wxCloseEvent& event)
+void DialogMachineDebugger::OnXClose(wxCloseEvent& event)
 {
 	TransferDataFromWindow();
 	machineControl->Show(false);

@@ -86,7 +86,7 @@ bool DialogSetupStereo3D::TransferDataFromWindow(void)
 	return true;
 }
 
-void DialogSetupStereo3D::OnClose(wxCloseEvent& event)
+void DialogSetupStereo3D::OnXClose(wxCloseEvent& event)
 {
 	this->Hide();
 }

@@ -121,7 +121,7 @@ bool DialogPlacement::TransferDataFromWindow(void)
 	return false;
 }
 
-void DialogPlacement::OnClose(wxCloseEvent& event)
+void DialogPlacement::OnXClose(wxCloseEvent& event)
 {
 	this->Hide();
 }

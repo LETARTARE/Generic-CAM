@@ -89,8 +89,10 @@ public:
 	{
 		return (szPort);
 	}
+#ifdef __LINUX
 	void SetDTR(bool activate);
 	void WaitTXFinish(void);
+#endif
 
 protected:
 	bool Opened;
@@ -102,7 +104,6 @@ protected:
 	HANDLE m_hIDComDev;
 	OVERLAPPED m_OverlappedRead, m_OverlappedWrite;
 #endif
-
 
 #ifdef __LINUX
 	int fd, c, res;

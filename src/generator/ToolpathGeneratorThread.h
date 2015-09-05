@@ -33,12 +33,14 @@
  * ...
  */
 
+#if(_GENERICCAM_USEMULTITHREADING == 1)
+
 #include <stddef.h>
 #include <wx/thread.h>
 
 class Project;
 
-class ToolpathGeneratorThread:public wxThread {
+class ToolpathGeneratorThread:public wxThread{
 public:
 	ToolpathGeneratorThread(Project * project, size_t runNr, size_t toolpathNr);
 	virtual ~ToolpathGeneratorThread();
@@ -51,5 +53,7 @@ private:
 	size_t toolpathNr;
 
 };
+
+#endif
 
 #endif /* TOOLPATHGENERATORTHREAD_H_ */

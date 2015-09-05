@@ -75,7 +75,7 @@ public:
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 
-	void OnClose(wxCloseEvent& event);
+	void OnXClose(wxCloseEvent& event);
 	void OnClose(wxCommandEvent& event);
 
 	void OnSelectObject(wxCommandEvent& event);

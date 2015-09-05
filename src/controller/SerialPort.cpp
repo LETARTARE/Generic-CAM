@@ -24,7 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include "SerialPort.h"
 
 //#include <wx/log.h>
@@ -36,7 +35,6 @@ SerialPort::SerialPort()
 	memset(&m_OverlappedWrite, 0, sizeof(OVERLAPPED));
 	m_hIDComDev = NULL;
 #endif
-
 
 #ifdef __LINUX
 	buffer_RD = 0;
@@ -59,7 +57,6 @@ bool SerialPort::Open(int nPort, int nBaud)
 #ifdef __WIN
 	wsprintf(szPort, "COM%d", nPort);
 #endif
-
 
 #ifdef __LINUX
 	if(nPort < 1) return false;
@@ -122,9 +119,7 @@ bool SerialPort::Open(const char *Port, int nBaud)
 
 #endif
 
-
 #ifdef __LINUX
-
 
 	//  if (nPort < 1)  return false;
 	//if(!spezial)
@@ -144,7 +139,6 @@ bool SerialPort::Open(const char *Port, int nBaud)
 	newtio.c_cflag |= CS8 | HUPCL;
 	//newtio.c_cflag |= CRTSCTS; // Hardware flow control
 	newtio.c_iflag = IGNPAR;
-
 
 	//  newtio.c_oflag &= ~OPOST;
 
@@ -263,7 +257,6 @@ bool SerialPort::Close(void)
 	CloseHandle(m_hIDComDev);
 	m_hIDComDev = NULL;
 #endif
-
 
 #ifdef __LINUX
 
@@ -405,15 +398,15 @@ void SerialPort::FlushData()
 	}
 }
 
+#ifdef __LINUX
+//TODO: Implement DTR on/off for windows!
 void SerialPort::SetDTR(bool activate)
 {
 	if(!Opened) return;
 
 #ifdef __WIN
-	//TODO: Implement DTR on/off for windows!
 #error Not implemented!
 #endif
-
 
 #ifdef __LINUX
 	int dtr_bits = TIOCM_DTR;
@@ -424,10 +417,19 @@ void SerialPort::SetDTR(bool activate)
 	}
 #endif
 }
+#endif
 
+#ifdef __LINUX
+//TODO: Implement WaitTXFinish for windows!
 void SerialPort::WaitTXFinish(void)
 {
 	if(!Opened) return;
-	tcdrain(fd);
-}
 
+#ifdef __WIN
+#error Not implemented!
+#endif
+#ifdef __LINUX
+	tcdrain(fd);
+#endif
+}
+#endif

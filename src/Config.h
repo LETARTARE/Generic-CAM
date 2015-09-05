@@ -22,9 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-//$LastChangedDate$
-//$Revision$
-//$LastChangedBy$
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -38,6 +35,7 @@
 
 #define _GENERICCAM_VERSION "0.2"
 #define _GENERICCAM_AUTHORS "Tobias Schaefer"
+#define _GENERICCAM_USEMULTITHREADING 0
 
 #define _DEBUGMODE	true
 

@@ -36,7 +36,7 @@ LUACodeEvaluator::LUACodeEvaluator()
 	linkedMachine = NULL;
 	componentToManipulate = 0;
 
-	L = lua_open();
+	L = luaL_newstate();
 
 	availableLUACodeEvaluators.push_back(this);
 
@@ -70,7 +70,9 @@ LUACodeEvaluator::LUACodeEvaluator(const LUACodeEvaluator& other)
 
 	linkedMachine = other.linkedMachine;
 	componentToManipulate = other.componentToManipulate;
-	L = lua_open();
+
+//	L = lua_open();
+	L = luaL_newstate();
 
 	availableLUACodeEvaluators.push_back(this);
 

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : Project.h
 // Purpose            : Defines a Generic CAM Project.
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
@@ -45,7 +45,10 @@
 #include <wx/defs.h>
 #include <wx/filename.h>
 #include <wx/string.h>
+#include "../Config.h"
+#if(_GENERICCAM_USEMULTITHREADING == 1)
 #include <wx/thread.h>
+#endif
 
 #include "../3D/OctreeGenerator.h"
 #include "../3D/Quadtree.h"
@@ -72,8 +75,11 @@ public:
 	wxString name;
 
 	bool processToolpath;
+#if(_GENERICCAM_USEMULTITHREADING == 1)
+
 	wxMutex mtx_project;
 	wxMutex mtx_generator;
+#endif
 	bool interruptProcessing;
 
 	// Supplies
@@ -114,7 +120,16 @@ public:
 	void Paint(void);
 
 	void PropagateChanges(void);
+	size_t ToolpathToGenerate(void);
+	bool ToolpathGenerate(void);
+	wxString TollPathGenerateCurrent(void);
+
 	bool GenerateToolpaths(void);
+
+private:
+	size_t generator_workpieceNr;
+	size_t generator_runNr;
+	size_t generator_toolpathNr;
 
 };
 

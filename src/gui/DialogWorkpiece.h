@@ -45,7 +45,7 @@ public:
 	Project* project;
 	wxCommandProcessor * commandProcessor;
 
-	void OnClose(wxCloseEvent& event);
+	void OnXClose(wxCloseEvent& event);
 	void OnClose(wxCommandEvent& event);
 	void OnManageStock(wxCommandEvent& event);
 	void OnAddStock(wxCommandEvent& event);

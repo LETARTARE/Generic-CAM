@@ -25,6 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "OpenGLPick.h"
+#include <stdlib.h>
 
 OpenGLPick::OpenGLPick(GLsizei bufferSize)
 {

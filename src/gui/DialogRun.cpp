@@ -119,7 +119,7 @@ bool DialogRun::TransferDataFromWindow(void)
 	return false;
 }
 
-void DialogRun::OnClose(wxCloseEvent& event)
+void DialogRun::OnXClose(wxCloseEvent& event)
 {
 	TransferDataFromWindow();
 	this->Show(false);

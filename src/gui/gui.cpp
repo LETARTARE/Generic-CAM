@@ -920,7 +920,7 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	m_statusBar = this->CreateStatusBar( 2, wxST_SIZEGRIP, wxID_ANY );
 	
 	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIObjectTransformation::OnClose ) );
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIObjectTransformation::OnXClose ) );
 	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIObjectTransformation::OnClose ) );
 	m_choiceObjectSelection->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIObjectTransformation::OnSelectObject ), NULL, this );
 	m_buttonMultTen->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
@@ -956,7 +956,7 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 GUIObjectTransformation::~GUIObjectTransformation()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIObjectTransformation::OnClose ) );
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIObjectTransformation::OnXClose ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIObjectTransformation::OnClose ) );
 	m_choiceObjectSelection->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIObjectTransformation::OnSelectObject ), NULL, this );
 	m_buttonMultTen->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
@@ -1144,7 +1144,7 @@ GUIStockMaterial::GUIStockMaterial( wxWindow* parent, wxWindowID id, const wxStr
 	this->Layout();
 	
 	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIStockMaterial::OnClose ) );
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIStockMaterial::OnXClose ) );
 	this->Connect( wxEVT_SIZE, wxSizeEventHandler( GUIStockMaterial::OnSize ) );
 	this->Connect( m_menuItem34->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIStockMaterial::OnClose ) );
 	m_buttonStockAdd->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIStockMaterial::OnAddUpdate ), NULL, this );
@@ -1156,7 +1156,7 @@ GUIStockMaterial::GUIStockMaterial( wxWindow* parent, wxWindowID id, const wxStr
 GUIStockMaterial::~GUIStockMaterial()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIStockMaterial::OnClose ) );
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIStockMaterial::OnXClose ) );
 	this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( GUIStockMaterial::OnSize ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIStockMaterial::OnClose ) );
 	m_buttonStockAdd->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIStockMaterial::OnAddUpdate ), NULL, this );
@@ -1252,7 +1252,7 @@ GUIWorkpiece::GUIWorkpiece( wxWindow* parent, wxWindowID id, const wxString& tit
 	this->Layout();
 	
 	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIWorkpiece::OnClose ) );
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIWorkpiece::OnXClose ) );
 	this->Connect( wxEVT_SIZE, wxSizeEventHandler( GUIWorkpiece::OnSize ) );
 	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIWorkpiece::OnClose ) );
 	m_buttonAdd->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIWorkpiece::OnAddStock ), NULL, this );
@@ -1263,7 +1263,7 @@ GUIWorkpiece::GUIWorkpiece( wxWindow* parent, wxWindowID id, const wxString& tit
 GUIWorkpiece::~GUIWorkpiece()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIWorkpiece::OnClose ) );
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIWorkpiece::OnXClose ) );
 	this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( GUIWorkpiece::OnSize ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIWorkpiece::OnClose ) );
 	m_buttonAdd->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIWorkpiece::OnAddStock ), NULL, this );
@@ -1466,7 +1466,7 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	this->Layout();
 	
 	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIPlacement::OnClose ) );
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIPlacement::OnXClose ) );
 	this->Connect( wxEVT_SIZE, wxSizeEventHandler( GUIPlacement::OnSize ) );
 	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIPlacement::OnClose ) );
 	m_choiceWorkpiece->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectWorkpiece ), NULL, this );
@@ -1491,7 +1491,7 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 GUIPlacement::~GUIPlacement()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIPlacement::OnClose ) );
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIPlacement::OnXClose ) );
 	this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( GUIPlacement::OnSize ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIPlacement::OnClose ) );
 	m_choiceWorkpiece->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectWorkpiece ), NULL, this );
@@ -1649,7 +1649,7 @@ GUIRun::GUIRun( wxWindow* parent, wxWindowID id, const wxString& title, const wx
 	this->Layout();
 	
 	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIRun::OnClose ) );
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIRun::OnXClose ) );
 	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIRun::OnClose ) );
 	m_choiceRun->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIRun::OnRunSelect ), NULL, this );
 	m_choiceWorkpiece->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIRun::OnWorkpieceSelect ), NULL, this );
@@ -1664,7 +1664,7 @@ GUIRun::GUIRun( wxWindow* parent, wxWindowID id, const wxString& title, const wx
 GUIRun::~GUIRun()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIRun::OnClose ) );
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIRun::OnXClose ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIRun::OnClose ) );
 	m_choiceRun->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIRun::OnRunSelect ), NULL, this );
 	m_choiceWorkpiece->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIRun::OnWorkpieceSelect ), NULL, this );
@@ -1779,7 +1779,7 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	m_statusBar3 = this->CreateStatusBar( 1, wxST_SIZEGRIP, wxID_ANY );
 	
 	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineDebugger::OnClose ) );
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineDebugger::OnXClose ) );
 	this->Connect( m_menuItemLoad->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineLoad ) );
 	this->Connect( m_menuItemSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineSave ) );
 	this->Connect( m_menuItemMachineReevaluateScript->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ) );
@@ -1792,7 +1792,7 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 GUIMachineDebugger::~GUIMachineDebugger()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineDebugger::OnClose ) );
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineDebugger::OnXClose ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineLoad ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineSave ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ) );
@@ -2091,7 +2091,7 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	this->Layout();
 	
 	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineControl::OnClose ) );
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineControl::OnXClose ) );
 	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineControl::OnClose ) );
 	m_sliderX->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( GUIMachineControl::OnZero ), NULL, this );
 	m_sliderX->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
@@ -2206,7 +2206,7 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 GUIMachineControl::~GUIMachineControl()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineControl::OnClose ) );
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineControl::OnXClose ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineControl::OnClose ) );
 	m_sliderX->Disconnect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( GUIMachineControl::OnZero ), NULL, this );
 	m_sliderX->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUIMachineControl::OnScroll ), NULL, this );
@@ -2572,7 +2572,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	this->Layout();
 	
 	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIToolbox::OnClose ) );
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIToolbox::OnXClose ) );
 	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnClose ) );
 	this->Connect( m_menuItemStereo3D->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnChangeStereo3D ) );
 	m_comboBoxToolSelector->Connect( wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler( GUIToolbox::OnToolSelect ), NULL, this );
@@ -2595,7 +2595,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 GUIToolbox::~GUIToolbox()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIToolbox::OnClose ) );
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIToolbox::OnXClose ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnClose ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnChangeStereo3D ) );
 	m_comboBoxToolSelector->Disconnect( wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler( GUIToolbox::OnToolSelect ), NULL, this );
@@ -2879,7 +2879,7 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	this->Layout();
 	
 	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIToolpathGenerator::OnClose ) );
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIToolpathGenerator::OnXClose ) );
 	m_choiceRun->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolpathGenerator::OnSelectRun ), NULL, this );
 	m_choiceToolpath->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolpathGenerator::OnSelectToolpath ), NULL, this );
 	m_buttonAddNew->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolpathGenerator::OnAdd ), NULL, this );
@@ -2903,7 +2903,7 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 GUIToolpathGenerator::~GUIToolpathGenerator()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIToolpathGenerator::OnClose ) );
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIToolpathGenerator::OnXClose ) );
 	m_choiceRun->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolpathGenerator::OnSelectRun ), NULL, this );
 	m_choiceToolpath->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolpathGenerator::OnSelectToolpath ), NULL, this );
 	m_buttonAddNew->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolpathGenerator::OnAdd ), NULL, this );
@@ -3012,7 +3012,7 @@ GUIAnimation::GUIAnimation( wxWindow* parent, wxWindowID id, const wxString& tit
 	this->Layout();
 	
 	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIAnimation::OnClose ) );
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIAnimation::OnXClose ) );
 	m_choiceToolpath->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIAnimation::OnSelectToolpath ), NULL, this );
 	m_textCtrlTime->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUIAnimation::OnChangeTime ), NULL, this );
 	m_sliderTime->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUIAnimation::OnScroll ), NULL, this );
@@ -3034,7 +3034,7 @@ GUIAnimation::GUIAnimation( wxWindow* parent, wxWindowID id, const wxString& tit
 GUIAnimation::~GUIAnimation()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIAnimation::OnClose ) );
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIAnimation::OnXClose ) );
 	m_choiceToolpath->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIAnimation::OnSelectToolpath ), NULL, this );
 	m_textCtrlTime->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUIAnimation::OnChangeTime ), NULL, this );
 	m_sliderTime->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUIAnimation::OnScroll ), NULL, this );
@@ -3485,7 +3485,7 @@ GUISetupStereo3D::GUISetupStereo3D( wxWindow* parent, wxWindowID id, const wxStr
 	this->Layout();
 	
 	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUISetupStereo3D::OnClose ) );
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUISetupStereo3D::OnXClose ) );
 	m_sliderLR->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
 	m_sliderLR->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
 	m_sliderLR->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
@@ -3574,7 +3574,7 @@ GUISetupStereo3D::GUISetupStereo3D( wxWindow* parent, wxWindowID id, const wxStr
 GUISetupStereo3D::~GUISetupStereo3D()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUISetupStereo3D::OnClose ) );
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUISetupStereo3D::OnXClose ) );
 	m_sliderLR->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
 	m_sliderLR->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );
 	m_sliderLR->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( GUISetupStereo3D::OnScroll ), NULL, this );

@@ -169,8 +169,9 @@ int TreeSetup::GetFirstSelectedRun(void)
 
 	temprun = tree->GetFirstChild(groupRun, cookie);
 	while(temprun.IsOk()){
-		temp = tree->GetFirstChild(temprun, cookie);
 		data = (TreeItem*) tree->GetItemData(temprun);
+		if(tree->IsSelected(temprun)) return data->nr;
+		temp = tree->GetFirstChild(temprun, cookie);
 		if(data != NULL && data->dataType == itemRun){
 			while(temp.IsOk()){
 				if(tree->IsSelected(temp)) return data->nr;

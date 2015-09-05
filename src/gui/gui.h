@@ -374,7 +374,7 @@ class GUIObjectTransformation : public wxFrame
 		wxStatusBar* m_statusBar;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnXClose( wxCloseEvent& event ) = 0;
 		virtual void OnClose( wxCommandEvent& event ) = 0;
 		virtual void OnSelectObject( wxCommandEvent& event ) = 0;
 		virtual void OnTransform( wxCommandEvent& event ) = 0;
@@ -425,7 +425,7 @@ class GUIStockMaterial : public wxFrame
 		wxListCtrl* m_listCtrl;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnXClose( wxCloseEvent& event ) = 0;
 		virtual void OnSize( wxSizeEvent& event ) = 0;
 		virtual void OnClose( wxCommandEvent& event ) = 0;
 		virtual void OnAddUpdate( wxCommandEvent& event ) = 0;
@@ -458,7 +458,7 @@ class GUIWorkpiece : public wxFrame
 		wxGrid* m_grid;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnXClose( wxCloseEvent& event ) = 0;
 		virtual void OnSize( wxSizeEvent& event ) = 0;
 		virtual void OnClose( wxCommandEvent& event ) = 0;
 		virtual void OnAddStock( wxCommandEvent& event ) = 0;
@@ -519,7 +519,7 @@ class GUIPlacement : public wxFrame
 		PanelTopView * m_topview;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnXClose( wxCloseEvent& event ) = 0;
 		virtual void OnSize( wxSizeEvent& event ) = 0;
 		virtual void OnClose( wxCommandEvent& event ) = 0;
 		virtual void OnSelectWorkpiece( wxCommandEvent& event ) = 0;
@@ -565,7 +565,7 @@ class GUIRun : public wxFrame
 		wxButton* m_buttonToolAdd;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnXClose( wxCloseEvent& event ) = 0;
 		virtual void OnClose( wxCommandEvent& event ) = 0;
 		virtual void OnRunSelect( wxCommandEvent& event ) = 0;
 		virtual void OnWorkpieceSelect( wxCommandEvent& event ) = 0;
@@ -606,7 +606,7 @@ class GUIMachineDebugger : public wxFrame
 		wxStatusBar* m_statusBar3;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnXClose( wxCloseEvent& event ) = 0;
 		virtual void OnMachineLoad( wxCommandEvent& event ) = 0;
 		virtual void OnMachineSave( wxCommandEvent& event ) = 0;
 		virtual void OnScriptEvaluate( wxCommandEvent& event ) = 0;
@@ -693,7 +693,7 @@ class GUIMachineControl : public wxFrame
 		
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnXClose( wxCloseEvent& event ) = 0;
 		virtual void OnClose( wxCommandEvent& event ) = 0;
 		virtual void OnZero( wxMouseEvent& event ) = 0;
 		virtual void OnScroll( wxScrollEvent& event ) = 0;
@@ -761,7 +761,7 @@ class GUIToolbox : public wxFrame
 		ToolCanvas* m_canvas;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnXClose( wxCloseEvent& event ) = 0;
 		virtual void OnClose( wxCommandEvent& event ) = 0;
 		virtual void OnChangeStereo3D( wxCommandEvent& event ) = 0;
 		virtual void OnToolSelect( wxCommandEvent& event ) = 0;
@@ -836,7 +836,7 @@ class GUIToolpathGenerator : public wxFrame
 		wxButton* m_buttonClose;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnXClose( wxCloseEvent& event ) = 0;
 		virtual void OnSelectRun( wxCommandEvent& event ) = 0;
 		virtual void OnSelectToolpath( wxCommandEvent& event ) = 0;
 		virtual void OnAdd( wxCommandEvent& event ) = 0;
@@ -879,7 +879,7 @@ class GUIAnimation : public wxFrame
 		wxBitmapButton* m_bpButtonLast;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnXClose( wxCloseEvent& event ) = 0;
 		virtual void OnSelectToolpath( wxCommandEvent& event ) = 0;
 		virtual void OnChangeTime( wxCommandEvent& event ) = 0;
 		virtual void OnScroll( wxScrollEvent& event ) = 0;
@@ -1016,7 +1016,7 @@ class GUISetupStereo3D : public wxFrame
 		wxTextCtrl* m_textCtrlRB;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) = 0;
+		virtual void OnXClose( wxCloseEvent& event ) = 0;
 		virtual void OnScroll( wxScrollEvent& event ) = 0;
 		virtual void OnColorChanged( wxColourPickerEvent& event ) = 0;
 		virtual void OnSwap( wxCommandEvent& event ) = 0;

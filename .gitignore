@@ -2,32 +2,28 @@
 *~
 genericcam
 
-# /
 /pdf
 /rawWWW
 /WWW
-/build
 /bin_linux
+/bin_win
 /bin_debug
-/Debug_Linux
-/Debug_Linux
+/bin_release
 
 /src/generator/temp.cpp
 /src/generator/temp.h
 
 /toolpath
+/projekts
 
 /machines/Hermle\ 800.zip
 /*.zip
 
-# /doc4developer/
 /doc/doxygen/html
 /doc/doxygen/latex
 
-# /doc4user/
 /doc/*.aux
 /doc/*.toc
 /doc/*.pdf
 /doc/*.backup
 /doc/*.dvi
-

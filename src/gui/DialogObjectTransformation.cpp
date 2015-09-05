@@ -174,7 +174,7 @@ void DialogObjectTransformation::OnClose(wxCommandEvent& event)
 	TransferDataFromWindow();
 	this->Show(false);
 }
-void DialogObjectTransformation::OnClose(wxCloseEvent& event)
+void DialogObjectTransformation::OnXClose(wxCloseEvent& event)
 {
 	TransferDataFromWindow();
 	this->Show(false);

@@ -42,7 +42,7 @@ DialogWorkpiece::DialogWorkpiece(wxWindow* parent, Project* project,
 	this->commandProcessor = commandProcessor;
 }
 
-void DialogWorkpiece::OnClose(wxCloseEvent& event)
+void DialogWorkpiece::OnXClose(wxCloseEvent& event)
 {
 	TransferDataFromWindow();
 	this->Show(false);

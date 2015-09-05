@@ -92,7 +92,7 @@ double Unit::SIFromString(const wxString& text, bool useEvaluator)
 {
 	double temp;
 	if(useEvaluator){
-		lua_State *L = lua_open();
+		lua_State *L = luaL_newstate();
 		luaopen_base(L);
 		luaopen_math(L);
 		luaopen_string(L);

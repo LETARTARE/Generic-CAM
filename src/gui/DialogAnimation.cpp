@@ -46,7 +46,7 @@ bool DialogAnimation::TransferDataFromWindow(void)
 	return true;
 }
 
-void DialogAnimation::OnClose(wxCloseEvent &event)
+void DialogAnimation::OnXClose(wxCloseEvent &event)
 {
 	this->Show(false);
 }
