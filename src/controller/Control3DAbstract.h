@@ -80,6 +80,7 @@ public:
 	///\brief Returns an ID for the given 6-DOF driver.
 	virtual const unsigned char ReturnID() = 0;
 protected:
+	virtual void InitDevice();
 	virtual bool ProcessPacket() = 0;
 	virtual void DataIn(unsigned char c) = 0;
 

@@ -28,7 +28,7 @@
 #define __SERIALPORT_H__
 
 /*!\class SerialPort
- * \brief A serial port class for Linux and Windows.
+ * \brief Serial port class for Linux and Windows
  *
  *
  */
@@ -78,10 +78,10 @@ public:
 	bool Close(void);
 
 	int ReadData(char *, unsigned int);
-	int SendData(char *, unsigned int);
+	int SendData(const char *, unsigned int);
 	int ReadDataWaiting(void);
 	void FlushData(void);
-	bool IsOpen(void)
+	bool IsOpen(void) const
 	{
 		return (Opened);
 	}

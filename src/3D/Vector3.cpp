@@ -56,7 +56,7 @@ void Vector3::FromString(wxString const& string)
 	}
 }
 
-float Vector3::Abs(void)
+float Vector3::Abs(void) const
 {
 	return sqrt(x * x + y * y + z * z);
 }

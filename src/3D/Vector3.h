@@ -47,7 +47,9 @@ public:
 		this->FromString(string);
 	}
 
-	~Vector3(void){}
+	~Vector3(void)
+	{
+	}
 
 	// Member variables:
 public:
@@ -61,7 +63,7 @@ public:
 	void FromString(wxString const& string);
 
 	//!Calculate the absolut length of a vector.
-	float Abs();
+	float Abs() const;
 
 	//	void operator=(const Vector3& a){x=a.x;y=a.y;z=a.z;};
 
@@ -163,7 +165,7 @@ public:
 
 
 	//! Calculates the dot product (inner product) of two vectors.
-	float Dot(const Vector3& b)
+	float Dot(const Vector3& b) const
 	{
 		return (x * b.x + y * b.y + z * b.z);
 	}
@@ -193,8 +195,9 @@ public:
 	{
 		double epsilon = 1e-5;
 		double epsilon2 = epsilon * epsilon;
-		return (((this->x - b.x) * (this->x - b.x) + (this->y - b.y) * (this->y
-				- b.y) + (this->z - b.z) * (this->z - b.z)) <= epsilon2);
+		return (((this->x - b.x) * (this->x - b.x)
+				+ (this->y - b.y) * (this->y - b.y)
+				+ (this->z - b.z) * (this->z - b.z)) <= epsilon2);
 	}
 
 
@@ -223,7 +226,6 @@ public:
 	//! Normalizes the length of a vector.
 	Vector3 Normalize(void);
 };
-WX_DECLARE_OBJARRAY(Vector3, ArrayOfVector3)
-;
+WX_DECLARE_OBJARRAY(Vector3, ArrayOfVector3);
 
 #endif // _CVECTOR3_H_

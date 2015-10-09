@@ -26,8 +26,6 @@
 
 #include "SerialPort.h"
 
-//#include <wx/log.h>
-
 SerialPort::SerialPort()
 {
 #ifdef __WIN
@@ -63,7 +61,6 @@ bool SerialPort::Open(int nPort, int nBaud)
 	sprintf(szPort, "/dev/ttyS%1i", nPort - 1);
 	//  sprintf (szPort, "/dev/ttyUSB0");
 #endif
-	//wxLogMessage(_T("sizeof(szPort)=%u"), sizeof(szPort));
 	return Open(szPort, nBaud);
 }
 
@@ -237,7 +234,7 @@ bool SerialPort::Open(const char *Port, int nBaud)
 	}
 	if(!flag) return false;
 
-	tcsetattr(fd, TCSADRAIN, &newtio); // TCSADRAIN = Wait for pending transmissions to finish and change afterwards.
+	tcsetattr(fd, TCSAFLUSH, &newtio);
 
 #endif
 
@@ -294,7 +291,7 @@ bool SerialPort::WriteCommByte(unsigned char ucByte)
 }
 #endif
 
-int SerialPort::SendData(char *buffer, unsigned int size)
+int SerialPort::SendData(const char *buffer, unsigned int size)
 {
 #ifdef __WIN
 	if(m_hIDComDev == NULL) return (0);

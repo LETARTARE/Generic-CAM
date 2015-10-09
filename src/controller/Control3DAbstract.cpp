@@ -44,6 +44,11 @@ Control3DAbstract::~Control3DAbstract()
 
 }
 
+void Control3DAbstract::InitDevice()
+{
+
+}
+
 void Control3DAbstract::SetPort(wxString connection)
 {
 	this->connection = connection;
