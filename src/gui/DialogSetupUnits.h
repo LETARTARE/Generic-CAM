@@ -27,7 +27,6 @@
 #ifndef DIALOGSETUPUNITS_H_
 #define DIALOGSETUPUNITS_H_
 
-#include "../StdInclude.h"
 #include "DisplaySettings.h"
 #include "gui.h"
 

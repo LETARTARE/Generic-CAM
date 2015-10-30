@@ -344,6 +344,14 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 					+ wxString::Format(_T(": align bottom"));
 			newMatrix.TranslateGlobal(0, 0, -bbox.zmin);
 			break;
+		case ID_ALIGNCENTER:
+			if(bbox.IsVolumeZero()) break;
+			description = project->objects[n].name
+					+ wxString::Format(_T(": align center"));
+			newMatrix.TranslateGlobal(-(bbox.xmax + bbox.xmin) / 2.0,
+					-(bbox.ymax + bbox.ymin) / 2.0,
+					-(bbox.zmax + bbox.zmin) / 2.0);
+			break;
 
 		case ID_ROTATEXP:
 			description = project->objects[n].name

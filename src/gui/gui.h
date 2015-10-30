@@ -45,10 +45,7 @@
 #include "PanelTool.h"
 #include "ToolCanvas.h"
 #include <wx/choicebk.h>
-#include <wx/radiobox.h>
 #include <wx/dialog.h>
-#include "CanvasStereoTest.h"
-#include <wx/clrpicker.h>
 #include <wx/richtext/richtextctrl.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -111,72 +108,53 @@
 #define ID_ALIGNTOP 1055
 #define ID_ALIGNMIDDLE 1056
 #define ID_ALIGNBOTTOM 1057
-#define ID_ROTATEYN 1058
-#define ID_ROTATEXN 1059
-#define ID_ROTATEYP 1060
-#define ID_ROTATEZN 1061
-#define ID_ROTATEZP 1062
-#define ID_ROTATEXP 1063
-#define ID_FLIPX 1064
-#define ID_FLIPY 1065
-#define ID_FLIPZ 1066
-#define ID_POSX 1067
-#define ID_POSY 1068
-#define ID_POSZ 1069
-#define ID_ANGLE 1070
-#define ID_FORMBOX 1071
-#define ID_FORMCONTOUR 1072
-#define ID_WORKPIECEROTATEX 1073
-#define ID_WORKPIECEROTATEY 1074
-#define ID_WORKPIECEROTATEZ 1075
-#define wxID_LOAD 1076
-#define ID_AXISX 1077
-#define ID_AXISY 1078
-#define ID_AXISZ 1079
-#define ID_TEXTX 1080
-#define ID_TEXTY 1081
-#define ID_TEXTZ 1082
-#define ID_AXISA 1083
-#define ID_AXISB 1084
-#define ID_AXISC 1085
-#define ID_TEXTA 1086
-#define ID_TEXTB 1087
-#define ID_TEXTC 1088
-#define ID_AXISU 1089
-#define ID_AXISV 1090
-#define ID_AXISW 1091
-#define ID_TEXTU 1092
-#define ID_TEXTV 1093
-#define ID_TEXTW 1094
-#define ID_XSTART 1095
-#define ID_XEND 1096
-#define ID_YSTART 1097
-#define ID_YEND 1098
-#define ID_ZSTART 1099
-#define ID_ZEND 1100
-#define ID_SELECTAREAOBJECT 1101
-#define ID_MARGINSIDE 1102
-#define ID_MARGINBELOW 1103
-#define ID_BUTTONCONNECT 1104
-#define ID_BUTTONDISCONNECT 1105
-#define ID_COLORLR 1106
-#define ID_COLORLG 1107
-#define ID_COLORLB 1108
-#define ID_COLORRR 1109
-#define ID_COLORRG 1110
-#define ID_COLORRB 1111
-#define ID_COLORLEFT 1112
-#define ID_COLORRIGHT 1113
-#define ID_TEXTLR 1114
-#define ID_TEXTLG 1115
-#define ID_TEXTLB 1116
-#define ID_EYEDISTANCE 1117
-#define ID_TEXTEYEDISTANCE 1118
-#define ID_FOCALDISTANCE 1119
-#define ID_TEXTFOCALDISTANCE 1120
-#define ID_TEXTRR 1121
-#define ID_TEXTRG 1122
-#define ID_TEXTRB 1123
+#define ID_ALIGNCENTER 1058
+#define ID_ROTATEYN 1059
+#define ID_ROTATEXN 1060
+#define ID_ROTATEYP 1061
+#define ID_ROTATEZN 1062
+#define ID_ROTATEZP 1063
+#define ID_ROTATEXP 1064
+#define ID_FLIPX 1065
+#define ID_FLIPY 1066
+#define ID_FLIPZ 1067
+#define ID_POSX 1068
+#define ID_POSY 1069
+#define ID_POSZ 1070
+#define ID_ANGLE 1071
+#define ID_FORMBOX 1072
+#define ID_FORMCONTOUR 1073
+#define ID_WORKPIECEROTATEX 1074
+#define ID_WORKPIECEROTATEY 1075
+#define ID_WORKPIECEROTATEZ 1076
+#define wxID_LOAD 1077
+#define ID_AXISX 1078
+#define ID_AXISY 1079
+#define ID_AXISZ 1080
+#define ID_TEXTX 1081
+#define ID_TEXTY 1082
+#define ID_TEXTZ 1083
+#define ID_AXISA 1084
+#define ID_AXISB 1085
+#define ID_AXISC 1086
+#define ID_TEXTA 1087
+#define ID_TEXTB 1088
+#define ID_TEXTC 1089
+#define ID_AXISU 1090
+#define ID_AXISV 1091
+#define ID_AXISW 1092
+#define ID_TEXTU 1093
+#define ID_TEXTV 1094
+#define ID_TEXTW 1095
+#define ID_XSTART 1096
+#define ID_XEND 1097
+#define ID_YSTART 1098
+#define ID_YEND 1099
+#define ID_ZSTART 1100
+#define ID_ZEND 1101
+#define ID_SELECTAREAOBJECT 1102
+#define ID_MARGINSIDE 1103
+#define ID_MARGINBELOW 1104
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIMainFrame
@@ -347,6 +325,7 @@ class GUIObjectTransformation : public wxFrame
 		wxButton* m_button18;
 		wxButton* m_button17;
 		wxButton* m_button16;
+		wxButton* m_button50;
 		
 		wxPanel* m_panelRotate;
 		
@@ -898,46 +877,6 @@ class GUIAnimation : public wxFrame
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class GUISetup6DOFController
-///////////////////////////////////////////////////////////////////////////////
-class GUISetup6DOFController : public wxDialog 
-{
-	private:
-	
-	protected:
-		wxStaticText* m_staticText;
-		wxTextCtrl* textPort;
-		wxRadioBox* radioDeviceSelect;
-		wxStaticText* m_staticTextTx;
-		wxSlider* m_sliderTx;
-		wxStaticText* m_staticTextTy;
-		wxSlider* m_sliderTy;
-		wxStaticText* m_staticTextTz;
-		wxSlider* m_sliderTz;
-		wxStaticText* m_staticTextRx;
-		wxSlider* m_sliderRx;
-		wxStaticText* m_staticTextRy;
-		wxSlider* m_sliderRy;
-		wxStaticText* m_staticTextRz;
-		wxSlider* m_sliderRz;
-		wxButton* buttonConnect;
-		wxButton* buttonDisconnect;
-		wxButton* buttonClose;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnConnect( wxCommandEvent& event ) = 0;
-		virtual void OnDisconnect( wxCommandEvent& event ) = 0;
-		virtual void OnClose( wxCommandEvent& event ) = 0;
-		
-	
-	public:
-		
-		GUISetup6DOFController( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup 6DOF Controller"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,600 ), long style = wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
-		~GUISetup6DOFController();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
 /// Class GUISetupUnits
 ///////////////////////////////////////////////////////////////////////////////
 class GUISetupUnits : public wxFrame 
@@ -971,62 +910,6 @@ class GUISetupUnits : public wxFrame
 		
 		GUISetupUnits( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup display units"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxSTAY_ON_TOP|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		~GUISetupUnits();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class GUISetupStereo3D
-///////////////////////////////////////////////////////////////////////////////
-class GUISetupStereo3D : public wxFrame 
-{
-	private:
-	
-	protected:
-		wxStaticText* m_staticText120;
-		wxSlider* m_sliderLR;
-		wxSlider* m_sliderLG;
-		wxSlider* m_sliderLB;
-		CanvasStereoTest * m_canvas;
-		wxStaticText* m_staticText1201;
-		wxSlider* m_sliderRR;
-		wxSlider* m_sliderRG;
-		wxSlider* m_sliderRB;
-		wxColourPickerCtrl* m_colourPickerLeft;
-		wxButton* m_buttonSwapColors;
-		wxColourPickerCtrl* m_colourPickerRight;
-		wxStaticText* m_staticText113;
-		wxTextCtrl* m_textCtrlLR;
-		wxStaticText* m_staticText1131;
-		wxTextCtrl* m_textCtrlLG;
-		wxStaticText* m_staticText11311;
-		wxTextCtrl* m_textCtrlLB;
-		wxSlider* m_sliderEyeDistance;
-		wxStaticText* m_staticText125;
-		wxTextCtrl* m_textCtrlEyeDistance;
-		wxStaticText* m_staticTextUnitEyeDistance;
-		wxSlider* m_sliderFocalDistance;
-		wxStaticText* m_staticText127;
-		wxTextCtrl* m_textCtrlFocalDistance;
-		wxStaticText* m_staticTextUnitFocalDistance;
-		wxStaticText* m_staticText1132;
-		wxTextCtrl* m_textCtrlRR;
-		wxStaticText* m_staticText11312;
-		wxTextCtrl* m_textCtrlRG;
-		wxStaticText* m_staticText113111;
-		wxTextCtrl* m_textCtrlRB;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnXClose( wxCloseEvent& event ) = 0;
-		virtual void OnScroll( wxScrollEvent& event ) = 0;
-		virtual void OnColorChanged( wxColourPickerEvent& event ) = 0;
-		virtual void OnSwap( wxCommandEvent& event ) = 0;
-		virtual void OnTextChange( wxCommandEvent& event ) = 0;
-		
-	
-	public:
-		
-		GUISetupStereo3D( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup Stereo "), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 771,691 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
-		~GUISetupStereo3D();
 	
 };
 

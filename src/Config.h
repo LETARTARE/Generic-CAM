@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : Config.h
-// Purpose            : Global configuration.
+// Purpose            : Global configuration
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -24,11 +24,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 /*  Configuration file. Major switches that change the code
  *  and the structure can be found here (_DEBUG_ for example).
  */
-
 
 #ifndef CONFIG_H_
 #define CONFIG_H_
@@ -37,10 +35,8 @@
 #define _GENERICCAM_AUTHORS "Tobias Schaefer"
 #define _GENERICCAM_USEMULTITHREADING 0
 
-#define _DEBUGMODE	true
-
-
-
-
+#define _DEBUGMODE
+#define _USE_3DPICKING
+#define _USE_6DOFCONTROLLER
 
 #endif /* CONFIG_H_ */

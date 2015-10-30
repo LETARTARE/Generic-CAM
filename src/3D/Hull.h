@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Surface.h
+// Name               : Hull.h
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,8 +24,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef SURFACE_H_
-#define SURFACE_H_
+#ifndef HULL_H_
+#define HULL_H_
 
 #include "Vector3.h"
 #include "Triangle.h"
@@ -34,17 +34,18 @@
 #include <wx/string.h>
 #include <wx/dynarray.h>
 
-/*!\class SurfaceEdge
- * \brief ...
+/*!\class HullEdge
+ * \ingroup 3DObject
+ * \brief Closed Hull
  *
- * ...
+ * Calculates a clodes Hull from a TriangleSoup.
  */
 
-class SurfaceEdge {
+class HullEdge {
 	// Constructor/ Destructor
 public:
-	SurfaceEdge();
-	virtual ~SurfaceEdge();
+	HullEdge();
+	virtual ~HullEdge();
 
 	// Member variables
 public:
@@ -56,19 +57,19 @@ public:
 	// Methods
 public:
 };
-WX_DECLARE_OBJARRAY(SurfaceEdge, ArrayOfSurfaceEdge);
+WX_DECLARE_OBJARRAY(HullEdge, ArrayOfHullEdge);
 
-/*!\class SurfaceTriangle
+/*!\class HullTriangle
  * \brief ...
  *
  * ...
  */
 
-class SurfaceTriangle {
+class HullTriangle {
 	// Constructor/ Destructor
 public:
-	SurfaceTriangle();
-	virtual ~SurfaceTriangle();
+	HullTriangle();
+	virtual ~HullTriangle();
 
 	// Member variables
 public:
@@ -79,19 +80,19 @@ public:
 	// Methods
 public:
 };
-WX_DECLARE_OBJARRAY(SurfaceTriangle, ArrayOfSurfaceTriangle);
+WX_DECLARE_OBJARRAY(HullTriangle, ArrayOfHullTriangle);
 
-/*!\class Surface
+/*!\class Hull
  * \brief ...
  *
  * ...
  */
 
-class Surface {
+class Hull {
 	// Constructor/ Destructor
 public:
-	Surface();
-	virtual ~Surface();
+	Hull();
+	virtual ~Hull();
 
 	// Member variables
 public:
@@ -106,8 +107,8 @@ public:
 
 private:
 	ArrayOfVector3 v;
-	ArrayOfSurfaceEdge e;
-	ArrayOfSurfaceTriangle t;
+	ArrayOfHullEdge e;
+	ArrayOfHullTriangle t;
 
 	// Methods
 public:
@@ -150,6 +151,6 @@ private:
 	double DiffSquareAndAdd(const Vector3 &a, const Vector3 &b);
 
 };
-WX_DECLARE_OBJARRAY(Surface, ArrayOfSurface);
+WX_DECLARE_OBJARRAY(Hull, ArrayOfHull);
 
-#endif /* SURFACE_H_ */
+#endif /* HULL_H_ */

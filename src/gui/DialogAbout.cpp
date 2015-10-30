@@ -25,6 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "DialogAbout.h"
+#include "../StdInclude.h"
 
 DialogAbout::DialogAbout(wxWindow* parent) :
 GUIAbout(parent)

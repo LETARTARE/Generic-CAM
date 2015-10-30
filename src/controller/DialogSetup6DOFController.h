@@ -27,10 +27,12 @@
 #ifndef DIALOGSETUP6DOFCONTROLLER_H_
 #define DIALOGSETUP6DOFCONTROLLER_H_
 
-#include "../StdInclude.h"
-#include "../Config.h"
-#include "../controller/Control3D.h"
-#include "gui.h"
+#include <wx/event.h>
+#include <wx/timer.h>
+
+#include "Control3D.h"
+
+#include "guiSetup6DOFController.h"
 
 class DialogSetup6DOFController:public GUISetup6DOFController {
 	// Constructor / Destructor

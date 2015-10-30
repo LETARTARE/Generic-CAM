@@ -33,13 +33,17 @@
  * ...
  */
 
-#include "DisplaySettings.h"
-#include "gui.h"
+#include "guiSetupStereo3D.h"
+
+#include <wx/event.h>
+
+class DisplaySettings;
 
 class DialogSetupStereo3D:public GUISetupStereo3D {
 public:
 	DialogSetupStereo3D(wxWindow* parent, DisplaySettings * settings);
 
+private:
 	DisplaySettings * settings;
 
 	// Methods

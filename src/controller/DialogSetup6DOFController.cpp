@@ -25,7 +25,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "DialogSetup6DOFController.h"
-#include <wx/debug.h>
+
+#include <wx/log.h>
+
+//#include "../StdInclude.h"
+
+#include "ControlSpaceBall.h"
+#include "ControlSpaceMouse.h"
+#include "ControlSpaceOrb.h"
 
 DialogSetup6DOFController::DialogSetup6DOFController(wxWindow* parent) :
 		GUISetup6DOFController(parent)

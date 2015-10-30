@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GenericCAM.h
+// Name               : genericcam.h
 // Purpose            : Main entry point
 // Thread Safe        : Yes
 // Platform dependent : No

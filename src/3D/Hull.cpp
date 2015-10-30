@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Surface.cpp
+// Name               : Hull.cpp
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,36 +24,34 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
-#include "Surface.h"
+#include "Hull.h"
 
 #include <GL/gl.h>
 #include <wx/log.h>
-
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
-WX_DEFINE_OBJARRAY(ArrayOfSurfaceEdge)
-WX_DEFINE_OBJARRAY(ArrayOfSurfaceTriangle)
-WX_DEFINE_OBJARRAY(ArrayOfSurface)
+WX_DEFINE_OBJARRAY(ArrayOfHullEdge);
+WX_DEFINE_OBJARRAY(ArrayOfHullTriangle);
+WX_DEFINE_OBJARRAY(ArrayOfHull);
 
-SurfaceEdge::SurfaceEdge()
+HullEdge::HullEdge()
 {
 	n.Set(0, 0, 1);
 }
 
-SurfaceEdge::~SurfaceEdge()
+HullEdge::~HullEdge()
 {
 }
 
-SurfaceTriangle::SurfaceTriangle()
+HullTriangle::HullTriangle()
 {
 	n.Set(0, 0, 1);
 }
 
-SurfaceTriangle::~SurfaceTriangle()
+HullTriangle::~HullTriangle()
 {
 }
 
-Surface::Surface()
+Hull::Hull()
 {
 	visible = true;
 	paintTriangles = false;
@@ -62,18 +60,18 @@ Surface::Surface()
 
 }
 
-Surface::~Surface()
+Hull::~Hull()
 {
 }
 
-void Surface::Clear(void)
+void Hull::Clear(void)
 {
 	v.Clear();
 	e.Clear();
 	t.Clear();
 }
 
-void Surface::Paint(void) const
+void Hull::Paint(void) const
 {
 	size_t i;
 	if(!visible) return;
@@ -118,7 +116,7 @@ void Surface::Paint(void) const
 	::glPopMatrix();
 }
 
-void Surface::CopyFrom(const Geometry &geometry)
+void Hull::CopyFrom(const Geometry &geometry)
 {
 	Clear();
 	CopyTrianglesFrom(geometry);
@@ -130,7 +128,7 @@ void Surface::CopyFrom(const Geometry &geometry)
 			e.GetCount(), t.GetCount()));
 }
 
-void Surface::CopyTrianglesFrom(const Geometry &geometry)
+void Hull::CopyTrianglesFrom(const Geometry &geometry)
 {
 	size_t i;
 	for(i = 0; i < geometry.triangles.GetCount(); i++){
@@ -141,7 +139,7 @@ void Surface::CopyTrianglesFrom(const Geometry &geometry)
 	}
 }
 
-void Surface::ApplyTransformation(const AffineTransformMatrix &matrix)
+void Hull::ApplyTransformation(const AffineTransformMatrix &matrix)
 {
 	size_t i;
 	for(i = 0; i < v.GetCount(); i++){
@@ -154,7 +152,7 @@ void Surface::ApplyTransformation(const AffineTransformMatrix &matrix)
 		t[i].n = matrix.TransformNoShift(t[i].n);
 	}
 }
-void Surface::ApplyTransformation(void)
+void Hull::ApplyTransformation(void)
 {
 	size_t i;
 	for(i = 0; i < v.GetCount(); i++){
@@ -168,7 +166,7 @@ void Surface::ApplyTransformation(void)
 	}
 }
 
-double Surface::DiffSquareAndAdd(const Vector3 &a, const Vector3 &b)
+double Hull::DiffSquareAndAdd(const Vector3 &a, const Vector3 &b)
 {
 	double t1 = a.x - b.x;
 	double t2 = a.y - b.y;
@@ -176,7 +174,7 @@ double Surface::DiffSquareAndAdd(const Vector3 &a, const Vector3 &b)
 	return t1 * t1 + t2 * t2 + t3 * t3;
 }
 
-size_t Surface::AddTriangle(const Vector3 &a, const Vector3 &b,
+size_t Hull::AddTriangle(const Vector3 &a, const Vector3 &b,
 		const Vector3 &c)
 {
 	size_t i;
@@ -196,8 +194,8 @@ size_t Surface::AddTriangle(const Vector3 &a, const Vector3 &b,
 	double epsilon = 0.0001;
 	double epsilon2 = epsilon * epsilon;
 
-	SurfaceEdge tempe;
-	SurfaceTriangle tempt;
+	HullEdge tempe;
+	HullTriangle tempt;
 
 	for(i = 0; i < v.GetCount(); i++){
 		if(DiffSquareAndAdd(v[i], a) <= epsilon2){
@@ -305,14 +303,14 @@ size_t Surface::AddTriangle(const Vector3 &a, const Vector3 &b,
 	return nt;
 }
 
-size_t Surface::AddTriangleTransform(const Vector3 &a, const Vector3 &b,
+size_t Hull::AddTriangleTransform(const Vector3 &a, const Vector3 &b,
 		const Vector3 &c, const AffineTransformMatrix &transformMatrix)
 {
 	size_t nt = AddTriangle(matrix.Transform(a), matrix.Transform(b),
 			matrix.Transform(c));
 	return nt;
 }
-size_t Surface::AddTriangleWithNormals(const Vector3 &a, const Vector3 &b,
+size_t Hull::AddTriangleWithNormals(const Vector3 &a, const Vector3 &b,
 		const Vector3 &c, const Vector3 &na, const Vector3 &nb,
 		const Vector3 &nc)
 {
@@ -320,7 +318,7 @@ size_t Surface::AddTriangleWithNormals(const Vector3 &a, const Vector3 &b,
 	t[nt].n = (na + nb + nc) / 3;
 	return nt;
 }
-size_t Surface::AddTriangleWithNormal(const Vector3 &a, const Vector3 &b,
+size_t Hull::AddTriangleWithNormal(const Vector3 &a, const Vector3 &b,
 		const Vector3 &c, const Vector3 &n)
 {
 	size_t nt = AddTriangle(a, b, c);
@@ -328,13 +326,13 @@ size_t Surface::AddTriangleWithNormal(const Vector3 &a, const Vector3 &b,
 	return nt;
 }
 
-void Surface::AddQuad(const Vector3 &a, const Vector3 &b, const Vector3 &c,
+void Hull::AddQuad(const Vector3 &a, const Vector3 &b, const Vector3 &c,
 		const Vector3 &d)
 {
 	AddTriangle(a, b, c);
 	AddTriangle(a, c, d);
 }
-void Surface::AddQuadTransform(const Vector3 &a, const Vector3 &b,
+void Hull::AddQuadTransform(const Vector3 &a, const Vector3 &b,
 		const Vector3 &c, const Vector3 &d,
 		const AffineTransformMatrix &transformMatrix)
 {
@@ -342,7 +340,7 @@ void Surface::AddQuadTransform(const Vector3 &a, const Vector3 &b,
 	AddTriangle(matrix.Transform(a), matrix.Transform(c), matrix.Transform(d));
 }
 
-void Surface::CalcNormals(void)
+void Hull::CalcNormals(void)
 {
 	size_t i;
 	Vector3 temp;

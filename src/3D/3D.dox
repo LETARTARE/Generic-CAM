@@ -1,0 +1,14 @@
+/**
+ * \defgroup Base3D Basic 3D support
+ */
+ 
+/**
+ * \defgroup File3D File formats for 3D objects
+ * \ingroup Base3D
+ */
+ 
+/**
+ * \defgroup View3D Displaying 3D scenes
+ * \ingroup Base3D
+ */
+ 

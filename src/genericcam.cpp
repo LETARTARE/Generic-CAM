@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GenericCAM.cpp
+// Name               : genericcam.cpp
 // Purpose            : Main entry point
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,7 +24,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "GenericCAM.h"
+#include "genericcam.h"
 #include "languages.h"
 
 #include "wx/richtext/richtextxml.h"
@@ -127,10 +127,4 @@ bool GenericCAMApp::OnInit()
 
 	return true;
 }
-
-/*! \mainpage Generic CAM - Developers Documentation
- *
- * \image html  pictures/start.png
- *
- */
 

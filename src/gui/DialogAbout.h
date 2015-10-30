@@ -24,14 +24,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
-
 #ifndef DIALOGABOUT_H_
 #define DIALOGABOUT_H_
 
 #include <wx/event.h>
 
-#include "../StdInclude.h"
 #include "gui.h"
 
 class DialogAbout:public GUIAbout {
@@ -42,7 +39,6 @@ public:
 
 	// Member variables
 private:
-
 
 	// Methods
 private:

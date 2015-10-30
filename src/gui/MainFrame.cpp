@@ -29,8 +29,10 @@
 #include <unistd.h>
 
 #include "DialogAbout.h"
-#include "DialogSetup6DOFController.h"
+#include "../controller/DialogSetup6DOFController.h"
 #include "DialogSetupUnits.h"
+
+#include "../3D/MathParser.h"
 
 #include "../languages.h"
 #include "../command/CommandProjectRename.h"
@@ -64,6 +66,9 @@
 MainFrame::MainFrame(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 		GUIMainFrame(parent)
 {
+
+	MathParser x;
+	x.SetString(_T("1,000 * 15 mA"));
 
 	selectedTargetPosition = 0;
 
