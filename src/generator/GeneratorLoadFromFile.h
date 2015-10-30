@@ -32,6 +32,7 @@
  *
  * ...
  */
+#include "Generator.h"
 
 #include <stddef.h>
 #include <wx/filename.h>
@@ -41,7 +42,6 @@
 #include <wx/stattext.h>
 #include <wx/string.h>
 
-#include "Generator.h"
 
 class wxFilePickerCtrl;
 

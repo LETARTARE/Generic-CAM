@@ -28,6 +28,7 @@
 
 #include <wx/sizer.h>
 #include <wx/button.h>
+#include <wx/log.h>
 
 #include "../gui/DisplaySettings.h"
 #include "../project/ToolPath.h"
@@ -96,7 +97,6 @@ void GeneratorLoadFromFile::TransferDataFromPanel(void)
 	filename = m_filePicker->GetPath();
 	wxLogMessage(_T("Filename: ") + filename.GetFullPath());
 }
-
 
 void GeneratorLoadFromFile::GenerateToolpath(void)
 {

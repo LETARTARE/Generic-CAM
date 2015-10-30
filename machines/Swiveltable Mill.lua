@@ -56,17 +56,37 @@ function AssembleMachine()
 	identity();
 	rotate(-AXIS_A,0,0,0,-0.6,0.48);
 	placecomponent("Swing");
-	rotate(0,0,-AXIS_B,0.0,-0.6,0.447);
+	rotate(0,0,-AXIS_C,0.0,-0.6,0.447);
 	placecomponent("Table");
 
+        C = math.cos(AXIS_C/180*math.pi);
+        S = math.sin(AXIS_C/180*math.pi);
+
+        X = AXIS_X*C + AXIS_Y*S;
+        Y = AXIS_Y*C - AXIS_X*S;
+        Z = AXIS_Z;
+
+        C = math.cos(AXIS_A/180*math.pi);
+        S = math.sin(AXIS_A/180*math.pi);
+
+        H = Y;
+        Y = Y*C +Z*S;
+        Z = Z*C - H*S;
+
+        X = X + AXIS_U;
+        Y = Y + AXIS_V;
+        Z = Z + AXIS_W;
+
+        Z = Z - 0.3976;
+
 	identity();
-	translate(AXIS_X,0,0);
+	translate(X,0,0);
         placecomponent("Telescope 1");
-	translate(0,0,AXIS_Z/2);
+	translate(0,0,Z/2);
 	placecomponent("Telescope 2");
-	translate(0,0,AXIS_Z/2);
+	translate(0,0,Z/2);
 	placecomponent("Telescope 3");
-	translate(0,AXIS_Y,0);
+	translate(0,Y,0);
 	placecomponent("Head");
 	
 

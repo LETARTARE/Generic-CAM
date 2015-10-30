@@ -26,6 +26,8 @@
 
 #include "CommandObjectLoad.h"
 
+#include  <wx/stopwatch.h>
+
 CommandObjectLoad::CommandObjectLoad(const wxString& name, Project * project,
 		const wxString& fileName) :
 		wxCommand(true, name)
@@ -37,8 +39,11 @@ CommandObjectLoad::CommandObjectLoad(const wxString& name, Project * project,
 bool CommandObjectLoad::Do(void)
 {
 	Object temp;
+	wxStopWatch sw;
 	if(temp.LoadObject(fileName)){
 		project->objects.Add(temp);
+		wxLogMessage(_T("The long running function took %ldms to execute"),
+				sw.Time());
 		return true;
 	}
 	return false;
