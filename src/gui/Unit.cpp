@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : Unit.cpp
-// Purpose            : Converts from SI to whatever and back.
+// Purpose            : Value with unit
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -26,7 +26,6 @@
 
 #include "Unit.h"
 
-#include <lua.hpp>
 #include <wx/log.h>
 
 Unit::Unit()
@@ -88,28 +87,8 @@ wxString Unit::GetOtherName(void)
 	return otherName;
 }
 
-double Unit::SIFromString(const wxString& text, bool useEvaluator)
+double Unit::SIFromString(const wxString& text)
 {
-	double temp;
-	if(useEvaluator){
-		lua_State *L = luaL_newstate();
-		luaopen_base(L);
-		luaopen_math(L);
-		luaopen_string(L);
-		if(luaL_loadstring(L, (_T("return (") + text + _T(")")).ToAscii())){
-			text.ToDouble(&temp);
-			return ToSI(temp);
-		}
-		if(lua_pcall(L, 0, 1, 0)){
-			wxLogError(
-					_T("Error parsing input: ")
-							+ wxString::FromAscii(lua_tostring(L, -1)));
-			text.ToDouble(&temp);
-			return ToSI(temp);
-		}
-		temp = lua_tonumber(L, -1);
-		return ToSI(temp);
-	}
-	text.ToDouble(&temp);
-	return ToSI(temp);
+	parser.SetString(text);
+	return ToSI(parser.GetNumber());
 }

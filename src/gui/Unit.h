@@ -28,9 +28,10 @@
 #define UNIT_H_
 
 #include <wx/string.h>
+#include "MathParser.h"
 
 /*!\class Unit
- * \brief Converts from SI to whatever and back.
+ * \brief Converts from SI to whatever and back
  *
  * Simple conversion class.
  * The factor is the multiplier to convert into the other unit.
@@ -38,7 +39,7 @@
  *    1 cm = 0.01 m, factor = 1/100
  *    1 rpm = 1/60 1/s, factor = 1/60
  *
- * HINT: The available type for the units are maintained in the DialogSetupUnits.
+ * HINT: The available types for the units are maintained in the DialogSetupUnits.
  */
 
 class Unit {
@@ -55,6 +56,8 @@ private:
 	wxString SIName; ///> The name in SI: m, m/s, 1/s, ...
 	wxString otherName; ///> The name in the "other" system: h, cm, dm, rpm, inch, mil, mm, ...
 
+	MathParser parser;
+
 	// Methods
 public:
 	void Setup(const wxString SIName, const wxString otherName,
@@ -64,8 +67,7 @@ public:
 	wxString TextFromSI(const double value, unsigned int digitsAfterComma = 3);
 	wxString TextFromSIWithUnit(const double value,
 			unsigned int digitsAfterComma = 3);
-
-	double SIFromString(const wxString &text, bool useEvaluator = true);
+	double SIFromString(const wxString &text);
 
 	wxString GetSIName(void);
 	wxString GetOtherName(void);

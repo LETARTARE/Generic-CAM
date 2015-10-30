@@ -154,8 +154,11 @@ bool LUACodeEvaluator::EvaluateProgram()
 		}
 	}
 
-	if(_DEBUGMODE){
-
+#ifdef _DEBUGMODE
+	if(true){
+#else
+		if(false){
+#endif
 		unsigned int i;
 		for(i = 0; i < linkedMachine->components.Count(); i++){
 			wxLogMessage(

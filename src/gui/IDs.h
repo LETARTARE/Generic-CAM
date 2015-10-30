@@ -29,7 +29,7 @@
 
 /*!\class IDs
  * \brief List of command IDs
- * This headerfile contains a list of command IDs. These are used to comminucate
+ * This headerfile contains a list of command IDs. These are used to communicate
  * from the child windows to the main window.
  */
 
