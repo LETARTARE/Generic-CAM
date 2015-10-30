@@ -25,31 +25,28 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 /*!\class Vector3
- * \brief Contains a vector in 3D space
+ * \ingroup Base3D
+ * \brief Vector in 3D space
+ *
+ * (This class has lots of inlining code in the header to execute fast.)
  */
 
+// http://www.parashift.com/c++-faq-lite/operator-overloading.html
 #ifndef _CVECTOR3_H_
 #define _CVECTOR3_H_
 
-#include <math.h>
-#include <wx/string.h>
 #include <wx/dynarray.h>
+#include <wx/string.h>
+#include <math.h>
 
 class Vector3 {
 	// Constructor/Destructor:
 public:
 	Vector3(float px = 0.0, float py = 0.0, float pz = 0.0) :
-		x(px), y(py), z(pz)
+			x(px), y(py), z(pz)
 	{
 	}
-	Vector3(wxString string)
-	{
-		this->FromString(string);
-	}
-
-	~Vector3(void)
-	{
-	}
+	Vector3(wxString string);
 
 	// Member variables:
 public:
@@ -63,20 +60,27 @@ public:
 	void FromString(wxString const& string);
 
 	//!Calculate the absolut length of a vector.
-	float Abs() const;
+	inline float Abs() const
+	{
+		return sqrt(x * x + y * y + z * z);
+	}
+
+	//!Calculate the squared absolut length of a vector.
+	inline float Abs2() const
+	{
+		return x * x + y * y + z * z;
+	}
 
 	//	void operator=(const Vector3& a){x=a.x;y=a.y;z=a.z;};
 
-
 	//! Overloaded operator for vector addition.
-	Vector3 & operator+=(const Vector3 &a)
+	Vector3& operator+=(const Vector3& a)
 	{
 		this->x += a.x;
 		this->y += a.y;
 		this->z += a.z;
 		return *this;
 	}
-
 
 	//! Overloaded operator for vector addition.
 	const Vector3 operator+(const Vector3& a) const
@@ -86,16 +90,14 @@ public:
 		return temp;
 	}
 
-
 	//! Overloaded operator for vector subtraction.
-	Vector3 & operator-=(const Vector3& a)
+	Vector3& operator-=(const Vector3& a)
 	{
 		this->x -= a.x;
 		this->y -= a.y;
 		this->z -= a.z;
 		return *this;
 	}
-
 
 	//! Overloaded operator for vector subtraction.
 	const Vector3 operator-(const Vector3& a) const
@@ -105,14 +107,12 @@ public:
 		return temp;
 	}
 
-
 	//! Overloaded operator for vector negation.
 	const Vector3 operator-() const
 	{
 		Vector3 temp(-this->x, -this->y, -this->z);
 		return temp;
 	}
-
 
 	/*!\brief Overloaded operator for vector product.
 	 *
@@ -121,14 +121,14 @@ public:
 	 * \vec{c}=\left\{
 	 * \begin{array}{c}
 	 * \vec{a}_y \cdot \vec{b}_z - \vec{a}_z \cdot \vec{b}_y \\
-				 * \vec{a}_z \cdot \vec{b}_x - \vec{a}_x \cdot \vec{b}_z \\
-				 * \vec{a}_x \cdot \vec{b}_y - \vec{a}_y \cdot \vec{b}_x
+	 * \vec{a}_z \cdot \vec{b}_x - \vec{a}_x \cdot \vec{b}_z \\
+	 * \vec{a}_x \cdot \vec{b}_y - \vec{a}_y \cdot \vec{b}_x
 	 * \end{array}
 	 * \right\}
 	 * \f].
 	 */
 	//!Overloaded operator for vector product.
-	Vector3 & operator*=(const Vector3& b)
+	Vector3& operator*=(const Vector3& b)
 	{
 		Vector3 a = *(this);
 		this->x = a.y * b.z - a.z * b.y;
@@ -137,9 +137,8 @@ public:
 		return *this;
 	}
 
-
 	//! Overloaded operator for scalar product.
-	Vector3 & operator*=(const float &b)
+	Vector3& operator*=(const float b)
 	{
 		this->x *= b;
 		this->y *= b;
@@ -147,6 +146,7 @@ public:
 		return *this;
 	}
 
+	//! Overloaded operator for vector product.
 	const Vector3 operator*(const Vector3& b) const
 	{
 		Vector3 temp = *this;
@@ -154,15 +154,13 @@ public:
 		return temp;
 	}
 
-
 	//! Overloaded operator for scalar product.
-	const Vector3 operator*(const float &b) const
+	const Vector3 operator*(const float b) const
 	{
 		Vector3 temp = *this;
 		temp *= b;
 		return temp;
 	}
-
 
 	//! Calculates the dot product (inner product) of two vectors.
 	float Dot(const Vector3& b) const
@@ -170,9 +168,8 @@ public:
 		return (x * b.x + y * b.y + z * b.z);
 	}
 
-
 	//! Overloaded operator for scalar division.
-	Vector3 & operator/=(const float &b)
+	Vector3& operator/=(const float b)
 	{
 		this->x /= b;
 		this->y /= b;
@@ -180,35 +177,24 @@ public:
 		return *this;
 	}
 
-
 	//! Overloaded operator for scalar division.
-	const Vector3 operator/(const float &b) const
+	const Vector3 operator/(const float b) const
 	{
 		Vector3 temp = *this;
 		temp /= b;
 		return temp;
 	}
 
+	//! Comparison operator equality.
+	bool operator==(const Vector3& b) const;
 
-	//! Comparison operator.
-	bool operator==(const Vector3 &b) const
-	{
-		double epsilon = 1e-5;
-		double epsilon2 = epsilon * epsilon;
-		return (((this->x - b.x) * (this->x - b.x)
-				+ (this->y - b.y) * (this->y - b.y)
-				+ (this->z - b.z) * (this->z - b.z)) <= epsilon2);
-	}
-
-
-	//! Comparison operator.
-	bool operator!=(const Vector3 &b) const
+	//! Comparison operator inequality.
+	bool operator!=(const Vector3& b) const
 	{
 		return !(*this == b);
 	}
 
-
-	//! Zeros a vector.
+	//! Zeros the vector.
 	void Zero(void);
 
 	//! Sets the vector to the given coordinates.
@@ -218,7 +204,6 @@ public:
 		this->y = y;
 		this->z = z;
 	}
-
 
 	//! Swap the vector with a given vector.
 	void Swap(Vector3& b);

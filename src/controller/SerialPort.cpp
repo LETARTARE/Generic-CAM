@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : SerialPort.cpp
-// Purpose            : A serial port class for Linux and Windows.
+// Purpose            : A serial port class for Linux and Windows
 // Thread Safe        : No
 // Platform dependent : Yes
 // Compiler Options   :
@@ -37,6 +37,8 @@ SerialPort::SerialPort()
 #ifdef __LINUX
 	buffer_RD = 0;
 	buffer_WR = 0;
+	res = 0;
+	fd = 0;
 #endif
 	Error[0] = 0;
 	Opened = false;

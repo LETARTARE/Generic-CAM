@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : OpenGLCanvas.h
-// Purpose            : Class providing wxWidgets with an OpenGL canvas with extra functions.
+// Purpose            : Class providing wxWidgets with an OpenGL canvas with extra functions
 // Thread Safe        : Yes
 // Platform dependent : Yes
 // Compiler Options   : -lopengl32 -lglu
@@ -27,18 +27,22 @@
 #ifndef OPENGLCANVAS_H_
 #define OPENGLCANVAS_H_
 
-#include "../StdInclude.h"
 #include "../Config.h"
-#include "AffineTransformMatrix.h"
+#ifdef _USE_6DOFCONTROLLER
 #include "../controller/Control3D.h"
+#include <wx/timer.h>
+#endif
+#ifdef _USE_3DPICKING
 #include "OpenGLPick.h"
+#endif
+#include "AffineTransformMatrix.h"
 #include <wx/glcanvas.h>
-#include <wx/gdicmn.h>
 
 /*!\class OpenGLCanvas
- * \brief Extending wxGLCanvas with some useful features
+ * \ingroup View3D
+ * \brief Extended wxGLCanvas
  *
- * Features like:
+ * Provides features like:
  *  * Mouse movement
  *  * 6-DOF controller support
  *  * Object picking
@@ -49,8 +53,11 @@ enum Stereo3DType {
 	stereoOff = 0, stereoAnaglyph, stereoShutter
 };
 
+enum RotationType {
+	rotateTrackball, rotateInterwoven, rotateTurntable
+};
+
 class OpenGLCanvas:public wxGLCanvas {
-	//friend class ChildFrame;
 	// Constructor / Destructor
 public:
 	OpenGLCanvas(wxWindow *parent, wxWindowID id = wxID_ANY,
@@ -72,6 +79,8 @@ public:
 	unsigned char leftEyeG;
 	unsigned char leftEyeB;
 
+	RotationType rotationMode;
+
 protected:
 	AffineTransformMatrix rotmat;
 	AffineTransformMatrix transmat;
@@ -80,24 +89,33 @@ private:
 	bool isInitialized;
 	GLuint m_gllist;
 
+#ifdef _USE_6DOFCONTROLLER
 	Control3D* control; ///> Link to 6DOF-controller
 	wxTimer timer; ///> Timer for polling the controller
+#endif
 
 	int x; ///> Startpoint for mouse dragging
 	int y; ///> Startpoint for mouse dragging
+	int w; ///> Width of viewport
+	int h; ///> Height of viewport
+
+	float turntableX;
+	float turntableY;
 
 	// Methods
-
 public:
+#ifdef _USE_6DOFCONTROLLER
 	void SetController(Control3D& control);
+#endif
 
 	virtual void Render();
 	virtual void InitGL();
 	virtual void SetupLighting();
 
+#ifdef _USE_3DPICKING
 	bool OnPick(OpenGLPick &result, int x, int y);
 	bool OnPick(OpenGLPick &result, wxPoint pos);
-
+#endif
 protected:
 
 	void OnPaint(wxPaintEvent& WXUNUSED(event));
@@ -105,9 +123,9 @@ protected:
 	void OnEraseBackground(wxEraseEvent& WXUNUSED(event));
 	void OnEnterWindow(wxMouseEvent& WXUNUSED(event));
 	void OnMouseEvent(wxMouseEvent& event);
+#ifdef _USE_6DOFCONTROLLER
 	void OnTimer(wxTimerEvent& event);
-
-DECLARE_EVENT_TABLE()
+#endif
 };
 
 #endif /* OPENGLCANVAS_H_ */

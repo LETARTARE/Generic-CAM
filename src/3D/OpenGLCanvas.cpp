@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : OpenGLCanvas.cpp
-// Purpose            : Class providing wxWidgets with an OpenGL canvas with extra functions.
+// Purpose            : Class providing wxWidgets with an OpenGL canvas with extra functions
 // Thread Safe        : Yes
 // Platform dependent : Yes
 // Compiler Options   : -lopengl32 -lglu
@@ -26,7 +26,7 @@
 
 #include "OpenGLCanvas.h"
 
-#include <wx/wx.h>
+#include "../StdInclude.h"
 
 #ifdef __WXMAC__
 #include "OpenGL/glu.h"
@@ -36,20 +36,12 @@
 //#include <GL/gl.h>
 #endif
 
-//TODO: Change this to this->Connect(...) calls and get rid of that "#define" below!
-BEGIN_EVENT_TABLE(OpenGLCanvas, wxGLCanvas) EVT_SIZE(OpenGLCanvas::OnSize)
-EVT_PAINT(OpenGLCanvas::OnPaint)
-EVT_ERASE_BACKGROUND(OpenGLCanvas::OnEraseBackground)
-EVT_ENTER_WINDOW(OpenGLCanvas::OnEnterWindow)
-EVT_MOUSE_EVENTS(OpenGLCanvas::OnMouseEvent)
-END_EVENT_TABLE()
-
 static int wx_gl_attribs[] =
 	{WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24, 0};
 
 //wxGLCanvas(parent, wxID_ANY ,wxDefaultPosition, wxDefaultSize, 0, wxT("GLCanvas"));
 
-OpenGLCanvas::OpenGLCanvas(wxWindow *parent, wxWindowID id, const wxPoint& pos,
+OpenGLCanvas::OpenGLCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 		const wxSize& size, long style, const wxString& name) :
 		wxGLCanvas(parent, (wxGLCanvas*) NULL, id, pos, size,
 				style | wxFULL_REPAINT_ON_RESIZE, name, wx_gl_attribs)
@@ -59,7 +51,9 @@ OpenGLCanvas::OpenGLCanvas(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 	isInitialized = false;
 	m_gllist = 0;
 	x = y = 0;
-	control = NULL;
+	w = h = 1;
+	turntableX = 0;
+	turntableY = M_PI / 2;
 
 	stereoMode = stereoOff;
 	eyeDistance = 0.1;
@@ -72,22 +66,64 @@ OpenGLCanvas::OpenGLCanvas(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 	leftEyeG = 0;
 	leftEyeB = 0;
 
+	rotationMode = rotateTurntable;
+
+	this->Connect(wxEVT_SIZE, wxSizeEventHandler(OpenGLCanvas::OnSize), NULL,
+			this);
+	this->Connect(wxEVT_PAINT, wxPaintEventHandler(OpenGLCanvas::OnPaint), NULL,
+			this);
+	this->Connect(wxEVT_ERASE_BACKGROUND,
+			wxEraseEventHandler(OpenGLCanvas::OnEraseBackground), NULL, this);
+	this->Connect(wxEVT_ENTER_WINDOW,
+			wxMouseEventHandler(OpenGLCanvas::OnEnterWindow), NULL, this);
+	this->Connect(wxEVT_MOTION, wxMouseEventHandler(OpenGLCanvas::OnMouseEvent),
+			NULL, this);
+	this->Connect(wxEVT_RIGHT_DOWN,
+			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
+	this->Connect(wxEVT_MIDDLE_DOWN,
+			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
+	this->Connect(wxEVT_MOUSEWHEEL,
+			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
+
+#ifdef _USE_6DOFCONTROLLER
+	control = NULL;
 	timer.SetOwner(this);
-	this->Connect(wxEVT_TIMER, wxTimerEventHandler(OpenGLCanvas::OnTimer),
-	NULL, this);
+	this->Connect(wxEVT_TIMER, wxTimerEventHandler(OpenGLCanvas::OnTimer), NULL,
+			this);
 	timer.Start(100);
+#endif
 }
 
 OpenGLCanvas::~OpenGLCanvas()
 {
+	this->Disconnect(wxEVT_SIZE, wxSizeEventHandler(OpenGLCanvas::OnSize), NULL,
+			this);
+	this->Disconnect(wxEVT_PAINT, wxPaintEventHandler(OpenGLCanvas::OnPaint),
+			NULL, this);
+	this->Disconnect(wxEVT_ERASE_BACKGROUND,
+			wxEraseEventHandler(OpenGLCanvas::OnEraseBackground), NULL, this);
+	this->Disconnect(wxEVT_ENTER_WINDOW,
+			wxMouseEventHandler(OpenGLCanvas::OnEnterWindow), NULL, this);
+	this->Disconnect(wxEVT_MOTION,
+			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
+	this->Disconnect(wxEVT_RIGHT_DOWN,
+			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
+	this->Disconnect(wxEVT_MIDDLE_DOWN,
+			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
+	this->Disconnect(wxEVT_MOUSEWHEEL,
+			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
+#ifdef _USE_6DOFCONTROLLER
 	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(OpenGLCanvas::OnTimer),
-	NULL, this);
+			NULL, this);
+#endif
 }
 
+#ifdef _USE_6DOFCONTROLLER
 void OpenGLCanvas::SetController(Control3D& control)
 {
 	this->control = &control;
 }
+#endif
 
 void OpenGLCanvas::OnEnterWindow(wxMouseEvent& WXUNUSED(event))
 {
@@ -158,6 +194,8 @@ void OpenGLCanvas::InitGL()
 //	this->Refresh();
 }
 
+#ifdef _USE_3DPICKING
+
 bool OpenGLCanvas::OnPick(OpenGLPick &result, int x, int y)
 {
 	return this->OnPick(result, wxPoint(x, y));
@@ -206,6 +244,7 @@ bool OpenGLCanvas::OnPick(OpenGLPick &result, wxPoint pos)
 	result.SetHits(hits);
 	return (hits > 0);
 }
+#endif
 
 void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
@@ -224,7 +263,7 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	}
 
 	// set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
-	int w, h;
+
 	GetClientSize(&w, &h);
 	::glViewport(0, 0, (GLint) w, (GLint) h);
 
@@ -423,8 +462,31 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 		y = event.m_y;
 	}
 	if(event.Dragging() && event.RightIsDown()){
-		rotmat = AffineTransformMatrix::RotateXY(event.m_x - x, event.m_y - y,
-				0.5) * rotmat;
+		double r = (double) ((w < h)? w : h) / 2.2;
+		switch(rotationMode){
+		case rotateTrackball:
+			rotmat = AffineTransformMatrix::RotateTrackball(
+					(double) (x - w / 2), (double) (h / 2 - y),
+					(double) (event.m_x - w / 2), (double) (h / 2 - event.m_y),
+					r) * rotmat;
+			break;
+		case rotateInterwoven:
+			rotmat = AffineTransformMatrix::RotateXY(event.m_x - x,
+					event.m_y - y, 0.5) * rotmat;
+			break;
+		case rotateTurntable:
+			rotmat = AffineTransformMatrix::RotateAroundVector(Vector3(1, 0, 0),
+					-M_PI / 2);
+			turntableX += (double) (event.m_x - x) / 100;
+			turntableY += (double) (event.m_y - y) / 100;
+			rotmat = AffineTransformMatrix::RotateAroundVector(Vector3(1, 0, 0),
+					turntableY) * rotmat;
+			rotmat = rotmat
+					* AffineTransformMatrix::RotateAroundVector(
+							Vector3(0, 0, 1), turntableX);
+			break;
+
+		}
 		x = event.m_x;
 		y = event.m_y;
 
@@ -449,6 +511,7 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 
 }
 
+#ifdef _USE_6DOFCONTROLLER
 void OpenGLCanvas::OnTimer(wxTimerEvent& event)
 {
 	if(control == NULL) return;
@@ -473,4 +536,4 @@ void OpenGLCanvas::OnTimer(wxTimerEvent& event)
 	}
 	this->Refresh();
 }
-
+#endif

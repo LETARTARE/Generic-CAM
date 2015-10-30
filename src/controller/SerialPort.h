@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : SerialPort.h
-// Purpose            : A serial port class for Linux and Windows.
+// Purpose            : A serial port class for Linux and Windows
 // Thread Safe        : No
 // Platform dependent : Yes
 // Compiler Options   :
@@ -106,7 +106,7 @@ protected:
 #endif
 
 #ifdef __LINUX
-	int fd, c, res;
+	int fd, res;
 	unsigned int buffer_RD, buffer_WR;
 	char m_buffer[BUFFER_LEN];
 	struct termios oldtio, newtio;

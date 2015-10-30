@@ -32,11 +32,13 @@
 #include <wx/string.h>
 
 /*!\class FileGTS
- * \brief class that can read a GTS file.
+ * \ingroup File3D
+ * \brief GTS file
+ *
  * This class reads holds and displays the content of a GTS file.
  *
  * Documentation on GTS files can be found here:
- * //http://gts.sourceforge.net/reference/gts-surfaces.html#GTS-SURFACE-WRITE
+ * http://gts.sourceforge.net/reference/gts-surfaces.html#GTS-SURFACE-WRITE
  */
 
 class FileGTS:public GeometryFileAbstract {

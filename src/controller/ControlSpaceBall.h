@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : ControlSpaceBall.h
-// Purpose            : Class to get data from a Spaceball controller.
+// Purpose            : Class to get data from a Spaceball controller
 // Thread Safe        : Yes
 // Platform dependent : Yes
 // Compiler Options   :
@@ -52,7 +52,6 @@ public:
 protected:
 
 	void InitDevice();
-
 	bool ProcessPacket();
 	void DataIn(unsigned char c);
 };

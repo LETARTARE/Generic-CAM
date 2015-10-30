@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : GeometryFileAbstract.h
-// Purpose            : Abstract class for geometry loaded from a file.
+// Purpose            : Abstract class for geometry loaded from a file
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -28,11 +28,11 @@
 #define GEOMETRYFILEABSTRACT_H_
 
 #include "Geometry.h"
-
 #include <wx/string.h>
 
 /*!\class GeometryFileAbstract
- * \brief Abstract class for geometry loaded from a file.
+ * \ingroup File3D
+ * \brief Abstract class for 3D files
  */
 
 class GeometryFileAbstract {
@@ -43,15 +43,17 @@ public:
 
 	// Member variables
 public:
-	wxString filename;
-	AffineTransformMatrix matrix; ///> Transformation of the data
+	wxString filename; ///< Last read / written file
+	AffineTransformMatrix matrix;
 	ArrayOfGeometry geometry;
 	wxString error; ///> Errorstring, empty if no errors occured
-	Vector3 color;
+	Vector3 color; ///> Color of object, if no color is provided by the geometry itself.
+
 	//Methods:
 public:
 	void Paint(void) const;
-	virtual bool ReadFile(wxString fileName) = 0;
+	virtual bool ReadFile(wxString fileName);
+	virtual bool WriteFile(wxString fileName) const;
 };
 
 #endif /* GEOMETRYFILEABSTRACT_H_ */

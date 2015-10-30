@@ -30,6 +30,11 @@
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfVector3)
 
+Vector3::Vector3(wxString string)
+{
+	this->FromString(string);
+}
+
 wxString Vector3::ToString(void) const
 {
 	return wxString::Format(_T("%f#%f#%f"), x, y, z);
@@ -56,11 +61,6 @@ void Vector3::FromString(wxString const& string)
 	}
 }
 
-float Vector3::Abs(void) const
-{
-	return sqrt(x * x + y * y + z * z);
-}
-
 void Vector3::Zero(void)
 {
 	x = y = z = 0.0;
@@ -68,7 +68,7 @@ void Vector3::Zero(void)
 
 void Vector3::Swap(Vector3& b)
 {
-	float temp;
+	register float temp;
 	temp = b.x;
 	b.x = this->x;
 	this->x = temp;
@@ -91,4 +91,13 @@ Vector3 Vector3::Normalize(void)
 		z /= d;
 	}
 	return Vector3(x, y, z);
+}
+
+bool Vector3::operator ==(const Vector3& b) const
+{
+	double epsilon = 1e-5;
+	double epsilon2 = epsilon * epsilon;
+	return (((this->x - b.x) * (this->x - b.x)
+			+ (this->y - b.y) * (this->y - b.y)
+			+ (this->z - b.z) * (this->z - b.z)) <= epsilon2);
 }

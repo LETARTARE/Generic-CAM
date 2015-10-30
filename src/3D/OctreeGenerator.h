@@ -28,15 +28,14 @@
 #define OCTREEGENERATOR_H_
 
 #include "Octree.h"
+#include "Triangle.h"
+#include "Vector3.h"
+#include "BoundingBox.h"
 #include <stdint.h>
 
 /*!\class VectorInt64
  * \brief Stores an int64_t vector with 3 elements.
  */
-
-#include "../3D/Triangle.h"
-#include "../3D/Vector3.h"
-#include "../3D/BoundingBox.h"
 
 class VectorInt64 {
 public:

@@ -26,10 +26,10 @@
 
 #include "AffineTransformMatrix.h"
 
-#include <cmath>
+#include <math.h>
 #include <wx/tokenzr.h>
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
-WX_DEFINE_OBJARRAY(ArrayOfAffineTransformMatrix)
+WX_DEFINE_OBJARRAY(ArrayOfAffineTransformMatrix);
 
 AffineTransformMatrix::AffineTransformMatrix()
 {
@@ -37,12 +37,8 @@ AffineTransformMatrix::AffineTransformMatrix()
 	linkScaling = true;
 }
 
-AffineTransformMatrix::~AffineTransformMatrix()
-{
-}
-
 /*!\brief Copies a matrix by inserting a given matrix into \a a.
- *  \param matrix The matrix to copy.
+ *  \param b The matrix to copy.
  */
 void AffineTransformMatrix::Set(AffineTransformMatrix const& b)
 {
@@ -54,13 +50,13 @@ void AffineTransformMatrix::Set(AffineTransformMatrix const& b)
 }
 
 AffineTransformMatrix& AffineTransformMatrix::operator=(
-		const AffineTransformMatrix &b)
+		const AffineTransformMatrix& b)
 {
 	if(this == &b) return *this;
 	size_t i;
 	for(i = 0; i < 16; i++)
 		this->a[i] = b.a[i];
-	//this->TakeMatrixApart();
+	// this->TakeMatrixApart();
 	return *this;
 }
 
@@ -278,7 +274,7 @@ const AffineTransformMatrix AffineTransformMatrix::Inverse() const
 			+ (a[1] * a[6] + (-a[2] * a[5])) * a[8];
 	// T11 is the determinant of the matrix. This can not
 	// not be zero for a correct transformation matrix.
-	wxASSERT(T11!=0)
+	wxASSERT(T11!=0);
 
 	double T12 = a[4] * a[9];
 	double T13 = a[5] * a[8];
@@ -330,8 +326,8 @@ const AffineTransformMatrix AffineTransformMatrix::Inverse() const
 }
 
 //! Overloaded operator to allow correct multiplication of two matrices.
-AffineTransformMatrix & AffineTransformMatrix::operator*=(
-		const AffineTransformMatrix &b)
+AffineTransformMatrix& AffineTransformMatrix::operator*=(
+		const AffineTransformMatrix& b)
 {
 	//Generated with this code:
 	//php -r'for($i=0;$i<4;$i++){for($j=0;$j<4;$j++){printf("this->a[%u]=",$i*4+$j);for($k=0;$k<4;$k++){printf("c[%u]*b.a[%u]%s",$k*4+$j,$i*4+$k,($k==3)?";\r\n":"+");}}}'
@@ -374,7 +370,7 @@ AffineTransformMatrix & AffineTransformMatrix::operator*=(
 
 //! Overloaded operator to allow correct multiplication of two matrices.
 const AffineTransformMatrix AffineTransformMatrix::operator*(
-		const AffineTransformMatrix &b) const
+		const AffineTransformMatrix& b) const
 {
 	AffineTransformMatrix c = *this;
 	c *= b;
@@ -385,15 +381,16 @@ const AffineTransformMatrix AffineTransformMatrix::operator*(
  *
  * The division is done by inverting the second matrix and the multiplying both.
  */
-AffineTransformMatrix & AffineTransformMatrix::operator/=(
-		const AffineTransformMatrix &b)
+AffineTransformMatrix& AffineTransformMatrix::operator/=(
+		const AffineTransformMatrix& b)
 {
 	(*this) = (*this) * (b.Inverse());
 	return *this;
 }
 
+//! Overloaded operator to allow correct division of two matrices.
 const AffineTransformMatrix AffineTransformMatrix::operator/(
-		const AffineTransformMatrix &b) const
+		const AffineTransformMatrix& b) const
 {
 	AffineTransformMatrix c = *this;
 	c /= b;
@@ -486,6 +483,7 @@ void AffineTransformMatrix::ScaleGlobal(double const& x, double const& y,
 	a[14] *= z;
 }
 
+//! Scale matrix in the local coordinate system.
 void AffineTransformMatrix::ScaleLocal(const double& x, const double& y,
 		const double& z)
 {
@@ -634,16 +632,35 @@ AffineTransformMatrix AffineTransformMatrix::RotateInterwoven(double const& x,
 	return AffineTransformMatrix::RotateAroundVector(R, alpha);
 }
 
-//TODO: Program this: RotateTrackball(x1,y1,x2,y2,r)
-// r1= (0,0,r )-(x1,y1,0)
-// r2= (0,0,r )-(x2,y2,0)
-// P1 = SphereIntersect(r1,C,r);
-// P2 = SphereIntersect(r2,C,r);
-// V1 = (P1-C)
-// V2 = (P2-C)
-// V1.Normalize();
-// V2.Normalize();
-// A = V1xV2;
-// alpha = arcsin(abs(A));
-// if(V1*V2 <0)alpha+=M_PI/2;
-// return RotateAroundVector(A,alpha);
+/*!\brief Rotate around a virtual trackball.
+ *
+ * @param x1 Old x-mouse position on screen
+ * @param y1 Old y-mouse position on screen
+ * @param x2 New x-mouse position on screen
+ * @param y2 New y-mouse position on screen
+ * @param r Radius of a sphere in screen units.
+ * @return Rotational Matrix
+ */
+AffineTransformMatrix AffineTransformMatrix::RotateTrackball(const double& x1,
+		const double& y1, const double& x2, const double& y2, const double& r)
+{
+	Vector3 r1(x1, y1, 0);
+	r1 /= r;
+	double d1 = r1.Abs2();
+	if(d1 >= 1.0){
+		r1 /= sqrt(d1);
+	}else{
+		r1.z = sqrt(1 - d1);
+	}
+	Vector3 r2(x2, y2, 0);
+	r2 /= r;
+	double d2 = r2.Abs2();
+	if(d2 >= 1.0){
+		r2 /= sqrt(d2);
+	}else{
+		r2.z = sqrt(1 - d2);
+	}
+	Vector3 A = r1 * r2;
+	double alpha = asin(A.Abs());
+	return AffineTransformMatrix::RotateAroundVector(A, alpha);
+}

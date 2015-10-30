@@ -34,7 +34,9 @@
 #include <wx/datstrm.h>
 
 /*!\class FileSTL
- * \brief Reads in Stereolithography files.
+ * \ingroup File3D
+ * \brief Stereolithography files
+ *
  * STL is a very widespread file format to exchange geometry data
  * between CAD programms. This class reads a STL file and stores its
  * triangles.

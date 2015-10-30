@@ -27,8 +27,8 @@
 #include "OctreeGenerator.h"
 
 #include <GL/gl.h>
-#include <stdint.h>
 #include <math.h>
+#include <stdint.h>
 
 VectorInt64::VectorInt64()
 {

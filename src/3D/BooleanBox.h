@@ -29,16 +29,18 @@
 
 /*!\class BooleanBox
  * \brief Boolean operations on a small number of cubes
+ *
  * Boolean operations are performed on axis aligned boxes. This is like a
- * simple precursor of the octree class, but very fast.
+ * simple precursor of the octree class, but very fast. It only works on
+ * axis aligned cubes.
  */
 
-#include "../3D/AffineTransformMatrix.h"
+#include "AffineTransformMatrix.h"
 
 class BooleanBox {
 public:
 	BooleanBox();
-	BooleanBox(const BooleanBox& other); ///> Copy constructor, because this class has pointers
+	BooleanBox(const BooleanBox& other); //!< Copy constructor, because this class has pointers
 	BooleanBox(float sx, float sy, float sz);
 	BooleanBox(float x1, float y1, float z1, float x2, float y2, float z2);
 	virtual ~BooleanBox();

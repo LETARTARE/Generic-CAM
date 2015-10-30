@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : Geometry.h
-// Purpose            : Class for managing 3D geometry data.
+// Purpose            : Class for managing 3D geometry data
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -36,12 +36,13 @@
 #include <wx/xml/xml.h>
 
 /*!\class Geometry
- * \brief Contains geometric data.
+ * \ingroup Base3D
+ * \brief Geometric data from Triangles
  *
  * Geometric data is stored in this class.
  */
 enum GeometryColorStyle {
-	geometryColorGlobal, geometryColorTriangle, geometryColorVertex
+	geometryColorNone, geometryColorGlobal, geometryColorTriangle, geometryColorVertex
 };
 
 class Geometry {
@@ -64,12 +65,12 @@ public:
 	// Methods
 public:
 	void ToXml(wxXmlNode* parentNode);
-	bool FromXml(wxXmlNode* node);
+	bool FromXml(wxXmlNode* parentNode);
 
 	void Paint(void) const;
 
 	void Clear(void);
-	void InsertTrianglesFrom(const Geometry &geometry, bool recolor = false);
+	void InsertTrianglesFrom(const Geometry& geometry, bool recolor = false);
 
 	void CalculateNormals(void);
 	void FlipNormals(void);
@@ -77,22 +78,22 @@ public:
 	void FlipY(void);
 	void FlipZ(void);
 
-	void ApplyTransformation(const AffineTransformMatrix &matrix);
+	void ApplyTransformation(const AffineTransformMatrix& matrix);
 	void ApplyTransformation(void);
 
-	void AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c);
-	void AddTriangleWithNormals(const Vector3 &a, const Vector3 &b,
-			const Vector3 &c, const Vector3 &na, const Vector3 &nb,
-			const Vector3 &nc);
-	void AddTriangle(const Triangle &tri, bool copyNormals = true);
+	void AddTriangle(const Vector3& a, const Vector3& b, const Vector3& c);
+	void AddTriangleWithNormals(const Vector3& a, const Vector3& b,
+			const Vector3& c, const Vector3& na, const Vector3& nb,
+			const Vector3& nc);
+	void AddTriangle(const Triangle& tri, bool copyNormals = true);
 
-	void AddTriangleTransform(const Vector3 &a, const Vector3 &b,
-			const Vector3 &c, const AffineTransformMatrix &transformMatrix);
+	void AddTriangleTransform(const Vector3& a, const Vector3& b,
+			const Vector3& c, const AffineTransformMatrix& transformMatrix);
 
-	void AddQuad(const Vector3 &a, const Vector3 &b, const Vector3 &c,
-			const Vector3 &d);
-	void AddQuadTransform(const Vector3 &a, const Vector3 &b, const Vector3 &c,
-			const Vector3 &d, const AffineTransformMatrix &transformMatrix);
+	void AddQuad(const Vector3& a, const Vector3& b, const Vector3& c,
+			const Vector3& d);
+	void AddQuadTransform(const Vector3& a, const Vector3& b, const Vector3& c,
+			const Vector3& d, const AffineTransformMatrix& transformMatrix);
 };
 WX_DECLARE_OBJARRAY(Geometry, ArrayOfGeometry);
 

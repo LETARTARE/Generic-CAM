@@ -27,16 +27,15 @@
 #ifndef BOUNDINGBOX_H_
 #define BOUNDINGBOX_H_
 
+#include <wx/dynarray.h>
 #include <wx/txtstrm.h>
 
-#include "../3D/Vector3.h"
-#include "../3D/Geometry.h"
-#include "../3D/Surface.h"
+#include "Geometry.h"
 
 /*!\class BoundingBox
- * \brief ...
+ * \brief Bounding Box aligned with x,y,z
  *
- * ...
+ * Stores the min and max values of Vector3 s, Triangle s, other BoundingBox es and Geometry.
  */
 
 class BoundingBox {
@@ -44,7 +43,6 @@ class BoundingBox {
 public:
 	BoundingBox();
 	BoundingBox(float x1, float y1, float z1, float x2, float y2, float z2);
-	virtual ~BoundingBox();
 
 	// Member variables
 public:
@@ -57,36 +55,63 @@ public:
 
 	// Methods
 public:
-
+	//! Reset the BoundingBox.
 	void Clear(void);
-	void Insert(const Geometry &geometry, const AffineTransformMatrix &matrix);
-	void Insert(const Surface &surface);
-	void Insert(const BoundingBox &bbox);
-	void Insert(const Triangle &tri);
 
+	//! Insert a Geometry object into the box.
+	void Insert(const Geometry& geometry, const AffineTransformMatrix& matrix);
+
+	//! Insert a single vector.
+	void Insert(const Vector3& point);
+
+	//! Insert another BoungingBox.
+	void Insert(const BoundingBox& bbox);
+
+	//! Insert a single Triangle.
+	void Insert(const Triangle& tri);
+
+	//! Check ich the box is empty.
 	bool IsEmpty(void) const;
+
+	/*!\brief Check if the box has zero volume.
+	 * This function checks if all points inserted are the same point.
+	 * This is not the same as a check for IsEmpty.
+	 */
 	bool IsVolumeZero(void) const;
+
+	//! Get the volume of the box.
 	double GetVolume(void) const;
 
+	//! Returns the size in x direction.
 	double GetSizeX(void)
 	{
 		if(xmax < xmin) return 0.0;
 		return xmax - xmin;
 	}
+
+	//! Returns the size in x direction.
 	double GetSizeY(void)
 	{
 		if(ymax < ymin) return 0.0;
 		return ymax - ymin;
 	}
+
+	//! Returns the size in x direction.
 	double GetSizeZ(void)
 	{
 		if(zmax < zmin) return 0.0;
 		return zmax - zmin;
 	}
 
+	//! Put the box into a textstream.
 	void ToStream(wxTextOutputStream & stream);
+
+	//! Read a box from a textstream.
 	bool FromStream(wxTextInputStream & stream);
-	void Paint(void);
+
+	//! Paint the box in OpenGL.
+	void Paint(void) const;
 };
+WX_DECLARE_OBJARRAY(BoundingBox, ArrayOfBoundingBox);
 
 #endif /* BOUNDINGBOX_H_ */

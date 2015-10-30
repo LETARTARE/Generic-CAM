@@ -27,10 +27,10 @@
 #ifndef OCTREE_H_
 #define OCTREE_H_
 
-#include <GL/gl.h>
-#include <stdint.h>
 #include <wx/defs.h>
 #include <wx/dynarray.h>
+#include <GL/gl.h>
+#include <stdint.h>
 
 /*!\class OctreeCell
  * \brief Stores the data for a cell in the Octree.

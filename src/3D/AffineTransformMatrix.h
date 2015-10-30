@@ -29,6 +29,7 @@
 
 /** \class AffineTransformMatrix
  * 	\code #include "AffineTransformMatrix.h"\endcode
+ * 	\ingroup Base3D
  *  \brief A class to store a 3D affine transform matrix and provide operations upon.
  *
  * This class stores and manages a 4x4 matrix. This matrix is organized the same way,
@@ -56,8 +57,8 @@
  */
 
 // http://www.parashift.com/c++-faq-lite/operator-overloading.html
-#include <wx/string.h>
 #include <wx/dynarray.h>
+#include <wx/string.h>
 #include <wx/txtstrm.h>
 
 #include "Vector3.h"
@@ -66,7 +67,6 @@ class AffineTransformMatrix {
 	// Constructor / Destructor
 public:
 	AffineTransformMatrix();
-	virtual ~AffineTransformMatrix();
 
 	// Member variables
 public:
@@ -94,10 +94,10 @@ public:
 	void Set(AffineTransformMatrix const& b);
 
 	AffineTransformMatrix & operator*=(const AffineTransformMatrix &b);
-	const AffineTransformMatrix operator*(const AffineTransformMatrix &b) const;
+	const AffineTransformMatrix operator*(const AffineTransformMatrix& b) const;
 
 	AffineTransformMatrix & operator/=(const AffineTransformMatrix &b);
-	const AffineTransformMatrix operator/(const AffineTransformMatrix &b) const;
+	const AffineTransformMatrix operator/(const AffineTransformMatrix& b) const;
 
 	Vector3 GetCenter(void) const;
 
@@ -114,6 +114,9 @@ public:
 			double const& scale);
 	static AffineTransformMatrix RotateXYZ(double const& x, double const& y,
 			double const& z);
+	static AffineTransformMatrix RotateTrackball(double const& x1,
+			double const& y1, double const& x2, double const& y2,
+			double const& r);
 
 	void TranslateGlobal(double const& x, double const& y, double const& z);
 	void TranslateLocal(double const& x, double const& y, double const& z);
@@ -123,7 +126,6 @@ public:
 
 	Vector3 Transform(Vector3 const& v) const;
 	Vector3 TransformNoShift(Vector3 const& v) const;
-
 };
 
 WX_DECLARE_OBJARRAY(AffineTransformMatrix, ArrayOfAffineTransformMatrix);

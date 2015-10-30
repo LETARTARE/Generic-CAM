@@ -24,16 +24,18 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef TRIANGLE_H_
 #define TRIANGLE_H_
 
 #include "Vector3.h"
-#include "AffineTransformMatrix.h"
-#include <wx/string.h>
 #include <wx/dynarray.h>
+#include <wx/string.h>
+
+class AffineTransformMatrix;
+
 /*!\class Triangle
- * \brief Defines a simple triangle.
+ * \ingroup Base3D
+ * \brief Simple triangle
  *
  * Holds the data for a simple triangle. Three vertices with three normal vectors.
  */
@@ -43,7 +45,7 @@ class Triangle {
 public:
 	Triangle();
 	Triangle(wxString string);
-	virtual ~Triangle();
+
 	//Member variables:
 	Vector3 p[3]; //!< Position of vertices.
 	Vector3 n[3]; //!< Normal vectors.
@@ -58,7 +60,6 @@ public:
 	void ApplyTransformation(const AffineTransformMatrix &matrix);
 
 };
-WX_DECLARE_OBJARRAY(Triangle, ArrayOfTriangle)
-;
+WX_DECLARE_OBJARRAY(Triangle, ArrayOfTriangle);
 
 #endif /* TRIANGLE_H_ */

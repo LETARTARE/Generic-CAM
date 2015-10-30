@@ -25,6 +25,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "Triangle.h"
+
+#include "AffineTransformMatrix.h"
+
 #include <GL/gl.h>
 #include <wx/tokenzr.h>
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
@@ -33,13 +36,10 @@ WX_DEFINE_OBJARRAY(ArrayOfTriangle)
 Triangle::Triangle()
 {
 }
+
 Triangle::Triangle(wxString string)
 {
 	this->FromString(string);
-}
-
-Triangle::~Triangle()
-{
 }
 
 wxString Triangle::ToString(void) const

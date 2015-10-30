@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : Geometry.cpp
-// Purpose            : Class for managing 3D geometry data.
+// Purpose            : Class for managing 3D geometry data
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -25,11 +25,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "Geometry.h"
+
 #include <GL/gl.h>
 #include <wx/log.h>
-
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
-WX_DEFINE_OBJARRAY(ArrayOfGeometry)
+WX_DEFINE_OBJARRAY(ArrayOfGeometry);
 
 Geometry::Geometry()
 {
@@ -48,7 +48,7 @@ void Geometry::Clear(void)
 	triangles.Clear();
 }
 
-void Geometry::InsertTrianglesFrom(const Geometry &geometry, bool recolor)
+void Geometry::InsertTrianglesFrom(const Geometry& geometry, bool recolor)
 {
 	size_t i;
 	Triangle temp;
@@ -63,7 +63,7 @@ void Geometry::InsertTrianglesFrom(const Geometry &geometry, bool recolor)
 	}
 }
 
-void Geometry::ApplyTransformation(const AffineTransformMatrix &matrix)
+void Geometry::ApplyTransformation(const AffineTransformMatrix& matrix)
 {
 	size_t i;
 	for(i = 0; i < triangles.Count(); i++)
@@ -97,6 +97,10 @@ void Geometry::Paint(void) const
 	size_t i;
 	::glBegin(GL_TRIANGLES);
 	switch(useColor){
+	case geometryColorNone:
+		for(i = 0; i < triangles.Count(); i++)
+			triangles[i].Paint(true, false);
+		break;
 	case geometryColorGlobal:
 		::glColor3f(color.x, color.y, color.z);
 		for(i = 0; i < triangles.Count(); i++)
@@ -124,7 +128,7 @@ void Geometry::Paint(void) const
 #endif
 }
 
-void Geometry::AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c)
+void Geometry::AddTriangle(const Vector3& a, const Vector3& b, const Vector3& c)
 {
 	Triangle* tri = new Triangle;
 	tri->p[0] = a;
@@ -135,9 +139,9 @@ void Geometry::AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c)
 	triangles.Add(tri);
 }
 
-void Geometry::AddTriangleWithNormals(const Vector3 &a, const Vector3 &b,
-		const Vector3 &c, const Vector3 &na, const Vector3 &nb,
-		const Vector3 &nc)
+void Geometry::AddTriangleWithNormals(const Vector3& a, const Vector3& b,
+		const Vector3& c, const Vector3& na, const Vector3& nb,
+		const Vector3& nc)
 {
 	Triangle* tri = new Triangle;
 	tri->p[0] = a;
@@ -150,8 +154,8 @@ void Geometry::AddTriangleWithNormals(const Vector3 &a, const Vector3 &b,
 	triangles.Add(tri);
 }
 
-void Geometry::AddTriangleTransform(const Vector3 &a, const Vector3 &b,
-		const Vector3 &c, const AffineTransformMatrix &transformMatrix)
+void Geometry::AddTriangleTransform(const Vector3& a, const Vector3& b,
+		const Vector3& c, const AffineTransformMatrix& transformMatrix)
 {
 	Triangle* tri = new Triangle;
 	tri->p[0] = transformMatrix.Transform(a);
@@ -169,8 +173,8 @@ void Geometry::AddTriangle(const Triangle& tri, bool copyNormals)
 	triangles.Add(temp);
 }
 
-void Geometry::AddQuad(const Vector3 &a, const Vector3 &b, const Vector3 &c,
-		const Vector3 &d)
+void Geometry::AddQuad(const Vector3& a, const Vector3& b, const Vector3& c,
+		const Vector3& d)
 {
 	Triangle* tri0 = new Triangle;
 	Triangle* tri1 = new Triangle;
@@ -190,9 +194,9 @@ void Geometry::AddQuad(const Vector3 &a, const Vector3 &b, const Vector3 &c,
 	triangles.Add(tri1);
 }
 
-void Geometry::AddQuadTransform(const Vector3 &a, const Vector3 &b,
-		const Vector3 &c, const Vector3 &d,
-		const AffineTransformMatrix &transformMatrix)
+void Geometry::AddQuadTransform(const Vector3& a, const Vector3& b,
+		const Vector3& c, const Vector3& d,
+		const AffineTransformMatrix& transformMatrix)
 {
 	Triangle* tri0 = new Triangle;
 	Triangle* tri1 = new Triangle;
@@ -312,11 +316,11 @@ void Geometry::ToXml(wxXmlNode* parentNode)
 	}
 }
 
-bool Geometry::FromXml(wxXmlNode* node)
+bool Geometry::FromXml(wxXmlNode* parentNode)
 {
-	if(node->GetName() != _T("geometry")) return false;
-	name = node->GetPropVal(_T("name"), _T(""));
-	wxXmlNode *temp = node->GetChildren();
+	if(parentNode->GetName() != _T("geometry")) return false;
+	name = parentNode->GetPropVal(_T("name"), _T(""));
+	wxXmlNode *temp = parentNode->GetChildren();
 
 	triangles.Empty();
 	Triangle* tri;

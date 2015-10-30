@@ -26,12 +26,12 @@
 
 #include "Quadtree.h"
 
-#include <stddef.h>
-#include <wx/defs.h>
-#include <cmath>
-
 #include "Triangle.h"
 #include "Vector3.h"
+#include <wx/defs.h>
+#include <stddef.h>
+#include <cmath>
+
 
 Quadtree::QuadtreeCell::QuadtreeCell()
 {

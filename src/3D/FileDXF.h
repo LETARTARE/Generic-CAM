@@ -28,9 +28,10 @@
 #define FILEDXF_H_
 
 /*!\class FileDXF
- * \brief Reads a DXF file
+ * \ingroup File3D
+ * \brief DXF file
  *
- * ...
+ * Class for reading in DXF files
  */
 
 #include "GeometryFileAbstract.h"

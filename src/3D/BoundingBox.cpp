@@ -28,6 +28,8 @@
 
 #include <GL/gl.h>
 #include <float.h>
+#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+WX_DEFINE_OBJARRAY(ArrayOfBoundingBox)
 
 BoundingBox::BoundingBox()
 {
@@ -57,10 +59,6 @@ BoundingBox::BoundingBox(float x1, float y1, float z1, float x2, float y2,
 	xmax = x2;
 	ymax = y2;
 	zmax = z2;
-}
-
-BoundingBox::~BoundingBox()
-{
 }
 
 void BoundingBox::Clear(void)
@@ -111,19 +109,14 @@ void BoundingBox::Insert(const Geometry &geometry,
 	}
 }
 
-void BoundingBox::Insert(const Surface &surface)
+void BoundingBox::Insert(const Vector3& point)
 {
-	size_t i;
-	Vector3 temp;
-	for(i = 0; i < surface.GetVertexCount(); i++){
-		temp = surface.GetVertex(i);
-		if(temp.x > xmax) xmax = temp.x;
-		if(temp.x < xmin) xmin = temp.x;
-		if(temp.y > ymax) ymax = temp.y;
-		if(temp.y < ymin) ymin = temp.y;
-		if(temp.z > zmax) zmax = temp.z;
-		if(temp.z < zmin) zmin = temp.z;
-	}
+	if(point.x > xmax) xmax = point.x;
+	if(point.x < xmin) xmin = point.x;
+	if(point.y > ymax) ymax = point.y;
+	if(point.y < ymin) ymin = point.y;
+	if(point.z > zmax) zmax = point.z;
+	if(point.z < zmin) zmin = point.z;
 }
 
 void BoundingBox::Insert(const BoundingBox& bbox)
@@ -149,7 +142,7 @@ void BoundingBox::Insert(const Triangle &tri)
 	}
 }
 
-void BoundingBox::Paint(void)
+void BoundingBox::Paint(void) const
 {
 
 	float overlap = 0.1;

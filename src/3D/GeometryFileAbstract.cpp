@@ -47,3 +47,13 @@ void GeometryFileAbstract::Paint(void) const
 	}
 	::glPopMatrix();
 }
+
+bool GeometryFileAbstract::ReadFile(wxString fileName)
+{
+	return false;
+}
+
+bool GeometryFileAbstract::WriteFile(wxString fileName) const
+{
+	return false;
+}
