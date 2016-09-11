@@ -25,7 +25,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "DialogPlacement.h"
-#include "../command/CommandWorkpieceObjectTransform.h"
+
+#include "../project/command/CommandWorkpieceObjectTransform.h"
 #include "IDs.h"
 
 DialogPlacement::DialogPlacement(wxWindow* parent, Project* project,
@@ -55,7 +56,7 @@ bool DialogPlacement::TransferDataToWindow(void)
 
 	if(wpNr >= 0){
 		for(n = 0; n < project->workpieces[wpNr].placements.GetCount(); n++){
-			int obNr = project->workpieces[wpNr].placements[n].objectNr;
+			int obNr = project->workpieces[wpNr].placements[n].refObject;
 			if(obNr > -1){
 				m_choicePlacement->Append(project->objects[obNr].name);
 			}else{
@@ -82,7 +83,8 @@ bool DialogPlacement::TransferDataToWindow(void)
 						project->workpieces[wpNr].placements[plNr].matrix.rz));
 		m_sliderAngle->SetValue(
 				(int) round(
-						project->workpieces[wpNr].placements[plNr].matrix.rz*180.0/M_PI));
+						project->workpieces[wpNr].placements[plNr].matrix.rz
+								* 180.0 / M_PI));
 		m_textCtrlDistance->SetValue(
 				settings->Distance.TextFromSI(
 						project->workpieces[wpNr].placements[plNr].slotWidth));
@@ -165,7 +167,7 @@ void DialogPlacement::OnSelectWorkpiece(wxCommandEvent& event)
 	for(n = 0; n < project->workpieces.GetCount(); n++)
 		project->workpieces[n].selected = (n == id);
 
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHTREE);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHMAINGUI);
 	ProcessEvent(selectEvent);
 	TransferDataToWindow();
 }
@@ -181,7 +183,7 @@ void DialogPlacement::OnSelectObject(wxCommandEvent& event)
 	for(n = 0; n < project->workpieces[wpNr].placements.GetCount(); n++)
 		project->workpieces[wpNr].placements[n].selected = (n == plNr);
 
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHTREE);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHMAINGUI);
 	ProcessEvent(selectEvent);
 	TransferDataToWindow();
 
@@ -193,7 +195,7 @@ void DialogPlacement::OnChangePosition(wxCommandEvent& event)
 	if(wpNr < 0) return;
 	int plNr = m_choicePlacement->GetSelection() - 1;
 	if(plNr < 0) return;
-	int objNr = project->workpieces[wpNr].placements[plNr].objectNr;
+	int objNr = project->workpieces[wpNr].placements[plNr].refObject;
 	if(objNr < 0) return;
 
 	AffineTransformMatrix temp =
@@ -232,7 +234,7 @@ void DialogPlacement::OnChangePosition(wxCommandEvent& event)
 			new CommandWorkpieceObjectTransform(description, project, wpNr,
 					plNr, temp));
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-	ID_REFRESHDISPLAY);
+	ID_REFRESH3DVIEW);
 	ProcessEvent(selectEvent);
 	TransferDataToWindow();
 }
@@ -244,7 +246,7 @@ void DialogPlacement::OnChangeSlider(wxScrollEvent& event)
 	if(wpNr < 0) return;
 	int plNr = m_choicePlacement->GetSelection() - 1;
 	if(plNr < 0) return;
-	int objNr = project->workpieces[wpNr].placements[plNr].objectNr;
+	int objNr = project->workpieces[wpNr].placements[plNr].refObject;
 	if(objNr < 0) return;
 
 	AffineTransformMatrix temp =
@@ -253,7 +255,7 @@ void DialogPlacement::OnChangeSlider(wxScrollEvent& event)
 	wxString description;
 	float d;
 	d = (float) m_sliderAngle->GetValue();
-	temp.rz = d *M_PI/180.0;
+	temp.rz = d * M_PI / 180.0;
 	temp.PutMatrixTogether();
 	description = _("Rotate around Z: ")
 			+ settings->Angle.TextFromSIWithUnit(d, 2);
@@ -261,7 +263,7 @@ void DialogPlacement::OnChangeSlider(wxScrollEvent& event)
 			new CommandWorkpieceObjectTransform(description, project, wpNr,
 					plNr, temp));
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-	ID_REFRESHDISPLAY);
+	ID_REFRESH3DVIEW);
 	ProcessEvent(selectEvent);
 	TransferDataToWindow();
 }
@@ -279,7 +281,7 @@ void DialogPlacement::OnTransform(wxCommandEvent& event)
 	if(wpNr < 0) return;
 	int plNr = m_choicePlacement->GetSelection() - 1;
 	if(plNr < 0) return;
-	int objNr = project->workpieces[wpNr].placements[plNr].objectNr;
+	int objNr = project->workpieces[wpNr].placements[plNr].refObject;
 	if(objNr < 0) return;
 
 	AffineTransformMatrix temp =
@@ -312,13 +314,13 @@ void DialogPlacement::OnTransform(wxCommandEvent& event)
 		break;
 	case ID_ALIGNTOP:
 		temp.TranslateGlobal(0, 0,
-				-temp.tz + project->workpieces[wpNr].sz
+				-temp.tz + project->workpieces[wpNr].GetSizeZ()
 						- project->objects[objNr].bbox.GetSizeZ());
 		description = _("Align with top");
 		break;
 	case ID_ALIGNMIDDLE:
 		temp.TranslateGlobal(0, 0,
-				-temp.tz + project->workpieces[wpNr].sz / 2.0
+				-temp.tz + project->workpieces[wpNr].GetSizeZ() / 2.0
 						- project->objects[objNr].bbox.GetSizeZ() / 2.0);
 		description = _("Align with middle");
 		break;
@@ -333,7 +335,7 @@ void DialogPlacement::OnTransform(wxCommandEvent& event)
 					plNr, temp));
 
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-	ID_REFRESHDISPLAY);
+	ID_REFRESH3DVIEW);
 	ProcessEvent(selectEvent);
 	TransferDataToWindow();
 }

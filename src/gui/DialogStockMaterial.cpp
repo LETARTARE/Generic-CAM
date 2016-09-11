@@ -25,15 +25,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "DialogStockMaterial.h"
+
 #include "IDs.h"
 
 DialogStockMaterial::DialogStockMaterial(wxWindow* parent, Project * project,
-		wxCommandProcessor * commandProcessor, DisplaySettings * settings) :
+		StockFile* stock, DisplaySettings * settings) :
 		GUIStockMaterial(parent)
 {
 	this->project = project;
 	this->settings = settings;
-	this->commandProcessor = commandProcessor;
+	this->stock = stock;
 
 	selectedLine = -1;
 	isInitialized = false;
@@ -70,7 +71,7 @@ bool DialogStockMaterial::TransferDataToWindow(void)
 
 	if(!isInitialized) Initialize();
 
-	ArrayOfStockMaterial* temp = &(project->stock.stockMaterials);
+	ArrayOfStockMaterial* temp = &(stock->stockMaterials);
 	size_t N = m_listCtrl->GetItemCount();
 	size_t i;
 	for(i = 0; i < temp->GetCount(); i++){
@@ -158,23 +159,24 @@ void DialogStockMaterial::OnAddUpdate(wxCommandEvent& event)
 	TransferDataFromWindow();
 
 	size_t i;
-	for(i = 0; i < project->stock.stockMaterials.GetCount(); i++){
-		if(project->stock.stockMaterials[i].name.CmpNoCase(name) == 0) break;
+	for(i = 0; i < stock->stockMaterials.GetCount(); i++){
+		if(stock->stockMaterials[i].name.CmpNoCase(name) == 0) break;
 	}
-	if(i >= project->stock.stockMaterials.GetCount()){
-		project->stock.stockMaterials.Add(new StockMaterial);
-		i = project->stock.stockMaterials.GetCount() - 1;
+	if(i >= stock->stockMaterials.GetCount()){
+		stock->stockMaterials.Add(new StockMaterial);
+		i = stock->stockMaterials.GetCount() - 1;
 	}
 
-	project->stock.stockMaterials[i].name = name;
-	project->stock.stockMaterials[i].sx = sx;
-	project->stock.stockMaterials[i].sy = sy;
-	project->stock.stockMaterials[i].sz = sz;
-	project->stock.stockMaterials[i].maxToolSpeed = toolSpeed;
-	project->stock.stockMaterials[i].maxFeedrate = feedrate;
-	project->stock.stockMaterials[i].available = available;
+	stock->stockMaterials[i].name = name;
+	stock->stockMaterials[i].sx = sx;
+	stock->stockMaterials[i].sy = sy;
+	stock->stockMaterials[i].sz = sz;
+	stock->stockMaterials[i].maxToolSpeed = toolSpeed;
+	stock->stockMaterials[i].maxFeedrate = feedrate;
+	stock->stockMaterials[i].available = available;
 
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
+	//TODO: Does the above operation require a refresh?
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHMAINGUI);
 	ProcessEvent(selectEvent);
 }
 
@@ -182,11 +184,11 @@ void DialogStockMaterial::OnDelete(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
 	size_t i;
-	for(i = 0; i < project->stock.stockMaterials.GetCount(); i++){
-		if(project->stock.stockMaterials[i].name.Cmp(name) == 0) break;
+	for(i = 0; i < stock->stockMaterials.GetCount(); i++){
+		if(stock->stockMaterials[i].name.Cmp(name) == 0) break;
 	}
-	if(i < project->stock.stockMaterials.GetCount()){
-		project->stock.stockMaterials.RemoveAt(i);
+	if(i < stock->stockMaterials.GetCount()){
+		stock->stockMaterials.RemoveAt(i);
 	}
 	TransferDataToWindow();
 }
@@ -195,8 +197,8 @@ void DialogStockMaterial::OnActivate(wxListEvent& event)
 {
 	TransferDataFromWindow();
 	int i = event.GetIndex();
-	project->stock.stockMaterials[i].available ^= true;
-	available = project->stock.stockMaterials[i].available;
+	stock->stockMaterials[i].available ^= true;
+	available = stock->stockMaterials[i].available;
 	TransferDataToWindow();
 }
 
@@ -212,13 +214,13 @@ void DialogStockMaterial::OnSelected(wxListEvent& event)
 {
 	int i = event.GetIndex();
 
-	sx = project->stock.stockMaterials[i].sx;
-	sy = project->stock.stockMaterials[i].sy;
-	sz = project->stock.stockMaterials[i].sz;
-	name = project->stock.stockMaterials[i].name;
-	feedrate = project->stock.stockMaterials[i].maxFeedrate;
-	toolSpeed = project->stock.stockMaterials[i].maxToolSpeed;
-	available = project->stock.stockMaterials[i].available;
+	sx = stock->stockMaterials[i].sx;
+	sy = stock->stockMaterials[i].sy;
+	sz = stock->stockMaterials[i].sz;
+	name = stock->stockMaterials[i].name;
+	feedrate = stock->stockMaterials[i].maxFeedrate;
+	toolSpeed = stock->stockMaterials[i].maxToolSpeed;
+	available = stock->stockMaterials[i].available;
 
 	TransferDataToWindow();
 }

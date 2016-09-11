@@ -28,62 +28,59 @@
 #define OBJECTPLACEMENT_H_
 
 /*!\class ObjectPlacement
- * \brief ...
+ * \ingroup document
+ * \brief Placement of an object
  *
- * ...
+ * Placement of an object in the workpiece. This also containc slicing information. One object thus can have
+ * more than one placement. (This is why this a separate class.)
  */
 
-#include <stddef.h>
-#include <wx/dynarray.h>
-#include <wx/wfstream.h>
-#include <wx/xml/xml.h>
-
-#include "../3D/AffineTransformMatrix.h"
+#include "Object.h"
 #include "../3D/BoundingBox.h"
 #include "../3D/Polygon25.h"
-#include "Object.h"
+#include "../3D/AffineTransformMatrix.h"
 
-class ArrayOfObject;
+#include <wx/xml/xml.h>
+#include <wx/wfstream.h>
+#include <wx/dynarray.h>
+#include <stddef.h>
 
+class Workpiece;
 class ObjectPlacement {
 public:
 	ObjectPlacement();
 	virtual ~ObjectPlacement();
 
 public:
-	bool selected;
-	bool modified;
+	size_t refObject;
 
 	AffineTransformMatrix matrix;
-	size_t objectNr;
 
-	Polygon25 outline;
+	//TODO: Remove the "selected" flag.
+	bool selected;
+//	bool modified;
+//	bool isMovable;
+//	bool isKeepout;
+//	BoundingBox bbox;
 
-	BoundingBox bbox;
-
-	//	// Slot around Objects
-	double slotWidth;
+// Slot around Objects
 	bool useContour;
-	//	double supportDistance;
-	//	double supportWidth;
-	//	double supportHeight;
-	//	double middleY;
-	//	double offsetX;
+	double slotWidth;
+	Polygon25 outline;
+	Workpiece * parent; //!< Pointer back to the Workpiece this ObjectPlacement belongs to.
 
-	bool isMovable;
-	bool isKeepout;
-
-	//Methods:
+//Methods:
 public:
 	void Clear(void);
-	void Update(const ArrayOfObject &objects);
 
 	void ToStream(wxTextOutputStream & stream);
 	bool FromStream(wxTextInputStream & stream);
 
+//	void Update(const ArrayOfObject &objects);
 //	void SetKeepout(double x, double y, double sizex, double sizey);
-
 //	void Paint(void) const;
+
 };
 WX_DECLARE_OBJARRAY(ObjectPlacement, ArrayOfObjectPlacement);
+
 #endif /* OBJECTPLACEMENT_H_ */

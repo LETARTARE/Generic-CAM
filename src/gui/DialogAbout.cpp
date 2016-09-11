@@ -25,16 +25,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "DialogAbout.h"
+
 #include "../StdInclude.h"
 
 DialogAbout::DialogAbout(wxWindow* parent) :
-GUIAbout(parent)
+		GUIAbout(parent)
 {
-	}
+}
 
 DialogAbout::~DialogAbout()
 {
-
 }
 
 void DialogAbout::OnClose(wxCommandEvent& event)

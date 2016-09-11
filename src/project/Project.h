@@ -28,7 +28,8 @@
 #define PROJECT_H_
 
 /*!\class Project
- * \brief Holds the data for an project.
+ * \ingroup document
+ * \brief Holds the data of a project.
  *
  * An GenericCAM project consists of
  * - one or more objects (may be modified, sliced, inverted into mold forms, ect.)
@@ -39,30 +40,20 @@
  *    - toolpath generators
  *    - generated toolpaths
  *
+ * \todo: Rewrite the XML load/store to LUA script store/load.
  */
 
-#include <stddef.h>
-#include <wx/defs.h>
+#include "../Config.h"
+
+#include "Run.h"
+#include "Workpiece.h"
+#include "Object.h"
+
 #include <wx/filename.h>
 #include <wx/string.h>
-#include "../Config.h"
-#if(_GENERICCAM_USEMULTITHREADING == 1)
-#include <wx/thread.h>
-#endif
+#include <wx/defs.h>
 
-#include "../3D/OctreeGenerator.h"
-#include "../3D/Quadtree.h"
-#include "FlipDrillPattern.h"
-#include "Object.h"
-#include "Run.h"
-#include "StockFile.h"
-#include "Toolbox.h"
-#include "ToolPath.h"
-#include "Workpiece.h"
-
-enum DisplayType {
-	displayObjects, displayWorkpieces, displayRun
-};
+#include <stddef.h>
 
 class Project {
 public:
@@ -74,24 +65,13 @@ public:
 	wxFileName fileName;
 	wxString name;
 
-	bool processToolpath;
-#if(_GENERICCAM_USEMULTITHREADING == 1)
-
-	wxMutex mtx_project;
-	wxMutex mtx_generator;
-#endif
-	bool interruptProcessing;
-
-	// Supplies
-	StockFile stock;
-	Toolbox toolbox;
-	ArrayOfFlipDrillPattern pattern;
-
-	// Loaded and constructed items
 	ArrayOfObject objects; //!> Loaded objects
 	ArrayOfWorkpiece workpieces; //!> Workpieces with objects
 	ArrayOfRun run; //!> Machine runs on workpieces
 
+	// Loaded and constructed items
+//	bool processToolpath;
+//	bool interruptProcessing;
 	// Experimental stuff:
 	//	OctreeGenerator octree;
 	//	Quadtree quadtree;
@@ -99,15 +79,15 @@ public:
 	// For target generator
 	//	double resolution;
 
-	DisplayType displayType;
-
-	bool displayGeometry;
-	bool displayMachine;
-	bool displayStock;
-	bool displayBoundingBox;
-	bool displayTargets;
-	bool displayToolpath;
-	bool displayOutLines;
+//	DisplayType displayType;
+//
+//	bool displayGeometry;
+//	bool displayMachine;
+//	bool displayStock;
+//	bool displayBoundingBox;
+//	bool displayTargets;
+//	bool displayToolpath;
+//	bool displayOutLines;
 
 	// Methods
 public:
@@ -115,21 +95,28 @@ public:
 
 	bool Load(wxFileName fileName);
 	bool Save(wxFileName fileName);
+
 	void LoadPattern(wxFileName filename);
 
 	void Paint(void);
 
-	void PropagateChanges(void);
-	size_t ToolpathToGenerate(void);
-	bool ToolpathGenerate(void);
-	wxString TollPathGenerateCurrent(void);
+	void Update(void);
 
-	bool GenerateToolpaths(void);
+//	void PropagateChanges(void);
+//	size_t ToolpathToGenerate(void);
+//	bool ToolpathGenerate(void);
+//	bool GenerateToolpaths(void);
 
-private:
-	size_t generator_workpieceNr;
-	size_t generator_runNr;
-	size_t generator_toolpathNr;
+//	wxString TollPathGenerateCurrent(void);
+
+//	size_t generator_workpieceNr;
+//	size_t generator_runNr;
+//	size_t generator_toolpathNr;
+
+#if(_GENERICCAM_USEMULTITHREADING == 1)
+	wxMutex mtx_project;
+	wxMutex mtx_generator;
+#endif
 
 };
 

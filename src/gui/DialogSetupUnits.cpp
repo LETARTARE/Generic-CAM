@@ -25,8 +25,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "DialogSetupUnits.h"
-#include "../StdInclude.h"
 #include "IDs.h"
+#include "../StdInclude.h"
 
 DialogSetupUnits::DialogSetupUnits(wxWindow* parent, DisplaySettings * settings) :
 		GUISetupUnits(parent)
@@ -135,6 +135,6 @@ bool DialogSetupUnits::TransferDataFromWindow(void)
 void DialogSetupUnits::OnChangeUnit(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
 	ProcessEvent(selectEvent);
 }

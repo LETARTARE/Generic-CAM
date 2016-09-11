@@ -89,12 +89,11 @@ BooleanBox::BooleanBox(const BooleanBox& other)
 	pY = new float[bufferSizeIntersect];
 	pZ = new float[bufferSizeIntersect];
 
-	unsigned int n;
-	for(n = 0; n <= other.nx; n++)
+	for(unsigned int n = 0; n <= other.nx; n++)
 		pX[n] = other.pX[n];
-	for(n = 0; n <= other.ny; n++)
+	for(unsigned int n = 0; n <= other.ny; n++)
 		pY[n] = other.pY[n];
-	for(n = 0; n <= other.nz; n++)
+	for(unsigned int n = 0; n <= other.nz; n++)
 		pZ[n] = other.pZ[n];
 
 	bufferSizeOccupied = other.bufferSizeOccupied;
@@ -105,8 +104,8 @@ BooleanBox::BooleanBox(const BooleanBox& other)
 	bufferSizeOccupied += 1000;
 
 	occupied = new bool[bufferSizeOccupied];
-	unsigned int N = nx * ny * nz;
-	for(n = 0; n < N; n++)
+	const unsigned int N = nx * ny * nz;
+	for(unsigned int n = 0; n < N; n++)
 		occupied[n] = other.occupied[n];
 }
 
@@ -121,14 +120,13 @@ BooleanBox::~BooleanBox()
 void BooleanBox::SizeUpIntersect(unsigned int newSize)
 {
 	if(newSize < 2) return;
-	unsigned int n;
 	float * tempX = new float[newSize];
 	float * tempY = new float[newSize];
 	float * tempZ = new float[newSize];
 	unsigned int h;
 	h = bufferSizeIntersect;
 	if(h > newSize) h = newSize;
-	for(n = 0; n < h; n++){
+	for(unsigned int n = 0; n < h; n++){
 		tempX[n] = pX[n];
 		tempY[n] = pY[n];
 		tempZ[n] = pZ[n];
@@ -141,18 +139,18 @@ void BooleanBox::SizeUpIntersect(unsigned int newSize)
 	pZ = tempZ;
 	bufferSizeIntersect = newSize;
 
-	n = (newSize - 1) * (newSize - 1) * (newSize - 1);
+	unsigned int n = (newSize - 1) * (newSize - 1) * (newSize - 1);
 	if(n > bufferSizeOccupied) SizeUpOccupied(n);
 }
 
 void BooleanBox::SizeUpOccupied(unsigned int newSize)
 {
-	unsigned int n;
+
 	bool * temp = new bool[newSize];
 	unsigned int h;
 	h = bufferSizeOccupied;
 	if(h > newSize) h = newSize;
-	for(n = 0; n < h; n++)
+	for(unsigned int n = 0; n < h; n++)
 		temp[n] = occupied[n];
 	delete[] occupied;
 	occupied = temp;
@@ -161,23 +159,20 @@ void BooleanBox::SizeUpOccupied(unsigned int newSize)
 
 void BooleanBox::Paint(bool flipNormals) const
 {
-	unsigned int ix;
-	unsigned int iy;
-	unsigned int iz;
-	unsigned int hx = 1;
-	unsigned int hy = nx;
-	unsigned int hz = nx * ny;
+	const unsigned int hx = 1;
+	const unsigned int hy = nx;
+	const unsigned int hz = nx * ny;
 
 	::glPushMatrix();
 	::glMultMatrixd(matrix.a);
 
 	::glBegin(GL_QUADS);
 
-	unsigned int n = 0;
 	if(flipNormals){
-		for(iz = 0; iz < nz; iz++){
-			for(iy = 0; iy < ny; iy++){
-				for(ix = 0; ix < nx; ix++){
+		unsigned int n = 0;
+		for(unsigned int iz = 0; iz < nz; iz++){
+			for(unsigned int iy = 0; iy < ny; iy++){
+				for(unsigned int ix = 0; ix < nx; ix++){
 					if(!occupied[n]){
 						n++;
 						continue;
@@ -239,9 +234,10 @@ void BooleanBox::Paint(bool flipNormals) const
 		}
 
 	}else{
-		for(iz = 0; iz < nz; iz++){
-			for(iy = 0; iy < ny; iy++){
-				for(ix = 0; ix < nx; ix++){
+		unsigned int n = 0;
+		for(unsigned int iz = 0; iz < nz; iz++){
+			for(unsigned int iy = 0; iy < ny; iy++){
+				for(unsigned int ix = 0; ix < nx; ix++){
 					if(!occupied[n]){
 						n++;
 						continue;
@@ -329,18 +325,18 @@ void BooleanBox::SetSize(float sx, float sy, float sz)
 BooleanBox& BooleanBox::operator -=(const BooleanBox& rhs)
 {
 // Calculate relative position in x, y and z
-	float mx = rhs.matrix.a[12] - matrix.a[12];
-	float my = rhs.matrix.a[13] - matrix.a[13];
-	float mz = rhs.matrix.a[14] - matrix.a[14];
+	const float mx = rhs.matrix.a[12] - matrix.a[12];
+	const float my = rhs.matrix.a[13] - matrix.a[13];
+	const float mz = rhs.matrix.a[14] - matrix.a[14];
 
-	float eps = 1e-6; // = 1 um
+	const float eps = 1e-6; // = 1 um
 
 // Add extra intersections...
 	float rx, ry, rz;
-	unsigned int n, m, i, j, ix, iy, iz;
+	unsigned int n,  i, j;
 // ... on the X axis:
 	n = 0;
-	for(m = 0; m <= rhs.nx; m++){
+	for(unsigned int m = 0; m <= rhs.nx; m++){
 		rx = rhs.pX[m] + mx;
 		if(rx > pX[nx] - eps) break;
 		while(rx > pX[n + 1] - eps)
@@ -349,16 +345,16 @@ BooleanBox& BooleanBox::operator -=(const BooleanBox& rhs)
 
 		if(nx + 1 >= bufferSizeIntersect) SizeUpIntersect(nx + 11);
 
-		for(i = nx; i > n; i--)
+		for(unsigned int i = nx; i > n; i--)
 			pX[i + 1] = pX[i];
 		pX[n + 1] = rx;
 		nx++;
 		bool * temp = new bool[bufferSizeOccupied];
-		i = 0;
-		j = 0;
-		for(iz = 0; iz < nz; iz++){
-			for(iy = 0; iy < ny; iy++){
-				for(ix = 0; ix < nx; ix++){
+		unsigned int i = 0;
+		unsigned int j = 0;
+		for(unsigned int iz = 0; iz < nz; iz++){
+			for(unsigned int iy = 0; iy < ny; iy++){
+				for(unsigned int ix = 0; ix < nx; ix++){
 					if(ix == n + 1) i--;
 					temp[j] = occupied[i];
 					i++;
@@ -371,24 +367,24 @@ BooleanBox& BooleanBox::operator -=(const BooleanBox& rhs)
 	}
 	// ... on the Y axis:
 	n = 0;
-	for(m = 0; m <= rhs.ny; m++){
+	for(unsigned int m = 0; m <= rhs.ny; m++){
 		ry = rhs.pY[m] + my;
 		if(ry > pY[ny] - eps) break;
 		while(ry > pY[n + 1] - eps)
 			n++;
 		if(ry < pY[n] + eps) continue;
 		if(ny + 1 >= bufferSizeIntersect) SizeUpIntersect(ny + 11);
-		for(i = ny; i > n; i--)
+		for(unsigned int i = ny; i > n; i--)
 			pY[i + 1] = pY[i];
 		pY[n + 1] = ry;
 		ny++;
 		bool * temp = new bool[bufferSizeOccupied];
-		i = 0;
-		j = 0;
-		for(iz = 0; iz < nz; iz++){
-			for(iy = 0; iy < ny; iy++){
+		unsigned int i = 0;
+		unsigned int j = 0;
+		for(unsigned int iz = 0; iz < nz; iz++){
+			for(unsigned int iy = 0; iy < ny; iy++){
 				if(iy == n + 1) i -= nx;
-				for(ix = 0; ix < nx; ix++){
+				for(unsigned int ix = 0; ix < nx; ix++){
 					temp[j] = occupied[i];
 					i++;
 					j++;
@@ -400,24 +396,24 @@ BooleanBox& BooleanBox::operator -=(const BooleanBox& rhs)
 	}
 	// ... on the Z axis:
 	n = 0;
-	for(m = 0; m <= rhs.nz; m++){
+	for(unsigned int m = 0; m <= rhs.nz; m++){
 		rz = rhs.pZ[m] + mz;
 		if(rz > pZ[nz] - eps) break;
 		while(rz > pZ[n + 1] - eps)
 			n++;
 		if(rz < pZ[n] + eps) continue;
 		if(nz + 1 >= bufferSizeIntersect) SizeUpIntersect(nz + 11);
-		for(i = nz; i > n; i--)
+		for(unsigned int i = nz; i > n; i--)
 			pZ[i + 1] = pZ[i];
 		pZ[n + 1] = rz;
 		nz++;
 		bool * temp = new bool[bufferSizeOccupied];
-		i = 0;
-		j = 0;
-		for(iz = 0; iz < nz; iz++){
+		unsigned int i = 0;
+		unsigned int j = 0;
+		for(unsigned int iz = 0; iz < nz; iz++){
 			if(iz == n + 1) i -= nx * ny;
-			for(iy = 0; iy < ny; iy++){
-				for(ix = 0; ix < nx; ix++){
+			for(unsigned int iy = 0; iy < ny; iy++){
+				for(unsigned int ix = 0; ix < nx; ix++){
 					temp[j] = occupied[i];
 					i++;
 					j++;
@@ -429,12 +425,11 @@ BooleanBox& BooleanBox::operator -=(const BooleanBox& rhs)
 	}
 
 	// Do the boolean operation
-	unsigned int jx, jy, jz;
 	float ex, ey, ez;
 	j = 0;
-	for(jz = 0; jz < rhs.nz; jz++)
-		for(jy = 0; jy < rhs.ny; jy++)
-			for(jx = 0; jx < rhs.nx; jx++){
+	for(unsigned int jz = 0; jz < rhs.nz; jz++)
+		for(unsigned int jy = 0; jy < rhs.ny; jy++)
+			for(unsigned int jx = 0; jx < rhs.nx; jx++){
 				if(!rhs.occupied[j]){
 					j++;
 					continue;
@@ -446,17 +441,17 @@ BooleanBox& BooleanBox::operator -=(const BooleanBox& rhs)
 				ey = rhs.pY[jy + 1] + my;
 				ez = rhs.pZ[jz + 1] + mz;
 				i = 0;
-				for(iz = 0; iz < nz; iz++){
+				for(unsigned int iz = 0; iz < nz; iz++){
 					if(pZ[iz] < rz - eps || pZ[iz + 1] > ez + eps){
 						i += nx * ny;
 						continue;
 					}
-					for(iy = 0; iy < ny; iy++){
+					for(unsigned int iy = 0; iy < ny; iy++){
 						if(pY[iy] < ry - eps || pY[iy + 1] > ey + eps){
 							i += nx;
 							continue;
 						}
-						for(ix = 0; ix < nx; ix++){
+						for(unsigned int ix = 0; ix < nx; ix++){
 							if(pX[ix] < rx - eps || pX[ix + 1] > ex + eps){
 								i++;
 								continue;

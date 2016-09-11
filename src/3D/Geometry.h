@@ -42,7 +42,7 @@
  * Geometric data is stored in this class.
  */
 enum GeometryColorStyle {
-	geometryColorNone, geometryColorGlobal, geometryColorTriangle, geometryColorVertex
+	geometryColorNone, geometryColorGlobal, geometryColorTriangle, geometryColorVertex, geometryColorDefault
 };
 
 class Geometry {
@@ -67,7 +67,7 @@ public:
 	void ToXml(wxXmlNode* parentNode);
 	bool FromXml(wxXmlNode* parentNode);
 
-	void Paint(void) const;
+	void Paint(GeometryColorStyle style = geometryColorDefault) const;
 
 	void Clear(void);
 	void InsertTrianglesFrom(const Geometry& geometry, bool recolor = false);

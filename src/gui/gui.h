@@ -22,7 +22,7 @@
 #include <wx/treectrl.h>
 #include <wx/sizer.h>
 #include <wx/panel.h>
-#include "MainCanvas.h"
+#include "CanvasMain.h"
 #include <wx/splitter.h>
 #include <wx/statusbr.h>
 #include <wx/toolbar.h>
@@ -43,7 +43,7 @@
 #include <wx/spinctrl.h>
 #include <wx/combobox.h>
 #include "PanelTool.h"
-#include "ToolCanvas.h"
+#include "CanvasTool.h"
 #include <wx/choicebk.h>
 #include <wx/dialog.h>
 #include <wx/richtext/richtextctrl.h>
@@ -157,9 +157,9 @@
 #define ID_MARGINBELOW 1104
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class GUIMainFrame
+/// Class GUIMain
 ///////////////////////////////////////////////////////////////////////////////
-class GUIMainFrame : public wxFrame 
+class GUIMain : public wxFrame 
 {
 	private:
 	
@@ -180,8 +180,8 @@ class GUIMainFrame : public wxFrame
 		wxSplitterWindow* m_splitter;
 		wxPanel* m_panelTree;
 		wxTreeCtrl* m_tree;
-		wxPanel* m_panelMainCanvas;
-		MainCanvas* m_canvas;
+		wxPanel* m_panelCanvasMain;
+		CanvasMain* m_canvas;
 		wxStatusBar* m_statusBar;
 		wxToolBar* m_toolBar;
 		
@@ -241,12 +241,12 @@ class GUIMainFrame : public wxFrame
 	
 	public:
 		
-		GUIMainFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxPoint( -1,-1 ), const wxSize& size = wxSize( 803,627 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
-		~GUIMainFrame();
+		GUIMain( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxPoint( -1,-1 ), const wxSize& size = wxSize( 803,627 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		~GUIMain();
 		void m_splitterOnIdle( wxIdleEvent& )
 		{
 		m_splitter->SetSashPosition( 144 );
-		m_splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIMainFrame::m_splitterOnIdle ), NULL, this );
+		m_splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIMain::m_splitterOnIdle ), NULL, this );
 		}
 		
 	
@@ -581,7 +581,7 @@ class GUIMachineDebugger : public wxFrame
 		wxPanel* m_panelOutput;
 		wxTextCtrl* m_textCtrlOutput;
 		wxPanel* m_panelMachineView;
-		MainCanvas* m_canvas;
+		CanvasMain* m_canvas;
 		wxStatusBar* m_statusBar3;
 		
 		// Virtual event handlers, overide them in your derived class
@@ -737,7 +737,7 @@ class GUIToolbox : public wxFrame
 		wxCheckBox* m_checkBoxCutting;
 		
 		wxListCtrl* m_listCtrl;
-		ToolCanvas* m_canvas;
+		CanvasTool* m_canvas;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;

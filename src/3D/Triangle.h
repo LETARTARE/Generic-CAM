@@ -27,18 +27,19 @@
 #ifndef TRIANGLE_H_
 #define TRIANGLE_H_
 
-#include "Vector3.h"
-#include <wx/dynarray.h>
-#include <wx/string.h>
-
-class AffineTransformMatrix;
-
 /*!\class Triangle
  * \ingroup Base3D
  * \brief Simple triangle
  *
  * Holds the data for a simple triangle. Three vertices with three normal vectors.
  */
+
+#include "Vector3.h"
+
+#include <wx/string.h>
+#include <wx/dynarray.h>
+
+class AffineTransformMatrix;
 
 class Triangle {
 	// Constructor/Destructor:

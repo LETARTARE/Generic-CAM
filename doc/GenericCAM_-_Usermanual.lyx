@@ -122,7 +122,7 @@ thispagestyle{empty}
 \begin_inset Graphics
 	filename pictures/start.png
 	lyxscale 40
-	width 10cm
+	width 15cm
 
 \end_inset
 
@@ -216,6 +216,79 @@ The "Generic" in Generic CAM stands for being universal.
 This documentation consists of two parts.
  The first one descripts the workflow.
  The second chapter assists on the writing of machine description files.
+\end_layout
+
+\begin_layout Section
+CNC Basics
+\end_layout
+
+\begin_layout Subsection
+Feeds and Speeds
+\end_layout
+
+\begin_layout Itemize
+Tool speeds are in SFM.
+ Surface Feet per Minute.
+ Speed of the blade in a material.
+\end_layout
+
+\begin_layout Itemize
+Calculate RPM from SFM and the tool diameter.
+\end_layout
+
+\begin_layout Itemize
+Forward speed: Chipload for every tooth (flute) on the cutter.
+ Width of the chips.
+ Not to far below the optimal value.
+\end_layout
+
+\begin_layout Itemize
+Climb milling: Chip from wide to small.
+ Better surface.
+\end_layout
+
+\begin_layout Itemize
+Convential milling: Chip from small to wide.
+ No problems with imprecise bearings.
+\end_layout
+
+\begin_layout Itemize
+RPM as fast as possible.
+ But spindle rpm vs power < spindle max power.
+\end_layout
+
+\begin_layout Itemize
+Machine rigidity.
+\end_layout
+
+\begin_layout Itemize
+Cooling and coolant.
+\end_layout
+
+\begin_layout Itemize
+Slotting vs pocketing vs peripheral milling
+\end_layout
+
+\begin_layout Itemize
+Shortest cutter possible, widest diameter possible.
+\end_layout
+
+\begin_layout Itemize
+Quill
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Quill: (german) Hohlwelle, Pinole
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+4-6 mil Chipload for hardwood.
 \end_layout
 
 \begin_layout Standard
@@ -416,19 +489,6 @@ Define a Machine Run
 A machine run is one continuous run of a CNC machine.
  During a run the machine may change tools, but the machine and the workpiece
  are fixed.
-\end_layout
-
-\begin_layout Subsubsection
-Select Workpiece
-\end_layout
-
-\begin_layout Standard
-Each run gets a workpiece assigned.
- A workpiece can be assigned to different runs.
- in every run it can have a different orientation, thus for example the
- top and bottom of an object can be machined.
- In the second run, a workpiece starts of with the modifications of the
- first run, thus hollowed out areas need not be machined again.
 \end_layout
 
 \begin_layout Subsubsection
@@ -734,7 +794,20 @@ Thermoplastics
 \end_layout
 
 \begin_layout Subsubsection
-Toolpath
+Select Workpiece
+\end_layout
+
+\begin_layout Standard
+Each run gets a workpiece assigned.
+ A workpiece can be assigned to different runs.
+ in every run it can have a different orientation, thus for example the
+ top and bottom of an object can be machined.
+ In the second run, a workpiece starts of with the modifications of the
+ first run, thus hollowed out areas need not be machined again.
+\end_layout
+
+\begin_layout Subsubsection
+Toolpath Generators
 \end_layout
 
 \begin_layout Standard
@@ -1022,10 +1095,6 @@ Modelling a Stäubli RX-90 robot with Blender
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 

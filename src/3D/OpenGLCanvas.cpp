@@ -50,11 +50,13 @@ OpenGLCanvas::OpenGLCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 
 	isInitialized = false;
 	m_gllist = 0;
-	x = y = 0;
-	w = h = 1;
+	w = h = 500;
+	x = y = 250;
+	unitAtOrigin = 400;
+
 	turntableX = 0;
 	turntableY = M_PI / 2;
-
+	scale = 1.0;
 	stereoMode = stereoOff;
 	eyeDistance = 0.1;
 	focalDistance = 1.0;
@@ -66,7 +68,7 @@ OpenGLCanvas::OpenGLCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 	leftEyeG = 0;
 	leftEyeB = 0;
 
-	rotationMode = rotateTurntable;
+	rotationMode = rotateInterwoven;
 
 	this->Connect(wxEVT_SIZE, wxSizeEventHandler(OpenGLCanvas::OnSize), NULL,
 			this);
@@ -77,12 +79,14 @@ OpenGLCanvas::OpenGLCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 	this->Connect(wxEVT_ENTER_WINDOW,
 			wxMouseEventHandler(OpenGLCanvas::OnEnterWindow), NULL, this);
 	this->Connect(wxEVT_MOTION, wxMouseEventHandler(OpenGLCanvas::OnMouseEvent),
-			NULL, this);
+	NULL, this);
+	this->Connect(wxEVT_MOUSEWHEEL,
+			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
 	this->Connect(wxEVT_RIGHT_DOWN,
 			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
 	this->Connect(wxEVT_MIDDLE_DOWN,
 			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
-	this->Connect(wxEVT_MOUSEWHEEL,
+	this->Connect(wxEVT_RIGHT_DCLICK,
 			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
 
 #ifdef _USE_6DOFCONTROLLER
@@ -96,26 +100,28 @@ OpenGLCanvas::OpenGLCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 
 OpenGLCanvas::~OpenGLCanvas()
 {
-	this->Disconnect(wxEVT_SIZE, wxSizeEventHandler(OpenGLCanvas::OnSize), NULL,
-			this);
-	this->Disconnect(wxEVT_PAINT, wxPaintEventHandler(OpenGLCanvas::OnPaint),
-			NULL, this);
-	this->Disconnect(wxEVT_ERASE_BACKGROUND,
-			wxEraseEventHandler(OpenGLCanvas::OnEraseBackground), NULL, this);
-	this->Disconnect(wxEVT_ENTER_WINDOW,
-			wxMouseEventHandler(OpenGLCanvas::OnEnterWindow), NULL, this);
-	this->Disconnect(wxEVT_MOTION,
-			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
-	this->Disconnect(wxEVT_RIGHT_DOWN,
+#ifdef _USE_6DOFCONTROLLER
+	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(OpenGLCanvas::OnTimer),
+	NULL, this);
+#endif
+	this->Disconnect(wxEVT_RIGHT_DCLICK,
 			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
 	this->Disconnect(wxEVT_MIDDLE_DOWN,
 			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
+	this->Disconnect(wxEVT_RIGHT_DOWN,
+			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
 	this->Disconnect(wxEVT_MOUSEWHEEL,
 			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
-#ifdef _USE_6DOFCONTROLLER
-	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(OpenGLCanvas::OnTimer),
-			NULL, this);
-#endif
+	this->Disconnect(wxEVT_MOTION,
+			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
+	this->Disconnect(wxEVT_ENTER_WINDOW,
+			wxMouseEventHandler(OpenGLCanvas::OnEnterWindow), NULL, this);
+	this->Disconnect(wxEVT_ERASE_BACKGROUND,
+			wxEraseEventHandler(OpenGLCanvas::OnEraseBackground), NULL, this);
+	this->Disconnect(wxEVT_PAINT, wxPaintEventHandler(OpenGLCanvas::OnPaint),
+	NULL, this);
+	this->Disconnect(wxEVT_SIZE, wxSizeEventHandler(OpenGLCanvas::OnSize), NULL,
+			this);
 }
 
 #ifdef _USE_6DOFCONTROLLER
@@ -235,9 +241,12 @@ bool OpenGLCanvas::OnPick(OpenGLPick &result, wxPoint pos)
 	::gluPerspective(45, ar, 0.01, 10);
 	::glMatrixMode(GL_MODELVIEW);
 	::glLoadIdentity();
-	::glTranslatef(0.0, -0.0, -1.0);
-	::glMultMatrixd(transmat.a);
+
+	::glTranslatef(0.0, 0.0, -focalDistance);
+	::glScalef(scale, scale, scale);
 	::glMultMatrixd(rotmat.a);
+	::glMultMatrixd(transmat.a);
+
 	Render();
 	glFlush();
 	GLuint hits = glRenderMode(GL_RENDER);
@@ -328,15 +337,30 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	}
 
 	if(stereoMode != stereoOff){
-		::glRotatef(
-				atan(eyeDistance / 2 / (focalDistance - transmat.a[14] + 1.0))
-						* 180.0 / M_PI, 0, 1, 0);
+		::glRotatef(atan(eyeDistance / 2 / focalDistance) * 180.0 / M_PI, 0, 1,
+				0);
 		::glTranslatef(eyeDistance / 2, 0, 0);
 	}
 
-	::glTranslatef(0.0, 0.0, -1.0);
-	::glMultMatrixd(transmat.a);
+	::glTranslatef(0.0, 0.0, -focalDistance);
+	::glScalef(scale, scale, scale);
+
+	GLint viewport[4];
+	GLdouble modelview[16];
+	GLdouble projection[16];
+	GLdouble winX1, winY1, winZ1;
+	GLdouble winX2, winY2, winZ2;
+	glGetDoublev( GL_MODELVIEW_MATRIX, modelview);
+	glGetDoublev( GL_PROJECTION_MATRIX, projection);
+	glGetIntegerv( GL_VIEWPORT, viewport);
+	gluProject(0, 0, 0, modelview, projection, viewport, &winX1, &winY1,
+			&winZ1);
+	gluProject(1, 0, 0, modelview, projection, viewport, &winX2, &winY2,
+			&winZ2);
+	unitAtOrigin = winX2 - winX1;
+
 	::glMultMatrixd(rotmat.a);
+	::glMultMatrixd(transmat.a);
 	//	if(m_gllist == 0){
 	//		m_gllist = glGenLists(1); // Make one (1) empty display list.
 	//		glNewList(m_gllist, GL_COMPILE_AND_EXECUTE);
@@ -363,13 +387,13 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	if(stereoMode != stereoOff){
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		::glRotatef(
-				-atan(eyeDistance / 2 / (focalDistance - transmat.a[14] + 1.0))
-						* 180.0 / M_PI, 0, 1, 0);
+		::glRotatef(-atan(eyeDistance / 2 / focalDistance) * 180.0 / M_PI, 0, 1,
+				0);
 		::glTranslatef(-eyeDistance / 2, 0, 0);
-		::glTranslatef(0.0, 0.0, -1.0);
-		::glMultMatrixd(transmat.a);
+		::glTranslatef(0.0, 0.0, -focalDistance);
+		::glScalef(scale, scale, scale);
 		::glMultMatrixd(rotmat.a);
+		::glMultMatrixd(transmat.a);
 		Render();
 		//glCallList(m_gllist);
 
@@ -461,6 +485,16 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 		x = event.m_x;
 		y = event.m_y;
 	}
+	if(event.ButtonDClick(wxMOUSE_BTN_RIGHT)){
+		rotmat = AffineTransformMatrix::Identity();
+		transmat = AffineTransformMatrix::Identity();
+		turntableX = 0;
+		turntableY = M_PI / 2;
+		x = event.m_x;
+		y = event.m_y;
+		this->Refresh();
+	}
+
 	if(event.Dragging() && event.RightIsDown()){
 		double r = (double) ((w < h)? w : h) / 2.2;
 		switch(rotationMode){
@@ -494,9 +528,11 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 	}
 
 	if(event.Dragging() && event.MiddleIsDown()){
-		float dx = (float) (event.m_x - x) / 1000.0;
-		float dy = (float) (event.m_y - y) / 1000.0;
-		transmat.TranslateGlobal(dx, -dy, 0);
+		float movement = 1.0;
+		if(unitAtOrigin > 1.0) movement = unitAtOrigin;
+		float dx = (float) (event.m_x - x) / movement;
+		float dy = (float) (event.m_y - y) / movement;
+		rotmat.TranslateGlobal(dx, -dy, 0);
 		x = event.m_x;
 		y = event.m_y;
 
@@ -505,10 +541,12 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 
 	int x = event.GetWheelRotation();
 	if(x != 0){
-		transmat.TranslateGlobal(0, 0, (float) -x / 1000.0);
+		scale = exp(log(scale) - ((float) x) / 1000.0);
+//		rotmat.TranslateGlobal(0, 0, (float) -x / 1000.0);
 		this->Refresh();
 	}
 
+	if(event.Moving() || event.Dragging()) event.Skip();
 }
 
 #ifdef _USE_6DOFCONTROLLER
@@ -520,15 +558,16 @@ void OpenGLCanvas::OnTimer(wxTimerEvent& event)
 	if(control->IsIdle()) return;
 
 	float resRot = 2000;
-	float resMov = 10000;
+	float resMov = 5 * unitAtOrigin;
 
 	rotmat = AffineTransformMatrix::RotateInterwoven(
 			(float) control->GetAxis(3) / resRot,
 			(float) control->GetAxis(4) / resRot,
 			(float) control->GetAxis(5) / resRot) * rotmat;
-	transmat.TranslateGlobal((float) control->GetAxis(0) / resMov,
+	rotmat.TranslateGlobal((float) control->GetAxis(0) / resMov,
 			(float) control->GetAxis(1) / resMov,
 			(float) control->GetAxis(2) / resMov);
+
 	//rotmat.RotateXY(1,0,1);
 	if(control->GetButton(0)){
 		rotmat.SetIdentity();

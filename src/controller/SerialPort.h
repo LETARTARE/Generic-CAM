@@ -30,41 +30,23 @@
 /*!\class SerialPort
  * \brief Serial port class for Linux and Windows
  *
- *
+ * Encapuslates the intricacies of the serial port on different systems.
  */
-
-#define FC_DTRDSR       0x01
-#define FC_RTSCTS       0x02
-#define FC_XONXOFF      0x04
-#define ASCII_BEL       0x07
-#define ASCII_BS        0x08
-#define ASCII_LF        0x0A
-#define ASCII_CR        0x0D
-#define ASCII_XON       0x11
-#define ASCII_XOFF      0x13
-
-#define BUFFER_LEN	2100
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__)
 #define __WIN
 #elif defined(linux) || defined(__linux)
 #define __LINUX
 #else
-#error "Weder Linux noch Windows gefunden!"
+#error "Neither a Linux nor a Windows system was found!"
 #endif
 
 #ifdef __WIN
 #include <windows.h>
 #endif
-
 #ifdef __LINUX
-#include <stdio.h>
-#include <fcntl.h>
 #include <termios.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#define _POSIX_SOURCE 1
+#include <stdlib.h>
 #endif
 
 class SerialPort {
@@ -81,40 +63,41 @@ public:
 	int SendData(const char *, unsigned int);
 	int ReadDataWaiting(void);
 	void FlushData(void);
-	bool IsOpen(void) const
+	inline bool IsOpen(void) const
 	{
 		return (Opened);
 	}
-	char* GetName()
+	const char* GetName(void) const
 	{
 		return (szPort);
 	}
+
 #ifdef __LINUX
 	void SetDTR(bool activate);
 	void WaitTXFinish(void);
 #endif
 
+public:
+	char Error[200];
+
 protected:
 	bool Opened;
+	char szPort[15]; ///< Name of the open port.
 
-	char szPort[15]; ///> Name of the open port.
+private:
 
 #ifdef __WIN
 	bool WriteCommByte( unsigned char );
 	HANDLE m_hIDComDev;
 	OVERLAPPED m_OverlappedRead, m_OverlappedWrite;
 #endif
-
 #ifdef __LINUX
+	static const unsigned int BUFFER_LEN = 2100;
 	int fd, res;
 	unsigned int buffer_RD, buffer_WR;
 	char m_buffer[BUFFER_LEN];
 	struct termios oldtio, newtio;
-
 #endif
-
-public:
-	char Error[200];
 
 };
 

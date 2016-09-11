@@ -25,20 +25,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "Project.h"
-#include "../3D/BooleanBox.h"
-#include "../generator/ToolpathGeneratorThread.h"
 
-#include <GL/gl.h>
-#include <math.h>
-#include <wx/txtstrm.h>
-#include <wx/wfstream.h>
-#include <wx/zipstrm.h>
+#include "../3D/BooleanBox.h"
+#include "generator/ToolpathGeneratorThread.h"
 
 #include "../3D/FileSTL.h"
 
-#include "../Config.h"
-//TODO: Rewrite the XML load/store to LUA script store/load.
+#include <wx/zipstrm.h>
+#include <wx/txtstrm.h>
+#include <wx/wfstream.h>
 
+#include <GL/gl.h>
+#include <math.h>
 
 Project::Project()
 {
@@ -53,88 +51,87 @@ void Project::Clear(void)
 {
 	name = _("Untitled");
 
-	processToolpath = false;
-	interruptProcessing = false;
+//	processToolpath = false;
+//	interruptProcessing = false;
 
-	run.Empty();
-	workpieces.Empty();
-	objects.Empty();
+	objects.Clear();
+	workpieces.Clear();
+	run.Clear();
 
-	displayType = displayObjects;
+//	displayType = displayObjects;
+//
+//	displayGeometry = true;
+//	displayBoundingBox = false;
+//	displayMachine = false;
+//	displayStock = false;
+//	displayTargets = false;
+//	displayToolpath = false;
+//	displayOutLines = false;
 
-	displayGeometry = true;
-	displayBoundingBox = false;
-	displayMachine = false;
-	displayStock = false;
-	displayTargets = false;
-	displayToolpath = false;
-	displayOutLines = false;
-
-	FlipDrillPattern temp;
-	temp.name = _T("Testpattern 1");
-	pattern.Add(temp);
+//	FlipDrillPattern temp;
+//	temp.name = _T("Testpattern 1");
+//	pattern.Add(temp);
 }
 
-bool Project::GenerateToolpaths(void)
-{
-
-#if(_GENERICCAM_USEMULTITHREADING == 1)
-
-	// Prevent the toolpath generation from being started in more than
-	// one thread.
-	if(mtx_generator.TryLock() != wxMUTEX_NO_ERROR) return false;
-
-	// Wait for the last command to finish. (For these
-	// are the only other function locking the project.)
-	mtx_project.Lock();
-
-	PropagateChanges();
-
-	// Select and start the next generators to have a go
-	// The selection is done workpiece-wise, even if spread across multiple runs.
-	for(size_t workpieceNr = 0; workpieceNr < workpieces.GetCount();
-			workpieceNr++){
-		if(workpieces[workpieceNr].hasRunningGenerator) continue;
-		for(size_t runNr = 0; runNr < run.GetCount(); runNr++){
-			if(run[runNr].workpieceNr != workpieceNr) continue;
-
-			// Find the first generator, that has not generated its toolpath.
-			for(size_t toolpathNr = 0;
-					toolpathNr < run[runNr].toolpaths.GetCount(); toolpathNr++){
-				if(run[runNr].toolpaths[toolpathNr].generator->toolpathGenerated) continue;
-
-				// Generate a detached thread. on exit it signals the workpiece to be free for
-				// other generators.
-				workpieces[workpieceNr].hasRunningGenerator = true;
-				wxThread * thread = new ToolpathGeneratorThread(this, runNr,
-						toolpathNr);
-				if(thread->Create() != wxTHREAD_NO_ERROR){
-					workpieces[workpieceNr].hasRunningGenerator = false;
-					wxLogError(
-							_(
-									"Could not create new thread for toolpath generation."));
-				} else{
-					thread->Run();
-				}
-				break;
-			}
-			if(workpieces[workpieceNr].hasRunningGenerator) break;
-		}
-	}
-
-	mtx_project.Unlock();
-
-	mtx_generator.Unlock();
-	return true;
-#else
-	return false;
-#endif
-
-}
+//bool Project::GenerateToolpaths(void)
+//{
+//
+//#if(_GENERICCAM_USEMULTITHREADING == 1)
+//
+//	// Prevent the toolpath generation from being started in more than
+//	// one thread.
+//	if(mtx_generator.TryLock() != wxMUTEX_NO_ERROR) return false;
+//
+//	// Wait for the last command to finish. (For these
+//	// are the only other function locking the project.)
+//	mtx_project.Lock();
+//
+//	PropagateChanges();
+//
+//	// Select and start the next generators to have a go
+//	// The selection is done workpiece-wise, even if spread across multiple runs.
+//	for(size_t workpieceNr = 0; workpieceNr < workpieces.GetCount();
+//			workpieceNr++){
+//		if(workpieces[workpieceNr].hasRunningGenerator) continue;
+//		for(size_t runNr = 0; runNr < run.GetCount(); runNr++){
+//			if(run[runNr].workpieceNr != workpieceNr) continue;
+//
+//			// Find the first generator, that has not generated its toolpath.
+//			for(size_t toolpathNr = 0;
+//					toolpathNr < run[runNr].toolpaths.GetCount(); toolpathNr++){
+//				if(run[runNr].toolpaths[toolpathNr].generator->toolpathGenerated) continue;
+//
+//				// Generate a detached thread. on exit it signals the workpiece to be free for
+//				// other generators.
+//				workpieces[workpieceNr].hasRunningGenerator = true;
+//				wxThread * thread = new ToolpathGeneratorThread(this, runNr,
+//						toolpathNr);
+//				if(thread->Create() != wxTHREAD_NO_ERROR){
+//					workpieces[workpieceNr].hasRunningGenerator = false;
+//					wxLogError(
+//							_(
+//									"Could not create new thread for toolpath generation."));
+//				} else{
+//					thread->Run();
+//				}
+//				break;
+//			}
+//			if(workpieces[workpieceNr].hasRunningGenerator) break;
+//		}
+//	}
+//
+//	mtx_project.Unlock();
+//
+//	mtx_generator.Unlock();
+//	return true;
+//#else
+//	return false;
+//#endif
+//
+//}
 
 bool Project::Save(wxFileName fileName)
 {
-
 	if(!fileName.IsOk()) return false;
 
 	wxFFileOutputStream out(fileName.GetFullPath());
@@ -271,7 +268,7 @@ bool Project::Load(wxFileName fileName)
 	for(n = 0; n < objects.GetCount(); n++)
 		objects[n].Update();
 	for(n = 0; n < workpieces.GetCount(); n++)
-		workpieces[n].Update(objects);
+		workpieces[n].Update();
 
 	return true;
 }
@@ -297,135 +294,151 @@ void Project::Paint(void)
 
 	size_t i;
 
-	switch(displayType){
-	case displayObjects:
-		glLoadName(1);
-		for(i = 0; i < objects.GetCount(); i++){
-			glPushName(i + 1);
-			objects[i].Paint();
-			glPopName();
-		}
-		break;
-
-	case displayWorkpieces:
-		glLoadName(2);
-		for(i = 0; i < workpieces.GetCount(); i++){
-			if(!workpieces[i].selected) continue;
-			glPushName(i);
-			workpieces[i].Paint(objects);
-			glPopName();
-		}
-		break;
-	case displayRun:
-		glLoadName(3);
-		for(i = 0; i < run.GetCount(); i++){
-			if(!run[i].selected) continue;
-
-			::glPushName(i);
-			run[i].Paint(objects, workpieces);
-			::glPopName();
-		}
-		break;
-	}
-	::glLoadName(0);
+//	switch(displayType){
+//	case displayObjects:
+//		glLoadName(1);
+//		for(i = 0; i < objects.GetCount(); i++){
+//			glPushName(i + 1);
+//			objects[i].Paint();
+//			glPopName();
+//		}
+//		break;
+//
+//	case displayWorkpieces:
+//		glLoadName(2);
+//		for(i = 0; i < workpieces.GetCount(); i++){
+//			if(!workpieces[i].selected) continue;
+//			glPushName(i);
+//			workpieces[i].Paint(objects);
+//			glPopName();
+//		}
+//		break;
+//	case displayRun:
+//		glLoadName(3);
+//		for(i = 0; i < run.GetCount(); i++){
+//			if(!run[i].selected) continue;
+//
+//			::glPushName(i);
+//			run[i].Paint(objects, workpieces);
+//			::glPopName();
+//		}
+//		break;
+//	}
+//	::glLoadName(0);
 }
 
-void Project::PropagateChanges(void)
+//void Project::PropagateChanges(void)
+//{
+//	// Testing preconditions.
+//	// Propagate modifcation flag from object to workpiece
+//	for(size_t workpieceNr = 0; workpieceNr < workpieces.GetCount();
+//			workpieceNr++){
+//		for(size_t placementNr = 0;
+//				placementNr < workpieces[workpieceNr].placements.GetCount();
+//				placementNr++){
+//			int objectNr =
+//					workpieces[workpieceNr].placements[placementNr].objectNr;
+//			if(objectNr >= 0){
+//				if(objects[objectNr].modified) workpieces[workpieceNr].modified =
+//						true;
+//			}
+//		}
+//	}
+//
+//	// Propagate modification flag from workpiece to run to the generators
+//	for(size_t runNr = 0; runNr < run.GetCount(); runNr++){
+//		int workpieceNr = run[runNr].workpieceNr;
+//		if(workpieceNr >= 0){
+//			if(workpieces[workpieceNr].modified) run[runNr].modified = true;
+//		}
+//		if(run[runNr].modified){
+//			for(size_t toolpathNr = 0;
+//					toolpathNr < run[runNr].toolpaths.GetCount(); toolpathNr++){
+//				run[runNr].toolpaths[toolpathNr].generator->toolpathGenerated =
+//						false;
+//			}
+//		}
+//	}
+//
+//}
+
+//size_t Project::ToolpathToGenerate(void)
+//{
+//	size_t maxNr = 0;
+//	for(size_t workpieceNr = 0; workpieceNr < workpieces.GetCount();
+//			workpieceNr++){
+//		if(workpieces[workpieceNr].hasRunningGenerator) continue;
+//		for(size_t runNr = 0; runNr < run.GetCount(); runNr++){
+//			if(run[runNr].workpieceNr != workpieceNr) continue;
+//			maxNr += run[runNr].toolpaths.GetCount();
+//		}
+//	}
+//
+//	generator_workpieceNr = 0;
+//	generator_runNr = 0;
+//	generator_toolpathNr = 0;
+//
+//	return maxNr;
+//}
+//
+//bool Project::ToolpathGenerate(void)
+//{
+//	if(generator_workpieceNr >= workpieces.GetCount()) return false;
+//
+//	bool flag = true;
+//	if(flag && workpieces[generator_workpieceNr].hasRunningGenerator) flag =
+//			false;
+//
+//	if(flag && run[generator_runNr].workpieceNr != generator_workpieceNr) flag =
+//			false;
+//
+//	if(flag
+//			&& run[generator_runNr].toolpaths[generator_toolpathNr].generator->toolpathGenerated) flag =
+//			false;
+//
+//	if(flag){
+//		run[generator_runNr].toolpaths[generator_toolpathNr].generator->GenerateToolpath();
+//		workpieces[generator_workpieceNr].hasRunningGenerator = false;
+//	}
+//
+//	generator_toolpathNr++;
+//	if(generator_toolpathNr >= run[generator_runNr].toolpaths.GetCount()){
+//		generator_toolpathNr = 0;
+//		generator_runNr++;
+//	}
+//	if(generator_runNr >= run.GetCount()){
+//		generator_runNr = 0;
+//		generator_workpieceNr++;
+//	}
+//	if(generator_workpieceNr >= workpieces.GetCount()) return false;
+//	return true;
+//}
+
+//wxString Project::TollPathGenerateCurrent(void)
+//{
+//	// TODO: Const correctness for this function.
+//	if(generator_workpieceNr >= workpieces.GetCount()) return _T("");
+//	if(generator_runNr >= run.GetCount()) return _T("");
+//	if(generator_workpieceNr >= run[generator_runNr].toolpaths.GetCount()) return _T(
+//			"");
+//	return (workpieces[generator_workpieceNr].name + _T(" - ")
+//			+ run[generator_runNr].toolpaths[generator_toolpathNr].generator->GetName());
+//}
+
+void Project::LoadPattern(wxFileName filename)
 {
-	// Testing preconditions.
-	// Propagate modifcation flag from object to workpiece
-	for(size_t workpieceNr = 0; workpieceNr < workpieces.GetCount();
-			workpieceNr++){
-		for(size_t placementNr = 0;
-				placementNr < workpieces[workpieceNr].placements.GetCount();
-				placementNr++){
-			int objectNr =
-					workpieces[workpieceNr].placements[placementNr].objectNr;
-			if(objectNr >= 0){
-				if(objects[objectNr].modified) workpieces[workpieceNr].modified =
-						true;
-			}
-		}
-	}
-
-	// Propagate modification flag from workpiece to run to the generators
-	for(size_t runNr = 0; runNr < run.GetCount(); runNr++){
-		int workpieceNr = run[runNr].workpieceNr;
-		if(workpieceNr >= 0){
-			if(workpieces[workpieceNr].modified) run[runNr].modified = true;
-		}
-		if(run[runNr].modified){
-			for(size_t toolpathNr = 0;
-					toolpathNr < run[runNr].toolpaths.GetCount(); toolpathNr++){
-				run[runNr].toolpaths[toolpathNr].generator->toolpathGenerated =
-						false;
-			}
-		}
-	}
-
 }
 
-size_t Project::ToolpathToGenerate(void)
+void Project::Update(void)
 {
-	size_t maxNr = 0;
-	for(size_t workpieceNr = 0; workpieceNr < workpieces.GetCount();
-			workpieceNr++){
-		if(workpieces[workpieceNr].hasRunningGenerator) continue;
-		for(size_t runNr = 0; runNr < run.GetCount(); runNr++){
-			if(run[runNr].workpieceNr != workpieceNr) continue;
-			maxNr += run[runNr].toolpaths.GetCount();
-		}
+	for(size_t i = 0; i < workpieces.GetCount(); i++){
+		workpieces[i].parent = this;
+		workpieces[i].Update();
 	}
-
-	generator_workpieceNr = 0;
-	generator_runNr = 0;
-	generator_toolpathNr = 0;
-
-	return maxNr;
-}
-
-bool Project::ToolpathGenerate(void)
-{
-	if(generator_workpieceNr >= workpieces.GetCount()) return false;
-
-	bool flag = true;
-	if(flag && workpieces[generator_workpieceNr].hasRunningGenerator) flag =
-			false;
-
-	if(flag && run[generator_runNr].workpieceNr != generator_workpieceNr) flag =
-			false;
-
-	if(flag
-			&& run[generator_runNr].toolpaths[generator_toolpathNr].generator->toolpathGenerated) flag =
-			false;
-
-	if(flag){
-		run[generator_runNr].toolpaths[generator_toolpathNr].generator->GenerateToolpath();
-		workpieces[generator_workpieceNr].hasRunningGenerator = false;
+	for(size_t i = 0; i < run.GetCount(); i++){
+		run[i].parent = this;
+		run[i].Update();
 	}
-
-	generator_toolpathNr++;
-	if(generator_toolpathNr >= run[generator_runNr].toolpaths.GetCount()){
-		generator_toolpathNr = 0;
-		generator_runNr++;
-	}
-	if(generator_runNr >= run.GetCount()){
-		generator_runNr = 0;
-		generator_workpieceNr++;
-	}
-	if(generator_workpieceNr >= workpieces.GetCount()) return false;
-	return true;
-}
-
-wxString Project::TollPathGenerateCurrent(void)
-{
-	// TODO: Const correctness for this function.
-	if(generator_workpieceNr >= workpieces.GetCount()) return _T("");
-	if(generator_runNr >= run.GetCount()) return _T("");
-	if(generator_workpieceNr >= run[generator_runNr].toolpaths.GetCount()) return _T(
-			"");
-	return (workpieces[generator_workpieceNr].name + _T(" - ")
-			+ run[generator_runNr].toolpaths[generator_toolpathNr].generator->GetName());
 }
 //void Project::FlipRun(void)
 //{

@@ -26,63 +26,72 @@
 
 #include "Run.h"
 
-#include <float.h>
-#include <GL/gl.h>
-#include <wx/log.h>
-#include <wx/arrimpl.cpp>
+#include "generator/GeneratorCollection.h"
 
-#include "../generator/GeneratorCollection.h"
+#include <wx/log.h>
+#include <GL/gl.h>
+#include <float.h>
+
+#include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfRun)
 
 Run::Run()
 {
 	selected = false;
-	modified = false;
+//	modified = false;
 	name = _T("Run #");
-	workpieceNr = -1;
-	toolbox.Empty();
-	selectedTool = 0;
+	refWorkpiece = 0;
+//	toolbox.Empty();
+//	selectedTool = 0;
+	parent = NULL;
+}
+
+Run::Run(const Run& other)
+{
+	throw(__FILE__ "Copy Constructor called.");
 }
 
 Run::~Run()
 {
+	for(size_t i = 0; i < generators.GetCount(); i++)
+		delete generators[i];
 }
 
-void Run::Paint(const ArrayOfObject& objects,
-		const ArrayOfWorkpiece& workpieces) const
-{
-	machine.Paint();
-
-	::glPushMatrix();
-
-	if(workpieceNr > -1){
-		::glPushMatrix();
-		::glMultMatrixd(machine.workpiecePosition.a);
-		::glMultMatrixd(workpiecePlacement.a);
-		for(int n = 0; n < toolpaths.GetCount(); n++){
-			toolpaths[n].Paint();
-			if(toolpaths[n].generator != NULL) toolpaths[n].generator->Paint();
-		}
-		workpieces[workpieceNr].Paint(objects);
-		::glPopMatrix();
-	}
-
-	::glPopMatrix();
-	if(selectedTool < toolbox.GetToolCount()){
-		::glPushMatrix();
-		::glMultMatrixd(machine.toolPosition.a);
-		::glColor3f(0.7, 0.7, 0.7);
-		toolbox.tools[selectedTool].Paint();
-		::glPopMatrix();
-	}
-
-}
+//void Run::Paint(const ArrayOfObject& objects,
+//		const ArrayOfWorkpiece& workpieces) const
+//{
+//	machine.Paint();
+//
+//	::glPushMatrix();
+//
+//	if(refWorkpiece > -1){
+//		::glPushMatrix();
+//		::glMultMatrixd(machine.workpiecePosition.a);
+//		::glMultMatrixd(workpiecePlacement.a);
+//		for(int n = 0; n < toolpaths.GetCount(); n++){
+//			toolpaths[n].Paint();
+//			if(toolpaths[n].generator != NULL) toolpaths[n].generator->Paint();
+//		}
+//		workpieces[refWorkpiece].Paint(objects);
+//		::glPopMatrix();
+//	}
+//
+//	::glPopMatrix();
+//	if(selectedTool < toolbox.GetToolCount()){
+//		::glPushMatrix();
+//		::glMultMatrixd(machine.toolPosition.a);
+//		::glColor3f(0.7, 0.7, 0.7);
+//		toolbox.tools[selectedTool].Paint();
+//		::glPopMatrix();
+//	}
+//
+//}
 
 void Run::ToXml(wxXmlNode* parentNode)
 {
 	wxXmlNode *temp, *temp2;
 	wxXmlNode *nodeObject = NULL;
-
+	throw(__FILE__ "Not yet implemented.");
 	// Find out, if object already exists in XML tree.
 	temp = parentNode->GetChildren();
 	while(temp != NULL && nodeObject == NULL){
@@ -132,7 +141,7 @@ void Run::ToXml(wxXmlNode* parentNode)
 bool Run::FromXml(wxXmlNode* node)
 {
 	if(node->GetName() != _T("run")) return false;
-
+	throw(__FILE__ "Not yet implemented.");
 	name = node->GetPropVal(_T("name"), _T(""));
 	wxXmlNode *temp = node->GetChildren();
 	//	long tempLong;
@@ -152,31 +161,36 @@ bool Run::FromXml(wxXmlNode* node)
 	return true;
 }
 
+void Run::Update(void)
+{
+	for(size_t i = 0; i < generators.GetCount(); i++)
+		generators[i]->parent = this;
+}
+
 void Run::ToolpathToStream(wxTextOutputStream & stream)
 {
 //	toolPath.ToolpathToStream(f);
+	throw(__FILE__ "Not yet implemented.");
 }
 
 void Run::ToStream(wxTextOutputStream& stream)
 {
-	stream << _T("Name:") << endl;
-	stream << name << endl;
-	stream << _T("Workpiece: ");
-	stream << wxString::Format(_T("%i"), workpieceNr);
-	stream << endl;
-	toolbox.ToStream(stream);
-	size_t n;
+	stream << _T("Name:") << endl << name << endl;
+	stream << wxString::Format(_T("Workpiece: %u"), refWorkpiece) << endl;
+	stream << wxString::Format(_T("Tools: %u"), tools.GetCount()) << endl;
+	for(size_t n = 0; n < tools.GetCount(); n++){
+		stream << wxString::Format(_T("Tool: %u"), n) << endl;
+		tools[n].ToStream(stream);
+	}
 	GeneratorCollection gc;
-	stream << _T("Generators: ");
-	stream << wxString::Format(_T("%u"), toolpaths.GetCount());
-	stream << endl;
-	int g;
-	for(n = 0; n < toolpaths.GetCount(); n++){
-		toolpaths[n].ToStream(stream);
-		stream << _T("Generator:") << endl;
-		g = gc.FindGenerator(toolpaths[n].generator);
+	stream << wxString::Format(_T("Generators: %u"), generators.GetCount())
+			<< endl;
+	for(size_t n = 0; n < generators.GetCount(); n++){
+		stream << wxString::Format(_T("Generator: %u"), n) << endl;
+		size_t g;
+		if(!gc.FindGenerator(generators[n], &g)) throw(__FILE__ "Cannot find generator.");
 		stream << gc.GetName(g) << endl;
-		toolpaths[n].generator->ToStream(stream);
+		generators[n]->ToStream(stream);
 	}
 }
 
@@ -188,32 +202,39 @@ bool Run::FromStream(wxTextInputStream& stream, int runNr, Project * project)
 	name = stream.ReadLine();
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Workpiece:")) != 0) return false;
-	workpieceNr = stream.Read32S();
-	if(!toolbox.FromStream(stream)) return false;
+	refWorkpiece = stream.Read32S();
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Tools:")) != 0) return false;
+	size_t NTools = stream.Read32S();
+	tools.Clear();
+	for(size_t n = 0; n < NTools; n++){
+		temp = stream.ReadWord();
+		if(temp.Cmp(_T("Tool:")) != 0) return false;
+		size_t index = stream.Read32S();
+		if(index != n) return false;
+		Tool temp;
+		temp.FromStream(stream);
+		tools.Add(temp);
+	}
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Generators:")) != 0) return false;
 	size_t N = stream.Read32();
-	size_t n;
-	size_t toolpathIndex;
-	int generatorNr;
-	ToolPath toolpath;
-	toolpaths.Clear();
+
+	for(size_t n = 0; n < generators.GetCount(); n++)
+		delete generators[n];
+	generators.Clear();
 	GeneratorCollection gc;
-	for(n = 0; n < N; n++){
-		toolpath.FromStream(stream);
-		toolpaths.Add(toolpath);
-		toolpathIndex = toolpaths.GetCount() - 1;
+	for(size_t n = 0; n < N; n++){
 		temp = stream.ReadLine();
 		if(temp.Cmp(_T("Generator:")) != 0) return false;
+		size_t index = stream.Read32S();
+		if(index != n) return false;
 		temp = stream.ReadLine();
-		generatorNr = gc.FindGenerator(temp);
-		if(generatorNr < 0) generatorNr = 0;
-		toolpaths[toolpathIndex].generator = gc.NewGenerator(generatorNr,
-				project, runNr, n);
-		toolpaths[toolpathIndex].generator->FromStream(stream);
-		printf(toolpaths[toolpathIndex].generator->GetName().ToAscii());
-		printf("\n");
+		size_t generatorNr;
+		if(!gc.FindGenerator(temp, &generatorNr)) return false;
+		Generator* tempGen = gc.NewGenerator(generatorNr);
+		tempGen->FromStream(stream);
+		generators.Add(&tempGen);
 	}
 	return true;
 }
-

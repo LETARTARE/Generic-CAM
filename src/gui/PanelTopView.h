@@ -27,16 +27,15 @@
 #ifndef PANELTOPVIEW_H_
 #define PANELTOPVIEW_H_
 
-#include <wx/panel.h>
-#include <wx/gdicmn.h>
-
-#include "../project/Project.h"
-
 /*!\class PanelTopView
  * \brief ...
  *
  * ...
  */
+
+#include "../project/Project.h"
+#include <wx/panel.h>
+#include <wx/gdicmn.h>
 
 class PanelTopView:public wxPanel {
 public:

@@ -27,18 +27,17 @@
 #ifndef DIALOGOBJECTTRANSFORMATION_H_
 #define DIALOGOBJECTTRANSFORMATION_H_
 
-#include <wx/cmdproc.h>
-
-#include "gui.h"
-#include "../project/Project.h"
-#include "DisplaySettings.h"
-#include "Unit.h"
-
 /*!\class DialogObjectTransformation
  * \brief ...
  *
  * ...
  */
+
+#include "../project/Project.h"
+#include "DisplaySettings.h"
+#include "Unit.h"
+#include "gui.h"
+#include <wx/cmdproc.h>
 
 class DialogObjectTransformation:public GUIObjectTransformation {
 	// Constructor/ Destructor

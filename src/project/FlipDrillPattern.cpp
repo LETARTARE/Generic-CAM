@@ -25,6 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "FlipDrillPattern.h"
+
 #include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfDrillPosition)
 WX_DEFINE_OBJARRAY(ArrayOfFlipDrillPattern)

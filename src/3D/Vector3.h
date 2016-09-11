@@ -40,7 +40,7 @@
 #include <math.h>
 
 class Vector3 {
-	// Constructor/Destructor:
+	// Constructor / Destructor:
 public:
 	Vector3(float px = 0.0, float py = 0.0, float pz = 0.0) :
 			x(px), y(py), z(pz)
@@ -59,19 +59,17 @@ public:
 	wxString ToString(void) const;
 	void FromString(wxString const& string);
 
-	//!Calculate the absolut length of a vector.
+	//! Calculate the absolut length of a vector.
 	inline float Abs() const
 	{
 		return sqrt(x * x + y * y + z * z);
 	}
 
-	//!Calculate the squared absolut length of a vector.
+	//! Calculate the squared absolut length of a vector.
 	inline float Abs2() const
 	{
 		return x * x + y * y + z * z;
 	}
-
-	//	void operator=(const Vector3& a){x=a.x;y=a.y;z=a.z;};
 
 	//! Overloaded operator for vector addition.
 	Vector3& operator+=(const Vector3& a)

@@ -34,13 +34,11 @@
  * in the derived classes, the parent class does not know about.
  */
 
+#include "../project/Project.h"
+#include "../project/generator/GeneratorCollection.h"
+#include "DisplaySettings.h"
 #include "gui.h"
 #include <wx/cmdproc.h>
-
-#include "../project/Project.h"
-#include "../generator/GeneratorCollection.h"
-
-#include "DisplaySettings.h"
 
 class DialogToolpathGenerator:public GUIToolpathGenerator {
 public:

@@ -24,26 +24,25 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-/*!\class ToolPath
- * \code #include "ToolPath.h"\endcode
- * \brief Describes the boundary of the volume to be cut away.
- *
- */
-
 #ifndef TOOLPATH_H_
 #define TOOLPATH_H_
 
-#include <wx/dynarray.h>
+/*!\class ToolPath
+ * \ingroup document
+ * \brief generated toolpath
+ */
+
+//#include "generator/Generator.h"
+#include "machine/MachinePosition.h"
+#include "../3D/AffineTransformMatrix.h"
+#include "../3D/Vector3.h"
+
 #include <wx/filename.h>
 #include <wx/textfile.h>
 #include <wx/thread.h>
+#include <vector>
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../3D/Vector3.h"
-#include "../generator/Generator.h"
-#include "../machine/MachinePosition.h"
-
-class Generator;
+//class Generator;
 
 class ToolPath {
 	// Constructor / Destructor
@@ -56,16 +55,14 @@ public:
 	// Member variables
 public:
 	bool selected;
-	Generator * generator;
 
 	AffineTransformMatrix matrix;
 
 	ArrayOfMachinePosition positions;
+	MachinePosition minPosition, maxPosition;
 
 	Vector3 colorMoving;
 	Vector3 colorCutting;
-
-	MachinePosition minPosition, maxPosition;
 
 	wxString info;
 
@@ -87,6 +84,5 @@ public:
 	bool ReadGCodeFile(wxFileName fileName);
 	void CalculateMinMaxValues(void);
 };
-WX_DECLARE_OBJARRAY(ToolPath, ArrayOfToolPath);
 
 #endif /* TOOLPATH_H_ */

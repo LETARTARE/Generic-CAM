@@ -26,6 +26,25 @@
 
 #include "SerialPort.h"
 
+#ifdef __LINUX
+#define _POSIX_SOURCE 1
+#include <stdio.h>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#endif
+
+#define FC_DTRDSR       0x01
+#define FC_RTSCTS       0x02
+#define FC_XONXOFF      0x04
+#define ASCII_BEL       0x07
+#define ASCII_BS        0x08
+#define ASCII_LF        0x0A
+#define ASCII_CR        0x0D
+#define ASCII_XON       0x11
+#define ASCII_XOFF      0x13
+
 SerialPort::SerialPort()
 {
 #ifdef __WIN

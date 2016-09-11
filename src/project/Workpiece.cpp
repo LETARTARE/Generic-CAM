@@ -25,89 +25,106 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "Workpiece.h"
-
+#include "Project.h"
 #include <GL/gl.h>
+
 #include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfWorkpiece)
 
 Workpiece::Workpiece()
 {
+	parent = NULL;
 	selected = false;
-	modified = false;
-	hasRunningGenerator = false;
+//	modified = false;
+//	hasRunningGenerator = false;
+//	handle = 0;
 }
 
-Workpiece::Workpiece(const StockMaterial &material) :
-		StockMaterial(material)
+Workpiece::Workpiece(const StockMaterial &material)
 {
-	selected = false;
-	modified = false;
-	hasRunningGenerator = false;
-	box.SetSize(material.sx, material.sy, material.sz);
+	parent = NULL;
+	color = material.color;
+//	selected = false;
+//	modified = false;
+//	handle = 0;
+//	hasRunningGenerator = false;
+	SetSize(material.sx, material.sy, material.sz);
 }
 
 Workpiece::~Workpiece()
 {
 }
 
-void Workpiece::Paint(const ArrayOfObject &objects) const
+void Workpiece::Paint(void) const
 {
+//	AffineTransformMatrix tempMatrix;
 
-	AffineTransformMatrix tempMatrix;
+	Project* project = this->parent;
+	if(project == NULL) return;
+	::glPushMatrix();
+	::glMultMatrixd(this->matrix.a);
+	BoundingBox::Paint();
 
 	for(size_t j = 0; j < placements.GetCount(); j++){
-		size_t objNr = placements[j].objectNr;
+//		const float x = placements[j].matrix.a[12];
+//		const float y = placements[j].matrix.a[13];
+//		const float z = placements[j].matrix.a[14];
+//
+//		tempMatrix = AffineTransformMatrix::Identity();
+//		tempMatrix.TranslateLocal(-placements[j].box.xmin,
+//				-placements[j].box.ymin, -placements[j].box.zmin);
+//		tempMatrix.TranslateLocal(x, y, z);
+//		tempMatrix *= placements[j].matrix;
 
-		float x = placements[j].matrix.a[12];
-		float y = placements[j].matrix.a[13];
-		float z = placements[j].matrix.a[14];
+		ObjectPlacement* obpl = &(placements[j]);
+		Object* obj = &(project->objects[obpl->refObject]);
+		if(obj != NULL){
+			::glPushMatrix();
+			::glMultMatrixd(obpl->matrix.a);
+			obj->Paint();
+			::glPopMatrix();
+		}
+//		placements[j].outline.matrix.a[12] = x;
+//		placements[j].outline.matrix.a[13] = y;
+//		placements[j].outline.matrix.a[14] = 0;
+//		placements[j].outline.Paint();
 
-		tempMatrix = AffineTransformMatrix::Identity();
-		tempMatrix.TranslateLocal(-placements[j].bbox.xmin,
-				-placements[j].bbox.ymin, -placements[j].bbox.zmin);
-		tempMatrix.TranslateLocal(x, y, z);
-		tempMatrix *= placements[j].matrix;
-
-		::glPushMatrix();
-		::glMultMatrixd(tempMatrix.a);
-		objects[objNr].Paint();
-		::glPopMatrix();
-		placements[j].outline.matrix.a[12] = x;
-		placements[j].outline.matrix.a[13] = y;
-		placements[j].outline.matrix.a[14] = 0;
-		placements[j].outline.Paint();
 	}
 
 	glColor3f(color.x, color.y, color.z);
 	if(glIsEnabled(GL_COLOR_MATERIAL)){
-		box.Paint();
-		StockMaterial::Paint(0.2, false);
+		BoundingBox::Paint();
+//		StockMaterial::Paint(0.2, false);
 	}else{
-		box.Paint();
-		StockMaterial::PaintWireBox();
+		BoundingBox::Paint();
+//		StockMaterial::PaintWireBox();
 	}
-
+	::glPopMatrix();
 }
 
-void Workpiece::Update(ArrayOfObject& objects)
+void Workpiece::Update(void)
 {
-	box.SetSize(sx, sy, sz);
+	Project* project = this->parent;
+	if(project == NULL) return;
 
+	bbox.SetSize(GetSizeX(), GetSizeY(), GetSizeZ());
 	for(size_t j = 0; j < placements.GetCount(); j++){
-		placements[j].Update(objects);
+		placements[j].parent = this;
+//		placements[j].Update();
 
-		float x = placements[j].matrix.a[12];
-		float y = placements[j].matrix.a[13];
-		float d = placements[j].slotWidth;
+		const float x = placements[j].matrix.a[12];
+		const float y = placements[j].matrix.a[13];
+		const float d = placements[j].slotWidth;
 
-		box -= BooleanBox(x - d, y - d, 0,
-				x + placements[j].bbox.GetSizeX() + d,
-				y + placements[j].bbox.GetSizeY() + d, sz);
+		Object* obj = &(project->objects[placements[j].refObject]);
+
+		bbox -= BooleanBox(x - d, y - d, 0, x + obj->bbox.GetSizeX() + d,
+				y + obj->bbox.GetSizeY() + d, GetSizeZ());
 	}
 }
 
-void Workpiece::SortTargets(void)
-{
+//void Workpiece::SortTargets(void)
+//{
 //	size_t i, j;
 //	double dmin, d;
 //	Polygon25 temp, temp2;
@@ -136,38 +153,33 @@ void Workpiece::SortTargets(void)
 //			}
 //		}
 //	}
+//}
 
-}
 void Workpiece::ToStream(wxTextOutputStream& stream)
 {
-	stream << _T("Stockmaterial:") << endl;
-	StockMaterial::ToStream(stream);
+//	stream << _T("Stockmaterial:") << endl;
+//	StockMaterial::ToStream(stream);
 	stream << _T("Placements: ");
 	stream << wxString::Format(_T("%u"), placements.GetCount());
 	stream << endl;
-	size_t n;
-	for(n = 0; n < placements.GetCount(); n++){
+	for(size_t n = 0; n < placements.GetCount(); n++)
 		placements[n].ToStream(stream);
-	}
-
 }
 
 bool Workpiece::FromStream(wxTextInputStream& stream)
 {
-	wxString temp = stream.ReadLine();
-	if(temp.Cmp(_T("Stockmaterial:")) != 0) return false;
-	bool flag = StockMaterial::FromStream(stream);
+//	wxString temp = stream.ReadLine();
+//	if(temp.Cmp(_T("Stockmaterial:")) != 0) return false;
+//	bool flag = StockMaterial::FromStream(stream);
+	wxString temp;
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Placements:")) != 0) return false;
 	size_t N = stream.Read32();
-	size_t n;
-	flag = true;
 	ObjectPlacement placement;
 	placements.Clear();
-	for(n = 0; n < N; n++){
-		flag = placement.FromStream(stream);
-		if(!flag) break;
+	for(size_t n = 0; n < N; n++){
+		if(!placement.FromStream(stream)) return false;
 		placements.Add(placement);
 	}
-	return flag;
+	return true;
 }

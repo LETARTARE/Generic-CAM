@@ -28,13 +28,17 @@
 #define FLIPDRILLPATTERN_H_
 
 /*!\class FlipDrillPattern
- * \brief ...
+ * \ingroup document
+ * \brief Pattern for flipping the workpiece
  *
- * ...
+ * The for alignment of two-sided workpieces, a drillpattern is put on the top of the workpiece.
+ * The same pattern is drilled into the base of the machine. This allows for simple turning-over
+ * of the workpiece.
+ *
  */
 
-#include <wx/dynarray.h>
 #include <wx/string.h>
+#include <wx/dynarray.h>
 
 class DrillPosition {
 public:

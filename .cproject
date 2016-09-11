@@ -37,6 +37,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1283442708" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.exe.debug.option.optimization.level.1840255596" name="Optimization Level" superClass="gnu.c.compiler.exe.debug.option.optimization.level" valueType="enumerated"/>
 								<option id="gnu.c.compiler.exe.debug.option.debugging.level.696364749" name="Debug Level" superClass="gnu.c.compiler.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.dialect.std.1746963051" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.2109539144" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.499271279" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
@@ -55,16 +56,6 @@
 							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.585771149" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug">
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1125635168" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
-						</toolChain>
-					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1074777317.389217405" name="/" resourcePath="bin_win">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.978874291" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.759047905" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.2138686872"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.311429004" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1358257702"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1937151225" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1283442708"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.941029059" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug.499271279"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1253994413" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.376884687"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.2031207396" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug.585771149"/>
 						</toolChain>
 					</folderInfo>
 					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1074777317.1817404178" name="/" resourcePath="src/theAttic">

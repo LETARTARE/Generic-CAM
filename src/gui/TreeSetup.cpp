@@ -26,9 +26,8 @@
 
 #include "TreeSetup.h"
 
-#include <wx/debug.h>
-
 #include "TreeItem.h"
+#include <wx/debug.h>
 
 TreeSetup::TreeSetup(wxTreeCtrl * tree, Project * project)
 {
@@ -400,7 +399,7 @@ void TreeSetup::Update(void)
 	for(n = 0; n < project->workpieces.GetCount(); n++){
 		SetAtLevel(2, project->workpieces[n].name, itemWorkpiece, n);
 		for(m = 0; m < project->workpieces[n].placements.GetCount(); m++){
-			objectNr = project->workpieces[n].placements[m].objectNr;
+			objectNr = project->workpieces[n].placements[m].refObject;
 			SetAtLevel(3, project->objects[objectNr].name, itemObjectLink,
 					linkNr);
 			linkNr++;
@@ -432,7 +431,7 @@ void TreeSetup::Update(void)
 			SetAtLevel(3, _("Machine: -"), itemMachine, n);
 		}
 
-		workpieceNr = project->run[n].workpieceNr;
+		workpieceNr = project->run[n].refWorkpiece;
 		if(workpieceNr >= 0)
 			SetAtLevel(3,
 			_("Workpiece: ") + project->workpieces[workpieceNr].name,
@@ -441,22 +440,22 @@ void TreeSetup::Update(void)
 			SetAtLevel(3, wxString(_("Workpiece: ")) + _T("-"),
 					itemRunWorkpiece, n);
 
-		for(m = 0; m < project->run[n].toolpaths.GetCount(); m++){
+		for(m = 0; m < project->run[n].generators.GetCount(); m++){
 			wxString temp;
 
-			if(project->run[n].toolpaths[m].generator != NULL){
+			if(project->run[n].generators[m] != NULL){
 				temp =
 				_("Toolpath - ")
-						+ project->run[n].toolpaths[m].generator->GetName();
+						+ project->run[n].generators[m]->GetName();
 
-				if(project->processToolpath){
-					if(!project->run[n].toolpaths[m].generator->toolpathGenerated) temp +=
-							_(" - waiting");
-				}
-				if(project->run[n].toolpaths[m].generator->toolpathGenerated) temp +=
-						_(" - generated");
-				if(project->run[n].toolpaths[m].generator->errorOccured) temp +=
-						_(" - Error");
+//				if(project->processToolpath){
+//					if(!project->run[n].toolpaths[m].generator->toolpathGenerated) temp +=
+//							_(" - waiting");
+//				}
+//				if(project->run[n].toolpaths[m].generator->toolpathGenerated) temp +=
+//						_(" - generated");
+//				if(project->run[n].toolpaths[m].generator->errorOccured) temp +=
+//						_(" - Error");
 			}else{
 				temp = _("Toolpath - ?");
 			}

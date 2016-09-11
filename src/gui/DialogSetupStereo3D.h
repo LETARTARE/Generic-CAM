@@ -28,9 +28,7 @@
 #define DIALOGSETUPSTEREO3D_H_
 
 /*!\class DialogSetupStereo3D
- * \brief ...
- *
- * ...
+ * \brief Dialog to setup stereo 3d anaglyph glasses
  */
 
 #include "guiSetupStereo3D.h"

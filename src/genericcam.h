@@ -30,7 +30,7 @@
 #include "StdInclude.h"
 #include "Config.h"
 
-#include "gui/MainFrame.h"
+#include "gui/FrameMain.h"
 
 #include <wx/cmdline.h>
 #include <wx/string.h>
@@ -45,7 +45,7 @@ public:
 
 	// Member variables
 public:
-	MainFrame* frame;
+	FrameMain* frame;
 	wxString loadOnStartup;
 
 protected:

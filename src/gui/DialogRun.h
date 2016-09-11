@@ -27,26 +27,27 @@
 #ifndef DIALOGRUN_H_
 #define DIALOGRUN_H_
 
-#include <wx/cmdproc.h>
-
-#include "../project/Project.h"
-#include "DisplaySettings.h"
-#include "gui.h"
-
 /*!\class DialogRun
  * \brief ...
  *
  * ...
  */
 
+#include "../project/Project.h"
+#include "../project/ToolBox.h"
+#include "DisplaySettings.h"
+#include "gui.h"
+#include <wx/cmdproc.h>
+
 class DialogRun:public GUIRun {
 public:
-	DialogRun(wxWindow* parent, Project * project,
+	DialogRun(wxWindow* parent, Project * project, ToolBox * toolbox,
 			wxCommandProcessor * commandProcessor, DisplaySettings * settings);
 	virtual ~DialogRun();
 
 private:
 	Project* project;
+	ToolBox* toolbox;
 	DisplaySettings * settings;
 	wxCommandProcessor * commandProcessor;
 
@@ -56,7 +57,6 @@ public:
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 	int GetSelected(void);
-
 
 	void OnXClose(wxCloseEvent& event);
 	void OnClose(wxCommandEvent& event);

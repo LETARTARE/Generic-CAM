@@ -28,10 +28,10 @@
 #ifndef TOOLPANEL_H_
 #define TOOLPANEL_H_
 
+#include "../project/Tool.h"
+
 #include <wx/panel.h>
 #include <wx/dcclient.h>
-
-#include "../machine/Tool.h"
 
 class PanelTool:public wxPanel {
 	// Costructor/ Destructor

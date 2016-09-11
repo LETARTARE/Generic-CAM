@@ -26,19 +26,18 @@
 
 #include "DialogWorkpiece.h"
 
+#include "../project/command/CommandWorkpieceAdd.h"
+#include "../project/command/CommandWorkpieceObjectAssign.h"
+#include "../project/command/CommandWorkpieceObjectRemove.h"
+#include "IDs.h"
 #include <wx/grid.h>
 
-#include "../command/CommandWorkpieceAdd.h"
-#include "../command/CommandWorkpieceObjectAssign.h"
-#include "../command/CommandWorkpieceObjectRemove.h"
-
-#include "IDs.h"
-
 DialogWorkpiece::DialogWorkpiece(wxWindow* parent, Project* project,
-		wxCommandProcessor* commandProcessor) :
+		StockFile * stock, wxCommandProcessor* commandProcessor) :
 		GUIWorkpiece(parent)
 {
 	this->project = project;
+	this->stock = stock;
 	this->commandProcessor = commandProcessor;
 }
 
@@ -62,13 +61,12 @@ void DialogWorkpiece::OnManageStock(wxCommandEvent& event)
 void DialogWorkpiece::OnAddStock(wxCommandEvent& event)
 {
 	int selected = m_choiceStock->GetSelection();
-	if(selected < 0 || selected >= project->stock.stockMaterials.GetCount()) return;
-	wxString name = project->stock.stockMaterials[selected].name;
+	if(selected < 0 || selected >= stock->stockMaterials.GetCount()) return;
+	wxString name = stock->stockMaterials[selected].name;
 	CommandWorkpieceAdd * command = new CommandWorkpieceAdd(
-	_("Add Workpiece ") + name, project,
-			project->stock.stockMaterials[selected]);
+	_("Add Workpiece ") + name, project, stock->stockMaterials[selected]);
 	commandProcessor->Submit(command);
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATEPROJECT);
 	ProcessEvent(selectEvent);
 }
 
@@ -80,13 +78,14 @@ void DialogWorkpiece::OnDBLClick(wxGridEvent& event)
 	for(placementNr = 0;
 			placementNr < project->workpieces[workpieceNr].placements.GetCount();
 			placementNr++){
-		if(project->workpieces[workpieceNr].placements[placementNr].objectNr
+		if(project->workpieces[workpieceNr].placements[placementNr].refObject
 				== objectNr){
 			commandProcessor->Submit(
 					new CommandWorkpieceObjectRemove(
 							_("Remove Object from Workpiece"), project,
 							workpieceNr, placementNr));
-			wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
+			wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
+			ID_UPDATEPROJECT);
 			ProcessEvent(selectEvent);
 			return;
 		}
@@ -94,7 +93,7 @@ void DialogWorkpiece::OnDBLClick(wxGridEvent& event)
 	commandProcessor->Submit(
 			new CommandWorkpieceObjectAssign(_("Assign Object to Workpiece"),
 					project, workpieceNr, objectNr));
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATEPROJECT);
 	ProcessEvent(selectEvent);
 }
 
@@ -149,21 +148,21 @@ bool DialogWorkpiece::TransferDataToWindow(void)
 			workpieceNr++){
 		for(j = 0; j < project->workpieces[workpieceNr].placements.GetCount();
 				j++){
-			objectNr = project->workpieces[workpieceNr].placements[j].objectNr;
+			objectNr = project->workpieces[workpieceNr].placements[j].refObject;
 			m_grid->SetCellValue(objectNr, workpieceNr, _T("X"));
 		}
 	}
 
 	// Update available stock material
-	for(i = 0; i < project->stock.stockMaterials.GetCount(); i++){
+	for(i = 0; i < stock->stockMaterials.GetCount(); i++){
 		if(i >= m_choiceStock->GetCount()){
-			m_choiceStock->Append(project->stock.stockMaterials[i].name);
+			m_choiceStock->Append(stock->stockMaterials[i].name);
 		}else{
-			m_choiceStock->SetString(i, project->stock.stockMaterials[i].name);
+			m_choiceStock->SetString(i, stock->stockMaterials[i].name);
 		}
 	}
-	for(i = m_choiceStock->GetCount();
-			i > project->stock.stockMaterials.GetCount(); i--)
+	for(i = m_choiceStock->GetCount(); i > stock->stockMaterials.GetCount();
+			i--)
 		m_choiceStock->Delete(i - 1);
 
 	if(m_choiceStock->GetSelection() < 0

@@ -27,16 +27,24 @@
 #ifndef WORKPIECE_H_
 #define WORKPIECE_H_
 
-#include <wx/dynarray.h>
-#include <wx/txtstrm.h>
+/*!\class Workpiece
+ * \ingroup document
+ * \brief Workpiece for a Run
+ *
+ */
 
-#include "../3D/BooleanBox.h"
-#include "../3D/Vector3.h"
-#include "Object.h"
-#include "ObjectPlacement.h"
 #include "StockMaterial.h"
+#include "ObjectPlacement.h"
+#include "Support.h"
+#include "../3D/BooleanBox.h"
+#include "../3D/BoundingBox.h"
 
-class Workpiece:public StockMaterial {
+#include <wx/txtstrm.h>
+#include <wx/dynarray.h>
+
+class Project;
+
+class Workpiece:public BoundingBox {
 	// Constructor / Destructor
 public:
 	Workpiece();
@@ -45,26 +53,29 @@ public:
 
 	// Member variables
 public:
-	bool selected;
-	bool modified;
-	volatile bool hasRunningGenerator;
-
+	Project * parent; //!< Pointer back to the Project this Workpiece belongs to.
+	wxString name;
+	AffineTransformMatrix matrix;
 	ArrayOfObjectPlacement placements;
+	ArrayOfSupport supports;
 
-	BooleanBox box;
-protected:
+//	bool modified;
+	//TODO: Remove the "selected" flag.
+	bool selected;
+//	volatile bool hasRunningGenerator;
+
+private:
+	BooleanBox bbox;
 
 	// Methods
 public:
-
 	void ToStream(wxTextOutputStream & stream);
 	bool FromStream(wxTextInputStream & stream);
 
-	void Paint(const ArrayOfObject& objects) const;
-	void Update(ArrayOfObject& objects);
-	void SortTargets(void);
+	void Paint(void) const;
+	void Update(void);
+//	void SortTargets(void);
 };
-
 WX_DECLARE_OBJARRAY(Workpiece, ArrayOfWorkpiece);
 
 #endif /* WORKPIECE_H_ */

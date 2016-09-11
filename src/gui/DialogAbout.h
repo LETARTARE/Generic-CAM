@@ -27,9 +27,9 @@
 #ifndef DIALOGABOUT_H_
 #define DIALOGABOUT_H_
 
-#include <wx/event.h>
-
 #include "gui.h"
+
+#include <wx/event.h>
 
 class DialogAbout:public GUIAbout {
 	// Constructor/ Destructor
@@ -37,12 +37,8 @@ public:
 	DialogAbout(wxWindow* parent);
 	virtual ~DialogAbout();
 
-	// Member variables
-private:
-
 	// Methods
 private:
-
 	void OnClose(wxCommandEvent& event);
 };
 

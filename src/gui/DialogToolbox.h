@@ -27,20 +27,23 @@
 #ifndef TOOLBOXFRAME_H_
 #define TOOLBOXFRAME_H_
 
-#include "gui.h"
+#include "../project/ToolBox.h"
 #include "../project/Project.h"
 #include "DisplaySettings.h"
+#include "gui.h"
 
 class DialogToolbox:public GUIToolbox {
 	// Constructor/ Destructor
 
 public:
-	DialogToolbox(wxWindow* parent, Project * project,
+	DialogToolbox(wxWindow* parent, Project * project, ToolBox * toolbox,
 			DisplaySettings * settings);
 	virtual ~DialogToolbox();
 
 	// Member Variables
+protected:
 
+	ToolBox* toolbox;
 	Project* project;
 	DisplaySettings * settings;
 

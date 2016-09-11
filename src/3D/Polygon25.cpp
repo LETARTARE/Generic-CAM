@@ -26,10 +26,11 @@
 
 #include "Polygon25.h"
 
+#include <wx/log.h>
+#include <wx/arrimpl.cpp>
 #include <GL/gl.h>
 #include <float.h>
-#include <wx/log.h>
-#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+
 WX_DEFINE_OBJARRAY(ArrayOfPolygon25)
 
 Polygon25::Polygon25()

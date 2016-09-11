@@ -33,11 +33,9 @@
  * ...
  */
 
-#include <wx/config.h>
-
 #include "../3D/OpenGLCanvas.h"
-
 #include "Unit.h"
+#include <wx/config.h>
 
 class DisplaySettings {
 	friend class DialogSetupUnits;

@@ -28,22 +28,31 @@
 #define SUPPORT_H_
 
 /*!\class Support
- * \brief ...
+ * \ingroup document
+ * \brief Support structure around the object
  *
- * ...
+ * When manufacturing an object, that is atand alone (i.e. not just an incarving) the object
+ * may be unconnected to the rest of the workpiece. It would float around.
+ *
+ * This object provides an support structure, that is added to the object, to keep it from
+ * doing just that, by adding connections to the rest of the workpiece.
  */
 
 #include <wx/dynarray.h>
 
 class Support {
-
-
-
 public:
 	Support();
 	virtual ~Support();
-};
 
+
+	//	double supportDistance;
+		//	double supportWidth;
+		//	double supportHeight;
+		//	double middleY;
+		//	double offsetX;
+
+};
 WX_DECLARE_OBJARRAY(Support, ArrayOfSupport);
 
 #endif /* SUPPORT_H_ */

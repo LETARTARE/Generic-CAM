@@ -27,17 +27,17 @@
 #ifndef DIALOGMACHINEDEBUGGER_H_
 #define DIALOGMACHINEDEBUGGER_H_
 
-#include "../machine/Machine.h"
-#include "../project/Project.h"
-#include "DialogMachineControl.h"
-#include "DisplaySettings.h"
-#include "gui.h"
-
 /*!\class DialogMachineDebugger
  * \brief ...
  *
  * ...
  */
+
+#include "../project/Project.h"
+#include "../project/machine/Machine.h"
+#include "DialogMachineControl.h"
+#include "DisplaySettings.h"
+#include "gui.h"
 
 class DialogMachineDebugger:public GUIMachineDebugger {
 public:

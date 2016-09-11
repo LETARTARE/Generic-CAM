@@ -47,10 +47,8 @@ void FileDXF::ProcessCode(long codeNr, wxString code)
 	char text[20];
 	strcpy(text, code.To8BitData());
 
-
 	// This line converts the english '.' in numbers into the german ','. Argl!
 	code.Replace(_T("."), _T(","));
-
 
 	// Fill in data
 
@@ -134,8 +132,8 @@ void FileDXF::ProcessCode(long codeNr, wxString code)
 			if(objectFlag == 128){
 				if(lastGeometry >= 0){
 					if(v0 > 0 && v1 > 0 && v2 > 0 && v3 < 0){
-						geometry[lastGeometry].AddTriangle(v[v0 - 1],
-								v[v1 - 1], v[v2 - 1]);
+						geometry[lastGeometry].AddTriangle(v[v0 - 1], v[v1 - 1],
+								v[v2 - 1]);
 					}
 					if(v0 > 0 && v1 > 0 && v2 > 0 && v3 > 0)
 
@@ -225,11 +223,10 @@ bool FileDXF::ReadFile(wxString fileName)
 	}while(!file.Eof());
 	file.Close();
 
-
 	// Calculate normals to get the lighting right.
 	size_t i;
 	for(i = 0; i < geometry.GetCount(); i++){
-
+		geometry[i].CalculateNormals();
 	}
 	return true;
 }

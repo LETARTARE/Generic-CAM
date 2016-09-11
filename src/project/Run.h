@@ -27,56 +27,66 @@
 #ifndef RUN_H_
 #define RUN_H_
 
-#include <wx/dynarray.h>
-#include <wx/filename.h>
-#include <wx/string.h>
-#include <wx/txtstrm.h>
-
-#include "../3D/AffineTransformMatrix.h"
-#include "../3D/Geometry.h"
-#include "../machine/Machine.h"
-#include "StockMaterial.h"
-#include "Toolbox.h"
-#include "ToolPath.h"
-#include "Workpiece.h"
-
-class ArrayOfObject;
-class ArrayOfWorkpiece;
-
 /*!\class Run
- * \brief ...
+ * \ingroup document
+ * \brief Single run of a machine
  *
  * The workpiecePlacement matrix herein is for rotating the workpiece.
+ *
  * The machine itself contains another matrix used for placing the
  * workpiece in the machine.
  */
 
+#include "generator/Generator.h"
+#include "FlipDrillPattern.h"
+#include "Workpiece.h"
+#include "machine/Machine.h"
+
+#include "../3D/Geometry.h"
+#include "../3D/AffineTransformMatrix.h"
+
+#include <wx/filename.h>
+#include <wx/txtstrm.h>
+#include <wx/string.h>
+#include <wx/dynarray.h>
+
+
+class Project;
 class Run {
+	friend class Project;
+
 	// Constructor / Destructor
 public:
 	Run();
+	Run(const Run &other);
 	virtual ~Run();
+
 	// Member variables
 public:
 	wxString name;
-	bool selected;
-	bool modified;
-
-	AffineTransformMatrix workpiecePlacement; ///> For flipping the workpiece to machine the other sides.
-
-	int workpieceNr;
+	size_t refWorkpiece;
 
 	Machine machine;
-	Toolbox toolbox;
-	int selectedTool;
+	ArrayOfGeneratorPointer generators;
+	ArrayOfTool tools;
 
-	ArrayOfToolPath toolpaths;
+	AffineTransformMatrix workpiecePlacement; //!< For flipping the workpiece to machine the other sides.
+	FlipDrillPattern pattern; //!< Experimental: FlipDrillPattern
+
+	//TODO: Remove the "selected" flag.
+	bool selected;
+//	bool modified;
+//	int workpieceNr;
+//	int selectedTool;
+//	ArrayOfToolPath toolpaths;
+
+	Project * parent; //!< Pointer back to the Project this Run belongs to.
 
 	// Methods
 public:
-
-	void Paint(const ArrayOfObject& objects,
-			const ArrayOfWorkpiece& workpieces) const;
+	void Update(void);
+//	void Paint(const ArrayOfObject& objects,
+//			const ArrayOfWorkpiece& workpieces) const;
 	void ToXml(wxXmlNode* parentNode);
 	bool FromXml(wxXmlNode* node);
 
@@ -84,7 +94,6 @@ public:
 	bool FromStream(wxTextInputStream & stream, int runNr,Project * project);
 
 	void ToolpathToStream(wxTextOutputStream & stream);
-
 };
 WX_DECLARE_OBJARRAY(Run, ArrayOfRun);
 

@@ -28,14 +28,15 @@
 #define POLYGON3_H_
 
 /*!\class Polygon3
- * \brief ...
+ * \brief Polygon in 3D space.
  *
- * ...
+ * Loop of Vector3 objects that form a polygon.
  */
 
-#include <wx/dynarray.h>
-#include "Vector3.h"
 #include "AffineTransformMatrix.h"
+#include "Vector3.h"
+
+#include <wx/dynarray.h>
 
 class Polygon3 {
 	// Constructor / Destructor
@@ -44,25 +45,88 @@ public:
 	virtual ~Polygon3();
 	// Member variables
 public:
-	AffineTransformMatrix matrix;
-	Vector3 color;
-	ArrayOfVector3 elements;
+	AffineTransformMatrix matrix; ///< Global Transformation of the polygon points
+	Vector3 color; ///< OpenGL Color of the polygon
+	ArrayOfVector3 elements; ///< Points that make up the polygon
 
-	bool isClosed;
+	bool isClosed; ///< Boolean: Closed or open polygon
+	bool showDots; ///< Show Dots (GL_POINTS) at the points of the polygon
 
 	// Methods
 public:
+
+	/*! \brief Clear all points from the Polygon
+	 */
 	void Clear(void);
-	void Close(bool close = true);
+
+	/*! \brief Insert a point at the end of the polygon using the coordinates x,y and z
+	 */
 	void InsertPoint(double x = 0.0, double y = 0.0, double z = 0.0);
+
+	/*! \brief Insert a point at the end of the polygon using a Vector3 point
+	 *
+	 * @param x Vector3 point
+	 */
+	void InsertPoint(const Vector3 &x);
+
+	/*! \brief Close (or open) the polygon to a cycle
+	 *
+	 * @param close Boolean: True (default) to close the polygon, false to open it.
+	 */
+	void Close(bool close = true);
+
+	/*! \brief Reverse the direction of the polygon
+	 */
 	void Reverse(void);
+
+	/*! \brief Remove all segments from the polygon, that have a length of zero
+	 */
 	void RemoveZeroLength(void);
-	Polygon3 & operator+=(const Polygon3 &a);
-	const Polygon3 operator+(const Polygon3 &a) const;
-	void Paint(void) const;
-	double GetLength(void) const;
+
+	/*! \brief Apply the transformation matrix to the points in the polygon.
+	 *
+	 * The transformation matrix is reset to the identity matrix afterwards.
+	 */
 	void ApplyTransformation(void);
+
+	/*! \brief Apply a AffineTransformMatrix to the point in the polygon
+	 *
+	 * The matrix belonging to the Polygon3 itself stays unchanged.
+	 * @param matrix AffineTransformMatrix with the transform operation
+	 */
 	void ApplyTransformation(const AffineTransformMatrix &matrix);
+
+	/*! \brief Add the pointe of two Polygon3 together
+	 *
+	 * Both polygons are appended behind each other.
+	 */
+	Polygon3 & operator+=(const Polygon3 &a);
+
+	/*! \brief Add another Polygon3 to this polygon
+	 */
+	const Polygon3 operator+(const Polygon3 &a) const;
+
+	/*! \brief Returns the length of the polygon
+	 */
+	double GetLength(void) const;
+
+	/*! \brief Resample the point in the polygon.
+	 *
+	 * The polygon is resampled into N even segments. This can be an over- or undersampling.
+	 * @param N Number of segments
+	 */
+	void Resample(unsigned int N);
+
+	/*! \brief MA Filter the polygon
+	 *
+	 * Use a simple MA FIR filter to filter the points of the polygon in all three dimensions.
+	 * @param N length of the MA filter.
+	 */
+	void Filter(unsigned int N);
+
+	/*! \brief Render the Polygon to OpenGL
+	 */
+	void Paint(void) const;
 };
 WX_DECLARE_OBJARRAY(Polygon3, ArrayOfPolygon3);
 

@@ -25,8 +25,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "ToolPath.h"
-#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
-WX_DEFINE_OBJARRAY(ArrayOfToolPath)
 
 #include <wx/log.h>
 #include <GL/gl.h>
@@ -35,7 +33,7 @@ WX_DEFINE_OBJARRAY(ArrayOfToolPath)
 ToolPath::ToolPath()
 {
 	selected = false;
-	generator = NULL;
+//	generator = NULL;
 	colorMoving.Set(0.3, 0.8, 0.3);
 	colorCutting.Set(0.8, 0.3, 0.3);
 }
@@ -45,7 +43,7 @@ ToolPath::ToolPath(const ToolPath& other)
 	// Performance issues if called. Too many object have ToolPath objects.
 	printf("Copy constructor on ToolPath called.\n");
 	selected = false;
-	generator = NULL;
+//	generator = NULL;
 	colorMoving = other.colorMoving;
 	colorCutting = other.colorCutting;
 	matrix = other.matrix;
@@ -57,7 +55,7 @@ ToolPath::ToolPath(const ToolPath& other)
 
 ToolPath::~ToolPath()
 {
-	if(generator != NULL) delete generator;
+//	if(generator != NULL) delete generator;
 }
 
 void ToolPath::Clear(void)
@@ -69,8 +67,7 @@ void ToolPath::Clear(void)
 //! Overloaded operator for polygon concatenation.
 ToolPath & ToolPath::operator+=(const ToolPath &a)
 {
-	size_t i;
-	for(i = 0; i < a.positions.GetCount(); i++)
+	for(size_t i = 0; i < a.positions.GetCount(); i++)
 		this->positions.Add(a.positions[i]);
 	return *this;
 }
@@ -92,7 +89,7 @@ void ToolPath::ApplyTransformation(void)
 {
 	size_t i;
 	Vector3 temp;
-	for(i = 0; i < positions.GetCount(); i++){
+	for(i = 0; i < positions.size(); i++){
 		temp.Set(positions[i].axisX, positions[i].axisY, positions[i].axisZ);
 		temp = matrix.Transform(temp);
 		positions[i].axisX = temp.x;
@@ -107,7 +104,7 @@ void ToolPath::ApplyTransformation(const AffineTransformMatrix &matrix)
 {
 	size_t i;
 	Vector3 temp;
-	for(i = 0; i < positions.GetCount(); i++){
+	for(i = 0; i < positions.size(); i++){
 		temp.Set(positions[i].axisX, positions[i].axisY, positions[i].axisZ);
 		temp = matrix.Transform(temp);
 		positions[i].axisX = temp.x;
@@ -124,8 +121,7 @@ void ToolPath::Paint(void)
 
 	::glBegin(GL_LINE_STRIP);
 	::glNormal3f(0, 0, 1);
-	size_t i;
-	for(i = 0; i < positions.GetCount(); i++){
+	for(size_t i = 0; i < positions.size(); i++){
 
 		if(positions[i].isCutting)
 			::glColor3f(colorCutting.x, colorCutting.y, colorCutting.z);
@@ -142,8 +138,6 @@ void ToolPath::Paint(void)
 
 void ToolPath::CalculateMinMaxValues(void)
 {
-	size_t i;
-
 	minPosition.axisX = +FLT_MAX;
 	minPosition.axisY = +FLT_MAX;
 	minPosition.axisZ = +FLT_MAX;
@@ -164,7 +158,7 @@ void ToolPath::CalculateMinMaxValues(void)
 	maxPosition.axisB = -FLT_MAX;
 	maxPosition.axisC = -FLT_MAX;
 
-	for(i = 0; i < positions.GetCount(); i++){
+	for(size_t i = 0; i < positions.GetCount(); i++){
 		if(positions[i].axisX > maxPosition.axisX) maxPosition.axisX =
 				positions[i].axisX;
 		if(positions[i].axisY > maxPosition.axisY) maxPosition.axisY =
@@ -208,56 +202,59 @@ void ToolPath::CalculateMinMaxValues(void)
 void ToolPath::CleanPath(double tolerance)
 {
 	ArrayOfMachinePosition temp;
-	size_t i, j;
 	if(positions.GetCount() < 2) return;
 
-	bool isOnLine;
-	bool isSameSort;
-
-	double gx, gy, gz;
-	double px, py, pz;
-	double s, d2;
-	double hx, hy, hz;
-	double t2 = tolerance * tolerance;
-	double dg;
+//	bool isOnLine;
+//	bool isSameSort;
+//
+//	double gx, gy, gz;
+//	double px, py, pz;
+//	double s, d2;
+//	double hx, hy, hz;
+//	double dg;
+	const double t2 = tolerance * tolerance;
 	size_t lastWritten = 0;
 	temp.Add(positions[lastWritten]);
 	unsigned char lastGCode = positions[lastWritten].GetGNumber();
-	unsigned char gCode;
-	for(i = 1; i < positions.GetCount(); i++){
-		isOnLine = true;
-		isSameSort = true;
-		gCode = positions[i].GetGNumber();
+//	unsigned char gCode;
+	size_t i;
+	for(i = 1; i < positions.size(); i++){
+		bool isOnLine = true;
+		bool isSameSort = true;
+		unsigned char gCode = positions[i].GetGNumber();
 		if(gCode != lastGCode) isSameSort = false;
 		if(lastGCode != 0 && lastGCode != 1) isSameSort = false;
 
 		if(isSameSort){
-			gx = positions[i].axisX - positions[lastWritten].axisX;
-			gy = positions[i].axisY - positions[lastWritten].axisY;
-			gz = positions[i].axisZ - positions[lastWritten].axisZ;
+			double gx = positions[i].axisX - positions[lastWritten].axisX;
+			double gy = positions[i].axisY - positions[lastWritten].axisY;
+			double gz = positions[i].axisZ - positions[lastWritten].axisZ;
 
-			dg = gx * gx + gy * gy + gz * gz;
+			double dg = gx * gx + gy * gy + gz * gz;
 			if(dg > 0.0){
 
-				for(j = lastWritten + 1; j < i; j++){
-					px = positions[j].axisX - positions[lastWritten].axisX;
-					py = positions[j].axisY - positions[lastWritten].axisY;
-					pz = positions[j].axisZ - positions[lastWritten].axisZ;
+				for(size_t j = lastWritten + 1; j < i; j++){
+					const double px = positions[j].axisX
+							- positions[lastWritten].axisX;
+					const double py = positions[j].axisY
+							- positions[lastWritten].axisY;
+					const double pz = positions[j].axisZ
+							- positions[lastWritten].axisZ;
 
-					s = (gx * px + gy * py + gz * pz) / dg;
+					const double s = (gx * px + gy * py + gz * pz) / dg;
 
 					if(s < 0.0 || s > 1.0){
 						isOnLine = false;
 						break;
 					}
 
-					hx = gx * s;
-					hy = gy * s;
-					hz = gz * s;
+					double hx = gx * s;
+					double hy = gy * s;
+					double hz = gz * s;
 					hx -= px;
 					hy -= py;
 					hz -= pz;
-					d2 = hx * hx + hy * hy + hz * hz;
+					const double d2 = hx * hx + hy * hy + hz * hz;
 
 					if(d2 > t2){
 						isOnLine = false;
@@ -290,7 +287,7 @@ void ToolPath::CleanPath(double tolerance)
 
 void ToolPath::WriteToFile(wxTextFile &f)
 {
-	if(positions.GetCount() < 2) return;
+	if(positions.size() < 2) return;
 
 	CleanPath(0.0003);
 
@@ -327,9 +324,8 @@ void ToolPath::WriteToFile(wxTextFile &f)
 
 	}
 
-	size_t i;
 	f.AddLine(positions[0].GenerateCommandXYZ(), fileType);
-	for(i = 1; i < positions.GetCount(); i++)
+	for(size_t i = 1; i < positions.GetCount(); i++)
 		f.AddLine(positions[i].GenerateCommandDiff(positions[i - 1]), fileType);
 
 	f.AddLine(_T("M5 (Stop spindel)"), fileType);

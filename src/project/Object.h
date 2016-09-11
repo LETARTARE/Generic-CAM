@@ -27,20 +27,21 @@
 #ifndef OBJECT_H_
 #define OBJECT_H_
 
-#include <wx/dynarray.h>
-#include <wx/filename.h>
-#include <wx/string.h>
-#include <wx/txtstrm.h>
+/*!\class Object
+ * \ingroup document
+ * \brief 3D Object
+ *
+ * Object to manufacture.
+ */
 
-#include "../3D/AffineTransformMatrix.h"
 #include "../3D/BoundingBox.h"
 #include "../3D/Geometry.h"
+#include "../3D/AffineTransformMatrix.h"
 
-/*!\class Object
- * \brief ...
- *
- * ...
- */
+#include <wx/txtstrm.h>
+#include <wx/filename.h>
+#include <wx/string.h>
+#include <wx/dynarray.h>
 
 class Object {
 	// Constructor / Destructor
@@ -50,27 +51,31 @@ public:
 
 	// Member variables
 public:
-	bool selected;
-	bool modified;
-	AffineTransformMatrix matrix;
-
-	wxFileName fileName;
 	wxString name;
+	wxFileName fileName;
+
+	AffineTransformMatrix matrix; //!< Transformation (rotation and scaling) of the object in the positive quadrant next to the origin.
+	AffineTransformMatrix displayTransform; //!< Shift of the object to the position it was loaded.
 
 	ArrayOfGeometry geometries;
 	BoundingBox bbox;
+
+	bool show; //!< An object hides, e.g. if derived objects exist
+
+	//TODO: Remove the "selected" flag.
+	bool selected;
+//	bool modified;
 
 private:
 
 	// Methods
 public:
+	void Update(void); //!< Update the coordinate system
+	void UpdateNormals(void); //!< Normalize the normals for the object to shade correctly.
 
-	void UpdateBoundingBox(void);
-	void UpdateBoundingBox(AffineTransformMatrix const &matrix);
-	void UpdateNormals(void);
-	void Update(void);
+	void TransformFromCenter(void); //!< Shifts the origin for transfomration on 'matrix' to the center of the object.
 
-	void Paint(void) const;
+	void Paint() const;
 
 	bool LoadObject(wxFileName fileName);
 	bool ReloadObject(void);
@@ -84,6 +89,8 @@ public:
 
 	void ToStream(wxTextOutputStream & stream, int n);
 	bool FromStream(wxTextInputStream & stream);
+
+private:
 
 };
 WX_DECLARE_OBJARRAY(Object, ArrayOfObject);

@@ -39,8 +39,9 @@
  */
 
 #include "../project/Project.h"
-#include <wx/treectrl.h>
 #include "TreeItem.h"
+
+#include <wx/treectrl.h>
 
 class TreeSetup {
 public:

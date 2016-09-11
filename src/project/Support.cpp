@@ -26,10 +26,12 @@
 
 #include "Support.h"
 
+#include <wx/arrimpl.cpp>
+WX_DEFINE_OBJARRAY(ArrayOfSupport)
+
 Support::Support()
 {
 	// TODO Auto-generated constructor stub
-	
 }
 
 Support::~Support()

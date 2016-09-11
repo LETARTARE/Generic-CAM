@@ -27,18 +27,18 @@
 #ifndef DIALOGPLACEMENT_H_
 #define DIALOGPLACEMENT_H_
 
-#include <wx/cmdproc.h>
-#include <wx/wx.h>
-
-#include "../project/Project.h"
-#include "DisplaySettings.h"
-#include "gui.h"
-
 /*!\class DialogPlacement
  * \brief ...
  *
  * ...
  */
+
+#include "../project/Project.h"
+#include "DisplaySettings.h"
+#include "gui.h"
+
+#include <wx/wx.h>
+#include <wx/cmdproc.h>
 
 class DialogPlacement:public GUIPlacement {
 public:

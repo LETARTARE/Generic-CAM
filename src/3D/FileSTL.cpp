@@ -192,7 +192,7 @@ void FileSTL::WriteStream(wxOutputStream& stream, Geometry & g)
 
 	binaryStream.Write8(header, 80);
 	binaryStream.Write32(wxUint32(g.triangles.GetCount()));
-	for(int n = 0; n < g.triangles.GetCount(); n++){
+	for(size_t n = 0; n < g.triangles.GetCount(); n++){
 		float coord[12];
 		coord[0] = g.triangles[n].n[0].x;
 		coord[1] = g.triangles[n].n[0].y;

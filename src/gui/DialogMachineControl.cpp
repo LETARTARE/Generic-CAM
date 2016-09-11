@@ -62,7 +62,8 @@ void DialogMachineControl::OnScroll(wxScrollEvent& event)
 {
 	TransferDataFromWindowSliders();
 	TransferDataToWindowTextbox();
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
+			ID_UPDATESIMULATION);
 	ProcessEvent(selectEvent);
 }
 
@@ -70,7 +71,8 @@ void DialogMachineControl::OnTrack(wxScrollEvent& event)
 {
 	TransferDataFromWindowSliders();
 	TransferDataToWindowTextbox();
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
+			ID_UPDATESIMULATION);
 	ProcessEvent(selectEvent);
 }
 
@@ -200,7 +202,8 @@ void DialogMachineControl::OnZero(wxMouseEvent& event)
 		break;
 	}
 	TransferDataToWindow();
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
+			ID_UPDATESIMULATION);
 	ProcessEvent(selectEvent);
 }
 
@@ -246,6 +249,7 @@ void DialogMachineControl::OnTextChanged(wxCommandEvent& event)
 
 	}
 	TransferDataToWindowSliders();
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
+			ID_UPDATESIMULATION);
 	ProcessEvent(selectEvent);
 }

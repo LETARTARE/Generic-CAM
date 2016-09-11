@@ -32,7 +32,7 @@
 /*!\class MathParser
  * \brief Simple single-line math parser
  *
- * Parses a single line into an double number.
+ * Parses a single line into a double number.
  *
  * Supported functions:
  *  - + - * / ^ ( )
@@ -41,7 +41,14 @@
  *  - sqrt cbrt
  *  - ceil floor round
  *  - abs
+ *
+ *  Standard values:
+ *  - e and pi (both lowercase)
  */
+
+#include <wx/hashmap.h>
+
+WX_DECLARE_STRING_HASH_MAP(double, Variables);
 
 class MathParser {
 public:
@@ -61,24 +68,39 @@ public:
 	wxString GetUnit(void) const;
 	inline bool HasUnit(void) const
 	{
-		return unit.IsEmpty();
+		return !unit.IsEmpty();
 	}
 
+	wxString GetError(void) const;
 	inline bool HasError(void) const
 	{
-		return error.IsEmpty();
+		return !error.IsEmpty();
 	}
-	wxString GetError(void) const;
+
+	void ResetVariables(bool setStandard = true);
+	void SetVariable(const wxString& variable, double value);
+	double GetVariable(const wxString& variable);
+
+	void ResetAllowedUnits(void);
+	void AddAllowedUnit(const wxString& unit, double factor);
 
 	bool Evaluate(void);
 
 private:
+
+	/*! \brief Parse a single token off the string and add it to the stack
+	 *
+	 * @return (bool) Success of operation
+	 */
 	bool GetNextToken(void);
 
 	// Member variables
 public:
 	bool autoEvaluate; ///< Evaluate string whenever a new one is passed?
 	bool addUnit; ///< Add unit to generated string?
+
+	Variables globals;
+	Variables allowedUnits;
 
 private:
 	wxString text;

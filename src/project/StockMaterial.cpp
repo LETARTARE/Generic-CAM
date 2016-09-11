@@ -25,9 +25,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "StockMaterial.h"
+
 #include <GL/gl.h>
 #include <math.h>
-#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+#include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfStockMaterial)
 
 StockMaterial::StockMaterial()

@@ -36,6 +36,7 @@ MathParser::MathParser()
 	autoEvaluate = true;
 	addUnit = false;
 	number = 0.0;
+	ResetVariables(true);
 }
 
 void MathParser::SetString(const wxString& expression)
@@ -90,10 +91,36 @@ wxString MathParser::GetUnit(void) const
 	return unit;
 }
 
-/*! \brief Parse a single token off the string and add it to the stack
- *
- * @return (bool) Success of operation
- */
+void MathParser::ResetVariables(bool setStandard)
+{
+	globals.clear();
+	if(setStandard){
+		globals[_T("pi")] = M_PI;
+		globals[_T("e")] = M_E;
+	}
+}
+
+void MathParser::SetVariable(const wxString& variable, double value)
+{
+	globals[variable] = value;
+}
+
+double MathParser::GetVariable(const wxString& variable)
+{
+	double x = globals[variable];
+	return x;
+}
+
+void MathParser::ResetAllowedUnits(void)
+{
+	allowedUnits.clear();
+}
+
+void MathParser::AddAllowedUnit(const wxString& unit, double factor)
+{
+	allowedUnits[unit] = factor;
+}
+
 bool MathParser::GetNextToken(void)
 {
 	if(posStack >= maxStackDepth){
@@ -227,7 +254,10 @@ bool MathParser::GetNextToken(void)
 bool MathParser::Evaluate(void)
 {
 	error.Empty();
-	if(text.IsEmpty()) return true;
+	if(text.IsEmpty()){
+		error = _T("Expression empty.");
+		return false;
+	}
 
 	strLength = text.Length();
 	posText = 0;
@@ -239,23 +269,26 @@ bool MathParser::Evaluate(void)
 		while(flag){
 			flag = false;
 
-			// Replace special symbols and variables
-			//TODO: Add processing of global variables.
+			// Replace variables
 			if(posStack >= 2 && stackType[posStack - 2] == expressionText){
 				wxString variable = text.Mid(stackStartPos[posStack - 2],
 						stackCharCount[posStack - 2]);
-				bool foundVariable = false;
-
-				if(variable.CmpNoCase(_T("pi")) == 0){
-					stackNumber[posStack - 2] = M_PI;
-					foundVariable = true;
-				}
-				if(variable.CmpNoCase(_T("e")) == 0){
-					stackNumber[posStack - 2] = M_E;
-					foundVariable = true;
-				}
-				if(foundVariable){
+				if(globals.count(variable) == 1){
+					stackNumber[posStack - 2] = globals[variable];
 					stackType[posStack - 2] = expressionNumber;
+					flag = true;
+				}
+			}
+
+			// Replace units
+			if(posStack >= 2 && stackType[posStack - 1] == expressionText
+					&& !allowedUnits.empty()){
+				wxString temp = text.Mid(stackStartPos[posStack - 1],
+						stackCharCount[posStack - 1]);
+				if(allowedUnits.count(temp) == 1
+						&& stackType[posStack - 2] == expressionNumber){
+					stackNumber[posStack - 2] *= allowedUnits[temp];
+					posStack--;
 					flag = true;
 				}
 			}
@@ -428,19 +461,36 @@ bool MathParser::Evaluate(void)
 
 	// Check if stack could be totally reduced into a Number + EndSymbol or Number + Text + EndSymbol.
 	// In the second case, assume that the text is a unit.
-	if(posStack == 2 && stackType[posStack - 1] == expressionEnd
-			&& stackType[posStack - 2] == expressionNumber){
-		number = stackNumber[0];
-		unit.Empty();
-	}else
-		if(posStack == 3 && stackType[posStack - 1] == expressionEnd
-				&& stackType[posStack - 2] == expressionText
-				&& stackType[posStack - 3] == expressionNumber){
+
+	switch(posStack){
+	case 0:
+		error = _T("This should not be possible.");
+		break;
+	case 1:
+		error = _T("Expression empty.");
+		break;
+	case 2:
+		if(stackType[1] == expressionEnd && stackType[0] == expressionNumber){
+			number = stackNumber[0];
+			unit.Empty();
+		}else{
+			error = _T("Cannot be reduced to a number.");
+		}
+		break;
+	case 3:
+		if(allowedUnits.empty() && stackType[2] == expressionEnd
+				&& stackType[1] == expressionText
+				&& stackType[0] == expressionNumber){
 			number = stackNumber[0];
 			unit = text.Mid(stackStartPos[1], stackCharCount[1]);
 		}else{
-			error = _T("Could not parse expression completely.");
+			error = _T("Cannot be reduced to a number.");
 		}
+		break;
+	default:
+		error = _T("Could not parse expression completely.");
+		break;
+	}
 
 	return !HasError();
 }

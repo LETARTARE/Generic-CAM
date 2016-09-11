@@ -27,18 +27,20 @@
 #ifndef STOCKMATERIAL_H_
 #define STOCKMATERIAL_H_
 
-#include <wx/string.h>
+/*!\class StockMaterial
+ * \ingroup document
+ * \brief Definition of one piece of raw material.
+ *
+ * Stock material as it can be found in the workshop. It is assumed that it is box-like.
+ *
+ * The stock material contains technical data of the material as well.
+ */
 
-#include <wx/dynarray.h>
 #include "../3D/AffineTransformMatrix.h"
 #include "../3D/Vector3.h"
 
-/*!\class StockMaterial
- * \brief Definition of one piece of raw material.
- *
- * The material is defined as a Quadtree to speed up drawing.
- *
- */
+#include <wx/string.h>
+#include <wx/dynarray.h>
 
 class StockMaterial {
 	// Constructor / Destructor
@@ -51,14 +53,14 @@ public:
 	wxString name;
 	float sx, sy, sz;
 
-	bool available; ///> Available in workshop
+	bool available; ///< Available in workshop
 
-	float maxToolSpeed;
-	float maxFeedrate;
-	float thermalConductivity;
-	float ignitionTemperature;
+	float maxToolSpeed; ///< Maximum rotational speed of the toolhead
+	float maxFeedrate; ///< Maximum forward feedrate
+	float thermalConductivity; ///< Thermal conductivity to calculate heat buildup
+	float ignitionTemperature; ///< Material ignites at this temperature
 
-	Vector3 color;
+	Vector3 color; ///< Color of the material for rendering
 
 	// Methods
 public:

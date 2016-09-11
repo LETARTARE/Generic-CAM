@@ -25,11 +25,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "DialogObjectTransformation.h"
-#include <math.h>
+
+#include "../project/command/CommandObjectTransform.h"
 #include "IDs.h"
 #include <wx/event.h>
+#include <math.h>
 
-#include "../command/CommandObjectTransform.h"
 
 DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent,
 		Project * project, wxCommandProcessor * commandProcessor,
@@ -191,7 +192,7 @@ void DialogObjectTransformation::OnSelectObject(wxCommandEvent& event)
 		project->objects[n].selected = (n == id);
 
 	// Tell the main frame to update the selection in the treeview via custom command.
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHTREE);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHMAINGUI);
 	ProcessEvent(selectEvent);
 }
 
@@ -411,7 +412,7 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 		}
 	}
 
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATE);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATEPROJECT);
 	ProcessEvent(selectEvent);
 }
 

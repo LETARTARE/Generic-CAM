@@ -1,0 +1,53 @@
+/** \defgroup document Project data
+ 
+This describes the parts that make up the data of Generic Cams Document / View architecture.
+  
+Class Relation
+ 
+\dot
+  digraph classes {
+	node [shape=record, fontname=Helvetica, fontsize=10];
+    pro [ label="Project" URL="\ref Project"];
+    run [ label="Run" URL="\ref Run"];
+    wpi [ label="Workpiece" URL="\ref Workpiece"];
+    obj [ label="Object" URL="\ref Object"];
+    mac [ label="Machine" URL="\ref Machine"];
+    gen [ label="Generator" URL="\ref Generator"];
+    too [ label="Tool" URL="\ref Tool"];
+    fli [ label="FlipDrillPattern" URL="\ref FlipDrillPattern"];
+    tpa [ label="ToolPath" URL="\ref ToolPath"];
+    sfi [ label="StockFile" URL="\ref StockFile"];
+    sma [ label="StockMaterial" URL="\ref StockMaterial"];
+    opl [ label="ObjectPlacement" URL="\ref ObjectPlacement"];
+    sup [ label="Support" URL="\ref Support"];
+    tbo [ label="ToolBox" URL="\ref ToolBox"];
+           
+    pro -> run [label="*"];
+    pro -> wpi [label="*"];
+    pro -> obj [label="*"];
+      
+    wpi -> sup [label="*"];
+    wpi -> opl [label="*"];
+          
+    run -> mac;
+    run -> too [label="*"];
+    run -> gen [label="*"];
+    run -> fli;
+    
+    opl -> obj [style=dashed];
+	run -> wpi [style=dashed];
+	gen -> too [style=dashed];
+	    
+	sfi -> sma;
+	sma -> wpi [style=dotted label="init"];
+    tbo -> too [style=dotted label="copy"];
+        
+    gen -> tpa;
+  }
+  \enddot
+  
+  The protected: handles, that are spread throughout the parts of the
+  project are used for reconstructing the project after loading. They
+  are generated upon saving.
+   
+**/

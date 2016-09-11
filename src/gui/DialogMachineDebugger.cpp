@@ -26,17 +26,16 @@
 
 #include "DialogMachineDebugger.h"
 
-#include <wx/dir.h>
-#include <wx/textfile.h>
-
 #include "IDs.h"
+#include <wx/textfile.h>
+#include <wx/dir.h>
 
 DialogMachineDebugger::DialogMachineDebugger(wxWindow * parent,
 		DisplaySettings * settings) :
 		GUIMachineDebugger(parent)
 {
 
-	this->Connect(ID_UPDATE, wxEVT_COMMAND_MENU_SELECTED,
+	this->Connect(ID_UPDATESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(DialogMachineDebugger::Update));
 
 	this->settings = settings;
@@ -53,7 +52,7 @@ DialogMachineDebugger::DialogMachineDebugger(wxWindow * parent,
 
 DialogMachineDebugger::~DialogMachineDebugger()
 {
-	this->Disconnect(ID_UPDATE, wxEVT_COMMAND_MENU_SELECTED,
+	this->Disconnect(ID_UPDATESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(DialogMachineDebugger::Update));
 }
 

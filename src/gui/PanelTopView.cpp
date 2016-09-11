@@ -67,37 +67,38 @@ void PanelTopView::OnPaint(wxPaintEvent& event)
 	float x;
 	float y;
 
-	if(sz.GetWidth() / project->workpieces[wpNr].sx
-			< sz.GetHeight() / project->workpieces[wpNr].sy){
-		scale = (float) sz.GetWidth() / project->workpieces[wpNr].sx;
+	if(sz.GetWidth() / project->workpieces[wpNr].GetSizeX()
+			< sz.GetHeight() / project->workpieces[wpNr].GetSizeY()){
+		scale = (float) sz.GetWidth() / project->workpieces[wpNr].GetSizeX();
 		x = 0;
-		y = ((float) sz.GetHeight() - project->workpieces[wpNr].sy * scale)
+		y = ((float) sz.GetHeight() - project->workpieces[wpNr].GetSizeY() * scale)
 				/ 2.0;
 	}else{
-		scale = (float) sz.GetHeight() / project->workpieces[wpNr].sy;
-		x = ((float) sz.GetWidth() - project->workpieces[wpNr].sx * scale)
+		scale = (float) sz.GetHeight() / project->workpieces[wpNr].GetSizeY();
+		x = ((float) sz.GetWidth() - project->workpieces[wpNr].GetSizeX() * scale)
 				/ 2.0;
 		y = 0;
 	}
-	dc.DrawRoundedRectangle(x, y, (int) (project->workpieces[wpNr].sx * scale),
-			(int) (project->workpieces[wpNr].sy * scale), 10);
+	dc.DrawRoundedRectangle(x, y, (int) (project->workpieces[wpNr].GetSizeX()* scale),
+			(int) (project->workpieces[wpNr].GetSizeY() * scale), 10);
 
 	size_t N = project->workpieces[wpNr].placements.GetCount();
 	size_t n, m, p;
 	AffineTransformMatrix temp;
 	Vector3 p1, p2, p3;
 	for(n = 0; n < N; n++){
-		size_t objNr = project->workpieces[wpNr].placements[n].objectNr;
+		size_t objNr = project->workpieces[wpNr].placements[n].refObject;
 		if(objNr < 0) continue;
 		for(m = 0; m < project->objects[objNr].geometries.GetCount(); m++){
 
+			//TODO: Rethink this.
 			temp = AffineTransformMatrix::Identity();
 			temp.TranslateLocal(x, sz.GetHeight() - y, 0);
 			temp.ScaleLocal(scale, -scale, scale);
-			temp.TranslateLocal(
-					-project->workpieces[wpNr].placements[n].bbox.xmin,
-					-project->workpieces[wpNr].placements[n].bbox.ymin,
-					-project->workpieces[wpNr].placements[n].bbox.zmin);
+//			temp.TranslateLocal(
+//					-project->workpieces[wpNr].placements[n].bbox.xmin,
+//					-project->workpieces[wpNr].placements[n].bbox.ymin,
+//					-project->workpieces[wpNr].placements[n].bbox.zmin);
 			temp.TranslateLocal(
 					project->workpieces[wpNr].placements[n].matrix.a[12],
 					project->workpieces[wpNr].placements[n].matrix.a[13],

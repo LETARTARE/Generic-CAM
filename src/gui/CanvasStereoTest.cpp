@@ -38,9 +38,6 @@ CanvasStereoTest::CanvasStereoTest(wxWindow* parent, wxWindowID id,
 
 CanvasStereoTest::~CanvasStereoTest()
 {
-	this->Disconnect(wxEVT_TIMER,
-			wxTimerEventHandler(CanvasStereoTest::OnTimer),
-			NULL, this);
 }
 
 void CanvasStereoTest::Render()

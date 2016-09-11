@@ -27,26 +27,25 @@
 #ifndef DIALOGSTOCKMATERIAL_H_
 #define DIALOGSTOCKMATERIAL_H_
 
-#include <wx/cmdproc.h>
-
-#include "gui.h"
-#include "../project/Project.h"
-#include "DisplaySettings.h"
-
 /*!\class DialogStockMaterial
  * \brief Manages the heap of stock material in the workshop
  */
 
+#include "../project/Project.h"
+#include "../project/StockFile.h"
+#include "DisplaySettings.h"
+#include "gui.h"
+
 class DialogStockMaterial:public GUIStockMaterial {
 public:
 	// Constructor/ Destructor
-	DialogStockMaterial(wxWindow* parent, Project * project,
-			wxCommandProcessor * commandProcessor, DisplaySettings * settings);
+	DialogStockMaterial(wxWindow* parent, Project * project, StockFile* stock,
+			DisplaySettings * settings);
 
 	// Member Variables
 private:
 	Project* project;
-	wxCommandProcessor * commandProcessor;
+	StockFile* stock;
 	DisplaySettings * settings;
 
 	int selectedLine;
@@ -56,7 +55,7 @@ private:
 	wxString name;
 	double feedrate;
 	double toolSpeed;
-bool available;
+	bool available;
 	// Methods
 public:
 	bool TransferDataToWindow(void);

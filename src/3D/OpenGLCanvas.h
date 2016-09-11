@@ -84,6 +84,10 @@ public:
 protected:
 	AffineTransformMatrix rotmat;
 	AffineTransformMatrix transmat;
+	float scale;
+	float turntableX;
+	float turntableY;
+	float unitAtOrigin;
 
 private:
 	bool isInitialized;
@@ -98,9 +102,6 @@ private:
 	int y; ///> Startpoint for mouse dragging
 	int w; ///> Width of viewport
 	int h; ///> Height of viewport
-
-	float turntableX;
-	float turntableY;
 
 	// Methods
 public:

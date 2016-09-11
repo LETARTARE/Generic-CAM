@@ -28,7 +28,8 @@
 
 #include <GL/gl.h>
 #include <float.h>
-#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+
+#include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfBoundingBox)
 
 BoundingBox::BoundingBox()
@@ -67,6 +68,67 @@ void BoundingBox::Clear(void)
 	xmin = ymin = zmin = DBL_MAX;
 }
 
+void BoundingBox::Insert(const BoundingBox& bbox)
+{
+	if(bbox.xmin < xmin) xmin = bbox.xmin;
+	if(bbox.xmax > xmax) xmax = bbox.xmax;
+	if(bbox.ymin < ymin) ymin = bbox.ymin;
+	if(bbox.ymax > ymax) ymax = bbox.ymax;
+	if(bbox.zmin < zmin) zmin = bbox.zmin;
+	if(bbox.zmax > zmax) zmax = bbox.zmax;
+}
+
+void BoundingBox::Insert(const Vector3& point)
+{
+	if(point.x > xmax) xmax = point.x;
+	if(point.x < xmin) xmin = point.x;
+	if(point.y > ymax) ymax = point.y;
+	if(point.y < ymin) ymin = point.y;
+	if(point.z > zmax) zmax = point.z;
+	if(point.z < zmin) zmin = point.z;
+}
+
+void BoundingBox::Insert(const Triangle &tri)
+{
+	for(unsigned char i = 0; i < 3; i++){
+		if(tri.p[i].x > xmax) xmax = tri.p[i].x;
+		if(tri.p[i].x < xmin) xmin = tri.p[i].x;
+		if(tri.p[i].y > ymax) ymax = tri.p[i].y;
+		if(tri.p[i].y < ymin) ymin = tri.p[i].y;
+		if(tri.p[i].z > zmax) zmax = tri.p[i].z;
+		if(tri.p[i].z < zmin) zmin = tri.p[i].z;
+	}
+}
+
+void BoundingBox::Insert(const Geometry &geometry,
+		const AffineTransformMatrix &matrix)
+{
+	for(size_t i = 0; i < geometry.triangles.GetCount(); i++){
+		Triangle temp = geometry.triangles[i];
+		temp.ApplyTransformation(matrix * geometry.matrix);
+		for(size_t j = 0; j < 3; j++){
+			if(temp.p[j].x > xmax) xmax = temp.p[j].x;
+			if(temp.p[j].x < xmin) xmin = temp.p[j].x;
+			if(temp.p[j].y > ymax) ymax = temp.p[j].y;
+			if(temp.p[j].y < ymin) ymin = temp.p[j].y;
+			if(temp.p[j].z > zmax) zmax = temp.p[j].z;
+			if(temp.p[j].z < zmin) zmin = temp.p[j].z;
+		}
+	}
+}
+
+BoundingBox& BoundingBox::operator +=(const BoundingBox& rhs)
+{
+	this->Insert(rhs);
+	return *this;
+}
+
+const BoundingBox BoundingBox::operator +(const BoundingBox& rhs) const
+{
+	BoundingBox temp = *this;
+	temp += rhs;
+	return temp;
+}
 bool BoundingBox::IsEmpty(void) const
 {
 	if(xmax < xmin) return true;
@@ -83,6 +145,17 @@ bool BoundingBox::IsVolumeZero(void) const
 	return false;
 }
 
+void BoundingBox::SetSize(float sx, float sy, float sz, float origx,
+		float origy, float origz)
+{
+	xmin = origx;
+	ymin = origy;
+	zmin = origz;
+	xmax = xmin + sx;
+	ymax = ymin + sy;
+	zmax = zmin + sz;
+}
+
 double BoundingBox::GetVolume(void) const
 {
 	if(xmax <= xmin) return 0.0;
@@ -91,61 +164,10 @@ double BoundingBox::GetVolume(void) const
 	return (xmax - xmin) * (ymax - ymin) * (zmax - zmin);
 }
 
-void BoundingBox::Insert(const Geometry &geometry,
-		const AffineTransformMatrix &matrix)
-{
-	size_t i, j;
-	for(i = 0; i < geometry.triangles.GetCount(); i++){
-		Triangle temp = geometry.triangles[i];
-		temp.ApplyTransformation(matrix * geometry.matrix);
-		for(j = 0; j < 3; j++){
-			if(temp.p[j].x > xmax) xmax = temp.p[j].x;
-			if(temp.p[j].x < xmin) xmin = temp.p[j].x;
-			if(temp.p[j].y > ymax) ymax = temp.p[j].y;
-			if(temp.p[j].y < ymin) ymin = temp.p[j].y;
-			if(temp.p[j].z > zmax) zmax = temp.p[j].z;
-			if(temp.p[j].z < zmin) zmin = temp.p[j].z;
-		}
-	}
-}
-
-void BoundingBox::Insert(const Vector3& point)
-{
-	if(point.x > xmax) xmax = point.x;
-	if(point.x < xmin) xmin = point.x;
-	if(point.y > ymax) ymax = point.y;
-	if(point.y < ymin) ymin = point.y;
-	if(point.z > zmax) zmax = point.z;
-	if(point.z < zmin) zmin = point.z;
-}
-
-void BoundingBox::Insert(const BoundingBox& bbox)
-{
-	if(bbox.xmin < xmin) xmin = bbox.xmin;
-	if(bbox.xmax > xmax) xmax = bbox.xmax;
-	if(bbox.ymin < ymin) ymin = bbox.ymin;
-	if(bbox.ymax > ymax) ymax = bbox.ymax;
-	if(bbox.zmin < zmin) zmin = bbox.zmin;
-	if(bbox.zmax > zmax) zmax = bbox.zmax;
-}
-
-void BoundingBox::Insert(const Triangle &tri)
-{
-	unsigned char i;
-	for(i = 0; i < 3; i++){
-		if(tri.p[i].x > xmax) xmax = tri.p[i].x;
-		if(tri.p[i].x < xmin) xmin = tri.p[i].x;
-		if(tri.p[i].y > ymax) ymax = tri.p[i].y;
-		if(tri.p[i].y < ymin) ymin = tri.p[i].y;
-		if(tri.p[i].z > zmax) zmax = tri.p[i].z;
-		if(tri.p[i].z < zmin) zmin = tri.p[i].z;
-	}
-}
-
 void BoundingBox::Paint(void) const
 {
 
-	float overlap = 0.1;
+	const float overlap = 0.1;
 
 	if(xmax < xmin) return;
 	if(ymax < ymin) return;
@@ -196,7 +218,7 @@ void BoundingBox::Paint(void) const
 	::glEnd();
 }
 
-void BoundingBox::ToStream(wxTextOutputStream& stream)
+void BoundingBox::ToStream(wxTextOutputStream& stream) const
 {
 	stream << _T("BoundingBox:") << endl;
 	stream << xmin << _T(" ") << xmax << _T(" ");

@@ -19,8 +19,8 @@ genericcam
 /machines/Hermle\ 800.zip
 /*.zip
 
-/doc/doxygen/html
-/doc/doxygen/latex
+/doc/html
+/doc/latex
 
 /doc/*.aux
 /doc/*.toc

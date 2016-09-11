@@ -27,16 +27,17 @@
 #include "DialogToolbox.h"
 
 DialogToolbox::DialogToolbox(wxWindow* parent, Project * project,
-		DisplaySettings * settings) :
+		ToolBox * toolbox, DisplaySettings * settings) :
 		GUIToolbox(parent)
 {
 	this->project = project;
+	this->toolbox = toolbox;
 	this->settings = settings;
 
 	selectedTool = 0;
 	selectedElement = 0;
-	if(selectedTool < project->toolbox.tools.GetCount()){
-		tempTool = project->toolbox.tools[selectedTool];
+	if(selectedTool < toolbox->tools.GetCount()){
+		tempTool = toolbox->tools[selectedTool];
 		if(selectedElement < tempTool.elements.GetCount()) tempElement =
 				tempTool.elements[selectedElement];
 	}
@@ -50,17 +51,17 @@ DialogToolbox::~DialogToolbox()
 
 bool DialogToolbox::TransferDataToWindow(void)
 {
-	if(project == NULL) return false;
+	if(toolbox == NULL) return false;
 
 	size_t i, j;
 
 	m_comboBoxToolSelector->Clear();
-	if(project->toolbox.tools.GetCount() == 0){
+	if(toolbox->tools.GetCount() == 0){
 		m_comboBoxToolSelector->Append(_("No tools in toolbox!"));
 		m_comboBoxToolSelector->Enable(false);
 	}else{
-		for(i = 0; i < project->toolbox.tools.GetCount(); i++){
-			m_comboBoxToolSelector->Append(project->toolbox.tools[i].toolName);
+		for(i = 0; i < toolbox->tools.GetCount(); i++){
+			m_comboBoxToolSelector->Append(toolbox->tools[i].toolName);
 		}
 		m_comboBoxToolSelector->SetValue(tempTool.toolName);
 		m_comboBoxToolSelector->Enable(true);
@@ -231,8 +232,8 @@ void DialogToolbox::OnToolSelect(wxCommandEvent& event)
 //	if(selectedTool == event.GetSelection()) return;
 	TransferDataFromWindow();
 	selectedTool = event.GetSelection();
-	if(selectedTool < project->toolbox.tools.GetCount()){
-		tempTool = project->toolbox.tools[selectedTool];
+	if(selectedTool < toolbox->tools.GetCount()){
+		tempTool = toolbox->tools[selectedTool];
 		selectedElement = 0;
 		if(tempTool.elements.GetCount() > 0) tempElement = tempTool.elements[0];
 	}
@@ -252,28 +253,28 @@ void DialogToolbox::OnToolNew(wxCommandEvent& event)
 	if(!tempTool.toolName.IsEmpty()){
 		tempTool.toolName = _("Copy of ") + tempTool.toolName;
 	}
-	project->toolbox.tools.Add(tempTool);
-	selectedTool = project->toolbox.tools.GetCount() - 1;
+	toolbox->tools.Add(tempTool);
+	selectedTool = toolbox->tools.GetCount() - 1;
 	TransferDataToWindow();
 }
 
 void DialogToolbox::OnToolUpdate(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
-	if(selectedTool >= project->toolbox.tools.GetCount()) return;
-	project->toolbox.tools[selectedTool] = tempTool;
+	if(selectedTool >= toolbox->tools.GetCount()) return;
+	toolbox->tools[selectedTool] = tempTool;
 	TransferDataToWindow();
 }
 
 void DialogToolbox::OnToolDelete(wxCommandEvent& event)
 {
 	if(selectedTool < 0) return;
-	if(selectedTool >= project->toolbox.tools.GetCount()) return;
-	project->toolbox.tools.RemoveAt(selectedTool, 1);
+	if(selectedTool >= toolbox->tools.GetCount()) return;
+	toolbox->tools.RemoveAt(selectedTool, 1);
 	selectedTool--;
 	if(selectedTool < 0) selectedTool = 0;
-	if(selectedTool < project->toolbox.tools.GetCount()){
-		tempTool = project->toolbox.tools[selectedTool];
+	if(selectedTool < toolbox->tools.GetCount()){
+		tempTool = toolbox->tools[selectedTool];
 		selectedElement = 0;
 		if(tempTool.elements.GetCount() > 0) tempElement = tempTool.elements[0];
 	}

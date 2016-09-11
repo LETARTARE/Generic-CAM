@@ -27,14 +27,17 @@
 #ifndef STOCKFILE_H_
 #define STOCKFILE_H_
 
-#include "StockMaterial.h"
-#include "../3D/AffineTransformMatrix.h"
-#include <wx/filename.h>
-
 /*!\class StockFile
+ * \ingroup document
  * \brief Collection of raw material in the workshop
  *
+ * A library of raw material.
  */
+
+#include "StockMaterial.h"
+#include "../3D/AffineTransformMatrix.h"
+
+#include <wx/filename.h>
 
 class StockFile {
 	// Constructor / Destructor

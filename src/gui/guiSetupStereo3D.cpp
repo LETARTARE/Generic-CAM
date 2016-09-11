@@ -131,7 +131,7 @@ GUISetupStereo3D::GUISetupStereo3D( wxWindow* parent, wxWindowID id, const wxStr
 	
 	bSizerMiddle->Add( bSizer82, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_sliderFocalDistance = new wxSlider( this, ID_FOCALDISTANCE, 0, -200, 200, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+	m_sliderFocalDistance = new wxSlider( this, ID_FOCALDISTANCE, 100, 0, 200, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
 	bSizerMiddle->Add( m_sliderFocalDistance, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxBoxSizer* bSizer83;

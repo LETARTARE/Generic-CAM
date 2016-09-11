@@ -26,10 +26,6 @@
 
 #ifndef DIALOGWORKPIECE_H_
 #define DIALOGWORKPIECE_H_
-#include <wx/cmdproc.h>
-
-#include "../project/Project.h"
-#include "gui.h"
 
 /*!\class DialogWorkpiece
  * \brief ...
@@ -37,12 +33,19 @@
  * ...
  */
 
+#include "../project/Project.h"
+#include "../project/StockFile.h"
+#include "gui.h"
+#include <wx/cmdproc.h>
+
+
 class DialogWorkpiece:public GUIWorkpiece {
 public:
-	DialogWorkpiece(wxWindow* parent, Project * project,
+	DialogWorkpiece(wxWindow* parent, Project * project, StockFile * stock,
 			wxCommandProcessor * commandProcessor);
 
 	Project* project;
+	StockFile* stock;
 	wxCommandProcessor * commandProcessor;
 
 	void OnXClose(wxCloseEvent& event);

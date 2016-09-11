@@ -27,14 +27,14 @@
 #ifndef DIALOGSETUPUNITS_H_
 #define DIALOGSETUPUNITS_H_
 
-#include "DisplaySettings.h"
-#include "gui.h"
-
 /*!\class DialogSetupUnits
  * \brief ...
  *
  * ...
  */
+
+#include "DisplaySettings.h"
+#include "gui.h"
 
 class DialogSetupUnits:public GUISetupUnits {
 	// Constructor/ Destructor

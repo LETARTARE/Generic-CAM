@@ -1568,7 +1568,7 @@
                                         <property name="id">ID_FOCALDISTANCE</property>
                                         <property name="maxValue">200</property>
                                         <property name="maximum_size"></property>
-                                        <property name="minValue">-200</property>
+                                        <property name="minValue">0</property>
                                         <property name="minimum_size"></property>
                                         <property name="name">m_sliderFocalDistance</property>
                                         <property name="permission">protected</property>
@@ -1581,7 +1581,7 @@
                                         <property name="validator_style">wxFILTER_NONE</property>
                                         <property name="validator_type">wxDefaultValidator</property>
                                         <property name="validator_variable"></property>
-                                        <property name="value">0</property>
+                                        <property name="value">100</property>
                                         <property name="window_extra_style"></property>
                                         <property name="window_name"></property>
                                         <property name="window_style"></property>

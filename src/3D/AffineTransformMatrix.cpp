@@ -43,8 +43,7 @@ AffineTransformMatrix::AffineTransformMatrix()
 void AffineTransformMatrix::Set(AffineTransformMatrix const& b)
 {
 	if(this == &b) return;
-	size_t i;
-	for(i = 0; i < 16; i++)
+	for(size_t i = 0; i < 16; i++)
 		a[i] = b.a[i];
 	TakeMatrixApart();
 }
@@ -53,8 +52,7 @@ AffineTransformMatrix& AffineTransformMatrix::operator=(
 		const AffineTransformMatrix& b)
 {
 	if(this == &b) return *this;
-	size_t i;
-	for(i = 0; i < 16; i++)
+	for(unsigned int i = 0; i < 16; i++)
 		this->a[i] = b.a[i];
 	// this->TakeMatrixApart();
 	return *this;
@@ -66,8 +64,7 @@ void AffineTransformMatrix::SetIdentity()
 	rx = ry = rz = 0.0;
 	tx = ty = tz = 0.0;
 	sx = sy = sz = 1.0;
-	unsigned char i;
-	for(i = 0; i < 16; i++)
+	for(unsigned int i = 0; i < 16; i++)
 		a[i] = 0;
 	a[0] = 1.0;
 	a[5] = 1.0;
@@ -137,7 +134,7 @@ void AffineTransformMatrix::FromString(wxString const& string)
 
 void AffineTransformMatrix::ToStream(wxTextOutputStream& stream)
 {
-	for(int n = 0; n < 16; n++){
+	for(unsigned int n = 0; n < 16; n++){
 		if(n > 0) stream << _T(" ");
 		stream.WriteDouble(a[n]);
 	}
@@ -145,7 +142,7 @@ void AffineTransformMatrix::ToStream(wxTextOutputStream& stream)
 
 void AffineTransformMatrix::FromStream(wxTextInputStream& stream)
 {
-	for(int n = 0; n < 16; n++)
+	for(unsigned int n = 0; n < 16; n++)
 		a[n] = stream.ReadDouble();
 	TakeMatrixApart();
 }
@@ -222,12 +219,12 @@ void AffineTransformMatrix::TakeMatrixApart(void)
 //! Calculate the matrix from rx,ry,rz,tx,ty,tz and sx,sy,sz.
 void AffineTransformMatrix::PutMatrixTogether(void)
 {
-	double cox = cos(rx);
-	double six = sin(rx);
-	double coy = cos(ry);
-	double siy = sin(ry);
-	double coz = cos(rz);
-	double siz = sin(rz);
+	const double cox = cos(rx);
+	const double six = sin(rx);
+	const double coy = cos(ry);
+	const double siy = sin(ry);
+	const double coz = cos(rz);
+	const double siz = sin(rz);
 
 	//Matrix calculated with Axiom:
 	// Rx := matrix[[1,0,0],[0,cox,-six],[0,six,cox]]
@@ -269,7 +266,7 @@ const AffineTransformMatrix AffineTransformMatrix::Inverse() const
 	// R:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]])
 	// inverse(R)
 
-	double T11 = (a[0] * a[5] + (-a[1] * a[4])) * a[10]
+	const double T11 = (a[0] * a[5] + (-a[1] * a[4])) * a[10]
 			+ ((-a[0] * a[6]) + a[2] * a[4]) * a[9]
 			+ (a[1] * a[6] + (-a[2] * a[5])) * a[8];
 	// T11 is the determinant of the matrix. This can not
@@ -341,8 +338,7 @@ AffineTransformMatrix& AffineTransformMatrix::operator*=(
 	// b:=matrix([[ba[0],ba[4],ba[8],ba[12]],[ba[1],ba[5],ba[9],ba[13]],[ba[2],ba[6],ba[10],ba[14]],[0,0,0,1]]);
 
 	double c[16];
-	size_t i;
-	for(i = 0; i < 16; i++)
+	for(unsigned int i = 0; i < 16; i++)
 		c[i] = this->a[i];
 
 	this->a[0] = c[0] * b.a[0] + c[4] * b.a[1] + c[8] * b.a[2];
@@ -513,9 +509,9 @@ void AffineTransformMatrix::ScaleLocal(const double& x, const double& y,
 AffineTransformMatrix AffineTransformMatrix::RotateAroundVector(
 		Vector3 const& vector, double const& phi)
 {
-	double c = cos(phi);
-	double s = sin(phi);
-	double t = 1 - c;
+	const double c = cos(phi);
+	const double s = sin(phi);
+	const double t = 1 - c;
 
 	Vector3 v(vector);
 	v.Normalize();
@@ -550,20 +546,20 @@ AffineTransformMatrix AffineTransformMatrix::RotateXY(int const& x,
 		int const& y, double const& scale)
 {
 
-	double dx = (double) x / scale;
-	double dy = (double) y / scale;
+	const double dx = (double) x / scale;
+	const double dy = (double) y / scale;
 
-	double dist = sqrt(dx * dx + dy * dy);
+	const double dist = sqrt(dx * dx + dy * dy);
 
 	AffineTransformMatrix a;
 
 	if(dist > 0.001){
-		double ang = -atan2(dy, dx);
+		const double ang = -atan2(dy, dx);
 
-		double coy = cos(dist / 100);
-		double siy = sin(dist / 100);
-		double coz = cos(ang);
-		double siz = sin(ang);
+		const double coy = cos(dist / 100);
+		const double siy = sin(dist / 100);
+		const double coz = cos(ang);
+		const double siz = sin(ang);
 
 		a.a[0] = coz * coz * coy + siz * siz;
 		a.a[1] = coz * siz * coy - coz * siz;
@@ -590,12 +586,12 @@ AffineTransformMatrix AffineTransformMatrix::RotateXYZ(double const& x,
 	// Rz := matrix[[coz,-siz,0,0],[siz,coz,0,0],[0,0,1,0],[0,0,0,1]]
 	// Rz*Ry*Rx
 
-	double six = sin(x);
-	double siy = sin(y);
-	double siz = sin(z);
-	double cox = cos(x);
-	double coy = cos(y);
-	double coz = cos(z);
+	const double six = sin(x);
+	const double siy = sin(y);
+	const double siz = sin(z);
+	const double cox = cos(x);
+	const double coy = cos(y);
+	const double coz = cos(z);
 
 	a.a[0] = coy * coz;
 	a.a[1] = coy * siz;
@@ -625,10 +621,9 @@ AffineTransformMatrix AffineTransformMatrix::RotateXYZ(double const& x,
 AffineTransformMatrix AffineTransformMatrix::RotateInterwoven(double const& x,
 		double const& y, double const& z)
 {
-	double alpha = sqrt(x * x + y * y + z * z);
+	const double alpha = sqrt(x * x + y * y + z * z);
 	if(alpha == 0) return AffineTransformMatrix::Identity();
-	Vector3 R;
-	R.Set(x / alpha, y / alpha, z / alpha);
+	const Vector3 R(x / alpha, y / alpha, z / alpha);
 	return AffineTransformMatrix::RotateAroundVector(R, alpha);
 }
 
@@ -646,7 +641,7 @@ AffineTransformMatrix AffineTransformMatrix::RotateTrackball(const double& x1,
 {
 	Vector3 r1(x1, y1, 0);
 	r1 /= r;
-	double d1 = r1.Abs2();
+	const double d1 = r1.Abs2();
 	if(d1 >= 1.0){
 		r1 /= sqrt(d1);
 	}else{
@@ -654,13 +649,13 @@ AffineTransformMatrix AffineTransformMatrix::RotateTrackball(const double& x1,
 	}
 	Vector3 r2(x2, y2, 0);
 	r2 /= r;
-	double d2 = r2.Abs2();
+	const double d2 = r2.Abs2();
 	if(d2 >= 1.0){
 		r2 /= sqrt(d2);
 	}else{
 		r2.z = sqrt(1 - d2);
 	}
-	Vector3 A = r1 * r2;
-	double alpha = asin(A.Abs());
+	const Vector3 A = r1 * r2;
+	const double alpha = asin(A.Abs());
 	return AffineTransformMatrix::RotateAroundVector(A, alpha);
 }

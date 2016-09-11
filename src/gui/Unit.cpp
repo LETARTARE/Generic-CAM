@@ -31,6 +31,25 @@
 Unit::Unit()
 {
 	factor = 1.0;
+	m = 0;
+	s = 0;
+	kg = 0;
+	A = 0;
+	K = 0;
+	mol = 0;
+	cd = 0;
+	cur = 0;
+//	this->extra = _T("*");
+}
+
+Unit::Unit(wxString currency)
+{
+	SetCurrency(currency);
+}
+
+Unit::Unit(unit predefinedUnit, wxString extra)
+{
+	SetUnit(predefinedUnit, extra);
 }
 
 Unit::Unit(const wxString SIName, const wxString otherName, const double factor)
@@ -43,6 +62,22 @@ Unit::Unit(const wxString SIName, const wxString otherName, const double factor)
 		this->factor = 1.0;
 }
 
+
+
+Unit::Unit(int m, int kg, int s, int A, int K, int mol, int cd, int cur)
+{
+	this->m = m;
+	this->s = s;
+	this->kg = kg;
+	this->A = A;
+	this->K = K;
+	this->mol = mol;
+	this->cd = cd;
+	this->cur = cur;
+//	this->extra = _T("*");
+}
+
+
 void Unit::Setup(const wxString SIName, const wxString otherName,
 		const double factor)
 {
@@ -53,6 +88,47 @@ void Unit::Setup(const wxString SIName, const wxString otherName,
 	else
 		this->factor = 1.0;
 }
+
+void Unit::SetUnit(unit predefinedUnit, wxString extra)
+{
+	m = 0;
+	s = 0;
+	kg = 0;
+	A = 0;
+	K = 0;
+	mol = 0;
+	cd = 0;
+	cur = 0;
+//	this->extra = extra;
+
+	switch(predefinedUnit){
+	case Unitless:
+		break;
+	case Second:
+		s = 1;
+		break;
+	case Volume:
+		m = 3;
+		break;
+	case Celsius:
+		K = 1;
+		break;
+	}
+}
+
+void Unit::SetCurrency(wxString currency)
+{
+	m = 0;
+	s = 0;
+	kg = 0;
+	A = 0;
+	K = 0;
+	mol = 0;
+	cd = 0;
+	cur = 1;
+//	this->extra = currency;
+}
+
 
 double Unit::FromSI(const double value)
 {
@@ -87,7 +163,7 @@ wxString Unit::GetOtherName(void)
 	return otherName;
 }
 
-double Unit::SIFromString(const wxString& text)
+double Unit::SIFromString(const wxString& text, bool useEvaluator)
 {
 	parser.SetString(text);
 	return ToSI(parser.GetNumber());

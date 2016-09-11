@@ -27,21 +27,22 @@
 #include "ObjectPlacement.h"
 
 #include <GL/gl.h>
+
 #include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfObjectPlacement)
 
 ObjectPlacement::ObjectPlacement()
 {
+	refObject = 0;
 	selected = false;
-	modified = false;
-	objectNr = 0;
+//	modified = false;
+//	isMovable = true;
+//	isKeepout = false;
+//	objectNr = 0;
 
+	useContour = false;
 	slotWidth = 0.01; // 1 cm
 
-	matrix.TranslateGlobal(0.00, 0.00, 0);
-	isMovable = true;
-	isKeepout = false;
-	useContour = false;
 }
 
 ObjectPlacement::~ObjectPlacement()
@@ -50,37 +51,37 @@ ObjectPlacement::~ObjectPlacement()
 
 void ObjectPlacement::Clear(void)
 {
-
-	objectNr = 0;
+	refObject = 0;
 	slotWidth = 0.01;
 	matrix.SetIdentity();
 
-	isMovable = true;
-	isKeepout = false;
 	outline.Clear();
+
+//	isMovable = true;
+//	isKeepout = false;
 }
 
-void ObjectPlacement::Update(const ArrayOfObject& objects)
-{
-	bbox.Clear();
-	outline.Clear();
-	if(objectNr < 0 || objectNr >= objects.GetCount()) return;
-	for(int n = 0; n < objects[objectNr].geometries.GetCount(); n++){
-		bbox.Insert(objects[objectNr].geometries[n],
-				matrix * objects[objectNr].matrix);
-	}
-
-	outline.InsertPoint(0, 0, 0);
-	outline.InsertPoint(bbox.GetSizeX(), 0, 0);
-	outline.InsertPoint(bbox.GetSizeX(), bbox.GetSizeY(), 0);
-	outline.InsertPoint(0, bbox.GetSizeY(), 0);
-	outline.Close();
-}
+//void ObjectPlacement::Update(const ArrayOfObject& objects)
+//{
+//	bbox.Clear();
+//	outline.Clear();
+//	if(objectNr < 0 || objectNr >= objects.GetCount()) return;
+//	for(int n = 0; n < objects[objectNr].geometries.GetCount(); n++){
+//		bbox.Insert(objects[objectNr].geometries[n],
+//				matrix * objects[objectNr].matrix);
+//	}
+//
+//	outline.InsertPoint(0, 0, 0);
+//	outline.InsertPoint(bbox.GetSizeX(), 0, 0);
+//	outline.InsertPoint(bbox.GetSizeX(), bbox.GetSizeY(), 0);
+//	outline.InsertPoint(0, bbox.GetSizeY(), 0);
+//	outline.Close();
+//}
 
 void ObjectPlacement::ToStream(wxTextOutputStream& stream)
 {
 	stream << _T("Object: ");
-	stream << wxString::Format(_T("%i"), objectNr);
+	stream << wxString::Format(_T("%i"), refObject);
 	stream << endl;
 	stream << _T("Matrix: ");
 	matrix.ToStream(stream);
@@ -88,8 +89,8 @@ void ObjectPlacement::ToStream(wxTextOutputStream& stream)
 	stream << _T("Parameter: ");
 	stream << slotWidth << _T(" ");
 	stream << (useContour? 1 : 0) << _T(" ");
-	stream << (isMovable? 1 : 0) << _T(" ");
-	stream << (isKeepout? 1 : 0) << endl;
+//	stream << (isMovable? 1 : 0) << _T(" ");
+//	stream << (isKeepout? 1 : 0) << endl;
 }
 
 bool ObjectPlacement::FromStream(wxTextInputStream& stream)
@@ -97,7 +98,7 @@ bool ObjectPlacement::FromStream(wxTextInputStream& stream)
 	wxString temp;
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Object:")) != 0) return false;
-	objectNr = stream.Read32S();
+	refObject = stream.Read32S();
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Matrix:")) != 0) return false;
 	matrix.FromStream(stream);
@@ -105,10 +106,11 @@ bool ObjectPlacement::FromStream(wxTextInputStream& stream)
 	if(temp.Cmp(_T("Parameter:")) != 0) return false;
 	stream >> slotWidth;
 	useContour = (stream.Read8() == 1);
-	isMovable = (stream.Read8() == 1);
-	isKeepout = (stream.Read8() == 1);
+//	isMovable = (stream.Read8() == 1);
+//	isKeepout = (stream.Read8() == 1);
 	return true;
 }
+
 //void ObjectPlacement::SetKeepout(double x, double y, double sizex, double sizey)
 //{
 //	matrix.SetIdentity();

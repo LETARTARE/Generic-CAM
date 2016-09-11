@@ -26,64 +26,98 @@
 
 #include "Object.h"
 
-#include <wx/arrimpl.cpp>
-#include <wx/string.h>
-WX_DEFINE_OBJARRAY(ArrayOfObject)
+#include "../3D/FileSTL.h"
+#include "../3D/FileDXF.h"
+#include "../3D/FileGTS.h"
 
+#include <wx/string.h>
 #include <wx/log.h>
 #include <GL/gl.h>
 
-#include "../3D/FileGTS.h"
-#include "../3D/FileSTL.h"
-#include "../3D/FileDXF.h"
+#include <wx/arrimpl.cpp>
+WX_DEFINE_OBJARRAY(ArrayOfObject)
 
 Object::Object()
 {
+	show = true;
 	selected = false;
-	modified = false;
+//	modified = false;
 }
 
 Object::~Object()
 {
 }
 
+bool Object::IsEmpty(void) const
+{
+	return (geometries.GetCount() == 0);
+}
+
 void Object::Paint(void) const
 {
+	if(!show) return;
 	::glPushMatrix();
 	::glMultMatrixd(matrix.a);
-	size_t i;
-	for(i = 0; i < geometries.GetCount(); i++)
+	for(size_t i = 0; i < geometries.GetCount(); i++)
 		geometries[i].Paint();
 	::glPopMatrix();
 }
 
-void Object::UpdateBoundingBox(void)
+void Object::Update(void)
 {
-	size_t i;
 	bbox.Clear();
-	for(i = 0; i < geometries.GetCount(); i++)
-		bbox.Insert((geometries[i]), this->matrix);
-}
-
-void Object::UpdateBoundingBox(AffineTransformMatrix const &matrix)
-{
-	size_t i;
-	bbox.Clear();
-	for(i = 0; i < geometries.GetCount(); i++)
-		bbox.Insert((geometries[i]), matrix * this->matrix);
+	for(size_t i = 0; i < geometries.GetCount(); i++)
+		bbox.Insert((geometries[i]), displayTransform * matrix);
+	displayTransform.TranslateGlobal(bbox.xmin, bbox.ymin, bbox.zmin);
+	matrix.TranslateGlobal(-bbox.xmin, -bbox.ymin, -bbox.zmin);
+	bbox.xmax -= bbox.xmin;
+	bbox.ymax -= bbox.ymin;
+	bbox.zmax -= bbox.zmin;
+	bbox.xmin = 0;
+	bbox.ymin = 0;
+	bbox.zmin = 0;
 }
 
 void Object::UpdateNormals(void)
 {
-	size_t i;
-	for(i = 0; i < geometries.GetCount(); i++)
+	for(size_t i = 0; i < geometries.GetCount(); i++)
 		geometries[i].CalculateNormals();
 }
 
-void Object::Update(void)
+void Object::TransformFromCenter(void)
 {
-	UpdateBoundingBox();
-	UpdateNormals();
+	const double dx = bbox.xmin + bbox.GetSizeX() / 2;
+	const double dy = bbox.ymin + bbox.GetSizeY() / 2;
+	const double dz = bbox.zmin + bbox.GetSizeZ() / 2;
+	displayTransform.TranslateGlobal(dx, dy, dz);
+	matrix.TranslateGlobal(-dx, -dy, -dz);
+	bbox.xmin -= dx;
+	bbox.ymin -= dy;
+	bbox.zmin -= dz;
+	bbox.xmax -= dx;
+	bbox.ymax -= dy;
+	bbox.zmax -= dz;
+}
+
+void Object::FlipNormals(void)
+{
+	for(size_t i = 0; i < geometries.GetCount(); i++)
+		geometries[i].FlipNormals();
+}
+void Object::FlipX(void)
+{
+	for(size_t i = 0; i < geometries.GetCount(); i++)
+		geometries[i].FlipX();
+}
+void Object::FlipY(void)
+{
+	for(size_t i = 0; i < geometries.GetCount(); i++)
+		geometries[i].FlipY();
+}
+void Object::FlipZ(void)
+{
+	for(size_t i = 0; i < geometries.GetCount(); i++)
+		geometries[i].FlipZ();
 }
 
 bool Object::LoadObject(wxFileName fileName)
@@ -96,8 +130,7 @@ bool Object::LoadObject(wxFileName fileName)
 
 bool Object::ReloadObject(void)
 {
-	Geometry g;
-	size_t i;
+
 	if(!fileName.IsOk()) return false;
 
 	// Process a GTS-file:
@@ -108,15 +141,16 @@ bool Object::ReloadObject(void)
 			return false;
 		}else{
 			geometries.Clear();
-			for(i = 0; i < temp.geometry.GetCount(); i++){
+			for(size_t i = 0; i < temp.geometry.GetCount(); i++){
 				temp.geometry[i].ApplyTransformation();
-				g.Clear();
+				Geometry g;
 				g.InsertTrianglesFrom(temp.geometry[i]);
 				g.name = fileName.GetName();
 				geometries.Add(g);
 			}
 		}
-		UpdateBoundingBox();
+		Update();
+		UpdateNormals();
 		return true;
 	}
 
@@ -129,12 +163,10 @@ bool Object::ReloadObject(void)
 			return false;
 		}else{
 			geometries.Clear();
-			for(i = 0; i < temp.geometry.GetCount(); i++){
+			for(size_t i = 0; i < temp.geometry.GetCount(); i++){
 				temp.geometry[i].ApplyTransformation();
-				g.Clear();
+				Geometry g;
 				g.InsertTrianglesFrom(temp.geometry[i]);
-				//TODO: Remove the calculation of normals.
-				g.CalculateNormals();
 				if(g.name.IsEmpty()){
 					g.name = fileName.GetName()
 							+ wxString::Format(_T(" - %u"), i);
@@ -146,7 +178,8 @@ bool Object::ReloadObject(void)
 			}
 			if(!temp.error.IsEmpty()) wxLogMessage(temp.error);
 		}
-		UpdateBoundingBox();
+		Update();
+		UpdateNormals();
 		return true;
 	}
 
@@ -157,49 +190,19 @@ bool Object::ReloadObject(void)
 			wxLogMessage(_("DXF file not readable!"));
 		}else{
 			geometries.Clear();
-			for(i = 0; i < temp.geometry.GetCount(); i++){
+			for(size_t i = 0; i < temp.geometry.GetCount(); i++){
 				temp.geometry[i].ApplyTransformation();
-				g.Clear();
+				Geometry g;
 				g.InsertTrianglesFrom(temp.geometry[i]);
 				g.name = temp.geometry[i].name;
 				geometries.Add(g);
 			}
 		}
-		UpdateBoundingBox();
+		Update();
+		UpdateNormals();
 		return true;
 	}
-
 	return false;
-}
-
-bool Object::IsEmpty(void) const
-{
-	return (geometries.GetCount() == 0);
-}
-
-void Object::FlipNormals(void)
-{
-	size_t i;
-	for(i = 0; i < geometries.GetCount(); i++)
-		geometries[i].FlipNormals();
-}
-void Object::FlipX(void)
-{
-	size_t i;
-	for(i = 0; i < geometries.GetCount(); i++)
-		geometries[i].FlipX();
-}
-void Object::FlipY(void)
-{
-	size_t i;
-	for(i = 0; i < geometries.GetCount(); i++)
-		geometries[i].FlipY();
-}
-void Object::FlipZ(void)
-{
-	size_t i;
-	for(i = 0; i < geometries.GetCount(); i++)
-		geometries[i].FlipZ();
 }
 
 void Object::ToStream(wxTextOutputStream& stream, int n)
@@ -212,7 +215,7 @@ void Object::ToStream(wxTextOutputStream& stream, int n)
 	stream << _T("Geometries: ");
 	stream << wxString::Format(_T("%u"), geometries.GetCount());
 	stream << endl;
-	for(int m = 0; m < geometries.GetCount(); m++){
+	for(size_t m = 0; m < geometries.GetCount(); m++){
 		stream << _T("Geometry: ");
 		stream << wxString::Format(_T("%u"), m);
 		stream << endl;
@@ -242,11 +245,10 @@ bool Object::FromStream(wxTextInputStream& stream)
 	matrix.FromStream(stream);
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Geometries:")) != 0) return false;
-	size_t N = stream.Read32();
-	size_t n;
+	const size_t N = stream.Read32();
 	Geometry geometry;
 	geometries.Clear();
-	for(n = 0; n < N; n++){
+	for(size_t n = 0; n < N; n++){
 		temp = stream.ReadWord();
 		if(temp.Cmp(_T("Geometry:")) != 0) return false;
 		if(n != stream.Read32()) return false;

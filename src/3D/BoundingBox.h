@@ -35,7 +35,7 @@
 /*!\class BoundingBox
  * \brief Bounding Box aligned with x,y,z
  *
- * Stores the min and max values of Vector3 s, Triangle s, other BoundingBox es and Geometry.
+ * Stores the min and max values of Vector3%s, Triangle%s, other BoundingBox%es and Geometry.
  */
 
 class BoundingBox {
@@ -67,10 +67,13 @@ public:
 	//! Insert another BoungingBox.
 	void Insert(const BoundingBox& bbox);
 
-	//! Insert a single Triangle.
+	BoundingBox& operator+=(const BoundingBox& rhs);
+	const BoundingBox operator+(const BoundingBox& rhs) const;
+
+//! Insert a single Triangle.
 	void Insert(const Triangle& tri);
 
-	//! Check ich the box is empty.
+	//! Check if the box is empty.
 	bool IsEmpty(void) const;
 
 	/*!\brief Check if the box has zero volume.
@@ -79,32 +82,35 @@ public:
 	 */
 	bool IsVolumeZero(void) const;
 
+	void SetSize(float sx, float sy, float sz, float origx = 0.0, float origy =
+			0.0, float origz = 0.0);
+
 	//! Get the volume of the box.
 	double GetVolume(void) const;
 
 	//! Returns the size in x direction.
-	double GetSizeX(void)
+	double GetSizeX(void) const
 	{
 		if(xmax < xmin) return 0.0;
 		return xmax - xmin;
 	}
 
 	//! Returns the size in x direction.
-	double GetSizeY(void)
+	double GetSizeY(void) const
 	{
 		if(ymax < ymin) return 0.0;
 		return ymax - ymin;
 	}
 
 	//! Returns the size in x direction.
-	double GetSizeZ(void)
+	double GetSizeZ(void) const
 	{
 		if(zmax < zmin) return 0.0;
 		return zmax - zmin;
 	}
 
 	//! Put the box into a textstream.
-	void ToStream(wxTextOutputStream & stream);
+	void ToStream(wxTextOutputStream & stream) const;
 
 	//! Read a box from a textstream.
 	bool FromStream(wxTextInputStream & stream);
