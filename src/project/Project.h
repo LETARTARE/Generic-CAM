@@ -40,7 +40,7 @@
  *    - toolpath generators
  *    - generated toolpaths
  *
- * \todo: Rewrite the XML load/store to LUA script store/load.
+ * \todo Rewrite the XML load/store to LUA script store/load.
  */
 
 #include "../Config.h"
@@ -65,29 +65,16 @@ public:
 	wxFileName fileName;
 	wxString name;
 
-	ArrayOfObject objects; //!> Loaded objects
-	ArrayOfWorkpiece workpieces; //!> Workpieces with objects
-	ArrayOfRun run; //!> Machine runs on workpieces
+	ArrayOfObject objects; //!< Loaded objects
+	ArrayOfWorkpiece workpieces; //!< Workpieces with objects
+	ArrayOfRun run; //!< Machine runs on workpieces
 
 	// Loaded and constructed items
 //	bool processToolpath;
 //	bool interruptProcessing;
-	// Experimental stuff:
-	//	OctreeGenerator octree;
-	//	Quadtree quadtree;
 
 	// For target generator
 	//	double resolution;
-
-//	DisplayType displayType;
-//
-//	bool displayGeometry;
-//	bool displayMachine;
-//	bool displayStock;
-//	bool displayBoundingBox;
-//	bool displayTargets;
-//	bool displayToolpath;
-//	bool displayOutLines;
 
 	// Methods
 public:
@@ -98,7 +85,10 @@ public:
 
 	void LoadPattern(wxFileName filename);
 
-	void Paint(void);
+	void PaintObjects(void);
+	void PaintWorkpiece(unsigned int workpieceNr);
+	void PaintRun(unsigned int runNr);
+	void PaintDepthField(unsigned int runNr, unsigned int objectReferenceNr);
 
 	void Update(void);
 

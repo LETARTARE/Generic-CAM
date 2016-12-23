@@ -44,6 +44,7 @@ class DialogPlacement:public GUIPlacement {
 public:
 	DialogPlacement(wxWindow* parent, Project * project,
 			wxCommandProcessor * commandProcessor, DisplaySettings * settings);
+	virtual ~DialogPlacement();
 
 private:
 	Project* project;

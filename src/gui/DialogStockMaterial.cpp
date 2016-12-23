@@ -45,9 +45,12 @@ DialogStockMaterial::DialogStockMaterial(wxWindow* parent, Project * project,
 	sz = 0.1;
 	feedrate = 1.0;
 	toolSpeed = 10000.0 / 60.0;
-	available = true;
+	available = false;
 }
 
+DialogStockMaterial::~DialogStockMaterial()
+{
+}
 void DialogStockMaterial::Initialize(void)
 {
 	wxSize sz = m_listCtrl->GetClientSize();
@@ -175,7 +178,9 @@ void DialogStockMaterial::OnAddUpdate(wxCommandEvent& event)
 	stock->stockMaterials[i].maxFeedrate = feedrate;
 	stock->stockMaterials[i].available = available;
 
-	//TODO: Does the above operation require a refresh?
+	TransferDataToWindow();
+
+	//TODO: Does the above operation require a refresh of the FrameMain?
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHMAINGUI);
 	ProcessEvent(selectEvent);
 }
@@ -224,3 +229,4 @@ void DialogStockMaterial::OnSelected(wxListEvent& event)
 
 	TransferDataToWindow();
 }
+

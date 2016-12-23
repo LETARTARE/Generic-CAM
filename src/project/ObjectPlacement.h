@@ -46,7 +46,8 @@
 #include <stddef.h>
 
 class Workpiece;
-class ObjectPlacement {
+
+class ObjectPlacement:public BoundingBox {
 public:
 	ObjectPlacement();
 	virtual ~ObjectPlacement();
@@ -69,6 +70,9 @@ public:
 	Polygon25 outline;
 	Workpiece * parent; //!< Pointer back to the Workpiece this ObjectPlacement belongs to.
 
+	float cornerX;
+	float cornerY;
+
 //Methods:
 public:
 	void Clear(void);
@@ -76,7 +80,7 @@ public:
 	void ToStream(wxTextOutputStream & stream);
 	bool FromStream(wxTextInputStream & stream);
 
-//	void Update(const ArrayOfObject &objects);
+	void Update(void);
 //	void SetKeepout(double x, double y, double sizex, double sizey);
 //	void Paint(void) const;
 

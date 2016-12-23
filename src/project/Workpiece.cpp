@@ -44,7 +44,8 @@ Workpiece::Workpiece(const StockMaterial &material)
 {
 	parent = NULL;
 	color = material.color;
-//	selected = false;
+	selected = false;
+	name = material.name;
 //	modified = false;
 //	handle = 0;
 //	hasRunningGenerator = false;
@@ -59,11 +60,13 @@ void Workpiece::Paint(void) const
 {
 //	AffineTransformMatrix tempMatrix;
 
-	Project* project = this->parent;
+	const Project* project = this->parent;
 	if(project == NULL) return;
-	::glPushMatrix();
-	::glMultMatrixd(this->matrix.a);
-	BoundingBox::Paint();
+	glPushMatrix();
+	glMultMatrixd(this->matrix.a);
+//	BoundingBox::Paint();
+
+	bbox.Paint();
 
 	for(size_t j = 0; j < placements.GetCount(); j++){
 //		const float x = placements[j].matrix.a[12];
@@ -79,10 +82,10 @@ void Workpiece::Paint(void) const
 		ObjectPlacement* obpl = &(placements[j]);
 		Object* obj = &(project->objects[obpl->refObject]);
 		if(obj != NULL){
-			::glPushMatrix();
-			::glMultMatrixd(obpl->matrix.a);
-			obj->Paint();
-			::glPopMatrix();
+			glPushMatrix();
+			glMultMatrixd(obpl->matrix.a);
+			obj->Paint(false);
+			glPopMatrix();
 		}
 //		placements[j].outline.matrix.a[12] = x;
 //		placements[j].outline.matrix.a[13] = y;
@@ -93,10 +96,10 @@ void Workpiece::Paint(void) const
 
 	glColor3f(color.x, color.y, color.z);
 	if(glIsEnabled(GL_COLOR_MATERIAL)){
-		BoundingBox::Paint();
+//		BoundingBox::Paint();
 //		StockMaterial::Paint(0.2, false);
 	}else{
-		BoundingBox::Paint();
+//		BoundingBox::Paint();
 //		StockMaterial::PaintWireBox();
 	}
 	::glPopMatrix();
@@ -104,22 +107,15 @@ void Workpiece::Paint(void) const
 
 void Workpiece::Update(void)
 {
-	Project* project = this->parent;
+	const Project* project = this->parent;
 	if(project == NULL) return;
 
 	bbox.SetSize(GetSizeX(), GetSizeY(), GetSizeZ());
 	for(size_t j = 0; j < placements.GetCount(); j++){
 		placements[j].parent = this;
-//		placements[j].Update();
-
-		const float x = placements[j].matrix.a[12];
-		const float y = placements[j].matrix.a[13];
-		const float d = placements[j].slotWidth;
-
-		Object* obj = &(project->objects[placements[j].refObject]);
-
-		bbox -= BooleanBox(x - d, y - d, 0, x + obj->bbox.GetSizeX() + d,
-				y + obj->bbox.GetSizeY() + d, GetSizeZ());
+		placements[j].Update();
+		bbox -= BooleanBox(placements[j].xmin, placements[j].ymin, 0,
+				placements[j].xmax, placements[j].ymax, GetSizeZ());
 	}
 }
 
@@ -157,8 +153,12 @@ void Workpiece::Update(void)
 
 void Workpiece::ToStream(wxTextOutputStream& stream)
 {
-//	stream << _T("Stockmaterial:") << endl;
-//	StockMaterial::ToStream(stream);
+	stream << _T("Name:") << endl;
+	stream << name << endl;
+	stream << _T("Matrix: ");
+	matrix.ToStream(stream);
+	stream << endl;
+	BoundingBox::ToStream(stream);
 	stream << _T("Placements: ");
 	stream << wxString::Format(_T("%u"), placements.GetCount());
 	stream << endl;
@@ -172,6 +172,13 @@ bool Workpiece::FromStream(wxTextInputStream& stream)
 //	if(temp.Cmp(_T("Stockmaterial:")) != 0) return false;
 //	bool flag = StockMaterial::FromStream(stream);
 	wxString temp;
+	temp = stream.ReadLine();
+	if(temp.Cmp(_T("Name:")) != 0) return false;
+	name = stream.ReadLine();
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Matrix:")) != 0) return false;
+	matrix.FromStream(stream);
+	BoundingBox::FromStream(stream);
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Placements:")) != 0) return false;
 	size_t N = stream.Read32();

@@ -29,6 +29,8 @@
 
 /*!\class CanvasMain
  * \brief Main 3D display
+ *
+ *
  */
 
 #include "../project/Project.h"
@@ -44,23 +46,44 @@ public:
 	virtual ~CanvasMain();
 
 	// Member Variables
-private:
-
-	Project* project;
-
-	Geometry* geometry;
-	Machine* machine;
+public:
+	enum DisplayType {
+		displayObjects, displayWorkpieces, displayRun
+	};
 
 	bool displayCoordinateSystem;
+
+	DisplayType display;
+
+	bool displayGeometry;
+	bool displayMachine;
+	bool displayStock;
+	bool displayBoundingBox;
+	bool displayTargets;
+	bool displayToolpath;
+	bool displayOutLines;
+
+	int selectedObject;
+	int selectedWorkpiece;
+	int selectedRun;
+
+	// Experimental stuff:
+	// OctreeGenerator octree;
+	// Quadtree quadtree;
+
+private:
+	Project* project;
+
+public:
+	unsigned int c0; ///< Counter for debugging. Remove on release.
 
 	// Methods
 public:
 	void InsertProject(Project* project);
-	void InsertMachine(Machine* machine);
-	void InsertGeometry(Geometry* geometry);
-
-	void RenderCoordinateSystem(AffineTransformMatrix *matrix = NULL);
 	void Render();
+
+private:
+	void RenderCoordinateSystem(AffineTransformMatrix *matrix = NULL);
 };
 
 #endif /* MAINCANVAS_H_ */

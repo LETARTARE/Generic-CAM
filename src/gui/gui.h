@@ -41,6 +41,7 @@
 #include <wx/radiobut.h>
 #include "PanelTopView.h"
 #include <wx/spinctrl.h>
+#include "CanvasMachine.h"
 #include <wx/combobox.h>
 #include "PanelTool.h"
 #include "CanvasTool.h"
@@ -228,6 +229,7 @@ class GUIMain : public wxFrame
 		virtual void OnExtraWindowClose( wxCommandEvent& event ) = 0;
 		virtual void OnShowLogWindow( wxCommandEvent& event ) = 0;
 		virtual void OnViewSet( wxCommandEvent& event ) = 0;
+		virtual void OnHelp( wxCommandEvent& event ) = 0;
 		virtual void OnAbout( wxCommandEvent& event ) = 0;
 		virtual void OnBeginLabelEdit( wxTreeEvent& event ) = 0;
 		virtual void OnEndLabelEdit( wxTreeEvent& event ) = 0;
@@ -581,7 +583,7 @@ class GUIMachineDebugger : public wxFrame
 		wxPanel* m_panelOutput;
 		wxTextCtrl* m_textCtrlOutput;
 		wxPanel* m_panelMachineView;
-		CanvasMain* m_canvas;
+		CanvasMachine* m_canvas;
 		wxStatusBar* m_statusBar3;
 		
 		// Virtual event handlers, overide them in your derived class

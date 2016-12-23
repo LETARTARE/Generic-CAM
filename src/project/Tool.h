@@ -89,6 +89,7 @@ public:
 public:
 	//TODO: Rename to "name":
 	wxString toolName;
+	int slotNr;
 	wxString comment;
 	double shaftDiameter;
 	double shaftLength;

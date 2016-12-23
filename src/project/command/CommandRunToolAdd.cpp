@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunToolAssign.cpp
+// Name               : CommandRunToolAdd.cpp
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
@@ -24,57 +24,60 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandRunToolAssign.h"
+#include "CommandRunToolAdd.h"
 
-CommandRunToolAssign::CommandRunToolAssign(const wxString& name,
-		Project* project, int runNr, Tool* newTool, int slotNr) :
+CommandRunToolAdd::CommandRunToolAdd(const wxString& name, Project* project,
+		int runNr, Tool newTool, int slotNr) :
 		wxCommand(true, name)
 {
 	this->project = project;
 	this->runNr = runNr;
 	this->slotNr = slotNr;
 	this->newTool = newTool;
-	this->oldTool = NULL;
+	this->newTool.slotNr = slotNr;
+	onlyUpdating = false;
 }
 
-CommandRunToolAssign::~CommandRunToolAssign(void)
+CommandRunToolAdd::~CommandRunToolAdd(void)
 {
-	if(oldTool != NULL) delete oldTool;
-	if(newTool != NULL) delete newTool;
 }
 
-bool CommandRunToolAssign::Do(void)
+bool CommandRunToolAdd::Do(void)
 {
-	Run* run = &(project->run[runNr]);
-	size_t maxTools = run->tools.GetCount();
-	if(slotNr >= maxTools){
-		for(size_t n=0;n<(slotNr-maxTools);n++)
-			run->tools.Add(Tool());
-		run->tools.Add(newTool);
-	}else{
-		oldTool = run->tools.Detach(slotNr);
-		if(slotNr + 1 == maxTools){
-			run->tools.Add(newTool);
-		}else{
-			run->tools.Insert(newTool, slotNr);
+	if(project == NULL) return false;
+	Run* const run = &(project->run[runNr]);
+	const size_t maxTools = run->tools.GetCount();
+	if(maxTools > 0){
+		for(size_t n = 0; n < maxTools; n++){
+			if(run->tools[n].slotNr == slotNr){
+				onlyUpdating = true;
+				oldTool = run->tools[n];
+				run->tools[n] = newTool;
+				return true;
+			}
 		}
 	}
-	newTool = NULL;
+	run->tools.Add(newTool);
+	run->Update();
 	return true;
 }
 
-bool CommandRunToolAssign::Undo(void)
+bool CommandRunToolAdd::Undo(void)
 {
-	Run* run = &(project->run[runNr]);
-	size_t maxTools = run->tools.GetCount();
-	newTool = run->tools.Detach(slotNr);
-	if(oldTool != NULL){
-		if(slotNr == maxTools){
-			run->tools.Add(oldTool);
-		}else{
-			run->tools.Insert(oldTool, slotNr);
+	if(project == NULL) return false;
+	Run* const run = &(project->run[runNr]);
+
+	const size_t maxTools = run->tools.GetCount();
+	if(onlyUpdating){
+		for(size_t n = 0; n < maxTools; n++){
+			if(run->tools[n].slotNr == slotNr){
+				run->tools[n] = oldTool;
+				return true;
+			}
 		}
-		oldTool = NULL;
+		return false;
 	}
+	run->tools.RemoveAt(run->tools.GetCount() - 1, 1);
+	run->Update();
 	return true;
 }

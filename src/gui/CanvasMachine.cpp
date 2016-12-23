@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunToolAssign.h
-// Purpose            : 
+// Name               : CanvasMachine.cpp
+// Purpose            :
 // Thread Safe        : No
 // Platform dependent : No
-// Compiler Options   :
-// Author             : Tobias Schaefer
-// Created            : 21.01.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Compiler Options   : -lm
+// Author             : toby
+// Created            : 21.12.2016
+// Copyright          : (C) 2016 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -23,29 +23,27 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 ///////////////////////////////////////////////////////////////////////////////
+#include "CanvasMachine.h"
 
-#ifndef COMMANDRUNADDTOOL_H_
-#define COMMANDRUNADDTOOL_H_
+CanvasMachine::CanvasMachine(wxWindow *parent, wxWindowID id,
+		const wxPoint& pos, const wxSize& size, long style,
+		const wxString& name) :
+		OpenGLCanvas(parent, id, pos, size, style, name)
+{
+	machine = NULL;
+}
 
-#include "../Project.h"
+CanvasMachine::~CanvasMachine()
+{
+}
 
-#include <wx/cmdproc.h>
+void CanvasMachine::InsertMachine(Machine* machine)
+{
+	this->machine = machine;
+}
 
-class CommandRunToolAssign:public wxCommand {
-public:
-	CommandRunToolAssign(const wxString& name, Project * project, int runNr,
-			Tool* newTool, int slotNr);
-	virtual ~CommandRunToolAssign(void);
-
-	bool Do(void);
-	bool Undo(void);
-
-protected:
-	Project * project;
-	int runNr;
-	size_t slotNr;
-	Tool * newTool;
-	Tool * oldTool;
-};
-
-#endif /* COMMANDRUNADDTOOL_H_ */
+void CanvasMachine::Render()
+{
+	if(machine == NULL) return;
+	machine->Paint();
+}

@@ -41,7 +41,10 @@ class OpenGLPick {
 	friend class OpenGLCanvas;
 public:
 	OpenGLPick(GLsizei bufferSize = 512);
+	OpenGLPick(const OpenGLPick& other); //!< Copy constructor
+	OpenGLPick& operator=(const OpenGLPick& other); ///< Assignment operator
 	virtual ~OpenGLPick();
+
 	bool SetBufferSize(GLsizei newSize);
 
 	bool HasHits(void);

@@ -71,6 +71,14 @@ OctreeGenerator::OctreeGenerator()
 
 }
 
+OctreeGenerator::OctreeGenerator(const OctreeGenerator& other)
+{
+}
+
+OctreeGenerator& OctreeGenerator::operator =(const OctreeGenerator& other)
+{
+}
+
 OctreeGenerator::~OctreeGenerator()
 {
 	if(root != NULL) delete (root);

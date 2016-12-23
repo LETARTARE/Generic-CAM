@@ -34,6 +34,8 @@
 #include <wx/log.h>
 #include <GL/gl.h>
 
+#include "../Config.h"
+
 #include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfObject)
 
@@ -53,14 +55,23 @@ bool Object::IsEmpty(void) const
 	return (geometries.GetCount() == 0);
 }
 
-void Object::Paint(void) const
+void Object::Paint(const bool absolutCoordinates) const
 {
 	if(!show) return;
-	::glPushMatrix();
-	::glMultMatrixd(matrix.a);
+	glPushMatrix();
+	if(absolutCoordinates){
+		glMultMatrixd(displayTransform.a);
+#ifdef _DEBUGMODE
+		glPointSize(5);
+		glBegin(GL_POINTS);
+		glVertex3i(0, 0, 0);
+		glEnd();
+#endif
+	}
+	glMultMatrixd(matrix.a);
 	for(size_t i = 0; i < geometries.GetCount(); i++)
 		geometries[i].Paint();
-	::glPopMatrix();
+	glPopMatrix();
 }
 
 void Object::Update(void)
@@ -205,12 +216,18 @@ bool Object::ReloadObject(void)
 	return false;
 }
 
-void Object::ToStream(wxTextOutputStream& stream, int n)
+void Object::ToStream(wxTextOutputStream& stream, size_t n)
 {
 	stream << _T("Name:") << endl;
 	stream << name << endl;
 	stream << _T("Matrix: ");
 	matrix.ToStream(stream);
+	stream << endl;
+	stream << _T("DisplayMatrix: ");
+	displayTransform.ToStream(stream);
+	stream << endl;
+	stream << _T("Show: ");
+	stream << ((show)? 1 : 0);
 	stream << endl;
 	stream << _T("Geometries: ");
 	stream << wxString::Format(_T("%u"), geometries.GetCount());
@@ -243,6 +260,12 @@ bool Object::FromStream(wxTextInputStream& stream)
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Matrix:")) != 0) return false;
 	matrix.FromStream(stream);
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("DisplayMatrix:")) != 0) return false;
+	displayTransform.FromStream(stream);
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Show:")) != 0) return false;
+	show = (stream.Read8() == 1);
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Geometries:")) != 0) return false;
 	const size_t N = stream.Read32();

@@ -41,7 +41,7 @@ public:
 	// Constructor/ Destructor
 	DialogStockMaterial(wxWindow* parent, Project * project, StockFile* stock,
 			DisplaySettings * settings);
-
+	virtual ~DialogStockMaterial();
 	// Member Variables
 private:
 	Project* project;

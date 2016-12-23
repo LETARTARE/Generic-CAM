@@ -28,20 +28,30 @@
 
 CommandWorkpieceObjectTransform::CommandWorkpieceObjectTransform(
 		const wxString& name, Project* project, size_t workpieceNr,
-		size_t placementNr, const AffineTransformMatrix& matrixNew) :
+		size_t placementNr, const AffineTransformMatrix& matrixNew, float x,
+		float y) :
 		wxCommand(true, name)
 {
 	this->project = project;
 	this->workpieceNr = workpieceNr;
 	this->placementNr = placementNr;
 	this->matrixNew = matrixNew;
+	this->newX = x;
+	this->newY = y;
+	this->oldX = 0;
+	this->oldY = 0;
 }
 
 bool CommandWorkpieceObjectTransform::Do(void)
 {
 	if(workpieceNr >= project->workpieces.GetCount()) return false;
+	if(placementNr >= project->workpieces[workpieceNr].placements.GetCount()) return false;
 	matrixOld = project->workpieces[workpieceNr].placements[placementNr].matrix;
+	oldX = project->workpieces[workpieceNr].placements[placementNr].cornerX;
+	oldY = project->workpieces[workpieceNr].placements[placementNr].cornerY;
 	project->workpieces[workpieceNr].placements[placementNr].matrix = matrixNew;
+	project->workpieces[workpieceNr].placements[placementNr].cornerX = newX;
+	project->workpieces[workpieceNr].placements[placementNr].cornerY = newY;
 	project->workpieces[workpieceNr].Update();
 	return true;
 }
@@ -49,7 +59,10 @@ bool CommandWorkpieceObjectTransform::Do(void)
 bool CommandWorkpieceObjectTransform::Undo(void)
 {
 	if(workpieceNr >= project->workpieces.GetCount()) return false;
+	if(placementNr >= project->workpieces[workpieceNr].placements.GetCount()) return false;
 	project->workpieces[workpieceNr].placements[placementNr].matrix = matrixOld;
+	project->workpieces[workpieceNr].placements[placementNr].cornerX = oldX;
+	project->workpieces[workpieceNr].placements[placementNr].cornerY = oldY;
 	project->workpieces[workpieceNr].Update();
 	return true;
 }

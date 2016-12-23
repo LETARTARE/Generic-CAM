@@ -70,8 +70,15 @@ public:
 	BoundingBox& operator+=(const BoundingBox& rhs);
 	const BoundingBox operator+(const BoundingBox& rhs) const;
 
-//! Insert a single Triangle.
+	//! Insert a single Triangle.
 	void Insert(const Triangle& tri);
+
+	/*!\brief Translate BoundingBox by matrix
+	 *
+	 * Only the translatory components are used.
+	 * @param matrix AffineTransformMatrix
+	 */
+	void Translate(const AffineTransformMatrix matrix);
 
 	//! Check if the box is empty.
 	bool IsEmpty(void) const;

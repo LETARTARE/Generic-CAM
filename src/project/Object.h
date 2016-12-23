@@ -29,9 +29,12 @@
 
 /*!\class Object
  * \ingroup document
- * \brief 3D Object
+ * \brief 3D Object to manufacture
  *
- * Object to manufacture.
+ * Please note, that the object has two AffineTransformMatrix. One
+ * only captures rotation and scale, the other one is used to arrange
+ * the objects when only the objects are displayed. It starts off as
+ * the postion, the object was loaded in.
  */
 
 #include "../3D/BoundingBox.h"
@@ -70,12 +73,12 @@ private:
 
 	// Methods
 public:
-	void Update(void); //!< Update the coordinate system
+	void Update(void); //!< Update the split corrdinate system.
 	void UpdateNormals(void); //!< Normalize the normals for the object to shade correctly.
 
 	void TransformFromCenter(void); //!< Shifts the origin for transfomration on 'matrix' to the center of the object.
 
-	void Paint() const;
+	void Paint(const bool absolutCoordinates = false) const;
 
 	bool LoadObject(wxFileName fileName);
 	bool ReloadObject(void);
@@ -87,7 +90,7 @@ public:
 
 	bool IsEmpty(void) const;
 
-	void ToStream(wxTextOutputStream & stream, int n);
+	void ToStream(wxTextOutputStream & stream, size_t n);
 	bool FromStream(wxTextInputStream & stream);
 
 private:

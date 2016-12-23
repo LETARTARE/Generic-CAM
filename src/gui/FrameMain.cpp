@@ -81,7 +81,7 @@ FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 #endif
 
 	logWindow = new wxLogWindow(this, _("Generic CAM - log window"), false,
-			true);
+	true);
 
 // Setup configuration
 	this->config = config;
@@ -115,6 +115,9 @@ FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	commandProcessor.Initialize();
 	commandProcessor.MarkAsSaved();
 
+	m_helpController = new wxHelpController;
+	m_helpController->Initialize(_T("doc/genericcam.hhp"));
+
 	dialogObjectTransformation = new DialogObjectTransformation(this, &project,
 			&commandProcessor, &settings);
 	dialogStockMaterial = new DialogStockMaterial(this, &project, &stock,
@@ -140,10 +143,10 @@ FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	timer.SetOwner(this);
 	this->Connect(wxEVT_TIMER, wxTimerEventHandler(FrameMain::OnTimer), NULL,
 			this);
-	timer.Start(1000); // ms
+	timer.Start(50); // ms
 	dt = 1.0;
 
-	display = displayObjects;
+	m_canvas->display = CanvasMain::displayObjects;
 
 	TransferDataToWindow();
 }
@@ -175,8 +178,8 @@ FrameMain::~FrameMain()
 	config->Write(_T("MainFrameWidth"), (long) w);
 	config->Write(_T("MainFrameHeight"), (long) h);
 
+	delete m_helpController;
 	settings.WriteConfigTo(config);
-
 	delete config; // config is written back on deletion of object
 }
 
@@ -266,9 +269,15 @@ void FrameMain::OnTimer(wxTimerEvent& event)
 	t += dt;
 
 	wxString temp;
-	temp = wxString::Format(_T("Free RAM: %lu MB"),
-			GetFreeSystemMemory() / 1024 / 1024);
-	m_statusBar->SetStatusText(temp, 1);
+//	temp = wxString::Format(_T("Free RAM: %lu MB"),
+//			GetFreeSystemMemory() / 1024 / 1024);
+//
+//	m_statusBar->SetStatusText(temp, 1);
+
+	temp = wxString::Format(_T("x: %4u y: %4u  - %4u %4u %4u %4u"), m_canvas->x,
+			m_canvas->y, m_canvas->c0, m_canvas->ct1, m_canvas->ct2,
+			m_canvas->ct3);
+	m_statusBar->SetStatusText(temp, 0);
 
 //	if(project.processToolpath){
 //		if(project.GenerateToolpaths()) TransferDataToWindow();
@@ -534,16 +543,16 @@ void FrameMain::OnSelectionChanged(wxTreeEvent& event)
 	switch(data->dataType){
 	case itemGroupObject:
 	case itemObject:
-		display = displayObjects;
+		m_canvas->display = CanvasMain::displayObjects;
 		break;
 	case itemGroupWorkpiece:
 	case itemWorkpiece:
-		display = displayWorkpieces;
+		m_canvas->display = CanvasMain::displayWorkpieces;
 		break;
 	case itemGroupRun:
 	case itemRun:
 	case itemToolpath:
-		display = displayRun;
+		m_canvas->display = CanvasMain::displayRun;
 		break;
 	}
 
@@ -752,7 +761,8 @@ void FrameMain::OnObjectFlipNormals(wxCommandEvent& event)
 	size_t n;
 	for(n = 0; n < project.objects.GetCount(); n++){
 		if(project.objects[n].selected){
-			AffineTransformMatrix matrix = project.objects[n].matrix;
+			AffineTransformMatrix matrix = project.objects[n].displayTransform
+					* project.objects[n].matrix;
 			CommandObjectTransform * command = new CommandObjectTransform(
 					project.objects[n].name + _(": Flipped normal vectors"),
 					&project, n, false, false, false, true, matrix);
@@ -1100,6 +1110,11 @@ void FrameMain::OnViewSet(wxCommandEvent& event)
 		break;
 	}
 	TransferDataToWindow();
+}
+
+void FrameMain::OnHelp(wxCommandEvent& event)
+{
+	m_helpController->DisplayContents();
 }
 
 void FrameMain::OnAbout(wxCommandEvent& event)

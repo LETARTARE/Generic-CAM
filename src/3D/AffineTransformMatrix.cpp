@@ -26,8 +26,11 @@
 
 #include "AffineTransformMatrix.h"
 
-#include <math.h>
 #include <wx/tokenzr.h>
+
+#include <math.h>
+#include <assert.h>
+
 #include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfAffineTransformMatrix);
 
@@ -43,19 +46,9 @@ AffineTransformMatrix::AffineTransformMatrix()
 void AffineTransformMatrix::Set(AffineTransformMatrix const& b)
 {
 	if(this == &b) return;
-	for(size_t i = 0; i < 16; i++)
+	for(unsigned int i = 0; i < 16; i++)
 		a[i] = b.a[i];
 	TakeMatrixApart();
-}
-
-AffineTransformMatrix& AffineTransformMatrix::operator=(
-		const AffineTransformMatrix& b)
-{
-	if(this == &b) return *this;
-	for(unsigned int i = 0; i < 16; i++)
-		this->a[i] = b.a[i];
-	// this->TakeMatrixApart();
-	return *this;
 }
 
 //! Resets the matrix to the identity matrix.
@@ -269,31 +262,31 @@ const AffineTransformMatrix AffineTransformMatrix::Inverse() const
 	const double T11 = (a[0] * a[5] + (-a[1] * a[4])) * a[10]
 			+ ((-a[0] * a[6]) + a[2] * a[4]) * a[9]
 			+ (a[1] * a[6] + (-a[2] * a[5])) * a[8];
-	// T11 is the determinant of the matrix. This can not
+	// T11 is the determinant of the matrix. This can
 	// not be zero for a correct transformation matrix.
-	wxASSERT(T11!=0);
+	assert(T11!=0);
 
-	double T12 = a[4] * a[9];
-	double T13 = a[5] * a[8];
-	double T14 = a[4] * a[10];
-	double T15 = a[6] * a[8];
-	double T16 = a[5] * a[10];
-	double T17 = a[6] * a[9];
-	double T18 = a[0] * a[9];
-	double T19 = a[1] * a[8];
-	double T21 = a[0] * a[10];
-	double T22 = a[2] * a[8];
-	double T24 = a[1] * a[10];
-	double T25 = a[2] * a[9];
-	double T27 = a[1] * a[6] + (-a[2] * a[5]);
-	double T28 = (-a[0] * a[6]) + a[2] * a[4];
-	double T29 = a[0] * a[5] + (-a[1] * a[4]);
-	double T30 = a[0] * a[5];
-	double T31 = a[1] * a[4];
-	double T32 = a[0] * a[6];
-	double T33 = a[2] * a[4];
-	double T34 = a[1] * a[6];
-	double T35 = a[2] * a[5];
+	const double T12 = a[4] * a[9];
+	const double T13 = a[5] * a[8];
+	const double T14 = a[4] * a[10];
+	const double T15 = a[6] * a[8];
+	const double T16 = a[5] * a[10];
+	const double T17 = a[6] * a[9];
+	const double T18 = a[0] * a[9];
+	const double T19 = a[1] * a[8];
+	const double T21 = a[0] * a[10];
+	const double T22 = a[2] * a[8];
+	const double T24 = a[1] * a[10];
+	const double T25 = a[2] * a[9];
+	const double T27 = a[1] * a[6] + (-a[2] * a[5]);
+	const double T28 = (-a[0] * a[6]) + a[2] * a[4];
+	const double T29 = a[0] * a[5] + (-a[1] * a[4]);
+	const double T30 = a[0] * a[5];
+	const double T31 = a[1] * a[4];
+	const double T32 = a[0] * a[6];
+	const double T33 = a[2] * a[4];
+	const double T34 = a[1] * a[6];
+	const double T35 = a[2] * a[5];
 
 	AffineTransformMatrix b;
 

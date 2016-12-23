@@ -32,9 +32,22 @@ CanvasMain::CanvasMain(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 {
 	displayCoordinateSystem = true;
 
+	display = displayObjects;
+
+	displayGeometry = true;
+	displayBoundingBox = false;
+	displayMachine = false;
+	displayStock = false;
+	displayTargets = false;
+	displayToolpath = false;
+	displayOutLines = false;
+
+	selectedObject = 0;
+	selectedWorkpiece = 0;
+	selectedRun = 0;
+
 	project = NULL;
-	machine = NULL;
-	geometry = NULL;
+	c0 = 0;
 }
 
 CanvasMain::~CanvasMain()
@@ -44,14 +57,6 @@ CanvasMain::~CanvasMain()
 void CanvasMain::InsertProject(Project* project)
 {
 	this->project = project;
-}
-void CanvasMain::InsertMachine(Machine* machine)
-{
-	this->machine = machine;
-}
-void CanvasMain::InsertGeometry(Geometry* geometry)
-{
-	this->geometry = geometry;
 }
 
 void CanvasMain::RenderCoordinateSystem(AffineTransformMatrix *matrix)
@@ -128,9 +133,29 @@ void CanvasMain::RenderCoordinateSystem(AffineTransformMatrix *matrix)
 
 void CanvasMain::Render()
 {
+	c0++;
 	if(displayCoordinateSystem) RenderCoordinateSystem();
-	if(project != NULL) project->Paint();
-	if(machine != NULL) machine->Paint();
-	if(geometry != NULL) geometry->Paint();
+	if(project == NULL) return;
+	switch(display){
+	case displayObjects:
+	{
+		glLoadName(1);
+		project->PaintObjects();
+		break;
+	}
+	case displayWorkpieces:
+	{
+		glLoadName(2);
+		project->PaintWorkpiece(selectedWorkpiece);
+		break;
+	}
+	case displayRun:
+	{
+		glLoadName(3);
+		project->PaintRun(selectedRun);
+
+		break;
+	}
+	}
 }
 

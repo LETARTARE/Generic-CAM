@@ -10,8 +10,8 @@ AXIS_Y_MAX_VELOCITY = 0.100 --m/s
 AXIS_Z_MAX_VELOCITY = 0.100 --m/s
   TRAJ_MAX_VELOCITY = 0.300 --m/s
 
-sizeX = 0.74 --m  Length of machinebed
-sizeY = 0.43 --m  Width of machinebed
+sizeX = 0.95 --m  Length of machinebed
+sizeY = 0.65 --m  Width of machinebed
 heightOfBed = 0.1 --m  Height of machinebed
 heightOfBridge = 0.4 --m  Height of bridge
 thicknessOfBridge = 0.05 --m 

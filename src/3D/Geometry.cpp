@@ -88,11 +88,11 @@ void Geometry::Paint(GeometryColorStyle style) const
 	// GL_NORMALIZE is slower, but works always
 	// ... and there seems to be a problem under Windows with OpenGL 1.1...
 
-#if defined __WIN32__
-	::glEnable(GL_NORMALIZE);
-#else
-	::glEnable(GL_RESCALE_NORMAL);
-#endif
+//#if defined __WIN32__
+//	::glEnable(GL_NORMALIZE);
+//#else
+//	::glEnable(GL_RESCALE_NORMAL);
+//#endif
 
 	::glPushMatrix();
 	::glMultMatrixd(matrix.a);
@@ -124,11 +124,11 @@ void Geometry::Paint(GeometryColorStyle style) const
 	}
 	::glEnd();
 	::glPopMatrix();
-#if defined (__WIN32__)
-	::glDisable(GL_NORMALIZE);
-#else
-	::glDisable(GL_RESCALE_NORMAL);
-#endif
+//#if defined (__WIN32__)
+//	::glDisable(GL_NORMALIZE);
+//#else
+//	::glDisable(GL_RESCALE_NORMAL);
+//#endif
 }
 
 void Geometry::AddTriangle(const Vector3& a, const Vector3& b, const Vector3& c)

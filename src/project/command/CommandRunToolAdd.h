@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceObjectTransform.h
-// Purpose            :
+// Name               : CommandRunToolAdd.h
+// Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
-// Compiler Options   : -lm
+// Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 30.01.2015
+// Created            : 21.01.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,38 +24,29 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDWORKPIECEOBJECTTRANSFORM_H_
-#define COMMANDWORKPIECEOBJECTTRANSFORM_H_
-
-/*!\class CommandWorkpieceObjectTransform
- * \brief ...
- *
- * ...
- */
+#ifndef COMMANDRUNTOOLADD_H_
+#define COMMANDRUNTOOLADD_H_
 
 #include "../Project.h"
-#include "../../3D/AffineTransformMatrix.h"
 
 #include <wx/cmdproc.h>
 
-class CommandWorkpieceObjectTransform:public wxCommand {
+class CommandRunToolAdd:public wxCommand {
 public:
-	CommandWorkpieceObjectTransform(const wxString& name, Project * project,
-			size_t workpieceNr, size_t placementNr,
-			const AffineTransformMatrix& matrixNew, float x, float y);
+	CommandRunToolAdd(const wxString& name, Project * project, int runNr,
+			Tool newTool, int slotNr);
+	virtual ~CommandRunToolAdd(void);
+
 	bool Do(void);
 	bool Undo(void);
 
 protected:
 	Project * project;
-	size_t workpieceNr;
-	size_t placementNr;
-	AffineTransformMatrix matrixNew;
-	AffineTransformMatrix matrixOld;
-	float newX;
-	float newY;
-	float oldX;
-	float oldY;
+	int runNr;
+	int slotNr;
+	Tool newTool;
+	Tool oldTool;
+	bool onlyUpdating;
 };
 
-#endif /* COMMANDWORKPIECEOBJECTTRANSFORM_H_ */
+#endif /* COMMANDRUNTOOLADD_H_ */

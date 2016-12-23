@@ -45,6 +45,7 @@ LUACodeEvaluator::LUACodeEvaluator()
 	luaopen_math(L);
 	luaopen_table(L);
 	luaopen_string(L);
+
 	lua_register(L, "print", print_glue);
 
 	lua_register(L, "identity", identity_glue);
@@ -100,6 +101,45 @@ LUACodeEvaluator::LUACodeEvaluator(const LUACodeEvaluator& other)
 	lua_register(L, "loadgeometry", loadgeometry_glue);
 }
 
+LUACodeEvaluator& LUACodeEvaluator::operator =(const LUACodeEvaluator& other)
+{
+	// Reminder, that something inefficient is happening.
+	printf("Assignment constructor on LUACodeEvaluator called.\n");
+
+	linkedMachine = other.linkedMachine;
+	componentToManipulate = other.componentToManipulate;
+
+	//	L = lua_open();
+	L = luaL_newstate();
+
+	availableLUACodeEvaluators.push_back(this);
+
+	luaopen_base(L);
+	luaopen_math(L);
+	luaopen_table(L);
+	luaopen_string(L);
+
+	lua_register(L, "print", print_glue);
+
+	lua_register(L, "identity", identity_glue);
+	lua_register(L, "box", box_glue);
+	lua_register(L, "cylinder", cylinder_glue);
+	lua_register(L, "setstyle", setstyle_glue);
+	lua_register(L, "addcomponent", addcomponent_glue);
+	lua_register(L, "toolholder", toolholder_glue);
+	lua_register(L, "tableorigin", tableorigin_glue);
+
+	lua_register(L, "translate", translate_glue);
+	lua_register(L, "rotate", rotate_glue);
+	lua_register(L, "scale", scale_glue);
+
+	lua_register(L, "placecomponent", placecomponent_glue);
+
+	lua_register(L, "loadgeometry", loadgeometry_glue);
+
+	return *this;
+}
+
 LUACodeEvaluator::~LUACodeEvaluator()
 {
 	availableLUACodeEvaluators.remove(this);
@@ -107,7 +147,7 @@ LUACodeEvaluator::~LUACodeEvaluator()
 	L = NULL;
 }
 
-void LUACodeEvaluator::LinkToProject(Machine* machine)
+void LUACodeEvaluator::LinkToMachine(Machine* machine)
 {
 	linkedMachine = machine;
 }
@@ -130,11 +170,10 @@ bool LUACodeEvaluator::EvaluateProgram()
 	int error = 0;
 
 	linkedMachine->ClearComponents();
+	componentToManipulate = &(linkedMachine->components.back());
 
 	//	wxLogMessage(wxString::Format(_T("Blip: %u"),linkedMachine->components.Count()));
 	//		return NULL;
-
-	componentToManipulate = 0;
 
 	programOutput.Empty();
 
@@ -149,7 +188,6 @@ bool LUACodeEvaluator::EvaluateProgram()
 		error = lua_pcall(L, 0, 0, 0);
 		if(error){
 			programOutput += _("\n---------- error while running ----------\n");
-
 			programOutput += wxString::FromAscii(lua_tostring(L, -1));
 			return false;
 		}
@@ -168,10 +206,8 @@ bool LUACodeEvaluator::EvaluateProgram()
 					wxString::Format(_T("Component %u:"), n++)
 							+ i->nameOfComponent);
 		}
-
 	}
 	return true;
-
 }
 
 bool LUACodeEvaluator::EvaluateAssembly()
@@ -179,7 +215,7 @@ bool LUACodeEvaluator::EvaluateAssembly()
 	if(linkedMachine == NULL) return false;
 	int error;
 
-	componentToManipulate = 0;
+	componentToManipulate = &(linkedMachine->components.front());
 
 	programOutput.Empty();
 	matrix.SetIdentity();
@@ -200,12 +236,10 @@ bool LUACodeEvaluator::EvaluateAssembly()
 	error = lua_pcall(L, 0, 0, 0);
 	if(error){
 		programOutput += _("\n---------- error while running ----------\n");
-
 		programOutput += wxString::FromAscii(lua_tostring(L, -1));
 		return false;
 	}
 	return true;
-
 }
 
 void LUACodeEvaluator::StopEvaluation()
@@ -224,7 +258,6 @@ void LUACodeEvaluator::HookRoutine(lua_State * L, lua_Debug * ar)
 	}
 }
 
-// The next function is megaugly!
 LUACodeEvaluator* LUACodeEvaluator::FindCallingClass(lua_State * L)
 {
 	std::list <LUACodeEvaluator*>::iterator p;
@@ -240,20 +273,17 @@ LUACodeEvaluator* LUACodeEvaluator::FindCallingClass(lua_State * L)
 int LUACodeEvaluator::print_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
-	//TODO: What if CC == NULL?
-	wxASSERT(CC==NULL);
-
-	int n = lua_gettop(L); /* number of arguments */
-	int i;
+	assert(CC != NULL);
+	const int n = lua_gettop(L); /* number of arguments */
 	lua_getglobal(L, "tostring");
-	for(i = 1; i <= n; i++){
+	for(int i = 1; i <= n; i++){
 		const char *s;
 		lua_pushvalue(L, -1); /* function to be called */
 		lua_pushvalue(L, i); /* value to print */
 		lua_call(L, 1, 1);
 		s = lua_tostring(L, -1); /* get result */
 		if(s == NULL) return luaL_error(L,
-		LUA_QL("tostring") " must return a string to " LUA_QL("print"));
+		LUA_QL("tostring") " must return a string to " LUA_QL("print_glue"));
 		if(i > 1) CC->programOutput += _T("\t");
 		CC->programOutput += wxString::FromAscii(s);
 		lua_pop(L, 1); /* pop result */
@@ -265,14 +295,14 @@ int LUACodeEvaluator::print_glue(lua_State * L)
 int LUACodeEvaluator::addcomponent_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
-	wxASSERT(CC==NULL);
+	assert(CC != NULL);
 	if(lua_gettop(L) != 1){
 		lua_pushstring(L, "addcomponent: parameter mismatch");
 		lua_error(L);
 		return 0;
 	}
 	// Generate a new part for the machine.
-	int n = lua_gettop(L); /* number of arguments */
+	const int n = lua_gettop(L); /* number of arguments */
 	if(n != 1) return luaL_error(L, "addcomponent needs exactly one string");
 
 	lua_getglobal(L, "tostring");
@@ -282,8 +312,10 @@ int LUACodeEvaluator::addcomponent_glue(lua_State * L)
 	lua_call(L, 1, 1);
 	s = lua_tostring(L, -1); /* get result */
 	if(s == NULL) return luaL_error(L,
-	LUA_QL("tostring") " must return a string to " LUA_QL("print"));
-
+	LUA_QL("tostring") " must return a string to " LUA_QL("addcomponent_glue"));
+	if(CC->linkedMachine == NULL) return luaL_error(L,
+			"In "LUA_QL("addcomponent_glue")
+			" CC->linkedMachine is NULL.");
 	if(!CC->linkedMachine->AddComponent(wxString::FromAscii(s))){
 		return luaL_error(L, "addcomponent: part already exists!");
 	}
@@ -291,10 +323,11 @@ int LUACodeEvaluator::addcomponent_glue(lua_State * L)
 	CC->matrix.SetIdentity();
 	return 0;
 }
+
 int LUACodeEvaluator::identity_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
-	wxASSERT(CC==NULL);
+	assert(CC != NULL);
 	if(lua_gettop(L) != 0){
 		lua_pushstring(L, "identity: parameter mismatch");
 		lua_error(L);
@@ -307,15 +340,15 @@ int LUACodeEvaluator::identity_glue(lua_State * L)
 int LUACodeEvaluator::translate_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
-	wxASSERT(CC==NULL);
+	assert(CC != NULL);
 	if(lua_gettop(L) != 3){
 		lua_pushstring(L, "translate: parameter mismatch");
 		lua_error(L);
 		return 0;
 	}
-	float x = luaL_checknumber(L, 1);
-	float y = luaL_checknumber(L, 2);
-	float z = luaL_checknumber(L, 3);
+	const float x = luaL_checknumber(L, 1);
+	const float y = luaL_checknumber(L, 2);
+	const float z = luaL_checknumber(L, 3);
 
 	CC->matrix.TranslateLocal(x, y, z);
 	return 0;
@@ -323,31 +356,36 @@ int LUACodeEvaluator::translate_glue(lua_State * L)
 int LUACodeEvaluator::rotate_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
-	wxASSERT(CC==NULL);
-	float x, y, z, tx, ty, tz;
+	assert(CC != NULL);
 	switch(lua_gettop(L)){
 	case 3:
-		x = luaL_checknumber(L, 1) / 180 * M_PI;
-		y = luaL_checknumber(L, 2) / 180 * M_PI;
-		z = luaL_checknumber(L, 3) / 180 * M_PI;
+	{
+		const float x = luaL_checknumber(L, 1) / 180 * M_PI;
+		const float y = luaL_checknumber(L, 2) / 180 * M_PI;
+		const float z = luaL_checknumber(L, 3) / 180 * M_PI;
 		CC->matrix = CC->matrix * AffineTransformMatrix::RotateXYZ(x, y, z);
 		break;
+	}
 	case 6:
-		x = luaL_checknumber(L, 1) / 180 * M_PI;
-		y = luaL_checknumber(L, 2) / 180 * M_PI;
-		z = luaL_checknumber(L, 3) / 180 * M_PI;
-		tx = luaL_checknumber(L, 4);
-		ty = luaL_checknumber(L, 5);
-		tz = luaL_checknumber(L, 6);
+	{
+		const float x = luaL_checknumber(L, 1) / 180 * M_PI;
+		const float y = luaL_checknumber(L, 2) / 180 * M_PI;
+		const float z = luaL_checknumber(L, 3) / 180 * M_PI;
+		const float tx = luaL_checknumber(L, 4);
+		const float ty = luaL_checknumber(L, 5);
+		const float tz = luaL_checknumber(L, 6);
 		CC->matrix.TranslateLocal(tx, ty, tz);
 		CC->matrix = CC->matrix * AffineTransformMatrix::RotateXYZ(x, y, z);
 		CC->matrix.TranslateLocal(-tx, -ty, -tz);
 		break;
+	}
 	default:
+	{
 		lua_pushstring(L,
 				"rotate: parameter mismatch (3 or 6 parameters expected!).");
 		lua_error(L);
 		break;
+	}
 	}
 	return 0;
 }
@@ -355,24 +393,42 @@ int LUACodeEvaluator::rotate_glue(lua_State * L)
 int LUACodeEvaluator::scale_glue(lua_State* L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
-	wxASSERT(CC==NULL);
-	float x, y, z;
+	assert(CC != NULL);
 	switch(lua_gettop(L)){
 	case 1:
-		x = luaL_checknumber(L, 1);
+	{
+		const float x = luaL_checknumber(L, 1);
 		CC->matrix.ScaleGlobal(x, x, x);
 		break;
+	}
 	case 3:
-		x = luaL_checknumber(L, 1);
-		y = luaL_checknumber(L, 2);
-		z = luaL_checknumber(L, 3);
+	{
+		const float x = luaL_checknumber(L, 1);
+		const float y = luaL_checknumber(L, 2);
+		const float z = luaL_checknumber(L, 3);
 		CC->matrix.ScaleGlobal(x, y, z);
 		break;
+	}
+	case 6:
+	{
+		const float x = luaL_checknumber(L, 1);
+		const float y = luaL_checknumber(L, 2);
+		const float z = luaL_checknumber(L, 3);
+		const float tx = luaL_checknumber(L, 4);
+		const float ty = luaL_checknumber(L, 5);
+		const float tz = luaL_checknumber(L, 6);
+		CC->matrix.TranslateLocal(tx, ty, tz);
+		CC->matrix.ScaleGlobal(x, y, z);
+		CC->matrix.TranslateLocal(-tx, -ty, -tz);
+		break;
+	}
 	default:
+	{
 		lua_pushstring(L,
-				"scale: parameter mismatch (1 or 3 parameters expected!).");
+				"scale: parameter mismatch (1, 3 or 6 parameters expected!).");
 		lua_error(L);
 		break;
+	}
 	}
 	return 0;
 }
@@ -380,42 +436,50 @@ int LUACodeEvaluator::scale_glue(lua_State* L)
 int LUACodeEvaluator::box_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
-	wxASSERT(CC==NULL);
+	assert(CC != NULL);
 	if(lua_gettop(L) != 3){
 		lua_pushstring(L, "box: parameter mismatch");
 		lua_error(L);
 		return 0;
 	}
-	float x = luaL_checknumber(L, 1);
-	float y = luaL_checknumber(L, 2);
-	float z = luaL_checknumber(L, 3);
-
+	const float x = luaL_checknumber(L, 1);
+	const float y = luaL_checknumber(L, 2);
+	const float z = luaL_checknumber(L, 3);
+	if(CC->componentToManipulate == NULL) return luaL_error(L,
+			"In "LUA_QL("box")
+			": No component to manipulate selected.");
 	CC->componentToManipulate->InsertBox(CC->matrix, x, y, z);
 	return 0;
 }
 int LUACodeEvaluator::cylinder_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
-	wxASSERT(CC==NULL);
-
-	float h, r1, r2;
+	assert(CC != NULL);
+	if(CC->componentToManipulate == NULL) return luaL_error(L,
+			"In "LUA_QL("cylinder")
+			": No component to manipulate selected.");
 	switch(lua_gettop(L)){
 	case 2:
-		h = luaL_checknumber(L, 1);
-		r1 = luaL_checknumber(L, 2);
+	{
+		const float h = luaL_checknumber(L, 1);
+		const float r1 = luaL_checknumber(L, 2);
 		CC->componentToManipulate->InsertCylinder(CC->matrix, h, r1);
-
 		break;
+	}
 	case 3:
-		h = luaL_checknumber(L, 1);
-		r1 = luaL_checknumber(L, 2);
-		r2 = luaL_checknumber(L, 3);
+	{
+		const float h = luaL_checknumber(L, 1);
+		const float r1 = luaL_checknumber(L, 2);
+		const float r2 = luaL_checknumber(L, 3);
 		CC->componentToManipulate->InsertCone(CC->matrix, h, r1, r2);
 		break;
+	}
 	default:
+	{
 		lua_pushstring(L, "cylinder: parameter mismatch");
 		lua_error(L);
 		break;
+	}
 	}
 	return 0;
 }
@@ -423,16 +487,18 @@ int LUACodeEvaluator::cylinder_glue(lua_State * L)
 int LUACodeEvaluator::setstyle_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
-	wxASSERT(CC==NULL);
-
+	assert(CC != NULL);
 	if(lua_gettop(L) != 3){
 		lua_pushstring(L, "setstyle: parameter mismatch");
 		lua_error(L);
 		return 0;
 	}
-	float r = luaL_checknumber(L, 1);
-	float g = luaL_checknumber(L, 2);
-	float b = luaL_checknumber(L, 3);
+	const float r = luaL_checknumber(L, 1);
+	const float g = luaL_checknumber(L, 2);
+	const float b = luaL_checknumber(L, 3);
+	if(CC->componentToManipulate == NULL) return luaL_error(L,
+			"In "LUA_QL("setstyle")
+			": No component to manipulate selected.");
 	CC->componentToManipulate->SetColor(r, g, b);
 	return 0;
 }
@@ -440,7 +506,7 @@ int LUACodeEvaluator::setstyle_glue(lua_State * L)
 int LUACodeEvaluator::toolholder_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
-	wxASSERT(CC==NULL);
+	assert(CC != NULL);
 	if(lua_gettop(L) != 0){
 		lua_pushstring(L, "identity: parameter mismatch");
 		lua_error(L);
@@ -455,7 +521,7 @@ int LUACodeEvaluator::toolholder_glue(lua_State * L)
 int LUACodeEvaluator::tableorigin_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
-	wxASSERT(CC==NULL);
+	assert(CC != NULL);
 	if(lua_gettop(L) != 0){
 		lua_pushstring(L, "identity: parameter mismatch");
 		lua_error(L);
@@ -471,7 +537,7 @@ int LUACodeEvaluator::tableorigin_glue(lua_State * L)
 int LUACodeEvaluator::placecomponent_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
-	wxASSERT(CC==NULL);
+	assert(CC != NULL);
 	if(lua_gettop(L) != 1){
 		lua_pushstring(L, "placecomponent: parameter mismatch");
 		lua_error(L);
@@ -480,7 +546,6 @@ int LUACodeEvaluator::placecomponent_glue(lua_State * L)
 	// Generate a new part for the machine.
 	int n = lua_gettop(L); /* number of arguments */
 	if(n != 1) return luaL_error(L, "placecomponent needs exactly one string");
-
 	lua_getglobal(L, "tostring");
 	const char *s;
 	lua_pushvalue(L, -1); /* function to be called */
@@ -489,7 +554,9 @@ int LUACodeEvaluator::placecomponent_glue(lua_State * L)
 	s = lua_tostring(L, -1); /* get result */
 	if(s == NULL) return luaL_error(L,
 	LUA_QL("tostring") " must return a string to " LUA_QL("print"));
-
+	if(CC->linkedMachine == NULL) return luaL_error(L,
+			"In "LUA_QL("placecomponent")
+			": CC->linkedMachine is NULL.");
 	if(!CC->linkedMachine->PlaceComponent(wxString::FromAscii(s), CC->matrix)){
 		return luaL_error(L, "placecomponent: part does not exist!");
 	}
@@ -499,14 +566,14 @@ int LUACodeEvaluator::placecomponent_glue(lua_State * L)
 int LUACodeEvaluator::loadgeometry_glue(lua_State * L)
 {
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
-	wxASSERT(CC==NULL);
+	assert(CC != NULL);
 	if(lua_gettop(L) != 1){
 		lua_pushstring(L, "loadgeometry: parameter mismatch");
 		lua_error(L);
 		return 0;
 	}
 	// Generate a new part for the machine.
-	int n = lua_gettop(L); /* number of arguments */
+	const int n = lua_gettop(L); /* number of arguments */
 	if(n != 1) return luaL_error(L, "loadgeometry needs exactly one string");
 
 	lua_getglobal(L, "tostring");
@@ -517,7 +584,12 @@ int LUACodeEvaluator::loadgeometry_glue(lua_State * L)
 	s = lua_tostring(L, -1); /* get result */
 	if(s == NULL) return luaL_error(L,
 	LUA_QL("tostring") " must return a string to " LUA_QL("print"));
-
+	if(CC->linkedMachine == NULL) return luaL_error(L,
+			"In "LUA_QL("loadgeometry")
+			": CC->linkedMachine is NULL.");
+	if(CC->componentToManipulate == NULL) return luaL_error(L,
+			"In "LUA_QL("loadgeometry")
+			": No component to manipulate selected.");
 	if(!CC->linkedMachine->LoadGeometryIntoComponent(wxString::FromAscii(s),
 			CC->componentToManipulate, CC->matrix)){
 		CC->programOutput += wxString::FromAscii(s) + _T("\n");

@@ -35,7 +35,7 @@
 #define _GENERICCAM_AUTHORS "Tobias Schaefer"
 //#define _GENERICCAM_USEMULTITHREADING
 
-#define _DEBUGMODE
+//#define _DEBUGMODE
 #define _USE_3DPICKING
 #define _USE_6DOFCONTROLLER
 

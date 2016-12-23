@@ -34,24 +34,35 @@ StockFile::StockFile()
 	default1.sz = 0.05;
 	default1.name = _("Small board");
 	stockMaterials.Add(default1);
+
 	StockMaterial default2;
 	default2.sx = 3 * 12 * 25.4e-3;
 	default2.sy = 4 * 25.4e-3;
 	default2.sz = 4 * 25.4e-3;
 	default2.name = _("4\" by 4\", 3 feet long");
 	stockMaterials.Add(default2);
+
 	StockMaterial default3;
 	default3.sx = 0.1;
 	default3.sy = 0.1;
 	default3.sz = 0.1;
 	default3.name = _("Cube 10cm x 10cm x 10cm");
 	stockMaterials.Add(default3);
+
 	StockMaterial default4;
 	default4.sx = 0.626 - 0.063;
 	default4.sy = 0.435 - 0.008 - 0.020;
 	default4.sz = 0.0145;
 	default4.name = _("MFD board on left stack in my workshop");
 	stockMaterials.Add(default4);
+
+	StockMaterial default5;
+	default5.sx = 0.700;
+	default5.sy = 0.460;
+	default5.sz = 0.027;
+	default5.available = true;
+	default5.name = _("MDF Board 70 x 46 x 2.7 cm");
+	stockMaterials.Add(default5);
 }
 
 StockFile::~StockFile()

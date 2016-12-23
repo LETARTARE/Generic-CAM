@@ -90,13 +90,12 @@ public:
 	void ToStream(wxTextOutputStream & stream);
 	void FromStream(wxTextInputStream & stream);
 
-	AffineTransformMatrix& operator=(const AffineTransformMatrix &b);
 	void Set(AffineTransformMatrix const& b);
 
-	AffineTransformMatrix & operator*=(const AffineTransformMatrix &b);
+	AffineTransformMatrix& operator*=(const AffineTransformMatrix &b);
 	const AffineTransformMatrix operator*(const AffineTransformMatrix& b) const;
 
-	AffineTransformMatrix & operator/=(const AffineTransformMatrix &b);
+	AffineTransformMatrix& operator/=(const AffineTransformMatrix &b);
 	const AffineTransformMatrix operator/(const AffineTransformMatrix& b) const;
 
 	Vector3 GetCenter(void) const;

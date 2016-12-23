@@ -28,6 +28,7 @@
 
 #include <GL/gl.h>
 #include <float.h>
+#include <stdint.h>
 
 #include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfBoundingBox)
@@ -90,7 +91,7 @@ void BoundingBox::Insert(const Vector3& point)
 
 void BoundingBox::Insert(const Triangle &tri)
 {
-	for(unsigned char i = 0; i < 3; i++){
+	for(uint_fast8_t i = 0; i < 3; i++){
 		if(tri.p[i].x > xmax) xmax = tri.p[i].x;
 		if(tri.p[i].x < xmin) xmin = tri.p[i].x;
 		if(tri.p[i].y > ymax) ymax = tri.p[i].y;
@@ -106,7 +107,7 @@ void BoundingBox::Insert(const Geometry &geometry,
 	for(size_t i = 0; i < geometry.triangles.GetCount(); i++){
 		Triangle temp = geometry.triangles[i];
 		temp.ApplyTransformation(matrix * geometry.matrix);
-		for(size_t j = 0; j < 3; j++){
+		for(uint_fast8_t j = 0; j < 3; j++){
 			if(temp.p[j].x > xmax) xmax = temp.p[j].x;
 			if(temp.p[j].x < xmin) xmin = temp.p[j].x;
 			if(temp.p[j].y > ymax) ymax = temp.p[j].y;
@@ -143,6 +144,16 @@ bool BoundingBox::IsVolumeZero(void) const
 	if(ymax <= ymin) return true;
 	if(zmax <= zmin) return true;
 	return false;
+}
+
+void BoundingBox::Translate(const AffineTransformMatrix matrix)
+{
+	this->xmin += matrix.a[12];
+	this->ymin += matrix.a[13];
+	this->zmin += matrix.a[14];
+	this->xmax += matrix.a[12];
+	this->ymax += matrix.a[13];
+	this->zmax += matrix.a[14];
 }
 
 void BoundingBox::SetSize(float sx, float sy, float sz, float origx,

@@ -120,6 +120,7 @@ void Tool::Clear(void)
 	shaftLength = 0.01;
 	elements.Clear();
 	contour.Clear();
+	slotNr = -1;
 }
 
 Tool::~Tool()
@@ -372,6 +373,7 @@ void Tool::ToStream(wxTextOutputStream & stream)
 	stream << maxSpeed << _T(" ");
 	stream << feedCoefficient << _T(" ");
 	stream << nrOfTeeth << _T(" ");
+	stream << endl;
 	stream << _T("Elements: ");
 	stream << wxString::Format(_T("%u"), elements.GetCount());
 	stream << endl;

@@ -99,10 +99,10 @@ void PanelTopView::OnPaint(wxPaintEvent& event)
 //					-project->workpieces[wpNr].placements[n].bbox.xmin,
 //					-project->workpieces[wpNr].placements[n].bbox.ymin,
 //					-project->workpieces[wpNr].placements[n].bbox.zmin);
-			temp.TranslateLocal(
-					project->workpieces[wpNr].placements[n].matrix.a[12],
-					project->workpieces[wpNr].placements[n].matrix.a[13],
-					project->workpieces[wpNr].placements[n].matrix.a[14]);
+//			temp.TranslateLocal(
+//					project->workpieces[wpNr].placements[n].matrix.a[12],
+//					project->workpieces[wpNr].placements[n].matrix.a[13],
+//					project->workpieces[wpNr].placements[n].matrix.a[14]);
 			temp *= project->workpieces[wpNr].placements[n].matrix;
 			temp *= project->objects[objNr].matrix;
 			temp *= project->objects[objNr].geometries[m].matrix;

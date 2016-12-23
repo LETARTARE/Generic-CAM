@@ -318,8 +318,7 @@ int SerialPort::SendData(const char *buffer, unsigned int size)
 	if(m_hIDComDev == NULL) return (0);
 
 	DWORD dwBytesWritten = 0;
-	unsigned int i;
-	for(i = 0; i < size; i++){
+	for(unsigned int i = 0; i < size; i++){
 		WriteCommByte(buffer[i]);
 		dwBytesWritten++;
 	}
@@ -393,9 +392,8 @@ int SerialPort::ReadData(char *buffer, unsigned int limit)
 	if(!Opened) return 0;
 
 	unsigned int i = ReadDataWaiting();
-	unsigned int j;
 	if(i > limit) i = limit;
-	for(j = 0; j < i; j++)
+	for(unsigned int j = 0; j < i; j++)
 		buffer[j] = m_buffer[(buffer_RD + j) % BUFFER_LEN];
 	buffer_RD += i;
 	buffer_RD %= BUFFER_LEN;
@@ -407,11 +405,10 @@ void SerialPort::FlushData()
 {
 	char Dummy[128];
 	unsigned int i = ReadDataWaiting();
-	unsigned int j, k;
 	while(i != 0){
-		j = i;
+		unsigned int j = i;
 		if(j > 128) j = 128;
-		k = ReadData(Dummy, j);
+		unsigned int k = ReadData(Dummy, j);
 		i -= k;
 	}
 }

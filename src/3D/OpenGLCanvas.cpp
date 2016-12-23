@@ -68,6 +68,8 @@ OpenGLCanvas::OpenGLCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 	leftEyeG = 0;
 	leftEyeB = 0;
 
+	ct1 = ct2 = ct3 = 0;
+
 	rotationMode = rotateInterwoven;
 
 	this->Connect(wxEVT_SIZE, wxSizeEventHandler(OpenGLCanvas::OnSize), NULL,
@@ -189,6 +191,7 @@ void OpenGLCanvas::InitGL()
 	::glEnable(GL_BLEND);
 	::glEnable(GL_POINT_SMOOTH);
 	::glEnable(GL_DEPTH_TEST);
+	::glEnable(GL_RESCALE_NORMAL);
 
 	::glFrontFace(GL_CCW);
 	::glCullFace(GL_BACK);
@@ -480,10 +483,13 @@ void OpenGLCanvas::Render()
 
 void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 {
+	ct1++;
+
 	if(event.ButtonDown(wxMOUSE_BTN_RIGHT)
 			|| event.ButtonDown(wxMOUSE_BTN_MIDDLE)){
 		x = event.m_x;
 		y = event.m_y;
+		ct2++;
 	}
 	if(event.ButtonDClick(wxMOUSE_BTN_RIGHT)){
 		rotmat = AffineTransformMatrix::Identity();
@@ -492,23 +498,29 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 		turntableY = M_PI / 2;
 		x = event.m_x;
 		y = event.m_y;
+		ct2++;
 		this->Refresh();
 	}
 
 	if(event.Dragging() && event.RightIsDown()){
-		double r = (double) ((w < h)? w : h) / 2.2;
 		switch(rotationMode){
 		case rotateTrackball:
+		{
+			const double r = (double) ((w < h)? w : h) / 2.2;
 			rotmat = AffineTransformMatrix::RotateTrackball(
 					(double) (x - w / 2), (double) (h / 2 - y),
 					(double) (event.m_x - w / 2), (double) (h / 2 - event.m_y),
 					r) * rotmat;
 			break;
+		}
 		case rotateInterwoven:
+		{
 			rotmat = AffineTransformMatrix::RotateXY(event.m_x - x,
 					event.m_y - y, 0.5) * rotmat;
 			break;
+		}
 		case rotateTurntable:
+		{
 			rotmat = AffineTransformMatrix::RotateAroundVector(Vector3(1, 0, 0),
 					-M_PI / 2);
 			turntableX += (double) (event.m_x - x) / 100;
@@ -519,10 +531,11 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 					* AffineTransformMatrix::RotateAroundVector(
 							Vector3(0, 0, 1), turntableX);
 			break;
-
+		}
 		}
 		x = event.m_x;
 		y = event.m_y;
+		ct3++;
 
 		this->Refresh();
 	}
@@ -535,6 +548,7 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 		rotmat.TranslateGlobal(dx, -dy, 0);
 		x = event.m_x;
 		y = event.m_y;
+		ct3++;
 
 		this->Refresh();
 	}
@@ -552,6 +566,7 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 #ifdef _USE_6DOFCONTROLLER
 void OpenGLCanvas::OnTimer(wxTimerEvent& event)
 {
+//	return;
 	if(control == NULL) return;
 
 	control->Pump();

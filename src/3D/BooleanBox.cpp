@@ -81,7 +81,7 @@ BooleanBox::BooleanBox(const BooleanBox& other)
 	if(bufferSizeIntersect <= ny) bufferSizeIntersect = ny + 1;
 	if(bufferSizeIntersect <= nz) bufferSizeIntersect = nz + 1;
 
-	// Is the content of the box is copied anyway, this can also be used
+	// If the content of the box is copied anyway, this can also be used
 	// to keep the buffers from overflowing.
 	bufferSizeIntersect += 10;
 
@@ -107,6 +107,49 @@ BooleanBox::BooleanBox(const BooleanBox& other)
 	const unsigned int N = nx * ny * nz;
 	for(unsigned int n = 0; n < N; n++)
 		occupied[n] = other.occupied[n];
+}
+
+BooleanBox& BooleanBox::operator =(const BooleanBox& other)
+{
+	if(&other == this) return *this;
+	nx = other.nx;
+	ny = other.ny;
+	nz = other.nz;
+	bufferSizeIntersect = other.bufferSizeIntersect;
+	if(bufferSizeIntersect <= nx) bufferSizeIntersect = nx + 1;
+	if(bufferSizeIntersect <= ny) bufferSizeIntersect = ny + 1;
+	if(bufferSizeIntersect <= nz) bufferSizeIntersect = nz + 1;
+
+	// If the content of the box is copied anyway, this can also be used
+	// to keep the buffers from overflowing.
+	bufferSizeIntersect += 10;
+	if(pX != NULL) delete[] pX;
+	pX = new float[bufferSizeIntersect];
+	if(pY != NULL) delete[] pY;
+	pY = new float[bufferSizeIntersect];
+	if(pZ != NULL) delete[] pZ;
+	pZ = new float[bufferSizeIntersect];
+
+	for(unsigned int n = 0; n <= other.nx; n++)
+		pX[n] = other.pX[n];
+	for(unsigned int n = 0; n <= other.ny; n++)
+		pY[n] = other.pY[n];
+	for(unsigned int n = 0; n <= other.nz; n++)
+		pZ[n] = other.pZ[n];
+
+	bufferSizeOccupied = other.bufferSizeOccupied;
+	if(bufferSizeOccupied < (nx * ny * nz)) bufferSizeOccupied = nx * ny * nz;
+
+	// The +1000 should be something cubic, but then it would get very big very fast.
+	// I intend to use this class only for a handfull of boxes.
+	bufferSizeOccupied += 1000;
+
+	if(occupied != NULL) delete[] occupied;
+	occupied = new bool[bufferSizeOccupied];
+	const unsigned int N = nx * ny * nz;
+	for(unsigned int n = 0; n < N; n++)
+		occupied[n] = other.occupied[n];
+	return *this;
 }
 
 BooleanBox::~BooleanBox()
@@ -324,20 +367,18 @@ void BooleanBox::SetSize(float sx, float sy, float sz)
 
 BooleanBox& BooleanBox::operator -=(const BooleanBox& rhs)
 {
-// Calculate relative position in x, y and z
+	// Calculate relative position in x, y and z
 	const float mx = rhs.matrix.a[12] - matrix.a[12];
 	const float my = rhs.matrix.a[13] - matrix.a[13];
 	const float mz = rhs.matrix.a[14] - matrix.a[14];
 
 	const float eps = 1e-6; // = 1 um
 
-// Add extra intersections...
-	float rx, ry, rz;
-	unsigned int n,  i, j;
-// ... on the X axis:
-	n = 0;
+	// Add extra intersections...
+	// ... on the X axis:
+	unsigned int n = 0;
 	for(unsigned int m = 0; m <= rhs.nx; m++){
-		rx = rhs.pX[m] + mx;
+		const float rx = rhs.pX[m] + mx;
 		if(rx > pX[nx] - eps) break;
 		while(rx > pX[n + 1] - eps)
 			n++;
@@ -368,7 +409,7 @@ BooleanBox& BooleanBox::operator -=(const BooleanBox& rhs)
 	// ... on the Y axis:
 	n = 0;
 	for(unsigned int m = 0; m <= rhs.ny; m++){
-		ry = rhs.pY[m] + my;
+		const float ry = rhs.pY[m] + my;
 		if(ry > pY[ny] - eps) break;
 		while(ry > pY[n + 1] - eps)
 			n++;
@@ -397,7 +438,7 @@ BooleanBox& BooleanBox::operator -=(const BooleanBox& rhs)
 	// ... on the Z axis:
 	n = 0;
 	for(unsigned int m = 0; m <= rhs.nz; m++){
-		rz = rhs.pZ[m] + mz;
+		const float rz = rhs.pZ[m] + mz;
 		if(rz > pZ[nz] - eps) break;
 		while(rz > pZ[n + 1] - eps)
 			n++;
@@ -425,8 +466,7 @@ BooleanBox& BooleanBox::operator -=(const BooleanBox& rhs)
 	}
 
 	// Do the boolean operation
-	float ex, ey, ez;
-	j = 0;
+	unsigned int j = 0;
 	for(unsigned int jz = 0; jz < rhs.nz; jz++)
 		for(unsigned int jy = 0; jy < rhs.ny; jy++)
 			for(unsigned int jx = 0; jx < rhs.nx; jx++){
@@ -434,13 +474,13 @@ BooleanBox& BooleanBox::operator -=(const BooleanBox& rhs)
 					j++;
 					continue;
 				}
-				rx = rhs.pX[jx] + mx;
-				ry = rhs.pY[jy] + my;
-				rz = rhs.pZ[jz] + mz;
-				ex = rhs.pX[jx + 1] + mx;
-				ey = rhs.pY[jy + 1] + my;
-				ez = rhs.pZ[jz + 1] + mz;
-				i = 0;
+				const float rx = rhs.pX[jx] + mx;
+				const float ry = rhs.pY[jy] + my;
+				const float rz = rhs.pZ[jz] + mz;
+				const float ex = rhs.pX[jx + 1] + mx;
+				const float ey = rhs.pY[jy + 1] + my;
+				const float ez = rhs.pZ[jz + 1] + mz;
+				unsigned int i = 0;
 				for(unsigned int iz = 0; iz < nz; iz++){
 					if(pZ[iz] < rz - eps || pZ[iz + 1] > ez + eps){
 						i += nx * ny;
@@ -486,4 +526,9 @@ BooleanBox& BooleanBox::operator -=(const BooleanBox& rhs)
 //	wxLogMessage(y);
 
 	return *this;
+}
+
+void BooleanBox::Translate(const AffineTransformMatrix matrix)
+{
+	this->matrix.TranslateGlobal(matrix.a[12], matrix.a[13], matrix.a[14]);
 }

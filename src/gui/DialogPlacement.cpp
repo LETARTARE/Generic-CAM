@@ -39,6 +39,10 @@ DialogPlacement::DialogPlacement(wxWindow* parent, Project* project,
 	m_topview->InsertProject(project);
 }
 
+DialogPlacement::~DialogPlacement()
+{
+}
+
 bool DialogPlacement::TransferDataToWindow(void)
 {
 	int wpNr = GetSelectedWorkpiece();
@@ -71,10 +75,10 @@ bool DialogPlacement::TransferDataToWindow(void)
 
 		m_textCtrlX->SetValue(
 				settings->Distance.TextFromSI(
-						project->workpieces[wpNr].placements[plNr].matrix.tx));
+						project->workpieces[wpNr].placements[plNr].cornerX));
 		m_textCtrlY->SetValue(
 				settings->Distance.TextFromSI(
-						project->workpieces[wpNr].placements[plNr].matrix.ty));
+						project->workpieces[wpNr].placements[plNr].cornerY));
 		m_textCtrlZ->SetValue(
 				settings->Distance.TextFromSI(
 						project->workpieces[wpNr].placements[plNr].matrix.tz));
@@ -200,19 +204,21 @@ void DialogPlacement::OnChangePosition(wxCommandEvent& event)
 
 	AffineTransformMatrix temp =
 			project->workpieces[wpNr].placements[plNr].matrix;
+	float newX = project->workpieces[wpNr].placements[plNr].cornerX;
+	float newY = project->workpieces[wpNr].placements[plNr].cornerY;
 	temp.TakeMatrixApart();
 	wxString description;
 	float d;
 	switch(event.GetId()){
 	case ID_POSX:
 		d = settings->Distance.SIFromString(m_textCtrlX->GetValue());
-		temp.TranslateGlobal(d - temp.tx, 0, 0);
+		newX = d;
 		description = _("Set X position: ")
 				+ settings->Distance.TextFromSIWithUnit(d, 2);
 		break;
 	case ID_POSY:
 		d = settings->Distance.SIFromString(m_textCtrlY->GetValue());
-		temp.TranslateGlobal(0, d - temp.ty, 0);
+		newY = d;
 		description = _("Set Y position: ")
 				+ settings->Distance.TextFromSIWithUnit(d, 2);
 		break;
@@ -224,15 +230,15 @@ void DialogPlacement::OnChangePosition(wxCommandEvent& event)
 		break;
 	case ID_ANGLE:
 		d = settings->Angle.SIFromString(m_textCtrlAngle->GetValue());
-		temp.rz = d;
-		temp.PutMatrixTogether();
+		d -= temp.rz;
+		temp *= AffineTransformMatrix::RotateAroundVector(Vector3(0, 0, 1), d);
 		description = _("Rotate around Z: ")
 				+ settings->Angle.TextFromSIWithUnit(d, 2);
 		break;
 	}
 	commandProcessor->Submit(
 			new CommandWorkpieceObjectTransform(description, project, wpNr,
-					plNr, temp));
+					plNr, temp, newX, newY));
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
 	ID_REFRESH3DVIEW);
 	ProcessEvent(selectEvent);
@@ -251,17 +257,20 @@ void DialogPlacement::OnChangeSlider(wxScrollEvent& event)
 
 	AffineTransformMatrix temp =
 			project->workpieces[wpNr].placements[plNr].matrix;
+	float newX = project->workpieces[wpNr].placements[plNr].cornerX;
+	float newY = project->workpieces[wpNr].placements[plNr].cornerY;
 	temp.TakeMatrixApart();
 	wxString description;
 	float d;
 	d = (float) m_sliderAngle->GetValue();
-	temp.rz = d * M_PI / 180.0;
-	temp.PutMatrixTogether();
+	d = d * M_PI / 180.0;
+	d -= temp.rz;
+	temp *= AffineTransformMatrix::RotateAroundVector(Vector3(0, 0, 1), d);
 	description = _("Rotate around Z: ")
 			+ settings->Angle.TextFromSIWithUnit(d, 2);
 	commandProcessor->Submit(
 			new CommandWorkpieceObjectTransform(description, project, wpNr,
-					plNr, temp));
+					plNr, temp, newX, newY));
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
 	ID_REFRESH3DVIEW);
 	ProcessEvent(selectEvent);
@@ -286,6 +295,8 @@ void DialogPlacement::OnTransform(wxCommandEvent& event)
 
 	AffineTransformMatrix temp =
 			project->workpieces[wpNr].placements[plNr].matrix;
+	float newX = project->workpieces[wpNr].placements[plNr].cornerX;
+	float newY = project->workpieces[wpNr].placements[plNr].cornerY;
 	temp.TakeMatrixApart();
 
 	float d = 0.01;
@@ -293,22 +304,22 @@ void DialogPlacement::OnTransform(wxCommandEvent& event)
 
 	switch(event.GetId()){
 	case ID_MOVEXP:
-		temp.TranslateGlobal(d, 0, 0);
+		newX += d;
 		description = _("Placement X+:")
 				+ settings->Distance.TextFromSIWithUnit(d, 2);
 		break;
 	case ID_MOVEXN:
-		temp.TranslateGlobal(-d, 0, 0);
+		newX -= d;
 		description = _("Placement X-: ")
 				+ settings->Distance.TextFromSIWithUnit(d, 2);
 		break;
 	case ID_MOVEYP:
-		temp.TranslateGlobal(0, d, 0);
+		newY += d;
 		description = _("Placement Y+:")
 				+ settings->Distance.TextFromSIWithUnit(d, 2);
 		break;
 	case ID_MOVEYN:
-		temp.TranslateGlobal(0, -d, 0);
+		newY -= d;
 		description = _("Placement Y-:")
 				+ settings->Distance.TextFromSIWithUnit(d, 2);
 		break;
@@ -332,7 +343,7 @@ void DialogPlacement::OnTransform(wxCommandEvent& event)
 
 	commandProcessor->Submit(
 			new CommandWorkpieceObjectTransform(description, project, wpNr,
-					plNr, temp));
+					plNr, temp, newX, newY));
 
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
 	ID_REFRESH3DVIEW);
@@ -345,3 +356,4 @@ void DialogPlacement::OnSize(wxSizeEvent& event)
 	event.Skip();
 	m_topview->Refresh();
 }
+

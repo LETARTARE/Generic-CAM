@@ -31,7 +31,6 @@
 #include <wx/event.h>
 #include <math.h>
 
-
 DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent,
 		Project * project, wxCommandProcessor * commandProcessor,
 		DisplaySettings * settings) :
@@ -215,7 +214,9 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 	BoundingBox bbox;
 	for(n = 0; n < project->objects.GetCount(); ++n){
 		if(!project->objects[n].selected) continue;
-		bbox.Insert(project->objects[n].bbox);
+		BoundingBox temp = project->objects[n].bbox;
+		temp.Translate((project->objects[n].displayTransform));
+		bbox.Insert(temp);
 	}
 
 	// Generate the commands for the modifications
@@ -223,7 +224,8 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 		if(!project->objects[n].selected) continue;
 
 		description.Empty();
-		newMatrix = project->objects[n].matrix; // Copy old to new for a start
+		newMatrix = project->objects[n].displayTransform
+				* project->objects[n].matrix; // Copy old to new for a start
 
 		switch(event.GetId()){
 		case ID_MULTTEN:

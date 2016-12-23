@@ -30,8 +30,7 @@
 /*! \class LUACodeEvaluator
  * \brief Wrapper for calling LUA.
  *
- * \todo: On LUA 5.2 there is no lua_open() function. It has been replaced by luaL_newstate().
- * \todo: This needs a copy constructor. It is in no way save to make a copy.
+ * \todo On LUA 5.2 there is no lua_open() function. It has been replaced by luaL_newstate().
  *
  * The evaluation of the LUA code takes place in a
  * seperate thread. This way, if the program hangs
@@ -75,7 +74,8 @@ class LUACodeEvaluator {
 	// Constructor / Destructor
 public:
 	LUACodeEvaluator();
-	LUACodeEvaluator(const LUACodeEvaluator & other);
+	LUACodeEvaluator(const LUACodeEvaluator & other); //!< Copy constructor
+	LUACodeEvaluator& operator=(const LUACodeEvaluator& other); ///< Assignment operator
 	virtual ~LUACodeEvaluator();
 
 	// Member Variables
@@ -89,9 +89,21 @@ protected:
 	AffineTransformMatrix matrix;
 
 	// Methods
-public:
 
-	void LinkToProject(Machine* machine);
+private:
+	/** \brief Find the caller for a lua_State
+	 *
+	 * Do a lookup of the caller by looking at the lua_state.
+	 *
+	 * @param L Pointer to LUA-State
+	 * @return Pointer to LUACodeEvaluator
+	 */
+	static LUACodeEvaluator* FindCallingClass(lua_State * L);
+
+	static void HookRoutine(lua_State * L, lua_Debug * ar);
+
+public:
+	void LinkToMachine(Machine* machine);
 	void InsertVariable(wxString vName, float vValue);
 
 	bool EvaluateProgram();
@@ -101,8 +113,6 @@ public:
 
 	wxString GetOutput();
 
-	static LUACodeEvaluator* FindCallingClass(lua_State * L);
-	static void HookRoutine(lua_State * L, lua_Debug * ar);
 	static int print_glue(lua_State * L);
 
 	static int identity_glue(lua_State * L);

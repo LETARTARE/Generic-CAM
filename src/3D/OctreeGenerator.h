@@ -107,6 +107,9 @@ class OctreeGenerator {
 	// Constructor / Destructor
 public:
 	OctreeGenerator();
+	OctreeGenerator(const OctreeGenerator& other); //!< Copy constructor
+	OctreeGenerator& operator=(const OctreeGenerator& other); ///< Assignment operator
+
 	virtual ~OctreeGenerator();
 
 	// Member variables

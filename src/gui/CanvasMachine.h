@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceObjectTransform.h
+// Name               : CanvasMachine.h
 // Purpose            :
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   : -lm
-// Author             : Tobias Schaefer
-// Created            : 30.01.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Author             : toby
+// Created            : 21.12.2016
+// Copyright          : (C) 2016 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,38 +24,35 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDWORKPIECEOBJECTTRANSFORM_H_
-#define COMMANDWORKPIECEOBJECTTRANSFORM_H_
+#ifndef CANVASMACHINE_H_
+#define CANVASMACHINE_H_
 
-/*!\class CommandWorkpieceObjectTransform
- * \brief ...
+/*!\class CanvasMachine
+ * \brief Canvas to display a Machine
  *
- * ...
+ * Canvas displaying a Machine. It is used for debugging purposes.
  */
 
-#include "../Project.h"
-#include "../../3D/AffineTransformMatrix.h"
+#include "../project/machine/Machine.h"
+#include "../3D/OpenGLCanvas.h"
 
-#include <wx/cmdproc.h>
+#include <wx/string.h>
 
-class CommandWorkpieceObjectTransform:public wxCommand {
+class CanvasMachine:public OpenGLCanvas {
 public:
-	CommandWorkpieceObjectTransform(const wxString& name, Project * project,
-			size_t workpieceNr, size_t placementNr,
-			const AffineTransformMatrix& matrixNew, float x, float y);
-	bool Do(void);
-	bool Undo(void);
+	CanvasMachine(wxWindow *parent, wxWindowID id = wxID_ANY,
+			const wxPoint& pos = wxDefaultPosition, const wxSize& size =
+					wxDefaultSize, long style = 0,
+			const wxString& name = _T(""));
+	virtual ~CanvasMachine();
 
-protected:
-	Project * project;
-	size_t workpieceNr;
-	size_t placementNr;
-	AffineTransformMatrix matrixNew;
-	AffineTransformMatrix matrixOld;
-	float newX;
-	float newY;
-	float oldX;
-	float oldY;
+private:
+	Machine* machine;
+
+	// Methods
+public:
+	void InsertMachine(Machine* machine);
+	void Render();
 };
 
-#endif /* COMMANDWORKPIECEOBJECTTRANSFORM_H_ */
+#endif /* CANVASMACHINE_H_ */

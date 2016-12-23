@@ -41,11 +41,13 @@ bool CommandRunAdd::Do(void)
 	Run* temp = new Run();
 	temp->name = runName;
 	project->run.Add(temp);
+	project->Update();
 	return true;
 }
 
 bool CommandRunAdd::Undo(void)
 {
 	project->run.RemoveAt(project->run.GetCount() - 1);
+	project->Update();
 	return true;
 }

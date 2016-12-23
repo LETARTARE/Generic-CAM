@@ -58,16 +58,6 @@ void Project::Clear(void)
 	workpieces.Clear();
 	run.Clear();
 
-//	displayType = displayObjects;
-//
-//	displayGeometry = true;
-//	displayBoundingBox = false;
-//	displayMachine = false;
-//	displayStock = false;
-//	displayTargets = false;
-//	displayToolpath = false;
-//	displayOutLines = false;
-
 //	FlipDrillPattern temp;
 //	temp.name = _T("Testpattern 1");
 //	pattern.Add(temp);
@@ -130,6 +120,18 @@ void Project::Clear(void)
 //
 //}
 
+void Project::Update(void)
+{
+	for(size_t i = 0; i < workpieces.GetCount(); i++){
+		workpieces[i].parent = this;
+		workpieces[i].Update();
+	}
+	for(size_t i = 0; i < run.GetCount(); i++){
+		run[i].parent = this;
+		run[i].Update();
+	}
+}
+
 bool Project::Save(wxFileName fileName)
 {
 	if(!fileName.IsOk()) return false;
@@ -143,25 +145,25 @@ bool Project::Save(wxFileName fileName)
 	txt << this->name << endl;
 
 	txt << wxString::Format(_T("Objects: %u"), objects.GetCount()) << endl;
-	for(int n = 0; n < objects.GetCount(); n++){
+	for(size_t n = 0; n < objects.GetCount(); n++){
 		txt << wxString::Format(_T("Object: %u"), n) << endl;
 		objects[n].ToStream(txt, n);
 	}
 
 	txt << wxString::Format(_T("Workpieces: %u"), workpieces.GetCount())
 			<< endl;
-	for(int n = 0; n < workpieces.GetCount(); n++){
+	for(size_t n = 0; n < workpieces.GetCount(); n++){
 		txt << wxString::Format(_T("Workpiece: %u"), n) << endl;
 		workpieces[n].ToStream(txt);
 	}
 	txt << wxString::Format(_T("Run: %u"), run.GetCount()) << endl;
-	for(int n = 0; n < run.GetCount(); n++){
+	for(size_t n = 0; n < run.GetCount(); n++){
 		txt << wxString::Format(_T("Run: %u"), n) << endl;
 		run[n].ToStream(txt);
 	}
 
-	for(int n = 0; n < objects.GetCount(); n++){
-		for(int m = 0; m < objects[n].geometries.GetCount(); m++){
+	for(size_t n = 0; n < objects.GetCount(); n++){
+		for(size_t m = 0; m < objects[n].geometries.GetCount(); m++){
 			wxString tempName = wxString::Format(
 					_T("object_%u_geometry_%u.stl"), n, m);
 			zip.PutNextEntry(tempName);
@@ -191,16 +193,16 @@ bool Project::Load(wxFileName fileName)
 	zip.OpenEntry(*entry);
 
 	wxString temp;
-	size_t N, n, m;
+	size_t m;
 	temp = txt.ReadLine();
 	if(temp.Cmp(_T("Name:")) != 0) return false;
 	name = txt.ReadLine();
 	temp = txt.ReadWord();
 	if(temp.Cmp(_T("Objects:")) != 0) return false;
-	N = txt.Read32();
+	const size_t N = txt.Read32();
 	objects.Clear();
 	Object object;
-	for(n = 0; n < N; n++){
+	for(size_t n = 0; n < N; n++){
 		temp = txt.ReadWord();
 		if(temp.Cmp(_T("Object:")) != 0) return false;
 		m = txt.Read32();
@@ -211,10 +213,10 @@ bool Project::Load(wxFileName fileName)
 
 	temp = txt.ReadWord();
 	if(temp.Cmp(_T("Workpieces:")) != 0) return false;
-	N = txt.Read32();
+	const size_t N2 = txt.Read32();
 	workpieces.Clear();
 	Workpiece workpiece;
-	for(n = 0; n < N; n++){
+	for(size_t n = 0; n < N2; n++){
 		temp = txt.ReadWord();
 		if(temp.Cmp(_T("Workpiece:")) != 0) return false;
 		m = txt.Read32();
@@ -225,10 +227,10 @@ bool Project::Load(wxFileName fileName)
 
 	temp = txt.ReadWord();
 	if(temp.Cmp(_T("Run:")) != 0) return false;
-	N = txt.Read32();
+	const size_t N3 = txt.Read32();
 	run.Clear();
 	Run * tempRun;
-	for(n = 0; n < N; n++){
+	for(size_t n = 0; n < N3; n++){
 		temp = txt.ReadWord();
 		if(temp.Cmp(_T("Run:")) != 0) return false;
 		m = txt.Read32();
@@ -247,7 +249,7 @@ bool Project::Load(wxFileName fileName)
 		if(!temp.StartsWith(wxT("object_"), &temp)) continue;
 		long p;
 		temp.BeforeFirst('_').ToLong(&p);
-		n = p;
+		long n = p;
 		temp = temp.AfterFirst('_');
 		if(!temp.StartsWith(wxT("geometry_"), &temp)) continue;
 		temp.BeforeFirst('.').ToLong(&p);
@@ -265,18 +267,11 @@ bool Project::Load(wxFileName fileName)
 		zip.CloseEntry();
 	}
 
-	for(n = 0; n < objects.GetCount(); n++)
-		objects[n].Update();
-	for(n = 0; n < workpieces.GetCount(); n++)
-		workpieces[n].Update();
-
+	this->Update();
 	return true;
 }
 
-void Project::Paint(void)
-{
-
-	// Experimental stuff:
+// Experimental stuff:
 //	BooleanBox x;
 //	BooleanBox y(0.4, 0.4, 0.4);
 //	y.matrix.TranslateGlobal(0.1, -0.1, 0.5);
@@ -291,9 +286,9 @@ void Project::Paint(void)
 //	::glColor4f(0.75, 0.75, 0.75, 0.4);
 //	x.Paint();
 //	y.Paint();
-
-	size_t i;
-
+//
+//	size_t i;
+//
 //	switch(displayType){
 //	case displayObjects:
 //		glLoadName(1);
@@ -325,7 +320,6 @@ void Project::Paint(void)
 //		break;
 //	}
 //	::glLoadName(0);
-}
 
 //void Project::PropagateChanges(void)
 //{
@@ -429,16 +423,36 @@ void Project::LoadPattern(wxFileName filename)
 {
 }
 
-void Project::Update(void)
+void Project::PaintObjects(void)
+{
+	for(size_t i = 0; i < objects.GetCount(); i++){
+		glPushName(i + 1); // "+1" because the background is 0.
+		objects[i].Paint(true);
+		glPopName();
+	}
+}
+
+void Project::PaintWorkpiece(unsigned int workpieceNr)
 {
 	for(size_t i = 0; i < workpieces.GetCount(); i++){
-		workpieces[i].parent = this;
-		workpieces[i].Update();
+		glPushName(i + 1);
+		workpieces[i].Paint();
+		glPopName();
 	}
+}
+
+void Project::PaintRun(unsigned int runNr)
+{
 	for(size_t i = 0; i < run.GetCount(); i++){
-		run[i].parent = this;
-		run[i].Update();
+		glPushName(i + 1);
+		run[i].Paint();
+		glPopName();
 	}
+}
+
+void Project::PaintDepthField(unsigned int runNr,
+		unsigned int objectReferenceNr)
+{
 }
 //void Project::FlipRun(void)
 //{

@@ -72,7 +72,7 @@ public:
 	Imprinter(const double sizeX = 0.1, const double sizeY = 0.1,
 			const double sizeZ = 0.05, const double resolutionX = 0.001,
 			const double resolutionY = 0.001);
-	Imprinter(const Imprinter& ip); ///> Copy constructor
+	Imprinter(const Imprinter& ip); ///< Copy constructor
 	virtual ~Imprinter();
 
 	// Member variables
@@ -110,7 +110,7 @@ protected:
 	// Methods
 public:
 
-	Imprinter& operator=(const Imprinter &b);
+	Imprinter& operator=(const Imprinter &b); ///< Assignment operator
 	Imprinter & operator+=(const Imprinter &a);
 	const Imprinter operator+(const Imprinter& a) const;
 

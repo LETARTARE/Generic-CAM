@@ -41,12 +41,15 @@ CommandWorkpieceAdd::~CommandWorkpieceAdd()
 bool CommandWorkpieceAdd::Do(void)
 {
 	Workpiece temp(stock);
+	temp.parent = project;
 	project->workpieces.Add(temp);
+	project->Update();
 	return true;
 }
 
 bool CommandWorkpieceAdd::Undo(void)
 {
 	project->workpieces.RemoveAt(project->workpieces.GetCount() - 1);
+	project->Update();
 	return true;
 }

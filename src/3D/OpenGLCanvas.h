@@ -81,7 +81,9 @@ public:
 
 	RotationType rotationMode;
 
-protected:
+//protected:
+public:
+	//TODO: <-- remove
 	AffineTransformMatrix rotmat;
 	AffineTransformMatrix transmat;
 	float scale;
@@ -97,11 +99,15 @@ private:
 	Control3D* control; ///> Link to 6DOF-controller
 	wxTimer timer; ///> Timer for polling the controller
 #endif
-
+public:
+	//TODO: <-- remove
 	int x; ///> Startpoint for mouse dragging
 	int y; ///> Startpoint for mouse dragging
 	int w; ///> Width of viewport
 	int h; ///> Height of viewport
+	unsigned int ct1;
+	unsigned int ct2;
+	unsigned int ct3;
 
 	// Methods
 public:

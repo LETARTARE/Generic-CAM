@@ -45,7 +45,7 @@ CommandObjectDelete::~CommandObjectDelete()
 bool CommandObjectDelete::Do(void)
 {
 	object = project->objects.Detach(objectNr);
-	return true;
+	project->Update();return true;
 }
 
 bool CommandObjectDelete::Undo(void)
@@ -58,5 +58,5 @@ bool CommandObjectDelete::Undo(void)
 	// If the the object was inserted back into the project,
 	// this function must not delete the object in the destructor.
 	object = NULL;
-	return true;
+	project->Update();return true;
 }

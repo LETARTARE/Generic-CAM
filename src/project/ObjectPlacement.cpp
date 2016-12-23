@@ -26,6 +26,8 @@
 
 #include "ObjectPlacement.h"
 
+#include "../project/Project.h"
+
 #include <GL/gl.h>
 
 #include <wx/arrimpl.cpp>
@@ -33,12 +35,16 @@ WX_DEFINE_OBJARRAY(ArrayOfObjectPlacement)
 
 ObjectPlacement::ObjectPlacement()
 {
+	parent = NULL;
 	refObject = 0;
 	selected = false;
 //	modified = false;
 //	isMovable = true;
 //	isKeepout = false;
 //	objectNr = 0;
+
+	cornerX = 0;
+	cornerY = 0;
 
 	useContour = false;
 	slotWidth = 0.01; // 1 cm
@@ -61,47 +67,76 @@ void ObjectPlacement::Clear(void)
 //	isKeepout = false;
 }
 
-//void ObjectPlacement::Update(const ArrayOfObject& objects)
-//{
-//	bbox.Clear();
+void ObjectPlacement::Update(void)
+{
+	BoundingBox::Clear();
+
+	const Workpiece * wp = parent;
+	if(wp == NULL) return;
+	const Project * pr = wp->parent;
+	if(pr == NULL) return;
+
+	if(refObject >= pr->objects.GetCount()) return;
+
 //	outline.Clear();
-//	if(objectNr < 0 || objectNr >= objects.GetCount()) return;
-//	for(int n = 0; n < objects[objectNr].geometries.GetCount(); n++){
-//		bbox.Insert(objects[objectNr].geometries[n],
-//				matrix * objects[objectNr].matrix);
-//	}
-//
+	for(size_t n = 0; n < pr->objects[refObject].geometries.GetCount(); n++){
+		BoundingBox::Insert(pr->objects[refObject].geometries[n],
+				matrix * pr->objects[refObject].matrix);
+	}
+
+	const float dx = cornerX - xmin;
+	const float dy = cornerY - ymin;
+
+	matrix.TranslateGlobal(dx, dy, 0);
+	xmin += dx;
+	xmax += dx;
+	ymin += dy;
+	ymax += dy;
+
+	xmin -= slotWidth;
+	ymin -= slotWidth;
+	zmin -= slotWidth;
+	xmax += slotWidth;
+	ymax += slotWidth;
+	zmax += slotWidth;
+
 //	outline.InsertPoint(0, 0, 0);
 //	outline.InsertPoint(bbox.GetSizeX(), 0, 0);
 //	outline.InsertPoint(bbox.GetSizeX(), bbox.GetSizeY(), 0);
 //	outline.InsertPoint(0, bbox.GetSizeY(), 0);
 //	outline.Close();
-//}
+}
 
 void ObjectPlacement::ToStream(wxTextOutputStream& stream)
 {
-	stream << _T("Object: ");
+	stream << _T("ObjectRef: ");
 	stream << wxString::Format(_T("%i"), refObject);
 	stream << endl;
 	stream << _T("Matrix: ");
 	matrix.ToStream(stream);
 	stream << endl;
+	stream << _T("Corner: ") << cornerX << _T(" ") << cornerY << endl;
 	stream << _T("Parameter: ");
 	stream << slotWidth << _T(" ");
 	stream << (useContour? 1 : 0) << _T(" ");
 //	stream << (isMovable? 1 : 0) << _T(" ");
-//	stream << (isKeepout? 1 : 0) << endl;
+//	stream << (isKeepout? 1 : 0);
+	stream << endl;
 }
 
 bool ObjectPlacement::FromStream(wxTextInputStream& stream)
 {
 	wxString temp;
 	temp = stream.ReadWord();
-	if(temp.Cmp(_T("Object:")) != 0) return false;
+	if(temp.Cmp(_T("ObjectRef:")) != 0) return false;
 	refObject = stream.Read32S();
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Matrix:")) != 0) return false;
 	matrix.FromStream(stream);
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Corner:")) != 0) return false;
+	stream >> cornerX;
+	stream >> cornerY;
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Parameter:")) != 0) return false;
 	stream >> slotWidth;

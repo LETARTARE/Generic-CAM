@@ -47,7 +47,7 @@
 #define ID_UPDATEPROJECT			(wxID_HIGHEST+11)
 #define ID_UPDATESIMULATION			(wxID_HIGHEST+12)
 
-//!>\def ID_THREADLASTDONE Worker thread to main thread: Processing of volume ready.
+//! \def ID_THREADLASTDONE Worker thread to main thread: Processing of volume ready.
 #define ID_THREADLASTDONE			(wxID_HIGHEST+21)
 
 #endif /* IDS_H_ */

@@ -25,8 +25,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "CommandObjectLoad.h"
-
+#include "../../Config.h"
+#ifdef _DEBUGMODE
 #include  <wx/stopwatch.h>
+#endif
 
 CommandObjectLoad::CommandObjectLoad(const wxString& name, Project * project,
 		const wxString& fileName) :
@@ -39,11 +41,16 @@ CommandObjectLoad::CommandObjectLoad(const wxString& name, Project * project,
 bool CommandObjectLoad::Do(void)
 {
 	Object temp;
+#ifdef _DEBUGMODE
 	wxStopWatch sw;
+#endif
 	if(temp.LoadObject(fileName)){
 		project->objects.Add(temp);
-		wxLogMessage(_T("The long running function took %ldms to execute"),
+#ifdef _DEBUGMODE
+		wxLogMessage(_T("CommandObjectLoad took %ld ms to execute."),
 				sw.Time());
+#endif
+		project->Update();
 		return true;
 	}
 	return false;
@@ -52,5 +59,6 @@ bool CommandObjectLoad::Do(void)
 bool CommandObjectLoad::Undo(void)
 {
 	project->objects.RemoveAt(project->objects.GetCount() - 1, 1);
+	project->Update();
 	return true;
 }

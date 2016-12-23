@@ -26,6 +26,7 @@
 
 #include "Run.h"
 
+#include "Project.h"
 #include "generator/GeneratorCollection.h"
 
 #include <wx/log.h>
@@ -40,15 +41,22 @@ Run::Run()
 	selected = false;
 //	modified = false;
 	name = _T("Run #");
-	refWorkpiece = 0;
+	refWorkpiece = -1;
 //	toolbox.Empty();
-//	selectedTool = 0;
+	selectedTool = 0;
 	parent = NULL;
 }
 
 Run::Run(const Run& other)
 {
-	throw(__FILE__ "Copy Constructor called.");
+	throw("'Run::Copy constructor' is unimplemented!");
+}
+
+Run& Run::operator=(const Run& other)
+{
+	if(&other == this) return *this;
+	throw("'Run::operator=' is unimplemented!");
+	return *this;
 }
 
 Run::~Run()
@@ -57,108 +65,34 @@ Run::~Run()
 		delete generators[i];
 }
 
-//void Run::Paint(const ArrayOfObject& objects,
-//		const ArrayOfWorkpiece& workpieces) const
-//{
-//	machine.Paint();
-//
-//	::glPushMatrix();
-//
-//	if(refWorkpiece > -1){
-//		::glPushMatrix();
-//		::glMultMatrixd(machine.workpiecePosition.a);
-//		::glMultMatrixd(workpiecePlacement.a);
+void Run::Paint(void) const
+{
+	const Project * pr = parent;
+	if(pr == NULL) return;
+
+	machine.Paint();
+
+	::glPushMatrix();
+
+	if(refWorkpiece > -1){
+		::glPushMatrix();
+		::glMultMatrixd(machine.workpiecePosition.a);
+		::glMultMatrixd(workpiecePlacement.a);
 //		for(int n = 0; n < toolpaths.GetCount(); n++){
 //			toolpaths[n].Paint();
 //			if(toolpaths[n].generator != NULL) toolpaths[n].generator->Paint();
 //		}
-//		workpieces[refWorkpiece].Paint(objects);
-//		::glPopMatrix();
-//	}
-//
-//	::glPopMatrix();
-//	if(selectedTool < toolbox.GetToolCount()){
-//		::glPushMatrix();
-//		::glMultMatrixd(machine.toolPosition.a);
-//		::glColor3f(0.7, 0.7, 0.7);
-//		toolbox.tools[selectedTool].Paint();
-//		::glPopMatrix();
-//	}
-//
-//}
-
-void Run::ToXml(wxXmlNode* parentNode)
-{
-	wxXmlNode *temp, *temp2;
-	wxXmlNode *nodeObject = NULL;
-	throw(__FILE__ "Not yet implemented.");
-	// Find out, if object already exists in XML tree.
-	temp = parentNode->GetChildren();
-	while(temp != NULL && nodeObject == NULL){
-		if(temp->GetName() == _T("run")
-				&& temp->GetPropVal(_T("name"), _T("")) == name) nodeObject =
-				temp;
-		temp = temp->GetNext();
+		pr->workpieces[refWorkpiece].Paint();
+		::glPopMatrix();
 	}
-	if(nodeObject == NULL){
-		nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("run"));
-		nodeObject->AddProperty(_T("name"), name);
-		parentNode->InsertChild(nodeObject, NULL);
+	::glPopMatrix();
+	if(selectedTool >= 0 && selectedTool < tools.GetCount()){
+		::glPushMatrix();
+		::glMultMatrixd(machine.toolPosition.a);
+		::glColor3f(0.7, 0.7, 0.7);
+		tools[selectedTool].Paint();
+		::glPopMatrix();
 	}
-
-	//	// Remove the subelements, that will be updated
-	//	temp = nodeObject->GetChildren();
-	//	while(temp != NULL){
-	//		temp2 = NULL;
-	//		if(temp->GetName() == _T("matrix")) temp2 = temp;
-	//		if(temp->GetName() == _T("tri")) temp2 = temp;
-	//		temp = temp->GetNext();
-	//		if(temp2 != NULL){
-	//			nodeObject->RemoveChild(temp2);
-	//			delete (temp2);
-	//		}
-	//	}
-	//
-	//	// Insert new matrix
-	//	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("matrix"));
-	//	nodeObject->InsertChild(temp, NULL);
-	//	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
-	//			matrix.ToString());
-	//	temp->InsertChild(temp2, NULL);
-	//
-	//
-	//	// Insert new triangles
-	//	size_t i;
-	//	for(i = 0; i < triangles.GetCount(); i++){
-	//		temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("tri"));
-	//		nodeObject->InsertChild(temp, NULL);
-	//		temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
-	//				triangles[i].ToString());
-	//		temp->InsertChild(temp2, NULL);
-	//	}
-}
-
-bool Run::FromXml(wxXmlNode* node)
-{
-	if(node->GetName() != _T("run")) return false;
-	throw(__FILE__ "Not yet implemented.");
-	name = node->GetPropVal(_T("name"), _T(""));
-	wxXmlNode *temp = node->GetChildren();
-	//	long tempLong;
-	//
-	//	triangles.Empty();
-	//	Triangle* tri;
-	//
-	//	while(temp != NULL){
-	//		if(temp->GetName() == _T("tri")){
-	//			tri = new Triangle(temp->GetNodeContent());
-	//			triangles.Add(tri);
-	//		}
-	//		if(temp->GetName() == _T("matrix")) matrix.FromString(
-	//				temp->GetNodeContent());
-	//		temp = temp->GetNext();
-	//	}
-	return true;
 }
 
 void Run::Update(void)
@@ -175,13 +109,16 @@ void Run::ToolpathToStream(wxTextOutputStream & stream)
 
 void Run::ToStream(wxTextOutputStream& stream)
 {
-	stream << _T("Name:") << endl << name << endl;
-	stream << wxString::Format(_T("Workpiece: %u"), refWorkpiece) << endl;
+	stream << _T("Name:") << endl;
+	stream << name << endl;
+	stream << wxString::Format(_T("WorkpieceRef: %u"), refWorkpiece) << endl;
 	stream << wxString::Format(_T("Tools: %u"), tools.GetCount()) << endl;
 	for(size_t n = 0; n < tools.GetCount(); n++){
 		stream << wxString::Format(_T("Tool: %u"), n) << endl;
 		tools[n].ToStream(stream);
 	}
+	stream << _T("Machine:") << endl;
+	stream << machine.fileName.GetFullPath() << endl;
 	GeneratorCollection gc;
 	stream << wxString::Format(_T("Generators: %u"), generators.GetCount())
 			<< endl;
@@ -201,7 +138,7 @@ bool Run::FromStream(wxTextInputStream& stream, int runNr, Project * project)
 	if(temp.Cmp(_T("Name:")) != 0) return false;
 	name = stream.ReadLine();
 	temp = stream.ReadWord();
-	if(temp.Cmp(_T("Workpiece:")) != 0) return false;
+	if(temp.Cmp(_T("WorkpieceRef:")) != 0) return false;
 	refWorkpiece = stream.Read32S();
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Tools:")) != 0) return false;
@@ -216,6 +153,10 @@ bool Run::FromStream(wxTextInputStream& stream, int runNr, Project * project)
 		temp.FromStream(stream);
 		tools.Add(temp);
 	}
+	temp = stream.ReadLine();
+	if(temp.Cmp(_T("Machine:")) != 0) return false;
+	wxFileName fileName(stream.ReadLine());
+	machine.Load(fileName);
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Generators:")) != 0) return false;
 	size_t N = stream.Read32();

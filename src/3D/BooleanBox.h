@@ -33,6 +33,8 @@
  * Boolean operations are performed on axis aligned boxes. This is like a
  * simple precursor of the octree class, but very fast. It only works on
  * axis aligned cubes.
+ *
+ * \todo Garbage collector to simplify internal representation after several operations.
  */
 
 #include "AffineTransformMatrix.h"
@@ -40,12 +42,20 @@
 class BooleanBox {
 public:
 	BooleanBox();
-	BooleanBox(const BooleanBox& other); //!< Copy constructor, because this class has pointers
+	BooleanBox(const BooleanBox& other); //!< Copy constructor
+	BooleanBox& operator=(const BooleanBox& other); ///< Assignment operator
 	BooleanBox(float sx, float sy, float sz);
 	BooleanBox(float x1, float y1, float z1, float x2, float y2, float z2);
 	virtual ~BooleanBox();
 
 	AffineTransformMatrix matrix;
+
+	/*!\brief Translate BoundingBox by matrix
+	 *
+	 * Only the translatory components are used.
+	 * @param matrix AffineTransformMatrix
+	 */
+	void Translate(const AffineTransformMatrix matrix);
 
 	/*!\brief Paint box in Open GL*/
 	void Paint(bool flipNormals = false) const;
@@ -68,8 +78,6 @@ public:
 	 * matrices in each box are used to align them.
 	 */
 	BooleanBox& operator-=(const BooleanBox& rhs);
-
-	//TODO: 	void GarbageCollector(void);
 
 private:
 	unsigned int nx;

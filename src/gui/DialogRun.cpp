@@ -27,7 +27,7 @@
 #include "DialogRun.h"
 
 #include "../project/command/CommandRunWorkpieceAssign.h"
-#include "../project/command/CommandRunToolAssign.h"
+#include "../project/command/CommandRunToolAdd.h"
 #include "../project/command/CommandRunToolRemove.h"
 #include "../project/command/CommandRunWorkpieceTransform.h"
 #include "IDs.h"
@@ -79,7 +79,8 @@ bool DialogRun::TransferDataToWindow(void)
 
 	if(selected > -1){
 
-		m_choiceWorkpiece->SetSelection(project->run[selected].refWorkpiece + 1);
+		m_choiceWorkpiece->SetSelection(
+				project->run[selected].refWorkpiece + 1);
 
 		m_textCtrlMachineName->SetValue(
 				project->run[selected].machine.fileName.GetName());
@@ -95,8 +96,7 @@ bool DialogRun::TransferDataToWindow(void)
 				2 * w);
 
 		for(i = 0; i < project->run[selected].tools.GetCount(); i++){
-			m_listCtrlTools->InsertItem(i,
-					wxString::Format(_T("%u"),i));
+			m_listCtrlTools->InsertItem(i, wxString::Format(_T("%u"), i));
 			m_listCtrlTools->SetItem(i, 1,
 					project->run[selected].tools[i].toolName);
 			m_listCtrlTools->SetItem(i, 2,
@@ -218,7 +218,7 @@ void DialogRun::OnToolRemove(wxCommandEvent& event)
 	int runNr = GetSelected();
 	if(runNr < 0) return;
 	int slotNr = m_listCtrlTools->GetNextItem(-1, wxLIST_NEXT_ALL,
-	wxLIST_STATE_SELECTED);
+			wxLIST_STATE_SELECTED);
 	if(slotNr < 0) return;
 	commandProcessor->Submit(
 			new CommandRunToolRemove(
@@ -249,12 +249,10 @@ void DialogRun::OnToolAdd(wxCommandEvent& event)
 	int toolNr = m_choiceTool->GetSelection();
 	if(toolNr < 0) return;
 	int slotNr = m_spinCtrlToolSlot->GetValue();
-	Tool* newTool = new Tool;
-	*newTool = toolbox->tools[toolNr];
 	commandProcessor->Submit(
-			new CommandRunToolAssign(
-			_("Added tool to run ") + newTool->toolName, project,
-					selected, newTool, slotNr));
+			new CommandRunToolAdd(
+			_("Added tool to run ") + toolbox->tools[toolNr].toolName,
+					project, selected, toolbox->tools[toolNr], slotNr));
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESH3DVIEW);
 	ProcessEvent(selectEvent);
 }

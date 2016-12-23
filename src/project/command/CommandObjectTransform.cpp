@@ -43,8 +43,10 @@ CommandObjectTransform::CommandObjectTransform(const wxString& name,
 bool CommandObjectTransform::Do(void)
 {
 	if(objectNr >= project->objects.GetCount()) return false;
-	matrixOld = project->objects[objectNr].matrix;
+	matrixOld = project->objects[objectNr].displayTransform
+			* project->objects[objectNr].matrix;
 	project->objects[objectNr].matrix = matrixNew;
+	project->objects[objectNr].displayTransform.SetIdentity();
 	if(flipX) project->objects[objectNr].FlipX();
 	if(flipY) project->objects[objectNr].FlipY();
 	if(flipZ) project->objects[objectNr].FlipZ();
@@ -57,6 +59,7 @@ bool CommandObjectTransform::Undo(void)
 {
 	if(objectNr >= project->objects.GetCount()) return false;
 	project->objects[objectNr].matrix = matrixOld;
+	project->objects[objectNr].displayTransform.SetIdentity();
 	if(flipX) project->objects[objectNr].FlipX();
 	if(flipY) project->objects[objectNr].FlipY();
 	if(flipZ) project->objects[objectNr].FlipZ();

@@ -35,6 +35,8 @@
  *
  * The machine itself contains another matrix used for placing the
  * workpiece in the machine.
+ *
+ * \todo: Implement copy and assignment constructors.
  */
 
 #include "generator/Generator.h"
@@ -50,7 +52,6 @@
 #include <wx/string.h>
 #include <wx/dynarray.h>
 
-
 class Project;
 class Run {
 	friend class Project;
@@ -58,13 +59,14 @@ class Run {
 	// Constructor / Destructor
 public:
 	Run();
-	Run(const Run &other);
+	Run(const Run& other); //!< Copy constructor
+	Run& operator=(const Run& other); ///< Assignment operator
 	virtual ~Run();
 
 	// Member variables
 public:
 	wxString name;
-	size_t refWorkpiece;
+	int refWorkpiece;
 
 	Machine machine;
 	ArrayOfGeneratorPointer generators;
@@ -77,7 +79,7 @@ public:
 	bool selected;
 //	bool modified;
 //	int workpieceNr;
-//	int selectedTool;
+	int selectedTool;
 //	ArrayOfToolPath toolpaths;
 
 	Project * parent; //!< Pointer back to the Project this Run belongs to.
@@ -85,13 +87,10 @@ public:
 	// Methods
 public:
 	void Update(void);
-//	void Paint(const ArrayOfObject& objects,
-//			const ArrayOfWorkpiece& workpieces) const;
-	void ToXml(wxXmlNode* parentNode);
-	bool FromXml(wxXmlNode* node);
+	void Paint(void) const;
 
 	void ToStream(wxTextOutputStream & stream);
-	bool FromStream(wxTextInputStream & stream, int runNr,Project * project);
+	bool FromStream(wxTextInputStream & stream, int runNr, Project * project);
 
 	void ToolpathToStream(wxTextOutputStream & stream);
 };

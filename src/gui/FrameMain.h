@@ -29,6 +29,7 @@
 
 /*!\class FrameMain
  * \brief Main window
+ *
  * This classs takes care of the main window. It contains a lot of file juggling for all the dialogs.
  * The manipulation of the project itself is done via wxCommand classes. These are passed to the
  * commandProcessor which executes them. The commandProcessor enables Undo/Redo behaviour.
@@ -58,13 +59,10 @@
 
 #include "../controller/Control3D.h"
 
+#include <wx/help.h>
 #include <wx/config.h>
 #include <wx/log.h>
 #include <wx/cmdproc.h>
-
-enum DisplayType {
-	displayObjects, displayWorkpieces, displayRun
-};
 
 class FrameMain:public GUIMain {
 	// Constructor/ Destructor
@@ -81,6 +79,7 @@ private:
 	wxLogWindow* logWindow;
 	TreeSetup* tree;
 	wxCommandProcessor commandProcessor;
+	wxHelpController* m_helpController;
 
 	Project project;
 
@@ -89,8 +88,6 @@ private:
 	ToolBox toolbox;
 
 	DisplaySettings settings;
-
-	DisplayType display;
 
 	size_t selectedTargetPosition;
 
@@ -171,6 +168,7 @@ private:
 	void OnExtraWindowClose(wxCommandEvent& event);
 	void OnShowLogWindow(wxCommandEvent& event);
 	void OnViewSet(wxCommandEvent& event);
+	void OnHelp(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
 	void OnBeginLabelEdit(wxTreeEvent& event);
 	void OnEndLabelEdit(wxTreeEvent& event);

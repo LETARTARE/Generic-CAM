@@ -46,8 +46,8 @@ Class Relation
   }
   \enddot
   
-  The protected: handles, that are spread throughout the parts of the
-  project are used for reconstructing the project after loading. They
-  are generated upon saving.
+  Backreferencing pointers are spread throughout the
+  object-tree to connect back the the objects
+  parents.
    
 **/
