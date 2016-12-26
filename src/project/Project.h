@@ -35,12 +35,12 @@
  * - one or more objects (may be modified, sliced, inverted into mold forms, ect.)
  * - one or more pieces of stock material
  * - one or more run
- *    - a machine (with setup)
- *    - a toolbox for the machine (at least one tool)
+ *    - a machine
+ *    - tools for the machine
  *    - toolpath generators
- *    - generated toolpaths
+ *       - generated toolpaths
  *
- * \todo Rewrite the XML load/store to LUA script store/load.
+ * \todo Rewrite to XML load/store for future backward compatibility.
  */
 
 #include "../Config.h"
@@ -69,12 +69,8 @@ public:
 	ArrayOfWorkpiece workpieces; //!< Workpieces with objects
 	ArrayOfRun run; //!< Machine runs on workpieces
 
-	// Loaded and constructed items
 //	bool processToolpath;
 //	bool interruptProcessing;
-
-	// For target generator
-	//	double resolution;
 
 	// Methods
 public:
@@ -92,12 +88,12 @@ public:
 
 	void Update(void);
 
+	bool GenerateToolpaths(void); ///< Direct generation of all toolpaths.
 //	void PropagateChanges(void);
 //	size_t ToolpathToGenerate(void);
 //	bool ToolpathGenerate(void);
-//	bool GenerateToolpaths(void);
 
-//	wxString TollPathGenerateCurrent(void);
+//	wxString ToolPathGenerateCurrent(void);
 
 //	size_t generator_workpieceNr;
 //	size_t generator_runNr;

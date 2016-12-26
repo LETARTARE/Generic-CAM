@@ -412,11 +412,11 @@ void DialogToolpathGenerator::OnSelectArea(wxCommandEvent& event)
 	if(workpieceNr < 0) return;
 
 	wxArrayString choices;
-	size_t i;
-	for(i = 0; i < project->workpieces[workpieceNr].placements.GetCount(); i++){
+	for(size_t i = 0;
+			i < project->workpieces[workpieceNr].placements.GetCount(); i++){
 		int objectNr = project->workpieces[workpieceNr].placements[i].refObject;
 		if(objectNr < 0){
-			choices.Add(_T("No object."));
+			choices.Add(_T("No object in reference (i.e. program error)."));
 		}else{
 			choices.Add(project->objects[objectNr].name);
 		}
@@ -428,21 +428,8 @@ void DialogToolpathGenerator::OnSelectArea(wxCommandEvent& event)
 		TransferDataFromWindow();
 		box.Clear();
 		wxArrayInt plSel = dialog.GetSelections();
-		for(i = 0; i < plSel.GetCount(); i++){
-
-			const float x =
-					project->workpieces[workpieceNr].placements[plSel[i]].matrix.a[12];
-			const float y =
-					project->workpieces[workpieceNr].placements[plSel[i]].matrix.a[13];
-			const float d =
-					project->workpieces[workpieceNr].placements[plSel[i]].slotWidth;
-			const int objNr =
-					project->workpieces[workpieceNr].placements[plSel[i]].refObject;
-			const float sx = project->objects[objNr].bbox.GetSizeX();
-			const float sy = project->objects[objNr].bbox.GetSizeY();
-			box.Insert(
-					BoundingBox(x - d, y - d, 0, x + sx + d, y + sy + d,
-							project->workpieces[workpieceNr].GetSizeZ()));
+		for(size_t i = 0; i < plSel.GetCount(); i++){
+			box.Insert(project->workpieces[workpieceNr].placements[plSel[i]]);
 		}
 		TransferDataToWindow();
 	}

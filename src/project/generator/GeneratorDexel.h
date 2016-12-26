@@ -45,6 +45,10 @@ public:
 	GeneratorDexel();
 	virtual void CopyParameterFrom(const Generator * other);
 	virtual ~GeneratorDexel();
+
+	virtual void ToStream(wxTextOutputStream & stream);
+	virtual bool FromStream(wxTextInputStream & stream);
+
 	virtual void Paint(void);
 
 protected:

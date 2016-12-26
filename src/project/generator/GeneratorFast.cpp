@@ -441,8 +441,8 @@ void GeneratorFast::GenerateToolpath(void)
 
 	//tp.CleanPath(0.0003);
 
-	for(size_t i = 0; i < tp.positions.GetCount(); i++)
-		tp.positions[i].axisZ -= temp.GetSizeZ();
+//	for(size_t i = 0; i < tp.positions.GetCount(); i++)
+//		tp.positions[i].axisZ -= temp.GetSizeZ();
 
 	toolpath = tp;
 	target.refresh = true;

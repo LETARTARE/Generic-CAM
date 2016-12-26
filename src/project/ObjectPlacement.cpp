@@ -95,10 +95,10 @@ void ObjectPlacement::Update(void)
 
 	xmin -= slotWidth;
 	ymin -= slotWidth;
-	zmin -= slotWidth;
+//	zmin -= slotWidth;
 	xmax += slotWidth;
 	ymax += slotWidth;
-	zmax += slotWidth;
+//	zmax += slotWidth;
 
 //	outline.InsertPoint(0, 0, 0);
 //	outline.InsertPoint(bbox.GetSizeX(), 0, 0);

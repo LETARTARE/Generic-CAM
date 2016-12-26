@@ -32,6 +32,7 @@
 #include <wx/log.h>
 #include <GL/gl.h>
 #include <float.h>
+#include <assert.h>
 
 #include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfRun)
@@ -65,6 +66,23 @@ Run::~Run()
 		delete generators[i];
 }
 
+void Run::GenerateToolpaths(void)
+{
+	Update();
+	for(size_t i = 0; i < generators.GetCount(); i++){
+		assert(generators[i] != NULL);
+		generators[i]->GenerateToolpath();
+	}
+}
+
+void Run::Update(void)
+{
+	for(size_t i = 0; i < generators.GetCount(); i++){
+		assert(generators[i] != NULL);
+		generators[i]->parent = this;
+	}
+}
+
 void Run::Paint(void) const
 {
 	const Project * pr = parent;
@@ -78,11 +96,11 @@ void Run::Paint(void) const
 		::glPushMatrix();
 		::glMultMatrixd(machine.workpiecePosition.a);
 		::glMultMatrixd(workpiecePlacement.a);
-//		for(int n = 0; n < toolpaths.GetCount(); n++){
-//			toolpaths[n].Paint();
-//			if(toolpaths[n].generator != NULL) toolpaths[n].generator->Paint();
-//		}
 		pr->workpieces[refWorkpiece].Paint();
+		for(size_t n = 0; n < generators.GetCount(); n++){
+			assert(generators[n] != NULL);
+			generators[n]->Paint();
+		}
 		::glPopMatrix();
 	}
 	::glPopMatrix();
@@ -93,12 +111,6 @@ void Run::Paint(void) const
 		tools[selectedTool].Paint();
 		::glPopMatrix();
 	}
-}
-
-void Run::Update(void)
-{
-	for(size_t i = 0; i < generators.GetCount(); i++)
-		generators[i]->parent = this;
 }
 
 void Run::ToolpathToStream(wxTextOutputStream & stream)
@@ -166,7 +178,7 @@ bool Run::FromStream(wxTextInputStream& stream, int runNr, Project * project)
 	generators.Clear();
 	GeneratorCollection gc;
 	for(size_t n = 0; n < N; n++){
-		temp = stream.ReadLine();
+		temp = stream.ReadWord();
 		if(temp.Cmp(_T("Generator:")) != 0) return false;
 		size_t index = stream.Read32S();
 		if(index != n) return false;
@@ -175,7 +187,8 @@ bool Run::FromStream(wxTextInputStream& stream, int runNr, Project * project)
 		if(!gc.FindGenerator(temp, &generatorNr)) return false;
 		Generator* tempGen = gc.NewGenerator(generatorNr);
 		tempGen->FromStream(stream);
-		generators.Add(&tempGen);
+		generators.Add(tempGen);
 	}
 	return true;
 }
+

@@ -76,8 +76,6 @@ Imprinter::Imprinter(const double sizeX, const double sizeY, const double sizeZ,
 	displayField = false;
 	displayBelowUp = false;
 	displayBelowDown = false;
-	displayBox = true;
-
 	this->SetupBox(sizeX, sizeY, sizeZ, resolutionX, resolutionY);
 }
 
@@ -90,7 +88,6 @@ Imprinter::Imprinter(const Imprinter& ip)
 	this->colorNormal = ip.colorNormal;
 	this->colorTodo = ip.colorTodo;
 	this->colorUnscratched = ip.colorUnscratched;
-	this->displayBox = ip.displayBox;
 	this->displayListGenerated = false;
 	this->displayListIndex = 0;
 	this->displayField = ip.displayField;
@@ -175,7 +172,6 @@ Imprinter& Imprinter::operator=(const Imprinter &b)
 	this->colorNormal = b.colorNormal;
 	this->colorTodo = b.colorTodo;
 	this->colorUnscratched = b.colorUnscratched;
-	this->displayBox = b.displayBox;
 	this->displayField = b.displayField;
 	this->displayAboveDown = b.displayAboveDown;
 	this->displayBelowUp = b.displayBelowUp;
@@ -1022,8 +1018,8 @@ void Imprinter::Paint()
 		refresh = true;
 	}
 
-	double rx2 = rx / 2.0;
-	double ry2 = ry / 2.0;
+	const double rx2 = rx / 2.0;
+	const double ry2 = ry / 2.0;
 
 	if(refresh){
 		::glNewList(displayListIndex, GL_COMPILE_AND_EXECUTE);
@@ -1175,83 +1171,7 @@ void Imprinter::Paint()
 			}
 
 		}
-		if(displayBox){
 
-			double cornerLength = 0.3; // 30% of a side
-			double dx = this->sx * cornerLength;
-			double dy = this->sy * cornerLength;
-			double dz = this->sz * cornerLength;
-
-			::glColor3f(0.8, 0.8, 0.8);
-
-			::glBegin(GL_LINES);
-
-			glNormal3d(0, -M_SQRT2, -M_SQRT2);
-			glVertex3d(0, 0, 0);
-			glVertex3d(dx, 0, 0);
-			glVertex3d(sx, 0, 0);
-			glVertex3d(sx - dx, 0, 0);
-			glNormal3d(0, M_SQRT2, -M_SQRT2);
-			glVertex3d(0, sy, 0);
-			glVertex3d(dx, sy, 0);
-			glVertex3d(sx, sy, 0);
-			glVertex3d(sx - dx, sy, 0);
-			glNormal3d(0, M_SQRT2, M_SQRT2);
-			glVertex3d(0, sy, sz);
-			glVertex3d(dx, sy, sz);
-			glVertex3d(sx, sy, sz);
-			glVertex3d(sx - dx, sy, sz);
-			glNormal3d(0, -M_SQRT2, M_SQRT2);
-			glVertex3d(0, 0, sz);
-			glVertex3d(dx, 0, sz);
-			glVertex3d(sx, 0, sz);
-			glVertex3d(sx - dx, 0, sz);
-
-			glNormal3d(-M_SQRT2, 0, -M_SQRT2);
-			glVertex3d(0, 0, 0);
-			glVertex3d(0, dy, 0);
-			glVertex3d(0, sy, 0);
-			glVertex3d(0, sy - dy, 0);
-			glNormal3d(M_SQRT2, 0, -M_SQRT2);
-			glVertex3d(sx, 0, 0);
-			glVertex3d(sx, dy, 0);
-			glVertex3d(sx, sy, 0);
-			glVertex3d(sx, sy - dy, 0);
-			glNormal3d(M_SQRT2, 0, M_SQRT2);
-			glVertex3d(sx, 0, sz);
-			glVertex3d(sx, dy, sz);
-			glVertex3d(sx, sy, sz);
-			glVertex3d(sx, sy - dy, sz);
-			glNormal3d(-M_SQRT2, 0, M_SQRT2);
-			glVertex3d(0, 0, sz);
-			glVertex3d(0, dy, sz);
-			glVertex3d(0, sy, sz);
-			glVertex3d(0, sy - dy, sz);
-
-			glNormal3d(-M_SQRT2, -M_SQRT2, 0);
-			glVertex3d(0, 0, 0);
-			glVertex3d(0, 0, dz);
-			glVertex3d(0, 0, sz);
-			glVertex3d(0, 0, sz - dz);
-			glNormal3d(M_SQRT2, -M_SQRT2, 0);
-			glVertex3d(sx, 0, 0);
-			glVertex3d(sx, 0, dz);
-			glVertex3d(sx, 0, sz);
-			glVertex3d(sx, 0, sz - dz);
-			glNormal3d(M_SQRT2, M_SQRT2, 0);
-			glVertex3d(sx, sy, 0);
-			glVertex3d(sx, sy, dz);
-			glVertex3d(sx, sy, sz);
-			glVertex3d(sx, sy, sz - dz);
-			glNormal3d(-M_SQRT2, M_SQRT2, 0);
-			glVertex3d(0, sy, 0);
-			glVertex3d(0, sy, dz);
-			glVertex3d(0, sy, sz);
-			glVertex3d(0, sy, sz - dz);
-
-			::glEnd();
-
-		}
 		::glEndList();
 
 		refresh = false;

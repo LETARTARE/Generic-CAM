@@ -95,6 +95,11 @@ FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	SetClientSize(w, h);
 	control.GetConfigFrom(config);
 
+	m_fileHistory = new wxFileHistory();
+	m_fileHistory->UseMenu(m_menuProjectRecent);
+	m_fileHistory->AddFilesToMenu(m_menuProjectRecent);
+	m_fileHistory->Load(*config);
+
 	m_canvas->SetController(control);
 
 	this->Connect(ID_UPDATEPROJECT, wxEVT_COMMAND_MENU_SELECTED,
@@ -106,6 +111,9 @@ FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 			wxCommandEventHandler(FrameMain::RefreshMainGUI));
 	this->Connect(ID_REFRESH3DVIEW, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(FrameMain::Refresh3DView));
+
+	this->Connect(wxID_FILE1, wxID_FILE9, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(FrameMain::OnProjectLoadRecent));
 
 	//TODO: Why is the KeyDown event connected to the canvas?
 	m_canvas->Connect(wxID_ANY, wxEVT_KEY_DOWN,
@@ -154,11 +162,12 @@ FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 FrameMain::~FrameMain()
 {
 	// Disconnect events
-	m_canvas->Disconnect(wxID_ANY, wxEVT_KEY_DOWN,
-			wxKeyEventHandler(FrameMain::OnKeyDown), NULL, this);
 	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(FrameMain::OnTimer), NULL,
 			this);
-
+	m_canvas->Disconnect(wxID_ANY, wxEVT_KEY_DOWN,
+			wxKeyEventHandler(FrameMain::OnKeyDown), NULL, this);
+	this->Disconnect(wxID_FILE1, wxID_FILE9, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(FrameMain::OnProjectLoadRecent));
 	this->Disconnect(ID_REFRESH3DVIEW, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(FrameMain::Refresh3DView));
 	this->Disconnect(ID_REFRESHMAINGUI, wxEVT_COMMAND_MENU_SELECTED,
@@ -180,6 +189,8 @@ FrameMain::~FrameMain()
 
 	delete m_helpController;
 	settings.WriteConfigTo(config);
+	m_fileHistory->Save(*config);
+	delete m_fileHistory;
 	delete config; // config is written back on deletion of object
 }
 
@@ -609,6 +620,7 @@ void FrameMain::OnProjectRename(wxCommandEvent& event)
 void FrameMain::ProjectLoad(wxString fileName)
 {
 	project.Load(fileName);
+
 	commandProcessor.ClearCommands();
 	commandProcessor.MarkAsSaved();
 	TransferDataToWindow();
@@ -627,6 +639,7 @@ void FrameMain::OnProjectLoad(wxCommandEvent& event)
 
 	if(dialog.ShowModal() == wxID_OK){
 		fileName = dialog.GetPath();
+		m_fileHistory->AddFileToHistory(fileName.GetFullPath());
 		if(project.Load(fileName)){
 			settings.lastProjectDirectory = fileName.GetPath();
 			TransferDataToWindow();
@@ -634,11 +647,21 @@ void FrameMain::OnProjectLoad(wxCommandEvent& event)
 	}
 }
 
+void FrameMain::OnProjectLoadRecent(wxCommandEvent& event)
+{
+	wxString fileName(
+			m_fileHistory->GetHistoryFile(event.GetId() - wxID_FILE1));
+	if(!fileName.empty() && project.Load(fileName)){
+		TransferDataToWindow();
+	}
+}
+
 void FrameMain::OnProjectSave(wxCommandEvent& event)
 {
 	if(!project.fileName.IsOk()) OnProjectSaveAs(event);
-	project.Save(project.fileName);
-	commandProcessor.MarkAsSaved();
+	if(project.Save(project.fileName)){
+		commandProcessor.MarkAsSaved();
+	}
 	TransferDataToWindow();
 }
 
@@ -646,8 +669,7 @@ void FrameMain::OnProjectSaveAs(wxCommandEvent &event)
 {
 	wxFileName fileName;
 	wxFileDialog dialog(this, _("Save Project As..."), _T(""), _T(""),
-			_(
-					"Generic CAM Project (*.prj)|*.prj|Zip File (*.zip)|*.zip|All Files|*.*"),
+			_("Generic CAM Project (*.zip)|*.zip|All Files|*.*"),
 			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 	if(wxDir::Exists(settings.lastProjectDirectory)){
@@ -662,9 +684,9 @@ void FrameMain::OnProjectSaveAs(wxCommandEvent &event)
 		if(project.Save(fileName)){
 			commandProcessor.MarkAsSaved();
 			settings.lastProjectDirectory = project.fileName.GetPath();
-			TransferDataToWindow();
 		}
 	}
+	TransferDataToWindow();
 }
 
 void FrameMain::OnQuit(wxCommandEvent& event)
@@ -967,6 +989,8 @@ void FrameMain::OnGeneratorSetup(wxCommandEvent& event)
 void FrameMain::OnGeneratorStart(wxCommandEvent& event)
 {
 
+	project.GenerateToolpaths();
+
 //	project.PropagateChanges();
 //
 //	size_t count = 0;
@@ -979,6 +1003,8 @@ void FrameMain::OnGeneratorStart(wxCommandEvent& event)
 //	while(project.ToolpathGenerate()){
 //		dialog.Update(count, project.TollPathGenerateCurrent());
 //	}
+
+	TransferDataToWindow();
 }
 
 void FrameMain::OnGeneratorAutomatic(wxCommandEvent& event)

@@ -48,6 +48,10 @@ public:
 public:
 	Vector3 color;
 	float alpha;
+	float overlap;
+
+	bool displayBox;
+	bool displaySides;
 
 	double xmin, xmax;
 	double ymin, ymax;

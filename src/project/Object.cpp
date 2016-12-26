@@ -62,6 +62,10 @@ void Object::Paint(const bool absolutCoordinates) const
 	if(absolutCoordinates){
 		glMultMatrixd(displayTransform.a);
 #ifdef _DEBUGMODE
+		if(geometries.GetCount() > 0){
+			glColor3f(geometries[0].color.x, geometries[0].color.y,
+					geometries[0].color.z);
+		}
 		glPointSize(5);
 		glBegin(GL_POINTS);
 		glVertex3i(0, 0, 0);
@@ -78,9 +82,9 @@ void Object::Update(void)
 {
 	bbox.Clear();
 	for(size_t i = 0; i < geometries.GetCount(); i++)
-		bbox.Insert((geometries[i]), displayTransform * matrix);
-	displayTransform.TranslateGlobal(bbox.xmin, bbox.ymin, bbox.zmin);
+		bbox.Insert((geometries[i]), matrix);
 	matrix.TranslateGlobal(-bbox.xmin, -bbox.ymin, -bbox.zmin);
+	displayTransform.TranslateGlobal(bbox.xmin, bbox.ymin, bbox.zmin);
 	bbox.xmax -= bbox.xmin;
 	bbox.ymax -= bbox.ymin;
 	bbox.zmax -= bbox.zmin;

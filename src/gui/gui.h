@@ -167,6 +167,7 @@ class GUIMain : public wxFrame
 	protected:
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuProject;
+		wxMenu* m_menuProjectRecent;
 		wxMenu* m_menuEdit;
 		wxMenu* m_menuObject;
 		wxMenu* m_menuStock;

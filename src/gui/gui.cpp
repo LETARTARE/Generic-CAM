@@ -46,6 +46,9 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemProjectLoad = new wxMenuItem( m_menuProject, wxID_OPEN, wxString( _("&Load Project...") ) + wxT('\t') + wxT("CTRL+L"), wxEmptyString, wxITEM_NORMAL );
 	m_menuProject->Append( m_menuItemProjectLoad );
 	
+	m_menuProjectRecent = new wxMenu();
+	m_menuProject->Append( -1, _("Load Recent"), m_menuProjectRecent );
+	
 	wxMenuItem* m_menuItemProjectSave;
 	m_menuItemProjectSave = new wxMenuItem( m_menuProject, wxID_SAVE, wxString( _("&Save Project") ) + wxT('\t') + wxT("CTRL+S"), wxEmptyString, wxITEM_NORMAL );
 	m_menuProject->Append( m_menuItemProjectSave );

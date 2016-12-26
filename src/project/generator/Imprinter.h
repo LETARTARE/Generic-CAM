@@ -73,6 +73,7 @@ public:
 			const double sizeZ = 0.05, const double resolutionX = 0.001,
 			const double resolutionY = 0.001);
 	Imprinter(const Imprinter& ip); ///< Copy constructor
+	Imprinter& operator=(const Imprinter &b); ///< Assignment operator
 	virtual ~Imprinter();
 
 	// Member variables
@@ -81,8 +82,6 @@ public:
 	enum face_t {
 		facing_up, facing_down, facing_side, other
 	};
-
-	bool displayBox;
 
 	bool displayField;
 
@@ -110,7 +109,6 @@ protected:
 	// Methods
 public:
 
-	Imprinter& operator=(const Imprinter &b); ///< Assignment operator
 	Imprinter & operator+=(const Imprinter &a);
 	const Imprinter operator+(const Imprinter& a) const;
 

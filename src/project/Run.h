@@ -87,6 +87,10 @@ public:
 	// Methods
 public:
 	void Update(void);
+
+	void GenerateToolpaths(void);
+
+
 	void Paint(void) const;
 
 	void ToStream(wxTextOutputStream & stream);

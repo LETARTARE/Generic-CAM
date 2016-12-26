@@ -43,8 +43,17 @@ void GeneratorDexel::CopyParameterFrom(const Generator * other)
 
 void GeneratorDexel::Paint(void)
 {
+	Generator::Paint();
+	area.alpha = 1.0;
+	area.displaySides = false;
+	area.displayBox = true;
+	area.Paint();
+
 	glPushMatrix();
 	glTranslatef(area.xmin, area.ymin, area.zmin);
+//	target.displayAboveUp = true;
+//	target.displayAboveDown = true;
+//	target.displayField = true;
 	target.Paint();
 	glPopMatrix();
 }
@@ -59,25 +68,22 @@ void GeneratorDexel::GenerateToolpath(void)
 			resY);
 	target.InitImprinting();
 
-	Run* run = this->parent;
-	if(run == NULL){
-		target.FinishImprint();
-		return;
-	}
-	Project* project = this->parent->parent;
-	Workpiece* workpiece = &(project->workpieces[run->refWorkpiece]);
-
-	if(workpiece == NULL){
-		target.FinishImprint();
-		return;
-	}
+	const Run* const run = this->parent;
+	assert(run != NULL);
+	const Project* const project = run->parent;
+	assert(project != NULL);
+	const Workpiece* const workpiece = &(project->workpieces[run->refWorkpiece]);
+	assert(workpiece != NULL);
 
 	AffineTransformMatrix tempMatrix;
-	tempMatrix.TranslateGlobal(area.xmin, area.ymin, area.zmin);
 
 	for(size_t i = 0; i < workpiece->placements.GetCount(); i++){
-		size_t refObject = workpiece->placements[i].refObject;
+		const ObjectPlacement* const opl = &(workpiece->placements[i]);
+		size_t refObject = opl->refObject;
 		Object* object = &(project->objects[refObject]);
+		tempMatrix.SetIdentity();
+		tempMatrix.TranslateGlobal(-area.xmin, -area.ymin, -area.zmin);
+		tempMatrix *= opl->matrix;
 		target.InsertObject(*object, tempMatrix);
 	}
 	for(size_t i = 0; i < workpiece->supports.GetCount(); i++){
@@ -87,6 +93,17 @@ void GeneratorDexel::GenerateToolpath(void)
 	//		target.CleanOutlier();
 }
 
+void GeneratorDexel::ToStream(wxTextOutputStream& stream)
+{
+	Generator::ToStream(stream);
+}
+
+bool GeneratorDexel::FromStream(wxTextInputStream& stream)
+{
+	bool result = Generator::FromStream(stream);
+	target.SetupBox(area.GetSizeX(), area.GetSizeY(), area.GetSizeZ());
+	return result;
+}
 //	, temp2;
 //	TargetPlacement tempPlace;
 //	Run* run = new Run;

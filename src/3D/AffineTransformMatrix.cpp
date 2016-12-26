@@ -136,7 +136,7 @@ void AffineTransformMatrix::ToStream(wxTextOutputStream& stream)
 void AffineTransformMatrix::FromStream(wxTextInputStream& stream)
 {
 	for(unsigned int n = 0; n < 16; n++)
-		a[n] = stream.ReadDouble();
+		stream >> a[n];
 	TakeMatrixApart();
 }
 

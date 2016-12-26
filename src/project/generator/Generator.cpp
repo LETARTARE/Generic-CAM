@@ -84,10 +84,17 @@ void Generator::CopyParameterFrom(const Generator * other)
 
 void Generator::Paint(void)
 {
-	::glBegin(GL_LINE);
-	::glVertex3f(area.xmin, area.ymin, area.zmin);
-	::glVertex3f(area.xmax, area.ymax, area.zmax);
-	::glEnd();
+	glPushMatrix();
+	glTranslatef(area.xmin, area.ymin, area.zmin);
+
+	toolpath.Paint();
+
+//	::glBegin(GL_LINE);
+//	::glVertex3f(area.xmin, area.ymin, area.zmin);
+//	::glVertex3f(area.xmax, area.ymax, area.zmax);
+//	::glEnd();
+
+	glPopMatrix();
 }
 
 void Generator::ToStream(wxTextOutputStream& stream)

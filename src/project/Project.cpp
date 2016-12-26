@@ -63,9 +63,13 @@ void Project::Clear(void)
 //	pattern.Add(temp);
 }
 
-//bool Project::GenerateToolpaths(void)
-//{
-//
+bool Project::GenerateToolpaths(void)
+{
+	Update();
+	for(size_t n = 0; n < run.GetCount(); n++){
+		run[n].GenerateToolpaths();
+	}
+	return true;
 //#if(_GENERICCAM_USEMULTITHREADING == 1)
 //
 //	// Prevent the toolpath generation from being started in more than
@@ -117,11 +121,14 @@ void Project::Clear(void)
 //#else
 //	return false;
 //#endif
-//
-//}
+
+}
 
 void Project::Update(void)
 {
+	for(size_t i = 0; i < objects.GetCount(); i++){
+		objects[i].Update();
+	}
 	for(size_t i = 0; i < workpieces.GetCount(); i++){
 		workpieces[i].parent = this;
 		workpieces[i].Update();
@@ -135,6 +142,8 @@ void Project::Update(void)
 bool Project::Save(wxFileName fileName)
 {
 	if(!fileName.IsOk()) return false;
+
+	setlocale(LC_ALL, "C");
 
 	wxFFileOutputStream out(fileName.GetFullPath());
 	wxZipOutputStream zip(out);
@@ -170,14 +179,15 @@ bool Project::Save(wxFileName fileName)
 			FileSTL::WriteStream(zip, objects[n].geometries[m]);
 		}
 	}
-
+	setlocale(LC_ALL, "");
+	this->fileName = fileName;
 	return true;
 }
 
 bool Project::Load(wxFileName fileName)
 {
 	if(!fileName.IsOk()) return false;
-
+	setlocale(LC_ALL, "C");
 	wxFFileInputStream in(fileName.GetFullPath());
 	wxZipInputStream zip(in);
 	wxTextInputStream txt(zip);
@@ -188,53 +198,86 @@ bool Project::Load(wxFileName fileName)
 	wxZipEntry* entry;
 	while((entry = zip.GetNextEntry()))
 		if(entry->GetName().Cmp(_T("project.txt")) == 0) break;
-	if(entry == NULL) return false;
+	if(entry == NULL){
+		setlocale(LC_ALL, "");
+		return false;
+	}
 
 	zip.OpenEntry(*entry);
 
 	wxString temp;
 	size_t m;
 	temp = txt.ReadLine();
-	if(temp.Cmp(_T("Name:")) != 0) return false;
+	if(temp.Cmp(_T("Name:")) != 0){
+		setlocale(LC_ALL, "");
+		return false;
+	}
 	name = txt.ReadLine();
 	temp = txt.ReadWord();
-	if(temp.Cmp(_T("Objects:")) != 0) return false;
+	if(temp.Cmp(_T("Objects:")) != 0){
+		setlocale(LC_ALL, "");
+		return false;
+	}
 	const size_t N = txt.Read32();
 	objects.Clear();
 	Object object;
 	for(size_t n = 0; n < N; n++){
 		temp = txt.ReadWord();
-		if(temp.Cmp(_T("Object:")) != 0) return false;
+		if(temp.Cmp(_T("Object:")) != 0){
+			setlocale(LC_ALL, "");
+			return false;
+		}
 		m = txt.Read32();
-		if(m != n) return false;
+		if(m != n){
+			setlocale(LC_ALL, "");
+			return false;
+		}
 		object.FromStream(txt);
 		objects.Add(object);
 	}
 
 	temp = txt.ReadWord();
-	if(temp.Cmp(_T("Workpieces:")) != 0) return false;
+	if(temp.Cmp(_T("Workpieces:")) != 0){
+		setlocale(LC_ALL, "");
+		return false;
+	}
 	const size_t N2 = txt.Read32();
 	workpieces.Clear();
 	Workpiece workpiece;
 	for(size_t n = 0; n < N2; n++){
 		temp = txt.ReadWord();
-		if(temp.Cmp(_T("Workpiece:")) != 0) return false;
+		if(temp.Cmp(_T("Workpiece:")) != 0){
+			setlocale(LC_ALL, "");
+			return false;
+		}
 		m = txt.Read32();
-		if(m != n) return false;
+		if(m != n){
+			setlocale(LC_ALL, "");
+			return false;
+		}
 		workpiece.FromStream(txt);
 		workpieces.Add(workpiece);
 	}
 
 	temp = txt.ReadWord();
-	if(temp.Cmp(_T("Run:")) != 0) return false;
+	if(temp.Cmp(_T("Run:")) != 0){
+		setlocale(LC_ALL, "");
+		return false;
+	}
 	const size_t N3 = txt.Read32();
 	run.Clear();
 	Run * tempRun;
 	for(size_t n = 0; n < N3; n++){
 		temp = txt.ReadWord();
-		if(temp.Cmp(_T("Run:")) != 0) return false;
+		if(temp.Cmp(_T("Run:")) != 0){
+			setlocale(LC_ALL, "");
+			return false;
+		}
 		m = txt.Read32();
-		if(m != n) return false;
+		if(m != n){
+			setlocale(LC_ALL, "");
+			return false;
+		}
 		tempRun = new Run();
 		tempRun->FromStream(txt, n, this);
 		run.Add(tempRun);
@@ -266,60 +309,11 @@ bool Project::Load(wxFileName fileName)
 		objects[n].geometries[m].triangles = stl.geometry[0].triangles;
 		zip.CloseEntry();
 	}
-
+	setlocale(LC_ALL, "");
+	this->fileName = fileName;
 	this->Update();
 	return true;
 }
-
-// Experimental stuff:
-//	BooleanBox x;
-//	BooleanBox y(0.4, 0.4, 0.4);
-//	y.matrix.TranslateGlobal(0.1, -0.1, 0.5);
-//	x -= y;
-//	y.matrix.TranslateGlobal(0.1, 0.1, 0.1);
-//	x -= y;
-//	BooleanBox z = x;
-//	z.matrix.TranslateGlobal(0.3, 0.3, 0.3);
-//	x -= z;
-//	::glColor4f(0.75, 0.75, 0.0, 1);
-//	x.Paint(true);
-//	::glColor4f(0.75, 0.75, 0.75, 0.4);
-//	x.Paint();
-//	y.Paint();
-//
-//	size_t i;
-//
-//	switch(displayType){
-//	case displayObjects:
-//		glLoadName(1);
-//		for(i = 0; i < objects.GetCount(); i++){
-//			glPushName(i + 1);
-//			objects[i].Paint();
-//			glPopName();
-//		}
-//		break;
-//
-//	case displayWorkpieces:
-//		glLoadName(2);
-//		for(i = 0; i < workpieces.GetCount(); i++){
-//			if(!workpieces[i].selected) continue;
-//			glPushName(i);
-//			workpieces[i].Paint(objects);
-//			glPopName();
-//		}
-//		break;
-//	case displayRun:
-//		glLoadName(3);
-//		for(i = 0; i < run.GetCount(); i++){
-//			if(!run[i].selected) continue;
-//
-//			::glPushName(i);
-//			run[i].Paint(objects, workpieces);
-//			::glPopName();
-//		}
-//		break;
-//	}
-//	::glLoadName(0);
 
 //void Project::PropagateChanges(void)
 //{
@@ -408,9 +402,9 @@ bool Project::Load(wxFileName fileName)
 //	return true;
 //}
 
-//wxString Project::TollPathGenerateCurrent(void)
+//wxString Project::ToolPathGenerateCurrent(void)
 //{
-//	// TODO: Const correctness for this function.
+//	// TODO: Const correctnessl for this function.
 //	if(generator_workpieceNr >= workpieces.GetCount()) return _T("");
 //	if(generator_runNr >= run.GetCount()) return _T("");
 //	if(generator_workpieceNr >= run[generator_runNr].toolpaths.GetCount()) return _T(
@@ -422,6 +416,56 @@ bool Project::Load(wxFileName fileName)
 void Project::LoadPattern(wxFileName filename)
 {
 }
+
+// Experimental stuff:
+//	BooleanBox x;
+//	BooleanBox y(0.4, 0.4, 0.4);
+//	y.matrix.TranslateGlobal(0.1, -0.1, 0.5);
+//	x -= y;
+//	y.matrix.TranslateGlobal(0.1, 0.1, 0.1);
+//	x -= y;
+//	BooleanBox z = x;
+//	z.matrix.TranslateGlobal(0.3, 0.3, 0.3);
+//	x -= z;
+//	::glColor4f(0.75, 0.75, 0.0, 1);
+//	x.Paint(true);
+//	::glColor4f(0.75, 0.75, 0.75, 0.4);
+//	x.Paint();
+//	y.Paint();
+//
+//	size_t i;
+//
+//	switch(displayType){
+//	case displayObjects:
+//		glLoadName(1);
+//		for(i = 0; i < objects.GetCount(); i++){
+//			glPushName(i + 1);
+//			objects[i].Paint();
+//			glPopName();
+//		}
+//		break;
+//
+//	case displayWorkpieces:
+//		glLoadName(2);
+//		for(i = 0; i < workpieces.GetCount(); i++){
+//			if(!workpieces[i].selected) continue;
+//			glPushName(i);
+//			workpieces[i].Paint(objects);
+//			glPopName();
+//		}
+//		break;
+//	case displayRun:
+//		glLoadName(3);
+//		for(i = 0; i < run.GetCount(); i++){
+//			if(!run[i].selected) continue;
+//
+//			::glPushName(i);
+//			run[i].Paint(objects, workpieces);
+//			::glPopName();
+//		}
+//		break;
+//	}
+//	::glLoadName(0);
 
 void Project::PaintObjects(void)
 {

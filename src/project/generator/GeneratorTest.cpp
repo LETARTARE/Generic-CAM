@@ -78,7 +78,8 @@ void GeneratorTest::GenerateToolpath(void)
 
 //	size_t slotNr = project->run[runNr].toolpaths[toolpathNr].generator->slotNr;
 //	Tool * tool = project->run[runNr].toolbox.GetToolInSlot(slotNr);
-	Run* run = this->parent;
+	const Run* const run = this->parent;
+	assert(run != NULL);
 
 	if(refTool >= run->tools.GetCount()){
 		output = _T("Tool empty.");
@@ -202,10 +203,10 @@ void GeneratorTest::GenerateToolpath(void)
 	}
 
 	// Shift toolpath down to align 0 with top-of-stock
-	for(size_t i = 0; i < tp.positions.GetCount(); i++){
-		tp.positions[i].axisZ -= temp.GetSizeZ();
-	}
-	tp.matrix.TranslateGlobal(0, 0, temp.GetSizeZ());
+//	for(size_t i = 0; i < tp.positions.GetCount(); i++){
+//		tp.positions[i].axisZ -= temp.GetSizeZ();
+//	}
+//	tp.matrix.TranslateGlobal(0, 0, temp.GetSizeZ());
 
 	//	t.InitImprinting();
 	//	t.matrix.SetIdentity();
