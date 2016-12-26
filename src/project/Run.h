@@ -75,6 +75,8 @@ public:
 	AffineTransformMatrix workpiecePlacement; //!< For flipping the workpiece to machine the other sides.
 	FlipDrillPattern pattern; //!< Experimental: FlipDrillPattern
 
+	float touchoffHeight;
+
 	//TODO: Remove the "selected" flag.
 	bool selected;
 //	bool modified;
@@ -82,14 +84,16 @@ public:
 	int selectedTool;
 //	ArrayOfToolPath toolpaths;
 
-	Project * parent; //!< Pointer back to the Project this Run belongs to.
+	Project * parent; ///< Pointer back to the Project this Run belongs to.
+private:
+	mutable GLuint textureID;
+	mutable bool isOGLInit; ///< Controls the setup of OpenGL elements on the first evaluation of the Paint function.
 
 	// Methods
 public:
 	void Update(void);
 
 	void GenerateToolpaths(void);
-
 
 	void Paint(void) const;
 

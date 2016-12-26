@@ -29,6 +29,8 @@
 #include "Project.h"
 #include "generator/GeneratorCollection.h"
 
+#include "../icon/touchpoint.xpm"
+
 #include <wx/log.h>
 #include <GL/gl.h>
 #include <float.h>
@@ -46,6 +48,9 @@ Run::Run()
 //	toolbox.Empty();
 	selectedTool = 0;
 	parent = NULL;
+	textureID = 0;
+	isOGLInit = false;
+	touchoffHeight = 0.027;
 }
 
 Run::Run(const Run& other)
@@ -62,6 +67,7 @@ Run& Run::operator=(const Run& other)
 
 Run::~Run()
 {
+	if(isOGLInit) glDeleteTextures(1, &textureID);
 	for(size_t i = 0; i < generators.GetCount(); i++)
 		delete generators[i];
 }
@@ -88,6 +94,31 @@ void Run::Paint(void) const
 	const Project * pr = parent;
 	if(pr == NULL) return;
 
+	if(!isOGLInit){
+		wxImage temp(touchpoint_xpm);
+		unsigned char rgba[64 * 64 * 4];
+		const unsigned char * data = temp.GetData();
+		for(unsigned int i = 0; i < 64 * 64; i++){
+			const unsigned char r = data[i * 3];
+			const unsigned char g = data[i * 3 + 1];
+			const unsigned char b = data[i * 3 + 2];
+			const unsigned char a = (r == 255 && g == 255 && b == 255)? 0 : 255;
+			rgba[i * 4] = r;
+			rgba[i * 4 + 1] = g;
+			rgba[i * 4 + 2] = b;
+			rgba[i * 4 + 3] = a;
+		}
+		glEnable( GL_TEXTURE_2D);
+		glGenTextures(1, &textureID);
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, rgba);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glDisable( GL_TEXTURE_2D);
+		isOGLInit = true;
+	}
+
 	machine.Paint();
 
 	::glPushMatrix();
@@ -101,6 +132,52 @@ void Run::Paint(void) const
 			assert(generators[n] != NULL);
 			generators[n]->Paint();
 		}
+
+		// Draw the "Touchpoint" symbol
+		const float s = 0.02;
+		glTranslatef(0, 0, touchoffHeight);
+		glColor3f(1, 1, 1);
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		glEnable( GL_TEXTURE_2D);
+		glBegin( GL_QUADS);
+		glNormal3f(-1, 0, 0);
+		glTexCoord2f(0, 1);
+		glVertex3f(0, 0, 0);
+		glTexCoord2f(1, 1);
+		glVertex3f(0, -s, 0);
+		glTexCoord2f(1, 0);
+		glVertex3f(0, -s, s);
+		glTexCoord2f(0, 0);
+		glVertex3f(0, 0, s);
+		glNormal3f(0, -1, 0);
+		glTexCoord2f(0, 1);
+		glVertex3f(0, 0, 0);
+		glTexCoord2f(1, 1);
+		glVertex3f(s, 0, 0);
+		glTexCoord2f(1, 0);
+		glVertex3f(s, 0, s);
+		glTexCoord2f(0, 0);
+		glVertex3f(0, 0, s);
+		glNormal3f(1, 0, 0);
+		glTexCoord2f(0, 1);
+		glVertex3f(0, 0, 0);
+		glTexCoord2f(1, 1);
+		glVertex3f(0, s, 0);
+		glTexCoord2f(1, 0);
+		glVertex3f(0, s, s);
+		glTexCoord2f(0, 0);
+		glVertex3f(0, 0, s);
+		glNormal3f(0, 1, 0);
+		glTexCoord2f(0, 1);
+		glVertex3f(0, 0, 0);
+		glTexCoord2f(1, 1);
+		glVertex3f(-s, 0, 0);
+		glTexCoord2f(1, 0);
+		glVertex3f(-s, 0, s);
+		glTexCoord2f(0, 0);
+		glVertex3f(0, 0, s);
+		glEnd();
+		glDisable(GL_TEXTURE_2D);
 		::glPopMatrix();
 	}
 	::glPopMatrix();
