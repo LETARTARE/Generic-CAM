@@ -83,3 +83,47 @@ FlipDrillPattern::FlipDrillPattern()
 	//}
 }
 
+void FlipDrillPattern::Paint(void) const
+{
+	toolpath.Paint();
+	outLine.Paint();
+}
+
+void FlipDrillPattern::SetupDrill(Tool &tool, double diameter, double depth)
+{
+	const double d = diameter + 0.002;
+	outLine.Clear();
+	outLine.InsertPoint(-d, -d, 0.0);
+	outLine.InsertPoint(d, -d, 0.0);
+	outLine.InsertPoint(d, d, 0.0);
+	outLine.InsertPoint(-d, d, 0.0);
+	outLine.Close();
+
+	const double r = (diameter - 0.0061) / 2.0;
+	MachinePosition temp;
+	temp.axisZ = 0.004;
+	toolpath.positions.Add(temp);
+	temp.axisZ = 0.001;
+	toolpath.positions.Add(temp);
+	temp.isCutting = true;
+	temp.axisZ = -0.001;
+	temp.axisX = r;
+	toolpath.positions.Add(temp);
+	temp.isRotationPositiv = true;
+	temp.radiusI = -r;
+	while(temp.axisZ > 0.003 - depth){
+		temp.axisZ -= 0.003;
+		toolpath.positions.Add(temp);
+	}
+	temp.axisZ = -depth;
+	toolpath.positions.Add(temp);
+	toolpath.positions.Add(temp);
+	temp.axisZ += 0.001;
+	temp.axisX = 0.000;
+	temp.radiusI = 0.000;
+	temp.isCutting = false;
+	toolpath.positions.Add(temp);
+	temp.axisZ = 0.004;
+	toolpath.positions.Add(temp);
+}
+

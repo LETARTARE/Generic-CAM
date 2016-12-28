@@ -32,29 +32,46 @@
 
 GeneratorDexel::GeneratorDexel()
 {
+	area.alpha = 1.0;
+	area.displaySides = false;
+	area.displayBox = true;
+
+	target.displayField = true;
+
+	outline.displayField = true;
 }
-GeneratorDexel::~GeneratorDexel()
-{
-}
+
 void GeneratorDexel::CopyParameterFrom(const Generator * other)
 {
 	Generator::CopyParameterFrom(other);
 }
 
-void GeneratorDexel::Paint(void)
+GeneratorDexel::~GeneratorDexel()
+{
+}
+
+void GeneratorDexel::ToStream(wxTextOutputStream& stream)
+{
+	Generator::ToStream(stream);
+}
+
+bool GeneratorDexel::FromStream(wxTextInputStream& stream)
+{
+	bool result = Generator::FromStream(stream);
+	target.SetupBox(area.GetSizeX(), area.GetSizeY(), area.GetSizeZ());
+	return result;
+}
+
+void GeneratorDexel::Paint(void) const
 {
 	Generator::Paint();
-	area.alpha = 1.0;
-	area.displaySides = false;
-	area.displayBox = true;
+
 	area.Paint();
 
 	glPushMatrix();
 	glTranslatef(area.xmin, area.ymin, area.zmin);
-//	target.displayAboveUp = true;
-//	target.displayAboveDown = true;
-//	target.displayField = true;
-	target.Paint();
+
+//	target.Paint();
 	glPopMatrix();
 }
 
@@ -77,6 +94,12 @@ void GeneratorDexel::GenerateToolpath(void)
 
 	AffineTransformMatrix tempMatrix;
 
+//	DexelTarget outline(target);
+	outline.SetupBox(area.GetSizeX(), area.GetSizeY(), area.GetSizeZ(), resX,
+			resY);
+
+	outline.Empty();
+
 	for(size_t i = 0; i < workpiece->placements.GetCount(); i++){
 		const ObjectPlacement* const opl = &(workpiece->placements[i]);
 		size_t refObject = opl->refObject;
@@ -85,25 +108,60 @@ void GeneratorDexel::GenerateToolpath(void)
 		tempMatrix.TranslateGlobal(-area.xmin, -area.ymin, -area.zmin);
 		tempMatrix *= opl->matrix;
 		target.InsertObject(*object, tempMatrix);
+
+		DexelTarget temp(target);
+		temp.InitImprinting();
+		if(opl->useContour){
+			temp.InsertObject(*object, tempMatrix);
+			temp.FinishImprint();
+			DexelTarget discSlot;
+			discSlot.SetupDisc(opl->slotWidth, resX, resY);
+			temp.FoldRaise(discSlot);
+		}else{
+			temp.InsertTriangle(
+					Vector3(opl->xmin - area.xmin, opl->ymin - area.ymin,
+							opl->zmax - area.zmin),
+					Vector3(opl->xmax - area.xmin, opl->ymin - area.ymin,
+							opl->zmax - area.zmin),
+					Vector3(opl->xmax - area.xmin, opl->ymax - area.ymin,
+							opl->zmax - area.zmin), Imprinter::facing_up);
+			temp.InsertTriangle(
+					Vector3(opl->xmin - area.xmin, opl->ymin - area.ymin,
+							opl->zmax - area.zmin),
+					Vector3(opl->xmin - area.xmin, opl->ymax - area.ymin,
+							opl->zmax - area.zmin),
+					Vector3(opl->xmax - area.xmin, opl->ymax - area.ymin,
+							opl->zmax - area.zmin), Imprinter::facing_up);
+			temp.InsertTriangle(
+					Vector3(opl->xmin - area.xmin, opl->ymin - area.ymin,
+							opl->zmin - area.zmin),
+					Vector3(opl->xmax - area.xmin, opl->ymin - area.ymin,
+							opl->zmin - area.zmin),
+					Vector3(opl->xmax - area.xmin, opl->ymax - area.ymin,
+							opl->zmin - area.zmin), Imprinter::facing_down);
+			temp.InsertTriangle(
+					Vector3(opl->xmin - area.xmin, opl->ymin - area.ymin,
+							opl->zmin - area.zmin),
+					Vector3(opl->xmin - area.xmin, opl->ymax - area.ymin,
+							opl->zmin - area.zmin),
+					Vector3(opl->xmax - area.xmin, opl->ymax - area.ymin,
+							opl->zmin - area.zmin), Imprinter::facing_down);
+			temp.FinishImprint();
+		}
+
+		outline += temp;
 	}
 	for(size_t i = 0; i < workpiece->supports.GetCount(); i++){
 		//TODO: Insert supports into target.
 	}
 	target.FinishImprint();
-	//		target.CleanOutlier();
+//	target.CleanOutlier();
+	outline.HardInvert();
+	target += outline;
+
+	target.Refresh();
 }
 
-void GeneratorDexel::ToStream(wxTextOutputStream& stream)
-{
-	Generator::ToStream(stream);
-}
-
-bool GeneratorDexel::FromStream(wxTextInputStream& stream)
-{
-	bool result = Generator::FromStream(stream);
-	target.SetupBox(area.GetSizeX(), area.GetSizeY(), area.GetSizeZ());
-	return result;
-}
 //	, temp2;
 //	TargetPlacement tempPlace;
 //	Run* run = new Run;

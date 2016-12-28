@@ -278,12 +278,6 @@ void GeneratorFast::GenerateToolpath(void)
 
 	GeneratorDexel::GenerateToolpath();
 
-	if(target.IsEmpty()){
-		output = _T("DexelTarget empty.");
-		errorOccured = true;
-		return;
-	}
-
 	ToolPath tp;
 	MachinePosition mp;
 
@@ -316,7 +310,6 @@ void GeneratorFast::GenerateToolpath(void)
 	double dmin = temptop.GetMinLevel();
 	double level = dmin + raiseStep;
 
-	temptop.InitOutSides(); // TODO: Check if definition is right?
 	temptop.GenerateDistanceMap(level, true);
 
 	double px, py, pz;
@@ -445,7 +438,7 @@ void GeneratorFast::GenerateToolpath(void)
 //		tp.positions[i].axisZ -= temp.GetSizeZ();
 
 	toolpath = tp;
-	target.refresh = true;
+	target.Refresh();
 	return;
 	//
 	//	double level = temp.GetSizeZ() - 0.0005;

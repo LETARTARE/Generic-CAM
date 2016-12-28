@@ -82,18 +82,11 @@ void Generator::CopyParameterFrom(const Generator * other)
 	this->freeHeight = other->freeHeight;
 }
 
-void Generator::Paint(void)
+void Generator::Paint(void) const
 {
 	glPushMatrix();
 	glTranslatef(area.xmin, area.ymin, area.zmin);
-
 	toolpath.Paint();
-
-//	::glBegin(GL_LINE);
-//	::glVertex3f(area.xmin, area.ymin, area.zmin);
-//	::glVertex3f(area.xmax, area.ymax, area.zmax);
-//	::glEnd();
-
 	glPopMatrix();
 }
 

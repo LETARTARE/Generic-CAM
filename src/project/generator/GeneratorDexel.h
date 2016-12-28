@@ -49,14 +49,14 @@ public:
 	virtual void ToStream(wxTextOutputStream & stream);
 	virtual bool FromStream(wxTextInputStream & stream);
 
-	virtual void Paint(void);
+	virtual void Paint(void) const;
 
 protected:
 
 	void GenerateToolpath(void);
 
 	DexelTarget target;
-
+	DexelTarget outline;
 };
 
 #endif /* GENERATORDEXEL_H_ */

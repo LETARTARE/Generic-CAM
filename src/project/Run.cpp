@@ -119,7 +119,7 @@ void Run::Paint(void) const
 		isOGLInit = true;
 	}
 
-	machine.Paint();
+//	machine.Paint();
 
 	::glPushMatrix();
 

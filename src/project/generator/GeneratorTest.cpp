@@ -90,12 +90,6 @@ void GeneratorTest::GenerateToolpath(void)
 
 	GeneratorDexel::GenerateToolpath();
 
-	if(target.IsEmpty()){
-		output = _T("DexelTarget empty.");
-		errorOccured = true;
-		return;
-	}
-
 	ToolPath tp;
 	MachinePosition m;
 

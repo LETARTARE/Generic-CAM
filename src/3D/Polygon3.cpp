@@ -210,14 +210,13 @@ void Polygon3::Paint() const
 		::glBegin(GL_LINE_LOOP);
 	else
 		::glBegin(GL_LINE_STRIP);
-	size_t i;
-	for(i = 0; i < elements.GetCount(); i++)
+	for(size_t i = 0; i < elements.GetCount(); i++)
 		::glVertex3f(elements[i].x, elements[i].y, elements[i].z);
 	::glEnd();
 
 	if(showDots){
 		::glBegin(GL_POINTS);
-		for(i = 0; i < elements.GetCount(); i++)
+		for(size_t i = 0; i < elements.GetCount(); i++)
 			::glVertex3f(elements[i].x, elements[i].y, elements[i].z);
 		::glEnd();
 	}

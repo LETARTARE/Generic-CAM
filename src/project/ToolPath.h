@@ -75,7 +75,7 @@ public:
 	bool IsEmpty(void) const;
 	void ApplyTransformation(void);
 	void ApplyTransformation(const AffineTransformMatrix &matrix);
-	void Paint(void);
+	void Paint(void) const;
 	void CleanPath(double tolerance = 0.0002);
 	void WriteToFile(wxTextFile &f);
 	void ToStream(wxTextOutputStream & stream);

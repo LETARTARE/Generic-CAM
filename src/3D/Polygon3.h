@@ -71,7 +71,7 @@ public:
 
 	/*! \brief Close (or open) the polygon to a cycle
 	 *
-	 * @param close Boolean: True (default) to close the polygon, false to open it.
+	 * @param close Boolean: true (default) to close the polygon, false to open it.
 	 */
 	void Close(bool close = true);
 
@@ -89,9 +89,9 @@ public:
 	 */
 	void ApplyTransformation(void);
 
-	/*! \brief Apply a AffineTransformMatrix to the point in the polygon
+	/*! \brief Apply a AffineTransformMatrix to the points in the polygon
 	 *
-	 * The matrix belonging to the Polygon3 itself stays unchanged.
+	 * The matrix belonging to the polygon itself stays unchanged.
 	 * @param matrix AffineTransformMatrix with the transform operation
 	 */
 	void ApplyTransformation(const AffineTransformMatrix &matrix);

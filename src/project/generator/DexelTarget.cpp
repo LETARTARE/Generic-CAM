@@ -91,13 +91,182 @@ void DexelTarget::InsertObject(const Object &object,
 		InsertGeometrie(&(object.geometries[i]), shift * object.matrix);
 }
 
-//Moves on the outside
+void DexelTarget::SetupTool(const Tool& tool, const double resolutionX,
+		const double resolutionY)
+{
+	const double radius = tool.GetMaxDiameter();
+	const double depth = tool.GetPositiveLength();
+
+	size_t cellsX = ceil(radius / resolutionX) * 2 + 1;
+	size_t cellsY = ceil(radius / resolutionY) * 2 + 1;
+	if(!SetupField(cellsX, cellsY, resolutionX, resolutionY)) return;
+	const double centerX = (ceil(radius / resolutionX) + 0.5) * this->rx;
+	const double centerY = (ceil(radius / resolutionY) + 0.5) * this->ry;
+
+	size_t p = 0;
+	double py = ry / 2;
+	for(size_t j = 0; j < ny; j++){
+		double px = rx / 2;
+		for(size_t i = 0; i < nx; i++){
+			double d = (px - centerX) * (px - centerX)
+					+ (py - centerY) * (py - centerY);
+			if(d >= 0.0)
+				d = sqrt(d);
+			else
+				d = 0;
+
+			field[p].down = d;
+			field[p].up = -FLT_MAX;
+			px += rx;
+			p++;
+		}
+		py += ry;
+	}
+
+	for(size_t i = 0; i < tool.contour.GetCount(); i++){
+		const double h = tool.contour[i].p1.x - tool.contour[i].p2.x;
+		if(h <= 0) continue;
+		for(size_t j = 0; j < this->N; j++){
+			if(field[j].down < tool.contour[i].p2.x
+					|| field[j].down > tool.contour[i].p1.x) continue;
+			double d = (tool.contour[i].p1.z - tool.contour[i].p2.z)
+					* (field[j].down - tool.contour[i].p1.x) / h;
+			d += tool.contour[i].p2.z;
+			d -= depth;
+			if(d > field[j].up) field[j].up = d;
+		}
+	}
+
+	for(size_t j = 0; j < this->N; j++)
+		field[j].down = -depth;
+
+	refresh = true;
+}
+
+void DexelTarget::DocumentField(int x, int y, double height)
+{
+	wxString tp;
+	for(int_fast8_t j = -3; j <= 3; j++){
+		tp = wxString::Format(_T("x:%3i y%3i:"), x, y - j);
+		for(int_fast8_t i = -3; i <= 3; i++){
+			if(IsFilledAbove(x + i, y - j, height))
+				tp += _T("# ");
+			else
+				tp += _T("_ ");
+		}
+		wxLogMessage(tp);
+	}
+}
+
+void DexelTarget::DocumentField(int x, int y)
+{
+	wxString tp;
+	for(int_fast8_t j = -3; j <= 3; j++){
+		tp = wxString::Format(_T("x:%3i y%3i:"), x, y - j);
+		for(int_fast8_t i = -3; i <= 3; i++){
+			if(HasToBeCut(x + i, y - j))
+				tp += _T("X ");
+			else
+				if(IsInsideWorkingArea(x + i, y - j))
+					tp += _T("_ ");
+				else
+					tp += _T("0 ");
+		}
+		wxLogMessage(tp);
+	}
+}
+
+void DexelTarget::Paint(void) const
+{
+	Imprinter::Paint();
+	::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
+//	toolpath.Paint();
+	::glColor3f(0.5, 0.5, 0.5);
+	supportLine.Paint();
+	::glColor3f(0.9, 0.9, 0.1);
+	outLine.Paint();
+}
+
+void DexelTarget::Simulate(const ToolPath &toolpath)
+{
+	this->InitImprinting();
+	this->HardInvert();
+	Polygon3 temp;
+	for(size_t i = 0; i < toolpath.positions.GetCount(); i++){
+		temp.InsertPoint(toolpath.positions[i].axisX,
+				toolpath.positions[i].axisY, toolpath.positions[i].axisZ + sz);
+	}
+	DexelTarget discTool;
+	discTool.SetupDisc(0.003, rx, rx);
+	this->PolygonDropDexelTarget(temp, discTool);
+}
+
+double DexelTarget::GetMinLevel(void)
+{
+	double d = FLT_MAX;
+	for(size_t i = 0; i < N; i++)
+		if(field[i].down < d) d = field[i].down;
+	return d;
+}
+
+double DexelTarget::GetMaxUpsideLevel(int &x, int &y)
+{
+	double d = -FLT_MAX;
+	x = -1;
+	y = -1;
+	for(size_t i = 0; i < N; i++)
+		if(field[i].aboveDown > d){
+			d = field[i].aboveDown;
+			x = i % nx;
+			y = floor(i / nx);
+		}
+	return d;
+}
+
+bool DexelTarget::IsInsideWorkingArea(int x, int y)
+{
+	if(x < 0 || x >= (int) nx) return false;
+	if(y < 0 || y >= (int) ny) return false;
+	size_t p = x + y * nx;
+
+	if(field[p].aboveUp > -0.0001) return true;
+	return false;
+
+}
+
+bool DexelTarget::HadBeenCut(int x, int y)
+{
+	if(x < 0 || x >= (int) nx) return false;
+	if(y < 0 || y >= (int) ny) return false;
+	size_t p = x + y * nx;
+
+	//Outside working area ?
+	if(field[p].aboveUp < -0.0001) return false;
+
+	//On border uncut?
+	if(field[p].aboveUp > -0.0) return false;
+
+	//Material left?
+	if(field[p].belowDown > 0.0) return false;
+
+	return true;
+}
+
+bool DexelTarget::HasToBeCut(int x, int y)
+{
+	if(x < 0 || x >= (int) nx) return false;
+	if(y < 0 || y >= (int) ny) return false;
+	size_t p = x + y * nx;
+	if(field[p].belowDown > 0.0001) return true;
+	if(field[p].aboveUp > 0.0001) return true;
+	return false;
+}
+
 int DexelTarget::NextDir(int sx, int sy, int olddir)
 {
 	int d = (olddir + 3) % 8;
 
-	char c;
-	for(c = 0; c < 8; c++){
+	for(uint_fast8_t c = 0; c < 8; c++){
 		switch(d){
 		case 0:
 			if(!IsVisible(sx + 1, sy + 0)) return d;
@@ -136,8 +305,7 @@ int DexelTarget::NextDir(int sx, int sy, double height, int olddir)
 {
 	int d = (olddir + 5) % 8;
 
-	char c;
-	for(c = 0; c < 8; c++){
+	for(uint_fast8_t c = 0; c < 8; c++){
 		switch(d){
 		case 0:
 			if(IsFilledAbove(sx + 1, sy + 0, height)) return d;
@@ -170,6 +338,154 @@ int DexelTarget::NextDir(int sx, int sy, double height, int olddir)
 }
 
 // On the outside
+int DexelTarget::NextDirReverseDistance(int sx, int sy, int olddir)
+{
+	int d = (olddir + 5) % 8;
+
+	char c;
+	bool isOutOfMaterial = HadBeenCut(sx, sy);
+	for(c = 0; c < 16; c++){
+		switch(d){
+		case 0:
+			if(HadBeenCut(sx + 1, sy + 0)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 0)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 0)) return d;
+
+			break;
+		case 1:
+			if(HadBeenCut(sx + 1, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 1)) return d;
+			break;
+		case 2:
+			if(HadBeenCut(sx + 0, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 0, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy + 1)) return d;
+			break;
+		case 3:
+			if(HadBeenCut(sx - 1, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 1)) return d;
+			break;
+		case 4:
+			if(HadBeenCut(sx - 1, sy + 0)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 0)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 0)) return d;
+			break;
+		case 5:
+			if(HadBeenCut(sx - 1, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx - 1, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy - 1)) return d;
+			break;
+		case 6:
+			if(HadBeenCut(sx + 0, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 0, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy - 1)) return d;
+			break;
+		case 7:
+			if(HadBeenCut(sx + 1, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 1, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy - 1)) return d;
+			break;
+		}
+
+		d = (d + 1) % 8;
+	}
+	return -1;
+}
+
+int DexelTarget::NextDirForwardDistance(int sx, int sy, int olddir)
+{
+	int d = (olddir + 3) % 8;
+
+	bool isOutOfMaterial = HadBeenCut(sx, sy);
+
+	char c;
+	for(c = 0; c < 16; c++){
+		switch(d){
+		case 0:
+			if(HadBeenCut(sx + 1, sy + 0)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 0)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 0)) return d;
+
+			break;
+		case 1:
+			if(HadBeenCut(sx + 1, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 1)) return d;
+			break;
+		case 2:
+			if(HadBeenCut(sx + 0, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 0, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy + 1)) return d;
+			break;
+		case 3:
+			if(HadBeenCut(sx - 1, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 1)) return d;
+			break;
+		case 4:
+			if(HadBeenCut(sx - 1, sy + 0)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 0)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 0)) return d;
+			break;
+		case 5:
+			if(HadBeenCut(sx - 1, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx - 1, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy - 1)) return d;
+			break;
+		case 6:
+			if(HadBeenCut(sx + 0, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 0, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy - 1)) return d;
+			break;
+		case 7:
+			if(HadBeenCut(sx + 1, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCut(sx + 1, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy - 1)) return d;
+			break;
+		}
+
+		d--;
+		if(d <= -1) d = 7;
+	}
+	return -1;
+}
+
+void DexelTarget::MoveInDir(int &x, int &y, int dir)
+{
+	switch(dir){
+	case 0:
+		x++;
+		break;
+	case 1:
+		x++;
+		y++;
+		break;
+	case 2:
+		y++;
+		break;
+	case 3:
+		x--;
+		y++;
+		break;
+	case 4:
+		x--;
+		break;
+	case 5:
+		x--;
+		y--;
+		break;
+	case 6:
+		y--;
+		break;
+	case 7:
+		x++;
+		y--;
+		break;
+	}
+}
+
 const Polygon25 DexelTarget::GeneratePolygon(int stx, int sty)
 {
 	Polygon25 temp;
@@ -247,42 +563,7 @@ const Polygon25 DexelTarget::GeneratePolygon(int stx, int sty)
 	return temp;
 }
 
-void DexelTarget::DocumentField(int x, int y, double height)
-{
-	int i, j;
-	wxString tp;
-	for(j = -3; j <= 3; j++){
-		tp = wxString::Format(_T("x:%3i y%3i:"), x, y - j);
-		for(i = -3; i <= 3; i++){
-			if(IsFilledAbove(x + i, y - j, height))
-				tp += _T("# ");
-			else
-				tp += _T("_ ");
-		}
-		wxLogMessage(tp);
-	}
-}
-
 //On the inside
-void DexelTarget::DocumentField(int x, int y)
-{
-	int i, j;
-	wxString tp;
-	for(j = -3; j <= 3; j++){
-		tp = wxString::Format(_T("x:%3i y%3i:"), x, y - j);
-		for(i = -3; i <= 3; i++){
-			if(HasToBeCut(x + i, y - j))
-				tp += _T("X ");
-			else
-				if(IsInsideWorkingArea(x + i, y - j))
-					tp += _T("_ ");
-				else
-					tp += _T("0 ");
-		}
-		wxLogMessage(tp);
-	}
-}
-
 const Polygon25 DexelTarget::GeneratePolygon(int stx, int sty, double height)
 {
 	Polygon25 temp;
@@ -442,231 +723,14 @@ const Polygon25 DexelTarget::GenerateConvexOutline(void)
 	return temp1;
 }
 
-void DexelTarget::PolygonDropDexelTarget(Polygon3 &polygon, DexelTarget &tool)
-{
-	size_t i;
-	for(i = 0; i < polygon.elements.GetCount(); i++){
-		this->FoldLower(round(polygon.elements[i].x / rx),
-				round(polygon.elements[i].y / ry), polygon.elements[i].z, tool);
-	}
-}
-
-void DexelTarget::PolygonDrop(Polygon3 &polygon, double level)
-{
-	size_t i;
-	double d;
-	for(i = 0; i < polygon.elements.GetCount(); i++){
-		d = this->GetLevel(polygon.elements[i].x, polygon.elements[i].y);
-
-		//		if(d >= 0)
-		//			polygon.elements[i].z = d;
-		//		else
-		//			polygon.elements[i].z = 0.0;
-
-		polygon.elements[i].z -= level;
-		if(d >= 0.0){
-			if(polygon.elements[i].z < d) polygon.elements[i].z = d;
-		}else{
-			if(polygon.elements[i].z < 0.0) polygon.elements[i].z = 0.0;
-		}
-	}
-}
-
-void DexelTarget::VectorDrop(double &x, double &y, double &z, double level)
-{
-	double d;
-	d = this->GetLevel(x, y);
-	z -= level;
-	if(d >= 0.0){
-		if(z < d) z = d;
-	}else{
-		if(z < 0.0) z = 0.0;
-	}
-}
-
-void DexelTarget::FillOutsidePolygon(Polygon3 &polygon)
-{
-	size_t *left;
-	size_t *right;
-
-	left = new size_t[this->ny];
-	right = new size_t[this->ny];
-
-	size_t i, j;
-	for(i = 0; i < this->ny; i++){
-		left[i] = this->nx;
-		right[i] = 0;
-	}
-
-	int px, py;
-	for(i = 0; i < polygon.elements.GetCount(); i++){
-		//TODO: Change this to a real line algorithm.
-		px = round(polygon.elements[i].x / this->rx);
-		py = round(polygon.elements[i].y / this->ry);
-		if(py >= 0 && py < this->ny){
-			if(px < this->nx && px > right[py]) right[py] = px;
-			if(px < left[py] && px >= 0) left[py] = px;
-		}
-	}
-
-	size_t p = 0;
-	for(i = 0; i < this->ny; i++){
-		if(right[i] < left[i]) right[i] = left[i];
-		for(j = 0; j < left[i]; j++){
-			this->field[p + j].down = 0.0;
-			this->field[p + j].up = this->sz;
-		}
-		for(j = right[i]; j < this->nx; j++){
-			this->field[p + j].down = 0.0;
-			this->field[p + j].up = this->sz;
-		}
-		p += this->nx;
-	}
-	delete[] left;
-	delete[] right;
-}
-
-void DexelTarget::AddSupport(Polygon3 &polygon, double distance, double height,
-		double width, double slotWidth)
-{
-
-	if(polygon.elements.GetCount() < 2) return;
-
-	double dc = -distance / 2;
-	size_t i;
-	Vector3 o, v, h, p;
-	Vector3 a, b, c, d;
-
-	// Limit polygon range
-	for(i = 0; i < polygon.elements.GetCount(); i++){
-		if(polygon.elements[i].z >= sz - (height / 2)) polygon.elements[i].z =
-				sz - (height / 2) - 0.0001;
-		if(polygon.elements[i].z <= (height / 2)) polygon.elements[i].z =
-				(height / 2) + 0.0001;
-	}
-
-	o = polygon.elements[0];
-	for(i = 1; i < polygon.elements.GetCount(); i++){
-		p = polygon.elements[i];
-		h = o - p;
-		o = p;
-		h.z = 0.0;
-		dc += h.Abs();
-		if(dc > 0){
-			h.Normalize();
-			v.x = h.y;
-			v.y = -h.x;
-			v.z = 0.0;
-
-			//TODO: Write a smarter algorithm!
-
-			a = p + h * width / 2;
-			d = p - h * width / 2;
-			b = a + v * slotWidth;
-			c = d + v * slotWidth;
-			a = a - v * slotWidth;
-			d = d - v * slotWidth;
-
-			a.z += height / 2;
-			b.z += height / 2;
-			c.z += height / 2;
-			d.z += height / 2;
-
-			InsertTriangle(a, b, c, DexelTarget::facing_up);
-			InsertTriangle(a, c, d, DexelTarget::facing_up);
-			a.z -= height;
-			b.z -= height;
-			c.z -= height;
-			d.z -= height;
-
-			InsertTriangle(a, b, c, DexelTarget::facing_down);
-			InsertTriangle(a, c, d, DexelTarget::facing_down);
-
-			dc -= distance;
-		}
-	}
-
-}
-
-//void DexelTarget::SetupDrill(Tool &tool, double diameter, double depth)
-//{
-//	this->ClearField();
-//
-//	double d = diameter + 0.002;
-//	outLine.Clear();
-//	outLine.InsertPoint(-d, -d, 0.0);
-//	outLine.InsertPoint(d, -d, 0.0);
-//	outLine.InsertPoint(d, d, 0.0);
-//	outLine.InsertPoint(-d, d, 0.0);
-//	outLine.Close();
-//
-//	double r = (diameter - 0.0061) / 2.0;
-//	MachinePosition temp;
-//	temp.axisZ = 0.004;
-//	toolpath.positions.push_back(temp);
-//	temp.axisZ = 0.001;
-//	toolpath.positions.Add(temp);
-//	temp.isCutting = true;
-//	temp.axisZ = -0.001;
-//	temp.axisX = r;
-//	toolpath.positions.Add(temp);
-//	temp.isRotationPositiv = true;
-//	temp.radiusI = -r;
-//	while(temp.axisZ > 0.003 - depth){
-//		temp.axisZ -= 0.003;
-//		toolpath.positions.Add(temp);
-//	}
-//	temp.axisZ = -depth;
-//	toolpath.positions.Add(temp);
-//	toolpath.positions.Add(temp);
-//	temp.axisZ += 0.001;
-//	temp.axisX = 0.000;
-//	temp.radiusI = 0.000;
-//	temp.isCutting = false;
-//	toolpath.positions.Add(temp);
-//	temp.axisZ = 0.004;
-//	toolpath.positions.Add(temp);
-//}
-
-//void DexelTarget::Simulate(void)
-//{
-//	this->InitImprinting();
-//	this->HardInvert();
-//	Polygon3 temp;
-//	size_t i;
-////	for(i = 0; i < toolpath.positions.size(); i++){
-////		temp.InsertPoint(toolpath.positions[i].axisX,
-////				toolpath.positions[i].axisY, toolpath.positions[i].axisZ + sz);
-////	}
-//	DexelTarget discTool;
-//	discTool.SetupDisc(0.003, rx, rx);
-//	this->PolygonDropDexelTarget(temp, discTool);
-//}
-
-double DexelTarget::GetMinLevel(void)
-{
-	double d = FLT_MAX;
-	for(size_t i = 0; i < N; i++)
-		if(field[i].down < d) d = field[i].down;
-	return d;
-}
-
-double DexelTarget::GetMaxUpsideLevel(int &x, int &y)
-{
-	double d = -FLT_MAX;
-	x = -1;
-	y = -1;
-	for(size_t i = 0; i < N; i++)
-		if(field[i].aboveDown > d){
-			d = field[i].aboveDown;
-			x = i % nx;
-			y = floor(i / nx);
-		}
-	return d;
-}
-
 void DexelTarget::GenerateDistanceMap(double height, bool invert)
 {
+	for(size_t i = 0; i < N; i++){
+		field[i].aboveUp = 0;
+		field[i].aboveDown = sz;
+		field[i].belowUp = sz;
+		field[i].belowDown = 0;
+	}
 	if(invert){
 		for(size_t i = 0; i < N; i++){
 			if(field[i].down > height){
@@ -760,6 +824,37 @@ void DexelTarget::GenerateDistanceMap(double height, bool invert)
 
 }
 
+void DexelTarget::FoldLowerDistance(int x, int y, const DexelTarget &b)
+{
+	size_t ib, jb, pb, ph;
+	size_t cx, cy;
+	cx = b.nx / 2;
+	cy = b.ny / 2;
+
+	if(x >= 0 && x < nx && y >= 0 && y < ny){
+		ph = x + nx * y;
+		if(field[ph].aboveUp > 0.0001){
+			field[ph].aboveUp = 0.0;
+		}
+	}
+	pb = 0;
+	for(jb = 0; jb < b.ny; jb++){
+		for(ib = 0; ib < b.nx; ib++){
+			if(b.field[pb].IsVisible()){
+				if(ib + x >= cx && ib + x < nx + cx && jb + y >= cy
+						&& jb + y < ny + cy){
+					ph = x + ib - cx + (y + jb - cy) * nx;
+
+					if(field[ph].belowDown > 0.0001){
+						field[ph].belowDown = 0.0;
+					}
+				}
+			}
+			pb++;
+		}
+	}
+}
+
 void DexelTarget::RaiseDistanceMap(double height, bool invert)
 {
 	if(invert){
@@ -805,37 +900,6 @@ void DexelTarget::RaiseDistanceMap(double height, bool invert)
 	}
 }
 
-void DexelTarget::FoldLowerDistance(int x, int y, const DexelTarget &b)
-{
-	size_t ib, jb, pb, ph;
-	size_t cx, cy;
-	cx = b.nx / 2;
-	cy = b.ny / 2;
-
-	if(x >= 0 && x < nx && y >= 0 && y < ny){
-		ph = x + nx * y;
-		if(field[ph].aboveUp > 0.0001){
-			field[ph].aboveUp = 0.0;
-		}
-	}
-	pb = 0;
-	for(jb = 0; jb < b.ny; jb++){
-		for(ib = 0; ib < b.nx; ib++){
-			if(b.field[pb].IsVisible()){
-				if(ib + x >= cx && ib + x < nx + cx && jb + y >= cy
-						&& jb + y < ny + cy){
-					ph = x + ib - cx + (y + jb - cy) * nx;
-
-					if(field[ph].belowDown > 0.0001){
-						field[ph].belowDown = 0.0;
-					}
-				}
-			}
-			pb++;
-		}
-	}
-}
-
 bool DexelTarget::FindNextDistance(int &x, int&y)
 {
 	size_t i, j, p;
@@ -864,195 +928,6 @@ bool DexelTarget::FindNextDistance(int &x, int&y)
 		y = cy;
 	}
 	return foundSomething;
-}
-
-bool DexelTarget::IsInsideWorkingArea(int x, int y)
-{
-	if(x < 0 || x >= (int) nx) return false;
-	if(y < 0 || y >= (int) ny) return false;
-	size_t p = x + y * nx;
-
-	if(field[p].aboveUp > -0.0001) return true;
-	return false;
-
-}
-
-bool DexelTarget::HadBeenCut(int x, int y)
-{
-	if(x < 0 || x >= (int) nx) return false;
-	if(y < 0 || y >= (int) ny) return false;
-	size_t p = x + y * nx;
-
-	//Outside working area ?
-	if(field[p].aboveUp < -0.0001) return false;
-
-	//On border uncut?
-	if(field[p].aboveUp > -0.0) return false;
-
-	//Material left?
-	if(field[p].belowDown > 0.0) return false;
-
-	return true;
-}
-
-bool DexelTarget::HasToBeCut(int x, int y)
-{
-	if(x < 0 || x >= (int) nx) return false;
-	if(y < 0 || y >= (int) ny) return false;
-	size_t p = x + y * nx;
-	if(field[p].belowDown > 0.0001) return true;
-	if(field[p].aboveUp > 0.0001) return true;
-	return false;
-}
-
-void DexelTarget::MoveInDir(int &x, int &y, int dir)
-{
-	switch(dir){
-	case 0:
-		x++;
-		break;
-	case 1:
-		x++;
-		y++;
-		break;
-	case 2:
-		y++;
-		break;
-	case 3:
-		x--;
-		y++;
-		break;
-	case 4:
-		x--;
-		break;
-	case 5:
-		x--;
-		y--;
-		break;
-	case 6:
-		y--;
-		break;
-	case 7:
-		x++;
-		y--;
-		break;
-	}
-}
-
-//Moves inside the matrial clockwise
-int DexelTarget::NextDirReverseDistance(int sx, int sy, int olddir)
-{
-	int d = (olddir + 5) % 8;
-
-	char c;
-	bool isOutOfMaterial = HadBeenCut(sx, sy);
-	for(c = 0; c < 16; c++){
-		switch(d){
-		case 0:
-			if(HadBeenCut(sx + 1, sy + 0)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 0)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 0)) return d;
-
-			break;
-		case 1:
-			if(HadBeenCut(sx + 1, sy + 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 1)) return d;
-			break;
-		case 2:
-			if(HadBeenCut(sx + 0, sy + 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 0, sy + 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy + 1)) return d;
-			break;
-		case 3:
-			if(HadBeenCut(sx - 1, sy + 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 1)) return d;
-			break;
-		case 4:
-			if(HadBeenCut(sx - 1, sy + 0)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 0)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 0)) return d;
-			break;
-		case 5:
-			if(HadBeenCut(sx - 1, sy - 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx - 1, sy - 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy - 1)) return d;
-			break;
-		case 6:
-			if(HadBeenCut(sx + 0, sy - 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 0, sy - 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy - 1)) return d;
-			break;
-		case 7:
-			if(HadBeenCut(sx + 1, sy - 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 1, sy - 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy - 1)) return d;
-			break;
-		}
-
-		d = (d + 1) % 8;
-	}
-	return -1;
-}
-
-//Moves inside the material to be cut counter-clockwise
-int DexelTarget::NextDirForwardDistance(int sx, int sy, int olddir)
-{
-	int d = (olddir + 3) % 8;
-
-	bool isOutOfMaterial = HadBeenCut(sx, sy);
-
-	char c;
-	for(c = 0; c < 16; c++){
-		switch(d){
-		case 0:
-			if(HadBeenCut(sx + 1, sy + 0)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 0)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 0)) return d;
-
-			break;
-		case 1:
-			if(HadBeenCut(sx + 1, sy + 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 1)) return d;
-			break;
-		case 2:
-			if(HadBeenCut(sx + 0, sy + 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 0, sy + 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy + 1)) return d;
-			break;
-		case 3:
-			if(HadBeenCut(sx - 1, sy + 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 1)) return d;
-			break;
-		case 4:
-			if(HadBeenCut(sx - 1, sy + 0)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 0)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 0)) return d;
-			break;
-		case 5:
-			if(HadBeenCut(sx - 1, sy - 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx - 1, sy - 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy - 1)) return d;
-			break;
-		case 6:
-			if(HadBeenCut(sx + 0, sy - 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 0, sy - 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy - 1)) return d;
-			break;
-		case 7:
-			if(HadBeenCut(sx + 1, sy - 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 1, sy - 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy - 1)) return d;
-			break;
-		}
-
-		d--;
-		if(d <= -1) d = 7;
-	}
-	return -1;
 }
 
 bool DexelTarget::FindStartCutting(int &x, int &y)
@@ -1188,67 +1063,151 @@ Polygon25 DexelTarget::FindCut(int &x, int &y)
 
 	return temp;
 }
-
-void DexelTarget::SetupTool(const Tool& tool, const double resolutionX,
-		const double resolutionY)
+void DexelTarget::PolygonDropDexelTarget(Polygon3 &polygon, DexelTarget &tool)
 {
-	const double radius = tool.GetMaxDiameter();
-	const double depth = tool.GetPositiveLength();
+	size_t i;
+	for(i = 0; i < polygon.elements.GetCount(); i++){
+		this->FoldLower(round(polygon.elements[i].x / rx),
+				round(polygon.elements[i].y / ry), polygon.elements[i].z, tool);
+	}
+}
 
-	size_t cellsX = ceil(radius / resolutionX) * 2 + 1;
-	size_t cellsY = ceil(radius / resolutionY) * 2 + 1;
-	if(!SetupField(cellsX, cellsY, resolutionX, resolutionY)) return;
-	const double centerX = (ceil(radius / resolutionX) + 0.5) * this->rx;
-	const double centerY = (ceil(radius / resolutionY) + 0.5) * this->ry;
+void DexelTarget::PolygonDrop(Polygon3 &polygon, double level)
+{
+	size_t i;
+	double d;
+	for(i = 0; i < polygon.elements.GetCount(); i++){
+		d = this->GetLevel(polygon.elements[i].x, polygon.elements[i].y);
+
+		//		if(d >= 0)
+		//			polygon.elements[i].z = d;
+		//		else
+		//			polygon.elements[i].z = 0.0;
+
+		polygon.elements[i].z -= level;
+		if(d >= 0.0){
+			if(polygon.elements[i].z < d) polygon.elements[i].z = d;
+		}else{
+			if(polygon.elements[i].z < 0.0) polygon.elements[i].z = 0.0;
+		}
+	}
+}
+
+void DexelTarget::VectorDrop(double &x, double &y, double &z, double level)
+{
+	double d;
+	d = this->GetLevel(x, y);
+	z -= level;
+	if(d >= 0.0){
+		if(z < d) z = d;
+	}else{
+		if(z < 0.0) z = 0.0;
+	}
+}
+
+void DexelTarget::FillOutsidePolygon(Polygon3 &polygon)
+{
+	size_t *left;
+	size_t *right;
+
+	left = new size_t[this->ny];
+	right = new size_t[this->ny];
+
+	size_t i, j;
+	for(i = 0; i < this->ny; i++){
+		left[i] = this->nx;
+		right[i] = 0;
+	}
+
+	int px, py;
+	for(i = 0; i < polygon.elements.GetCount(); i++){
+		//TODO: Change this to a Bresenham algorithm.
+		px = round(polygon.elements[i].x / this->rx);
+		py = round(polygon.elements[i].y / this->ry);
+		if(py >= 0 && py < this->ny){
+			if(px < this->nx && px > right[py]) right[py] = px;
+			if(px < left[py] && px >= 0) left[py] = px;
+		}
+	}
 
 	size_t p = 0;
-	double py = ry / 2;
-	for(size_t j = 0; j < ny; j++){
-		double px = rx / 2;
-		for(size_t i = 0; i < nx; i++){
-			double d = (px - centerX) * (px - centerX)
-					+ (py - centerY) * (py - centerY);
-			if(d >= 0.0)
-				d = sqrt(d);
-			else
-				d = 0;
-
-			field[p].down = d;
-			field[p].up = -FLT_MAX;
-			px += rx;
-			p++;
+	for(i = 0; i < this->ny; i++){
+		if(right[i] < left[i]) right[i] = left[i];
+		for(j = 0; j < left[i]; j++){
+			this->field[p + j].down = 0.0;
+			this->field[p + j].up = this->sz;
 		}
-		py += ry;
-	}
-
-	for(size_t i = 0; i < tool.contour.size(); i++){
-		double h = tool.contour[i].p1.x - tool.contour[i].p2.x;
-		if(h <= 0) continue;
-		for(size_t j = 0; j < this->N; j++){
-			if(field[j].down < tool.contour[i].p2.x
-					|| field[j].down > tool.contour[i].p1.x) continue;
-			double d = (tool.contour[i].p1.z - tool.contour[i].p2.z)
-					* (field[j].down - tool.contour[i].p1.x) / h;
-			d += tool.contour[i].p2.z;
-			d -= depth;
-			if(d > field[j].up) field[j].up = d;
+		for(j = right[i]; j < this->nx; j++){
+			this->field[p + j].down = 0.0;
+			this->field[p + j].up = this->sz;
 		}
+		p += this->nx;
 	}
-
-	for(size_t j = 0; j < this->N; j++)
-		field[j].down = -depth;
-
-	refresh = true;
+	delete[] left;
+	delete[] right;
 }
 
-void DexelTarget::Paint(void)
+void DexelTarget::AddSupport(Polygon3 &polygon, double distance, double height,
+		double width, double slotWidth)
 {
-	Imprinter::Paint();
-	::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
-//	toolpath.Paint();
-	::glColor3f(0.5, 0.5, 0.5);
-	supportLine.Paint();
-	::glColor3f(0.9, 0.9, 0.1);
-	outLine.Paint();
+
+	if(polygon.elements.GetCount() < 2) return;
+
+	double dc = -distance / 2;
+	size_t i;
+	Vector3 o, v, h, p;
+	Vector3 a, b, c, d;
+
+	// Limit polygon range
+	for(i = 0; i < polygon.elements.GetCount(); i++){
+		if(polygon.elements[i].z >= sz - (height / 2)) polygon.elements[i].z =
+				sz - (height / 2) - 0.0001;
+		if(polygon.elements[i].z <= (height / 2)) polygon.elements[i].z =
+				(height / 2) + 0.0001;
+	}
+
+	o = polygon.elements[0];
+	for(i = 1; i < polygon.elements.GetCount(); i++){
+		p = polygon.elements[i];
+		h = o - p;
+		o = p;
+		h.z = 0.0;
+		dc += h.Abs();
+		if(dc > 0){
+			h.Normalize();
+			v.x = h.y;
+			v.y = -h.x;
+			v.z = 0.0;
+
+			//TODO: Write a smarter algorithm!
+
+			a = p + h * width / 2;
+			d = p - h * width / 2;
+			b = a + v * slotWidth;
+			c = d + v * slotWidth;
+			a = a - v * slotWidth;
+			d = d - v * slotWidth;
+
+			a.z += height / 2;
+			b.z += height / 2;
+			c.z += height / 2;
+			d.z += height / 2;
+
+			InsertTriangle(a, b, c, DexelTarget::facing_up);
+			InsertTriangle(a, c, d, DexelTarget::facing_up);
+			a.z -= height;
+			b.z -= height;
+			c.z -= height;
+			d.z -= height;
+
+			InsertTriangle(a, b, c, DexelTarget::facing_down);
+			InsertTriangle(a, c, d, DexelTarget::facing_down);
+
+			dc -= distance;
+		}
+	}
+
 }
 
+//Moves inside the matrial clockwise
+//Moves inside the material to be cut counter-clockwise

@@ -82,10 +82,6 @@ public:
 
 protected:
 	DisplaySettings * settings;
-//	ToolPath toolpath;
-//	Project * project;
-//	size_t runNr;
-//	size_t toolpathNr;
 
 //Methods:
 public:
@@ -96,7 +92,7 @@ public:
 	virtual void TransferDataFromPanel(void) = 0;
 	virtual void ToStream(wxTextOutputStream & stream);
 	virtual bool FromStream(wxTextInputStream & stream);
-	virtual void Paint(void);
+	virtual void Paint(void) const;
 	virtual void GenerateToolpath(void) = 0;
 };
 WX_DECLARE_OBJARRAY(Generator*, ArrayOfGeneratorPointer);

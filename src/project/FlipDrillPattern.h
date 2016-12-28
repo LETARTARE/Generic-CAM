@@ -37,6 +37,10 @@
  *
  */
 
+#include "../3D/Polygon25.h"
+#include "Tool.h"
+#include "ToolPath.h"
+
 #include <wx/string.h>
 #include <wx/dynarray.h>
 
@@ -55,6 +59,14 @@ public:
 	FlipDrillPattern();
 	wxString name;
 	ArrayOfDrillPosition position;
+	ToolPath toolpath;
+	Polygon25 outLine;
+
+public:
+	void Paint(void) const;
+private:
+
+	void SetupDrill(Tool &tool, double diameter, double depth);
 };
 WX_DECLARE_OBJARRAY(FlipDrillPattern, ArrayOfFlipDrillPattern);
 

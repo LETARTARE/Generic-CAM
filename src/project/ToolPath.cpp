@@ -113,7 +113,7 @@ void ToolPath::ApplyTransformation(const AffineTransformMatrix &matrix)
 	}
 }
 
-void ToolPath::Paint(void)
+void ToolPath::Paint(void) const
 {
 
 	::glPushMatrix();
