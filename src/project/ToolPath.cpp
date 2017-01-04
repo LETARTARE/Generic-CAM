@@ -33,20 +33,17 @@
 ToolPath::ToolPath()
 {
 	selected = false;
-//	generator = NULL;
 	colorMoving.Set(0.3, 0.8, 0.3);
 	colorCutting.Set(0.8, 0.3, 0.3);
 }
 
 ToolPath::ToolPath(const ToolPath& other)
 {
-	// Performance issues if called. Too many object have ToolPath objects.
+	// Performance issues if called.
 	printf("Copy constructor on ToolPath called.\n");
 	selected = false;
-//	generator = NULL;
 	colorMoving = other.colorMoving;
 	colorCutting = other.colorCutting;
-	matrix = other.matrix;
 	info = other.info;
 	positions = other.positions;
 	minPosition = other.minPosition;
@@ -55,12 +52,10 @@ ToolPath::ToolPath(const ToolPath& other)
 
 ToolPath::~ToolPath()
 {
-//	if(generator != NULL) delete generator;
 }
 
 void ToolPath::Clear(void)
 {
-	matrix.SetIdentity();
 	positions.Empty();
 }
 
@@ -85,21 +80,6 @@ bool ToolPath::IsEmpty(void) const
 	return (positions.GetCount() == 0);
 }
 
-void ToolPath::ApplyTransformation(void)
-{
-	size_t i;
-	Vector3 temp;
-	for(i = 0; i < positions.size(); i++){
-		temp.Set(positions[i].axisX, positions[i].axisY, positions[i].axisZ);
-		temp = matrix.Transform(temp);
-		positions[i].axisX = temp.x;
-		positions[i].axisY = temp.y;
-		positions[i].axisZ = temp.z;
-
-	}
-	matrix.SetIdentity();
-}
-
 void ToolPath::ApplyTransformation(const AffineTransformMatrix &matrix)
 {
 	size_t i;
@@ -115,10 +95,6 @@ void ToolPath::ApplyTransformation(const AffineTransformMatrix &matrix)
 
 void ToolPath::Paint(void) const
 {
-
-	::glPushMatrix();
-	::glMultMatrixd(matrix.a);
-
 	::glBegin(GL_LINE_STRIP);
 	::glNormal3f(0, 0, 1);
 	for(size_t i = 0; i < positions.size(); i++){
@@ -133,7 +109,6 @@ void ToolPath::Paint(void) const
 	}
 
 	::glEnd();
-	::glPopMatrix();
 }
 
 void ToolPath::CalculateMinMaxValues(void)
@@ -285,15 +260,15 @@ void ToolPath::CleanPath(double tolerance)
 	positions = temp;
 }
 
-void ToolPath::WriteToFile(wxTextFile &f)
+bool ToolPath::WriteToFile(wxTextFile &f)
 {
-	if(positions.size() < 2) return;
+	if(positions.size() < 2) return false;
 
 	CleanPath(0.0003);
 
 	setlocale(LC_ALL, "C"); // To get a 3.1415 instead 3,1415 or else on every computer.
 
-	bool useWithFanucM = true;
+	bool useWithFanucM = false;
 	wxTextFileType fileType = wxTextFileType_Dos;
 
 	if(useWithFanucM){
@@ -321,7 +296,6 @@ void ToolPath::WriteToFile(wxTextFile &f)
 		f.AddLine(_T("M3 (Start spindel)"), fileType);
 		f.AddLine(_T("G4 P3 (Wait For Seconds, Parameter 3 Seconds)"),
 				fileType);
-
 	}
 
 	f.AddLine(positions[0].GenerateCommandXYZ(), fileType);
@@ -339,6 +313,7 @@ void ToolPath::WriteToFile(wxTextFile &f)
 	f.AddLine(_T("M2 (End programm)"), fileType);
 
 	setlocale(LC_ALL, "");
+	return true;
 }
 
 bool ToolPath::ReadGCodeFile(wxFileName fileName)
@@ -389,20 +364,5 @@ bool ToolPath::ReadGCodeFile(wxFileName fileName)
 	positions.Add(pos);
 	file.Close();
 	info.Empty();
-	return true;
-}
-
-void ToolPath::ToStream(wxTextOutputStream& stream)
-{
-	stream << _T("Matrix: ");
-	matrix.ToStream(stream);
-	stream << endl;
-}
-
-bool ToolPath::FromStream(wxTextInputStream& stream)
-{
-	wxString temp = stream.ReadWord();
-	if(temp.Cmp(_T("Matrix:")) != 0) return false;
-	matrix.FromStream(stream);
 	return true;
 }

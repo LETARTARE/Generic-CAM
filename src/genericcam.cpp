@@ -112,7 +112,6 @@ bool GenericCAMApp::OnInit()
 
 	if(!loadOnStartup.IsEmpty()){
 		frame->ProjectLoad(loadOnStartup);
-
 	}
 
 	frame->Show(true);
@@ -121,8 +120,7 @@ bool GenericCAMApp::OnInit()
 	// Show release notes
 	wxRichTextBuffer::AddHandler(new wxRichTextXMLHandler);
 	StartupText * temp = new StartupText(frame);
-	temp->m_richText->LoadFile(_T("releasenote.xml"),
-	wxRICHTEXT_TYPE_XML);
+	temp->m_richText->LoadFile(_T("releasenote.xml"), wxRICHTEXT_TYPE_XML);
 //	temp->Show();
 
 	return true;

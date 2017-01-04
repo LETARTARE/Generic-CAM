@@ -89,6 +89,37 @@ void Run::Update(void)
 	}
 }
 
+bool Run::SaveToolpaths(wxFileName fileName)
+{
+	ToolPath temp;
+	for(size_t i = 0; i < generators.GetCount(); i++){
+		assert(generators[i] != NULL);
+		AffineTransformMatrix matrix;
+		matrix.TranslateGlobal(generators[i]->area.xmin,
+				generators[i]->area.ymin, generators[i]->area.zmin);
+		ToolPath moved = generators[i]->toolpath;
+		moved.ApplyTransformation(matrix);
+		temp += moved;
+	}
+
+	// Move toolpath down by the touchoff height.
+	AffineTransformMatrix matrix;
+	matrix.TranslateGlobal(0, 0, -touchoffHeight);
+	temp.ApplyTransformation(matrix);
+
+	wxTextFile f;
+	if(fileName.FileExists()){
+		f.Open(fileName.GetFullPath());
+		f.Clear();
+	}else{
+		f.Create(fileName.GetFullPath());
+	}
+	bool flag = temp.WriteToFile(f);
+	f.Write();
+	f.Close();
+	return flag;
+}
+
 void Run::Paint(void) const
 {
 	const Project * pr = parent;
@@ -119,7 +150,7 @@ void Run::Paint(void) const
 		isOGLInit = true;
 	}
 
-//	machine.Paint();
+	machine.Paint();
 
 	::glPushMatrix();
 

@@ -29,7 +29,7 @@
 CommandWorkpieceObjectTransform::CommandWorkpieceObjectTransform(
 		const wxString& name, Project* project, size_t workpieceNr,
 		size_t placementNr, const AffineTransformMatrix& matrixNew, float x,
-		float y) :
+		float y, bool useContour, double slotWidth) :
 		wxCommand(true, name)
 {
 	this->project = project;
@@ -38,8 +38,12 @@ CommandWorkpieceObjectTransform::CommandWorkpieceObjectTransform(
 	this->matrixNew = matrixNew;
 	this->newX = x;
 	this->newY = y;
+	this->newSlotWidth = slotWidth;
+	this->newUseContour = useContour;
 	this->oldX = 0;
 	this->oldY = 0;
+	this->oldSlotWidth = 0.0;
+	this->oldUseContour = false;
 }
 
 bool CommandWorkpieceObjectTransform::Do(void)
@@ -49,9 +53,17 @@ bool CommandWorkpieceObjectTransform::Do(void)
 	matrixOld = project->workpieces[workpieceNr].placements[placementNr].matrix;
 	oldX = project->workpieces[workpieceNr].placements[placementNr].cornerX;
 	oldY = project->workpieces[workpieceNr].placements[placementNr].cornerY;
+	oldUseContour =
+			project->workpieces[workpieceNr].placements[placementNr].useContour;
+	oldSlotWidth =
+			project->workpieces[workpieceNr].placements[placementNr].slotWidth;
 	project->workpieces[workpieceNr].placements[placementNr].matrix = matrixNew;
 	project->workpieces[workpieceNr].placements[placementNr].cornerX = newX;
 	project->workpieces[workpieceNr].placements[placementNr].cornerY = newY;
+	project->workpieces[workpieceNr].placements[placementNr].useContour =
+			newUseContour;
+	project->workpieces[workpieceNr].placements[placementNr].slotWidth =
+			newSlotWidth;
 	project->workpieces[workpieceNr].Update();
 	return true;
 }
@@ -63,6 +75,10 @@ bool CommandWorkpieceObjectTransform::Undo(void)
 	project->workpieces[workpieceNr].placements[placementNr].matrix = matrixOld;
 	project->workpieces[workpieceNr].placements[placementNr].cornerX = oldX;
 	project->workpieces[workpieceNr].placements[placementNr].cornerY = oldY;
+	project->workpieces[workpieceNr].placements[placementNr].useContour =
+			oldUseContour;
+	project->workpieces[workpieceNr].placements[placementNr].slotWidth =
+			oldSlotWidth;
 	project->workpieces[workpieceNr].Update();
 	return true;
 }

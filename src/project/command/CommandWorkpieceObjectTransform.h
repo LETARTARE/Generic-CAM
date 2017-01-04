@@ -42,7 +42,8 @@ class CommandWorkpieceObjectTransform:public wxCommand {
 public:
 	CommandWorkpieceObjectTransform(const wxString& name, Project * project,
 			size_t workpieceNr, size_t placementNr,
-			const AffineTransformMatrix& matrixNew, float x, float y);
+			const AffineTransformMatrix& matrixNew, float x, float y,
+			bool useContour, double slowWidth);
 	bool Do(void);
 	bool Undo(void);
 
@@ -54,8 +55,13 @@ protected:
 	AffineTransformMatrix matrixOld;
 	float newX;
 	float newY;
+	bool newUseContour;
+	double newSlotWidth;
 	float oldX;
 	float oldY;
+	bool oldUseContour;
+	double oldSlotWidth;
+
 };
 
 #endif /* COMMANDWORKPIECEOBJECTTRANSFORM_H_ */

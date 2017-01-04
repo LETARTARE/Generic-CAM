@@ -26,6 +26,8 @@
 
 #include "DialogToolbox.h"
 
+#include "DialogToolWizard.h"
+
 DialogToolbox::DialogToolbox(wxWindow* parent, Project * project,
 		ToolBox * toolbox, DisplaySettings * settings) :
 		GUIToolbox(parent)
@@ -322,4 +324,10 @@ void DialogToolbox::OnShapeDelete(wxCommandEvent& event)
 	if(selectedElement < tempTool.elements.GetCount()) tempElement =
 			tempTool.elements[selectedElement];
 	TransferDataToWindow();
+}
+
+void DialogToolbox::OnShapeWizard(wxCommandEvent& event)
+{
+	DialogToolWizard dialog(this);
+	dialog.ShowModal();
 }

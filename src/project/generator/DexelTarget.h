@@ -58,15 +58,15 @@ public:
 
 // ***** Construction / Debugging *****
 
-	void InsertObject(const Object &object,
-			const AffineTransformMatrix & shift);
-	void SetupTool(const Tool & tool, const double resolutionX,
+	void InsertObject(const Object &object, const AffineTransformMatrix &shift);
+	void SetupTool(const Tool &tool, const double resolutionX,
 			const double resolutionY);
+	void MarkOutline(void);
 
 	void DocumentField(int x, int y, double height);
 	void DocumentField(int x, int y);
 	void Paint(void) const;
-	void Simulate(const ToolPath &toolpath);
+	void Simulate(const ToolPath &toolpath, const Tool &tool);
 
 // ***** Traversing data *****
 
@@ -97,9 +97,21 @@ public:
 
 	// Polygon3 Methods
 
-	void PolygonDropDexelTarget(Polygon3 &polygon, DexelTarget &tool);
-	void PolygonDrop(Polygon3 &polygon, double level);
-	void VectorDrop(double &x, double &y, double &z, double level);
+	void PolygonCutInTarget(Polygon3 &polygon, DexelTarget &tool);
+	void PolygonPunchThroughTarget(Polygon3 &polygon, double level,
+			DexelTarget &tool);
+
+	/**\brief Drop a polygon down onto the target or onto the level.
+	 *
+	 * Moves every vertex of a polygon until it touches the target or
+	 * the level given whichever is higher. Movement in only in the Z
+	 * direction.
+	 *
+	 * @param polygon Polygon3 to manipulate
+	 * @param level Lowest level to move to
+	 */
+	void PolygonDropOntoTarget(Polygon3 &polygon, double level);
+	void VectorDropOntoTarget(double &x, double &y, double &z, double level);
 	void FillOutsidePolygon(Polygon3 &polygon);
 
 	void AddSupport(Polygon3 &polygon, double distance, double height,

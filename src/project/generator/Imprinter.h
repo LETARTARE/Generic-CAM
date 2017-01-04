@@ -78,6 +78,7 @@ public:
 
 //TODO: Base Imprinter on BoundingBox
 class Imprinter {
+	friend class GeneratorTest;
 public:
 	enum face_t {
 		facing_up, facing_down, facing_side, other
@@ -161,11 +162,13 @@ public:
 	bool IsFilled(int x, int y, double height); ///< Test, if at cell[x,y] the level at height is filled.
 	bool IsFilled(size_t p, double height); ///< Test, if at cell[p] the level at height is filled.
 	bool IsFilledAbove(int x, int y, double height); ///< Test, if upper in cell(x,y) is above height.
+	bool IsFilledAbove(size_t p, double height); ///< Test, if upper in cell(x,y) is above height.
 	bool IsFilled(size_t p); ///< Test, if cell(p) has a particle somewhere.
 	bool IsVisible(int x, int y); ///< Synonymous with IsFilled
 	bool IsVisible(size_t p); ///< Synonymous with IsFilled
 	bool IsOnOuterBorder(size_t p); ///< Test, if cell belongs to the outermost row.
-	bool IsSurrounded(size_t p); ///< test, if cell is not on outer border and surrounded by filled cells. Does not check cell itself.
+	bool IsSurrounded(size_t p); ///< Test, if cell is not on outer border and surrounded by filled cells. Does not check cell itself.
+	bool IsStandAlone(size_t p, double height); ///< Test, if cell is not on outer border and surrounded by filled cells at a certain height. Does not check cell itself.
 
 	double GetMeanLevel(int x, int y); ///< Get the middle of the cell[x,y], otherwise return -1;
 	double GetMeanLevel(size_t p); ///< Get the middle of the cell[p], otherwise return -1;
@@ -202,17 +205,23 @@ public:
 	 * @param z Float Height of center of 2nd Imprinter.
 	 * @param b 2nd Imprinter
 	 */
-	void FoldLower(int x, int y, double z, const Imprinter &b);
+	void ShiftDown(int x, int y, double z, const Imprinter &b);
+	void TouchErase(int x, int y, double z, double level, const Imprinter &b);
 	void HardInvert(void); ///< Invert field without contour.
 	void MaxFilling(void); ///< Fill up cells with particle to the max.
 	void InvertTop(void); ///< Invert the top levels height.
-	void InvertZ(void); ///< Mirror along the z axis.
-	void FlipX(void); ///< Mirror along the x axis.
-//	void FlipY(void);
+	void NegateZ(void); ///< Invert around 0.
+	void MirrorY(void); ///< Mirror along the Y axis.
+	void MirrorZ(void); ///< Mirror along the Z axis.
+	void RotateX180(void); ///< Rotate along the X axis.
+
+private:
+	Vector3 CellNormal(double p0, double p1, double p2, double p3) const;
 
 	// Member variables
 public:
 
+	bool displayBox;
 	bool displayField;
 	bool displayAboveDown;
 	bool displayBelowUp;

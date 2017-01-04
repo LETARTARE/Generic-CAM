@@ -93,6 +93,7 @@ bool ControlSpaceOrb::ProcessPacket()
 
 void ControlSpaceOrb::DataIn(unsigned char c)
 {
+	//TODO Check spec, if xor is correct here.
 	if(~c & 0x80){
 		if(idx) ProcessPacket();
 		idx = 0;

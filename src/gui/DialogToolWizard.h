@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GeneratorTest.h
+// Name               : DialogToolWizard.h
 // Purpose            :
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
-// Compiler Options   :
-// Author             : Tobias Schaefer
-// Created            : 13.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Compiler Options   : -lm
+// Author             : toby
+// Created            : 30.12.2016
+// Copyright          : (C) 2016 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,38 +24,26 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef GENERATORTEST_H_
-#define GENERATORTEST_H_
+#ifndef DIALOGTOOLWIZARD_H_
+#define DIALOGTOOLWIZARD_H_
 
-/*!\class GeneratorTest
- * \ingroup Generator
+/*!\class DialogToolWizard
  * \brief ...
  *
  * ...
  */
 
-#include "GeneratorDexel.h"
-#include "../Tool.h"
+#include "gui.h"
 
-#include <wx/string.h>
-#include <stddef.h>
-
-class GeneratorTest:public GeneratorDexel {
-	// Constructor/ Destructor
+class DialogToolWizard:public GUIToolWizard {
 public:
-	GeneratorTest();
-	virtual ~GeneratorTest();
+	DialogToolWizard(wxWindow* parent);
+	virtual ~DialogToolWizard();
 
-	virtual void CopyParameterFrom(const Generator * other);
-	virtual wxString GetName(void) const;
-	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
-	virtual void TransferDataToPanel(void) const;
-	virtual void TransferDataFromPanel(void);
-	virtual void GenerateToolpath(void);
-
-	//Member variables:
-public:
+	virtual void OnAddTool(wxCommandEvent& event);
+	virtual void OnSetShape(wxCommandEvent& event);
+	virtual void OnClose(wxCommandEvent& event);
 
 };
 
-#endif /* GENERATORTEST_H_ */
+#endif /* DIALOGTOOLWIZARD_H_ */

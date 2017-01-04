@@ -56,6 +56,19 @@ Workpiece::~Workpiece()
 {
 }
 
+void Workpiece::InitSimulation(size_t maxCells)
+{
+	const double area = GetSizeX() * GetSizeY();
+	const double L = sqrt(area / (double) maxCells);
+	size_t nx = floor(GetSizeX() / L);
+	size_t ny = floor(GetSizeY() / L);
+	if(nx == 0 || ny == 0) return;
+	const double dx = GetSizeX() / (double) nx;
+	const double dy = GetSizeY() / (double) ny;
+	simulation.SetupBox(GetSizeX(), GetSizeY(), GetSizeZ(), dx, dy);
+	simulation.displayBox = true;
+}
+
 void Workpiece::Paint(void) const
 {
 //	AffineTransformMatrix tempMatrix;
@@ -64,8 +77,8 @@ void Workpiece::Paint(void) const
 	if(project == NULL) return;
 	glPushMatrix();
 	glMultMatrixd(this->matrix.a);
-//	BoundingBox::Paint();
 
+//	BoundingBox::Paint();
 	bbox.Paint();
 
 	for(size_t j = 0; j < placements.GetCount(); j++){
@@ -103,6 +116,14 @@ void Workpiece::Paint(void) const
 //		StockMaterial::PaintWireBox();
 	}
 	::glPopMatrix();
+}
+
+void Workpiece::PaintSimulation(void) const
+{
+	glPushMatrix();
+	glMultMatrixd(this->matrix.a);
+	simulation.Paint();
+	glPopMatrix();
 }
 
 void Workpiece::Update(void)
@@ -190,3 +211,4 @@ bool Workpiece::FromStream(wxTextInputStream& stream)
 	}
 	return true;
 }
+

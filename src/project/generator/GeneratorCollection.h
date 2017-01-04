@@ -31,7 +31,9 @@
  * \ingroup GeneratorBasics
  * \brief Factory for all available Generator%s
  *
- * ...
+ * To add new Generator%s in GeneratorCollection.cpp:
+ *   - Increment const size_t N_GENERATORS
+ *   - Add Generator to the NewGenerator(...) function
  */
 
 #include "Generator.h"

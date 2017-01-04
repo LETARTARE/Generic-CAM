@@ -413,8 +413,14 @@ bool Project::Load(wxFileName fileName)
 //			+ run[generator_runNr].toolpaths[generator_toolpathNr].generator->GetName());
 //}
 
-void Project::LoadPattern(wxFileName filename)
+void Project::LoadPattern(wxFileName fileName)
 {
+}
+
+bool Project::SaveToolpath(wxFileName fileName, int runNr)
+{
+	if(runNr < 0 || runNr > run.GetCount()) return false;
+	return run[runNr].SaveToolpaths(fileName);
 }
 
 // Experimental stuff:
@@ -494,10 +500,21 @@ void Project::PaintRun(unsigned int runNr)
 	}
 }
 
+void Project::PaintAnimation(unsigned int runNr)
+{
+	if(runNr < 0 || runNr >= run.GetCount()) return;
+	const int workpieceNr = run[runNr].refWorkpiece;
+	if(workpieceNr < 0 || workpieceNr >= workpieces.GetCount()) return;
+
+	glPushName(runNr + 1);
+	workpieces[workpieceNr].PaintSimulation();
+	glPopName();
+}
 void Project::PaintDepthField(unsigned int runNr,
 		unsigned int objectReferenceNr)
 {
 }
+
 //void Project::FlipRun(void)
 //{
 //	size_t n = run[activeRun].placements.GetCount();
@@ -552,17 +569,4 @@ void Project::PaintDepthField(unsigned int runNr,
 //		targets[i].refresh = true;
 //	}
 //}
-
-//wxTextFile f;
-//		if(fileName.FileExists()){
-//			f.Open(fileName.GetFullPath());
-//			f.Clear();
-//		}else{
-//			f.Create(fileName.GetFullPath());
-//		}
-//		size_t n;
-//		for(n = 0; n < project.run.GetCount(); n++)
-//			project.run[n].WriteToFile(f);
-//		f.Write();
-//		f.Close();
 

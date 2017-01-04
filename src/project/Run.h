@@ -94,7 +94,7 @@ public:
 	void Update(void);
 
 	void GenerateToolpaths(void);
-
+	bool SaveToolpaths(wxFileName fileName);
 	void Paint(void) const;
 
 	void ToStream(wxTextOutputStream & stream);

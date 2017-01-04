@@ -32,7 +32,6 @@
  * \brief generated toolpath
  */
 
-//#include "generator/Generator.h"
 #include "machine/MachinePosition.h"
 #include "../3D/AffineTransformMatrix.h"
 #include "../3D/Vector3.h"
@@ -56,10 +55,9 @@ public:
 public:
 	bool selected;
 
-	AffineTransformMatrix matrix;
-
 	ArrayOfMachinePosition positions;
-	MachinePosition minPosition, maxPosition;
+	MachinePosition minPosition;
+	MachinePosition maxPosition;
 
 	Vector3 colorMoving;
 	Vector3 colorCutting;
@@ -73,14 +71,10 @@ public:
 	const ToolPath operator+(const ToolPath &a) const;
 	void Clear(void);
 	bool IsEmpty(void) const;
-	void ApplyTransformation(void);
 	void ApplyTransformation(const AffineTransformMatrix &matrix);
 	void Paint(void) const;
 	void CleanPath(double tolerance = 0.0002);
-	void WriteToFile(wxTextFile &f);
-	void ToStream(wxTextOutputStream & stream);
-	bool FromStream(wxTextInputStream & stream);
-
+	bool WriteToFile(wxTextFile &f);
 	bool ReadGCodeFile(wxFileName fileName);
 	void CalculateMinMaxValues(void);
 };

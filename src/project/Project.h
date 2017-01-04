@@ -79,11 +79,13 @@ public:
 	bool Load(wxFileName fileName);
 	bool Save(wxFileName fileName);
 
-	void LoadPattern(wxFileName filename);
+	void LoadPattern(wxFileName fileName);
+	bool SaveToolpath(wxFileName fileName, int runNr);
 
 	void PaintObjects(void);
 	void PaintWorkpiece(unsigned int workpieceNr);
 	void PaintRun(unsigned int runNr);
+	void PaintAnimation(unsigned int runNr);
 	void PaintDepthField(unsigned int runNr, unsigned int objectReferenceNr);
 
 	void Update(void);

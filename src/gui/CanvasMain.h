@@ -62,6 +62,7 @@ public:
 	bool displayTargets;
 	bool displayToolpath;
 	bool displayOutLines;
+	bool displayAnimation;
 
 	int selectedObject;
 	int selectedWorkpiece;

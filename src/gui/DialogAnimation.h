@@ -32,7 +32,7 @@
 class DialogAnimation:public GUIAnimation {
 	// Constructor/ Destructor
 public:
-	DialogAnimation(wxWindow* parent, Project * project);
+	DialogAnimation(wxWindow *parent, Project *project);
 	virtual ~DialogAnimation();
 
 	// Member Variables
@@ -41,6 +41,9 @@ public:
 
 	// Methods
 public:
+
+	int GetSelectedRun(void);
+
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 

@@ -58,7 +58,7 @@ StockFile::StockFile()
 
 	StockMaterial default5;
 	default5.sx = 0.700;
-	default5.sy = 0.460;
+	default5.sy = 0.390;
 	default5.sz = 0.027;
 	default5.available = true;
 	default5.name = _("MDF Board 70 x 46 x 2.7 cm");
@@ -71,10 +71,10 @@ StockFile::~StockFile()
 
 bool StockFile::LoadFromFile(wxString filename)
 {
-	return true;
+	return false;
 }
 
 bool StockFile::WriteToFile(wxString filename)
 {
-	return true;
+	return false;
 }

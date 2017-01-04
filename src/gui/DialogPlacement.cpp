@@ -193,7 +193,7 @@ void DialogPlacement::OnSelectObject(wxCommandEvent& event)
 
 }
 
-void DialogPlacement::OnChangePosition(wxCommandEvent& event)
+void DialogPlacement::OnChange(wxCommandEvent& event)
 {
 	int wpNr = m_choiceWorkpiece->GetSelection() - 1;
 	if(wpNr < 0) return;
@@ -209,6 +209,8 @@ void DialogPlacement::OnChangePosition(wxCommandEvent& event)
 	temp.TakeMatrixApart();
 	wxString description;
 	float d;
+	bool useContour = project->workpieces[wpNr].placements[plNr].useContour;
+	double slotWidth = project->workpieces[wpNr].placements[plNr].slotWidth;
 	switch(event.GetId()){
 	case ID_POSX:
 		d = settings->Distance.SIFromString(m_textCtrlX->GetValue());
@@ -235,10 +237,24 @@ void DialogPlacement::OnChangePosition(wxCommandEvent& event)
 		description = _("Rotate around Z: ")
 				+ settings->Angle.TextFromSIWithUnit(d, 2);
 		break;
+	case ID_DISTANCE:
+		slotWidth = settings->Distance.SIFromString(
+				m_textCtrlDistance->GetValue());
+		description = _("Set slotwidth to: ")
+				+ settings->Distance.TextFromSIWithUnit(slotWidth, 2);
+		break;
+	case ID_FORMBOX:
+		useContour = false;
+		description = _("Set form to box");
+		break;
+	case ID_FORMCONTOUR:
+		useContour = true;
+		description = _("Set form to contour");
+		break;
 	}
 	commandProcessor->Submit(
 			new CommandWorkpieceObjectTransform(description, project, wpNr,
-					plNr, temp, newX, newY));
+					plNr, temp, newX, newY, useContour, slotWidth));
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
 	ID_REFRESH3DVIEW);
 	ProcessEvent(selectEvent);
@@ -259,6 +275,8 @@ void DialogPlacement::OnChangeSlider(wxScrollEvent& event)
 			project->workpieces[wpNr].placements[plNr].matrix;
 	float newX = project->workpieces[wpNr].placements[plNr].cornerX;
 	float newY = project->workpieces[wpNr].placements[plNr].cornerY;
+	bool useContour = project->workpieces[wpNr].placements[plNr].useContour;
+	double slotWidth = project->workpieces[wpNr].placements[plNr].slotWidth;
 	temp.TakeMatrixApart();
 	wxString description;
 	float d;
@@ -270,18 +288,11 @@ void DialogPlacement::OnChangeSlider(wxScrollEvent& event)
 			+ settings->Angle.TextFromSIWithUnit(d, 2);
 	commandProcessor->Submit(
 			new CommandWorkpieceObjectTransform(description, project, wpNr,
-					plNr, temp, newX, newY));
+					plNr, temp, newX, newY, useContour, slotWidth));
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
 	ID_REFRESH3DVIEW);
 	ProcessEvent(selectEvent);
 	TransferDataToWindow();
-}
-
-void DialogPlacement::OnSelectForm(wxCommandEvent& event)
-{
-//	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHDISPLAY);
-//	ProcessEvent(selectEvent);
-//	TransferDataToWindow();
 }
 
 void DialogPlacement::OnTransform(wxCommandEvent& event)
@@ -297,6 +308,8 @@ void DialogPlacement::OnTransform(wxCommandEvent& event)
 			project->workpieces[wpNr].placements[plNr].matrix;
 	float newX = project->workpieces[wpNr].placements[plNr].cornerX;
 	float newY = project->workpieces[wpNr].placements[plNr].cornerY;
+	bool useContour = project->workpieces[wpNr].placements[plNr].useContour;
+	double slotWidth = project->workpieces[wpNr].placements[plNr].slotWidth;
 	temp.TakeMatrixApart();
 
 	float d = 0.01;
@@ -343,7 +356,7 @@ void DialogPlacement::OnTransform(wxCommandEvent& event)
 
 	commandProcessor->Submit(
 			new CommandWorkpieceObjectTransform(description, project, wpNr,
-					plNr, temp, newX, newY));
+					plNr, temp, newX, newY, useContour, slotWidth));
 
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
 	ID_REFRESH3DVIEW);

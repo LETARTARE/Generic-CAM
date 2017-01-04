@@ -210,6 +210,8 @@ bool FrameMain::TransferDataToWindow(void)
 	temp += project.name;
 	this->SetTitle(temp);
 
+	m_canvas->displayAnimation = dialogAnimation->IsShown();
+
 	dialogObjectTransformation->TransferDataToWindow();
 	dialogStockMaterial->TransferDataToWindow();
 	dialogWorkpiece->TransferDataToWindow();
@@ -218,6 +220,7 @@ bool FrameMain::TransferDataToWindow(void)
 	dialogRun->TransferDataToWindow();
 	dialogDebugger->TransferDataToWindow();
 	dialogToolpathGenerator->TransferDataToWindow();
+	dialogAnimation->TransferDataToWindow();
 	dialogSetupStereo3D->TransferDataToWindow();
 
 	Refresh();
@@ -273,6 +276,11 @@ size_t FrameMain::GetFreeSystemMemory()
 	//TODO: Change this to available memory.
 	return status.ullTotalPhys;
 #endif
+}
+
+void FrameMain::OnIdle(wxIdleEvent& event)
+{
+	event.Skip();
 }
 
 void FrameMain::OnTimer(wxTimerEvent& event)
@@ -1019,11 +1027,8 @@ void FrameMain::OnGeneratorRestart(wxCommandEvent& event)
 
 void FrameMain::OnGeneratorSaveToolpath(wxCommandEvent& event)
 {
-
-	int i = tree->GetFirstSelectedRun();
-	int j = tree->GetFirstSelectedToolpath();
-	if(i < 0 || i >= project.run.GetCount()) return;
-	if(j < 0 || j >= project.run[i].generators.GetCount()) return;
+	const int runNr = tree->GetFirstSelectedRun();
+	if(runNr < 0 || runNr >= project.run.GetCount()) return;
 
 	wxFileDialog dialog(this, _("Save toolpath..."), _T(""), _T(""),
 			_("G-Code file (*.nc)|*.nc|All files|*.*"),
@@ -1036,12 +1041,7 @@ void FrameMain::OnGeneratorSaveToolpath(wxCommandEvent& event)
 		wxFileName fileName;
 		fileName = dialog.GetPath();
 		settings.lastToolpathDirectory = fileName.GetPath();
-
-		wxTextFile file(fileName.GetFullPath());
-		file.Open();
-		file.Clear();
-		project.run[i].generators[j]->toolpath.WriteToFile(file);
-		file.Write();
+		project.SaveToolpath(fileName, runNr);
 	}
 }
 

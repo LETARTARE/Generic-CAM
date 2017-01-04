@@ -106,9 +106,10 @@ private:
 public:
 	void Clear(void);
 
-	float GetPositiveLength(void) const;
-	float GetNegativeLength(void) const;
-	float GetMaxDiameter(void) const;
+	float GetPositiveLength(void) const; ///< Total length of the tool outside the chuck.
+	float GetNegativeLength(void) const; ///< Length of the part, that disappears in the chuck.
+	float GetMaxDiameter(void) const; ///< Maximum diameter of the tool.
+	float GetCuttingDepth(void) const; ///< Length measured from the tip of the tool, that can cut.
 
 	void GenerateContour(void);
 

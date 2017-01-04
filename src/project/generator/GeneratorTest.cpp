@@ -40,8 +40,6 @@
 
 GeneratorTest::GeneratorTest()
 {
-	freeHeightAboveMaterial = 0.002;
-	levelDrop = 0.020;
 }
 
 GeneratorTest::~GeneratorTest()
@@ -75,138 +73,140 @@ void GeneratorTest::TransferDataFromPanel(void)
 void GeneratorTest::GenerateToolpath(void)
 {
 	output.Empty();
-
-//	size_t slotNr = project->run[runNr].toolpaths[toolpathNr].generator->slotNr;
-//	Tool * tool = project->run[runNr].toolbox.GetToolInSlot(slotNr);
 	const Run* const run = this->parent;
 	assert(run != NULL);
-
 	if(refTool >= run->tools.GetCount()){
 		output = _T("Tool empty.");
 		errorOccured = true;
 		return;
 	}
-	Tool * tool = &(run->tools[refTool]);
-
 	GeneratorDexel::GenerateToolpath();
+	const Tool* const tool = &(run->tools[refTool]);
+
+	const double maxCutDepth = tool->GetCuttingDepth();
+
+	const double tolerance = 0.0001; // 1/10 mm
 
 	ToolPath tp;
 	MachinePosition m;
 
-	// TODO: Change this to reflect tool shape.
-	DexelTarget discTool;
-	discTool.SetupTool(*tool, target.GetSizeRX(), target.GetSizeRY());
+	DexelTarget toolShape;
+	toolShape.SetupTool(*tool, target.GetSizeRX(), target.GetSizeRY());
 
+	toolShape.NegateZ();
 	DexelTarget temp = target;
-	DexelTarget temptop;
-
-	temp.FoldRaise(discTool);
+	temp.FoldRaise(toolShape);
 	temp.Limit();
-	temptop = temp;
+	toolShape.NegateZ();
+
+	DexelTarget temptop = temp;
 	temp.InvertTop();
-
-	double level = temp.GetSizeZ() - 0.0005;
-
-	// Starting point
-	//
-	//	tp.positions.Add(m);
+	double level = temp.GetSizeZ(); // at upper surface
 
 	// Position at start (! not a toolpath position)
 	m.axisX = 0.0;
 	m.axisY = 0.0;
-	m.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
+	m.axisZ = temp.GetSizeZ() + freeHeight;
 	m.isCutting = false;
 
 	ArrayOfPolygon25 pgs;
 	Polygon25 pg;
 
-	AffineTransformMatrix tm;
-	tm.TranslateGlobal(0.0, 0.0, -0.0001);
+//	AffineTransformMatrix tm;
+//	tm.TranslateGlobal(0.0, 0.0, -0.0001);
 
-	while(level > -0.0001){
+	while(level > -tolerance){
+		double dropLevel = level - maxCutDepth;
+		if(dropLevel < 0.0) dropLevel = 0.0;
 
-		// Find All polygons on one level
-		bool flag;
-		flag = true;
-		while(flag){
-			pg = temp.GeneratePolygon(-1, -1, level);
-			pg.ApplyTransformation(tm);
-			if(pg.elements.GetCount() < 1) flag = false;
-			if(pg.elements.GetCount() > 1){
-				temptop.PolygonDrop(pg, levelDrop - 0.0005);
-				pg.ApplyTransformation(tm);
-				temp.PolygonDropDexelTarget(pg, discTool);
-				pg.PolygonSmooth();
-				pgs.Add(pg);
-			}
+		// Find all polygons on one level
+		pg = temp.GeneratePolygon(-1, -1, level - tolerance);
+		while(pg.elements.GetCount() > 0){
+			temptop.PolygonDropOntoTarget(pg, dropLevel);
+			temp.PolygonPunchThroughTarget(pg, dropLevel, toolShape);
+			pg.PolygonSmooth();
+			pgs.Add(pg);
+			pg = temp.GeneratePolygon(-1, -1, level - tolerance);
 		}
 
+//		debug = temp;
+//		debug.Empty();
+//		debug.outLine = pgs[4];
+//		for(size_t n = 0; n < debug.N; n++){
+//			const double x = ((double) (n % debug.nx) + 0.5) * debug.rx;
+//			const double y = ((double) (n / debug.nx) + 0.5) * debug.ry;
+//			if(pgs[4].IsElementInside(Vector3(x, y, 0))){
+//				debug.field[n].down = 0.01;
+//				debug.field[n].up = 0.02;
+//			}
+//		}
+//		return;
+
+		Polygon25::SortPolygonsFromOutside(&pgs);
+
+//		debug = temp;
+
 		bool isMillUp = true;
-		// Generate a toolpath from polygons
-		size_t j;
-		size_t i;
-		double d2;
-		for(i = pgs.GetCount(); i > 0; i--){
-			if(pgs[i - 1].elements.GetCount() > 0){
+		// Generate a toolpath from the polygon collection
+		for(size_t i = pgs.GetCount(); i > 0; i--){
+			if(pgs[i - 1].elements.GetCount() == 0) continue;
 
-				pgs[i - 1].RotatePolygonStart(m.axisX, m.axisY);
+			pgs[i - 1].RotatePolygonStart(m.axisX, m.axisY);
 
-				if(!isMillUp){
-					d2 = (m.axisX - pgs[i - 1].elements[0].x)
-							* (m.axisX - pgs[i - 1].elements[0].x)
-							+ (m.axisY - pgs[i - 1].elements[0].y)
-									* (m.axisY - pgs[i - 1].elements[0].y);
-					if(d2 > (0.008 * 0.008)){
-						// Move tool out of material to travel to next polygon.
-						m.isCutting = false;
-						m.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
-						tp.positions.Add(m);
-						isMillUp = true;
-					}
-				}
-
-				if(isMillUp){
-					// Move tool into material
-					m.axisX = pgs[i - 1].elements[0].x;
-					m.axisY = pgs[i - 1].elements[0].y;
-					m.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
+			if(!isMillUp){
+				const double d2 = (m.axisX - pgs[i - 1].elements[0].x)
+						* (m.axisX - pgs[i - 1].elements[0].x)
+						+ (m.axisY - pgs[i - 1].elements[0].y)
+								* (m.axisY - pgs[i - 1].elements[0].y);
+				if(d2 > (0.008 * 0.008)){
+					// Move tool out of material to travel to next polygon.
 					m.isCutting = false;
+					m.axisZ = temp.GetSizeZ() + freeHeight;
 					tp.positions.Add(m);
+					isMillUp = true;
 				}
-				// Add polyg.positions[i].axisX,on
-				m.isCutting = true;
-				isMillUp = false;
+			}
 
-				for(j = 0; j < pgs[i - 1].elements.GetCount(); j++){
-					m.axisX = pgs[i - 1].elements[j].x;
-					m.axisY = pgs[i - 1].elements[j].y;
-					m.axisZ = pgs[i - 1].elements[j].z;
-					tp.positions.Add(m);
-				}
+			if(isMillUp){
+				// Move tool to next position
+				m.axisX = pgs[i - 1].elements[0].x;
+				m.axisY = pgs[i - 1].elements[0].y;
+				m.axisZ = temp.GetSizeZ() + freeHeight;
+				m.isCutting = false;
+				tp.positions.Add(m);
+			}
+			// Add polyg.positions[i].axisX,on
+			m.isCutting = true;
+			isMillUp = false;
 
+			for(size_t j = 0; j < pgs[i - 1].elements.GetCount(); j++){
+				m.axisX = pgs[i - 1].elements[j].x;
+				m.axisY = pgs[i - 1].elements[j].y;
+				m.axisZ = pgs[i - 1].elements[j].z;
+				tp.positions.Add(m);
 			}
 		}
 		pgs.Clear();
-		level -= levelDrop;
+
+		if(level >= 0.0 && level < 3 * tolerance){
+			level = -1.0;
+		}else{
+			level = dropLevel;
+			if(level < 2 * tolerance){
+				level = 2 * tolerance;
+			}
+		}
+
 		// Move tool out of material
-		m.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
+		m.axisZ = temp.GetSizeZ() + freeHeight;
 		m.isCutting = false;
 		isMillUp = true;
 		tp.positions.Add(m);
+#ifdef _DEBUGMODE
 		wxLogMessage(wxString::Format(_T("Next Level: %.3f m"), level));
+//		level = -1;
+#endif
 	}
-
-	// Shift toolpath down to align 0 with top-of-stock
-//	for(size_t i = 0; i < tp.positions.GetCount(); i++){
-//		tp.positions[i].axisZ -= temp.GetSizeZ();
-//	}
-//	tp.matrix.TranslateGlobal(0, 0, temp.GetSizeZ());
-
-	//	t.InitImprinting();
-	//	t.matrix.SetIdentity();
-	//t.matrix.TranslateGlobal(t.GetSizeX(), 0, 0);
-	//targets.Add(t);
-
+//	debug = temp;
 	toolpath = tp;
-
 }

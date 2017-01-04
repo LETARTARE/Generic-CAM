@@ -358,6 +358,18 @@ float Tool::GetMaxDiameter(void) const
 	return maxD;
 }
 
+float Tool::GetCuttingDepth(void) const
+{
+	float maxCuttingDepth = 0.0;
+	float zPosition = 0.0;
+	for(unsigned int i = elements.Count(); i > 0; i--){
+		if(!elements[i - 1].cutting && elements[i - 1].h != 0.0) break;
+		zPosition += elements[i - 1].h;
+		if(zPosition > maxCuttingDepth) maxCuttingDepth = zPosition;
+	}
+	return maxCuttingDepth;
+}
+
 void Tool::ToStream(wxTextOutputStream & stream)
 {
 	stream << _T("Tool:") << endl;

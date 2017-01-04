@@ -58,6 +58,10 @@ Imprinter::Imprinter(const double sizeX, const double sizeY, const double sizeZ,
 
 	refresh = true;
 
+	colorNormal.Set(0.4, 0.4, 0.0);
+	colorTodo.Set(0, 0, 0.8);
+	colorUnscratched.Set(0.0, 0.8, 0.1);
+
 	displayListGenerated = false;
 	displayListIndex = 0;
 
@@ -65,6 +69,7 @@ Imprinter::Imprinter(const double sizeX, const double sizeY, const double sizeZ,
 	displayAboveUp = false;
 	displayAboveDown = false;
 	displayField = false;
+	displayBox = false;
 	displayBelowUp = false;
 	displayBelowDown = false;
 	this->SetupBox(sizeX, sizeY, sizeZ, resolutionX, resolutionY);
@@ -91,14 +96,19 @@ Imprinter& Imprinter::operator=(const Imprinter &b)
 	this->sx = b.sx;
 	this->sy = b.sy;
 	this->sz = b.sz;
-	this->colorNormal = b.colorNormal;
-	this->colorTodo = b.colorTodo;
-	this->colorUnscratched = b.colorUnscratched;
-	this->displayField = b.displayField;
-	this->displayAboveDown = b.displayAboveDown;
-	this->displayBelowUp = b.displayBelowUp;
-	this->displayAboveUp = b.displayAboveUp;
-	this->displayBelowDown = b.displayBelowDown;
+
+//	this->colorNormal = b.colorNormal;
+//	this->colorTodo = b.colorTodo;
+//	this->colorUnscratched = b.colorUnscratched;
+//	this->displayField = b.displayField;
+//	this->displayAboveDown = b.displayAboveDown;
+//	this->displayBelowUp = b.displayBelowUp;
+//	this->displayAboveUp = b.displayAboveUp;
+//	this->displayBelowDown = b.displayBelowDown;
+
+	this->displayListGenerated = false;
+	this->displayListIndex = 0;
+	this->refresh = true;
 
 	if(b.N > 0){
 		for(size_t i = 0; i < b.N; i++)
@@ -114,18 +124,19 @@ Imprinter::Imprinter(const Imprinter& ip)
 	this->nx = this->ny = this->N = 0;
 	this->sx = this->sy = this->sz = 0.0;
 	this->rx = this->ry = 1.0;
+
 	this->colorNormal = ip.colorNormal;
 	this->colorTodo = ip.colorTodo;
 	this->colorUnscratched = ip.colorUnscratched;
-	this->displayListGenerated = false;
-	this->displayListIndex = 0;
+	this->displayBox = ip.displayBox;
 	this->displayField = ip.displayField;
-
 	this->displayAboveDown = ip.displayAboveDown;
 	this->displayBelowUp = ip.displayBelowUp;
 	this->displayAboveUp = ip.displayAboveUp;
 	this->displayBelowDown = ip.displayBelowDown;
 
+	this->displayListGenerated = false;
+	this->displayListIndex = 0;
 	this->refresh = true;
 
 	if(ip.N == 0) return;
@@ -186,6 +197,15 @@ void Imprinter::Refresh()
 	refresh = true;
 }
 
+Vector3 Imprinter::CellNormal(double p0, double p1, double p2, double p3) const
+{
+	Vector3 temp;
+	temp.x = ry * (p0 - p1 + p2 - p3);
+	temp.y = rx * (p0 + p1 - p2 - p3);
+	temp.z = 2 * rx * ry;
+	return temp;
+}
+
 void Imprinter::Paint() const
 {
 	if(field == NULL) return;
@@ -206,6 +226,34 @@ void Imprinter::Paint() const
 	::glNewList(displayListIndex, GL_COMPILE_AND_EXECUTE);
 
 	if(field != NULL){
+		if(displayBox){
+			glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
+			glBegin(GL_QUADS);
+			size_t p = 0;
+			double py = ry2;
+			for(size_t j = 0; j < ny; j++){
+				double px = rx2;
+				for(size_t i = 0; i < nx; i++){
+					if(i > 0 && j > 0){
+						const float p0 = field[p].up;
+						const float p1 = field[p + 1].up;
+						const float p2 = field[p + nx].up;
+						const float p3 = field[p + nx + 1].up;
+						Vector3 n = CellNormal(p0, p1, p2, p3);
+						n.Normalize();
+						glNormal3f(n.x, n.y, n.z);
+						glVertex3f(px, py, p0);
+						glVertex3f(px + rx, py, p1);
+						glVertex3f(px + rx, py + ry, p3);
+						glVertex3f(px, py + ry, p2);
+					}
+					p++;
+					px += rx;
+				}
+				py += ry;
+			}
+			glEnd();
+		}
 		if(displayField){
 			::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
 			::glBegin(GL_QUADS);
@@ -618,9 +666,6 @@ bool Imprinter::SetupBox(const double sizeX, const double sizeY,
 		field[i].down = 0.0;
 	}
 
-	colorNormal.Set(0.8, 0.4, 0.0);
-	colorTodo.Set(0, 0, 0.8);
-	colorUnscratched.Set(0.0, 0.8, 0.1);
 	refresh = true;
 	return true;
 }
@@ -740,14 +785,16 @@ bool Imprinter::IsFilledAbove(int x, int y, double height)
 {
 	if(x < 0 || y < 0 || x >= (int) nx || y >= (int) ny) return false;
 	size_t p = x + y * nx;
-
-	//	ImprinterElement temp;
-	//	temp = field[p];
-
 	if(field[p].up >= height) return true;
 	return false;
 }
 
+bool Imprinter::IsFilledAbove(size_t p, double height)
+{
+	if(p > N) return false;
+	if(field[p].up >= height) return true;
+	return false;
+}
 bool Imprinter::IsFilled(size_t p, double height)
 {
 	if(p > N) return false;
@@ -806,6 +853,24 @@ bool Imprinter::IsSurrounded(size_t p)
 	return true;
 }
 
+bool Imprinter::IsStandAlone(size_t p, double height)
+{
+	if(IsOnOuterBorder(p)) return false;
+	size_t i = p - nx - 1;
+	if(IsFilledAbove(i++, height)) return false;
+	if(IsFilledAbove(i++, height)) return false;
+	if(IsFilledAbove(i++, height)) return false;
+	i = i + nx - 3;
+	if(IsFilledAbove(i++, height)) return false;
+	i++;
+	if(IsFilledAbove(i++, height)) return false;
+	i = i + nx - 3;
+	if(IsFilledAbove(i++, height)) return false;
+	if(IsFilledAbove(i++, height)) return false;
+	if(IsFilledAbove(i++, height)) return false;
+	return true;
+}
+
 double Imprinter::GetMeanLevel(int x, int y)
 {
 	if(x < 0 || y < 0 || x >= (int) nx || y >= (int) ny) return -1.0;
@@ -823,11 +888,10 @@ double Imprinter::GetMeanLevel(size_t p)
 
 double Imprinter::GetLevel(double x, double y)
 {
-	int px, py;
-	px = round((x - rx / 2) / rx);
-	py = round((y - ry / 2) / ry);
+	const int px = round((x - rx / 2) / rx);
+	const int py = round((y - ry / 2) / ry);
 	if(px < 0 || py < 0 || px >= (int) nx || py >= (int) ny) return -1.0;
-	size_t p = px + py * nx;
+	const size_t p = px + py * nx;
 	if(!field[p].IsVisible()) return -1.0;
 	return field[p].up;
 }
@@ -1017,7 +1081,7 @@ void Imprinter::FoldReplace(const Imprinter &b)
 	refresh = true;
 }
 
-void Imprinter::FoldLower(int x, int y, double z, const Imprinter &b)
+void Imprinter::ShiftDown(int x, int y, double z, const Imprinter &b)
 {
 	const size_t cx = b.nx / 2;
 	const size_t cy = b.ny / 2;
@@ -1029,7 +1093,6 @@ void Imprinter::FoldLower(int x, int y, double z, const Imprinter &b)
 				if(ib + x >= cx && ib + x < nx + cx && jb + y >= cy
 						&& jb + y < ny + cy){
 					const size_t ph = x + ib - cx + (y + jb - cy) * nx;
-
 					if(field[ph].up > b.field[pb].down + z){
 						field[ph].up = b.field[pb].down + z;
 					}
@@ -1045,6 +1108,35 @@ void Imprinter::FoldLower(int x, int y, double z, const Imprinter &b)
 	refresh = true;
 }
 
+void Imprinter::TouchErase(int x, int y, double z, double level,
+		const Imprinter& b)
+{
+	const size_t cx = b.nx / 2;
+	const size_t cy = b.ny / 2;
+
+	size_t pb = 0;
+	for(size_t jb = 0; jb < b.ny; jb++){
+		for(size_t ib = 0; ib < b.nx; ib++){
+			if(b.field[pb].IsVisible()){
+				if(ib + x >= cx && ib + x < nx + cx && jb + y >= cy
+						&& jb + y < ny + cy){
+					const size_t ph = x + ib - cx + (y + jb - cy) * nx;
+
+					if(field[ph].up >= z){
+						field[ph].up = level;
+					}
+					if(field[ph].up < field[ph].down){
+						field[ph].down = sz;
+						field[ph].up = 0.0;
+					}
+
+				}
+			}
+			pb++;
+		}
+	}
+	refresh = true;
+}
 void Imprinter::HardInvert(void)
 {
 	size_t i;
@@ -1077,9 +1169,10 @@ void Imprinter::MaxFilling(void)
 
 void Imprinter::InvertTop(void)
 {
+	const double tolerance = 0.0001;
 	for(size_t i = 0; i < N; i++){
 		if(field[i].IsVisible()){
-			if(field[i].up >= sz - 0.0001){
+			if(field[i].up >= sz - tolerance){
 				field[i].down = sz;
 				field[i].up = 0.0;
 
@@ -1095,17 +1188,17 @@ void Imprinter::InvertTop(void)
 	refresh = true;
 }
 
-void Imprinter::InvertZ(void)
+void Imprinter::NegateZ(void)
 {
 	for(size_t i = 0; i < N; i++){
 		float temp = field[i].up;
-		field[i].up = sz - field[i].down;
-		field[i].down = sz - temp;
+		field[i].up = -field[i].down;
+		field[i].down = -temp;
 	}
 	refresh = true;
 }
 
-void Imprinter::FlipX(void)
+void Imprinter::MirrorY(void)
 {
 	if(field == NULL) return;
 	const size_t c = ny / 2;
@@ -1118,12 +1211,22 @@ void Imprinter::FlipX(void)
 			p2++;
 		}
 	}
-	InvertZ();
 	refresh = true;
 }
 
-//void Imprinter::FlipY(void)
-//{
-//	throw("Imprinter::FlipY - not implemented.");
-//	//TODO: Write FlipY
-//}
+void Imprinter::MirrorZ(void)
+{
+	for(size_t i = 0; i < N; i++){
+		float temp = field[i].up;
+		field[i].up = sz - field[i].down;
+		field[i].down = sz - temp;
+	}
+	refresh = true;
+}
+
+void Imprinter::RotateX180(void)
+{
+	MirrorY();
+	MirrorZ();
+}
+

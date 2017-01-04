@@ -41,7 +41,7 @@ CanvasMain::CanvasMain(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 	displayTargets = false;
 	displayToolpath = false;
 	displayOutLines = false;
-
+	displayAnimation = false;
 	selectedObject = 0;
 	selectedWorkpiece = 0;
 	selectedRun = 0;
@@ -152,8 +152,11 @@ void CanvasMain::Render()
 	case displayRun:
 	{
 		glLoadName(3);
-		project->PaintRun(selectedRun);
-
+		if(displayAnimation){
+			project->PaintAnimation(selectedRun);
+		}else{
+			project->PaintRun(selectedRun);
+		}
 		break;
 	}
 	}

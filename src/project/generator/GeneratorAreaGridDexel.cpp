@@ -81,29 +81,30 @@ void GeneratorAreaGridDexel::TransferDataFromPanel(void)
 
 void GeneratorAreaGridDexel::GenerateToolpath(void)
 {
-	printf("AreaGridDexel called.\n");
+	output.Empty();
 	errorOccured = false;
 	toolpathGenerated = true;
-	output.Empty();
-
-//	size_t slotNr = project->run[runNr].toolpaths[toolpathNr].generator->slotNr;
-//	Tool * tool = project->run[runNr].toolbox.GetToolInSlot(slotNr);
-	Run* run = this->parent;
-
+	const Run* const run = this->parent;
+	assert(run != NULL);
 	if(refTool >= run->tools.GetCount()){
 		output = _T("Tool empty.");
 		errorOccured = true;
 		return;
 	}
-	Tool * tool = &(run->tools[refTool]);
-
 	GeneratorDexel::GenerateToolpath();
+	const Tool* const tool = &(run->tools[refTool]);
+
+	printf("AreaGridDexel called.\n");
 
 	ToolPath tp;
 	MachinePosition m;
 
-	DexelTarget temp;
-	temp.SetupTool(*tool, target.GetSizeRX(), target.GetSizeRY());
-	target.FoldRaise(temp);
+	DexelTarget surface = target;
+	DexelTarget toolShape;
+	toolShape.SetupTool(*tool, target.GetSizeRX(), target.GetSizeRY());
+	toolShape.NegateZ();
+	surface.FoldRaise(toolShape);
+	surface.Limit();
 
+	debug = surface;
 }

@@ -45,8 +45,8 @@
 #include <wx/combobox.h>
 #include "PanelTool.h"
 #include "CanvasTool.h"
-#include <wx/choicebk.h>
 #include <wx/dialog.h>
+#include <wx/choicebk.h>
 #include <wx/richtext/richtextctrl.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -125,37 +125,39 @@
 #define ID_ANGLE 1071
 #define ID_FORMBOX 1072
 #define ID_FORMCONTOUR 1073
-#define ID_WORKPIECEROTATEX 1074
-#define ID_WORKPIECEROTATEY 1075
-#define ID_WORKPIECEROTATEZ 1076
-#define wxID_LOAD 1077
-#define ID_AXISX 1078
-#define ID_AXISY 1079
-#define ID_AXISZ 1080
-#define ID_TEXTX 1081
-#define ID_TEXTY 1082
-#define ID_TEXTZ 1083
-#define ID_AXISA 1084
-#define ID_AXISB 1085
-#define ID_AXISC 1086
-#define ID_TEXTA 1087
-#define ID_TEXTB 1088
-#define ID_TEXTC 1089
-#define ID_AXISU 1090
-#define ID_AXISV 1091
-#define ID_AXISW 1092
-#define ID_TEXTU 1093
-#define ID_TEXTV 1094
-#define ID_TEXTW 1095
-#define ID_XSTART 1096
-#define ID_XEND 1097
-#define ID_YSTART 1098
-#define ID_YEND 1099
-#define ID_ZSTART 1100
-#define ID_ZEND 1101
-#define ID_SELECTAREAOBJECT 1102
-#define ID_MARGINSIDE 1103
-#define ID_MARGINBELOW 1104
+#define ID_DISTANCE 1074
+#define ID_WORKPIECEROTATEX 1075
+#define ID_WORKPIECEROTATEY 1076
+#define ID_WORKPIECEROTATEZ 1077
+#define wxID_LOAD 1078
+#define ID_CONTROLLERSHOW 1079
+#define ID_AXISX 1080
+#define ID_AXISY 1081
+#define ID_AXISZ 1082
+#define ID_TEXTX 1083
+#define ID_TEXTY 1084
+#define ID_TEXTZ 1085
+#define ID_AXISA 1086
+#define ID_AXISB 1087
+#define ID_AXISC 1088
+#define ID_TEXTA 1089
+#define ID_TEXTB 1090
+#define ID_TEXTC 1091
+#define ID_AXISU 1092
+#define ID_AXISV 1093
+#define ID_AXISW 1094
+#define ID_TEXTU 1095
+#define ID_TEXTV 1096
+#define ID_TEXTW 1097
+#define ID_XSTART 1098
+#define ID_XEND 1099
+#define ID_YSTART 1100
+#define ID_YEND 1101
+#define ID_ZSTART 1102
+#define ID_ZEND 1103
+#define ID_SELECTAREAOBJECT 1104
+#define ID_MARGINSIDE 1105
+#define ID_MARGINBELOW 1106
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIMain
@@ -188,6 +190,7 @@ class GUIMain : public wxFrame
 		wxToolBar* m_toolBar;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnIdle( wxIdleEvent& event ) = 0;
 		virtual void OnProjectNew( wxCommandEvent& event ) = 0;
 		virtual void OnProjectRename( wxCommandEvent& event ) = 0;
 		virtual void OnProjectLoad( wxCommandEvent& event ) = 0;
@@ -506,9 +509,8 @@ class GUIPlacement : public wxFrame
 		virtual void OnClose( wxCommandEvent& event ) = 0;
 		virtual void OnSelectWorkpiece( wxCommandEvent& event ) = 0;
 		virtual void OnSelectObject( wxCommandEvent& event ) = 0;
-		virtual void OnChangePosition( wxCommandEvent& event ) = 0;
+		virtual void OnChange( wxCommandEvent& event ) = 0;
 		virtual void OnChangeSlider( wxScrollEvent& event ) = 0;
-		virtual void OnSelectForm( wxCommandEvent& event ) = 0;
 		virtual void OnTransform( wxCommandEvent& event ) = 0;
 		
 	
@@ -676,7 +678,6 @@ class GUIMachineControl : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;
-		virtual void OnClose( wxCommandEvent& event ) = 0;
 		virtual void OnZero( wxMouseEvent& event ) = 0;
 		virtual void OnScroll( wxScrollEvent& event ) = 0;
 		virtual void OnTrack( wxScrollEvent& event ) = 0;
@@ -744,6 +745,7 @@ class GUIToolbox : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;
+		virtual void OnShapeWizard( wxCommandEvent& event ) = 0;
 		virtual void OnClose( wxCommandEvent& event ) = 0;
 		virtual void OnChangeStereo3D( wxCommandEvent& event ) = 0;
 		virtual void OnToolSelect( wxCommandEvent& event ) = 0;
@@ -762,6 +764,35 @@ class GUIToolbox : public wxFrame
 		
 		GUIToolbox( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolbox"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 687,757 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		~GUIToolbox();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class GUIToolWizard
+///////////////////////////////////////////////////////////////////////////////
+class GUIToolWizard : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxNotebook* m_notebook;
+		wxPanel* m_panelCylinder;
+		wxPanel* m_panelSphere;
+		wxPanel* m_panelCone;
+		wxButton* m_buttonAdd;
+		wxButton* m_buttonSetShape;
+		wxButton* m_buttonClose;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnAddTool( wxCommandEvent& event ) = 0;
+		virtual void OnSetShape( wxCommandEvent& event ) = 0;
+		virtual void OnClose( wxCommandEvent& event ) = 0;
+		
+	
+	public:
+		
+		GUIToolWizard( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolshape Wizard"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 479,400 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~GUIToolWizard();
 	
 };
 

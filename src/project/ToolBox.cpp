@@ -61,7 +61,7 @@ ToolBox::ToolBox()
 
 	e = new ToolElement;
 	e->t = 2;
-	e->h = 0.025;
+	e->h = 0.020;
 	e->d = 0.00;
 	e->r = 0.0;
 	e->cutting = true;
@@ -72,8 +72,8 @@ ToolBox::ToolBox()
 	temp->shaftDiameter = 0.006;
 	temp->shaftLength = 0.01;
 	temp->maxSpeed = 166.67;
-	temp->feedCoefficient = 0.003;
-	temp->nrOfTeeth = 2;
+	temp->feedCoefficient = 0.004;
+	temp->nrOfTeeth = 1;
 
 	temp->GenerateContour();
 
@@ -117,7 +117,7 @@ ToolBox::ToolBox()
 	temp->comment = _T("for testing circle generation");
 	temp->shaftDiameter = 0.006;
 	temp->shaftLength = 0.01;
-	temp->maxSpeed = 100e3;
+	temp->maxSpeed = 300;
 	temp->feedCoefficient = 0.003;
 	temp->nrOfTeeth = 2;
 

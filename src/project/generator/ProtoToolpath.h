@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GeneratorTest.h
+// Name               : ProtoToolpath.h
 // Purpose            :
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
-// Compiler Options   :
-// Author             : Tobias Schaefer
-// Created            : 13.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Compiler Options   : -lm
+// Author             : toby
+// Created            : 03.01.2017
+// Copyright          : (C) 2017 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,38 +24,27 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef GENERATORTEST_H_
-#define GENERATORTEST_H_
+#ifndef PROTOTOOLPATH_H_
+#define PROTOTOOLPATH_H_
 
-/*!\class GeneratorTest
- * \ingroup Generator
- * \brief ...
+/*!\class ProtoToolpath
+ * \brief Polygon-loop with additional information
  *
- * ...
  */
 
-#include "GeneratorDexel.h"
-#include "../Tool.h"
+#include "../../3D/Polygon25.h"
 
-#include <wx/string.h>
-#include <stddef.h>
-
-class GeneratorTest:public GeneratorDexel {
-	// Constructor/ Destructor
+class ProtoToolpath:public Polygon25 {
 public:
-	GeneratorTest();
-	virtual ~GeneratorTest();
+	ProtoToolpath();
+	virtual ~ProtoToolpath();
 
-	virtual void CopyParameterFrom(const Generator * other);
-	virtual wxString GetName(void) const;
-	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
-	virtual void TransferDataToPanel(void) const;
-	virtual void TransferDataFromPanel(void);
-	virtual void GenerateToolpath(void);
-
-	//Member variables:
 public:
+	int parent;
+	int child;
+	int next;
 
+	int level;
 };
 
-#endif /* GENERATORTEST_H_ */
+#endif /* PROTOTOOLPATH_H_ */

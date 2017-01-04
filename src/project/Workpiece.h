@@ -38,6 +38,7 @@
 #include "Support.h"
 #include "../3D/BooleanBox.h"
 #include "../3D/BoundingBox.h"
+#include "generator/DexelTarget.h"
 
 #include <wx/txtstrm.h>
 #include <wx/dynarray.h>
@@ -59,6 +60,8 @@ public:
 	ArrayOfObjectPlacement placements;
 	ArrayOfSupport supports;
 
+	DexelTarget simulation;
+
 //	bool modified;
 	//TODO: Remove the "selected" flag.
 	bool selected;
@@ -72,7 +75,10 @@ public:
 	void ToStream(wxTextOutputStream & stream);
 	bool FromStream(wxTextInputStream & stream);
 
+	void InitSimulation(size_t maxCells);
+
 	void Paint(void) const;
+	void PaintSimulation(void) const;
 	void Update(void);
 //	void SortTargets(void);
 };

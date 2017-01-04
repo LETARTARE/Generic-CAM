@@ -88,16 +88,14 @@ void Polygon25::PolygonFillHoles(void)
 
 void Polygon25::PolygonSmooth(void)
 {
-	size_t i;
-	Vector3 d;
-	ArrayOfVector3 temp;
-	temp = elements;
+	ArrayOfVector3 temp = elements;
 
-	for(i = 0; i < elements.GetCount(); i++){
-		if(i > 0)
-			d = elements[i - 1];
-		else
+	for(size_t i = 0; i < elements.GetCount(); i++){
+		Vector3 d;
+		if(i == 0)
 			d = elements[elements.GetCount() - 1];
+		else
+			d = elements[i - 1];
 		d += elements[i];
 		if(i + 1 < elements.GetCount())
 			d += elements[i + 1];
@@ -131,56 +129,83 @@ void Polygon25::PolygonDiminish(double r)
 	this->PolygonExpand(-r);
 }
 
-bool Polygon25::IsElementInside(const Vector3 v)
+bool Polygon25::IsElementInside(const Vector3 &v) const
 {
-	size_t i, j;
+	// Using the Jordan Polygon Theorem
 
-	bool flagTryY = false;
-	size_t c = 0;
-
-	for(i = 0; i < elements.GetCount(); i++){
-		if(i < elements.GetCount() - 1)
-			j = i + 1;
+	int_fast8_t c = 1;
+	size_t E = elements.GetCount();
+	for(size_t i = 0; i < E; i++){
+		Vector3 p0 = elements[i];
+		Vector3 p1;
+		if(i + 1 == E)
+			p1 = elements[0];
 		else
-			j = 0;
-		// Test if line i-j is on v->X-Infty
-		if(elements[i].y == v.y && elements[j].y == v.y){
-			flagTryY = true;
+			p1 = elements[i + 1];
+		if(v.y == p0.y && v.y == p1.y){
+			if((p0.x <= v.x && v.x <= p1.x) || (p0.x >= v.x && v.x >= p1.x)){
+				c = 0;
+				break;
+			}
+			continue;
+		}
+		if(p0.y > p1.y){
+			float h = p0.x;
+			p0.x = p1.x;
+			p1.x = h;
+			h = p0.y;
+			p0.y = p1.y;
+			p1.y = h;
+		}
+		if(v.x == p0.x && v.y == p0.y){
+			c = 0;
 			break;
 		}
-		if((elements[i].y <= v.y && elements[j].y >= v.y)
-				|| (elements[i].y >= v.y && elements[j].y <= v.y)){
-			double px = ((elements[j].x - elements[i].x) * v.y
-					+ elements[i].x * elements[j].y
-					- elements[i].y * elements[j].x)
-					/ (elements[j].y - elements[i].y);
-			if(px > v.x) c++;
+		if(v.y <= p0.y || v.y > p1.y) continue;
+		const float delta = (p0.x - v.x) * (p1.y - v.y)
+				- (p0.y - v.y) * (p1.x - v.x);
+		if(delta > 0){
+			c = -c;
+			continue;
 		}
-	}
-
-	if(flagTryY){
+		if(delta < 0) continue;
 		c = 0;
-		for(i = 0; i < elements.GetCount(); i++){
-			if(i < elements.GetCount() - 1)
-				j = i + 1;
-			else
-				j = 0;
-			// Test if line i-j is on v->Y-Infty
-			if(elements[i].x == v.x && elements[j].x == v.x){
-				return false;
-			}
-			if((elements[i].x <= v.x && elements[j].x >= v.x)
-					|| (elements[i].x >= v.x && elements[j].x <= v.x)){
-				double py = ((elements[j].y - elements[i].y) * v.x
-						- elements[i].x * elements[j].y
-						+ elements[i].y * elements[j].x)
-						/ (elements[j].x - elements[i].x);
-				if(py > v.y) c++;
-			}
+		break;
+	}
+	if(c <= 0) return true;
+	return false;
+}
+
+bool Polygon25::IsPolygonInside(const Polygon25& other) const
+{
+	for(size_t i = 0; i < other.elements.GetCount(); i++){
+		if(!IsElementInside(other.elements[i])){
+			return false;
 		}
 	}
-	if((c % 2) == 1) return true;
-	return false;
+	return true;
+}
+
+void Polygon25::SortPolygonsFromOutside(ArrayOfPolygon25 *array)
+{
+	const int N = array->GetCount();
+	if(N == 0) return;
+	ArrayOfPolygon25 temp;
+	temp.Add(array->operator [](0));
+	for(int i = 1; i < N; i++){
+		int pos = -1;
+		const int M = temp.GetCount();
+		for(int j = M; j > 0; j--){
+			if(temp[j - 1].IsPolygonInside(array->operator [](i))){
+				pos = j - 1;
+				break;
+			}
+		}
+		if(pos == -1) temp.Insert(array->operator [](i), 0);
+		if(pos >= 0 && pos < M - 1) temp.Insert(array->operator [](i), pos + 1);
+		if(pos >= M - 1) temp.Add(array->operator [](i));
+	}
+	*array = temp;
 }
 
 double Polygon25::DistanceToElement(const size_t elementInPolygon,

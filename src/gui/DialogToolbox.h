@@ -71,6 +71,7 @@ public:
 	void OnToolNew(wxCommandEvent& event);
 	void OnToolUpdate(wxCommandEvent& event);
 	void OnToolDelete(wxCommandEvent& event);
+	void OnShapeWizard(wxCommandEvent& event);
 	void OnShapeNew(wxCommandEvent& event);
 	void OnShapeUpdate(wxCommandEvent& event);
 	void OnShapeDelete(wxCommandEvent& event);

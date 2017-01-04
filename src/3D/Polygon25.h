@@ -40,7 +40,7 @@
 #include "Polygon3.h"
 
 #include <wx/dynarray.h>
-
+class ArrayOfPolygon25;
 class Polygon25:public Polygon3 {
 public:
 	Polygon25();
@@ -60,6 +60,8 @@ public:
 	void PolygonFillHoles(void);
 
 	/*! \brief MA Filter for polygons with the size of 3
+	 *
+	 * Replaces every vertex i with the average of the vertices i-1, i, i+1.
 	 */
 	void PolygonSmooth(void);
 
@@ -88,7 +90,11 @@ public:
 	 * @param v Vector3 point
 	 * @return Boolean, if point is inside
 	 */
-	bool IsElementInside(const Vector3 v);
+	bool IsElementInside(const Vector3 &v) const;
+
+	bool IsPolygonInside(const Polygon25 &other) const;
+
+	static void SortPolygonsFromOutside(ArrayOfPolygon25 *array);
 
 	/*! \brief Find the closest distance of a line to an element on the polygon
 	 *

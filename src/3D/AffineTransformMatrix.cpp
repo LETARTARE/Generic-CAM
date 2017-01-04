@@ -31,7 +31,7 @@
 #include <math.h>
 #include <assert.h>
 
-#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+#include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfAffineTransformMatrix);
 
 AffineTransformMatrix::AffineTransformMatrix()

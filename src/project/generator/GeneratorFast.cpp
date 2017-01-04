@@ -285,7 +285,7 @@ void GeneratorFast::GenerateToolpath(void)
 
 	DexelTarget discTool;
 	discTool.SetupTool(*tool, target.GetSizeRX(), target.GetSizeRY());
-
+	discTool.NegateZ();
 	DexelTarget temp = target;
 	DexelTarget temptop;
 
@@ -348,7 +348,7 @@ void GeneratorFast::GenerateToolpath(void)
 			//				+ rx2, cy * ry + ry2, level)) break;
 
 			poly = temptop.FindCut(cx, cy);
-			temp.PolygonDrop(poly, level + raiseStep);
+			temp.PolygonDropOntoTarget(poly, level + raiseStep);
 
 			if(mp.axisZ > level){
 				// Drill down

@@ -56,7 +56,7 @@ protected:
 	void GenerateToolpath(void);
 
 	DexelTarget target;
-	DexelTarget outline;
+	DexelTarget debug;
 };
 
 #endif /* GENERATORDEXEL_H_ */

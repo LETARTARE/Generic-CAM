@@ -35,7 +35,7 @@
 
 #include <typeinfo>
 
-const size_t N_GENERATORS = 5;
+const size_t N_GENERATORS = 6;
 
 Generator* GeneratorCollection::NewGenerator(size_t generatorNr)
 {
@@ -50,13 +50,13 @@ Generator* GeneratorCollection::NewGenerator(size_t generatorNr)
 	case 2:
 		return new GeneratorLoadFromFile();
 		break;
-//	case 3:
-//		return new GeneratorAreaGridDexel();
-//		break;
 	case 3:
-		return new GeneratorFast();
+		return new GeneratorAreaGridDexel();
 		break;
 	case 4:
+		return new GeneratorFast();
+		break;
+	case 5:
 		return new GeneratorTest();
 		break;
 	}

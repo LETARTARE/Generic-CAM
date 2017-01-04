@@ -91,18 +91,22 @@ void DexelTarget::InsertObject(const Object &object,
 		InsertGeometrie(&(object.geometries[i]), shift * object.matrix);
 }
 
-void DexelTarget::SetupTool(const Tool& tool, const double resolutionX,
+void DexelTarget::SetupTool(const Tool &tool, const double resolutionX,
 		const double resolutionY)
 {
-	const double radius = tool.GetMaxDiameter();
+	const double radius = tool.GetMaxDiameter() / 2.0;
 	const double depth = tool.GetPositiveLength();
 
-	size_t cellsX = ceil(radius / resolutionX) * 2 + 1;
-	size_t cellsY = ceil(radius / resolutionY) * 2 + 1;
+	// Calculate the size to be odd, so there always a cell in the center.
+	const size_t cellsX = ceil(radius / resolutionX) * 2 + 1;
+	const size_t cellsY = ceil(radius / resolutionY) * 2 + 1;
 	if(!SetupField(cellsX, cellsY, resolutionX, resolutionY)) return;
+
 	const double centerX = (ceil(radius / resolutionX) + 0.5) * this->rx;
 	const double centerY = (ceil(radius / resolutionY) + 0.5) * this->ry;
 
+	// Prefill the up-layer with the distance from the center
+	// (speeds up the toolshape creation)
 	size_t p = 0;
 	double py = ry / 2;
 	for(size_t j = 0; j < ny; j++){
@@ -113,10 +117,9 @@ void DexelTarget::SetupTool(const Tool& tool, const double resolutionX,
 			if(d >= 0.0)
 				d = sqrt(d);
 			else
-				d = 0;
-
-			field[p].down = d;
-			field[p].up = -FLT_MAX;
+				d = 0.0;
+			field[p].up = d;
+			field[p].down = FLT_MAX;
 			px += rx;
 			p++;
 		}
@@ -124,21 +127,24 @@ void DexelTarget::SetupTool(const Tool& tool, const double resolutionX,
 	}
 
 	for(size_t i = 0; i < tool.contour.GetCount(); i++){
-		const double h = tool.contour[i].p1.x - tool.contour[i].p2.x;
-		if(h <= 0) continue;
+		const double dRadius = tool.contour[i].p2.x - tool.contour[i].p1.x;
+		if(dRadius >= 0) continue;
 		for(size_t j = 0; j < this->N; j++){
-			if(field[j].down < tool.contour[i].p2.x
-					|| field[j].down > tool.contour[i].p1.x) continue;
-			double d = (tool.contour[i].p1.z - tool.contour[i].p2.z)
-					* (field[j].down - tool.contour[i].p1.x) / h;
-			d += tool.contour[i].p2.z;
-			d -= depth;
-			if(d > field[j].up) field[j].up = d;
+			if(field[j].up < tool.contour[i].p2.x
+					|| field[j].up > tool.contour[i].p1.x) continue;
+			// Linear interpolation for conic changes
+			double d = (tool.contour[i].p2.z - tool.contour[i].p1.z)
+					* (field[j].up - tool.contour[i].p1.x) / dRadius;
+			d += tool.contour[i].p1.z;
+			// Turn tool around, so that it is pointing in -Z direction, tip at 0.
+			d = depth - d;
+			if(d < field[j].down) field[j].down = d;
 		}
 	}
 
+	// Put a square cap on top of the tool.
 	for(size_t j = 0; j < this->N; j++)
-		field[j].down = -depth;
+		field[j].up = depth;
 
 	refresh = true;
 }
@@ -187,18 +193,18 @@ void DexelTarget::Paint(void) const
 	outLine.Paint();
 }
 
-void DexelTarget::Simulate(const ToolPath &toolpath)
+void DexelTarget::Simulate(const ToolPath &toolpath, const Tool &tool)
 {
+	DexelTarget toolShape;
+	toolShape.SetupTool(tool, GetSizeRX(), GetSizeRY());
 	this->InitImprinting();
 	this->HardInvert();
 	Polygon3 temp;
 	for(size_t i = 0; i < toolpath.positions.GetCount(); i++){
 		temp.InsertPoint(toolpath.positions[i].axisX,
-				toolpath.positions[i].axisY, toolpath.positions[i].axisZ + sz);
+				toolpath.positions[i].axisY, toolpath.positions[i].axisZ);
 	}
-	DexelTarget discTool;
-	discTool.SetupDisc(0.003, rx, rx);
-	this->PolygonDropDexelTarget(temp, discTool);
+	this->PolygonCutInTarget(temp, toolShape);
 }
 
 double DexelTarget::GetMinLevel(void)
@@ -508,8 +514,8 @@ const Polygon25 DexelTarget::GeneratePolygon(int stx, int sty)
 	double z = -1.0;
 
 	do{
-
-		temp.InsertPoint((double) x * rx, (double) y * ry, z);
+		temp.InsertPoint((((double) x) + 0.5) * rx, (((double) y) + 0.5) * ry,
+				z);
 		dir = NextDir(x, y, dir);
 
 		if(dir == -1){
@@ -584,9 +590,17 @@ const Polygon25 DexelTarget::GeneratePolygon(int stx, int sty, double height)
 	int y = sty;
 	int dir = 0;
 
+	// Return, if only a single pixel was found.
+	if(IsStandAlone(x + y * nx, height)){
+		temp.InsertPoint((((double) x) + 0.5) * rx, (((double) y) + 0.5) * ry,
+				height);
+		return temp;
+	}
+
 	do{
 
-		temp.InsertPoint((double) x * rx, (double) y * ry, height);
+		temp.InsertPoint((((double) x) + 0.5) * rx, (((double) y) + 0.5) * ry,
+				height);
 		dir = NextDir(x, y, height, dir);
 
 		if(dir == -1){
@@ -677,12 +691,14 @@ const Polygon25 DexelTarget::GenerateConvexOutline(void)
 		return temp1;
 	}
 
-	temp2.InsertPoint(right[first] * this->rx, first * this->ry, 0.0);
+	temp2.InsertPoint(((double) right[first] + 0.5) * this->rx,
+			((double) first + 0.5) * this->ry, 0.0);
 
 	double d, dmax;
 
 	i = first;
-	temp1.InsertPoint(left[i] * this->rx, i * this->ry, 0.0);
+	temp1.InsertPoint(((double) left[i] + 0.5) * this->rx,
+			((double) i + 0.5) * this->ry, 0.0);
 	while(i < last){
 		dmax = DBL_MAX;
 		k = i;
@@ -694,11 +710,13 @@ const Polygon25 DexelTarget::GenerateConvexOutline(void)
 				dmax = d;
 			}
 		}
-		temp1.InsertPoint(left[i] * this->rx, i * this->ry, 0.0);
+		temp1.InsertPoint(((double) left[i] + 0.5) * this->rx,
+				((double) i + 0.5) * this->ry, 0.0);
 	}
 
 	i = first;
-	temp2.InsertPoint(right[i] * this->rx, i * this->ry, 0.0);
+	temp2.InsertPoint(((double) right[i] + 0.5) * this->rx,
+			((double) i + 0.5) * this->ry, 0.0);
 	while(i < last){
 		dmax = -DBL_MAX;
 		k = i;
@@ -710,7 +728,8 @@ const Polygon25 DexelTarget::GenerateConvexOutline(void)
 				dmax = d;
 			}
 		}
-		temp2.InsertPoint(right[i] * this->rx, i * this->ry, 0.0);
+		temp2.InsertPoint(((double) right[i] + 0.5) * this->rx,
+				((double) i + 0.5) * this->ry, 0.0);
 	}
 
 	temp1.Reverse();
@@ -954,8 +973,7 @@ bool DexelTarget::FindStartCutting(int &x, int &y)
 	}
 	char dir = 0;
 
-	while(true) // TODO: Restructure this loop! A while(true)! Yeah right! goto is evil!
-	{
+	while(true){
 
 		dir = NextDirReverseDistance(sx, sy, dir);
 
@@ -1005,8 +1023,8 @@ Polygon25 DexelTarget::FindCut(int &x, int &y)
 
 	size_t N = 1000 * 4;
 
-	double rx2 = rx / 2;
-	double ry2 = ry / 2;
+	const double rx2 = rx / 2;
+	const double ry2 = ry / 2;
 
 	temp.InsertPoint((double) x * rx + rx2, (double) y * ry + ry2, 0.002);
 
@@ -1016,8 +1034,7 @@ Polygon25 DexelTarget::FindCut(int &x, int &y)
 	}
 
 	char dir = 0;
-	while(true) // TODO: Restructure this loop! A while(true)! Yeah right! goto is evil!
-	{
+	while(true){
 		dir = NextDirForwardDistance(sx, sy, dir);
 
 		if(dir == -1) // Wall contact lost
@@ -1063,37 +1080,39 @@ Polygon25 DexelTarget::FindCut(int &x, int &y)
 
 	return temp;
 }
-void DexelTarget::PolygonDropDexelTarget(Polygon3 &polygon, DexelTarget &tool)
+void DexelTarget::PolygonCutInTarget(Polygon3 &polygon, DexelTarget &tool)
 {
-	size_t i;
-	for(i = 0; i < polygon.elements.GetCount(); i++){
-		this->FoldLower(round(polygon.elements[i].x / rx),
+	for(size_t i = 0; i < polygon.elements.GetCount(); i++){
+		this->ShiftDown(round(polygon.elements[i].x / rx),
 				round(polygon.elements[i].y / ry), polygon.elements[i].z, tool);
 	}
 }
 
-void DexelTarget::PolygonDrop(Polygon3 &polygon, double level)
+void DexelTarget::PolygonPunchThroughTarget(Polygon3& polygon, double level,
+		DexelTarget& tool)
 {
-	size_t i;
-	double d;
-	for(i = 0; i < polygon.elements.GetCount(); i++){
-		d = this->GetLevel(polygon.elements[i].x, polygon.elements[i].y);
+	for(size_t i = 0; i < polygon.elements.GetCount(); i++){
+		this->TouchErase(round(polygon.elements[i].x / rx - 0.5),
+				round(polygon.elements[i].y / ry - 0.5), polygon.elements[i].z,
+				level, tool);
+	}
+}
 
-		//		if(d >= 0)
-		//			polygon.elements[i].z = d;
-		//		else
-		//			polygon.elements[i].z = 0.0;
-
-		polygon.elements[i].z -= level;
-		if(d >= 0.0){
-			if(polygon.elements[i].z < d) polygon.elements[i].z = d;
+void DexelTarget::PolygonDropOntoTarget(Polygon3 &polygon, double level)
+{
+	for(size_t i = 0; i < polygon.elements.GetCount(); i++){
+		const double d = this->GetLevel(polygon.elements[i].x,
+				polygon.elements[i].y);
+		if(d < level){
+			polygon.elements[i].z = level;
 		}else{
-			if(polygon.elements[i].z < 0.0) polygon.elements[i].z = 0.0;
+			polygon.elements[i].z = d;
 		}
 	}
 }
 
-void DexelTarget::VectorDrop(double &x, double &y, double &z, double level)
+void DexelTarget::VectorDropOntoTarget(double &x, double &y, double &z,
+		double level)
 {
 	double d;
 	d = this->GetLevel(x, y);
@@ -1145,6 +1164,16 @@ void DexelTarget::FillOutsidePolygon(Polygon3 &polygon)
 	}
 	delete[] left;
 	delete[] right;
+}
+
+void DexelTarget::MarkOutline(void)
+{
+	for(size_t n = 0; n < N; n++){
+		if(IsOnOuterBorder(n)){
+			field[n].up = sz;
+			field[n].down = 0.0;
+		}
+	}
 }
 
 void DexelTarget::AddSupport(Polygon3 &polygon, double distance, double height,

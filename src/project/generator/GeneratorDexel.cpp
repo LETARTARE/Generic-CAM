@@ -36,9 +36,9 @@ GeneratorDexel::GeneratorDexel()
 	area.displaySides = false;
 	area.displayBox = true;
 
-	target.displayField = true;
+	target.displayField = false;
 
-	outline.displayField = true;
+	debug.displayField = false;
 }
 
 void GeneratorDexel::CopyParameterFrom(const Generator * other)
@@ -65,14 +65,17 @@ bool GeneratorDexel::FromStream(wxTextInputStream& stream)
 void GeneratorDexel::Paint(void) const
 {
 	Generator::Paint();
-
 	area.Paint();
 
 	glPushMatrix();
 	glTranslatef(area.xmin, area.ymin, area.zmin);
-
-//	target.Paint();
+	target.Paint();
 	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(area.xmin - 0.0, area.ymin, area.zmin);
+	debug.Paint();
+	glPopMatrix();
+
 }
 
 void GeneratorDexel::GenerateToolpath(void)
@@ -94,11 +97,11 @@ void GeneratorDexel::GenerateToolpath(void)
 
 	AffineTransformMatrix tempMatrix;
 
-//	DexelTarget outline(target);
-	outline.SetupBox(area.GetSizeX(), area.GetSizeY(), area.GetSizeZ(), resX,
+	DexelTarget outside(target);
+	outside.SetupBox(area.GetSizeX(), area.GetSizeY(), area.GetSizeZ(), resX,
 			resY);
 
-	outline.Empty();
+	outside.Empty();
 
 	for(size_t i = 0; i < workpiece->placements.GetCount(); i++){
 		const ObjectPlacement* const opl = &(workpiece->placements[i]);
@@ -149,15 +152,21 @@ void GeneratorDexel::GenerateToolpath(void)
 			temp.FinishImprint();
 		}
 
-		outline += temp;
+		outside += temp;
 	}
 	for(size_t i = 0; i < workpiece->supports.GetCount(); i++){
 		//TODO: Insert supports into target.
 	}
 	target.FinishImprint();
 //	target.CleanOutlier();
-	outline.HardInvert();
-	target += outline;
+	outside.HardInvert();
+
+	// Draw a single cell line on the outside of the area to kepp the tool inside the
+	// pocket.
+	//TODO Turn this feature off, if the working area is bigger or the same size as the workpiece in XY.
+	outside.MarkOutline();
+
+	target += outside;
 
 	target.Refresh();
 }

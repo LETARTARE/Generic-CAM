@@ -167,7 +167,7 @@ void DialogMachineDebugger::OnMachineSave(wxCommandEvent& event)
 
 void DialogMachineDebugger::OnShowController(wxCommandEvent& event)
 {
-	machineControl->Show();
+	machineControl->Show(!machineControl->IsShown());
 	machineControl->TransferDataToWindow();
 }
 
