@@ -28,6 +28,7 @@
 #ifndef TOOLCANVAS_H_
 #define TOOLCANVAS_H_
 
+#include "../StdInclude.h"
 #include "../project/Tool.h"
 #include "../3D/OpenGLCanvas.h"
 

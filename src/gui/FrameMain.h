@@ -35,9 +35,8 @@
  * commandProcessor which executes them. The commandProcessor enables Undo/Redo behaviour.
  */
 
-#include "../Config.h"
 #include "../StdInclude.h"
-
+#include "../Config.h"
 #include "gui.h"
 
 #include "DisplaySettings.h"

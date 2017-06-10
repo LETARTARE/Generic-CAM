@@ -31,6 +31,8 @@
  * \brief Dialog to setup stereo 3d anaglyph glasses
  */
 
+#include "../StdInclude.h"
+
 #include "guiSetupStereo3D.h"
 
 #include <wx/event.h>

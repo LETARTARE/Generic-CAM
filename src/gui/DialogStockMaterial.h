@@ -31,6 +31,7 @@
  * \brief Manages the heap of stock material in the workshop
  */
 
+#include "../StdInclude.h"
 #include "../project/Project.h"
 #include "../project/StockFile.h"
 #include "DisplaySettings.h"

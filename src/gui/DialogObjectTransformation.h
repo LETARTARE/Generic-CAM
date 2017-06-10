@@ -33,10 +33,13 @@
  * ...
  */
 
+#include "../StdInclude.h"
 #include "../project/Project.h"
 #include "DisplaySettings.h"
 #include "Unit.h"
+
 #include "gui.h"
+
 #include <wx/cmdproc.h>
 
 class DialogObjectTransformation:public GUIObjectTransformation {
@@ -73,6 +76,8 @@ public:
 
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
+
+private:
 
 	void OnXClose(wxCloseEvent& event);
 	void OnClose(wxCommandEvent& event);

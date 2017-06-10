@@ -27,6 +27,7 @@
 #ifndef ANIMATIONFRAME_H_
 #define ANIMATIONFRAME_H_
 
+#include "../StdInclude.h"
 #include "gui.h"
 
 class DialogAnimation:public GUIAnimation {

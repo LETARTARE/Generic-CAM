@@ -5,17 +5,12 @@ project(genericcam)
 find_package(wxWidgets COMPONENTS richtext gl core base xml adv REQUIRED)
 include( "${wxWidgets_USE_FILE}" )
 
-if(UNIX)
-include_directories( "/usr/include/lua5.1" )
-endif(UNIX)
-
-if(WIN32)
-include_directories( "/usr/local/i586-mingw32/include/lua5.3" )
-endif(WIN32)
-
-if(WIN32)
-set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -I/usr/local/i586-mingw32/include")
-endif(WIN32)
+if(MINGW)
+	include_directories( "/usr/local/i586-mingw32/include/lua5.3" )
+#	set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -I/usr/local/i586-mingw32/include")
+else(MINGW)
+	include_directories( "/usr/include/lua5.1" )
+endif(MINGW)
 
 set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -Wno-write-strings")
 
@@ -47,32 +42,28 @@ set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -Wno-write-strings")
 
 add_subdirectory(src)
 
-add_executable(genericcam src/genericcam.cpp)
+if(MINGW)
+	add_executable(genericcam.exe src/genericcam.cpp)
+	target_link_libraries(genericcam.exe
+		gui
+		controller
+		project
+		3D
+		${wxWidgets_LIBRARIES}
+		opengl32
+		glu32
+		lua53
+	)
+else(MINGW)
+	add_executable(genericcam src/genericcam.cpp)
+	target_link_libraries(genericcam
+		gui
+		controller
+		project
+		3D
+		${wxWidgets_LIBRARIES}
+		GLU
+		lua5.1
+	)
+endif(MINGW)
 
-
-target_link_libraries(genericcam
-	gui
-	controller
-#	machine
-	project
-#	generator
-#	command
-	3D
-)
-
-if(UNIX)
-target_link_libraries(genericcam
-	GLU
-	lua5.1
-	${wxWidgets_LIBRARIES}
-)
-endif(UNIX)
-
-if(WIN32)
-target_link_libraries(genericcam
-	opengl32
-	glu32
-	lua53
-	${wxWidgets_LIBRARIES}
-)
-endif(WIN32)

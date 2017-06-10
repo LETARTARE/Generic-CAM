@@ -33,10 +33,9 @@
  * ...
  */
 
+#include "../StdInclude.h"
 #include "../3D/BooleanBox.h"
 #include "../3D/OpenGLCanvas.h"
-
-#include "../StdInclude.h"
 
 class CanvasStereoTest:public OpenGLCanvas {
 public:

@@ -33,6 +33,7 @@
  * Canvas displaying a Machine. It is used for debugging purposes.
  */
 
+#include "../StdInclude.h"
 #include "../project/machine/Machine.h"
 #include "../3D/OpenGLCanvas.h"
 

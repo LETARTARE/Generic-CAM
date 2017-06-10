@@ -72,10 +72,9 @@ public:
 		return (szPort);
 	}
 
-#ifdef __LINUX
 	void SetDTR(bool activate);
+	void SetRTS(bool activate);
 	void WaitTXFinish(void);
-#endif
 
 public:
 	char Error[200];

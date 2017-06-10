@@ -34,6 +34,7 @@
  * in the derived classes, the parent class does not know about.
  */
 
+#include "../StdInclude.h"
 #include "../project/Project.h"
 #include "../project/generator/GeneratorCollection.h"
 #include "DisplaySettings.h"

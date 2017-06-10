@@ -27,6 +27,7 @@
 #ifndef TOOLBOXFRAME_H_
 #define TOOLBOXFRAME_H_
 
+#include "../StdInclude.h"
 #include "../project/ToolBox.h"
 #include "../project/Project.h"
 #include "DisplaySettings.h"

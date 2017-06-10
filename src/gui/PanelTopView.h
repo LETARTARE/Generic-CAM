@@ -33,6 +33,7 @@
  * ...
  */
 
+#include "../StdInclude.h"
 #include "../project/Project.h"
 #include <wx/panel.h>
 #include <wx/gdicmn.h>

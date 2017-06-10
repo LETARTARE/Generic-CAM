@@ -33,6 +33,7 @@
  * ...
  */
 
+#include "../StdInclude.h"
 #include "../project/Project.h"
 #include "../project/ToolBox.h"
 #include "DisplaySettings.h"

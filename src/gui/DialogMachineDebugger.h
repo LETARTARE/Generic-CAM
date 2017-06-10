@@ -33,6 +33,7 @@
  * ...
  */
 
+#include "../StdInclude.h"
 #include "../project/Project.h"
 #include "../project/machine/Machine.h"
 #include "DialogMachineControl.h"

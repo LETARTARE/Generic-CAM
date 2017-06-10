@@ -56,7 +56,7 @@ GenericCAMApp::GenericCAMApp()
 	}
 
 	//CHECK: Why does wxLOCALE_CONV_ENCODING not work?
-	if(!locale.Init(selectedLanguage, wxLOCALE_LOAD_DEFAULT)){
+	if(!locale.Init(selectedLanguage, wxLOCALE_CONV_ENCODING)){
 		wxLogError(_T("This language is not supported by the system."));
 		return;
 	}
@@ -66,7 +66,7 @@ GenericCAMApp::GenericCAMApp()
 	//			locale.GetLanguage()));
 	//	wxLogMessage(_T("name language :") + locale.GetCanonicalName());
 
-	locale.AddCatalogLookupPathPrefix(_T("i18n"));
+	locale.AddCatalogLookupPathPrefix(_T("./i18n"));
 	bool catalogLoaded = locale.AddCatalog(_T("GenericCAM"));
 	if(!catalogLoaded){
 		wxString temp;

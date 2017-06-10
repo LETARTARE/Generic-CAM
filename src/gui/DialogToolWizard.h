@@ -33,6 +33,7 @@
  * ...
  */
 
+#include "../StdInclude.h"
 #include "gui.h"
 
 class DialogToolWizard:public GUIToolWizard {

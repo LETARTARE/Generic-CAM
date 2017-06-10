@@ -413,14 +413,16 @@ void SerialPort::FlushData()
 	}
 }
 
-#ifdef __LINUX
-//TODO: Implement DTR on/off for windows!
 void SerialPort::SetDTR(bool activate)
 {
 	if(!Opened) return;
 
 #ifdef __WIN
-#error Not yet implemented!
+	if(activate){
+		EscapeCommFunction(m_hIDComDev,SETDTR);
+	} else{
+		EscapeCommFunction(m_hIDComDev,CLRDTR);
+	}
 #endif
 
 #ifdef __LINUX
@@ -432,19 +434,37 @@ void SerialPort::SetDTR(bool activate)
 	}
 #endif
 }
+
+void SerialPort::SetRTS(bool activate)
+{
+	if(!Opened) return;
+#ifdef __WIN
+	if(activate){
+		EscapeCommFunction(m_hIDComDev,SETRTS);
+	} else{
+		EscapeCommFunction(m_hIDComDev,CLRRTS);
+	}
 #endif
 
 #ifdef __LINUX
-//TODO: Implement WaitTXFinish for windows!
+	int dtr_bits = TIOCM_RTS;
+	if(activate){
+		ioctl(fd, TIOCMBIS, &dtr_bits);
+	}else{
+		ioctl(fd, TIOCMBIC, &dtr_bits);
+	}
+#endif
+}
+
 void SerialPort::WaitTXFinish(void)
 {
 	if(!Opened) return;
 
 #ifdef __WIN
-#error Not yet implemented!
+	FlushFileBuffers(m_hIDComDev);
 #endif
 #ifdef __LINUX
 	tcdrain(fd);
 #endif
 }
-#endif
+

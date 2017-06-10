@@ -27,8 +27,8 @@
 #ifndef DIALOGABOUT_H_
 #define DIALOGABOUT_H_
 
+#include "../StdInclude.h"
 #include "gui.h"
-
 #include <wx/event.h>
 
 class DialogAbout:public GUIAbout {

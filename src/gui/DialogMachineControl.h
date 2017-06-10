@@ -33,6 +33,7 @@
  * ...
  */
 
+#include "../StdInclude.h"
 #include "../project/Project.h"
 #include "DisplaySettings.h"
 #include "gui.h"

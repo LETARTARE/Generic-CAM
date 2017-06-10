@@ -33,6 +33,7 @@
  * ...
  */
 
+#include "../StdInclude.h"
 #include "../3D/OpenGLCanvas.h"
 #include "Unit.h"
 #include <wx/config.h>

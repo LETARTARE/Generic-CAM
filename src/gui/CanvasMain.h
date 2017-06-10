@@ -33,8 +33,8 @@
  *
  */
 
+#include "../StdInclude.h"
 #include "../project/Project.h"
-
 #include "../3D/OpenGLCanvas.h"
 
 class CanvasMain:public OpenGLCanvas {
