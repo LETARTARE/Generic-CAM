@@ -66,6 +66,7 @@ bool OpenGLPick::SetBufferSize(GLsizei newSize)
 	// Probably this problem will never arise. But if it happens, it would
 	// be a major headache to debug.
 	// (buffer assigned to OGL -> buffer delete[] -> OGL tries to write -> SEG_FAULT)
+	// The bufferAssigned flag is used to mitigate the problem.
 	if(bufferAssigned) return false;
 
 	// Create new buffer and copy the old content.
@@ -128,6 +129,34 @@ int OpenGLPick::Get(unsigned int hit, unsigned int level)
 	return buffer[pos + 3 + level];
 }
 
+int OpenGLPick::NearestWithLevel0(unsigned int L0)
+{
+	int temp = -1;
+	for(unsigned int n = 0; n < results; n++){
+		MoveBufferPos(n);
+		GLuint N = buffer[pos];
+		if(N < 1) continue;
+		if(buffer[pos + 3] != L0) continue;
+		temp = n;
+		break;
+	}
+	return temp;
+}
+
+int OpenGLPick::NearestWithLevel01(unsigned int L0, unsigned int L1)
+{
+	int temp = -1;
+	for(unsigned int n = 0; n < results; n++){
+		MoveBufferPos(n);
+		GLuint N = buffer[pos];
+		if(N < 2) continue;
+		if(buffer[pos + 3] != L0 || buffer[pos + 4] != L1) continue;
+		temp = n;
+		break;
+	}
+	return temp;
+}
+
 unsigned int OpenGLPick::Near(unsigned int hit)
 {
 	if(hit >= results) return 0;
@@ -151,6 +180,7 @@ void OpenGLPick::SortByNear(void)
 	GLuint near1, near2; // Near values
 	GLuint N1, N2; // Number of uints for each result
 	GLuint r, n; // Counter
+
 	// Bubble sort
 	while(!sorted){
 		sorted = true;
@@ -184,7 +214,7 @@ void OpenGLPick::SortByNear(void)
 			}
 		}
 		// Here a backwards pass could be written, but the results have varying
-		// sizes, so don't try to.
+		// sizes, so is would result in a very complicated iteration scheme.
 	}
 	pos = 0;
 	hitpos = 0;
@@ -205,4 +235,3 @@ void OpenGLPick::MoveBufferPos(GLuint hit)
 		throw("OpenGLPick::MoveBufferPos - Inconsistent buffer returned from OpenGL.");
 	}
 }
-

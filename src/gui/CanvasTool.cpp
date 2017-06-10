@@ -72,17 +72,17 @@ void CanvasTool::Render()
 {
 	float scaleFactor = 10.0;
 	RenderCoordinateSystem();
-#if defined (__WIN32__)
-	::glEnable(GL_NORMALIZE);
-#else
-	::glEnable( GL_RESCALE_NORMAL);
-#endif
+//#if defined (__WIN32__)
+//	::glEnable(GL_NORMALIZE);
+//#else
+//	::glEnable( GL_RESCALE_NORMAL);
+//#endif
 	::glScalef(scaleFactor, scaleFactor, scaleFactor);
 	::glColor3f(0.7, 0.7, 0.7);
 	if(tool != NULL) tool->Paint();
-#if defined (__WIN32__)
-	::glDisable(GL_NORMALIZE);
-#else
-	::glDisable(GL_RESCALE_NORMAL);
-#endif
+//#if defined (__WIN32__)
+//	::glDisable(GL_NORMALIZE);
+//#else
+//	::glDisable(GL_RESCALE_NORMAL);
+//#endif
 }

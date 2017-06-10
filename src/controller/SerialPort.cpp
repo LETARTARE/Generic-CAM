@@ -420,7 +420,7 @@ void SerialPort::SetDTR(bool activate)
 	if(!Opened) return;
 
 #ifdef __WIN
-#error Not implemented!
+#error Not yet implemented!
 #endif
 
 #ifdef __LINUX
@@ -441,7 +441,7 @@ void SerialPort::WaitTXFinish(void)
 	if(!Opened) return;
 
 #ifdef __WIN
-#error Not implemented!
+#error Not yet implemented!
 #endif
 #ifdef __LINUX
 	tcdrain(fd);

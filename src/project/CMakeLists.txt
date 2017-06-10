@@ -1,2 +1,5 @@
-aux_source_directory(. files)
-add_library(project ${files})
+aux_source_directory(command/. files_command)
+aux_source_directory(generator/. files_generator)
+aux_source_directory(machine/. files_machine)
+aux_source_directory(. files_project)
+add_library(project ${files_command} ${files_generator} ${files_machine} ${files_project})

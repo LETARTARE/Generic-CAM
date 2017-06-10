@@ -1,0 +1,7 @@
+<ul><!--> Index </!-->
+<li><object type="text/sitemap"><param name="Name" value="Router"><param name="Local" value="index.html"></object></li>
+<li><object type="text/sitemap"><param name="Name" value="Flute"><param name="Local" value="?"></object></li>
+<li><object type="text/sitemap"><param name="Name" value="CNC"><param name="Local" value="?"></object></li>
+<li><object type="text/sitemap"><param name="Name" value="Robot"><param name="Local" value="?"></object></li>
+<li><object type="text/sitemap"><param name="Name" value="Blender"><param name="Local" value="?"></object></li>
+</ul>

@@ -34,13 +34,13 @@ Class Relation
     run -> gen [label="*"];
     run -> fli;
     
-    opl -> obj [style=dashed];
-	run -> wpi [style=dashed];
-	gen -> too [style=dashed];
+    opl -> obj [style=dashed constraint=false];
+	run -> wpi [style=dashed constraint=false];
+	gen -> too [style=dashed constraint=false];
 	    
 	sfi -> sma;
-	sma -> wpi [style=dotted label="init"];
-    tbo -> too [style=dotted label="copy"];
+	sma -> wpi [style=dotted label="init" constraint=false];
+    tbo -> too [style=dotted label="copy" constraint=false];
         
     gen -> tpa;
   }

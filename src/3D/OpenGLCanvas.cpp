@@ -191,8 +191,11 @@ void OpenGLCanvas::InitGL()
 	::glEnable(GL_BLEND);
 	::glEnable(GL_POINT_SMOOTH);
 	::glEnable(GL_DEPTH_TEST);
+#if defined (__WIN32__)
+	::glEnable(GL_NORMALIZE);
+#else
 	::glEnable(GL_RESCALE_NORMAL);
-
+#endif
 	::glFrontFace(GL_CCW);
 	::glCullFace(GL_BACK);
 	::glEnable(GL_CULL_FACE);

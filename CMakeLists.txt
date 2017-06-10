@@ -47,16 +47,16 @@ set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -Wno-write-strings")
 
 add_subdirectory(src)
 
-add_executable(genericcam src/GenericCAM.cpp)
+add_executable(genericcam src/genericcam.cpp)
 
 
 target_link_libraries(genericcam
 	gui
 	controller
-	machine
+#	machine
 	project
-	generator
-	command
+#	generator
+#	command
 	3D
 )
 

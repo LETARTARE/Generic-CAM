@@ -29,6 +29,7 @@
 #include <wx/tokenzr.h>
 
 #include <math.h>
+#include <stdint.h>
 #include <assert.h>
 
 #include <wx/arrimpl.cpp>
@@ -46,7 +47,7 @@ AffineTransformMatrix::AffineTransformMatrix()
 void AffineTransformMatrix::Set(AffineTransformMatrix const& b)
 {
 	if(this == &b) return;
-	for(unsigned int i = 0; i < 16; i++)
+	for(uint_fast8_t i = 0; i < 16; i++)
 		a[i] = b.a[i];
 	TakeMatrixApart();
 }
@@ -57,7 +58,7 @@ void AffineTransformMatrix::SetIdentity()
 	rx = ry = rz = 0.0;
 	tx = ty = tz = 0.0;
 	sx = sy = sz = 1.0;
-	for(unsigned int i = 0; i < 16; i++)
+	for(uint_fast8_t i = 0; i < 16; i++)
 		a[i] = 0;
 	a[0] = 1.0;
 	a[5] = 1.0;
@@ -127,7 +128,7 @@ void AffineTransformMatrix::FromString(wxString const& string)
 
 void AffineTransformMatrix::ToStream(wxTextOutputStream& stream)
 {
-	for(unsigned int n = 0; n < 16; n++){
+	for(uint_fast8_t n = 0; n < 16; n++){
 		if(n > 0) stream << _T(" ");
 		stream.WriteDouble(a[n]);
 	}
@@ -135,7 +136,7 @@ void AffineTransformMatrix::ToStream(wxTextOutputStream& stream)
 
 void AffineTransformMatrix::FromStream(wxTextInputStream& stream)
 {
-	for(unsigned int n = 0; n < 16; n++)
+	for(uint_fast8_t n = 0; n < 16; n++)
 		stream >> a[n];
 	TakeMatrixApart();
 }
@@ -264,7 +265,7 @@ const AffineTransformMatrix AffineTransformMatrix::Inverse() const
 			+ (a[1] * a[6] + (-a[2] * a[5])) * a[8];
 	// T11 is the determinant of the matrix. This can
 	// not be zero for a correct transformation matrix.
-	assert(T11!=0);
+	assert(T11 != 0);
 
 	const double T12 = a[4] * a[9];
 	const double T13 = a[5] * a[8];
@@ -331,7 +332,7 @@ AffineTransformMatrix& AffineTransformMatrix::operator*=(
 	// b:=matrix([[ba[0],ba[4],ba[8],ba[12]],[ba[1],ba[5],ba[9],ba[13]],[ba[2],ba[6],ba[10],ba[14]],[0,0,0,1]]);
 
 	double c[16];
-	for(unsigned int i = 0; i < 16; i++)
+	for(uint_fast8_t i = 0; i < 16; i++)
 		c[i] = this->a[i];
 
 	this->a[0] = c[0] * b.a[0] + c[4] * b.a[1] + c[8] * b.a[2];

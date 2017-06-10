@@ -98,7 +98,7 @@ public:
 
 	/*! \brief Find the closest distance of a line to an element on the polygon
 	 *
-	 * Thei algorithm projects the polygon into the xy plane.
+	 * The algorithm projects the polygon into the xy plane.
 	 *
 	 * vx and vy also determine the length of the line.
 	 *

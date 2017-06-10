@@ -109,7 +109,7 @@ BooleanBox::BooleanBox(const BooleanBox& other)
 		occupied[n] = other.occupied[n];
 }
 
-BooleanBox& BooleanBox::operator =(const BooleanBox& other)
+BooleanBox& BooleanBox::operator =(const BooleanBox &other)
 {
 	if(&other == this) return *this;
 	nx = other.nx;
@@ -365,7 +365,7 @@ void BooleanBox::SetSize(float sx, float sy, float sz)
 	occupied[0] = true;
 }
 
-BooleanBox& BooleanBox::operator -=(const BooleanBox& rhs)
+BooleanBox& BooleanBox::operator -=(const BooleanBox &rhs)
 {
 	// Calculate relative position in x, y and z
 	const float mx = rhs.matrix.a[12] - matrix.a[12];

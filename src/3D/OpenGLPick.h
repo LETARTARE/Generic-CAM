@@ -33,6 +33,32 @@
  *
  * The result is stored as it is delivered from the OpenGL call.
  * Functions are provided to interpret the results.
+ *
+ * This class provides a buffer, that is filled by the OnPick function of the OpenGLCanvas.
+ *
+ * In the main code this is called by using the associated OpenGLCanvas and passing an object of this
+ * class to the OnPick function.
+ *
+ * \code
+ * void FrameMain::On3DSelect(wxMouseEvent& event)
+ * {
+ *   int x = event.GetX();
+ *   int y = event.GetY();
+ *   OpenGLPick result;
+ *   m_canvas->OnPick(result, x, y);
+ *   if(result.HasHits()){
+ *     result.SortByNear();
+ *     if(result.Get(0, 0) == 1){
+ *       <...>
+ *     }
+ *   }
+ * }
+ * \endcode
+ *
+ * \note When extending this class:\n
+ * The internal buffer is organized as a list of GLuint. Each record consists of\n
+ *   [Number of levels N], [Near value], [Far value], [Name0], ..., [NameN]\n
+ * Thus each record can have a different size.
  */
 
 #include <GL/gl.h>
@@ -45,20 +71,24 @@ public:
 	OpenGLPick& operator=(const OpenGLPick& other); ///< Assignment operator
 	virtual ~OpenGLPick();
 
-	bool SetBufferSize(GLsizei newSize);
+	bool SetBufferSize(GLsizei newSize); //!< Initialize the pick buffer
 
-	bool HasHits(void);
-	unsigned int GetCount(void);
-	void SortByNear(void);
-	int Get(unsigned int hit, unsigned int level);
-	unsigned int Near(unsigned int hit);
-	unsigned int Far(unsigned int hit);
+	bool HasHits(void); //!< Are there any hits at this position at all
+	unsigned int GetCount(void); //!< Number of hits recorded
+	void SortByNear(void); //!< Sort the results by the Near value
+	int NearestWithLevel0(unsigned int L0); //!< Find the nearest result with level0 == L0. Returns -1, if there is nothing found.
+	int NearestWithLevel01(unsigned int L0, unsigned int L1); //!< Find the nearest result with Name0 == L0 and Name1 = L1. Returns -1, if there is nothing found.
+	int Get(unsigned int hit, unsigned int level); //!< Return the levels of the namestack. Returns -1, if nothing is at this level.
+	unsigned int Near(unsigned int hit); //!< Return the Near value of the hit
+	unsigned int Far(unsigned int hit); //!< Return the Far value of the hit
 
 protected:
-	void SetHits(GLuint hits);
-	GLuint * GetBuffer();
-	GLsizei GetBufferSize();
-	void MoveBufferPos(GLuint hit);
+	void SetHits(GLuint hits); //!< OpenGLCanvas tells this class the number of hits found
+	GLuint * GetBuffer(); //!< OpenGLCanvas requests the pointer to the buffer
+	GLsizei GetBufferSize(); //!< OpenGLCanvas requests the size of the buffer
+
+private:
+	void MoveBufferPos(GLuint hit); //!< Shift the pointer to the result buffer around.
 
 private:
 	GLsizei bufferSize;

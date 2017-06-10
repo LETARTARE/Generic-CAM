@@ -30,7 +30,7 @@
 /*!\class SerialPort
  * \brief Serial port class for Linux and Windows
  *
- * Encapuslates the intricacies of the serial port on different systems.
+ * Encapsulates the intricacies of the serial port on different systems.
  */
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__)
