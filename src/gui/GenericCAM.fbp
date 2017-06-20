@@ -19,7 +19,7 @@
         <property name="relative_path">1</property>
         <property name="use_enum">0</property>
         <property name="use_microsoft_bom">0</property>
-        <object class="Frame" expanded="1">
+        <object class="Frame" expanded="0">
             <property name="bg"></property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -75,7 +75,7 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxMenuBar" expanded="1">
+            <object class="wxMenuBar" expanded="0">
                 <property name="bg"></property>
                 <property name="context_help"></property>
                 <property name="enabled">1</property>
@@ -262,7 +262,7 @@
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">&amp;Object</property>
                     <property name="name">m_menuObject</property>
                     <property name="permission">protected</property>
@@ -310,7 +310,7 @@
                         <property name="label">&amp;Load Object File...</property>
                         <property name="name">m_menuItemObjectLoad</property>
                         <property name="permission">none</property>
-                        <property name="shortcut"></property>
+                        <property name="shortcut">CTRL+O</property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">OnObjectLoad</event>
                         <event name="OnUpdateUI"></event>
@@ -465,57 +465,7 @@
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
-                <object class="wxMenu" expanded="0">
-                    <property name="label">&amp;Run</property>
-                    <property name="name">m_menuRun</property>
-                    <property name="permission">protected</property>
-                    <object class="wxMenuItem" expanded="1">
-                        <property name="bitmap"></property>
-                        <property name="checked">0</property>
-                        <property name="enabled">1</property>
-                        <property name="help"></property>
-                        <property name="id">ID_RUNEDIT</property>
-                        <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">&amp;Setup Run</property>
-                        <property name="name">m_menuItemRunSetup</property>
-                        <property name="permission">none</property>
-                        <property name="shortcut">CTRL+R</property>
-                        <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection">OnRunEdit</event>
-                        <event name="OnUpdateUI"></event>
-                    </object>
-                    <object class="wxMenuItem" expanded="1">
-                        <property name="bitmap"></property>
-                        <property name="checked">0</property>
-                        <property name="enabled">1</property>
-                        <property name="help"></property>
-                        <property name="id">ID_RUNADD</property>
-                        <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">&amp;Add Run</property>
-                        <property name="name">m_menuItemRunAdd</property>
-                        <property name="permission">none</property>
-                        <property name="shortcut"></property>
-                        <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection">OnRunAdd</event>
-                        <event name="OnUpdateUI"></event>
-                    </object>
-                    <object class="wxMenuItem" expanded="1">
-                        <property name="bitmap"></property>
-                        <property name="checked">0</property>
-                        <property name="enabled">1</property>
-                        <property name="help"></property>
-                        <property name="id">ID_RUNDELETE</property>
-                        <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">&amp;Delete Run</property>
-                        <property name="name">m_menuItemRunDelete</property>
-                        <property name="permission">none</property>
-                        <property name="shortcut"></property>
-                        <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection">OnRunDelete</event>
-                        <event name="OnUpdateUI"></event>
-                    </object>
-                </object>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">&amp;Machine</property>
                     <property name="name">m_menuMachine</property>
                     <property name="permission">protected</property>
@@ -529,7 +479,7 @@
                         <property name="label">&amp;Load Machine...</property>
                         <property name="name">m_menuItemMachineLoad</property>
                         <property name="permission">none</property>
-                        <property name="shortcut"></property>
+                        <property name="shortcut">CTRL+SHIFT+M</property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">OnMachineLoad</event>
                         <event name="OnUpdateUI"></event>
@@ -631,6 +581,56 @@
                         <property name="shortcut"></property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">OnToolboxSave</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                </object>
+                <object class="wxMenu" expanded="0">
+                    <property name="label">&amp;Run</property>
+                    <property name="name">m_menuRun</property>
+                    <property name="permission">protected</property>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">ID_RUNEDIT</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">&amp;Setup Run</property>
+                        <property name="name">m_menuItemRunSetup</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut">CTRL+R</property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">OnRunEdit</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">ID_RUNADD</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">&amp;Add Run</property>
+                        <property name="name">m_menuItemRunAdd</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">OnRunAdd</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">ID_RUNDELETE</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">&amp;Delete Run</property>
+                        <property name="name">m_menuItemRunDelete</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">OnRunDelete</event>
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
@@ -1014,7 +1014,7 @@
                         <property name="permission">protected</property>
                         <property name="pos"></property>
                         <property name="sashgravity">0.0</property>
-                        <property name="sashpos">144</property>
+                        <property name="sashpos">250</property>
                         <property name="sashsize">-1</property>
                         <property name="size"></property>
                         <property name="splitmode">wxSPLIT_VERTICAL</property>
@@ -1352,10 +1352,10 @@
                 <property name="bg">240,240,240</property>
                 <property name="bitmapsize"></property>
                 <property name="context_help"></property>
-                <property name="enabled">1</property>
+                <property name="enabled">0</property>
                 <property name="fg"></property>
                 <property name="font"></property>
-                <property name="hidden">0</property>
+                <property name="hidden">1</property>
                 <property name="id">wxID_ANY</property>
                 <property name="margins"></property>
                 <property name="maximum_size"></property>
@@ -1473,7 +1473,7 @@
                 </object>
             </object>
         </object>
-        <object class="Frame" expanded="0">
+        <object class="Frame" expanded="1">
             <property name="bg"></property>
             <property name="center"></property>
             <property name="context_help"></property>
@@ -2298,7 +2298,7 @@
                     <property name="border">5</property>
                     <property name="flag">wxALL|wxEXPAND</property>
                     <property name="proportion">1</property>
-                    <object class="wxNotebook" expanded="1">
+                    <object class="wxNotebook" expanded="0">
                         <property name="bg"></property>
                         <property name="bitmapsize"></property>
                         <property name="context_help"></property>
@@ -6156,55 +6156,6 @@
                         </object>
                     </object>
                 </object>
-            </object>
-            <object class="wxStatusBar" expanded="1">
-                <property name="bg"></property>
-                <property name="context_help"></property>
-                <property name="enabled">1</property>
-                <property name="fg"></property>
-                <property name="fields">2</property>
-                <property name="font"></property>
-                <property name="hidden">0</property>
-                <property name="id">wxID_ANY</property>
-                <property name="maximum_size"></property>
-                <property name="minimum_size"></property>
-                <property name="name">m_statusBar</property>
-                <property name="permission">protected</property>
-                <property name="pos"></property>
-                <property name="size"></property>
-                <property name="style">wxST_SIZEGRIP</property>
-                <property name="subclass"></property>
-                <property name="tooltip"></property>
-                <property name="validator_data_type"></property>
-                <property name="validator_style">wxFILTER_NONE</property>
-                <property name="validator_type">wxDefaultValidator</property>
-                <property name="validator_variable"></property>
-                <property name="window_extra_style"></property>
-                <property name="window_name"></property>
-                <property name="window_style"></property>
-                <event name="OnChar"></event>
-                <event name="OnEnterWindow"></event>
-                <event name="OnEraseBackground"></event>
-                <event name="OnKeyDown"></event>
-                <event name="OnKeyUp"></event>
-                <event name="OnKillFocus"></event>
-                <event name="OnLeaveWindow"></event>
-                <event name="OnLeftDClick"></event>
-                <event name="OnLeftDown"></event>
-                <event name="OnLeftUp"></event>
-                <event name="OnMiddleDClick"></event>
-                <event name="OnMiddleDown"></event>
-                <event name="OnMiddleUp"></event>
-                <event name="OnMotion"></event>
-                <event name="OnMouseEvents"></event>
-                <event name="OnMouseWheel"></event>
-                <event name="OnPaint"></event>
-                <event name="OnRightDClick"></event>
-                <event name="OnRightDown"></event>
-                <event name="OnRightUp"></event>
-                <event name="OnSetFocus"></event>
-                <event name="OnSize"></event>
-                <event name="OnUpdateUI"></event>
             </object>
         </object>
         <object class="Frame" expanded="0">

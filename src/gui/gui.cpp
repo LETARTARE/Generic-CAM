@@ -90,7 +90,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_separator8 = m_menuObject->AppendSeparator();
 	
 	wxMenuItem* m_menuItemObjectLoad;
-	m_menuItemObjectLoad = new wxMenuItem( m_menuObject, ID_OBJECTLOAD, wxString( _("&Load Object File...") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemObjectLoad = new wxMenuItem( m_menuObject, ID_OBJECTLOAD, wxString( _("&Load Object File...") ) + wxT('\t') + wxT("CTRL+O"), wxEmptyString, wxITEM_NORMAL );
 	m_menuObject->Append( m_menuItemObjectLoad );
 	
 	wxMenuItem* m_menuItemObjectRename;
@@ -140,24 +140,9 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	
 	m_menubar->Append( m_menuWorkpiece, _("&Workpiece") );
 	
-	m_menuRun = new wxMenu();
-	wxMenuItem* m_menuItemRunSetup;
-	m_menuItemRunSetup = new wxMenuItem( m_menuRun, ID_RUNEDIT, wxString( _("&Setup Run") ) + wxT('\t') + wxT("CTRL+R"), wxEmptyString, wxITEM_NORMAL );
-	m_menuRun->Append( m_menuItemRunSetup );
-	
-	wxMenuItem* m_menuItemRunAdd;
-	m_menuItemRunAdd = new wxMenuItem( m_menuRun, ID_RUNADD, wxString( _("&Add Run") ) , wxEmptyString, wxITEM_NORMAL );
-	m_menuRun->Append( m_menuItemRunAdd );
-	
-	wxMenuItem* m_menuItemRunDelete;
-	m_menuItemRunDelete = new wxMenuItem( m_menuRun, ID_RUNDELETE, wxString( _("&Delete Run") ) , wxEmptyString, wxITEM_NORMAL );
-	m_menuRun->Append( m_menuItemRunDelete );
-	
-	m_menubar->Append( m_menuRun, _("&Run") );
-	
 	m_menuMachine = new wxMenu();
 	wxMenuItem* m_menuItemMachineLoad;
-	m_menuItemMachineLoad = new wxMenuItem( m_menuMachine, ID_MACHINELOAD, wxString( _("&Load Machine...") ) , _("Load a machine for the selected run"), wxITEM_NORMAL );
+	m_menuItemMachineLoad = new wxMenuItem( m_menuMachine, ID_MACHINELOAD, wxString( _("&Load Machine...") ) + wxT('\t') + wxT("CTRL+SHIFT+M"), _("Load a machine for the selected run"), wxITEM_NORMAL );
 	m_menuMachine->Append( m_menuItemMachineLoad );
 	
 	wxMenuItem* m_menuItemMachineReload;
@@ -191,6 +176,21 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuToolbox->Append( m_menuItemToolboxSave );
 	
 	m_menubar->Append( m_menuToolbox, _("&Toolbox") );
+	
+	m_menuRun = new wxMenu();
+	wxMenuItem* m_menuItemRunSetup;
+	m_menuItemRunSetup = new wxMenuItem( m_menuRun, ID_RUNEDIT, wxString( _("&Setup Run") ) + wxT('\t') + wxT("CTRL+R"), wxEmptyString, wxITEM_NORMAL );
+	m_menuRun->Append( m_menuItemRunSetup );
+	
+	wxMenuItem* m_menuItemRunAdd;
+	m_menuItemRunAdd = new wxMenuItem( m_menuRun, ID_RUNADD, wxString( _("&Add Run") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuRun->Append( m_menuItemRunAdd );
+	
+	wxMenuItem* m_menuItemRunDelete;
+	m_menuItemRunDelete = new wxMenuItem( m_menuRun, ID_RUNDELETE, wxString( _("&Delete Run") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuRun->Append( m_menuItemRunDelete );
+	
+	m_menubar->Append( m_menuRun, _("&Run") );
 	
 	m_menuToolpath = new wxMenu();
 	wxMenuItem* m_menuItemGeneratorSetup;
@@ -332,7 +332,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_panelCanvasMain->SetSizer( bSizerMainCanvas );
 	m_panelCanvasMain->Layout();
 	bSizerMainCanvas->Fit( m_panelCanvasMain );
-	m_splitter->SplitVertically( m_panelTree, m_panelCanvasMain, 144 );
+	m_splitter->SplitVertically( m_panelTree, m_panelCanvasMain, 250 );
 	bSizer->Add( m_splitter, 1, wxEXPAND, 5 );
 	
 	this->SetSizer( bSizer );
@@ -340,6 +340,8 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_statusBar = this->CreateStatusBar( 2, wxST_SIZEGRIP, wxID_ANY );
 	m_toolBar = this->CreateToolBar( wxTB_HORIZONTAL, wxID_ANY ); 
 	m_toolBar->SetBackgroundColour( wxColour( 240, 240, 240 ) );
+	m_toolBar->Enable( false );
+	m_toolBar->Hide();
 	
 	m_toolBar->AddTool( wxID_UNDO, _("tool"), wxBitmap( undo_xpm ), wxNullBitmap, wxITEM_NORMAL, _("Undo"), _("Undo") );
 	m_toolBar->AddTool( wxID_REDO, _("tool"), wxBitmap( redo_xpm ), wxNullBitmap, wxITEM_NORMAL, _("Redo"), _("Redo") );
@@ -373,9 +375,6 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	this->Connect( m_menuItemWorkpieceSetup->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnWorkpieceSetup ) );
 	this->Connect( m_menuItemWorkpieceDelete->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnWorkpieceDelete ) );
 	this->Connect( m_menuItemWorkpieceDeleteUnused->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnWorkpieceDeleteUnused ) );
-	this->Connect( m_menuItemRunSetup->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunEdit ) );
-	this->Connect( m_menuItemRunAdd->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunAdd ) );
-	this->Connect( m_menuItemRunDelete->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunDelete ) );
 	this->Connect( m_menuItemMachineLoad->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnMachineLoad ) );
 	this->Connect( m_menuItemMachineReload->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnMachineReload ) );
 	this->Connect( m_menuItemMachineDebugger->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnMachineDebugger ) );
@@ -383,6 +382,9 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	this->Connect( m_menuItemToolboxEdit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnToolboxEdit ) );
 	this->Connect( m_menuItemToolboxLoad->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnToolboxLoad ) );
 	this->Connect( m_menuItemToolboxSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnToolboxSave ) );
+	this->Connect( m_menuItemRunSetup->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunEdit ) );
+	this->Connect( m_menuItemRunAdd->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunAdd ) );
+	this->Connect( m_menuItemRunDelete->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunDelete ) );
 	this->Connect( m_menuItemGeneratorSetup->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorSetup ) );
 	this->Connect( m_menuItemGeneratorStart->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorStart ) );
 	this->Connect( m_menuItemGeneratorAutomatic->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorAutomatic ) );
@@ -440,9 +442,6 @@ GUIMain::~GUIMain()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnWorkpieceSetup ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnWorkpieceDelete ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnWorkpieceDeleteUnused ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunEdit ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunAdd ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunDelete ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnMachineLoad ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnMachineReload ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnMachineDebugger ) );
@@ -450,6 +449,9 @@ GUIMain::~GUIMain()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnToolboxEdit ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnToolboxLoad ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnToolboxSave ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunEdit ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunAdd ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunDelete ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorSetup ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorStart ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorAutomatic ) );
@@ -931,7 +933,6 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	
 	this->SetSizer( bSizer21 );
 	this->Layout();
-	m_statusBar = this->CreateStatusBar( 2, wxST_SIZEGRIP, wxID_ANY );
 	
 	// Connect Events
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIObjectTransformation::OnXClose ) );

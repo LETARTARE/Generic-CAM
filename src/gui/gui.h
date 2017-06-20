@@ -64,15 +64,15 @@
 #define ID_WORKPIECESETUP 1010
 #define ID_WORKPIECEDELETE 1011
 #define ID_WORKPIECEDELETEUNUSED 1012
-#define ID_RUNEDIT 1013
-#define ID_RUNADD 1014
-#define ID_RUNDELETE 1015
-#define ID_MACHINELOAD 1016
-#define ID_MACHINERELOAD 1017
-#define ID_MACHINEDEBUGGER 1018
-#define ID_TOOLBOXEDIT 1019
-#define ID_TOOLBOXLOAD 1020
-#define ID_TOOLBOXSAVE 1021
+#define ID_MACHINELOAD 1013
+#define ID_MACHINERELOAD 1014
+#define ID_MACHINEDEBUGGER 1015
+#define ID_TOOLBOXEDIT 1016
+#define ID_TOOLBOXLOAD 1017
+#define ID_TOOLBOXSAVE 1018
+#define ID_RUNEDIT 1019
+#define ID_RUNADD 1020
+#define ID_RUNDELETE 1021
 #define ID_GENERATORSETUP 1022
 #define ID_GENERATORSTART 1023
 #define ID_GENERATORAUTOMATIC 1024
@@ -174,9 +174,9 @@ class GUIMain : public wxFrame
 		wxMenu* m_menuObject;
 		wxMenu* m_menuStock;
 		wxMenu* m_menuWorkpiece;
-		wxMenu* m_menuRun;
 		wxMenu* m_menuMachine;
 		wxMenu* m_menuToolbox;
+		wxMenu* m_menuRun;
 		wxMenu* m_menuToolpath;
 		wxMenu* m_menuSettings;
 		wxMenu* m_menuView;
@@ -209,9 +209,6 @@ class GUIMain : public wxFrame
 		virtual void OnWorkpieceSetup( wxCommandEvent& event ) = 0;
 		virtual void OnWorkpieceDelete( wxCommandEvent& event ) = 0;
 		virtual void OnWorkpieceDeleteUnused( wxCommandEvent& event ) = 0;
-		virtual void OnRunEdit( wxCommandEvent& event ) = 0;
-		virtual void OnRunAdd( wxCommandEvent& event ) = 0;
-		virtual void OnRunDelete( wxCommandEvent& event ) = 0;
 		virtual void OnMachineLoad( wxCommandEvent& event ) = 0;
 		virtual void OnMachineReload( wxCommandEvent& event ) = 0;
 		virtual void OnMachineDebugger( wxCommandEvent& event ) = 0;
@@ -219,6 +216,9 @@ class GUIMain : public wxFrame
 		virtual void OnToolboxEdit( wxCommandEvent& event ) = 0;
 		virtual void OnToolboxLoad( wxCommandEvent& event ) = 0;
 		virtual void OnToolboxSave( wxCommandEvent& event ) = 0;
+		virtual void OnRunEdit( wxCommandEvent& event ) = 0;
+		virtual void OnRunAdd( wxCommandEvent& event ) = 0;
+		virtual void OnRunDelete( wxCommandEvent& event ) = 0;
 		virtual void OnGeneratorSetup( wxCommandEvent& event ) = 0;
 		virtual void OnGeneratorStart( wxCommandEvent& event ) = 0;
 		virtual void OnGeneratorAutomatic( wxCommandEvent& event ) = 0;
@@ -251,7 +251,7 @@ class GUIMain : public wxFrame
 		~GUIMain();
 		void m_splitterOnIdle( wxIdleEvent& )
 		{
-		m_splitter->SetSashPosition( 144 );
+		m_splitter->SetSashPosition( 250 );
 		m_splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIMain::m_splitterOnIdle ), NULL, this );
 		}
 		
@@ -356,7 +356,6 @@ class GUIObjectTransformation : public wxFrame
 		
 		wxButton* m_buttonFlipNormalVectors;
 		
-		wxStatusBar* m_statusBar;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;

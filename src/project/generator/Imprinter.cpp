@@ -234,7 +234,7 @@ void Imprinter::Paint() const
 			for(size_t j = 0; j < ny; j++){
 				double px = rx2;
 				for(size_t i = 0; i < nx; i++){
-					if(i > 0 && j > 0){
+					if(i < nx - 1 && j < ny - 1){
 						const float p0 = field[p].up;
 						const float p1 = field[p + 1].up;
 						const float p2 = field[p + nx].up;

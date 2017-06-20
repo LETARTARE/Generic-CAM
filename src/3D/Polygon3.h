@@ -110,6 +110,10 @@ public:
 	 */
 	double GetLength(void) const;
 
+	/*! \brief Get the number of elements
+	 */
+	size_t GetCount(void) const;
+
 	/*! \brief Resample the point in the polygon.
 	 *
 	 * The polygon is resampled into N even segments. This can be an over- or undersampling.

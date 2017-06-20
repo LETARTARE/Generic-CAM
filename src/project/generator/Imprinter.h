@@ -35,6 +35,9 @@
  * It contains 2D arrays, that capture the levels of the upper and lower
  * surface of an object.
  *
+ * The values of the cells are defined in the middle of the cell. They are shifted by
+ * 1/2 dx and 1/2 dy respectively.
+ *
  * The setup of the objects is done directly by using the basic
  * functions to generate the objects or by imprinting 3D triangle-
  * meshes.
@@ -221,12 +224,12 @@ private:
 	// Member variables
 public:
 
-	bool displayBox;
-	bool displayField;
-	bool displayAboveDown;
-	bool displayBelowUp;
-	bool displayAboveUp;
-	bool displayBelowDown;
+	bool displayBox;  ///< Display the up surface as a continuous plane.
+	bool displayField; ///< Display the up and down surface as planar squares.
+	bool displayAboveDown; ///< Display the above down surface as a grid.
+	bool displayBelowUp; ///< Display the below up surface as a grid.
+	bool displayAboveUp; ///< Display the above up surface as a grid.
+	bool displayBelowDown; ///< Display the below down surface as a grid.
 
 	Vector3 colorNormal;
 	Vector3 colorUnscratched;

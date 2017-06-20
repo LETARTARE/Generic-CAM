@@ -1082,9 +1082,53 @@ Polygon25 DexelTarget::FindCut(int &x, int &y)
 }
 void DexelTarget::PolygonCutInTarget(Polygon3 &polygon, DexelTarget &tool)
 {
-	for(size_t i = 0; i < polygon.elements.GetCount(); i++){
-		this->ShiftDown(round(polygon.elements[i].x / rx),
-				round(polygon.elements[i].y / ry), polygon.elements[i].z, tool);
+	if(polygon.GetCount() == 0) return;
+	int px = floor(polygon.elements[0].x / rx);
+	int py = floor(polygon.elements[0].y / ry);
+	double pz = polygon.elements[0].z;
+	this->ShiftDown(px, py, pz, tool);
+	if(polygon.GetCount() == 1) return;
+	for(size_t i = 1; i < polygon.elements.GetCount(); i++){
+		const double dx = polygon.elements[i].x - polygon.elements[i - 1].x;
+		const double dy = polygon.elements[i].y - polygon.elements[i - 1].y;
+		const double dz = polygon.elements[i].z - polygon.elements[i - 1].z;
+		const int nx = abs(floor(polygon.elements[i].x / rx) - px);
+		const int ny = abs(floor(polygon.elements[i].y / ry) - py);
+		if(nx > ny){
+			const double rz = dz / (double) nx;
+			const int cx = dx >= 0? 1 : -1;
+			const int cy = dy >= 0? 1 : -1;
+			int b = 0;
+			for(size_t n = 0; n < nx; n++){
+				px += cx;
+				b += ny;
+				if(b > nx){
+					b -= nx;
+					py += cy;
+				}
+				pz += rz;
+				this->ShiftDown(px, py, pz, tool);
+			}
+
+		}else{
+			const double rz = dz / (double) ny;
+			const int cx = dx >= 0? 1 : -1;
+			const int cy = dy >= 0? 1 : -1;
+			int b = 0;
+			for(size_t n = 0; n < ny; n++){
+				py += cy;
+				b += nx;
+				if(b > ny){
+					b -= ny;
+					px += cx;
+				}
+				pz += rz;
+				this->ShiftDown(px, py, pz, tool);
+			}
+		}
+		px = floor(polygon.elements[i].x / rx);
+		py = floor(polygon.elements[i].y / ry);
+		pz = polygon.elements[i].z;
 	}
 }
 

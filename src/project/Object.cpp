@@ -66,10 +66,10 @@ void Object::Paint(const bool absolutCoordinates) const
 			glColor3f(geometries[0].color.x, geometries[0].color.y,
 					geometries[0].color.z);
 		}
-		glPointSize(5);
-		glBegin(GL_POINTS);
-		glVertex3i(0, 0, 0);
-		glEnd();
+//		glPointSize(5);
+//		glBegin(GL_POINTS);
+//		glVertex3i(0, 0, 0);
+//		glEnd();
 #endif
 	}
 	glMultMatrixd(matrix.a);

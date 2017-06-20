@@ -223,3 +223,8 @@ void Polygon3::Paint() const
 
 	::glPopMatrix();
 }
+
+size_t Polygon3::GetCount(void) const
+{
+	return elements.GetCount();
+}
