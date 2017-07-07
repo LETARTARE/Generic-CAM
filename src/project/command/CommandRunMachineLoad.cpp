@@ -37,12 +37,15 @@ CommandRunMachineLoad::CommandRunMachineLoad(const wxString& name,
 
 bool CommandRunMachineLoad::Do(void)
 {
-	return project->run[runNr].machine.Load(wxFileName(fileName));
+	bool flag = project->run[runNr].machine.Load(wxFileName(fileName));
+	if(flag) project->Update();
+	return flag;
 }
 
 bool CommandRunMachineLoad::Undo(void)
 {
-	// TODO: Implement Machine::Clear();
+	//TODO: Implement Machine::Clear();
 	project->run[runNr].machine.ClearComponents();
+	project->Update();
 	return true;
 }

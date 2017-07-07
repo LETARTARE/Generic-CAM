@@ -59,82 +59,9 @@ void CanvasMain::InsertProject(Project* project)
 	this->project = project;
 }
 
-void CanvasMain::RenderCoordinateSystem(AffineTransformMatrix *matrix)
-{
-	::glPushMatrix();
-	if(matrix != NULL) ::glMultMatrixd(matrix->a);
-
-	GLfloat s = 0.1;
-	GLfloat n = sqrt(2.0);
-	GLfloat d = s / 10;
-
-	glBegin(GL_LINES);
-
-	glColor3f(1.0, 0, 0);
-	glNormal3f(-s, 0, 0);
-	glVertex3f(-s, 0, 0);
-	glNormal3f(s, 0, 0);
-	glVertex3f(s, 0, 0);
-
-	glNormal3f(n, n, 0);
-	glVertex3f(s, 0, 0);
-	glVertex3f(s - d, d, 0);
-	glNormal3f(n, -n, 0);
-	glVertex3f(s, 0, 0);
-	glVertex3f(s - d, -d, 0);
-	glNormal3f(n, 0, n);
-	glVertex3f(s, 0, 0);
-	glVertex3f(s - d, 0, d);
-	glNormal3f(n, 0, -n);
-	glVertex3f(s, 0, 0);
-	glVertex3f(s - d, 0, -d);
-
-	glColor3f(0, 1.0, 0);
-	glNormal3f(0, -s, 0);
-	glVertex3f(0, -s, 0);
-	glNormal3f(0, s, 0);
-	glVertex3f(0, s, 0);
-
-	glNormal3f(n, n, 0);
-	glVertex3f(0, s, 0);
-	glVertex3f(d, s - d, 0);
-	glNormal3f(-n, n, 0);
-	glVertex3f(0, s, 0);
-	glVertex3f(-d, s - d, 0);
-	glNormal3f(0, n, n);
-	glVertex3f(0, s, 0);
-	glVertex3f(0, s - d, d);
-	glNormal3f(0, n, -n);
-	glVertex3f(0, s, 0);
-	glVertex3f(0, s - d, -d);
-
-	glColor3f(0, 0, 1.0);
-	glNormal3f(0, 0, -s);
-	glVertex3f(0, 0, -s);
-	glNormal3f(0, 0, s);
-	glVertex3f(0, 0, s);
-
-	glNormal3f(n, 0, n);
-	glVertex3f(0, 0, s);
-	glVertex3f(d, 0, s - d);
-	glNormal3f(-n, 0, n);
-	glVertex3f(0, 0, s);
-	glVertex3f(-d, 0, s - d);
-	glNormal3f(0, n, n);
-	glVertex3f(0, 0, s);
-	glVertex3f(0, d, s - d);
-	glNormal3f(0, -n, n);
-	glVertex3f(0, 0, s);
-	glVertex3f(0, -d, s - d);
-
-	::glEnd();
-	::glPopMatrix();
-}
-
 void CanvasMain::Render()
 {
 	c0++;
-	if(displayCoordinateSystem) RenderCoordinateSystem();
 	if(project == NULL) return;
 	switch(display){
 	case displayObjects:
@@ -146,16 +73,16 @@ void CanvasMain::Render()
 	case displayWorkpieces:
 	{
 		glLoadName(2);
-		project->PaintWorkpiece(selectedWorkpiece);
+		project->PaintWorkpiece();
 		break;
 	}
 	case displayRun:
 	{
 		glLoadName(3);
 		if(displayAnimation){
-			project->PaintAnimation(selectedRun);
+			project->PaintAnimation();
 		}else{
-			project->PaintRun(selectedRun);
+			project->PaintRun();
 		}
 		break;
 	}

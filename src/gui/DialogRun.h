@@ -52,6 +52,8 @@ private:
 	DisplaySettings * settings;
 	wxCommandProcessor * commandProcessor;
 
+	bool lockUpdate;
+
 	// Methods
 public:
 

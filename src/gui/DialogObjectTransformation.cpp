@@ -27,6 +27,7 @@
 #include "DialogObjectTransformation.h"
 
 #include "../project/command/CommandObjectTransform.h"
+#include "../project/command/CommandObjectSetColor.h"
 #include "IDs.h"
 #include <wx/event.h>
 #include <math.h>
@@ -83,7 +84,17 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 		m_choiceObjectSelection->Append(_("Multiple objects selected."));
 		m_choiceObjectSelection->SetSelection(n);
 	}
-	if(selection >= 0) m_choiceObjectSelection->SetSelection(selection);
+	Vector3 color;
+	if(selection >= 0){
+		m_choiceObjectSelection->SetSelection(selection);
+
+		if(project->objects[selection].geometries.GetCount() > 0){
+			color = project->objects[selection].geometries[0].color;
+
+		}
+	}
+	m_colourPickerObject->SetColour(
+	wxColor(floor(color.x * 255), floor(color.y * 255), floor(color.z * 255)));
 
 	// Update Units
 
@@ -414,7 +425,7 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 		}
 	}
 
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATEPROJECT);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
 	ProcessEvent(selectEvent);
 }
 
@@ -483,4 +494,21 @@ void DialogObjectTransformation::OnFlipNormals(wxCommandEvent& event)
 	wxCommandEvent flipEvent(wxEVT_COMMAND_MENU_SELECTED,
 	ID_OBJECTFLIPNORMALS);
 	ProcessEvent(flipEvent);
+}
+
+void DialogObjectTransformation::OnChangeObjectColor(wxColourPickerEvent& event)
+{
+	Vector3 color;
+	wxColor temp = m_colourPickerObject->GetColour();
+	color.x = (float) temp.Red() / 255.0;
+	color.y = (float) temp.Green() / 255.0;
+	color.z = (float) temp.Blue() / 255.0;
+	for(size_t n = 0; n < project->objects.GetCount(); n++){
+		if(!project->objects[n].selected) continue;
+		CommandObjectSetColor* command = new CommandObjectSetColor(
+				_("Set object color"), project, n, color);
+		commandProcessor->Submit(command);
+	}
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
+	ProcessEvent(selectEvent);
 }

@@ -27,23 +27,33 @@
 #ifndef TREEITEM_H_
 #define TREEITEM_H_
 
+/*!\class TreeItem
+ * \brief Items for the TreeSetup
+ *
+ * This class is used to identify the objects in the TreeView. Each item has
+ * a ItemDataType and a number. This is used to identify which part of the tree
+ * has been click upon.
+ *
+ */
+
+
 #include <wx/treectrl.h>
 
 enum ItemDataType {
 	itemUnknown = 0, ///> Default
-	itemProject,
-	itemGroupObject,
-	itemObject,
-	itemSubObject,
-	itemGroupWorkpiece,
-	itemWorkpiece,
-	itemPlacement,
-	itemObjectLink,
-	itemGroupRun,
-	itemRun,
-	itemRunWorkpiece,
-	itemMachine,
-	itemToolpath
+	itemProject,       //!< itemProject
+	itemGroupObject,   //!< itemGroupObject
+	itemObject,        //!< itemObject
+	itemSubObject,     //!< itemSubObject
+	itemGroupWorkpiece,//!< itemGroupWorkpiece
+	itemWorkpiece,     //!< itemWorkpiece
+	itemPlacement,     //!< itemPlacement
+	itemObjectLink,    //!< itemObjectLink
+	itemGroupRun,      //!< itemGroupRun
+	itemRun,           //!< itemRun
+	itemRunWorkpiece,  //!< itemRunWorkpiece
+	itemMachine,       //!< itemMachine
+	itemToolpath       //!< itemToolpath
 };
 
 class TreeItem:public wxTreeItemData {

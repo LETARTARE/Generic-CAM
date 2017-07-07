@@ -45,6 +45,7 @@ bool CommandRunGeneratorDelete::Do(void)
 {
 	Run* run = &(project->run[runNr]);
 	oldGenerator = *(run->generators.Detach(position));
+	project->Update();
 	return true;
 }
 
@@ -58,5 +59,6 @@ bool CommandRunGeneratorDelete::Undo(void)
 	else
 		run->generators.Insert(oldGenerator, position);
 	oldGenerator = NULL;
+	project->Update();
 	return true;
 }

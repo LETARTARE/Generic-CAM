@@ -81,7 +81,7 @@ private:
 
 	void OnXClose(wxCloseEvent& event);
 	void OnClose(wxCommandEvent& event);
-
+	void OnChangeObjectColor(wxColourPickerEvent& event);
 	void OnSelectObject(wxCommandEvent& event);
 	void OnTransform(wxCommandEvent& event);
 	void OnSetFactors(wxCommandEvent& event);

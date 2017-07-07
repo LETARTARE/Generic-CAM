@@ -37,6 +37,7 @@ Generator::Generator()
 {
 	parent = NULL;
 	refTool = 0;
+
 	marginBelow = 0.0;
 	marginSide = 0.0;
 	freeHeight = 0.001;

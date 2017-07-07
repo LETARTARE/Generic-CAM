@@ -149,7 +149,7 @@ bool ToolBox::LoadToolBox(wxFileName& fileName)
 //
 //	this->fileName = fileName;
 
-//TODO: Loading code comes here.
+//TODO: Add loading code.
 
 	return true;
 }
@@ -211,4 +211,65 @@ bool ToolBox::FromStream(wxTextInputStream& stream)
 		tools.Add(tool);
 	}
 	return flag;
+}
+
+Tool* ToolBox::ToolInSlot(int slotNr)
+{
+	for(size_t i = 0; i < tools.GetCount(); i++)
+		if(tools[i].slotNr == slotNr) return &(tools[i]);
+	return NULL;
+}
+
+const Tool* ToolBox::ToolInSlot(int slotNr) const
+{
+	for(size_t i = 0; i < tools.GetCount(); i++)
+		if(tools[i].slotNr == slotNr) return &(tools[i]);
+	return NULL;
+}
+
+Tool* ToolBox::ToolIndex(size_t index)
+{
+	return &(tools[index]);
+}
+
+const Tool* ToolBox::ToolIndex(size_t index) const
+{
+	return &(tools[index]);
+}
+
+int ToolBox::AddTool(Tool& newTool)
+{
+	size_t i;
+	for(i = 0; i < tools.GetCount(); i++)
+		if(tools[i].toolName.Cmp(newTool.toolName) == 0){
+			tools[i] = newTool;
+			return i;
+		}
+	tools.Add(newTool);
+	return tools.GetCount() - 1;
+}
+
+bool ToolBox::RemoveToolSlot(int slotNr)
+{
+	size_t i;
+	for(i = 0; i < tools.GetCount(); i++)
+		if(tools[i].slotNr == slotNr){
+			tools.RemoveAt(i, 1);
+			return true;
+		}
+	return false;
+}
+
+bool ToolBox::RemoveToolIndex(size_t index)
+{
+	if(index >= tools.GetCount()) return false;
+	tools.RemoveAt(index, 1);
+	return true;
+}
+
+bool ToolBox::IsSlotFilled(int slotNr) const
+{
+	for(size_t i = 0; i < tools.GetCount(); i++)
+		if(tools[i].slotNr == slotNr) return true;
+	return false;
 }

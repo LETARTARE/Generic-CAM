@@ -27,6 +27,7 @@
 #include <wx/statusbr.h>
 #include <wx/toolbar.h>
 #include <wx/frame.h>
+#include <wx/clrpicker.h>
 #include <wx/choice.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
@@ -241,6 +242,7 @@ class GUIMain : public wxFrame
 		virtual void OnActivateRightClickMenu( wxTreeEvent& event ) = 0;
 		virtual void OnSelectionChanged( wxTreeEvent& event ) = 0;
 		virtual void OnSelectionChanging( wxTreeEvent& event ) = 0;
+		virtual void On3DDClick( wxMouseEvent& event ) = 0;
 		virtual void On3DSelect( wxMouseEvent& event ) = 0;
 		virtual void OnToolbarButton( wxCommandEvent& event ) = 0;
 		
@@ -270,6 +272,7 @@ class GUIObjectTransformation : public wxFrame
 		wxMenu* m_menuObject;
 		wxMenu* m_menuEdit;
 		wxMenu* m_menuSettings;
+		wxColourPickerCtrl* m_colourPickerObject;
 		wxChoice* m_choiceObjectSelection;
 		wxStaticText* m_staticText37;
 		wxTextCtrl* m_textCtrlSizeX;
@@ -360,6 +363,7 @@ class GUIObjectTransformation : public wxFrame
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;
 		virtual void OnClose( wxCommandEvent& event ) = 0;
+		virtual void OnChangeObjectColor( wxColourPickerEvent& event ) = 0;
 		virtual void OnSelectObject( wxCommandEvent& event ) = 0;
 		virtual void OnTransform( wxCommandEvent& event ) = 0;
 		virtual void OnSetFactors( wxCommandEvent& event ) = 0;
@@ -436,7 +440,7 @@ class GUIWorkpiece : public wxFrame
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuStock;
 		wxMenu* m_menuEdit;
-		wxStaticText* m_staticText97;
+		wxStaticText* m_staticTextStock;
 		wxChoice* m_choiceStock;
 		wxButton* m_buttonAdd;
 		wxGrid* m_grid;
@@ -465,7 +469,9 @@ class GUIPlacement : public wxFrame
 	
 	protected:
 		wxMenuBar* m_menubar;
+		wxMenu* m_menuPlacement;
 		wxMenu* m_menuEdit;
+		wxMenu* m_menuSettings;
 		wxChoice* m_choiceWorkpiece;
 		wxChoice* m_choicePlacement;
 		
@@ -529,8 +535,8 @@ class GUIRun : public wxFrame
 	
 	protected:
 		wxMenuBar* m_menubar;
-		wxMenu* m_menuEdit;
 		wxMenu* m_menuToolbox;
+		wxMenu* m_menuEdit;
 		wxMenu* m_menuSettings;
 		wxChoice* m_choiceRun;
 		wxChoice* m_choiceWorkpiece;
@@ -841,11 +847,11 @@ class GUIToolpathGenerator : public wxFrame
 		wxTextCtrl* m_textCtrlFreeHeight;
 		wxStaticText* m_staticTextUnitFreeHeight;
 		wxChoicebook* m_choicebookGenerator;
-		wxTextCtrl* m_textCtrlInfo;
 		wxButton* m_buttonUpdate;
 		wxButton* m_buttonReset;
 		wxButton* m_buttonDelete;
 		wxButton* m_buttonClose;
+		wxTextCtrl* m_textCtrlInfo;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;

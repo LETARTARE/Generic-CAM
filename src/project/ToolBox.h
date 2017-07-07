@@ -50,6 +50,7 @@ public:
 	//Member variables
 public:
 	wxFileName fileName;
+private:
 	ArrayOfTool tools;
 
 private:
@@ -63,6 +64,15 @@ public:
 	void ToStream(wxTextOutputStream & stream);
 	bool FromStream(wxTextInputStream & stream);
 	bool IsInitialized(void) const;
+
+	int AddTool(Tool& newTool);
+	bool RemoveToolSlot(int slotNr);
+	bool RemoveToolIndex(size_t index);
+	bool IsSlotFilled(int slotNr) const;
+	Tool * ToolInSlot(int slotNr);
+	const Tool * ToolInSlot(int slotNr) const;
+	Tool * ToolIndex(size_t index);
+	const Tool * ToolIndex(size_t index) const;
 	size_t GetToolCount(void) const;
 };
 

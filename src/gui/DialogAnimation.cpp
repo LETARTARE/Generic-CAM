@@ -105,9 +105,10 @@ void DialogAnimation::OnScroll(wxScrollEvent& event)
 	const Tool * const tool = &(run->tools[toolNr]);
 
 	workpiece->InitSimulation(1000000);
-	workpiece->simulation.Simulate(generator->toolpath,*tool);
+	workpiece->simulation.Simulate(generator->toolpath, *tool);
 
-	wxCommandEvent refreshEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
+	wxCommandEvent refreshEvent(wxEVT_COMMAND_MENU_SELECTED,
+			ID_UPDATESIMULATION);
 	ProcessEvent(refreshEvent);
 }
 

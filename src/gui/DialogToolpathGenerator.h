@@ -54,6 +54,8 @@ public:
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 
+	void UndoChanges(void);
+
 	void OnXClose(wxCloseEvent& event);
 	void OnSelectRun(wxCommandEvent& event);
 	void OnSelectToolpath(wxCommandEvent& event);
@@ -70,15 +72,18 @@ public:
 private:
 
 	GeneratorCollection gc;
-
-	int GetSelectedToolpath(int runNr);
 	int GetGeneratorNr(int runNr, int toolpathNr);
 
+	int currentRun;
+	int currentToolpath;
 	BoundingBox box;
 	float marginSides;
 	float marginBelow;
 	size_t slotNr;
 	float freeHeight;
+
+	bool lockUpdate;
+
 };
 
 #endif /* DIALOGTOOLPATHGENERATOR_H_ */

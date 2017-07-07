@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunWorkpieceAssign.cpp
-// Purpose            : 
+// Name               : DnDFile.h
+// Purpose            : Drag&Drop target for files
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 21.01.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 24.06.2017
+// Copyright          : (C) 2017 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,31 +24,30 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandRunWorkpieceAssign.h"
+#ifndef DNDFILE_H_
+#define DNDFILE_H_
 
-CommandRunWorkpieceAssign::CommandRunWorkpieceAssign(const wxString& name,
-		Project* project, int runNr, int workpieceNr) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->runNr = runNr;
-	this->newWorkpieceNr = workpieceNr;
-	this->oldWorkpieceNr = -1;
-}
+/*!\class DnDFile
+ * \brief Drag&Drop target for files
+ *
+ * This target is associated with the treeview and the main 3D window (from FrameMain).
+ * It receives files (filenames). According to the type, it either issues a object load
+ * command (*.stl, *.gts, *.dxf) or loads a project (*.zip, *.prj).
+ */
 
-bool CommandRunWorkpieceAssign::Do(void)
-{
-	Run* run = &(project->run[runNr]);
-	oldWorkpieceNr = run->refWorkpiece;
-	run->refWorkpiece = newWorkpieceNr;
-	project->Update();
-	return true;
-}
+#include "FrameMain.h"
+#include "../project/Project.h"
+#include <wx/dnd.h>
 
-bool CommandRunWorkpieceAssign::Undo(void)
-{
-	Run* run = &(project->run[runNr]);
-	run->refWorkpiece = oldWorkpieceNr;
-	project->Update();
-	return true;
-}
+class DnDFile:public wxFileDropTarget {
+public:
+	DnDFile(Project *project, FrameMain* parent);
+	virtual bool OnDropFiles(wxCoord x, wxCoord y,
+			const wxArrayString& filenames);
+
+private:
+	Project* project;
+	FrameMain* parent;
+};
+
+#endif /* DNDFILE_H_ */

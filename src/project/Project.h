@@ -31,14 +31,9 @@
  * \ingroup document
  * \brief Holds the data of a project.
  *
- * An GenericCAM project consists of
- * - one or more objects (may be modified, sliced, inverted into mold forms, ect.)
- * - one or more pieces of stock material
- * - one or more run
- *    - a machine
- *    - tools for the machine
- *    - toolpath generators
- *       - generated toolpaths
+ * An GenericCAM project consists of the Object%s, Workpiece%s and Run%s.
+ *
+ * The linking of all parts of the project is describes in the \ref document document.
  *
  * \todo Rewrite to XML load/store for future backward compatibility.
  */
@@ -82,15 +77,24 @@ public:
 	void LoadPattern(wxFileName fileName);
 	bool SaveToolpath(wxFileName fileName, int runNr);
 
-	void PaintObjects(void);
-	void PaintWorkpiece(unsigned int workpieceNr);
-	void PaintRun(unsigned int runNr);
-	void PaintAnimation(unsigned int runNr);
-	void PaintDepthField(unsigned int runNr, unsigned int objectReferenceNr);
+	void PaintObjects(void) const;
+	void PaintWorkpiece(void) const;
+	void PaintRun(void) const;
+	void PaintAnimation(void) const;
+
+	int GetFirstSelectedObject(void) const;
+	int GetFirstSelectedWorkpiece(void) const;
+	int GetFirstSelectedRun(void) const;
+
+//	void PaintDepthField(unsigned int runNr, unsigned int objectReferenceNr);
 
 	void Update(void);
 
 	bool GenerateToolpaths(void); ///< Direct generation of all toolpaths.
+
+private:
+	void RenderCoordinateSystem(void) const;
+
 //	void PropagateChanges(void);
 //	size_t ToolpathToGenerate(void);
 //	bool ToolpathGenerate(void);

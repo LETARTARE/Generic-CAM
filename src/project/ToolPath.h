@@ -29,7 +29,21 @@
 
 /*!\class ToolPath
  * \ingroup document
- * \brief generated toolpath
+ * \brief Generated Toolpath
+ *
+ *
+ * \par Safety Block
+ *  - \b G90 - Absolute positioning
+ *  - \b G80 - Cancel all canned cycles
+ *  - \b G40 - Tool radius compensation: off
+ *  - \b G54 - No working coordinate system offsets
+ *  - \b G21 - Unit: mm
+ *  - \b G17 - XY plane selection
+ *  - \b G50 - Cancel scaling function
+ *  - \b G94 - Feedrate per minute
+ *  - \b G64 - Default cutting mode
+ *
+ *
  */
 
 #include "machine/MachinePosition.h"
@@ -53,7 +67,6 @@ public:
 
 	// Member variables
 public:
-	bool selected;
 
 	ArrayOfMachinePosition positions;
 	MachinePosition minPosition;
@@ -63,6 +76,8 @@ public:
 	Vector3 colorCutting;
 
 	wxString info;
+
+	bool selected;
 
 	// Methods
 public:

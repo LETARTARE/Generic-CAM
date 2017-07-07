@@ -43,6 +43,7 @@ CommandWorkpieceDelete::~CommandWorkpieceDelete()
 bool CommandWorkpieceDelete::Do(void)
 {
 	workpiece = project->workpieces.Detach(workpieceNr);
+	project->Update();
 	return true;
 }
 
@@ -56,5 +57,6 @@ bool CommandWorkpieceDelete::Undo(void)
 	// If the the workpiece was inserted back into the project,
 	// this function must not delete the workpiece in the destructor.
 	workpiece = NULL;
+	project->Update();
 	return true;
 }

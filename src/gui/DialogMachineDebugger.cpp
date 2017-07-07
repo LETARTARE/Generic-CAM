@@ -35,7 +35,7 @@ DialogMachineDebugger::DialogMachineDebugger(wxWindow * parent,
 		GUIMachineDebugger(parent)
 {
 
-	this->Connect(ID_UPDATESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
+	this->Connect(ID_UPDATEMACHINESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(DialogMachineDebugger::Update));
 
 	this->settings = settings;
@@ -52,7 +52,7 @@ DialogMachineDebugger::DialogMachineDebugger(wxWindow * parent,
 
 DialogMachineDebugger::~DialogMachineDebugger()
 {
-	this->Disconnect(ID_UPDATESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
+	this->Disconnect(ID_UPDATEMACHINESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(DialogMachineDebugger::Update));
 }
 

@@ -32,22 +32,26 @@
  * This headerfile contains a list of command IDs. These are used to communicate
  * from the child windows to the main window.
  *
- * On the difference between Update and Refresh:
+ * \par Difference between Update and Refresh
+ *  - \b Refresh - Refresh of the display without changing the Project itself.
+ *  - \b Update - Changing the Project or the Simulation and updating the display afterwards.
  *
- *   Refresh: It would be nice, if we do a repaint next time we are in the idle loop. All calculations are already done.
- *
- *   Update: Do some processing, use new information to recalculate something. (Perhaps do a Refresh afterwards.)
- *
+ * \par List of IDs
+ *  - \b ID_REFRESH3DVIEW - Refresh the main OpenGL drawing area (e.g after a rotation of scene)
+ *  - \b ID_REFRESHMAINGUI - Update and refresh the Treeview, the menu items and the main OpenGL view
+ *  - \b ID_REFRESHALL - All of the above, also all subwindows as well (e.g. propagation of Units)
+ *  - \b ID_UPDATESIMULATION - Update the Simulation system in the Project. Refresh OpenGL afterwards.
+ *  - \b ID_UPDATEMACHINESIMULATION - Refresh the Machine Simulator in the DialogMachineDebugger
  */
 
-#define ID_REFRESH3DVIEW			(wxID_HIGHEST+1)
-#define ID_REFRESHMAINGUI			(wxID_HIGHEST+2)
-#define ID_REFRESHALL				(wxID_HIGHEST+3)
+#define ID_REFRESH3DVIEW				(wxID_HIGHEST+1)
+#define ID_REFRESHMAINGUI				(wxID_HIGHEST+2)
+#define ID_REFRESHALL					(wxID_HIGHEST+3)
 
-#define ID_UPDATEPROJECT			(wxID_HIGHEST+11)
-#define ID_UPDATESIMULATION			(wxID_HIGHEST+12)
+#define ID_UPDATESIMULATION				(wxID_HIGHEST+11)
+#define ID_UPDATEMACHINESIMULATION		(wxID_HIGHEST+12)
 
 //! \def ID_THREADLASTDONE Worker thread to main thread: Processing of volume ready.
-#define ID_THREADLASTDONE			(wxID_HIGHEST+21)
+#define ID_THREADLASTDONE				(wxID_HIGHEST+21)
 
 #endif /* IDS_H_ */

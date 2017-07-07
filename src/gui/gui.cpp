@@ -54,7 +54,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuProject->Append( m_menuItemProjectSave );
 	
 	wxMenuItem* m_menuItemProjectSaveAs;
-	m_menuItemProjectSaveAs = new wxMenuItem( m_menuProject, wxID_SAVEAS, wxString( _("Save Project &as...") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemProjectSaveAs = new wxMenuItem( m_menuProject, wxID_SAVEAS, wxString( _("Save Project &as...") ) + wxT('\t') + wxT("CTRL+SHIFT+S"), wxEmptyString, wxITEM_NORMAL );
 	m_menuProject->Append( m_menuItemProjectSaveAs );
 	
 	wxMenuItem* m_separator4;
@@ -159,6 +159,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	wxMenuItem* m_menuItemFlipDrill;
 	m_menuItemFlipDrill = new wxMenuItem( m_menuMachine, wxID_ANY, wxString( _("Setup &Filp Drills") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuMachine->Append( m_menuItemFlipDrill );
+	m_menuItemFlipDrill->Enable( false );
 	
 	m_menubar->Append( m_menuMachine, _("&Machine") );
 	
@@ -212,6 +213,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	wxMenuItem* m_menuItemGeneratorRestart;
 	m_menuItemGeneratorRestart = new wxMenuItem( m_menuToolpath, ID_GENERATORRESTART, wxString( _("&Restart Generation") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuToolpath->Append( m_menuItemGeneratorRestart );
+	m_menuItemGeneratorRestart->Enable( false );
 	
 	wxMenuItem* m_separator19;
 	m_separator19 = m_menuToolpath->AppendSeparator();
@@ -412,6 +414,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_tree->Connect( wxEVT_COMMAND_TREE_ITEM_MENU, wxTreeEventHandler( GUIMain::OnActivateRightClickMenu ), NULL, this );
 	m_tree->Connect( wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler( GUIMain::OnSelectionChanged ), NULL, this );
 	m_tree->Connect( wxEVT_COMMAND_TREE_SEL_CHANGING, wxTreeEventHandler( GUIMain::OnSelectionChanging ), NULL, this );
+	m_canvas->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( GUIMain::On3DDClick ), NULL, this );
 	m_canvas->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( GUIMain::On3DSelect ), NULL, this );
 	this->Connect( wxID_UNDO, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnUndo ) );
 	this->Connect( wxID_REDO, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnRedo ) );
@@ -479,6 +482,7 @@ GUIMain::~GUIMain()
 	m_tree->Disconnect( wxEVT_COMMAND_TREE_ITEM_MENU, wxTreeEventHandler( GUIMain::OnActivateRightClickMenu ), NULL, this );
 	m_tree->Disconnect( wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler( GUIMain::OnSelectionChanged ), NULL, this );
 	m_tree->Disconnect( wxEVT_COMMAND_TREE_SEL_CHANGING, wxTreeEventHandler( GUIMain::OnSelectionChanging ), NULL, this );
+	m_canvas->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( GUIMain::On3DDClick ), NULL, this );
 	m_canvas->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( GUIMain::On3DSelect ), NULL, this );
 	this->Disconnect( wxID_UNDO, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnUndo ) );
 	this->Disconnect( wxID_REDO, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnRedo ) );
@@ -534,56 +538,59 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	
 	this->SetMenuBar( m_menubar );
 	
-	wxBoxSizer* bSizer21;
-	bSizer21 = new wxBoxSizer( wxVERTICAL );
+	wxBoxSizer* bSizerMain;
+	bSizerMain = new wxBoxSizer( wxVERTICAL );
 	
-	wxBoxSizer* bSizer22;
-	bSizer22 = new wxBoxSizer( wxHORIZONTAL );
+	wxBoxSizer* bSizerTop;
+	bSizerTop = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_colourPickerObject = new wxColourPickerCtrl( this, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
+	bSizerTop->Add( m_colourPickerObject, 0, wxALL, 5 );
 	
 	wxArrayString m_choiceObjectSelectionChoices;
 	m_choiceObjectSelection = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceObjectSelectionChoices, 0 );
 	m_choiceObjectSelection->SetSelection( 0 );
-	bSizer22->Add( m_choiceObjectSelection, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizerTop->Add( m_choiceObjectSelection, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	bSizer21->Add( bSizer22, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizerMain->Add( bSizerTop, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	wxStaticBoxSizer* sbSizer3;
-	sbSizer3 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Current size of object") ), wxHORIZONTAL );
+	wxStaticBoxSizer* sbSizerSize;
+	sbSizerSize = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Current size of object") ), wxHORIZONTAL );
 	
 	m_staticText37 = new wxStaticText( this, wxID_ANY, _("X:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText37->Wrap( -1 );
-	sbSizer3->Add( m_staticText37, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerSize->Add( m_staticText37, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrlSizeX = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxTE_RIGHT );
-	sbSizer3->Add( m_textCtrlSizeX, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerSize->Add( m_textCtrlSizeX, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticTextUnitX = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitX->Wrap( -1 );
-	sbSizer3->Add( m_staticTextUnitX, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerSize->Add( m_staticTextUnitX, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticText38 = new wxStaticText( this, wxID_ANY, _("Y:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText38->Wrap( -1 );
-	sbSizer3->Add( m_staticText38, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerSize->Add( m_staticText38, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrlSizeY = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxTE_RIGHT );
-	sbSizer3->Add( m_textCtrlSizeY, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerSize->Add( m_textCtrlSizeY, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticTextUnitY = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitY->Wrap( -1 );
-	sbSizer3->Add( m_staticTextUnitY, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerSize->Add( m_staticTextUnitY, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticText39 = new wxStaticText( this, wxID_ANY, _("Z:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText39->Wrap( -1 );
-	sbSizer3->Add( m_staticText39, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerSize->Add( m_staticText39, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrlSizeZ = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxTE_RIGHT );
-	sbSizer3->Add( m_textCtrlSizeZ, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerSize->Add( m_textCtrlSizeZ, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticTextUnitZ = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitZ->Wrap( -1 );
-	sbSizer3->Add( m_staticTextUnitZ, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerSize->Add( m_staticTextUnitZ, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	bSizer21->Add( sbSizer3, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	bSizerMain->Add( sbSizerSize, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
 	m_notebook = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 	m_panelScale = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
@@ -929,14 +936,15 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	bSizer36->Fit( m_panelMirror );
 	m_notebook->AddPage( m_panelMirror, _("Mirror"), false );
 	
-	bSizer21->Add( m_notebook, 1, wxALL|wxEXPAND, 5 );
+	bSizerMain->Add( m_notebook, 1, wxALL|wxEXPAND, 5 );
 	
-	this->SetSizer( bSizer21 );
+	this->SetSizer( bSizerMain );
 	this->Layout();
 	
 	// Connect Events
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIObjectTransformation::OnXClose ) );
 	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIObjectTransformation::OnClose ) );
+	m_colourPickerObject->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( GUIObjectTransformation::OnChangeObjectColor ), NULL, this );
 	m_choiceObjectSelection->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIObjectTransformation::OnSelectObject ), NULL, this );
 	m_buttonMultTen->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_buttonDivTen->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
@@ -974,6 +982,7 @@ GUIObjectTransformation::~GUIObjectTransformation()
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIObjectTransformation::OnXClose ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIObjectTransformation::OnClose ) );
+	m_colourPickerObject->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( GUIObjectTransformation::OnChangeObjectColor ), NULL, this );
 	m_choiceObjectSelection->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIObjectTransformation::OnSelectObject ), NULL, this );
 	m_buttonMultTen->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_buttonDivTen->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
@@ -1013,11 +1022,11 @@ GUIStockMaterial::GUIStockMaterial( wxWindow* parent, wxWindowID id, const wxStr
 	m_menubar = new wxMenuBar( 0 );
 	m_menuStock = new wxMenu();
 	wxMenuItem* m_menuItemLoadStock;
-	m_menuItemLoadStock = new wxMenuItem( m_menuStock, ID_TOOLBOXLOAD, wxString( _("&Load Stocklist...") ) + wxT('\t') + wxT("Ctrl+L"), wxEmptyString, wxITEM_NORMAL );
+	m_menuItemLoadStock = new wxMenuItem( m_menuStock, ID_STOCKLOAD, wxString( _("&Load Stocklist...") ) + wxT('\t') + wxT("Ctrl+L"), wxEmptyString, wxITEM_NORMAL );
 	m_menuStock->Append( m_menuItemLoadStock );
 	
 	wxMenuItem* m_menuItemSaveStock;
-	m_menuItemSaveStock = new wxMenuItem( m_menuStock, ID_TOOLBOXSAVE, wxString( _("&Save Stocklist...") ) + wxT('\t') + wxT("Ctrl+S"), wxEmptyString, wxITEM_NORMAL );
+	m_menuItemSaveStock = new wxMenuItem( m_menuStock, ID_STOCKSAVE, wxString( _("&Save Stocklist...") ) + wxT('\t') + wxT("Ctrl+S"), wxEmptyString, wxITEM_NORMAL );
 	m_menuStock->Append( m_menuItemSaveStock );
 	
 	wxMenuItem* m_separator;
@@ -1038,69 +1047,69 @@ GUIStockMaterial::GUIStockMaterial( wxWindow* parent, wxWindowID id, const wxStr
 	
 	this->SetMenuBar( m_menubar );
 	
-	wxBoxSizer* bSizer20;
-	bSizer20 = new wxBoxSizer( wxVERTICAL );
+	wxBoxSizer* bSizerMain;
+	bSizerMain = new wxBoxSizer( wxVERTICAL );
 	
-	wxBoxSizer* bSizer55;
-	bSizer55 = new wxBoxSizer( wxHORIZONTAL );
+	wxBoxSizer* bSizerTop;
+	bSizerTop = new wxBoxSizer( wxHORIZONTAL );
 	
 	
-	bSizer55->Add( 0, 0, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizerTop->Add( 0, 0, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticText96 = new wxStaticText( this, wxID_ANY, _("Name:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText96->Wrap( -1 );
-	bSizer55->Add( m_staticText96, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizerTop->Add( m_staticText96, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrlName = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer55->Add( m_textCtrlName, 3, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizerTop->Add( m_textCtrlName, 3, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
-	bSizer55->Add( 0, 0, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizerTop->Add( 0, 0, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	bSizer20->Add( bSizer55, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	bSizerMain->Add( bSizerTop, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
-	wxBoxSizer* bSizer52;
-	bSizer52 = new wxBoxSizer( wxHORIZONTAL );
+	wxBoxSizer* bSizerSize;
+	bSizerSize = new wxBoxSizer( wxHORIZONTAL );
 	
-	wxFlexGridSizer* fgSizer4;
-	fgSizer4 = new wxFlexGridSizer( 3, 3, 0, 0 );
-	fgSizer4->SetFlexibleDirection( wxBOTH );
-	fgSizer4->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxFlexGridSizer* fgSizerCols;
+	fgSizerCols = new wxFlexGridSizer( 3, 3, 0, 0 );
+	fgSizerCols->SetFlexibleDirection( wxBOTH );
+	fgSizerCols->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	m_staticText27 = new wxStaticText( this, wxID_ANY, _("Length (in X):"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText27->Wrap( -1 );
-	fgSizer4->Add( m_staticText27, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	fgSizerCols->Add( m_staticText27, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
 	
 	m_textCtrlX = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
-	fgSizer4->Add( m_textCtrlX, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	fgSizerCols->Add( m_textCtrlX, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_staticTextUnitX = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitX->Wrap( -1 );
-	fgSizer4->Add( m_staticTextUnitX, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	fgSizerCols->Add( m_staticTextUnitX, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticText29 = new wxStaticText( this, wxID_ANY, _("Width (in Y):"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText29->Wrap( -1 );
-	fgSizer4->Add( m_staticText29, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	fgSizerCols->Add( m_staticText29, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
 	
 	m_textCtrlY = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
-	fgSizer4->Add( m_textCtrlY, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	fgSizerCols->Add( m_textCtrlY, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_staticTextUnitY = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitY->Wrap( -1 );
-	fgSizer4->Add( m_staticTextUnitY, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	fgSizerCols->Add( m_staticTextUnitY, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticText31 = new wxStaticText( this, wxID_ANY, _("Height (in Z):"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText31->Wrap( -1 );
-	fgSizer4->Add( m_staticText31, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	fgSizerCols->Add( m_staticText31, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
 	
 	m_textCtrlZ = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
-	fgSizer4->Add( m_textCtrlZ, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	fgSizerCols->Add( m_textCtrlZ, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_staticTextUnitZ = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitZ->Wrap( -1 );
-	fgSizer4->Add( m_staticTextUnitZ, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	fgSizerCols->Add( m_staticTextUnitZ, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	bSizer52->Add( fgSizer4, 0, wxALIGN_BOTTOM, 5 );
+	bSizerSize->Add( fgSizerCols, 0, wxALIGN_BOTTOM, 5 );
 	
 	wxBoxSizer* bSizer53;
 	bSizer53 = new wxBoxSizer( wxVERTICAL );
@@ -1134,30 +1143,30 @@ GUIStockMaterial::GUIStockMaterial( wxWindow* parent, wxWindowID id, const wxStr
 	
 	bSizer53->Add( fgSizer13, 0, 0, 5 );
 	
-	bSizer52->Add( bSizer53, 0, wxALIGN_BOTTOM, 5 );
+	bSizerSize->Add( bSizer53, 0, wxALIGN_BOTTOM, 5 );
 	
-	bSizer20->Add( bSizer52, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizerMain->Add( bSizerSize, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_checkBoxAvailable = new wxCheckBox( this, wxID_ANY, _("available in workshop"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_checkBoxAvailable->SetToolTip( _("Pieces of stock material can be set to \"available\". This allows the (not yet written) autosetup function to know what is really available in the workshop. Thus stock that is not available needs not to be deleted.") );
 	
-	bSizer20->Add( m_checkBoxAvailable, 0, wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizerMain->Add( m_checkBoxAvailable, 0, wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	wxBoxSizer* bSizer54;
-	bSizer54 = new wxBoxSizer( wxHORIZONTAL );
+	wxBoxSizer* bSizerButtons;
+	bSizerButtons = new wxBoxSizer( wxHORIZONTAL );
 	
 	m_buttonStockAdd = new wxButton( this, wxID_ANY, _("Add / Update"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer54->Add( m_buttonStockAdd, 0, wxALL, 5 );
+	bSizerButtons->Add( m_buttonStockAdd, 0, wxALL, 5 );
 	
 	m_buttonStockDelete = new wxButton( this, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer54->Add( m_buttonStockDelete, 0, wxALL, 5 );
+	bSizerButtons->Add( m_buttonStockDelete, 0, wxALL, 5 );
 	
-	bSizer20->Add( bSizer54, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizerMain->Add( bSizerButtons, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_listCtrl = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VRULES );
-	bSizer20->Add( m_listCtrl, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizerMain->Add( m_listCtrl, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	this->SetSizer( bSizer20 );
+	this->SetSizer( bSizerMain );
 	this->Layout();
 	
 	// Connect Events
@@ -1214,30 +1223,30 @@ GUIWorkpiece::GUIWorkpiece( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	this->SetMenuBar( m_menubar );
 	
-	wxBoxSizer* bSizer56;
-	bSizer56 = new wxBoxSizer( wxVERTICAL );
+	wxBoxSizer* bSizerMain;
+	bSizerMain = new wxBoxSizer( wxVERTICAL );
 	
-	wxBoxSizer* bSizer57;
-	bSizer57 = new wxBoxSizer( wxHORIZONTAL );
+	wxBoxSizer* bSizerTop;
+	bSizerTop = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_staticText97 = new wxStaticText( this, wxID_ANY, _("Stock:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText97->Wrap( -1 );
-	bSizer57->Add( m_staticText97, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextStock = new wxStaticText( this, wxID_ANY, _("Stock:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextStock->Wrap( -1 );
+	bSizerTop->Add( m_staticTextStock, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxArrayString m_choiceStockChoices;
 	m_choiceStock = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceStockChoices, 0 );
 	m_choiceStock->SetSelection( 0 );
-	bSizer57->Add( m_choiceStock, 1, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizerTop->Add( m_choiceStock, 1, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	wxBoxSizer* bSizer58;
-	bSizer58 = new wxBoxSizer( wxVERTICAL );
+	wxBoxSizer* bSizerSelector;
+	bSizerSelector = new wxBoxSizer( wxVERTICAL );
 	
 	m_buttonAdd = new wxButton( this, wxID_ANY, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer58->Add( m_buttonAdd, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizerSelector->Add( m_buttonAdd, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	bSizer57->Add( bSizer58, 0, 0, 5 );
+	bSizerTop->Add( bSizerSelector, 0, 0, 5 );
 	
-	bSizer56->Add( bSizer57, 0, wxEXPAND, 5 );
+	bSizerMain->Add( bSizerTop, 0, wxEXPAND, 5 );
 	
 	m_grid = new wxGrid( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 	
@@ -1263,9 +1272,9 @@ GUIWorkpiece::GUIWorkpiece( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	// Cell Defaults
 	m_grid->SetDefaultCellAlignment( wxALIGN_CENTRE, wxALIGN_CENTRE );
-	bSizer56->Add( m_grid, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizerMain->Add( m_grid, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	this->SetSizer( bSizer56 );
+	this->SetSizer( bSizerMain );
 	this->Layout();
 	
 	// Connect Events
@@ -1293,6 +1302,13 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
 	m_menubar = new wxMenuBar( 0 );
+	m_menuPlacement = new wxMenu();
+	wxMenuItem* m_menuItemClose;
+	m_menuItemClose = new wxMenuItem( m_menuPlacement, wxID_CLOSE, wxString( _("&Close") ) + wxT('\t') + wxT("Ctrl+W"), wxEmptyString, wxITEM_NORMAL );
+	m_menuPlacement->Append( m_menuItemClose );
+	
+	m_menubar->Append( m_menuPlacement, _("&Placement") );
+	
 	m_menuEdit = new wxMenu();
 	wxMenuItem* m_menuItemUndo;
 	m_menuItemUndo = new wxMenuItem( m_menuEdit, wxID_UNDO, wxString( _("&Undo") ) + wxT('\t') + wxT("CTRL+Z"), wxEmptyString, wxITEM_NORMAL );
@@ -1302,21 +1318,14 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menuItemRedo = new wxMenuItem( m_menuEdit, wxID_REDO, wxString( _("&Redo") ) + wxT('\t') + wxT("CTRL+Y"), wxEmptyString, wxITEM_NORMAL );
 	m_menuEdit->Append( m_menuItemRedo );
 	
-	wxMenuItem* m_separator14;
-	m_separator14 = m_menuEdit->AppendSeparator();
-	
-	wxMenuItem* m_menuItemSetupUnits;
-	m_menuItemSetupUnits = new wxMenuItem( m_menuEdit, ID_SETUPUNITS, wxString( _("Setup &Units") ) + wxT('\t') + wxT("CTRL+U"), wxEmptyString, wxITEM_NORMAL );
-	m_menuEdit->Append( m_menuItemSetupUnits );
-	
-	wxMenuItem* m_separator16;
-	m_separator16 = m_menuEdit->AppendSeparator();
-	
-	wxMenuItem* m_menuItemClose;
-	m_menuItemClose = new wxMenuItem( m_menuEdit, wxID_CLOSE, wxString( _("&Close") ) + wxT('\t') + wxT("Ctrl+W"), wxEmptyString, wxITEM_NORMAL );
-	m_menuEdit->Append( m_menuItemClose );
-	
 	m_menubar->Append( m_menuEdit, _("&Edit") );
+	
+	m_menuSettings = new wxMenu();
+	wxMenuItem* m_menuItemSetupUnits;
+	m_menuItemSetupUnits = new wxMenuItem( m_menuSettings, ID_SETUPUNITS, wxString( _("Setup &Units") ) + wxT('\t') + wxT("CTRL+U"), wxEmptyString, wxITEM_NORMAL );
+	m_menuSettings->Append( m_menuItemSetupUnits );
+	
+	m_menubar->Append( m_menuSettings, _("&Settings") );
 	
 	this->SetMenuBar( m_menubar );
 	
@@ -1533,6 +1542,20 @@ GUIRun::GUIRun( wxWindow* parent, wxWindowID id, const wxString& title, const wx
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
 	m_menubar = new wxMenuBar( 0 );
+	m_menuToolbox = new wxMenu();
+	wxMenuItem* m_menuItemToolboxLoad;
+	m_menuItemToolboxLoad = new wxMenuItem( m_menuToolbox, ID_TOOLBOXLOAD, wxString( _("&Load Toolbox") ) + wxT('\t') + wxT("Ctrl+L"), wxEmptyString, wxITEM_NORMAL );
+	m_menuToolbox->Append( m_menuItemToolboxLoad );
+	
+	wxMenuItem* m_separator9;
+	m_separator9 = m_menuToolbox->AppendSeparator();
+	
+	wxMenuItem* m_menuItemClose;
+	m_menuItemClose = new wxMenuItem( m_menuToolbox, wxID_CLOSE, wxString( _("&Close Window") ) + wxT('\t') + wxT("Ctrl+W"), wxEmptyString, wxITEM_NORMAL );
+	m_menuToolbox->Append( m_menuItemClose );
+	
+	m_menubar->Append( m_menuToolbox, _("&Toolbox") );
+	
 	m_menuEdit = new wxMenu();
 	wxMenuItem* m_menuItemUndo;
 	m_menuItemUndo = new wxMenuItem( m_menuEdit, wxID_UNDO, wxString( _("&Undo") ) + wxT('\t') + wxT("CTRL+Z"), wxEmptyString, wxITEM_NORMAL );
@@ -1542,21 +1565,7 @@ GUIRun::GUIRun( wxWindow* parent, wxWindowID id, const wxString& title, const wx
 	m_menuItemRedo = new wxMenuItem( m_menuEdit, wxID_REDO, wxString( _("&Redo") ) + wxT('\t') + wxT("CTRL+Y"), wxEmptyString, wxITEM_NORMAL );
 	m_menuEdit->Append( m_menuItemRedo );
 	
-	wxMenuItem* m_separator9;
-	m_separator9 = m_menuEdit->AppendSeparator();
-	
-	wxMenuItem* m_menuItemClose;
-	m_menuItemClose = new wxMenuItem( m_menuEdit, wxID_CLOSE, wxString( _("&Close Window") ) + wxT('\t') + wxT("Ctrl+W"), wxEmptyString, wxITEM_NORMAL );
-	m_menuEdit->Append( m_menuItemClose );
-	
 	m_menubar->Append( m_menuEdit, _("Edit") );
-	
-	m_menuToolbox = new wxMenu();
-	wxMenuItem* m_menuItemToolboxLoad;
-	m_menuItemToolboxLoad = new wxMenuItem( m_menuToolbox, ID_TOOLBOXLOAD, wxString( _("&Load Toolbox") ) + wxT('\t') + wxT("Ctrl+L"), wxEmptyString, wxITEM_NORMAL );
-	m_menuToolbox->Append( m_menuItemToolboxLoad );
-	
-	m_menubar->Append( m_menuToolbox, _("&Toolbox") );
 	
 	m_menuSettings = new wxMenu();
 	wxMenuItem* m_menuItemSetupUnits;
@@ -2937,9 +2946,6 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	
 	bSizerMain->Add( sbSizer18, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_textCtrlInfo = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
-	bSizerMain->Add( m_textCtrlInfo, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
 	wxBoxSizer* bSizerButtons;
 	bSizerButtons = new wxBoxSizer( wxHORIZONTAL );
 	
@@ -2964,6 +2970,9 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	bSizerButtons->Add( m_buttonClose, 0, wxALL, 5 );
 	
 	bSizerMain->Add( bSizerButtons, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_textCtrlInfo = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	bSizerMain->Add( m_textCtrlInfo, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	this->SetSizer( bSizerMain );
 	this->Layout();

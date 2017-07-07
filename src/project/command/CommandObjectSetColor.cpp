@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunWorkpieceAssign.cpp
+// Name               : CommandObjectSetColor.cpp
 // Purpose            : 
-// Thread Safe        : No
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 21.01.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 21.06.2017
+// Copyright          : (C) 2017 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,31 +24,27 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandRunWorkpieceAssign.h"
+#include "CommandObjectSetColor.h"
 
-CommandRunWorkpieceAssign::CommandRunWorkpieceAssign(const wxString& name,
-		Project* project, int runNr, int workpieceNr) :
+CommandObjectSetColor::CommandObjectSetColor(const wxString& name,
+		Project* project, size_t objectNr, Vector3 color) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->runNr = runNr;
-	this->newWorkpieceNr = workpieceNr;
-	this->oldWorkpieceNr = -1;
+	this->objectNr = objectNr;
+	this->newColor = color;
 }
 
-bool CommandRunWorkpieceAssign::Do(void)
+//TODO: Add checks
+bool CommandObjectSetColor::Do(void)
 {
-	Run* run = &(project->run[runNr]);
-	oldWorkpieceNr = run->refWorkpiece;
-	run->refWorkpiece = newWorkpieceNr;
-	project->Update();
+	this->oldColor = project->objects[objectNr].geometries[0].color;
+	project->objects[objectNr].geometries[0].color = this->newColor;
 	return true;
 }
 
-bool CommandRunWorkpieceAssign::Undo(void)
+bool CommandObjectSetColor::Undo(void)
 {
-	Run* run = &(project->run[runNr]);
-	run->refWorkpiece = oldWorkpieceNr;
-	project->Update();
+	project->objects[objectNr].geometries[0].color = this->oldColor;
 	return true;
 }

@@ -45,6 +45,7 @@
 #include "machine/Machine.h"
 
 #include "../3D/Geometry.h"
+#include "../3D/OpenGLImage.h"
 #include "../3D/AffineTransformMatrix.h"
 
 #include <wx/filename.h>
@@ -65,26 +66,30 @@ public:
 
 	// Member variables
 public:
+	Project * parent; ///< Pointer back to the Project this Run belongs to.
 	wxString name;
-	int refWorkpiece;
 
-	Machine machine;
-	ArrayOfGeneratorPointer generators;
-	ArrayOfTool tools;
+	int prevRun; ///< Link to the previous Run
+	int refWorkpiece; ///< Workpiece reference
+
+	Machine machine; ///< Machine used in this run
+	ArrayOfTool tools; ///< Tool%s in the Machine
+	ArrayOfGeneratorPointer generators; ///< List of Generator%s applied to the workpiece in this run
 
 	AffineTransformMatrix workpiecePlacement; //!< For flipping the workpiece to machine the other sides.
 	FlipDrillPattern pattern; //!< Experimental: FlipDrillPattern
 
-	float touchoffHeight;
+	float touchoffHeight; ///< Flag to set the position of the touchoff. This can be below the workpiece or at the top of it. Not to be neglected or the machine-bed will get a scar.
 
-	//TODO: Remove the "selected" flag.
-	bool selected;
+	bool selected; ///< Flag if this run is selected.
+private:
+	int selectedTool;
+	OpenGLImage touchpoint;
+
 //	bool modified;
 //	int workpieceNr;
-	int selectedTool;
 //	ArrayOfToolPath toolpaths;
 
-	Project * parent; ///< Pointer back to the Project this Run belongs to.
 private:
 	mutable GLuint textureID;
 	mutable bool isOGLInit; ///< Controls the setup of OpenGL elements on the first evaluation of the Paint function.
@@ -95,12 +100,19 @@ public:
 
 	void GenerateToolpaths(void);
 	bool SaveToolpaths(wxFileName fileName);
+
+	Vector3 GetCenter(void) const;
 	void Paint(void) const;
 
 	void ToStream(wxTextOutputStream & stream);
 	bool FromStream(wxTextInputStream & stream, int runNr, Project * project);
 
 	void ToolpathToStream(wxTextOutputStream & stream);
+
+private:
+	Workpiece* GetWorkpiece(void);
+	const Workpiece* GetWorkpiece(void) const;
+
 };
 WX_DECLARE_OBJARRAY(Run, ArrayOfRun);
 

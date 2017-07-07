@@ -29,10 +29,14 @@
 
 /*!\class TreeSetup
  * \brief Takes care of the treeview in the mainframe
+ *
  * This class sets up the treeview in the main window. This is an extra class, because the
  * treeview is quite complicated to program. To prevent these functions from cluttering up the
  * already well filled main frame class, this classs collects all functionality concerning the
  * tree view.
+ *
+ * The TreeView is filles by the Update function with objects derived of TreeItem. This class
+ * identifies the item clicked upon.
  *
  * This class provides a minimal interface to the outside. The whole ugly mess is hidden
  * in the depth of these private functions.
@@ -48,9 +52,10 @@ public:
 	TreeSetup(wxTreeCtrl * tree, Project * project);
 	virtual ~TreeSetup();
 
-	void Update(void);
-	void UpdateSelection(void);
-	void UpdateVariables(void);
+	void Update(void); ///< Populate the wxTreeView with all items from the Project. Also update the view.
+	void UpdateSelection(void); ///< Set the selection in the tree to the selection marked in the Project.
+	void UpdateVariables(void); ///< Update the "selected" variables in the Project from the selection in the tree.
+
 	int GetFirstSelectedObject(void);
 	int GetFirstSelectedWorkpiece(void);
 	int GetFirstSelectedRun(void);
@@ -67,7 +72,7 @@ private:
 	bool GetSelection(void);
 	void SetSelection(bool selection = true);
 
-	bool prohibitVariableUpdate;
+	bool prohibitVariableUpdate; ///< Cancel update loops. Tree updates variable updates tree updates variable updates ...
 
 	bool levelModified;
 	wxTreeItemIdValue cookie;

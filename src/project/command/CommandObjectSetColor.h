@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunWorkpieceAssign.cpp
+// Name               : CommandObjectSetColor.h
 // Purpose            : 
-// Thread Safe        : No
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 21.01.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 21.06.2017
+// Copyright          : (C) 2017 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,31 +24,31 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandRunWorkpieceAssign.h"
+#ifndef COMMANDOBJECTSETCOLOR_H_
+#define COMMANDOBJECTSETCOLOR_H_
 
-CommandRunWorkpieceAssign::CommandRunWorkpieceAssign(const wxString& name,
-		Project* project, int runNr, int workpieceNr) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->runNr = runNr;
-	this->newWorkpieceNr = workpieceNr;
-	this->oldWorkpieceNr = -1;
-}
+/*!\class CommandObjectSetColor
+ * \brief ...
+ *
+ * ...
+ */
 
-bool CommandRunWorkpieceAssign::Do(void)
-{
-	Run* run = &(project->run[runNr]);
-	oldWorkpieceNr = run->refWorkpiece;
-	run->refWorkpiece = newWorkpieceNr;
-	project->Update();
-	return true;
-}
+#include <wx/cmdproc.h>
 
-bool CommandRunWorkpieceAssign::Undo(void)
-{
-	Run* run = &(project->run[runNr]);
-	run->refWorkpiece = oldWorkpieceNr;
-	project->Update();
-	return true;
-}
+#include "../Project.h"
+#include "../../3D/Vector3.h"
+
+class CommandObjectSetColor:public wxCommand {
+public:
+	CommandObjectSetColor(const wxString& name, Project * project,
+			size_t objectNr, Vector3 color);
+	bool Do(void);
+	bool Undo(void);
+protected:
+	Project * project;
+	size_t objectNr;
+	Vector3 newColor;
+	Vector3 oldColor;
+};
+
+#endif /* COMMANDOBJECTSETCOLOR_H_ */

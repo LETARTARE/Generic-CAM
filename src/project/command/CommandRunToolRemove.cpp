@@ -27,12 +27,12 @@
 #include "CommandRunToolRemove.h"
 
 CommandRunToolRemove::CommandRunToolRemove(const wxString& name,
-		Project* project, int runNr, int slotNr) :
+		Project* project, int runNr, int index) :
 		wxCommand(true, name)
 {
 	this->project = project;
 	this->runNr = runNr;
-	this->slotNr = slotNr;
+	this->index = index;
 	this->oldTool = NULL;
 }
 
@@ -45,11 +45,15 @@ bool CommandRunToolRemove::Do(void)
 {
 	Run* run = &(project->run[runNr]);
 	size_t maxTools = run->tools.GetCount();
-	if(slotNr >= maxTools) return false;
-	oldTool = run->tools.Detach(slotNr);
-	if(slotNr + 1 < maxTools){
-		run->tools.Insert(Tool(), slotNr);
+	if(index >= maxTools) return false;
+	oldTool = run->tools.Detach(index);
+	if(index + 1 < maxTools){
+		Tool temp;
+		temp.slotNr = oldTool->slotNr;
+		temp.shaftDiameter = 0.0;
+		run->tools.Insert(temp, index);
 	}
+	run->Update();
 	return true;
 }
 
@@ -57,12 +61,13 @@ bool CommandRunToolRemove::Undo(void)
 {
 	Run* run = &(project->run[runNr]);
 	size_t maxTools = run->tools.GetCount();
-	if(slotNr >= maxTools){
+	if(index >= maxTools){
 		run->tools.Add(oldTool);
 	}else{
-		run->tools[slotNr] = *oldTool;
+		run->tools[index] = *oldTool;
 		delete oldTool;
 	}
 	oldTool = NULL;
+	run->Update();
 	return true;
 }

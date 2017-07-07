@@ -66,10 +66,11 @@ void Object::Paint(const bool absolutCoordinates) const
 			glColor3f(geometries[0].color.x, geometries[0].color.y,
 					geometries[0].color.z);
 		}
-//		glPointSize(5);
-//		glBegin(GL_POINTS);
+		// Paint a little dot at the origin of the Object.
+		glPointSize(5);
+		glBegin(GL_POINTS);
 //		glVertex3i(0, 0, 0);
-//		glEnd();
+		glEnd();
 #endif
 	}
 	glMultMatrixd(matrix.a);
@@ -177,18 +178,21 @@ bool Object::ReloadObject(void)
 			wxLogMessage(temp.error);
 			return false;
 		}else{
+			AffineTransformMatrix scaledown;
+			scaledown.ScaleGlobal(0.001, 0.001, 0.001); // Most programs export .stl with the unit of mm.
 			geometries.Clear();
 			for(size_t i = 0; i < temp.geometry.GetCount(); i++){
 				temp.geometry[i].ApplyTransformation();
+				temp.geometry[i].ApplyTransformation(scaledown);
 				Geometry g;
 				g.InsertTrianglesFrom(temp.geometry[i]);
 				if(g.name.IsEmpty()){
 					g.name = fileName.GetName()
 							+ wxString::Format(_T(" - %u"), i);
 				}
-				g.color.Set((float) rand() / (float) RAND_MAX,
-						(float) rand() / (float) RAND_MAX,
-						(float) rand() / (float) RAND_MAX);
+				g.color.Set((float) rand() / (float) RAND_MAX / 2.0 + 0.5,
+						(float) rand() / (float) RAND_MAX / 2.0 + 0.5,
+						(float) rand() / (float) RAND_MAX / 2.0 + 0.5);
 				geometries.Add(g);
 			}
 			if(!temp.error.IsEmpty()) wxLogMessage(temp.error);

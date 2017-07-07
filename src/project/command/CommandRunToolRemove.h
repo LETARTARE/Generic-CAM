@@ -35,7 +35,7 @@
 class CommandRunToolRemove:public wxCommand {
 public:
 	CommandRunToolRemove(const wxString& name, Project * project, int runNr,
-			int slotNr);
+			int index);
 	virtual ~CommandRunToolRemove(void);
 
 	bool Do(void);
@@ -44,7 +44,7 @@ public:
 protected:
 	Project * project;
 	size_t runNr;
-	size_t slotNr;
+	size_t index;
 	Tool * oldTool;
 };
 

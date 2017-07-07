@@ -63,11 +63,9 @@ public:
 	ArrayOfGeometry geometries;
 	BoundingBox bbox;
 
-	bool show; //!< An object hides, e.g. if derived objects exist
+	bool show; //!< An object can hide, e.g. if derived objects exist
 
-	//TODO: Remove the "selected" flag.
 	bool selected;
-//	bool modified;
 
 private:
 

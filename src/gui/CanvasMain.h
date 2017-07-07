@@ -30,6 +30,9 @@
 /*!\class CanvasMain
  * \brief Main 3D display
  *
+ * This class is the View part of the Data/View model. The other part is of course the Project.
+ *
+ * This class displays the Project depending on the selections made in the TreeSetup.
  *
  */
 
@@ -52,9 +55,10 @@ public:
 	};
 
 	bool displayCoordinateSystem;
-
 	DisplayType display;
+	bool displayAnimation;
 
+private:
 	bool displayGeometry;
 	bool displayMachine;
 	bool displayStock;
@@ -62,7 +66,6 @@ public:
 	bool displayTargets;
 	bool displayToolpath;
 	bool displayOutLines;
-	bool displayAnimation;
 
 	int selectedObject;
 	int selectedWorkpiece;
@@ -82,9 +85,6 @@ public:
 public:
 	void InsertProject(Project* project);
 	void Render();
-
-private:
-	void RenderCoordinateSystem(AffineTransformMatrix *matrix = NULL);
 };
 
 #endif /* MAINCANVAS_H_ */

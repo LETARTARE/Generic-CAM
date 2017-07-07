@@ -66,7 +66,7 @@ void DialogWorkpiece::OnAddStock(wxCommandEvent& event)
 	CommandWorkpieceAdd * command = new CommandWorkpieceAdd(
 	_("Add Workpiece ") + name, project, stock->stockMaterials[selected]);
 	commandProcessor->Submit(command);
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATEPROJECT);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
 	ProcessEvent(selectEvent);
 }
 
@@ -85,7 +85,7 @@ void DialogWorkpiece::OnDBLClick(wxGridEvent& event)
 							_("Remove Object from Workpiece"), project,
 							workpieceNr, placementNr));
 			wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-			ID_UPDATEPROJECT);
+					ID_REFRESHALL);
 			ProcessEvent(selectEvent);
 			return;
 		}
@@ -93,7 +93,7 @@ void DialogWorkpiece::OnDBLClick(wxGridEvent& event)
 	commandProcessor->Submit(
 			new CommandWorkpieceObjectAssign(_("Assign Object to Workpiece"),
 					project, workpieceNr, objectNr));
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_UPDATEPROJECT);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
 	ProcessEvent(selectEvent);
 }
 

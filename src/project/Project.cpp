@@ -63,6 +63,27 @@ void Project::Clear(void)
 //	pattern.Add(temp);
 }
 
+int Project::GetFirstSelectedObject(void) const
+{
+	for(size_t i = 0; i < objects.GetCount(); i++)
+		if(objects[i].selected) return i;
+	return -1;
+}
+
+int Project::GetFirstSelectedWorkpiece(void) const
+{
+	for(size_t i = 0; i < workpieces.GetCount(); i++)
+		if(workpieces[i].selected) return i;
+	return -1;
+}
+
+int Project::GetFirstSelectedRun(void) const
+{
+	for(size_t i = 0; i < run.GetCount(); i++)
+		if(run[i].selected) return i;
+	return -1;
+}
+
 bool Project::GenerateToolpaths(void)
 {
 	Update();
@@ -473,8 +494,9 @@ bool Project::SaveToolpath(wxFileName fileName, int runNr)
 //	}
 //	::glLoadName(0);
 
-void Project::PaintObjects(void)
+void Project::PaintObjects(void) const
 {
+	RenderCoordinateSystem();
 	for(size_t i = 0; i < objects.GetCount(); i++){
 		glPushName(i + 1); // "+1" because the background is 0.
 		objects[i].Paint(true);
@@ -482,38 +504,115 @@ void Project::PaintObjects(void)
 	}
 }
 
-void Project::PaintWorkpiece(unsigned int workpieceNr)
+void Project::PaintWorkpiece(void) const
 {
-	for(size_t i = 0; i < workpieces.GetCount(); i++){
-		glPushName(i + 1);
-		workpieces[i].Paint();
-		glPopName();
-	}
+	const int i = GetFirstSelectedWorkpiece();
+	if(i < 0) return;
+	glPushMatrix();
+	glTranslatef(-workpieces[i].xmax / 2, -workpieces[i].ymax / 2, 0);
+	RenderCoordinateSystem();
+	glPushName(i + 1);
+	workpieces[i].Paint();
+	glPopName();
+	glPopMatrix();
 }
 
-void Project::PaintRun(unsigned int runNr)
+void Project::PaintRun(void) const
 {
-	for(size_t i = 0; i < run.GetCount(); i++){
-		glPushName(i + 1);
-		run[i].Paint();
-		glPopName();
-	}
+	const int i = GetFirstSelectedRun();
+	if(i < 0) return;
+	Vector3 center = run[i].GetCenter();
+	glPushMatrix();
+//	glTranslatef(-center.x, -center.y, -center.z);
+	glPushName(i + 1);
+	run[i].Paint();
+	glPopName();
+	glPopMatrix();
 }
 
-void Project::PaintAnimation(unsigned int runNr)
+void Project::PaintAnimation(void) const
 {
-	if(runNr < 0 || runNr >= run.GetCount()) return;
+	const int runNr = GetFirstSelectedRun();
+	if(runNr < 0) return;
 	const int workpieceNr = run[runNr].refWorkpiece;
 	if(workpieceNr < 0 || workpieceNr >= workpieces.GetCount()) return;
-
 	glPushName(runNr + 1);
 	workpieces[workpieceNr].PaintSimulation();
 	glPopName();
 }
-void Project::PaintDepthField(unsigned int runNr,
-		unsigned int objectReferenceNr)
+
+void Project::RenderCoordinateSystem(void) const
 {
+	GLfloat s = 0.1;
+	GLfloat n = sqrt(2.0);
+	GLfloat d = s / 10;
+
+	glBegin(GL_LINES);
+
+	glColor3f(1.0, 0, 0);
+	glNormal3f(-s, 0, 0);
+	glVertex3f(-s, 0, 0);
+	glNormal3f(s, 0, 0);
+	glVertex3f(s, 0, 0);
+
+	glNormal3f(n, n, 0);
+	glVertex3f(s, 0, 0);
+	glVertex3f(s - d, d, 0);
+	glNormal3f(n, -n, 0);
+	glVertex3f(s, 0, 0);
+	glVertex3f(s - d, -d, 0);
+	glNormal3f(n, 0, n);
+	glVertex3f(s, 0, 0);
+	glVertex3f(s - d, 0, d);
+	glNormal3f(n, 0, -n);
+	glVertex3f(s, 0, 0);
+	glVertex3f(s - d, 0, -d);
+
+	glColor3f(0, 1.0, 0);
+	glNormal3f(0, -s, 0);
+	glVertex3f(0, -s, 0);
+	glNormal3f(0, s, 0);
+	glVertex3f(0, s, 0);
+
+	glNormal3f(n, n, 0);
+	glVertex3f(0, s, 0);
+	glVertex3f(d, s - d, 0);
+	glNormal3f(-n, n, 0);
+	glVertex3f(0, s, 0);
+	glVertex3f(-d, s - d, 0);
+	glNormal3f(0, n, n);
+	glVertex3f(0, s, 0);
+	glVertex3f(0, s - d, d);
+	glNormal3f(0, n, -n);
+	glVertex3f(0, s, 0);
+	glVertex3f(0, s - d, -d);
+
+	glColor3f(0, 0, 1.0);
+	glNormal3f(0, 0, -s);
+	glVertex3f(0, 0, -s);
+	glNormal3f(0, 0, s);
+	glVertex3f(0, 0, s);
+
+	glNormal3f(n, 0, n);
+	glVertex3f(0, 0, s);
+	glVertex3f(d, 0, s - d);
+	glNormal3f(-n, 0, n);
+	glVertex3f(0, 0, s);
+	glVertex3f(-d, 0, s - d);
+	glNormal3f(0, n, n);
+	glVertex3f(0, 0, s);
+	glVertex3f(0, d, s - d);
+	glNormal3f(0, -n, n);
+	glVertex3f(0, 0, s);
+	glVertex3f(0, -d, s - d);
+
+	::glEnd();
 }
+
+//void Project::PaintDepthField(unsigned int runNr,
+//		unsigned int objectReferenceNr)
+//{
+//}
 
 //void Project::FlipRun(void)
 //{

@@ -385,6 +385,7 @@ void Tool::ToStream(wxTextOutputStream & stream)
 	stream << maxSpeed << _T(" ");
 	stream << feedCoefficient << _T(" ");
 	stream << nrOfTeeth << _T(" ");
+	stream << slotNr << _T(" ");
 	stream << endl;
 	stream << _T("Elements: ");
 	stream << wxString::Format(_T("%u"), elements.GetCount());
@@ -413,6 +414,7 @@ bool Tool::FromStream(wxTextInputStream& stream)
 	stream >> maxSpeed;
 	stream >> feedCoefficient;
 	stream >> nrOfTeeth;
+	stream >> slotNr;
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Elements:")) != 0) return false;
 	const size_t N = stream.Read32();

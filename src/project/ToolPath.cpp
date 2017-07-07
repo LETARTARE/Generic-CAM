@@ -287,7 +287,7 @@ bool ToolPath::WriteToFile(wxTextFile &f)
 	f.AddLine(_T("T1 M6 (Tool 1, Select tool)"), fileType);
 
 	if(useWithFanucM){
-		f.AddLine(_T("S1000 (Spindle speed rpm)"), fileType);
+		f.AddLine(_T("S10000 (Spindle speed rpm)"), fileType);
 		f.AddLine(_T("M3 (Start spindel)"), fileType);
 		f.AddLine(_T("G4 X3 (Wait For Seconds, Parameter 3 Seconds)"),
 				fileType);

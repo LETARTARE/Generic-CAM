@@ -42,6 +42,8 @@
 #include "../project/command/CommandRunRename.h"
 #include "../project/command/CommandRunRemove.h"
 
+#include "DnDFile.h"
+
 #include "MathParser.h"
 #include "../languages.h"
 #include "IDs.h"
@@ -81,7 +83,7 @@ FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 #endif
 
 	logWindow = new wxLogWindow(this, _("Generic CAM - log window"), false,
-	true);
+			true);
 
 // Setup configuration
 	this->config = config;
@@ -100,10 +102,13 @@ FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	m_fileHistory->AddFilesToMenu(m_menuProjectRecent);
 	m_fileHistory->Load(*config);
 
+	m_canvas->SetDropTarget(new DnDFile(&project, this));
+	m_tree->SetDropTarget(new DnDFile(&project, this));
+
 	m_canvas->SetController(control);
 
-	this->Connect(ID_UPDATEPROJECT, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(FrameMain::UpdateProject));
+	this->Connect(ID_UPDATESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(FrameMain::UpdateSimulation));
 
 	this->Connect(ID_REFRESHALL, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(FrameMain::RefreshAll));
@@ -124,7 +129,7 @@ FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	commandProcessor.MarkAsSaved();
 
 	m_helpController = new wxHelpController;
-	m_helpController->Initialize(_T("doc/genericcam.hhp"));
+	m_helpController->Initialize(_T("./doc/help/genericcam.hhp"));
 
 	dialogObjectTransformation = new DialogObjectTransformation(this, &project,
 			&commandProcessor, &settings);
@@ -151,8 +156,9 @@ FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	timer.SetOwner(this);
 	this->Connect(wxEVT_TIMER, wxTimerEventHandler(FrameMain::OnTimer), NULL,
 			this);
-	timer.Start(50); // ms
-	dt = 1.0;
+
+	dt = 50e-3; // s
+	timer.Start(round(dt * 1000.0)); // ms
 
 	m_canvas->display = CanvasMain::displayObjects;
 
@@ -175,8 +181,8 @@ FrameMain::~FrameMain()
 	this->Disconnect(ID_REFRESHALL, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(FrameMain::RefreshAll));
 
-	this->Disconnect(ID_UPDATEPROJECT, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(FrameMain::UpdateProject));
+	this->Disconnect(ID_UPDATESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(FrameMain::UpdateSimulation));
 
 	// Save the configuration of the 6DOF controller
 	control.WriteConfigTo(config);
@@ -239,6 +245,7 @@ bool FrameMain::TransferDataFromWindow(void)
 
 void FrameMain::RefreshAll(wxCommandEvent& event)
 {
+	settings.WriteToCanvas(m_canvas);
 	TransferDataToWindow();
 }
 
@@ -254,12 +261,9 @@ void FrameMain::Refresh3DView(wxCommandEvent& event)
 	m_canvas->Refresh();
 }
 
-void FrameMain::UpdateProject(wxCommandEvent& event)
+void FrameMain::UpdateSimulation(wxCommandEvent& event)
 {
-
-	//TODO: Put project specific updates here.
-
-	TransferDataToWindow();
+	m_canvas->Refresh();
 }
 
 size_t FrameMain::GetFreeSystemMemory()
@@ -273,7 +277,7 @@ size_t FrameMain::GetFreeSystemMemory()
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);
 	GlobalMemoryStatusEx(&status);
-	//TODO: Change this to available memory.
+	//TODO: Change this to return available memory.
 	return status.ullTotalPhys;
 #endif
 }
@@ -357,7 +361,6 @@ void FrameMain::On3DSelect(wxMouseEvent& event)
 {
 	int x = event.GetX();
 	int y = event.GetY();
-
 	OpenGLPick result;
 	m_canvas->OnPick(result, x, y);
 
@@ -372,6 +375,21 @@ void FrameMain::On3DSelect(wxMouseEvent& event)
 			Refresh();
 		}
 	}
+}
+
+void FrameMain::On3DDClick(wxMouseEvent& event)
+{
+	int x = event.GetX();
+	int y = event.GetY();
+	OpenGLPick result;
+	m_canvas->OnPick(result, x, y);
+	if(result.HasHits()){
+		result.SortByNear();
+		if(result.Get(0, 0) == 1){
+//	       <...>
+		}
+	}
+
 }
 
 void FrameMain::OnBeginLabelEdit(wxTreeEvent& event)
@@ -506,6 +524,12 @@ void FrameMain::OnActivateRightClickMenu(wxTreeEvent& event)
 		menu.Append(ID_RUNDELETE, wxT("&Delete Run"));
 	}
 
+	if(data->dataType == itemToolpath){
+		menu.Append(ID_GENERATORSETUP, wxT("Setup &Generator"));
+		menu.AppendSeparator();
+		menu.Append(ID_TOOLPATHSAVE, wxT("Save &Toolpath"));
+	}
+
 	if(menu.GetMenuItemCount() > 0) PopupMenu(&menu, event.GetPoint());
 }
 
@@ -540,6 +564,13 @@ void FrameMain::OnActivate(wxTreeEvent& event)
 		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, ID_RUNEDIT);
 		ProcessEvent(menuEvent);
 	}
+
+	if(data->dataType == itemToolpath){
+		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED,
+		ID_GENERATORSETUP);
+		ProcessEvent(menuEvent);
+	}
+
 }
 
 void FrameMain::OnSelectionChanged(wxTreeEvent& event)
@@ -560,16 +591,22 @@ void FrameMain::OnSelectionChanged(wxTreeEvent& event)
 	}
 
 	switch(data->dataType){
+	case itemProject:
 	case itemGroupObject:
 	case itemObject:
+	case itemSubObject:
 		m_canvas->display = CanvasMain::displayObjects;
 		break;
 	case itemGroupWorkpiece:
 	case itemWorkpiece:
+	case itemPlacement:
+	case itemObjectLink:
 		m_canvas->display = CanvasMain::displayWorkpieces;
 		break;
 	case itemGroupRun:
 	case itemRun:
+	case itemRunWorkpiece:
+	case itemMachine:
 	case itemToolpath:
 		m_canvas->display = CanvasMain::displayRun;
 		break;
@@ -600,6 +637,7 @@ void FrameMain::OnToolbarButton(wxCommandEvent& event)
 
 void FrameMain::OnProjectNew(wxCommandEvent& event)
 {
+	// TODO: Multiple Project%s in one session
 //	Project temp;
 //	project.Add(temp);
 	commandProcessor.ClearCommands();
@@ -638,7 +676,7 @@ void FrameMain::OnProjectLoad(wxCommandEvent& event)
 {
 	wxFileName fileName;
 	wxFileDialog dialog(this, _("Open Project..."), _T(""), _T(""),
-			_("Generic CAM Project (*.prj; *.zip)|*.prj;*.zip|All Files|*.*"),
+			_("Generic CAM Project (*.zip)|*.zip;*.ZIP|All Files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if(wxDir::Exists(settings.lastProjectDirectory)){
@@ -689,6 +727,8 @@ void FrameMain::OnProjectSaveAs(wxCommandEvent &event)
 
 	if(dialog.ShowModal() == wxID_OK){
 		fileName = dialog.GetPath();
+		if(fileName.GetExt().IsEmpty()) fileName.SetExt(_T("zip"));
+		m_fileHistory->AddFileToHistory(fileName.GetFullPath());
 		if(project.Save(fileName)){
 			commandProcessor.MarkAsSaved();
 			settings.lastProjectDirectory = project.fileName.GetPath();
@@ -705,12 +745,14 @@ void FrameMain::OnQuit(wxCommandEvent& event)
 void FrameMain::OnUndo(wxCommandEvent& event)
 {
 	commandProcessor.Undo();
+	dialogToolpathGenerator->UndoChanges();
 	TransferDataToWindow();
 }
 
 void FrameMain::OnRedo(wxCommandEvent& event)
 {
 	commandProcessor.Redo();
+	dialogToolpathGenerator->UndoChanges();
 	TransferDataToWindow();
 }
 
@@ -719,7 +761,7 @@ void FrameMain::OnObjectLoad(wxCommandEvent& event)
 	wxFileName fileName;
 	wxFileDialog dialog(this, _("Open Object..."), _T(""), _T(""),
 			_(
-					"All supported files (*.dxf; *.stl; *.gts)|*.dxf;*.stl;*.gts|DXF Files (*.dxf)|*.dxf|Stereolithography files (STL files) (*.stl)|*.stl|GTS files (*.gts)|*.gts|All files|*.*"),
+					"All supported files (*.dxf; *.stl; *.gts)|*.dxf;*DXF;*.stl;*.STL;*.gts;*.GTS|DXF Files (*.dxf)|*.dxf;*.DXF|Stereolithography files (STL files) (*.stl)|*.stl;*.STL|GTS files (*.gts)|*.gts;*.GTS|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_MULTIPLE);
 
 	if(wxDir::Exists(settings.lastObjectDirectory)){

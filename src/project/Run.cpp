@@ -51,6 +51,9 @@ Run::Run()
 	textureID = 0;
 	isOGLInit = false;
 	touchoffHeight = 0.027;
+	prevRun = -1;
+	touchpoint = wxImage(touchpoint_xpm);
+	touchpoint.SetAlphaColor(255, 255, 255);
 }
 
 Run::Run(const Run& other)
@@ -125,31 +128,6 @@ void Run::Paint(void) const
 	const Project * pr = parent;
 	if(pr == NULL) return;
 
-	if(!isOGLInit){
-		wxImage temp(touchpoint_xpm);
-		unsigned char rgba[64 * 64 * 4];
-		const unsigned char * data = temp.GetData();
-		for(unsigned int i = 0; i < 64 * 64; i++){
-			const unsigned char r = data[i * 3];
-			const unsigned char g = data[i * 3 + 1];
-			const unsigned char b = data[i * 3 + 2];
-			const unsigned char a = (r == 255 && g == 255 && b == 255)? 0 : 255;
-			rgba[i * 4] = r;
-			rgba[i * 4 + 1] = g;
-			rgba[i * 4 + 2] = b;
-			rgba[i * 4 + 3] = a;
-		}
-		glEnable( GL_TEXTURE_2D);
-		glGenTextures(1, &textureID);
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, rgba);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glDisable( GL_TEXTURE_2D);
-		isOGLInit = true;
-	}
-
 	machine.Paint();
 
 	::glPushMatrix();
@@ -167,48 +145,16 @@ void Run::Paint(void) const
 		// Draw the "Touchpoint" symbol
 		const float s = 0.02;
 		glTranslatef(0, 0, touchoffHeight);
-		glColor3f(1, 1, 1);
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glEnable( GL_TEXTURE_2D);
-		glBegin( GL_QUADS);
-		glNormal3f(-1, 0, 0);
-		glTexCoord2f(0, 1);
-		glVertex3f(0, 0, 0);
-		glTexCoord2f(1, 1);
-		glVertex3f(0, -s, 0);
-		glTexCoord2f(1, 0);
-		glVertex3f(0, -s, s);
-		glTexCoord2f(0, 0);
-		glVertex3f(0, 0, s);
-		glNormal3f(0, -1, 0);
-		glTexCoord2f(0, 1);
-		glVertex3f(0, 0, 0);
-		glTexCoord2f(1, 1);
-		glVertex3f(s, 0, 0);
-		glTexCoord2f(1, 0);
-		glVertex3f(s, 0, s);
-		glTexCoord2f(0, 0);
-		glVertex3f(0, 0, s);
-		glNormal3f(1, 0, 0);
-		glTexCoord2f(0, 1);
-		glVertex3f(0, 0, 0);
-		glTexCoord2f(1, 1);
-		glVertex3f(0, s, 0);
-		glTexCoord2f(1, 0);
-		glVertex3f(0, s, s);
-		glTexCoord2f(0, 0);
-		glVertex3f(0, 0, s);
-		glNormal3f(0, 1, 0);
-		glTexCoord2f(0, 1);
-		glVertex3f(0, 0, 0);
-		glTexCoord2f(1, 1);
-		glVertex3f(-s, 0, 0);
-		glTexCoord2f(1, 0);
-		glVertex3f(-s, 0, s);
-		glTexCoord2f(0, 0);
-		glVertex3f(0, 0, s);
-		glEnd();
-		glDisable(GL_TEXTURE_2D);
+
+		glScalef(s, s, s);
+		glRotatef(90, 1, 0, 0);
+		touchpoint.Paint();
+		glRotatef(90, 0, 1, 0);
+		touchpoint.Paint();
+		glRotatef(90, 0, 1, 0);
+		touchpoint.Paint();
+		glRotatef(90, 0, 1, 0);
+		touchpoint.Paint();
 		::glPopMatrix();
 	}
 	::glPopMatrix();
@@ -300,3 +246,30 @@ bool Run::FromStream(wxTextInputStream& stream, int runNr, Project * project)
 	return true;
 }
 
+Vector3 Run::GetCenter(void) const
+{
+	Vector3 temp;
+	const Workpiece* wp = GetWorkpiece();
+	if(wp != NULL){
+		temp.x = (wp->xmin + wp->xmax) / 2.0;
+		temp.y = (wp->ymin + wp->ymax) / 2.0;
+		temp.z = wp->zmin;
+	}
+	return temp;
+}
+
+Workpiece* Run::GetWorkpiece(void)
+{
+	if(parent == NULL) return NULL;
+	if(refWorkpiece < 0) return NULL;
+	if(refWorkpiece >= parent->workpieces.GetCount()) return NULL;
+	return &(parent->workpieces[refWorkpiece]);
+}
+
+const Workpiece* Run::GetWorkpiece(void) const
+{
+	if(parent == NULL) return NULL;
+	if(refWorkpiece < 0) return NULL;
+	if(refWorkpiece >= parent->workpieces.GetCount()) return NULL;
+	return &(parent->workpieces[refWorkpiece]);
+}

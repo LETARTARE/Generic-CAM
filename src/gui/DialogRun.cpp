@@ -42,6 +42,7 @@ DialogRun::DialogRun(wxWindow* parent, Project* project, ToolBox * toolbox,
 	this->toolbox = toolbox;
 	this->commandProcessor = commandProcessor;
 	this->settings = settings;
+	lockUpdate = false;
 }
 
 DialogRun::~DialogRun()
@@ -50,6 +51,7 @@ DialogRun::~DialogRun()
 
 bool DialogRun::TransferDataToWindow(void)
 {
+	if(lockUpdate) return false;
 	size_t i;
 	int selected = -1;
 	m_choiceRun->Clear();
@@ -59,29 +61,31 @@ bool DialogRun::TransferDataToWindow(void)
 		m_choiceRun->Append(project->run[i].name);
 		if(selected == -1 && project->run[i].selected) selected = i;
 	}
+	lockUpdate = true;
 	m_choiceRun->SetSelection(selected + 1);
-
+	lockUpdate = false;
 	m_choiceWorkpiece->Clear();
 	m_choiceWorkpiece->Append(_T(""));
 	for(i = 0; i < project->workpieces.GetCount(); i++)
 		m_choiceWorkpiece->Append(project->workpieces[i].name);
 
-	for(i = 0; i < toolbox->tools.GetCount(); i++){
+	for(i = 0; i < toolbox->GetToolCount(); i++){
 		if(i >= m_choiceTool->GetCount()){
-			m_choiceTool->Append(toolbox->tools[i].toolName);
+			m_choiceTool->Append(toolbox->ToolIndex(i)->toolName);
 		}else{
-			m_choiceTool->SetString(i, toolbox->tools[i].toolName);
+			m_choiceTool->SetString(i, toolbox->ToolIndex(i)->toolName);
 		}
 	}
-	for(i = m_choiceTool->GetCount(); i > toolbox->tools.GetCount(); i--)
+	for(i = m_choiceTool->GetCount(); i > toolbox->GetToolCount(); i--)
 		m_choiceTool->Delete(i - 1);
+	lockUpdate = true;
 	if(m_choiceTool->GetSelection() < 0) m_choiceTool->SetSelection(0);
-
-	if(selected > -1){
-
+	lockUpdate = false;
+	if(selected >= 0){
+		lockUpdate = true;
 		m_choiceWorkpiece->SetSelection(
 				project->run[selected].refWorkpiece + 1);
-
+		lockUpdate = false;
 		m_textCtrlMachineName->SetValue(
 				project->run[selected].machine.fileName.GetName());
 
@@ -96,7 +100,9 @@ bool DialogRun::TransferDataToWindow(void)
 				2 * w);
 
 		for(i = 0; i < project->run[selected].tools.GetCount(); i++){
-			m_listCtrlTools->InsertItem(i, wxString::Format(_T("%u"), i));
+			m_listCtrlTools->InsertItem(i,
+					wxString::Format(_T("%i"),
+							project->run[selected].tools[i].slotNr));
 			m_listCtrlTools->SetItem(i, 1,
 					project->run[selected].tools[i].toolName);
 			m_listCtrlTools->SetItem(i, 2,
@@ -107,7 +113,9 @@ bool DialogRun::TransferDataToWindow(void)
 	}else{
 		m_listCtrlTools->ClearAll();
 		m_textCtrlMachineName->SetValue(_T(""));
+		lockUpdate = true;
 		m_choiceWorkpiece->SetSelection(0);
+		lockUpdate = false;
 	}
 
 	return true;
@@ -132,6 +140,7 @@ void DialogRun::OnClose(wxCommandEvent& event)
 
 void DialogRun::OnRunSelect(wxCommandEvent& event)
 {
+	if(lockUpdate) return;
 	int id = m_choiceRun->GetSelection() - 1;
 
 	size_t n;
@@ -145,16 +154,24 @@ void DialogRun::OnRunSelect(wxCommandEvent& event)
 
 void DialogRun::OnWorkpieceSelect(wxCommandEvent& event)
 {
-	int selected = GetSelected();
+	if(lockUpdate) return;
+	const int selected = GetSelected();
 	if(selected < 0) return;
 	int temp = m_choiceWorkpiece->GetSelection() - 1;
-	if(temp < 0) return;
 	if(project->run[selected].refWorkpiece != temp){
-		commandProcessor->Submit(
-				new CommandRunWorkpieceAssign(
-						_("Set Workpiece to ")
-								+ m_choiceWorkpiece->GetString(temp + 1),
-						project, selected, temp));
+		if(temp >= 0){
+			commandProcessor->Submit(
+					new CommandRunWorkpieceAssign(
+							_("Set Workpiece to ")
+									+ m_choiceWorkpiece->GetString(temp + 1),
+							project, selected, temp));
+		}else{
+			commandProcessor->Submit(
+					new CommandRunWorkpieceAssign(_("Removed Workpiece."),
+							project, selected, temp));
+
+		}
+
 		wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
 		ID_REFRESHMAINGUI);
 		ProcessEvent(selectEvent);
@@ -201,7 +218,7 @@ void DialogRun::OnRotate(wxCommandEvent& event)
 	commandProcessor->Submit(
 			new CommandRunWorkpieceTransform(description, project, runNr,
 					matrix));
-
+	TransferDataToWindow();
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESH3DVIEW);
 	ProcessEvent(selectEvent);
 }
@@ -211,20 +228,22 @@ void DialogRun::OnMachineLoad(wxCommandEvent& event)
 	// Select Machine load... from the main menu.
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_MACHINELOAD);
 	ProcessEvent(selectEvent);
+	TransferDataToWindow();
 }
 
 void DialogRun::OnToolRemove(wxCommandEvent& event)
 {
 	int runNr = GetSelected();
 	if(runNr < 0) return;
-	int slotNr = m_listCtrlTools->GetNextItem(-1, wxLIST_NEXT_ALL,
-			wxLIST_STATE_SELECTED);
-	if(slotNr < 0) return;
+	int index = m_listCtrlTools->GetNextItem(-1, wxLIST_NEXT_ALL,
+	wxLIST_STATE_SELECTED);
+	if(index < 0) return;
 	commandProcessor->Submit(
 			new CommandRunToolRemove(
-					_("Removed tool from run ")
-							+ project->run[runNr].tools[slotNr].toolName,
-					project, runNr, slotNr));
+					_(
+							"Removed tool ") + project->run[runNr].tools[index].toolName+_(" from run"),
+					project, runNr, index));
+	TransferDataToWindow();
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESH3DVIEW);
 	ProcessEvent(selectEvent);
 }
@@ -251,8 +270,11 @@ void DialogRun::OnToolAdd(wxCommandEvent& event)
 	int slotNr = m_spinCtrlToolSlot->GetValue();
 	commandProcessor->Submit(
 			new CommandRunToolAdd(
-			_("Added tool to run ") + toolbox->tools[toolNr].toolName,
-					project, selected, toolbox->tools[toolNr], slotNr));
+					_("Added tool to run ")
+							+ toolbox->ToolIndex(toolNr)->toolName, project,
+					selected, *(toolbox->ToolIndex(toolNr)), slotNr));
+
+	TransferDataToWindow();
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESH3DVIEW);
 	ProcessEvent(selectEvent);
 }

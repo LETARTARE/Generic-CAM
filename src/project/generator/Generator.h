@@ -77,7 +77,6 @@ public:
 	float marginBelow; //!< Distance to the final shape below the tool
 	float marginSide; //!< Distance to the final shape next to the tool
 
-	//TODO: Remove the "selected" flag.
 	bool selected;
 
 protected:

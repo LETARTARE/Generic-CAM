@@ -207,10 +207,9 @@ int TreeSetup::GetFirstSelectedToolpath(void)
 
 int TreeSetup::GetWorkpieceFromLink(int linkNr)
 {
-	int n, m;
 	int linkCounter = 0;
-	for(n = 0; n < project->workpieces.GetCount(); n++){
-		for(m = 0; m < project->workpieces[n].placements.GetCount(); m++){
+	for(int n = 0; n < project->workpieces.GetCount(); n++){
+		for(int m = 0; m < project->workpieces[n].placements.GetCount(); m++){
 			if(linkCounter == linkNr) return n;
 			linkCounter++;
 		}
@@ -220,10 +219,9 @@ int TreeSetup::GetWorkpieceFromLink(int linkNr)
 
 int TreeSetup::GetObjectFromLink(int linkNr)
 {
-	int n, m;
 	int linkCounter = 0;
-	for(n = 0; n < project->workpieces.GetCount(); n++){
-		for(m = 0; m < project->workpieces[n].placements.GetCount(); m++){
+	for(int n = 0; n < project->workpieces.GetCount(); n++){
+		for(int m = 0; m < project->workpieces[n].placements.GetCount(); m++){
 			if(linkCounter == linkNr) return m;
 			linkCounter++;
 		}
@@ -233,17 +231,12 @@ int TreeSetup::GetObjectFromLink(int linkNr)
 
 void TreeSetup::SetSelection(bool selection)
 {
-	bool temp = tree->IsSelected(id[currentLevel]);
+	const bool temp = tree->IsSelected(id[currentLevel]);
 	if(temp != selection) tree->SelectItem(id[currentLevel], selection);
 }
 
 void TreeSetup::UpdateSelection(void)
 {
-	wxTreeItemId temp;
-	bool flag;
-	TreeItem * data;
-	unsigned int N;
-
 	// Check if all groups are ok.
 	if(!groupObjects.IsOk()) return;
 
@@ -252,111 +245,162 @@ void TreeSetup::UpdateSelection(void)
 	prohibitVariableUpdate = true;
 
 	// Updates for Objects:
-	N = project->objects.GetCount();
+	{
+		const unsigned int N = project->objects.GetCount();
 
-	temp = tree->GetFirstChild(groupObjects, cookie);
-	while(temp.IsOk()){
-		data = (TreeItem*) tree->GetItemData(temp);
-		if(data != NULL && data->dataType == itemObject){
-			if(data->nr >= 0 && data->nr < N){
-				flag = tree->IsSelected(temp);
-				if(flag != project->objects[data->nr].selected){
-					tree->SelectItem(temp, project->objects[data->nr].selected);
+		wxTreeItemId temp = tree->GetFirstChild(groupObjects, cookie);
+		while(temp.IsOk()){
+			TreeItem * data = (TreeItem*) tree->GetItemData(temp);
+			if(data != NULL && data->dataType == itemObject){
+				if(data->nr >= 0 && data->nr < N){
+					const bool flag = tree->IsSelected(temp);
+					if(flag != project->objects[data->nr].selected){
+						tree->SelectItem(temp,
+								project->objects[data->nr].selected);
+					}
 				}
 			}
+			temp = tree->GetNextSibling(temp);
 		}
-		temp = tree->GetNextSibling(temp);
 	}
 
 	// Updates for Workpieces:
-	N = project->workpieces.GetCount();
+	{
+		const unsigned int N = project->workpieces.GetCount();
 
-	temp = tree->GetFirstChild(groupWorkpieces, cookie);
-	while(temp.IsOk()){
-		data = (TreeItem*) tree->GetItemData(temp);
-		if(data != NULL && data->dataType == itemWorkpiece){
-			if(data->nr >= 0 && data->nr < N){
-				flag = tree->IsSelected(temp);
-				if(flag != project->workpieces[data->nr].selected){
-					tree->SelectItem(temp,
-							project->workpieces[data->nr].selected);
+		wxTreeItemId temp = tree->GetFirstChild(groupWorkpieces, cookie);
+		while(temp.IsOk()){
+			TreeItem * data = (TreeItem*) tree->GetItemData(temp);
+			if(data != NULL && data->dataType == itemWorkpiece){
+				if(data->nr >= 0 && data->nr < N){
+					const bool flag = tree->IsSelected(temp);
+					if(flag != project->workpieces[data->nr].selected){
+						tree->SelectItem(temp,
+								project->workpieces[data->nr].selected);
+					}
 				}
 			}
+			temp = tree->GetNextSibling(temp);
 		}
-		temp = tree->GetNextSibling(temp);
 	}
 
 	// Updates for Run:
-	N = project->run.GetCount();
+	{
+		const unsigned int N = project->run.GetCount();
 
-	temp = tree->GetFirstChild(groupRun, cookie);
-	while(temp.IsOk()){
-		data = (TreeItem*) tree->GetItemData(temp);
-		if(data != NULL && data->dataType == itemRun){
-			if(data->nr >= 0 && data->nr < N){
-				flag = tree->IsSelected(temp);
-				if(flag != project->run[data->nr].selected){
-					tree->SelectItem(temp, project->run[data->nr].selected);
+		wxTreeItemId temp = tree->GetFirstChild(groupRun, cookie);
+		while(temp.IsOk()){
+			TreeItem * data = (TreeItem*) tree->GetItemData(temp);
+			if(data != NULL && data->dataType == itemRun){
+				if(data->nr >= 0 && data->nr < N){
+					const bool flag = tree->IsSelected(temp);
+					if(flag != project->run[data->nr].selected){
+						tree->SelectItem(temp, project->run[data->nr].selected);
+					}
+					const unsigned int N2 =
+							project->run[data->nr].generators.GetCount();
+					wxTreeItemIdValue cookie2;
+					wxTreeItemId temp2 = tree->GetFirstChild(temp, cookie2);
+					while(temp2.IsOk()){
+						TreeItem * data2 = (TreeItem*) tree->GetItemData(temp2);
+						if(data2 != NULL && data2->dataType == itemToolpath){
+							if(data2->nr >= 0 && data2->nr < N2){
+								const bool flag2 = tree->IsSelected(temp2);
+								if(flag2
+										!= project->run[data->nr].generators[data2->nr]->selected){
+									tree->SelectItem(temp2,
+											project->run[data->nr].generators[data2->nr]->selected);
+								}
+							}
+						}
+						temp2 = tree->GetNextSibling(temp2);
+					}
 				}
 			}
+			temp = tree->GetNextSibling(temp);
 		}
-		temp = tree->GetNextSibling(temp);
 	}
-
 	prohibitVariableUpdate = false;
 	UpdateVariables();
 }
 
 void TreeSetup::UpdateVariables(void)
 {
-	wxTreeItemId temp;
-	TreeItem * data;
-	unsigned int N;
-
 	// The function UpdateSelection uses this flag to temporally disable variable update.
 	if(prohibitVariableUpdate) return;
 
 	if(!groupObjects.IsOk()) return;
 
 	// Updates for Objects:
-	N = project->objects.GetCount();
-	temp = tree->GetFirstChild(groupObjects, cookie);
-	while(temp.IsOk()){
-		data = (TreeItem*) tree->GetItemData(temp);
-		if(data != NULL && data->dataType == itemObject){
-			if(data->nr >= 0 && data->nr < N){
-				project->objects[data->nr].selected = tree->IsSelected(temp);
+	{
+		const unsigned int N = project->objects.GetCount();
+		wxTreeItemId temp = tree->GetFirstChild(groupObjects, cookie);
+		while(temp.IsOk()){
+			TreeItem * data = (TreeItem*) tree->GetItemData(temp);
+			if(data != NULL && data->dataType == itemObject){
+				if(data->nr >= 0 && data->nr < N){
+					project->objects[data->nr].selected = tree->IsSelected(
+							temp);
+				}
 			}
+			temp = tree->GetNextSibling(temp);
 		}
-		temp = tree->GetNextSibling(temp);
 	}
 
 	// Updates for Workpieces:
-	N = project->workpieces.GetCount();
-	temp = tree->GetFirstChild(groupWorkpieces, cookie);
-	while(temp.IsOk()){
-		data = (TreeItem*) tree->GetItemData(temp);
-		if(data != NULL && data->dataType == itemWorkpiece){
-			if(data->nr >= 0 && data->nr < N){
-				project->workpieces[data->nr].selected = tree->IsSelected(temp);
+	{
+		const unsigned int N = project->workpieces.GetCount();
+		wxTreeItemId temp = tree->GetFirstChild(groupWorkpieces, cookie);
+		while(temp.IsOk()){
+			TreeItem * data = (TreeItem*) tree->GetItemData(temp);
+			if(data != NULL && data->dataType == itemWorkpiece){
+				if(data->nr >= 0 && data->nr < N){
+					project->workpieces[data->nr].selected = tree->IsSelected(
+							temp);
+				}
 			}
+			temp = tree->GetNextSibling(temp);
 		}
-		temp = tree->GetNextSibling(temp);
 	}
 
 	// Updates for Run:
-	N = project->run.GetCount();
-	temp = tree->GetFirstChild(groupRun, cookie);
-	while(temp.IsOk()){
-		data = (TreeItem*) tree->GetItemData(temp);
-		if(data != NULL && data->dataType == itemRun){
-			if(data->nr >= 0 && data->nr < N){
-				project->run[data->nr].selected = tree->IsSelected(temp);
-			}
-		}
-		temp = tree->GetNextSibling(temp);
-	}
+	{
+		const unsigned int N = project->run.GetCount();
+		wxTreeItemId temp = tree->GetFirstChild(groupRun, cookie);
+		while(temp.IsOk()){
+			TreeItem * data = (TreeItem*) tree->GetItemData(temp);
+			if(data != NULL && data->dataType == itemRun){
+				bool toolpathSelected = false;
+				const unsigned int N2 =
+						project->run[data->nr].generators.GetCount();
+				wxTreeItemIdValue cookie2;
+				wxTreeItemId temp2 = tree->GetFirstChild(temp, cookie2);
+				while(temp2.IsOk()){
+					TreeItem * data2 = (TreeItem*) tree->GetItemData(temp2);
+					if(data2 != NULL && data2->dataType == itemToolpath){
+						if(data2->nr >= 0 && data2->nr < N2){
+							project->run[data->nr].generators[data2->nr]->selected =
+									tree->IsSelected(temp2);
+							if(tree->IsSelected(temp2)) toolpathSelected = true;
+						}
+					}
+					temp2 = tree->GetNextSibling(temp2);
+				}
 
+				if(data->nr >= 0 && data->nr < N){
+					project->run[data->nr].selected = (tree->IsSelected(temp)
+							| toolpathSelected);
+					if(toolpathSelected){
+						prohibitVariableUpdate = true;
+						tree->SelectItem(temp, toolpathSelected);
+						prohibitVariableUpdate = false;
+					}
+				}
+
+			}
+			temp = tree->GetNextSibling(temp);
+		}
+	}
 }
 
 void TreeSetup::Update(void)

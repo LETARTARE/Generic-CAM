@@ -49,6 +49,7 @@ bool CommandRunGeneratorUpdate::Do(void)
 	oldGenerator = run->generators[position];
 	run->generators[position] = newGenerator;
 	newGenerator = NULL;
+	project->Update();
 	return true;
 }
 
@@ -58,5 +59,6 @@ bool CommandRunGeneratorUpdate::Undo(void)
 	newGenerator = run->generators[position];
 	run->generators[position] = oldGenerator;
 	oldGenerator = NULL;
+	project->Update();
 	return true;
 }

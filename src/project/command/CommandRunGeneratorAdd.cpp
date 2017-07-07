@@ -50,6 +50,7 @@ bool CommandRunGeneratorAdd::Do(void)
 	else
 		run->generators.Insert(newGenerator, position);
 	newGenerator = NULL;
+	project->Update();
 	return true;
 }
 
@@ -57,5 +58,6 @@ bool CommandRunGeneratorAdd::Undo(void)
 {
 	Run* run = &(project->run[runNr]);
 	newGenerator = *(run->generators.Detach(position));
+	project->Update();
 	return true;
 }

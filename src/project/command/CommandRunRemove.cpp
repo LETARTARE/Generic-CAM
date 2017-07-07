@@ -43,6 +43,7 @@ CommandRunRemove::~CommandRunRemove()
 bool CommandRunRemove::Do(void)
 {
 	run = project->run.Detach(runNr);
+	project->Update();
 	return true;
 }
 
@@ -56,5 +57,6 @@ bool CommandRunRemove::Undo(void)
 	// If the the workpiece was inserted back into the project,
 	// this function must not delete the workpiece in the destructor.
 	run = NULL;
+	project->Update();
 	return true;
 }

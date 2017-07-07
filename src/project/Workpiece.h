@@ -60,15 +60,17 @@ public:
 	ArrayOfObjectPlacement placements;
 	ArrayOfSupport supports;
 
+	Geometry geometry;
 	DexelTarget simulation;
 
-//	bool modified;
-	//TODO: Remove the "selected" flag.
 	bool selected;
+
 //	volatile bool hasRunningGenerator;
 
 private:
-	BooleanBox bbox;
+
+	//TODO: Replace the BooleanBox with the simulation or geometry.
+	BooleanBox bbox; ///< Redundant?
 
 	// Methods
 public:
