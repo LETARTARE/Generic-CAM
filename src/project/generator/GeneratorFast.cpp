@@ -28,6 +28,7 @@
 #include <math.h>
 
 #include "../Project.h"
+#include "../machine/MachinePosition.h"
 
 GeneratorFast::GeneratorFast()
 {
@@ -47,15 +48,14 @@ ToolPath GeneratorFast::GenerateDrill(double x, double y, double diameter,
 		double depth)
 {
 	ToolPath temp;
-	MachinePosition mp;
+	GCodeBlock mp;
 
-	double r = (diameter - toolDiameter) / 2.0;
+	const double r = (diameter - toolDiameter) / 2.0;
 
-	mp.axisX = x;
-	mp.axisY = y;
-	mp.axisZ = 0.0;
-	mp.isCutting = true;
-	mp.isRotationPositiv = true;
+	mp.FeedSpeed();
+	mp.X = x;
+	mp.Y = y;
+	mp.Z = 0.0;
 	temp.positions.Add(mp);
 
 	if(r <= 0.001){
@@ -63,62 +63,64 @@ ToolPath GeneratorFast::GenerateDrill(double x, double y, double diameter,
 		while(d > dropStep - depth){
 			d -= dropStep;
 
-			mp.axisZ = d;
+			mp.Z = d;
 			temp.positions.Add(mp);
-			mp.axisZ = 0.0;
+			mp.Z = 0.0;
 			temp.positions.Add(mp);
 		}
-		mp.axisZ = -depth;
-		mp.axisX += r;
+		mp.Z = -depth;
+		mp.X += r;
 		temp.positions.Add(mp);
-		mp.radiusI = -r;
+		mp.I = -r;
 		temp.positions.Add(mp);
-		mp.radiusI = 0.0;
-		mp.axisX = x;
+		mp.I = 0.0;
+		mp.X = x;
 		temp.positions.Add(mp);
 	}else{
-		mp.axisX += r;
+		mp.X += r;
 		temp.positions.Add(mp);
-		mp.radiusI = -r;
-		while(mp.axisZ > dropStep - depth){
-			mp.axisZ -= dropStep;
+		mp.ArcCCW();
+		mp.I = -r;
+		while(mp.Z > dropStep - depth){
+			mp.Z -= dropStep;
 			temp.positions.Add(mp);
 		}
-		mp.axisZ = -depth;
+		mp.Z = -depth;
 		temp.positions.Add(mp);
 		temp.positions.Add(mp);
-		mp.radiusI = 0.0;
-		mp.axisX = x;
+		mp.Rapid();
+		mp.I = 0.0;
+		mp.X = x;
 		temp.positions.Add(mp);
 	}
-
 	return temp;
 }
 
 ToolPath GeneratorFast::GenerateSpiral(double x, double y, double radius)
 {
 	ToolPath temp;
-	MachinePosition mp;
+	GCodeBlock mp;
 
-	double rinc = toolDiameter / 2.0;
-	double r;
+	const double rinc = toolDiameter / 2.0;
 
-	size_t Npt = 40;
-	size_t Nt = floor((double) Npt * radius / rinc);
+	const size_t Npt = 40;
+	const size_t Nt = floor((double) Npt * radius / rinc);
 	size_t n;
 
-	mp.axisX = x;
-	mp.axisY = y;
-	mp.axisZ = 0.0;
-	mp.isCutting = true;
-	mp.isRotationPositiv = true;
+	throw("Is this used?");
+
+	mp.X = x;
+	mp.Y = y;
+	mp.Z = 0.0;
+	mp.FeedSpeed();
 	temp.positions.Add(mp);
 
+	mp.ArcCCW();
 	for(n = 1; n <= Nt; n++){
-		r = radius / (double) Nt * (double) n;
-		mp.radiusR = r;
-		mp.axisX = x + r * cos(2 * M_PI / (double) Npt * (double) n);
-		mp.axisY = y + r * sin(2 * M_PI / (double) Npt * (double) n);
+		const double r = radius / (double) Nt * (double) n;
+		mp.R = r;
+		mp.X = x + r * cos(2 * M_PI / (double) Npt * (double) n);
+		mp.Y = y + r * sin(2 * M_PI / (double) Npt * (double) n);
 		temp.positions.Add(mp);
 	}
 	return temp;
@@ -182,7 +184,7 @@ ToolPath GeneratorFast::MoveSavely(DexelTarget &target, double sx, double sy,
 		double sz, double x, double y, double z)
 {
 	ToolPath tp;
-	MachinePosition mp;
+	GCodeBlock mp;
 
 	bool hasToDrop = false;
 
@@ -194,10 +196,10 @@ ToolPath GeneratorFast::MoveSavely(DexelTarget &target, double sx, double sy,
 	double ry = target.GetSizeRY();
 	double r = (rx + ry) / 2;
 
-	mp.axisX = sx;
-	mp.axisY = sy;
-	mp.axisZ = sz;
-	mp.isCutting = false;
+	mp.X = sx;
+	mp.Y = sy;
+	mp.Z = sz;
+	mp.Rapid();
 
 	double dx = x - sx;
 	double dy = y - sy;
@@ -207,12 +209,12 @@ ToolPath GeneratorFast::MoveSavely(DexelTarget &target, double sx, double sy,
 	double dt;
 
 	if(dz >= 0){
-		mp.axisZ = z + 0.001;
+		mp.Z = z + 0.001;
 		tp.positions.Add(mp);
 	}
 
-	size_t n = round(d / r);
-
+	const size_t n = round(d / r);
+	bool isCutting = false;
 	for(i = 1; i < n; i++){
 
 		px = sx + dx / (double) n * (double) i;
@@ -221,41 +223,43 @@ ToolPath GeneratorFast::MoveSavely(DexelTarget &target, double sx, double sy,
 
 		dt = d * (1 - (double) i / (double) n);
 
-		if(hz > mp.axisZ && !mp.isCutting){
-			mp.axisX = sx + dx / (double) (n - 1) * (double) i;
-			mp.axisY = sy + dy / (double) (n - 1) * (double) i;
-			mp.axisZ = target.GetSizeZ() + freeHeightAboveMaterial;
+		if(hz > mp.Z && !isCutting){
+			mp.X = sx + dx / (double) (n - 1) * (double) i;
+			mp.Y = sy + dy / (double) (n - 1) * (double) i;
+			mp.Z = target.GetSizeZ() + freeHeightAboveMaterial;
 			tp.positions.Add(mp);
 			hasToDrop = true;
 		}
 
-		if(dt <= toolDiameter / 2 && !mp.isCutting && !hasToDrop){
-			mp.axisX = sx + dx / (double) (n - 1) * (double) i;
-			mp.axisY = sy + dy / (double) (n - 1) * (double) i;
+		if(dt <= toolDiameter / 2 && !isCutting && !hasToDrop){
+			mp.X = sx + dx / (double) (n - 1) * (double) i;
+			mp.Y = sy + dy / (double) (n - 1) * (double) i;
 			tp.positions.Add(mp);
-			mp.axisX = px;
-			mp.axisY = py;
-			mp.isCutting = true;
+			mp.X = px;
+			mp.Y = py;
+			isCutting = true;
+			mp.FeedSpeed();
 			tp.positions.Add(mp);
 		}
 	}
-	mp.axisX = x;
-	mp.axisY = y;
-	if(!hasToDrop) mp.axisZ = z;
+	mp.FeedSpeed();
+	mp.X = x;
+	mp.Y = y;
+	if(!hasToDrop) mp.Z = z;
 	tp.positions.Add(mp);
 
 	if(hasToDrop){
 		double d = target.GetSizeZ();
 		while(d > dropStep + z){
-			mp.isCutting = true;
+			mp.FeedSpeed();
 			d -= dropStep;
-			mp.axisZ = d;
+			mp.Z = d;
 			tp.positions.Add(mp);
-			mp.isCutting = false;
-			mp.axisZ = target.GetSizeZ();
+			mp.Rapid();
+			mp.Z = target.GetSizeZ();
 		}
-		mp.isCutting = true;
-		mp.axisZ = z;
+		mp.FeedSpeed();
+		mp.Z = z;
 		tp.positions.Add(mp);
 	}
 	return tp;
@@ -269,17 +273,17 @@ void GeneratorFast::GenerateToolpath(void)
 //	Tool * tool = project->run[runNr].toolbox.GetToolInSlot(slotNr);
 	Run* run = this->parent;
 
-	if(refTool >= run->tools.GetCount()){
+	if(refTool >= run->machine.tools.GetCount()){
 		output = _T("Tool empty.");
 		errorOccured = true;
 		return;
 	}
-	Tool * tool = &(run->tools[refTool]);
+	Tool * tool = &(run->machine.tools[refTool]);
 
 	GeneratorDexel::GenerateToolpath();
 
 	ToolPath tp;
-	MachinePosition mp;
+	GCodeBlock mp;
 
 	toolDiameter = tool->GetMaxDiameter();
 
@@ -318,9 +322,9 @@ void GeneratorFast::GenerateToolpath(void)
 //	ArrayOfMachinePosition mpa = target.toolpathFlipped.positions;
 //	if(!mpa.IsEmpty()){
 //		for(size_t i = 0; i < mpa.GetCount(); i++){
-//			px = mpa[i].axisX;
-//			py = target.GetSizeY() - mpa[i].axisY;
-//			pz = target.GetSizeZ() - mpa[i].axisZ;
+//			px = mpa[i].X;
+//			py = target.GetSizeY() - mpa[i].Y;
+//			pz = target.GetSizeZ() - mpa[i].Z;
 //			if(pz > level) temptop.FoldLowerDistance(round((px - rx2) / rx),
 //					round((py - ry2) / ry), discTool);
 //		}
@@ -329,10 +333,10 @@ void GeneratorFast::GenerateToolpath(void)
 	d = temptop.GetMaxUpsideLevel(cx, cy);
 
 	if(tp.IsEmpty()){ // New toolpath starting position
-		mp.axisX = rx * cx + rx2;
-		mp.axisY = ry * cy + ry2;
-		mp.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
-		mp.isCutting = false;
+		mp.X = rx * cx + rx2;
+		mp.Y = ry * cy + ry2;
+		mp.Z = temp.GetSizeZ() + freeHeightAboveMaterial;
+		mp.Rapid();
 		tp.positions.Add(mp);
 	}
 
@@ -344,25 +348,25 @@ void GeneratorFast::GenerateToolpath(void)
 		while(temptop.FindNextDistance(cx, cy)){
 			temptop.FindStartCutting(cx, cy);
 
-			//		if(!IsDirectlyReachable(temp, mp.axisX, mp.axisY, mp.axisZ, cx * rx
+			//		if(!IsDirectlyReachable(temp, mp.X, mp.Y, mp.Z, cx * rx
 			//				+ rx2, cy * ry + ry2, level)) break;
 
 			poly = temptop.FindCut(cx, cy);
 			temp.PolygonDropOntoTarget(poly, level + raiseStep);
 
-			if(mp.axisZ > level){
+			if(mp.Z > level){
 				// Drill down
 				d = target.GetSizeZ();
 				while(d > level + dropStep){
-					mp.isCutting = true;
+					mp.FeedSpeed();
 					d -= dropStep;
-					mp.axisZ = d;
+					mp.Z = d;
 					tp.positions.Add(mp);
-					mp.isCutting = false;
-					mp.axisZ = target.GetSizeZ();
+					mp.Rapid();
+					mp.Z = target.GetSizeZ();
 				}
-				mp.isCutting = true;
-				mp.axisZ = level;
+				mp.FeedSpeed();
+				mp.Z = level;
 				tp.positions.Add(mp);
 			}
 			//if(poly.elements.GetCount() > 3){
@@ -373,14 +377,13 @@ void GeneratorFast::GenerateToolpath(void)
 						round((poly.elements[i].y - ry2) / ry), discTool);
 
 				if(i == 0){
-					tp += MoveSavely(temp, mp.axisX, mp.axisY, mp.axisZ,
-							poly.elements[i].x, poly.elements[i].y,
-							poly.elements[i].z);
+					tp += MoveSavely(temp, mp.X, mp.Y, mp.Z, poly.elements[i].x,
+							poly.elements[i].y, poly.elements[i].z);
 				}
-				mp.axisX = poly.elements[i].x;
-				mp.axisY = poly.elements[i].y;
-				mp.axisZ = poly.elements[i].z;
-				mp.isCutting = true;
+				mp.X = poly.elements[i].x;
+				mp.Y = poly.elements[i].y;
+				mp.Z = poly.elements[i].z;
+				mp.FeedSpeed();
 				tp.positions.Add(mp);
 				//}
 			}
@@ -394,8 +397,8 @@ void GeneratorFast::GenerateToolpath(void)
 			level = temptop.GetSizeZ() + 0.0001;
 		}
 
-		mp.axisZ = level;
-		mp.isCutting = false;
+		mp.Z = level;
+		mp.Rapid();
 		tp.positions.Add(mp);
 
 		if(level < temptop.GetSizeZ()){
@@ -404,9 +407,9 @@ void GeneratorFast::GenerateToolpath(void)
 			//TODO: Removed other side from flipped designs?
 //			if(!mpa.IsEmpty()){
 //				for(size_t i = 0; i < mpa.GetCount(); i++){
-//					px = mpa[i].axisX;
-//					py = target.GetSizeY() - mpa[i].axisY;
-//					pz = target.GetSizeZ() - mpa[i].axisZ;
+//					px = mpa[i].X;
+//					py = target.GetSizeY() - mpa[i].Y;
+//					pz = target.GetSizeZ() - mpa[i].Z;
 //					if(pz > level) temptop.FoldLowerDistance(px, py, discTool);
 //				}
 //			}
@@ -420,14 +423,14 @@ void GeneratorFast::GenerateToolpath(void)
 	//	// Drop onto geometry
 	//	size_t i;
 	//	for(i = 0; i < temptp.positions.GetCount(); i++)
-	//		temp.VectorDrop(temptp.positions[i].axisX, temptp.positions[i].axisY,
-	//				temptp.positions[i].axisZ, dmin);
+	//		temp.VectorDrop(temptp.positions[i].X, temptp.positions[i].Y,
+	//				temptp.positions[i].Z, dmin);
 	//
 	//	tp += temptp;
 
 	// Move out of material
-	mp.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
-	mp.isCutting = false;
+	mp.Z = temp.GetSizeZ() + freeHeightAboveMaterial;
+	mp.Rapid();
 	tp.positions.Add(mp);
 
 	//target = temptop;
@@ -435,7 +438,7 @@ void GeneratorFast::GenerateToolpath(void)
 	//tp.CleanPath(0.0003);
 
 //	for(size_t i = 0; i < tp.positions.GetCount(); i++)
-//		tp.positions[i].axisZ -= temp.GetSizeZ();
+//		tp.positions[i].Z -= temp.GetSizeZ();
 
 	toolpath = tp;
 	target.Refresh();
@@ -449,9 +452,9 @@ void GeneratorFast::GenerateToolpath(void)
 	//	//	tp.positions.Add(m);
 	//
 	//	// Position at start (! not a toolpath position)
-	//	m.axisX = 0.0;
-	//	m.axisY = 0.0;
-	//	m.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
+	//	m.X = 0.0;
+	//	m.Y = 0.0;
+	//	m.Z = temp.GetSizeZ() + freeHeightAboveMaterial;
 	//	m.isCutting = false;
 	//
 	//	ArrayOfPolygon25 pgs;
@@ -462,14 +465,14 @@ void GeneratorFast::GenerateToolpath(void)
 	//
 	//
 	//	// Move tool out of material
-	//	m.axisZ = temp.GetSizeZ() + freeHeightAboveMaterial;
+	//	m.Z = temp.GetSizeZ() + freeHeightAboveMaterial;
 	//	m.isCutting = false;
 	//	tp.positions.Add(m);
 	//
 	//
 	//	// Shift toolpath down to align 0 with top-of-stock
 	//	for(size_t i = 0; i < tp.positions.GetCount(); i++){
-	//		tp.positions[i].axisZ -= temp.GetSizeZ();
+	//		tp.positions[i].Z -= temp.GetSizeZ();
 	//	}
 	//	tp.matrix.TranslateGlobal(0, 0, temp.GetSizeZ());
 	//

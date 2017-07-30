@@ -38,7 +38,6 @@
 #include "Support.h"
 #include "../3D/BooleanBox.h"
 #include "../3D/BoundingBox.h"
-#include "generator/DexelTarget.h"
 
 #include <wx/txtstrm.h>
 #include <wx/dynarray.h>
@@ -61,7 +60,6 @@ public:
 	ArrayOfSupport supports;
 
 	Geometry geometry;
-	DexelTarget simulation;
 
 	bool selected;
 
@@ -77,10 +75,9 @@ public:
 	void ToStream(wxTextOutputStream & stream);
 	bool FromStream(wxTextInputStream & stream);
 
-	void InitSimulation(size_t maxCells);
+	Vector3 GetCenter(void) const;
 
 	void Paint(void) const;
-	void PaintSimulation(void) const;
 	void Update(void);
 //	void SortTargets(void);
 };

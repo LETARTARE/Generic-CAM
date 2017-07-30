@@ -64,6 +64,7 @@
 #include <wx/log.h>
 #include <wx/cmdproc.h>
 
+
 class FrameMain:public GUIMain {
 	friend class DnDFile;
 	// Constructor/ Destructor
@@ -173,6 +174,7 @@ private:
 	void OnShowLogWindow(wxCommandEvent& event);
 	void OnViewSet(wxCommandEvent& event);
 	void OnHelp(wxCommandEvent& event);
+	void OnTestGCode(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
 	void OnBeginLabelEdit(wxTreeEvent& event);
 	void OnEndLabelEdit(wxTreeEvent& event);

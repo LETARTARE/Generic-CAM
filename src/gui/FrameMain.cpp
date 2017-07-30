@@ -29,6 +29,7 @@
 #include "../controller/DialogSetup6DOFController.h"
 #include "DialogAbout.h"
 #include "DialogSetupUnits.h"
+#include "DialogTestGCode.h"
 
 #include "../project/generator/ToolpathGeneratorThread.h"
 #include "../project/command/CommandProjectRename.h"
@@ -148,6 +149,13 @@ FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 			&commandProcessor, &settings);
 	dialogAnimation = new DialogAnimation(this, &project);
 
+	wxString dialect;
+	config->Read(_T("GCodeDialect"), &dialect, _T("RS274NGC"));
+	m_menuDialect->Check(ID_DIALECT_RS274NGC,
+			dialect.CmpNoCase(_T("RS274NGC")) == 0);
+	m_menuDialect->Check(ID_DIALECT_FANUCM,
+			dialect.CmpNoCase(_T("FanucM")) == 0);
+
 	// Connect the project to the 3D canvas
 	m_canvas->InsertProject(&project);
 	settings.WriteToCanvas(m_canvas);
@@ -192,6 +200,10 @@ FrameMain::~FrameMain()
 	GetClientSize(&w, &h);
 	config->Write(_T("MainFrameWidth"), (long) w);
 	config->Write(_T("MainFrameHeight"), (long) h);
+
+	wxString dialect = _T("RS274NGC");
+	if(m_menuDialect->IsChecked(ID_DIALECT_FANUCM)) dialect = _T("FanucM");
+	config->Write(_T("GCodeDialect"), dialect);
 
 	delete m_helpController;
 	settings.WriteConfigTo(config);
@@ -645,6 +657,7 @@ void FrameMain::OnProjectNew(wxCommandEvent& event)
 	commandProcessor.MarkAsSaved();
 	commandProcessor.SetMenuStrings();
 	TransferDataToWindow();
+	tree->UpdateSelection();
 }
 
 void FrameMain::OnProjectRename(wxCommandEvent& event)
@@ -689,6 +702,7 @@ void FrameMain::OnProjectLoad(wxCommandEvent& event)
 		if(project.Load(fileName)){
 			settings.lastProjectDirectory = fileName.GetPath();
 			TransferDataToWindow();
+			tree->UpdateSelection();
 		}
 	}
 }
@@ -699,6 +713,7 @@ void FrameMain::OnProjectLoadRecent(wxCommandEvent& event)
 			m_fileHistory->GetHistoryFile(event.GetId() - wxID_FILE1));
 	if(!fileName.empty() && project.Load(fileName)){
 		TransferDataToWindow();
+		tree->UpdateSelection();
 	}
 }
 
@@ -1083,7 +1098,10 @@ void FrameMain::OnGeneratorSaveToolpath(wxCommandEvent& event)
 		wxFileName fileName;
 		fileName = dialog.GetPath();
 		settings.lastToolpathDirectory = fileName.GetPath();
-		project.SaveToolpath(fileName, runNr);
+		ToolPath::Dialect dialect = ToolPath::RS274NGC;
+		if(m_menuDialect->IsChecked(ID_DIALECT_FANUCM)) dialect =
+				ToolPath::FanucM;
+		project.SaveToolpath(fileName, runNr, dialect);
 	}
 }
 
@@ -1161,20 +1179,35 @@ void FrameMain::OnShowLogWindow(wxCommandEvent& event)
 
 void FrameMain::OnViewSet(wxCommandEvent& event)
 {
-//TODO: Canvas rotation from the outside.
 	switch(event.GetId()){
 	case ID_VIEWFRONT:
-
+		m_canvas->rotmat = AffineTransformMatrix::Identity();
+		m_canvas->rotmat *= AffineTransformMatrix::RotateXYZ(-M_PI_2, 0, 0);
+		m_statusBar->SetStatusText(_T("ID_VIEWFRONT"), 1);
 		break;
 	case ID_VIEWBACK:
+		m_canvas->rotmat = AffineTransformMatrix::Identity();
+		m_canvas->rotmat *= AffineTransformMatrix::RotateXYZ(M_PI_2, 0, 0);
+		m_statusBar->SetStatusText(_T("ID_VIEWBACK"), 1);
 		break;
 	case ID_VIEWLEFT:
+		m_canvas->rotmat = AffineTransformMatrix::Identity();
+		m_canvas->rotmat *= AffineTransformMatrix::RotateXYZ(0, M_PI_2, 0);
+		m_statusBar->SetStatusText(_T("ID_VIEWLEFT"), 1);
 		break;
 	case ID_VIEWRIGHT:
+		m_canvas->rotmat = AffineTransformMatrix::Identity();
+		m_canvas->rotmat *= AffineTransformMatrix::RotateXYZ(0, -M_PI_2, 0);
+		m_statusBar->SetStatusText(_T("ID_VIEWRIGHT"), 1);
 		break;
 	case ID_VIEWTOP:
+		m_canvas->rotmat = AffineTransformMatrix::Identity();
+		m_statusBar->SetStatusText(_T("ID_VIEWTOP"), 1);
 		break;
 	case ID_VIEWBOTTOM:
+		m_canvas->rotmat = AffineTransformMatrix::Identity();
+		m_canvas->rotmat *= AffineTransformMatrix::RotateXYZ(0, M_PI, 0);
+		m_statusBar->SetStatusText(_T("ID_VIEWBOTTOM"), 1);
 		break;
 	}
 	TransferDataToWindow();
@@ -1183,6 +1216,14 @@ void FrameMain::OnViewSet(wxCommandEvent& event)
 void FrameMain::OnHelp(wxCommandEvent& event)
 {
 	m_helpController->DisplayContents();
+}
+
+void FrameMain::OnTestGCode(wxCommandEvent& event)
+{
+	//TODO: When the units change the change is not immediately propagated into the TestGCode dialog.
+	DialogTestGCode * dialog = new DialogTestGCode(this, &settings);
+	dialog->Show();
+	dialog->Raise();
 }
 
 void FrameMain::OnAbout(wxCommandEvent& event)

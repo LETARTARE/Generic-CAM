@@ -26,7 +26,7 @@
 
 #include "DexelTarget.h"
 
-#include "../machine/MachinePosition.h"
+//#include "../machine/MachinePosition.h"
 
 #include <wx/log.h>
 #include <wx/string.h>
@@ -201,8 +201,8 @@ void DexelTarget::Simulate(const ToolPath &toolpath, const Tool &tool)
 	this->HardInvert();
 	Polygon3 temp;
 	for(size_t i = 0; i < toolpath.positions.GetCount(); i++){
-		temp.InsertPoint(toolpath.positions[i].axisX,
-				toolpath.positions[i].axisY, toolpath.positions[i].axisZ);
+		temp.InsertPoint(toolpath.positions[i].X, toolpath.positions[i].Y,
+				toolpath.positions[i].Z);
 	}
 	this->PolygonCutInTarget(temp, toolShape);
 }

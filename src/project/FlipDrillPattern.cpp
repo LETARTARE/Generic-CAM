@@ -100,30 +100,30 @@ void FlipDrillPattern::SetupDrill(Tool &tool, double diameter, double depth)
 	outLine.Close();
 
 	const double r = (diameter - 0.0061) / 2.0;
-	MachinePosition temp;
-	temp.axisZ = 0.004;
+	GCodeBlock temp;
+	temp.Z = 0.004;
 	toolpath.positions.Add(temp);
-	temp.axisZ = 0.001;
+	temp.Z = 0.001;
 	toolpath.positions.Add(temp);
-	temp.isCutting = true;
-	temp.axisZ = -0.001;
-	temp.axisX = r;
+	temp.FeedSpeed();
+	temp.Z = -0.001;
+	temp.X = r;
 	toolpath.positions.Add(temp);
-	temp.isRotationPositiv = true;
-	temp.radiusI = -r;
-	while(temp.axisZ > 0.003 - depth){
-		temp.axisZ -= 0.003;
+	temp.ArcCCW();
+	temp.I = -r;
+	while(temp.Z > 0.003 - depth){
+		temp.Z -= 0.003;
 		toolpath.positions.Add(temp);
 	}
-	temp.axisZ = -depth;
+	temp.Z = -depth;
 	toolpath.positions.Add(temp);
 	toolpath.positions.Add(temp);
-	temp.axisZ += 0.001;
-	temp.axisX = 0.000;
-	temp.radiusI = 0.000;
-	temp.isCutting = false;
+	temp.Z += 0.001;
+	temp.X = 0.000;
+	temp.I = 0.000;
+	temp.Rapid();
 	toolpath.positions.Add(temp);
-	temp.axisZ = 0.004;
+	temp.Z = 0.004;
 	toolpath.positions.Add(temp);
 }
 

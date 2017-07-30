@@ -33,29 +33,53 @@ MachineSimulator::MachineSimulator()
 	tStep = 0;
 	step = 0;
 
-	position.reserve(100);
-	position.push_back(MachinePosition(0.1, 0.1, -0.0));
-	position.push_back(MachinePosition(0.1, 0.1, -0.1));
-	position.push_back(MachinePosition(0.1, 0.1, -0.0));
-	position.push_back(MachinePosition(0.1, 0.2, -0.0));
-	position.push_back(MachinePosition(0.2, 0.2, -0.0));
-	position.push_back(MachinePosition(0.1, 0.1, -0.0));
+//	position.reserve(100);
+//	position.push_back(MachinePosition(0.1, 0.1, -0.0));
+//	position.push_back(MachinePosition(0.1, 0.1, -0.1));
+//	position.push_back(MachinePosition(0.1, 0.1, -0.0));
+//	position.push_back(MachinePosition(0.1, 0.2, -0.0));
+//	position.push_back(MachinePosition(0.2, 0.2, -0.0));
+//	position.push_back(MachinePosition(0.1, 0.1, -0.0));
 
 	AffineTransformMatrix a, b;
 
 	a.TranslateGlobal(-0.05, 0, 0);
 	b.TranslateGlobal(+0.05, 0.1, 0);
+
+	machine = NULL;
+	workpiece = NULL;
+	toolpath = NULL;
+
 }
 
 MachineSimulator::~MachineSimulator()
 {
+}
 
+void MachineSimulator::InsertWorkpiece(Workpiece* workpiece)
+{
+	this->workpiece = workpiece;
+}
+
+void MachineSimulator::InsertToolPath(ToolPath* toolpath)
+{
+	this->toolpath = toolpath;
+}
+
+void MachineSimulator::InsertMachine(Machine* machine)
+{
+	this->machine = machine;
 }
 
 void MachineSimulator::Reset(void)
 {
 	step = 0;
 }
+
+void MachineSimulator::Rewind(void)
+{
+}
+
 void MachineSimulator::Step(float tTarget)
 {
 	if(tTarget < tStep){
@@ -63,18 +87,50 @@ void MachineSimulator::Step(float tTarget)
 		step = 0;
 	}
 
-	while(step + 1 < position.size()
-			&& tTarget > tStep + position[step].duration){
-		tStep += position[step].duration;
-		step++;
-	}
+//	while(step + 1 < position.size()
+//			&& tTarget > tStep + position[step].duration){
+//		tStep += position[step].duration;
+//		step++;
+//	}
 
-	if(step + 1 == position.size()){
-		machine.position = position[step];
-	}else{
-		machine.position = position[step]
-				+ (position[step + 1] - position[step])
-						/ position[step].duration * (tTarget - tStep);
-	}
+//	if(step + 1 == position.size()){
+//		machine->position = position[step];
+//	}else{
+//		machine->position = position[step]
+//				+ (position[step + 1] - position[step])
+//						/ position[step].duration * (tTarget - tStep);
+//	}
+}
+
+void MachineSimulator::FForward(void)
+{
+}
+
+void MachineSimulator::InitSimulation(size_t maxCells)
+{
+	const double area = workpiece->GetSizeX() * workpiece->GetSizeY();
+	const double L = sqrt(area / (double) maxCells);
+	size_t nx = floor(workpiece->GetSizeX() / L);
+	size_t ny = floor(workpiece->GetSizeY() / L);
+	if(nx == 0 || ny == 0) return;
+	const double dx = workpiece->GetSizeX() / (double) nx;
+	const double dy = workpiece->GetSizeY() / (double) ny;
+	simulation.SetupBox(workpiece->GetSizeX(), workpiece->GetSizeY(),
+			workpiece->GetSizeZ(), dx, dy);
+	simulation.displayBox = true;
+}
+
+bool MachineSimulator::ReadGCodeFile(wxFileName fileName)
+{
+	return false;
+}
+
+void MachineSimulator::Paint(void) const
+{
+	if(workpiece == NULL) return;
+	glPushMatrix();
+	glMultMatrixd(workpiece->matrix.a);
+	simulation.Paint();
+	glPopMatrix();
 }
 

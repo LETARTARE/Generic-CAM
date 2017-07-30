@@ -86,18 +86,18 @@ void GeneratorAreaGridDexel::GenerateToolpath(void)
 	toolpathGenerated = true;
 	const Run* const run = this->parent;
 	assert(run != NULL);
-	if(refTool >= run->tools.GetCount()){
+	if(refTool >= run->machine.tools.GetCount()){
 		output = _T("Tool empty.");
 		errorOccured = true;
 		return;
 	}
 	GeneratorDexel::GenerateToolpath();
-	const Tool* const tool = &(run->tools[refTool]);
+	const Tool* const tool = &(run->machine.tools[refTool]);
 
 	printf("AreaGridDexel called.\n");
 
-	ToolPath tp;
-	MachinePosition m;
+//	ToolPath tp;
+//	MachinePosition m;
 
 	DexelTarget surface = target;
 	DexelTarget toolShape;

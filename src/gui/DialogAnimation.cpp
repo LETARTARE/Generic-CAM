@@ -100,12 +100,12 @@ void DialogAnimation::OnScroll(wxScrollEvent& event)
 	if(generatorNr < 0 || generatorNr >= run->generators.GetCount()) return;
 	const Generator * const generator = run->generators[generatorNr];
 
-	const int toolNr = generator->refTool;
-	if(toolNr < 0 || toolNr >= run->tools.GetCount()) return;
-	const Tool * const tool = &(run->tools[toolNr]);
+//	const int toolNr = generator->refTool;
+//	if(toolNr < 0 || toolNr >= run->tools.GetCount()) return;
+//	const Tool * const tool = &(run->tools[toolNr]);
 
-	workpiece->InitSimulation(1000000);
-	workpiece->simulation.Simulate(generator->toolpath, *tool);
+//	workpiece->InitSimulation(1000000);
+//	workpiece->simulation.Simulate(generator->toolpath, *tool);
 
 	wxCommandEvent refreshEvent(wxEVT_COMMAND_MENU_SELECTED,
 			ID_UPDATESIMULATION);

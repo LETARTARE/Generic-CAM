@@ -109,6 +109,8 @@ LUACodeEvaluator& LUACodeEvaluator::operator =(const LUACodeEvaluator& other)
 	linkedMachine = other.linkedMachine;
 	componentToManipulate = other.componentToManipulate;
 
+	// Starting with LUA 5.2 there is no lua_open() function anymore. It has been
+	// replaced by luaL_newstate().
 	//	L = lua_open();
 	L = luaL_newstate();
 
@@ -220,16 +222,16 @@ bool LUACodeEvaluator::EvaluateAssembly()
 	programOutput.Empty();
 	matrix.SetIdentity();
 
-	InsertVariable(_T("AXIS_X"), linkedMachine->position.axisX);
-	InsertVariable(_T("AXIS_Y"), linkedMachine->position.axisY);
-	InsertVariable(_T("AXIS_Z"), linkedMachine->position.axisZ);
+	InsertVariable(_T("AXIS_X"), linkedMachine->position.X);
+	InsertVariable(_T("AXIS_Y"), linkedMachine->position.Y);
+	InsertVariable(_T("AXIS_Z"), linkedMachine->position.Z);
 	// The rotational axes are in degrees.
-	InsertVariable(_T("AXIS_A"), linkedMachine->position.axisA * 180.0 / M_PI);
-	InsertVariable(_T("AXIS_B"), linkedMachine->position.axisB * 180.0 / M_PI);
-	InsertVariable(_T("AXIS_C"), linkedMachine->position.axisC * 180.0 / M_PI);
-	InsertVariable(_T("AXIS_U"), linkedMachine->position.axisU);
-	InsertVariable(_T("AXIS_V"), linkedMachine->position.axisV);
-	InsertVariable(_T("AXIS_W"), linkedMachine->position.axisW);
+	InsertVariable(_T("AXIS_A"), linkedMachine->position.A * 180.0 / M_PI);
+	InsertVariable(_T("AXIS_B"), linkedMachine->position.B * 180.0 / M_PI);
+	InsertVariable(_T("AXIS_C"), linkedMachine->position.C * 180.0 / M_PI);
+	InsertVariable(_T("AXIS_U"), linkedMachine->position.U);
+	InsertVariable(_T("AXIS_V"), linkedMachine->position.V);
+	InsertVariable(_T("AXIS_W"), linkedMachine->position.W);
 
 	lua_getglobal(L, "AssembleMachine");
 
@@ -314,7 +316,7 @@ int LUACodeEvaluator::addcomponent_glue(lua_State * L)
 	if(s == NULL) return luaL_error(L,
 	LUA_QL("tostring") " must return a string to " LUA_QL("addcomponent_glue"));
 	if(CC->linkedMachine == NULL) return luaL_error(L,
-			"In "LUA_QL("addcomponent_glue")
+			"In " LUA_QL("addcomponent_glue")
 			" CC->linkedMachine is NULL.");
 	if(!CC->linkedMachine->AddComponent(wxString::FromAscii(s))){
 		return luaL_error(L, "addcomponent: part already exists!");
@@ -446,7 +448,7 @@ int LUACodeEvaluator::box_glue(lua_State * L)
 	const float y = luaL_checknumber(L, 2);
 	const float z = luaL_checknumber(L, 3);
 	if(CC->componentToManipulate == NULL) return luaL_error(L,
-			"In "LUA_QL("box")
+			"In " LUA_QL("box")
 			": No component to manipulate selected.");
 	CC->componentToManipulate->InsertBox(CC->matrix, x, y, z);
 	return 0;
@@ -456,7 +458,7 @@ int LUACodeEvaluator::cylinder_glue(lua_State * L)
 	LUACodeEvaluator* CC = LUACodeEvaluator::FindCallingClass(L);
 	assert(CC != NULL);
 	if(CC->componentToManipulate == NULL) return luaL_error(L,
-			"In "LUA_QL("cylinder")
+			"In " LUA_QL("cylinder")
 			": No component to manipulate selected.");
 	switch(lua_gettop(L)){
 	case 2:
@@ -497,7 +499,7 @@ int LUACodeEvaluator::setstyle_glue(lua_State * L)
 	const float g = luaL_checknumber(L, 2);
 	const float b = luaL_checknumber(L, 3);
 	if(CC->componentToManipulate == NULL) return luaL_error(L,
-			"In "LUA_QL("setstyle")
+			"In " LUA_QL("setstyle")
 			": No component to manipulate selected.");
 	CC->componentToManipulate->SetColor(r, g, b);
 	return 0;
@@ -555,7 +557,7 @@ int LUACodeEvaluator::placecomponent_glue(lua_State * L)
 	if(s == NULL) return luaL_error(L,
 	LUA_QL("tostring") " must return a string to " LUA_QL("print"));
 	if(CC->linkedMachine == NULL) return luaL_error(L,
-			"In "LUA_QL("placecomponent")
+			"In " LUA_QL("placecomponent")
 			": CC->linkedMachine is NULL.");
 	if(!CC->linkedMachine->PlaceComponent(wxString::FromAscii(s), CC->matrix)){
 		return luaL_error(L, "placecomponent: part does not exist!");
@@ -585,10 +587,10 @@ int LUACodeEvaluator::loadgeometry_glue(lua_State * L)
 	if(s == NULL) return luaL_error(L,
 	LUA_QL("tostring") " must return a string to " LUA_QL("print"));
 	if(CC->linkedMachine == NULL) return luaL_error(L,
-			"In "LUA_QL("loadgeometry")
+			"In " LUA_QL("loadgeometry")
 			": CC->linkedMachine is NULL.");
 	if(CC->componentToManipulate == NULL) return luaL_error(L,
-			"In "LUA_QL("loadgeometry")
+			"In " LUA_QL("loadgeometry")
 			": No component to manipulate selected.");
 	if(!CC->linkedMachine->LoadGeometryIntoComponent(wxString::FromAscii(s),
 			CC->componentToManipulate, CC->matrix)){

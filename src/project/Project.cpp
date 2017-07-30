@@ -156,6 +156,11 @@ void Project::Update(void)
 	}
 	for(size_t i = 0; i < run.GetCount(); i++){
 		run[i].parent = this;
+		if(i == 0){
+			run[i].prevRun = -1;
+		}else{
+			run[i].prevRun = i - 1;
+		}
 		run[i].Update();
 	}
 }
@@ -438,10 +443,10 @@ void Project::LoadPattern(wxFileName fileName)
 {
 }
 
-bool Project::SaveToolpath(wxFileName fileName, int runNr)
+bool Project::SaveToolpath(wxFileName fileName, int runNr, ToolPath::Dialect dialect)
 {
 	if(runNr < 0 || runNr > run.GetCount()) return false;
-	return run[runNr].SaveToolpaths(fileName);
+	return run[runNr].SaveToolpaths(fileName, dialect);
 }
 
 // Experimental stuff:
@@ -508,8 +513,9 @@ void Project::PaintWorkpiece(void) const
 {
 	const int i = GetFirstSelectedWorkpiece();
 	if(i < 0) return;
+	Vector3 center = workpieces[i].GetCenter();
 	glPushMatrix();
-	glTranslatef(-workpieces[i].xmax / 2, -workpieces[i].ymax / 2, 0);
+	glTranslatef(-center.x, -center.y, -center.z);
 	RenderCoordinateSystem();
 	glPushName(i + 1);
 	workpieces[i].Paint();
@@ -523,7 +529,7 @@ void Project::PaintRun(void) const
 	if(i < 0) return;
 	Vector3 center = run[i].GetCenter();
 	glPushMatrix();
-//	glTranslatef(-center.x, -center.y, -center.z);
+	glTranslatef(-center.x, -center.y, -center.z);
 	glPushName(i + 1);
 	run[i].Paint();
 	glPopName();
@@ -532,13 +538,15 @@ void Project::PaintRun(void) const
 
 void Project::PaintAnimation(void) const
 {
-	const int runNr = GetFirstSelectedRun();
-	if(runNr < 0) return;
-	const int workpieceNr = run[runNr].refWorkpiece;
-	if(workpieceNr < 0 || workpieceNr >= workpieces.GetCount()) return;
-	glPushName(runNr + 1);
-	workpieces[workpieceNr].PaintSimulation();
+	const int i = GetFirstSelectedRun();
+	if(i < 0) return;
+	Vector3 center = run[i].GetCenter();
+	glPushMatrix();
+	glTranslatef(-center.x, -center.y, -center.z);
+	glPushName(i + 1);
+	run[i].Paint(true);
 	glPopName();
+	glPopMatrix();
 }
 
 void Project::RenderCoordinateSystem(void) const

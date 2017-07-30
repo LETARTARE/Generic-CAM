@@ -28,7 +28,7 @@
 
 #include <GL/gl.h>
 #include <wx/log.h>
-#include <wx/arrimpl.cpp> // this is a magic incantation which must be done!
+#include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfHullEdge);
 WX_DEFINE_OBJARRAY(ArrayOfHullTriangle);
 WX_DEFINE_OBJARRAY(ArrayOfHull);
@@ -124,8 +124,9 @@ void Hull::CopyFrom(const Geometry &geometry)
 	this->objectName = geometry.name;
 	this->visible = geometry.visible;
 	this->color = geometry.color;
-	wxLogMessage(wxString::Format(_T("V: %u E: %u T: %u"), v.GetCount(),
-			e.GetCount(), t.GetCount()));
+	wxLogMessage(
+			wxString::Format(_T("V: %u E: %u T: %u"), v.GetCount(),
+					e.GetCount(), t.GetCount()));
 }
 
 void Hull::CopyTrianglesFrom(const Geometry &geometry)
@@ -174,8 +175,7 @@ double Hull::DiffSquareAndAdd(const Vector3 &a, const Vector3 &b)
 	return t1 * t1 + t2 * t2 + t3 * t3;
 }
 
-size_t Hull::AddTriangle(const Vector3 &a, const Vector3 &b,
-		const Vector3 &c)
+size_t Hull::AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c)
 {
 	size_t i;
 
@@ -234,8 +234,8 @@ size_t Hull::AddTriangle(const Vector3 &a, const Vector3 &b,
 	}
 
 	for(i = 0; i < e.GetCount(); i++){
-		if((e[i].va == nva && e[i].vb == nvb) || (e[i].va == nvb && e[i].vb
-				== nva)){
+		if((e[i].va == nva && e[i].vb == nvb)
+				|| (e[i].va == nvb && e[i].vb == nva)){
 			nea = i;
 			xea = true;
 			break;
@@ -249,8 +249,8 @@ size_t Hull::AddTriangle(const Vector3 &a, const Vector3 &b,
 	}
 
 	for(i = 0; i < e.GetCount(); i++){
-		if((e[i].va == nvb && e[i].vb == nvc) || (e[i].va == nvc && e[i].vb
-				== nvb)){
+		if((e[i].va == nvb && e[i].vb == nvc)
+				|| (e[i].va == nvc && e[i].vb == nvb)){
 			neb = i;
 			xeb = true;
 			break;
@@ -264,8 +264,8 @@ size_t Hull::AddTriangle(const Vector3 &a, const Vector3 &b,
 	}
 
 	for(i = 0; i < e.GetCount(); i++){
-		if((e[i].va == nvc && e[i].vb == nva) || (e[i].va == nva && e[i].vb
-				== nvc)){
+		if((e[i].va == nvc && e[i].vb == nva)
+				|| (e[i].va == nva && e[i].vb == nvc)){
 			nec = i;
 			xec = true;
 			break;
@@ -278,12 +278,12 @@ size_t Hull::AddTriangle(const Vector3 &a, const Vector3 &b,
 		nec = e.GetCount() - 1;
 	}
 	for(i = 0; i < t.GetCount(); i++){
-		if((t[i].va == nva && t[i].vb == nvb && t[i].vc == nvc) || (t[i].va
-				== nva && t[i].vb == nvc && t[i].vc == nvb) || (t[i].va == nvb
-				&& t[i].vb == nvc && t[i].vc == nva) || (t[i].va == nvb
-				&& t[i].vb == nva && t[i].vc == nvc) || (t[i].va == nvc
-				&& t[i].vb == nva && t[i].vc == nvb) || (t[i].va == nvc
-				&& t[i].vb == nvb && t[i].vc == nva)){
+		if((t[i].va == nva && t[i].vb == nvb && t[i].vc == nvc)
+				|| (t[i].va == nva && t[i].vb == nvc && t[i].vc == nvb)
+				|| (t[i].va == nvb && t[i].vb == nvc && t[i].vc == nva)
+				|| (t[i].va == nvb && t[i].vb == nva && t[i].vc == nvc)
+				|| (t[i].va == nvc && t[i].vb == nva && t[i].vc == nvb)
+				|| (t[i].va == nvc && t[i].vb == nvb && t[i].vc == nva)){
 			nt = i;
 			xt = true;
 			break;

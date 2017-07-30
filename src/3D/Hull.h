@@ -38,7 +38,7 @@
  * \ingroup 3DObject
  * \brief Closed Hull
  *
- * Calculates a clodes Hull from a TriangleSoup.
+ * Calculates a closed Hull from a TriangleSoup.
  */
 
 class HullEdge {

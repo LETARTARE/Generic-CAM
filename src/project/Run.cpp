@@ -46,7 +46,6 @@ Run::Run()
 	name = _T("Run #");
 	refWorkpiece = -1;
 //	toolbox.Empty();
-	selectedTool = 0;
 	parent = NULL;
 	textureID = 0;
 	isOGLInit = false;
@@ -54,6 +53,7 @@ Run::Run()
 	prevRun = -1;
 	touchpoint = wxImage(touchpoint_xpm);
 	touchpoint.SetAlphaColor(255, 255, 255);
+	simulator.InsertMachine(&machine);
 }
 
 Run::Run(const Run& other)
@@ -90,11 +90,13 @@ void Run::Update(void)
 		assert(generators[i] != NULL);
 		generators[i]->parent = this;
 	}
+	simulator.InsertToolPath(this->GetSelectedToolpath());
+	simulator.InsertWorkpiece(this->GetWorkpiece());
 }
 
-bool Run::SaveToolpaths(wxFileName fileName)
+bool Run::SaveToolpaths(wxFileName fileName, ToolPath::Dialect dialect)
 {
-	ToolPath temp;
+	ToolPath generated;
 	for(size_t i = 0; i < generators.GetCount(); i++){
 		assert(generators[i] != NULL);
 		AffineTransformMatrix matrix;
@@ -102,14 +104,33 @@ bool Run::SaveToolpaths(wxFileName fileName)
 				generators[i]->area.ymin, generators[i]->area.zmin);
 		ToolPath moved = generators[i]->toolpath;
 		moved.ApplyTransformation(matrix);
-		temp += moved;
+		generated += moved;
 	}
 
 	// Move toolpath down by the touchoff height.
 	AffineTransformMatrix matrix;
 	matrix.TranslateGlobal(0, 0, -touchoffHeight);
-	temp.ApplyTransformation(matrix);
+	generated.ApplyTransformation(matrix);
 
+	generated.CleanPath(0.0003);
+	generated.DiffPath(0.0003);
+
+	// TODO: Move the following lines into the toolpath generators.
+	ToolPath startup;
+	startup.positions.Add(GCodeBlock(_T("F3000 (Feedrate mm/min)")));
+	startup.positions.Add(GCodeBlock(_T("T1 M6 (Tool 1, Select tool)")));
+	startup.positions.Add(GCodeBlock(_T("S10000 (Spindle speed rpm)")));
+	startup.positions.Add(GCodeBlock(_T("M3 (Start spindel)")));
+	startup.positions.Add(
+			GCodeBlock(
+					_T("G4 P3 (wait for 3 seconds for the spindle to start)")));
+
+	ToolPath temp = ToolPath::SafetyBlock() + startup + generated
+			+ ToolPath::EndBlock();
+
+	temp.Translate(dialect);
+
+	setlocale(LC_ALL, "C"); // To get a 3.1415 instead 3,1415 or else on every computer.
 	wxTextFile f;
 	if(fileName.FileExists()){
 		f.Open(fileName.GetFullPath());
@@ -117,29 +138,72 @@ bool Run::SaveToolpaths(wxFileName fileName)
 	}else{
 		f.Create(fileName.GetFullPath());
 	}
+
+	if(dialect == ToolPath::FanucM){
+		// For the fanucm.exe g-code simulator.
+		const wxTextFileType fileType = wxTextFileType_Dos;
+		f.AddLine(_T("G21"), fileType);
+		temp.CalculateMinMaxValues();
+		f.AddLine(
+				wxString::Format(_T("[billet x%g y%g z%g"),
+						(temp.maxPosition.X - temp.minPosition.X) * 1000.0,
+						(temp.maxPosition.Y - temp.minPosition.Y) * 1000.0,
+						(-temp.minPosition.Z) * 1000.0 + 0.1), fileType);
+		f.AddLine(
+				wxString::Format(_T("[edgemove x%g y%g"),
+						temp.minPosition.X * 1000.0,
+						temp.minPosition.Y * 1000.0), fileType);
+		for(size_t i = 0; i < machine.tools.GetCount(); i++){
+			f.AddLine(
+					wxString::Format(_T("[tooldef t%u d%g z%g"),
+							machine.tools[i].slotNr,
+							machine.tools[i].GetMaxDiameter() * 1000.0,
+							machine.tools[i].GetPositiveLength() * 1000.0),
+					fileType);
+		}
+	}
+
 	bool flag = temp.WriteToFile(f);
 	f.Write();
 	f.Close();
+	setlocale(LC_ALL, "");
+
 	return flag;
 }
 
-void Run::Paint(void) const
+void Run::Paint(bool showAnimation) const
 {
 	const Project * pr = parent;
 	if(pr == NULL) return;
 
-	machine.Paint();
-
 	::glPushMatrix();
+
+	if(refWorkpiece > -1){
+		Vector3 center = pr->workpieces[refWorkpiece].GetCenter();
+		::glTranslatef(-center.x, -center.y, -center.z);
+	}
+
+	machine.Paint();
 
 	if(refWorkpiece > -1){
 		::glPushMatrix();
 		::glMultMatrixd(machine.workpiecePosition.a);
 		::glMultMatrixd(workpiecePlacement.a);
-		pr->workpieces[refWorkpiece].Paint();
-		for(size_t n = 0; n < generators.GetCount(); n++){
-			assert(generators[n] != NULL);
-			generators[n]->Paint();
+		if(showAnimation){
+			simulator.Paint();
+		}else{
+			pr->workpieces[refWorkpiece].Paint();
+			bool anySelected = false;
+			for(size_t n = 0; n < generators.GetCount(); n++){
+				assert(generators[n] != NULL);
+				if(generators[n]->selected) anySelected = true;
+			}
+			for(size_t n = 0; n < generators.GetCount(); n++){
+				assert(generators[n] != NULL);
+				if(!anySelected || generators[n]->selected){
+					generators[n]->Paint();
+				}
+			}
 		}
 
 		// Draw the "Touchpoint" symbol
@@ -157,14 +221,8 @@ void Run::Paint(void) const
 		touchpoint.Paint();
 		::glPopMatrix();
 	}
+
 	::glPopMatrix();
-	if(selectedTool >= 0 && selectedTool < tools.GetCount()){
-		::glPushMatrix();
-		::glMultMatrixd(machine.toolPosition.a);
-		::glColor3f(0.7, 0.7, 0.7);
-		tools[selectedTool].Paint();
-		::glPopMatrix();
-	}
 }
 
 void Run::ToolpathToStream(wxTextOutputStream & stream)
@@ -178,10 +236,11 @@ void Run::ToStream(wxTextOutputStream& stream)
 	stream << _T("Name:") << endl;
 	stream << name << endl;
 	stream << wxString::Format(_T("WorkpieceRef: %u"), refWorkpiece) << endl;
-	stream << wxString::Format(_T("Tools: %u"), tools.GetCount()) << endl;
-	for(size_t n = 0; n < tools.GetCount(); n++){
+	stream << wxString::Format(_T("Tools: %u"), machine.tools.GetCount())
+			<< endl;
+	for(size_t n = 0; n < machine.tools.GetCount(); n++){
 		stream << wxString::Format(_T("Tool: %u"), n) << endl;
-		tools[n].ToStream(stream);
+		machine.tools[n].ToStream(stream);
 	}
 	stream << _T("Machine:") << endl;
 	stream << machine.fileName.GetFullPath() << endl;
@@ -209,7 +268,7 @@ bool Run::FromStream(wxTextInputStream& stream, int runNr, Project * project)
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Tools:")) != 0) return false;
 	size_t NTools = stream.Read32S();
-	tools.Clear();
+	machine.tools.Clear();
 	for(size_t n = 0; n < NTools; n++){
 		temp = stream.ReadWord();
 		if(temp.Cmp(_T("Tool:")) != 0) return false;
@@ -217,7 +276,7 @@ bool Run::FromStream(wxTextInputStream& stream, int runNr, Project * project)
 		if(index != n) return false;
 		Tool temp;
 		temp.FromStream(stream);
-		tools.Add(temp);
+		machine.tools.Add(temp);
 	}
 	temp = stream.ReadLine();
 	if(temp.Cmp(_T("Machine:")) != 0) return false;
@@ -249,11 +308,8 @@ bool Run::FromStream(wxTextInputStream& stream, int runNr, Project * project)
 Vector3 Run::GetCenter(void) const
 {
 	Vector3 temp;
-	const Workpiece* wp = GetWorkpiece();
-	if(wp != NULL){
-		temp.x = (wp->xmin + wp->xmax) / 2.0;
-		temp.y = (wp->ymin + wp->ymax) / 2.0;
-		temp.z = wp->zmin;
+	if(machine.IsInitialized()){
+		temp = machine.GetCenter();
 	}
 	return temp;
 }
@@ -272,4 +328,12 @@ const Workpiece* Run::GetWorkpiece(void) const
 	if(refWorkpiece < 0) return NULL;
 	if(refWorkpiece >= parent->workpieces.GetCount()) return NULL;
 	return &(parent->workpieces[refWorkpiece]);
+}
+
+ToolPath* Run::GetSelectedToolpath(void)
+{
+	for(size_t n = 0; n < generators.GetCount(); n++){
+		if(((generators[n]))->selected) return &((generators[n])->toolpath);
+	}
+	return NULL;
 }

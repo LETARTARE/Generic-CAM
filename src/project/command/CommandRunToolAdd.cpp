@@ -46,18 +46,18 @@ bool CommandRunToolAdd::Do(void)
 {
 	if(project == NULL) return false;
 	Run* const run = &(project->run[runNr]);
-	const size_t maxTools = run->tools.GetCount();
+	const size_t maxTools = run->machine.tools.GetCount();
 	if(maxTools > 0){
 		for(size_t n = 0; n < maxTools; n++){
-			if(run->tools[n].slotNr == slotNr){
+			if(run->machine.tools[n].slotNr == slotNr){
 				onlyUpdating = true;
-				oldTool = run->tools[n];
-				run->tools[n] = newTool;
+				oldTool = run->machine.tools[n];
+				run->machine.tools[n] = newTool;
 				return true;
 			}
 		}
 	}
-	run->tools.Add(newTool);
+	run->machine.tools.Add(newTool);
 	run->Update();
 	return true;
 }
@@ -67,17 +67,17 @@ bool CommandRunToolAdd::Undo(void)
 	if(project == NULL) return false;
 	Run* const run = &(project->run[runNr]);
 
-	const size_t maxTools = run->tools.GetCount();
+	const size_t maxTools = run->machine.tools.GetCount();
 	if(onlyUpdating){
 		for(size_t n = 0; n < maxTools; n++){
-			if(run->tools[n].slotNr == slotNr){
-				run->tools[n] = oldTool;
+			if(run->machine.tools[n].slotNr == slotNr){
+				run->machine.tools[n] = oldTool;
 				return true;
 			}
 		}
 		return false;
 	}
-	run->tools.RemoveAt(run->tools.GetCount() - 1, 1);
+	run->machine.tools.RemoveAt(run->machine.tools.GetCount() - 1, 1);
 	run->Update();
 	return true;
 }

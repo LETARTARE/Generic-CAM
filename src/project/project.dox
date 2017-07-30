@@ -11,15 +11,15 @@ Class Relation
     run [ label="Run" URL="\ref Run"];
     wpi [ label="Workpiece" URL="\ref Workpiece"];
     obj [ label="Object" URL="\ref Object"];
-    mac [ label="Machine" URL="\ref Machine"];
     gen [ label="Generator" URL="\ref Generator"];
+    mac [ label="Machine" URL="\ref Machine"];
     too [ label="Tool" URL="\ref Tool"];
     fli [ label="FlipDrillPattern" URL="\ref FlipDrillPattern"];
     tpa [ label="ToolPath" URL="\ref ToolPath"];
     sfi [ label="StockFile" URL="\ref StockFile"];
     sma [ label="StockMaterial" URL="\ref StockMaterial"];
-    opl [ label="ObjectPlacement" URL="\ref ObjectPlacement"];
     sup [ label="Support" URL="\ref Support"];
+    opl [ label="ObjectPlacement" URL="\ref ObjectPlacement"];
     tbo [ label="ToolBox" URL="\ref ToolBox"];
            
     pro -> run [label="*"];
@@ -30,7 +30,7 @@ Class Relation
     wpi -> opl [label="*"];
           
     run -> mac;
-    run -> too [label="*"];
+    mac -> too [label="*"];
     run -> gen [label="*"];
     run -> fli;
     

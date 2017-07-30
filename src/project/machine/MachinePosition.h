@@ -23,157 +23,71 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 ///////////////////////////////////////////////////////////////////////////////
-
-
 #ifndef MACHINEPOSITION_H_
 #define MACHINEPOSITION_H_
 
+/*!\class MachinePosition
+ * \ingroup Machine
+ * \brief State of the CNC Machine
+ *
+ * The state of the CNC machine contains a set of all parameters, registers and
+ * switches, that define the machine state at a certain point in time.
+ * The machine state reads G-Code to change.
+ *
+ * The animation of the transition between two states is done by the MachineSimulator.
+ *
+ * This contains a statemachine with all parameters of the machine. A sequence of
+ * these states can be generated into G-code and vice versa.
+ */
+
 // C++ Operator Overloading Guidelines
 // http://www.cs.caltech.edu/courses/cs11/material/cpp/donnie/cpp-ops.html
-
 #include <wx/string.h>
 #include <wx/dynarray.h>
 
 class MachinePosition {
 	// Constructor/ Destructor
 public:
-	MachinePosition(double x = 0.0, double y = 0.0, double z = 0.0, double a = 0.0,
-			double b = 0.0, double c = 0.0, double u = 0.0, double v = 0.0,
+	MachinePosition(double x = 0.0, double y = 0.0, double z = 0.0, double a =
+			0.0, double b = 0.0, double c = 0.0, double u = 0.0, double v = 0.0,
 			double w = 0.0);
 
 	virtual ~MachinePosition();
 
 	// Member variables
 public:
-	double axisX;
-	double axisY;
-	double axisZ;
-	double axisA;
-	double axisB;
-	double axisC;
-	double axisU;
-	double axisV;
-	double axisW;
-
-	double radiusI;
-	double radiusJ;
-	double radiusK;
-	double radiusR;
-	bool isRotationPositiv;
-
-	double duration;
-
-	double feed;
-
-	wxString code;
-
-	bool isCutting;
+	double X;
+	double Y;
+	double Z;
+	double A;
+	double B;
+	double C;
+	double U;
+	double V;
+	double W;
 
 	// Methods
+	MachinePosition & operator+=(const MachinePosition& a);
+	const MachinePosition operator+(const MachinePosition &b) const;
+	MachinePosition & operator-=(const MachinePosition& a);
+	const MachinePosition operator-(const MachinePosition &b) const;
+	const MachinePosition operator-() const;
+	MachinePosition & operator*=(const double &b);
+	const MachinePosition operator*(const double &b) const;
+	MachinePosition & operator/=(const double &b);
+	const MachinePosition operator/(const double &b) const;
 
-	MachinePosition & operator+=(const MachinePosition& a)
-	{
-		this->axisX += a.axisX;
-		this->axisY += a.axisY;
-		this->axisZ += a.axisZ;
-		this->axisA += a.axisA;
-		this->axisB += a.axisB;
-		this->axisC += a.axisC;
-		this->axisU += a.axisU;
-		this->axisV += a.axisV;
-		this->axisW += a.axisW;
-		return *this;
-	}
-
-	const MachinePosition operator+(const MachinePosition &b) const
-	{
-		MachinePosition temp = *this;
-		temp += b;
-		return temp;
-	}
-
-	MachinePosition & operator-=(const MachinePosition& a)
-	{
-		this->axisX -= a.axisX;
-		this->axisY -= a.axisY;
-		this->axisZ -= a.axisZ;
-		this->axisA -= a.axisA;
-		this->axisB -= a.axisB;
-		this->axisC -= a.axisC;
-		this->axisU -= a.axisU;
-		this->axisV -= a.axisV;
-		this->axisW -= a.axisW;
-		return *this;
-	}
-
-	const MachinePosition operator-(const MachinePosition &b) const
-	{
-		MachinePosition temp = *this;
-		temp -= b;
-		return temp;
-	}
-
-	const MachinePosition operator-() const
-	{
-		MachinePosition temp(-this->axisX, -this->axisY, -this->axisZ,
-				-this->axisA, -this->axisB, -this->axisC, -this->axisU,
-				-this->axisV, -this->axisW);
-		return temp;
-	}
-
-	MachinePosition & operator*=(const double &b)
-	{
-		this->axisX *= b;
-		this->axisY *= b;
-		this->axisZ *= b;
-		this->axisA *= b;
-		this->axisB *= b;
-		this->axisC *= b;
-		this->axisU *= b;
-		this->axisV *= b;
-		this->axisW *= b;
-		return *this;
-	}
-
-	const MachinePosition operator*(const double &b) const
-	{
-		MachinePosition temp = *this;
-		temp *= b;
-		return temp;
-	}
-
-	MachinePosition & operator/=(const double &b)
-	{
-		this->axisX /= b;
-		this->axisY /= b;
-		this->axisZ /= b;
-		this->axisA /= b;
-		this->axisB /= b;
-		this->axisC /= b;
-		this->axisU /= b;
-		this->axisV /= b;
-		this->axisW /= b;
-		return *this;
-	}
-
-	const MachinePosition operator/(const double &b) const
-	{
-		MachinePosition temp = *this;
-		temp /= b;
-		return temp;
-	}
-
-	void Zero(void);
+//	void Zero(void);
 	double AbsXYZ() const;
 	double AbsUVW() const;
 	double AbsXYZUVW() const;
 
-	bool ParseGCodeLine(wxString lineOfText);
-	unsigned char GetGNumber(void) const;
-	wxString GenerateCommandXYZ(void);
-	wxString GenerateCommandXYZABC(void);
-	wxString GenerateCommandXYZABCUVW(void);
-	wxString GenerateCommandDiff(const MachinePosition &oldPosition);
+//	bool ParseGCodeLine(wxString lineOfText);
+//	unsigned char GetGNumber(void) const;
+//	wxString GenerateCommandXYZ(void);
+//	wxString GenerateCommandXYZABC(void);
+//	wxString GenerateCommandXYZABCUVW(void);
+//	wxString GenerateCommandDiff(const MachinePosition &oldPosition);
 
 };
 WX_DECLARE_OBJARRAY(MachinePosition, ArrayOfMachinePosition);

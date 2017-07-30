@@ -78,87 +78,90 @@
 #define ID_GENERATORSTART 1023
 #define ID_GENERATORAUTOMATIC 1024
 #define ID_GENERATORRESTART 1025
-#define ID_TOOLPATHSAVE 1026
-#define ID_VIEWSTEREO3D 1027
-#define ID_SETUPCONTROLLER 1028
-#define ID_SETUPUNITS 1029
-#define ID_CLOSEEXTRAWINDOWS 1030
-#define ID_LOGSHOW 1031
-#define ID_VIEWTOP 1032
-#define ID_VIEWBOTTOM 1033
-#define ID_VIEWFRONT 1034
-#define ID_VIEWBACK 1035
-#define ID_VIEWLEFT 1036
-#define ID_VIEWRIGHT 1037
-#define ID_DISPLAYMACHINE 1038
-#define ID_DISPLAYMATERIAL 1039
-#define ID_MULTTEN 1040
-#define ID_DIVTEN 1041
-#define ID_SCALEUNITX 1042
-#define ID_SCALEUNITY 1043
-#define ID_SCALEUNITZ 1044
-#define ID_SCALEPERCENTX 1045
-#define ID_SCALEPERCENTY 1046
-#define ID_SCALEPERCENTZ 1047
-#define ID_SCALEPERCENT 1048
-#define ID_MOVEZP 1049
-#define ID_MOVEYP 1050
-#define ID_MOVEXN 1051
-#define ID_MOVEXP 1052
-#define ID_MOVEYN 1053
-#define ID_MOVEZN 1054
-#define ID_ALIGNTOP 1055
-#define ID_ALIGNMIDDLE 1056
-#define ID_ALIGNBOTTOM 1057
-#define ID_ALIGNCENTER 1058
-#define ID_ROTATEYN 1059
-#define ID_ROTATEXN 1060
-#define ID_ROTATEYP 1061
-#define ID_ROTATEZN 1062
-#define ID_ROTATEZP 1063
-#define ID_ROTATEXP 1064
-#define ID_FLIPX 1065
-#define ID_FLIPY 1066
-#define ID_FLIPZ 1067
-#define ID_POSX 1068
-#define ID_POSY 1069
-#define ID_POSZ 1070
-#define ID_ANGLE 1071
-#define ID_FORMBOX 1072
-#define ID_FORMCONTOUR 1073
-#define ID_DISTANCE 1074
-#define ID_WORKPIECEROTATEX 1075
-#define ID_WORKPIECEROTATEY 1076
-#define ID_WORKPIECEROTATEZ 1077
-#define wxID_LOAD 1078
-#define ID_CONTROLLERSHOW 1079
-#define ID_AXISX 1080
-#define ID_AXISY 1081
-#define ID_AXISZ 1082
-#define ID_TEXTX 1083
-#define ID_TEXTY 1084
-#define ID_TEXTZ 1085
-#define ID_AXISA 1086
-#define ID_AXISB 1087
-#define ID_AXISC 1088
-#define ID_TEXTA 1089
-#define ID_TEXTB 1090
-#define ID_TEXTC 1091
-#define ID_AXISU 1092
-#define ID_AXISV 1093
-#define ID_AXISW 1094
-#define ID_TEXTU 1095
-#define ID_TEXTV 1096
-#define ID_TEXTW 1097
-#define ID_XSTART 1098
-#define ID_XEND 1099
-#define ID_YSTART 1100
-#define ID_YEND 1101
-#define ID_ZSTART 1102
-#define ID_ZEND 1103
-#define ID_SELECTAREAOBJECT 1104
-#define ID_MARGINSIDE 1105
-#define ID_MARGINBELOW 1106
+#define ID_DIALECT_RS274NGC 1026
+#define ID_DIALECT_FANUCM 1027
+#define ID_TOOLPATHSAVE 1028
+#define ID_VIEWSTEREO3D 1029
+#define ID_SETUPCONTROLLER 1030
+#define ID_SETUPUNITS 1031
+#define ID_CLOSEEXTRAWINDOWS 1032
+#define ID_LOGSHOW 1033
+#define ID_VIEWTOP 1034
+#define ID_VIEWBOTTOM 1035
+#define ID_VIEWFRONT 1036
+#define ID_VIEWBACK 1037
+#define ID_VIEWRIGHT 1038
+#define ID_VIEWLEFT 1039
+#define ID_TESTGCODE 1040
+#define ID_DISPLAYMACHINE 1041
+#define ID_DISPLAYMATERIAL 1042
+#define ID_MULTTEN 1043
+#define ID_DIVTEN 1044
+#define ID_SCALEUNITX 1045
+#define ID_SCALEUNITY 1046
+#define ID_SCALEUNITZ 1047
+#define ID_SCALEPERCENTX 1048
+#define ID_SCALEPERCENTY 1049
+#define ID_SCALEPERCENTZ 1050
+#define ID_SCALEPERCENT 1051
+#define ID_MOVEZP 1052
+#define ID_MOVEYP 1053
+#define ID_MOVEXN 1054
+#define ID_MOVEXP 1055
+#define ID_MOVEYN 1056
+#define ID_MOVEZN 1057
+#define ID_ALIGNTOP 1058
+#define ID_ALIGNMIDDLE 1059
+#define ID_ALIGNBOTTOM 1060
+#define ID_ALIGNCENTER 1061
+#define ID_ROTATEYN 1062
+#define ID_ROTATEXN 1063
+#define ID_ROTATEYP 1064
+#define ID_ROTATEZN 1065
+#define ID_ROTATEZP 1066
+#define ID_ROTATEXP 1067
+#define ID_FLIPX 1068
+#define ID_FLIPY 1069
+#define ID_FLIPZ 1070
+#define ID_POSX 1071
+#define ID_POSY 1072
+#define ID_POSZ 1073
+#define ID_ANGLE 1074
+#define ID_FORMBOX 1075
+#define ID_FORMCONTOUR 1076
+#define ID_DISTANCE 1077
+#define ID_WORKPIECEROTATEX 1078
+#define ID_WORKPIECEROTATEY 1079
+#define ID_WORKPIECEROTATEZ 1080
+#define wxID_LOAD 1081
+#define ID_CONTROLLERSHOW 1082
+#define ID_AXISX 1083
+#define ID_AXISY 1084
+#define ID_AXISZ 1085
+#define ID_TEXTX 1086
+#define ID_TEXTY 1087
+#define ID_TEXTZ 1088
+#define ID_AXISA 1089
+#define ID_AXISB 1090
+#define ID_AXISC 1091
+#define ID_TEXTA 1092
+#define ID_TEXTB 1093
+#define ID_TEXTC 1094
+#define ID_AXISU 1095
+#define ID_AXISV 1096
+#define ID_AXISW 1097
+#define ID_TEXTU 1098
+#define ID_TEXTV 1099
+#define ID_TEXTW 1100
+#define ID_XSTART 1101
+#define ID_XEND 1102
+#define ID_YSTART 1103
+#define ID_YEND 1104
+#define ID_ZSTART 1105
+#define ID_ZEND 1106
+#define ID_SELECTAREAOBJECT 1107
+#define ID_MARGINSIDE 1108
+#define ID_MARGINBELOW 1109
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIMain
@@ -179,6 +182,7 @@ class GUIMain : public wxFrame
 		wxMenu* m_menuToolbox;
 		wxMenu* m_menuRun;
 		wxMenu* m_menuToolpath;
+		wxMenu* m_menuDialect;
 		wxMenu* m_menuSettings;
 		wxMenu* m_menuView;
 		wxMenu* m_menuHelp;
@@ -235,6 +239,7 @@ class GUIMain : public wxFrame
 		virtual void OnShowLogWindow( wxCommandEvent& event ) = 0;
 		virtual void OnViewSet( wxCommandEvent& event ) = 0;
 		virtual void OnHelp( wxCommandEvent& event ) = 0;
+		virtual void OnTestGCode( wxCommandEvent& event ) = 0;
 		virtual void OnAbout( wxCommandEvent& event ) = 0;
 		virtual void OnBeginLabelEdit( wxTreeEvent& event ) = 0;
 		virtual void OnEndLabelEdit( wxTreeEvent& event ) = 0;
@@ -988,6 +993,33 @@ class StartupText : public wxFrame
 		
 		StartupText( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Release Info"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 629,481 ), long style = wxCAPTION|wxCLOSE_BOX|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
 		~StartupText();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class GUITestGCode
+///////////////////////////////////////////////////////////////////////////////
+class GUITestGCode : public wxFrame 
+{
+	private:
+	
+	protected:
+		wxRadioButton* m_radioBtnG20;
+		wxRadioButton* m_radioBtnG21;
+		wxTextCtrl* m_textCtrlInput;
+		wxButton* m_buttonClear;
+		wxTextCtrl* m_textCtrlOutput;
+		wxTextCtrl* m_textCtrlRecreated;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnText( wxCommandEvent& event ) = 0;
+		virtual void OnClear( wxCommandEvent& event ) = 0;
+		
+	
+	public:
+		
+		GUITestGCode( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("G-Code parser"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxSTAY_ON_TOP|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		~GUITestGCode();
 	
 };
 

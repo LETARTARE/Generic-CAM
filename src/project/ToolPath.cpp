@@ -25,6 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "ToolPath.h"
+#include "../Config.h"
 
 #include <wx/log.h>
 #include <GL/gl.h>
@@ -60,6 +61,11 @@ void ToolPath::Clear(void)
 }
 
 //! Overloaded operator for polygon concatenation.
+bool ToolPath::IsEmpty(void) const
+{
+	return (positions.GetCount() == 0);
+}
+
 ToolPath & ToolPath::operator+=(const ToolPath &a)
 {
 	for(size_t i = 0; i < a.positions.GetCount(); i++)
@@ -75,21 +81,113 @@ const ToolPath ToolPath::operator+(const ToolPath &a) const
 	return temp;
 }
 
-bool ToolPath::IsEmpty(void) const
-{
-	return (positions.GetCount() == 0);
-}
-
 void ToolPath::ApplyTransformation(const AffineTransformMatrix &matrix)
 {
-	size_t i;
-	Vector3 temp;
-	for(i = 0; i < positions.size(); i++){
-		temp.Set(positions[i].axisX, positions[i].axisY, positions[i].axisZ);
+	for(size_t i = 0; i < positions.GetCount(); i++){
+		Vector3 temp(positions[i].X, positions[i].Y, positions[i].Z);
 		temp = matrix.Transform(temp);
-		positions[i].axisX = temp.x;
-		positions[i].axisY = temp.y;
-		positions[i].axisZ = temp.z;
+		positions[i].X = temp.x;
+		positions[i].Y = temp.y;
+		positions[i].Z = temp.z;
+	}
+}
+
+void ToolPath::Translate(Dialect target)
+{
+	switch(target){
+	case FanucM:
+		for(size_t i = 0; i < positions.GetCount(); i++){
+			// FanucM does not like spindle speeds above 1000 RPM.
+			if(positions[i].S > 1000.0 / 60.0) positions[i].S = 1000.0 / 60.0;
+
+			// FanucM uses X instead P for the dwell-time in G4
+			if(positions[i].G[0] == 40){
+				if(positions[i].P > -FLT_EPSILON){
+					positions[i].X = positions[i].P
+							* positions[i].conversionFactor;
+					positions[i].XFlag = true;
+					positions[i].P = -1.0;
+				}else{
+					positions[i].XFlag = false;
+				}
+			}
+
+			// Remove A,B,C and U,V,W for FanucM
+			positions[i].AFlag = false;
+			positions[i].BFlag = false;
+			positions[i].CFlag = false;
+			positions[i].UFlag = false;
+			positions[i].VFlag = false;
+			positions[i].WFlag = false;
+
+		}
+		break;
+
+	case RS274NGC:
+		// Nothing to do.
+		break;
+	}
+}
+
+void ToolPath::CalculateMinMaxValues(void)
+{
+	minPosition.X = +FLT_MAX;
+	minPosition.Y = +FLT_MAX;
+	minPosition.Z = +FLT_MAX;
+	minPosition.A = +FLT_MAX;
+	minPosition.B = +FLT_MAX;
+	minPosition.C = +FLT_MAX;
+	minPosition.U = +FLT_MAX;
+	minPosition.V = +FLT_MAX;
+	minPosition.W = +FLT_MAX;
+
+	maxPosition.X = -FLT_MAX;
+	maxPosition.Y = -FLT_MAX;
+	maxPosition.Z = -FLT_MAX;
+	maxPosition.A = -FLT_MAX;
+	maxPosition.B = -FLT_MAX;
+	maxPosition.C = -FLT_MAX;
+	maxPosition.U = -FLT_MAX;
+	maxPosition.V = -FLT_MAX;
+	maxPosition.W = -FLT_MAX;
+
+	for(size_t i = 0; i < positions.GetCount(); i++){
+		if(positions[i].XFlag){
+			if(positions[i].X > maxPosition.X) maxPosition.X = positions[i].X;
+			if(positions[i].X < minPosition.X) minPosition.X = positions[i].X;
+		}
+		if(positions[i].YFlag){
+			if(positions[i].Y > maxPosition.Y) maxPosition.Y = positions[i].Y;
+			if(positions[i].Y < minPosition.Y) minPosition.Y = positions[i].Y;
+		}
+		if(positions[i].ZFlag){
+			if(positions[i].Z > maxPosition.Z) maxPosition.Z = positions[i].Z;
+			if(positions[i].Z < minPosition.Z) minPosition.Z = positions[i].Z;
+		}
+		if(positions[i].AFlag){
+			if(positions[i].A > maxPosition.A) maxPosition.A = positions[i].A;
+			if(positions[i].A < minPosition.A) minPosition.A = positions[i].A;
+		}
+		if(positions[i].BFlag){
+			if(positions[i].B > maxPosition.B) maxPosition.B = positions[i].B;
+			if(positions[i].B < minPosition.B) minPosition.B = positions[i].B;
+		}
+		if(positions[i].CFlag){
+			if(positions[i].C > maxPosition.C) maxPosition.C = positions[i].C;
+			if(positions[i].C < minPosition.C) minPosition.C = positions[i].C;
+		}
+		if(positions[i].UFlag){
+			if(positions[i].U > maxPosition.U) maxPosition.U = positions[i].U;
+			if(positions[i].U < minPosition.U) minPosition.U = positions[i].U;
+		}
+		if(positions[i].VFlag){
+			if(positions[i].V > maxPosition.V) maxPosition.V = positions[i].V;
+			if(positions[i].V < minPosition.V) minPosition.V = positions[i].V;
+		}
+		if(positions[i].WFlag){
+			if(positions[i].W > maxPosition.W) maxPosition.W = positions[i].W;
+			if(positions[i].W < minPosition.W) minPosition.W = positions[i].W;
+		}
 	}
 }
 
@@ -97,86 +195,49 @@ void ToolPath::Paint(void) const
 {
 	::glBegin(GL_LINE_STRIP);
 	::glNormal3f(0, 0, 1);
-	for(size_t i = 0; i < positions.size(); i++){
-
-		if(positions[i].isCutting)
+	for(size_t i = 0; i < positions.GetCount(); i++){
+		if(positions[i].IsCutting())
 			::glColor3f(colorCutting.x, colorCutting.y, colorCutting.z);
 		else
 			::glColor3f(colorMoving.x, colorMoving.y, colorMoving.z);
-
-		::glVertex3f(positions[i].axisX, positions[i].axisY,
-				positions[i].axisZ);
+		::glVertex3f(positions[i].X, positions[i].Y, positions[i].Z);
 	}
-
 	::glEnd();
 }
 
-void ToolPath::CalculateMinMaxValues(void)
+ToolPath ToolPath::SafetyBlock(void)
 {
-	minPosition.axisX = +FLT_MAX;
-	minPosition.axisY = +FLT_MAX;
-	minPosition.axisZ = +FLT_MAX;
-	minPosition.axisU = +FLT_MAX;
-	minPosition.axisV = +FLT_MAX;
-	minPosition.axisW = +FLT_MAX;
-	minPosition.axisA = +FLT_MAX;
-	minPosition.axisB = +FLT_MAX;
-	minPosition.axisC = +FLT_MAX;
-
-	maxPosition.axisX = -FLT_MAX;
-	maxPosition.axisY = -FLT_MAX;
-	maxPosition.axisZ = -FLT_MAX;
-	maxPosition.axisU = -FLT_MAX;
-	maxPosition.axisV = -FLT_MAX;
-	maxPosition.axisW = -FLT_MAX;
-	maxPosition.axisA = -FLT_MAX;
-	maxPosition.axisB = -FLT_MAX;
-	maxPosition.axisC = -FLT_MAX;
-
-	for(size_t i = 0; i < positions.GetCount(); i++){
-		if(positions[i].axisX > maxPosition.axisX) maxPosition.axisX =
-				positions[i].axisX;
-		if(positions[i].axisY > maxPosition.axisY) maxPosition.axisY =
-				positions[i].axisY;
-		if(positions[i].axisZ > maxPosition.axisZ) maxPosition.axisZ =
-				positions[i].axisZ;
-		if(positions[i].axisU > maxPosition.axisU) maxPosition.axisU =
-				positions[i].axisU;
-		if(positions[i].axisV > maxPosition.axisV) maxPosition.axisV =
-				positions[i].axisV;
-		if(positions[i].axisW > maxPosition.axisW) maxPosition.axisW =
-				positions[i].axisW;
-		if(positions[i].axisA > maxPosition.axisA) maxPosition.axisA =
-				positions[i].axisA;
-		if(positions[i].axisB > maxPosition.axisB) maxPosition.axisB =
-				positions[i].axisB;
-		if(positions[i].axisC > maxPosition.axisC) maxPosition.axisC =
-				positions[i].axisC;
-
-		if(positions[i].axisX < minPosition.axisX) minPosition.axisX =
-				positions[i].axisX;
-		if(positions[i].axisY < minPosition.axisY) minPosition.axisY =
-				positions[i].axisY;
-		if(positions[i].axisZ < minPosition.axisZ) minPosition.axisZ =
-				positions[i].axisZ;
-		if(positions[i].axisU < minPosition.axisU) minPosition.axisU =
-				positions[i].axisU;
-		if(positions[i].axisV < minPosition.axisV) minPosition.axisV =
-				positions[i].axisV;
-		if(positions[i].axisW < minPosition.axisW) minPosition.axisW =
-				positions[i].axisW;
-		if(positions[i].axisA < minPosition.axisA) minPosition.axisA =
-				positions[i].axisA;
-		if(positions[i].axisB < minPosition.axisB) minPosition.axisB =
-				positions[i].axisB;
-		if(positions[i].axisC < minPosition.axisC) minPosition.axisC =
-				positions[i].axisC;
-	}
+	ToolPath tp;
+	tp.positions.Add(GCodeBlock(_T("G90 (set absolute distance mode)")));
+	tp.positions.Add(GCodeBlock(_T("G80 (cancel modal motion)")));
+	tp.positions.Add(
+			GCodeBlock(_T("G40 (cutter radius compensation in XY plane)")));
+	tp.positions.Add(GCodeBlock(_T("G54 (coordinate system 1 active)")));
+	tp.positions.Add(GCodeBlock(_T("G21 (length units: mm)")));
+	tp.positions.Add(GCodeBlock(_T("G17 (work in XY plane)")));
+	tp.positions.Add(GCodeBlock(_T("G50 (cancel scaling function)")));
+	tp.positions.Add(GCodeBlock(_T("G94 (per minute feed)")));
+	tp.positions.Add(GCodeBlock(_T("G64 (continuous path control mode)")));
+	tp.positions.Add(GCodeBlock(_T("G49 (disable tool length compensation)")));
+	tp.positions.Add(GCodeBlock(_T("G80 (disable modal motion)")));
+	tp.positions.Add(GCodeBlock(_T("G61 (exact path mode)")));
+	return tp;
 }
 
-void ToolPath::CleanPath(double tolerance)
+ToolPath ToolPath::EndBlock(void)
 {
-	ArrayOfMachinePosition temp;
+	ToolPath tp;
+	tp.positions.Add(GCodeBlock(_T("M5 (stop spindel)")));
+	tp.positions.Add(
+			GCodeBlock(
+					_T("G4 P3 (wait for 3 seconds for the spindle to stop)")));
+	tp.positions.Add(GCodeBlock(_T("M2 (end of programm)")));
+	return tp;
+}
+
+void ToolPath::CleanPath(const double tolerance)
+{
+	ArrayOfGCodeBlock temp;
 	if(positions.GetCount() < 2) return;
 
 //	bool isOnLine;
@@ -190,32 +251,28 @@ void ToolPath::CleanPath(double tolerance)
 	const double t2 = tolerance * tolerance;
 	size_t lastWritten = 0;
 	temp.Add(positions[lastWritten]);
-	unsigned char lastGCode = positions[lastWritten].GetGNumber();
+	unsigned char lastGCode = positions[lastWritten].Motion();
 //	unsigned char gCode;
 	size_t i;
-	for(i = 1; i < positions.size(); i++){
+	for(i = 1; i < positions.GetCount(); i++){
 		bool isOnLine = true;
 		bool isSameSort = true;
-		unsigned char gCode = positions[i].GetGNumber();
+		unsigned char gCode = positions[i].Motion();
 		if(gCode != lastGCode) isSameSort = false;
 		if(lastGCode != 0 && lastGCode != 1) isSameSort = false;
 
 		if(isSameSort){
-			double gx = positions[i].axisX - positions[lastWritten].axisX;
-			double gy = positions[i].axisY - positions[lastWritten].axisY;
-			double gz = positions[i].axisZ - positions[lastWritten].axisZ;
+			const double gx = positions[i].X - positions[lastWritten].X;
+			const double gy = positions[i].Y - positions[lastWritten].Y;
+			const double gz = positions[i].Z - positions[lastWritten].Z;
+			const double dg = gx * gx + gy * gy + gz * gz;
 
-			double dg = gx * gx + gy * gy + gz * gz;
 			if(dg > 0.0){
 
 				for(size_t j = lastWritten + 1; j < i; j++){
-					const double px = positions[j].axisX
-							- positions[lastWritten].axisX;
-					const double py = positions[j].axisY
-							- positions[lastWritten].axisY;
-					const double pz = positions[j].axisZ
-							- positions[lastWritten].axisZ;
-
+					const double px = positions[j].X - positions[lastWritten].X;
+					const double py = positions[j].Y - positions[lastWritten].Y;
+					const double pz = positions[j].Z - positions[lastWritten].Z;
 					const double s = (gx * px + gy * py + gz * pz) / dg;
 
 					if(s < 0.0 || s > 1.0){
@@ -245,14 +302,14 @@ void ToolPath::CleanPath(double tolerance)
 			if(lastWritten < i - 1){
 				temp.Add(positions[i - 1]);
 				lastWritten = i - 1;
-				lastGCode = positions[lastWritten].GetGNumber();
+				lastGCode = positions[lastWritten].Motion();
 			}
 		}
 		if(!isSameSort){
 			if(lastWritten < i){
 				temp.Add(positions[i]);
 				lastWritten = i;
-				lastGCode = positions[lastWritten].GetGNumber();
+				lastGCode = positions[lastWritten].Motion();
 			}
 		}
 	}
@@ -260,59 +317,47 @@ void ToolPath::CleanPath(double tolerance)
 	positions = temp;
 }
 
+void ToolPath::DiffPath(const double tolerance)
+{
+	if(positions.GetCount() < 1) return;
+	positions[0].XFlag = true;
+	positions[0].YFlag = true;
+	positions[0].ZFlag = true;
+	positions[0].AFlag = true;
+	positions[0].BFlag = true;
+	positions[0].CFlag = true;
+	positions[0].UFlag = true;
+	positions[0].VFlag = true;
+	positions[0].WFlag = true;
+	positions[0].IFlag = true;
+	positions[0].JFlag = true;
+	positions[0].KFlag = true;
+	positions[0].RFlag = true;
+	GCodeBlock oldPos = positions[0];
+
+	for(size_t i = 1; i < positions.GetCount(); i++){
+		GCodeBlock newPos = positions[i];
+		positions[i].XFlag = (fabs(oldPos.X - positions[i].X) > tolerance);
+		positions[i].YFlag = (fabs(oldPos.Y - positions[i].Y) > tolerance);
+		positions[i].ZFlag = (fabs(oldPos.Z - positions[i].Z) > tolerance);
+		positions[i].AFlag = (fabs(oldPos.A - positions[i].A) > tolerance);
+		positions[i].BFlag = (fabs(oldPos.B - positions[i].B) > tolerance);
+		positions[i].CFlag = (fabs(oldPos.C - positions[i].C) > tolerance);
+		positions[i].UFlag = (fabs(oldPos.U - positions[i].U) > tolerance);
+		positions[i].VFlag = (fabs(oldPos.V - positions[i].V) > tolerance);
+		positions[i].WFlag = (fabs(oldPos.W - positions[i].W) > tolerance);
+		positions[i].RFlag = (fabs(oldPos.R - positions[i].R) > tolerance);
+
+		if(oldPos.G[1] == positions[i].G[1]) positions[i].G[1] = -1;
+
+		oldPos = newPos;
+	}
+}
+
 bool ToolPath::WriteToFile(wxTextFile &f)
 {
-	if(positions.size() < 2) return false;
-
-	CleanPath(0.0003);
-
-	setlocale(LC_ALL, "C"); // To get a 3.1415 instead 3,1415 or else on every computer.
-
-	bool useWithFanucM = false;
-	wxTextFileType fileType = wxTextFileType_Dos;
-
-	if(useWithFanucM){
-		// For the fanucm.exe g-code simulator.
-		f.AddLine(_T("[billet x100 y100 z25"), fileType);
-		f.AddLine(_T("[tooldef t1 d6 z35"), fileType);
-	}else{
-		f.AddLine(_T("G90 G80 G40 G54 G21 G17 G50 G94 G64 (safety block)"),
-				fileType);
-	}
-	f.AddLine(_T("G49 (disable tool length compensation)"), fileType);
-	f.AddLine(_T("G80 (disable modal motion)"), fileType);
-	f.AddLine(_T("G61 (exact path mode)"), fileType);
-
-	f.AddLine(_T("F3000 (Feedrate mm/min)"), fileType);
-	f.AddLine(_T("T1 M6 (Tool 1, Select tool)"), fileType);
-
-	if(useWithFanucM){
-		f.AddLine(_T("S10000 (Spindle speed rpm)"), fileType);
-		f.AddLine(_T("M3 (Start spindel)"), fileType);
-		f.AddLine(_T("G4 X3 (Wait For Seconds, Parameter 3 Seconds)"),
-				fileType);
-	}else{
-		f.AddLine(_T("S10000 (Spindle speed rpm)"), fileType);
-		f.AddLine(_T("M3 (Start spindel)"), fileType);
-		f.AddLine(_T("G4 P3 (Wait For Seconds, Parameter 3 Seconds)"),
-				fileType);
-	}
-
-	f.AddLine(positions[0].GenerateCommandXYZ(), fileType);
-	for(size_t i = 1; i < positions.GetCount(); i++)
-		f.AddLine(positions[i].GenerateCommandDiff(positions[i - 1]), fileType);
-
-	f.AddLine(_T("M5 (Stop spindel)"), fileType);
-	if(useWithFanucM){
-		f.AddLine(_T("G4 X3 (Wait For Seconds, Parameter 3 Seconds)"),
-				fileType);
-	}else{
-		f.AddLine(_T("G4 P3 (Wait For Seconds, Parameter 3 Seconds)"),
-				fileType);
-	}
-	f.AddLine(_T("M2 (End programm)"), fileType);
-
-	setlocale(LC_ALL, "");
+	for(size_t i = 0; i < positions.GetCount(); i++)
+		f.AddLine(positions[i].GetCode(), wxTextFileType_Dos);
 	return true;
 }
 
@@ -326,42 +371,33 @@ bool ToolPath::ReadGCodeFile(wxFileName fileName)
 	}
 
 	wxTextFile file;
-
 	if(!file.Open(fileName.GetFullPath())){
 		info =
-		_T("ReadGCodeFile: Can't open ") + fileName.GetFullPath()
-		+ _T(" !");
+		_T("ReadGCodeFile: Can't open ") + fileName.GetFullPath() + _T(" !");
 		return false;
 	}
 
-	wxString temp;
 	if(file.Eof()){
 		info = _T("ReadGCodeFile: File is empty!");
 		return false;
 	}
+
+	wxString temp;
 	temp = file.GetFirstLine();
 	if(temp.IsEmpty()){
 		info = _T("ReadGCodeFile: File is empty!");
 		return false;
 	}
 
-	MachinePosition* pos = new MachinePosition;
 	positions.Clear();
-
-	if(pos->ParseGCodeLine(temp)){
-		positions.Add(pos);
-		pos = new MachinePosition;
-		*pos = positions[positions.Count() - 1];
-	}
+	GCodeBlock pos;
+	pos = GCodeBlock(temp);
+	if(!temp.IsEmpty() && pos.error.IsEmpty()) positions.Add(pos);
 	while(!file.Eof()){
 		temp = file.GetNextLine();
-		if(pos->ParseGCodeLine(temp)){
-			positions.Add(pos);
-			pos = new MachinePosition;
-			*pos = positions[positions.Count() - 1];
-		}
+		pos = GCodeBlock(temp);
+		if(!temp.IsEmpty() && pos.error.IsEmpty()) positions.Add(pos);
 	}
-	positions.Add(pos);
 	file.Close();
 	info.Empty();
 	return true;

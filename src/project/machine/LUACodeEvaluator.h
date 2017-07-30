@@ -27,18 +27,18 @@
 #ifndef LUACODEEVALUATOR_H_
 #define LUACODEEVALUATOR_H_
 
-/*! \class LUACodeEvaluator
+/*!\class LUACodeEvaluator
+ * \ingroup Machine
  * \brief Wrapper for calling LUA.
  *
- * \todo On LUA 5.2 there is no lua_open() function. It has been replaced by luaL_newstate().
- *
  * The evaluation of the LUA code takes place in a
- * seperate thread. This way, if the program hangs
+ * separate thread. This way, if the program hangs
  * it can be killed by the main thread.
  *
  * If the thread hangs it will be simply killed.
  * A more graceful exit would be to insert a hook-line
  * see StopEvaluation();
+ *
  * Still Calling Functions in a running Thread is not
  * recommended and may not work everywhere. So we kill
  * it. The lua_state may be Borscht afterwards. But in
@@ -70,39 +70,12 @@
 class Machine;
 
 class LUACodeEvaluator {
-
-	// Constructor / Destructor
 public:
 	LUACodeEvaluator();
 	LUACodeEvaluator(const LUACodeEvaluator & other); //!< Copy constructor
 	LUACodeEvaluator& operator=(const LUACodeEvaluator& other); ///< Assignment operator
 	virtual ~LUACodeEvaluator();
 
-	// Member Variables
-protected:
-
-	lua_State *L;
-	wxString programOutput;
-
-	Machine* linkedMachine;
-	MachineComponent* componentToManipulate;
-	AffineTransformMatrix matrix;
-
-	// Methods
-
-private:
-	/** \brief Find the caller for a lua_State
-	 *
-	 * Do a lookup of the caller by looking at the lua_state.
-	 *
-	 * @param L Pointer to LUA-State
-	 * @return Pointer to LUACodeEvaluator
-	 */
-	static LUACodeEvaluator* FindCallingClass(lua_State * L);
-
-	static void HookRoutine(lua_State * L, lua_Debug * ar);
-
-public:
 	void LinkToMachine(Machine* machine);
 	void InsertVariable(wxString vName, float vValue);
 
@@ -113,6 +86,7 @@ public:
 
 	wxString GetOutput();
 
+	// Glue functions added to the LUA state
 	static int print_glue(lua_State * L);
 
 	static int identity_glue(lua_State * L);
@@ -132,10 +106,37 @@ public:
 	static int toolholder_glue(lua_State * L);
 
 	static int placecomponent_glue(lua_State * L);
+
+private:
+	/** \brief Find the caller for a lua_State
+	 *
+	 * Do a lookup of the caller by looking at the lua_state.
+	 *
+	 * @param L Pointer to LUA-State
+	 * @return Pointer to LUACodeEvaluator
+	 */
+	static LUACodeEvaluator* FindCallingClass(lua_State * L);
+
+	/**\brief The hook routine can be inserted to stop a script that got caught in an infinite loop.
+	 *
+	 * @param L Pointer to LUA-State
+	 * @param ar
+	 */
+	static void HookRoutine(lua_State * L, lua_Debug * ar);
+
+	// Member Variables
+public:
+	wxString programOutput;
+
+protected:
+	lua_State *L;
+	Machine* linkedMachine;
+	MachineComponent* componentToManipulate;
+	AffineTransformMatrix matrix; //!< Used for chaining transformations in the machine description.
 };
 
 //TODO: Find out if there is a better way to tell the static functions about the CallingClass.
-static std::list <LUACodeEvaluator *> availableLUACodeEvaluators;
 // This is better then "static void* CallingClass;"
+static std::list <LUACodeEvaluator *> availableLUACodeEvaluators;
 
 #endif /* LUACODEEVALUATOR_H_ */

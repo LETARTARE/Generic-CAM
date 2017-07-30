@@ -75,7 +75,8 @@ public:
 	bool Save(wxFileName fileName);
 
 	void LoadPattern(wxFileName fileName);
-	bool SaveToolpath(wxFileName fileName, int runNr);
+	bool SaveToolpath(wxFileName fileName, int runNr,
+			ToolPath::Dialect dialect);
 
 	void PaintObjects(void) const;
 	void PaintWorkpiece(void) const;

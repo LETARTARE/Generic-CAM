@@ -58,15 +58,15 @@ DialogMachineDebugger::~DialogMachineDebugger()
 
 void DialogMachineDebugger::Update(wxCommandEvent& event)
 {
-	machine.position.axisX = machineControl->X;
-	machine.position.axisY = machineControl->Y;
-	machine.position.axisZ = machineControl->Z;
-	machine.position.axisA = machineControl->A;
-	machine.position.axisB = machineControl->B;
-	machine.position.axisC = machineControl->C;
-	machine.position.axisU = machineControl->U;
-	machine.position.axisV = machineControl->V;
-	machine.position.axisW = machineControl->W;
+	machine.position.X = machineControl->X;
+	machine.position.Y = machineControl->Y;
+	machine.position.Z = machineControl->Z;
+	machine.position.A = machineControl->A;
+	machine.position.B = machineControl->B;
+	machine.position.C = machineControl->C;
+	machine.position.U = machineControl->U;
+	machine.position.V = machineControl->V;
+	machine.position.W = machineControl->W;
 	machine.Assemble();
 	TransferDataToWindow();
 	this->Refresh();

@@ -121,9 +121,9 @@ public:
 	double FromSI(const double value);
 	double ToSI(const double value);
 
-	wxString TextFromSI(const double value, unsigned int digitsAfterComma = 3);
+	wxString TextFromSI(const double value, int digitsAfterComma = -1);
 	wxString TextFromSIWithUnit(const double value,
-			unsigned int digitsAfterComma = 3);
+			 int digitsAfterComma = -1);
 
 	double SIFromString(const wxString &text, bool useEvaluator = true);
 

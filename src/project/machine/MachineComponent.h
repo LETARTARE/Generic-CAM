@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : MachineComponent.h
-// Purpose            : A component of the machine.
+// Purpose            : A component of the machine
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -27,6 +27,14 @@
 #ifndef MACHINECOMPONENT_H_
 #define MACHINECOMPONENT_H_
 
+/*!\class MachineComponent
+ * \ingroup Machine
+ * \brief Storage for the geomatry of one part of the machine.
+ *
+ * The part / Geometry of the machine that is stored in this class is either read from a file
+ * (STL or DXF) or it is some basic geometric shape (box, cylinder, cone).
+ */
+
 #include "../../3D/AffineTransformMatrix.h"
 #include "../../3D/Geometry.h"
 
@@ -34,24 +42,10 @@
 #include <wx/string.h>
 
 class MachineComponent {
-	// Constructor / Destructor
 public:
 	MachineComponent(wxString nameOfComponent = _T(""));
 	virtual ~MachineComponent();
 
-	// Member variables
-public:
-
-	wxString nameOfComponent;
-
-	AffineTransformMatrix matrix;
-private:
-	Geometry geometry;
-	bool isColorSet;
-	// Methods
-public:
-	void Paint(void) const;
-	void SetColor(float r, float g, float b);
 	void InsertBox(AffineTransformMatrix matrix, float x, float y, float z);
 	void InsertCylinder(AffineTransformMatrix matrix, float h, float r);
 	void InsertCone(AffineTransformMatrix matrix, float h, float r1, float r2);
@@ -60,7 +54,17 @@ public:
 	bool InsertDXF(const AffineTransformMatrix &matrix, wxFileName file,
 			wxString componentName);
 
+	void SetColor(float r, float g, float b);
+	void Paint(void) const;
+
+	// Member variables
+public:
+	wxString nameOfComponent;
+	AffineTransformMatrix matrix;
+
 private:
+	Geometry geometry;
+	bool isColorSet;
 };
 
 #endif /* MACHINECOMPONENT_H_ */

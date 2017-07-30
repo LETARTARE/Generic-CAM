@@ -30,11 +30,12 @@
 PROJECT := genericcam
 
 # Main object file:
-SOURCES = src/GenericCAM.cpp
+SOURCES = src/genericcam.cpp
 
 # 3D object files:
 SOURCES += src/3D/AffineTransformMatrix.cpp \
 	src/3D/BoundingBox.cpp \
+	src/3D/BooleanBox.cpp \
 	src/3D/FileDXF.cpp \
 	src/3D/FileGTS.cpp \
 	src/3D/FileSTL.cpp \
@@ -42,7 +43,10 @@ SOURCES += src/3D/AffineTransformMatrix.cpp \
 	src/3D/GeometryFileAbstract.cpp \
 	src/3D/IKSolver.cpp \
 	src/3D/OpenGLCanvas.cpp \
+	src/3D/OpenGLImage.cpp \
+	src/3D/OpenGLPick.cpp \
 	src/3D/Polygon3.cpp \
+	src/3D/Polygon25.cpp \
 	src/3D/Surface.cpp \
 	src/3D/Triangle.cpp \
 	src/3D/Vector3.cpp \
@@ -53,6 +57,8 @@ SOURCES += src/controller/Control3D.cpp \
 	src/controller/ControlSpaceBall.cpp \
 	src/controller/ControlSpaceMouse.cpp \
 	src/controller/ControlSpaceOrb.cpp \
+	src/controller/DialogSetup6DOFController.cpp \
+	src/controller/guiSetup6DOFController.cpp \
 	src/controller/SerialPort.cpp \
 	
 # Generator object files:

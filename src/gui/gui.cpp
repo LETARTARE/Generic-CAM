@@ -218,6 +218,18 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	wxMenuItem* m_separator19;
 	m_separator19 = m_menuToolpath->AppendSeparator();
 	
+	m_menuDialect = new wxMenu();
+	wxMenuItem* m_menuItemDialectRS274NGC;
+	m_menuItemDialectRS274NGC = new wxMenuItem( m_menuDialect, ID_DIALECT_RS274NGC, wxString( _("RS274NGC") ) , _("Dialect according to the document \"The NIST RS274NGC Interpreter - Version 3\" by Thomas R. Kramer, Frederick M. Proctor and Elena Messina (NISTIR 6556, August 17, 2000).\n\n"), wxITEM_RADIO );
+	m_menuDialect->Append( m_menuItemDialectRS274NGC );
+	m_menuItemDialectRS274NGC->Check( true );
+	
+	wxMenuItem* m_menuItemDialectFanucM;
+	m_menuItemDialectFanucM = new wxMenuItem( m_menuDialect, ID_DIALECT_FANUCM, wxString( _("Fanuc-M") ) , _("Dialect used by the Fanuc-M milling simulator."), wxITEM_RADIO );
+	m_menuDialect->Append( m_menuItemDialectFanucM );
+	
+	m_menuToolpath->Append( -1, _("Dialect"), m_menuDialect );
+	
 	wxMenuItem* m_menuItemGeneratorSaveToolpath;
 	m_menuItemGeneratorSaveToolpath = new wxMenuItem( m_menuToolpath, ID_TOOLPATHSAVE, wxString( _("Save &Toolpath") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuToolpath->Append( m_menuItemGeneratorSaveToolpath );
@@ -270,28 +282,28 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_separator11 = m_menuView->AppendSeparator();
 	
 	wxMenuItem* m_menuItemTop;
-	m_menuItemTop = new wxMenuItem( m_menuView, ID_VIEWTOP, wxString( _("View from Top") ) + wxT('\t') + wxT("CTRL+8"), wxEmptyString, wxITEM_NORMAL );
+	m_menuItemTop = new wxMenuItem( m_menuView, ID_VIEWTOP, wxString( _("View from Top") ) + wxT('\t') + wxT("KP_7"), wxEmptyString, wxITEM_NORMAL );
 	m_menuView->Append( m_menuItemTop );
 	
 	wxMenuItem* m_menuItemBottom;
-	m_menuItemBottom = new wxMenuItem( m_menuView, ID_VIEWBOTTOM, wxString( _("View from Bottom") ) + wxT('\t') + wxT("CTRL+2"), wxEmptyString, wxITEM_NORMAL );
+	m_menuItemBottom = new wxMenuItem( m_menuView, ID_VIEWBOTTOM, wxString( _("View from Bottom") ) + wxT('\t') + wxT("CTRL+KP_7"), wxEmptyString, wxITEM_NORMAL );
 	m_menuView->Append( m_menuItemBottom );
 	
 	wxMenuItem* m_menuItemFront;
-	m_menuItemFront = new wxMenuItem( m_menuView, ID_VIEWFRONT, wxString( _("View from Front") ) + wxT('\t') + wxT("CTRL+5"), wxEmptyString, wxITEM_NORMAL );
+	m_menuItemFront = new wxMenuItem( m_menuView, ID_VIEWFRONT, wxString( _("View from Front") ) + wxT('\t') + wxT("KP_1"), wxEmptyString, wxITEM_NORMAL );
 	m_menuView->Append( m_menuItemFront );
 	
 	wxMenuItem* m_menuItemBack;
-	m_menuItemBack = new wxMenuItem( m_menuView, ID_VIEWBACK, wxString( _("View from Back") ) + wxT('\t') + wxT("CTRL+0"), wxEmptyString, wxITEM_NORMAL );
+	m_menuItemBack = new wxMenuItem( m_menuView, ID_VIEWBACK, wxString( _("View from Back") ) + wxT('\t') + wxT("CTRL+KP_1"), wxEmptyString, wxITEM_NORMAL );
 	m_menuView->Append( m_menuItemBack );
 	
-	wxMenuItem* m_menuItemLeft;
-	m_menuItemLeft = new wxMenuItem( m_menuView, ID_VIEWLEFT, wxString( _("View from Left") ) + wxT('\t') + wxT("CTRL+4"), wxEmptyString, wxITEM_NORMAL );
-	m_menuView->Append( m_menuItemLeft );
-	
 	wxMenuItem* m_menuItemRight;
-	m_menuItemRight = new wxMenuItem( m_menuView, ID_VIEWRIGHT, wxString( _("View from Right") ) + wxT('\t') + wxT("CTRL+6"), wxEmptyString, wxITEM_NORMAL );
+	m_menuItemRight = new wxMenuItem( m_menuView, ID_VIEWRIGHT, wxString( _("View from Right") ) + wxT('\t') + wxT("KP_3"), wxEmptyString, wxITEM_NORMAL );
 	m_menuView->Append( m_menuItemRight );
+	
+	wxMenuItem* m_menuItemLeft;
+	m_menuItemLeft = new wxMenuItem( m_menuView, ID_VIEWLEFT, wxString( _("View from Left") ) + wxT('\t') + wxT("CTRL+KP_3"), wxEmptyString, wxITEM_NORMAL );
+	m_menuView->Append( m_menuItemLeft );
 	
 	m_menubar->Append( m_menuView, _("&View") );
 	
@@ -299,6 +311,16 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	wxMenuItem* m_menuItemHelp;
 	m_menuItemHelp = new wxMenuItem( m_menuHelp, wxID_HELP, wxString( _("&Help") ) + wxT('\t') + wxT("F1"), wxEmptyString, wxITEM_NORMAL );
 	m_menuHelp->Append( m_menuItemHelp );
+	
+	wxMenuItem* m_separator181;
+	m_separator181 = m_menuHelp->AppendSeparator();
+	
+	wxMenuItem* m_menuItemTestGCode;
+	m_menuItemTestGCode = new wxMenuItem( m_menuHelp, ID_TESTGCODE, wxString( _("Test G-Code") ) + wxT('\t') + wxT("CTRL+SHIFT+G"), _("Analyse a line (block) of G-Code with the implemented parser."), wxITEM_NORMAL );
+	m_menuHelp->Append( m_menuItemTestGCode );
+	
+	wxMenuItem* m_separator191;
+	m_separator191 = m_menuHelp->AppendSeparator();
 	
 	wxMenuItem* m_menuAbout;
 	m_menuAbout = new wxMenuItem( m_menuHelp, wxID_ABOUT, wxString( _("&About") ) , _("About the program"), wxITEM_NORMAL );
@@ -404,9 +426,10 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	this->Connect( m_menuItemBottom->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
 	this->Connect( m_menuItemFront->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
 	this->Connect( m_menuItemBack->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
-	this->Connect( m_menuItemLeft->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
 	this->Connect( m_menuItemRight->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
+	this->Connect( m_menuItemLeft->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
 	this->Connect( m_menuItemHelp->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnHelp ) );
+	this->Connect( m_menuItemTestGCode->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnTestGCode ) );
 	this->Connect( m_menuAbout->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnAbout ) );
 	m_tree->Connect( wxEVT_COMMAND_TREE_BEGIN_LABEL_EDIT, wxTreeEventHandler( GUIMain::OnBeginLabelEdit ), NULL, this );
 	m_tree->Connect( wxEVT_COMMAND_TREE_END_LABEL_EDIT, wxTreeEventHandler( GUIMain::OnEndLabelEdit ), NULL, this );
@@ -475,6 +498,7 @@ GUIMain::~GUIMain()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnHelp ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnTestGCode ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnAbout ) );
 	m_tree->Disconnect( wxEVT_COMMAND_TREE_BEGIN_LABEL_EDIT, wxTreeEventHandler( GUIMain::OnBeginLabelEdit ), NULL, this );
 	m_tree->Disconnect( wxEVT_COMMAND_TREE_END_LABEL_EDIT, wxTreeEventHandler( GUIMain::OnEndLabelEdit ), NULL, this );
@@ -3312,4 +3336,70 @@ StartupText::StartupText( wxWindow* parent, wxWindowID id, const wxString& title
 
 StartupText::~StartupText()
 {
+}
+
+GUITestGCode::GUITestGCode( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizerV;
+	bSizerV = new wxBoxSizer( wxVERTICAL );
+	
+	wxBoxSizer* bSizerB;
+	bSizerB = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_radioBtnG20 = new wxRadioButton( this, wxID_ANY, _("G20 - inches"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_radioBtnG20->SetToolTip( _("Assume that in a previous block a G20 command was issued.") );
+	
+	bSizerB->Add( m_radioBtnG20, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_radioBtnG21 = new wxRadioButton( this, wxID_ANY, _("G21 - mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_radioBtnG21->SetToolTip( _("Assume that in a previous block a G21 command was issued.") );
+	
+	bSizerB->Add( m_radioBtnG21, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	bSizerV->Add( bSizerB, 0, 0, 5 );
+	
+	wxBoxSizer* bSizerH;
+	bSizerH = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_textCtrlInput = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlInput->SetToolTip( _("G-Code block to analyse.") );
+	
+	bSizerH->Add( m_textCtrlInput, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 5 );
+	
+	m_buttonClear = new wxButton( this, wxID_ANY, _("Clear"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonClear->SetToolTip( _("Clear text int the input field.") );
+	
+	bSizerH->Add( m_buttonClear, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+	
+	bSizerV->Add( bSizerH, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_textCtrlOutput = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
+	m_textCtrlOutput->SetToolTip( _("Meaning of the G-Code.") );
+	
+	bSizerV->Add( m_textCtrlOutput, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_textCtrlRecreated = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	m_textCtrlRecreated->SetToolTip( _("Reconstruction of the G-Code block.") );
+	
+	bSizerV->Add( m_textCtrlRecreated, 0, wxEXPAND|wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	this->SetSizer( bSizerV );
+	this->Layout();
+	
+	// Connect Events
+	m_radioBtnG20->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUITestGCode::OnText ), NULL, this );
+	m_radioBtnG21->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUITestGCode::OnText ), NULL, this );
+	m_textCtrlInput->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUITestGCode::OnText ), NULL, this );
+	m_buttonClear->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUITestGCode::OnClear ), NULL, this );
+}
+
+GUITestGCode::~GUITestGCode()
+{
+	// Disconnect Events
+	m_radioBtnG20->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUITestGCode::OnText ), NULL, this );
+	m_radioBtnG21->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUITestGCode::OnText ), NULL, this );
+	m_textCtrlInput->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUITestGCode::OnText ), NULL, this );
+	m_buttonClear->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUITestGCode::OnClear ), NULL, this );
 }

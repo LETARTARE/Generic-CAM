@@ -38,335 +38,418 @@ WX_DEFINE_OBJARRAY(ArrayOfMachinePosition)
 MachinePosition::MachinePosition(double x, double y, double z, double a,
 		double b, double c, double u, double v, double w)
 {
-	axisX = x;
-	axisY = y;
-	axisZ = z;
-	axisA = a;
-	axisB = b;
-	axisC = c;
-	axisU = u;
-	axisV = v;
-	axisW = w;
-	radiusI = 0.0;
-	radiusJ = 0.0;
-	radiusK = 0.0;
-	radiusR = 0.0;
+	X = x;
+	Y = y;
+	Z = z;
+	A = a;
+	B = b;
+	C = c;
+	U = u;
+	V = v;
+	W = w;
 
-	isRotationPositiv = true;
-	duration = 1.0;
-	feed = 1.0;
-	isCutting = false;
+
 }
 
 MachinePosition::~MachinePosition()
 {
 }
 
-void MachinePosition::Zero(void)
-{
-	axisX = axisY = axisZ = 0.0;
-	axisA = axisB = axisC = 0.0;
-	axisU = axisV = axisW = 0.0;
-	radiusI = radiusJ = radiusK = 0.0;
-	radiusR = 0.0;
-	isRotationPositiv = true;
-	duration = 1.0;
-	feed = 1.0;
-	isCutting = false;
-}
+//void MachinePosition::Zero(void)
+//{
+//	X = Y = Z = 0.0;
+//	A = B = C = 0.0;
+//	U = V = W = 0.0;
+//
+//	feed = 1.0;
+//}
 
 double MachinePosition::AbsXYZ() const
 {
-	return sqrt(axisX * axisX + axisY * axisY + axisZ * axisZ);
+	return sqrt(X * X + Y * Y + Z * Z);
 }
 
 double MachinePosition::AbsUVW() const
 {
-	return sqrt(axisU * axisU + axisV * axisV + axisW * axisW);
+	return sqrt(U * U + V * V + W * W);
 }
 
 double MachinePosition::AbsXYZUVW() const
 {
 	return sqrt(
-			axisX * axisX + axisY * axisY + axisZ * axisZ + axisU * axisU
-					+ axisV * axisV + axisW * axisW);
+			X * X + Y * Y + Z * Z + U * U
+					+ V * V + W * W);
 }
 
-bool MachinePosition::ParseGCodeLine(wxString lineOfText)
+//bool MachinePosition::ParseGCodeLine(wxString lineOfText)
+//{
+//
+//	code = GCodeBlock(lineOfText);
+//	if(code)
+//
+//	duration = 1.0;
+
+//	unsigned char state = 0;
+//	unsigned char c;
+//	unsigned char command = 'N';
+//	double number;
+//	const double conversionFactor = 0.01 / 2.54; // 1 cm = 2.54 inch
+//	double nCount = 0;
+//	bool negativ = false;
+//	bool isCommand;
+//	unsigned int i;
+//	lineOfText.MakeUpper();
+//	lineOfText += _T(" ");
+//	//wxLogMessage(lineOfText);
+//	for(i = 0; i < lineOfText.Length(); i++){
+//		c = lineOfText[i];
+//		if(c == '(') state += 4;
+//		if(c == ')') state -= 4;
+//		if(c >= 'A' && c <= 'Z')
+//			isCommand = true;
+//		else
+//			isCommand = false;
+//
+//		if(state > 1 && state < 4
+//				&& (isCommand || i == lineOfText.Length() - 1)){
+//			// Evaluate Command
+//			//wxLogMessage(wxString::Format(_T("Commado: %c mit %f"), command,
+//			//	number));
+//
+//			if(negativ) number = -number;
+//			switch(command){
+//			case 'F':
+//				feed = number;
+//				break;
+//			case 'G':
+//				break;
+//
+//			case 'I':
+//				radiusI = number * conversionFactor;
+//				break;
+//			case 'J':
+//				radiusJ = number * conversionFactor;
+//				break;
+//			case 'K':
+//				radiusK = number * conversionFactor;
+//				break;
+//			case 'R':
+//				radiusR = number * conversionFactor;
+//				break;
+//
+//			case 'A':
+//				A = number;
+//				break;
+//			case 'B':
+//				B = number;
+//				break;
+//			case 'C':
+//				C = number;
+//				break;
+//
+//			case 'U':
+//				U = number * conversionFactor;
+//				break;
+//			case 'V':
+//				V = number * conversionFactor;
+//				break;
+//			case 'W':
+//				W = number * conversionFactor;
+//				break;
+//
+//			case 'X':
+//				X = number * conversionFactor;
+//				break;
+//			case 'Y':
+//				Y = number * conversionFactor;
+//				break;
+//			case 'Z':
+//				Z = number * conversionFactor;
+//				break;
+//
+//			case 'M':
+//				break;
+//			case 'N':
+//				// Ignore linenumber
+//				break;
+//
+//			default:
+//				wxLogMessage(
+//						wxString::Format(_T("Unknown G-Code: %c"), command));
+//				break;
+//			}
+//			state = 0;
+//		}
+//
+//		switch(state){
+//		case 0:
+//			if(isCommand){
+//				command = c;
+//				state = 1;
+//				negativ = false;
+//				number = 0;
+//			}
+//			break;
+//		case 1:
+//			if(c == '-'){
+//				negativ = true;
+//				state = 2;
+//			}
+//			if(c >= '0' && c <= '9'){
+//				number = (double) (c - '0');
+//				state = 2;
+//			}
+//			if(c == ',' || c == '.'){
+//				state = 3;
+//				nCount = 1.0;
+//				break;
+//			}
+//			break;
+//		case 2:
+//			if(c == '-'){
+//				if(negativ) wxLogError(
+//						_T("ParseGCodeLine: Double '-' in G-Code!"));
+//			}
+//			if(c >= '0' && c <= '9'){
+//				number = number * 10 + (double) (c - '0');
+//				break;
+//			}
+//			if(c == ',' || c == '.'){
+//				state = 3;
+//				nCount = 1.0;
+//				break;
+//			}
+//
+//			break;
+//		case 3:
+//			if(c >= '0' && c <= '9'){
+//				nCount /= 10;
+//				number += (double) (c - '0') * nCount;
+//				break;
+//			}
+//			break;
+//		}
+//	}
+//
+//	return true;
+//}
+
+//unsigned char MachinePosition::GetGNumber(void) const
+//{
+//	const bool doCircle = (fabs(this->I) > FLT_EPSILON
+//			|| fabs(this->J) > FLT_EPSILON || fabs(this->K) > FLT_EPSILON
+//			|| fabs(this->R) > FLT_EPSILON);
+//	if(!(this->isCutting)){
+//		return 0;
+//	}else{
+//		if(doCircle){
+//			if(this->isRotationPositiv){
+//				return 3;
+//			}else{
+//				return 2;
+//			}
+//		}else{
+//			return 1;
+//		}
+//	}
+//}
+
+MachinePosition & MachinePosition::operator+=(const MachinePosition& a)
 {
-	code = lineOfText;
-	duration = 1.0;
-
-	unsigned char state = 0;
-	unsigned char c;
-	unsigned char command = 'N';
-	double number;
-	double conversionFactor = 0.01 / 2.54; // 1 cm = 2.54 inch
-	double nCount = 0;
-	bool negativ = false;
-	bool isCommand;
-	unsigned int i;
-	lineOfText.MakeUpper();
-	lineOfText += _T(" ");
-	//wxLogMessage(lineOfText);
-	for(i = 0; i < lineOfText.Length(); i++){
-		c = lineOfText[i];
-		if(c == '(') state += 4;
-		if(c == ')') state -= 4;
-		if(c >= 'A' && c <= 'Z')
-			isCommand = true;
-		else
-			isCommand = false;
-
-		if(state > 1 && state < 4
-				&& (isCommand || i == lineOfText.Length() - 1)){
-			// Evaluate Command
-			//wxLogMessage(wxString::Format(_T("Commado: %c mit %f"), command,
-			//	number));
-
-			if(negativ) number = -number;
-			switch(command){
-			case 'F':
-				feed = number;
-				break;
-			case 'G':
-				break;
-
-			case 'I':
-				radiusI = number * conversionFactor;
-				break;
-			case 'J':
-				radiusJ = number * conversionFactor;
-				break;
-			case 'K':
-				radiusK = number * conversionFactor;
-				break;
-			case 'R':
-				radiusR = number * conversionFactor;
-				break;
-
-			case 'A':
-				axisA = number;
-				break;
-			case 'B':
-				axisB = number;
-				break;
-			case 'C':
-				axisC = number;
-				break;
-
-			case 'U':
-				axisU = number * conversionFactor;
-				break;
-			case 'V':
-				axisV = number * conversionFactor;
-				break;
-			case 'W':
-				axisW = number * conversionFactor;
-				break;
-
-			case 'X':
-				axisX = number * conversionFactor;
-				break;
-			case 'Y':
-				axisY = number * conversionFactor;
-				break;
-			case 'Z':
-				axisZ = number * conversionFactor;
-				break;
-
-			case 'M':
-				break;
-			case 'N':
-				// Ignore linenumber
-				break;
-
-			default:
-				wxLogMessage(
-						wxString::Format(_T("Unknown G-Code: %c"), command));
-				break;
-			}
-			state = 0;
-		}
-
-		switch(state){
-		case 0:
-			if(isCommand){
-				command = c;
-				state = 1;
-				negativ = false;
-				number = 0;
-			}
-			break;
-		case 1:
-			if(c == '-'){
-				negativ = true;
-				state = 2;
-			}
-			if(c >= '0' && c <= '9'){
-				number = (double) (c - '0');
-				state = 2;
-			}
-			if(c == ',' || c == '.'){
-				state = 3;
-				nCount = 1.0;
-				break;
-			}
-			break;
-		case 2:
-			if(c == '-'){
-				if(negativ) wxLogError(
-						_T("ParseGCodeLine: Double '-' in G-Code!"));
-			}
-			if(c >= '0' && c <= '9'){
-				number = number * 10 + (double) (c - '0');
-				break;
-			}
-			if(c == ',' || c == '.'){
-				state = 3;
-				nCount = 1.0;
-				break;
-			}
-
-			break;
-		case 3:
-			if(c >= '0' && c <= '9'){
-				nCount /= 10;
-				number += (double) (c - '0') * nCount;
-				break;
-			}
-			break;
-		}
-	}
-
-	return true;
+	this->X += a.X;
+	this->Y += a.Y;
+	this->Z += a.Z;
+	this->A += a.A;
+	this->B += a.B;
+	this->C += a.C;
+	this->U += a.U;
+	this->V += a.V;
+	this->W += a.W;
+	return *this;
 }
 
-unsigned char MachinePosition::GetGNumber(void) const
+const MachinePosition MachinePosition::operator+(const MachinePosition &b) const
 {
-	bool doCircle = (fabs(this->radiusI) > FLT_EPSILON
-			|| fabs(this->radiusJ) > FLT_EPSILON
-			|| fabs(this->radiusK) > FLT_EPSILON
-			|| fabs(this->radiusR) > FLT_EPSILON);
-	if(!(this->isCutting)){
-		return 0;
-	}else{
-		if(doCircle){
-			if(this->isRotationPositiv){
-				return 3;
-			}else{
-				return 2;
-			}
-		}else{
-			return 1;
-		}
-	}
-}
-
-wxString MachinePosition::GenerateCommandXYZ(void)
-{
-	unsigned char gNum = this->GetGNumber();
-	wxString temp = wxString::Format(_T("G%02u"), gNum);
-
-	temp += wxString::Format(_T(" X%.2f Y%.2f Z%.2f"), this->axisX * 1000.0,
-			this->axisY * 1000.0, this->axisZ * 1000.0);
-
-	if(gNum == 2 || gNum == 3){
-		if(fabs(this->radiusR) > FLT_EPSILON){
-			temp += wxString::Format(_T(" R%.2f"), this->radiusR * 1000.0);
-		}else{
-			temp += wxString::Format(_T(" I%.2f J%.2f K%.2f"),
-					this->radiusI * 1000.0, this->radiusJ * 1000.0,
-					this->radiusK * 1000.0);
-		}
-	}
+	MachinePosition temp = *this;
+	temp += b;
 	return temp;
 }
 
-wxString MachinePosition::GenerateCommandXYZABC(void)
+MachinePosition & MachinePosition::operator-=(const MachinePosition& a)
 {
-	unsigned char gNum = this->GetGNumber();
-	wxString temp = wxString::Format(_T("G%02u"), gNum);
-
-	temp += wxString::Format(_T(" X%.2f Y%.2f Z%.2f"), this->axisX * 1000.0,
-			this->axisY * 1000.0, this->axisZ * 1000.0);
-	temp += wxString::Format(_T(" A%.2f B%.2f C%.2f"), this->axisA * 1000.0,
-			this->axisB * 1000.0, this->axisC * 1000.0);
-
-	if(gNum == 2 || gNum == 3){
-		if(fabs(this->radiusR) > FLT_EPSILON){
-			temp += wxString::Format(_T(" R%.2f"), this->radiusR * 1000.0);
-		}else{
-			temp += wxString::Format(_T(" I%.2f J%.2f K%.2f"),
-					this->radiusI * 1000.0, this->radiusJ * 1000.0,
-					this->radiusK * 1000.0);
-		}
-	}
-	return temp;
+	this->X -= a.X;
+	this->Y -= a.Y;
+	this->Z -= a.Z;
+	this->A -= a.A;
+	this->B -= a.B;
+	this->C -= a.C;
+	this->U -= a.U;
+	this->V -= a.V;
+	this->W -= a.W;
+	return *this;
 }
-wxString MachinePosition::GenerateCommandXYZABCUVW(void)
+
+const MachinePosition MachinePosition::operator-(const MachinePosition &b) const
 {
-	unsigned char gNum = this->GetGNumber();
-	wxString temp = wxString::Format(_T("G%02u"), gNum);
-
-	temp += wxString::Format(_T(" X%.2f Y%.2f Z%.2f"), this->axisX * 1000.0,
-			this->axisY * 1000.0, this->axisZ * 1000.0);
-	temp += wxString::Format(_T(" A%.2f B%.2f C%.2f"), this->axisA * 1000.0,
-			this->axisB * 1000.0, this->axisC * 1000.0);
-	temp += wxString::Format(_T(" U%.2f V%.2f W%.2f"), this->axisU * 1000.0,
-			this->axisV * 1000.0, this->axisW * 1000.0);
-
-	if(gNum == 2 || gNum == 3){
-		if(fabs(this->radiusR) > FLT_EPSILON){
-			temp += wxString::Format(_T(" R%.2f"), this->radiusR * 1000.0);
-		}else{
-			temp += wxString::Format(_T(" I%.2f J%.2f K%.2f"),
-					this->radiusI * 1000.0, this->radiusJ * 1000.0,
-					this->radiusK * 1000.0);
-		}
-	}
+	MachinePosition temp = *this;
+	temp -= b;
 	return temp;
 }
 
-wxString MachinePosition::GenerateCommandDiff(
-		const MachinePosition &oldPosition)
+const MachinePosition MachinePosition::operator-() const
 {
-	wxString temp;
-	unsigned char gNum = this->GetGNumber();
-
-	if(oldPosition.GetGNumber() != gNum){
-		temp = wxString::Format(_T("G%02u"), gNum);
-	}
-	if(fabs(this->axisX - oldPosition.axisX) > FLT_EPSILON) temp +=
-			wxString::Format(_T(" X%.2f"), this->axisX * 1000.0);
-	if(fabs(this->axisY - oldPosition.axisY) > FLT_EPSILON) temp +=
-			wxString::Format(_T(" Y%.2f"), this->axisY * 1000.0);
-	if(fabs(this->axisZ - oldPosition.axisZ) > FLT_EPSILON) temp +=
-			wxString::Format(_T(" Z%.2f"), this->axisZ * 1000.0);
-
-	if(fabs(this->axisA - oldPosition.axisA) > FLT_EPSILON) temp +=
-			wxString::Format(_T(" A%.2f"), this->axisA * 1000.0);
-	if(fabs(this->axisB - oldPosition.axisB) > FLT_EPSILON) temp +=
-			wxString::Format(_T(" B%.2f"), this->axisB * 1000.0);
-	if(fabs(this->axisC - oldPosition.axisC) > FLT_EPSILON) temp +=
-			wxString::Format(_T(" C%.2f"), this->axisC * 1000.0);
-
-	if(fabs(this->axisU - oldPosition.axisU) > FLT_EPSILON) temp +=
-			wxString::Format(_T(" U%.2f"), this->axisU * 1000.0);
-	if(fabs(this->axisV - oldPosition.axisV) > FLT_EPSILON) temp +=
-			wxString::Format(_T(" V%.2f"), this->axisV * 1000.0);
-	if(fabs(this->axisW - oldPosition.axisW) > FLT_EPSILON) temp +=
-			wxString::Format(_T(" W%.2f"), this->axisW * 1000.0);
-
-	if(gNum == 2 || gNum == 3){
-		if(fabs(this->radiusR) > FLT_EPSILON){
-			temp += wxString::Format(_T(" R%.2f"), this->radiusR * 1000.0);
-		}else{
-			temp += wxString::Format(_T(" I%.2f J%.2f K%.2f"),
-					this->radiusI * 1000.0, this->radiusJ * 1000.0,
-					this->radiusK * 1000.0);
-		}
-	}
+	MachinePosition temp(-this->X, -this->Y, -this->Z, -this->A,
+			-this->B, -this->C, -this->U, -this->V,
+			-this->W);
 	return temp;
 }
+
+MachinePosition & MachinePosition::operator*=(const double &b)
+{
+	this->X *= b;
+	this->Y *= b;
+	this->Z *= b;
+	this->A *= b;
+	this->B *= b;
+	this->C *= b;
+	this->U *= b;
+	this->V *= b;
+	this->W *= b;
+	return *this;
+}
+
+const MachinePosition MachinePosition::operator*(const double &b) const
+{
+	MachinePosition temp = *this;
+	temp *= b;
+	return temp;
+}
+
+MachinePosition & MachinePosition::operator/=(const double &b)
+{
+	this->X /= b;
+	this->Y /= b;
+	this->Z /= b;
+	this->A /= b;
+	this->B /= b;
+	this->C /= b;
+	this->U /= b;
+	this->V /= b;
+	this->W /= b;
+	return *this;
+}
+
+const MachinePosition MachinePosition::operator/(const double &b) const
+{
+	MachinePosition temp = *this;
+	temp /= b;
+	return temp;
+}
+
+//wxString MachinePosition::GenerateCommandXYZ(void)
+//{
+//	unsigned char gNum = this->GetGNumber();
+//	wxString temp = wxString::Format(_T("G%02u"), gNum);
+//
+//	temp += wxString::Format(_T(" X%.2f Y%.2f Z%.2f"), this->X * 1000.0,
+//			this->Y * 1000.0, this->Z * 1000.0);
+//
+//	if(gNum == 2 || gNum == 3){
+//		if(fabs(this->radiusR) > FLT_EPSILON){
+//			temp += wxString::Format(_T(" R%.2f"), this->radiusR * 1000.0);
+//		}else{
+//			temp += wxString::Format(_T(" I%.2f J%.2f K%.2f"),
+//					this->radiusI * 1000.0, this->radiusJ * 1000.0,
+//					this->radiusK * 1000.0);
+//		}
+//	}
+//	return temp;
+//}
+//
+//wxString MachinePosition::GenerateCommandXYZABC(void)
+//{
+//	unsigned char gNum = this->GetGNumber();
+//	wxString temp = wxString::Format(_T("G%02u"), gNum);
+//
+//	temp += wxString::Format(_T(" X%.2f Y%.2f Z%.2f"), this->X * 1000.0,
+//			this->Y * 1000.0, this->Z * 1000.0);
+//	temp += wxString::Format(_T(" A%.2f B%.2f C%.2f"), this->A * 1000.0,
+//			this->B * 1000.0, this->C * 1000.0);
+//
+//	if(gNum == 2 || gNum == 3){
+//		if(fabs(this->radiusR) > FLT_EPSILON){
+//			temp += wxString::Format(_T(" R%.2f"), this->radiusR * 1000.0);
+//		}else{
+//			temp += wxString::Format(_T(" I%.2f J%.2f K%.2f"),
+//					this->radiusI * 1000.0, this->radiusJ * 1000.0,
+//					this->radiusK * 1000.0);
+//		}
+//	}
+//	return temp;
+//}
+//wxString MachinePosition::GenerateCommandXYZABCUVW(void)
+//{
+//	unsigned char gNum = this->GetGNumber();
+//	wxString temp = wxString::Format(_T("G%02u"), gNum);
+//
+//	temp += wxString::Format(_T(" X%.2f Y%.2f Z%.2f"), this->X * 1000.0,
+//			this->Y * 1000.0, this->Z * 1000.0);
+//	temp += wxString::Format(_T(" A%.2f B%.2f C%.2f"), this->A * 1000.0,
+//			this->B * 1000.0, this->C * 1000.0);
+//	temp += wxString::Format(_T(" U%.2f V%.2f W%.2f"), this->U * 1000.0,
+//			this->V * 1000.0, this->W * 1000.0);
+//
+//	if(gNum == 2 || gNum == 3){
+//		if(fabs(this->radiusR) > FLT_EPSILON){
+//			temp += wxString::Format(_T(" R%.2f"), this->radiusR * 1000.0);
+//		}else{
+//			temp += wxString::Format(_T(" I%.2f J%.2f K%.2f"),
+//					this->radiusI * 1000.0, this->radiusJ * 1000.0,
+//					this->radiusK * 1000.0);
+//		}
+//	}
+//	return temp;
+//}
+//
+//wxString MachinePosition::GenerateCommandDiff(
+//		const MachinePosition &oldPosition)
+//{
+//	wxString temp;
+//	unsigned char gNum = this->GetGNumber();
+//
+//	if(oldPosition.GetGNumber() != gNum){
+//		temp = wxString::Format(_T("G%02u"), gNum);
+//	}
+//	if(fabs(this->X - oldPosition.X) > FLT_EPSILON) temp +=
+//			wxString::Format(_T(" X%.2f"), this->X * 1000.0);
+//	if(fabs(this->Y - oldPosition.Y) > FLT_EPSILON) temp +=
+//			wxString::Format(_T(" Y%.2f"), this->Y * 1000.0);
+//	if(fabs(this->Z - oldPosition.Z) > FLT_EPSILON) temp +=
+//			wxString::Format(_T(" Z%.2f"), this->Z * 1000.0);
+//
+//	if(fabs(this->A - oldPosition.A) > FLT_EPSILON) temp +=
+//			wxString::Format(_T(" A%.2f"), this->A * 1000.0);
+//	if(fabs(this->B - oldPosition.B) > FLT_EPSILON) temp +=
+//			wxString::Format(_T(" B%.2f"), this->B * 1000.0);
+//	if(fabs(this->C - oldPosition.C) > FLT_EPSILON) temp +=
+//			wxString::Format(_T(" C%.2f"), this->C * 1000.0);
+//
+//	if(fabs(this->U - oldPosition.U) > FLT_EPSILON) temp +=
+//			wxString::Format(_T(" U%.2f"), this->U * 1000.0);
+//	if(fabs(this->V - oldPosition.V) > FLT_EPSILON) temp +=
+//			wxString::Format(_T(" V%.2f"), this->V * 1000.0);
+//	if(fabs(this->W - oldPosition.W) > FLT_EPSILON) temp +=
+//			wxString::Format(_T(" W%.2f"), this->W * 1000.0);
+//
+//	if(gNum == 2 || gNum == 3){
+//		if(fabs(this->radiusR) > FLT_EPSILON){
+//			temp += wxString::Format(_T(" R%.2f"), this->radiusR * 1000.0);
+//		}else{
+//			temp += wxString::Format(_T(" I%.2f J%.2f K%.2f"),
+//					this->radiusI * 1000.0, this->radiusJ * 1000.0,
+//					this->radiusK * 1000.0);
+//		}
+//	}
+//	return temp;
+//}
 

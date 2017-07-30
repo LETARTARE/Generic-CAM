@@ -44,14 +44,14 @@ CommandRunToolRemove::~CommandRunToolRemove(void)
 bool CommandRunToolRemove::Do(void)
 {
 	Run* run = &(project->run[runNr]);
-	size_t maxTools = run->tools.GetCount();
+	size_t maxTools = run->machine.tools.GetCount();
 	if(index >= maxTools) return false;
-	oldTool = run->tools.Detach(index);
+	oldTool = run->machine.tools.Detach(index);
 	if(index + 1 < maxTools){
 		Tool temp;
 		temp.slotNr = oldTool->slotNr;
 		temp.shaftDiameter = 0.0;
-		run->tools.Insert(temp, index);
+		run->machine.tools.Insert(temp, index);
 	}
 	run->Update();
 	return true;
@@ -60,11 +60,11 @@ bool CommandRunToolRemove::Do(void)
 bool CommandRunToolRemove::Undo(void)
 {
 	Run* run = &(project->run[runNr]);
-	size_t maxTools = run->tools.GetCount();
+	size_t maxTools = run->machine.tools.GetCount();
 	if(index >= maxTools){
-		run->tools.Add(oldTool);
+		run->machine.tools.Add(oldTool);
 	}else{
-		run->tools[index] = *oldTool;
+		run->machine.tools[index] = *oldTool;
 		delete oldTool;
 	}
 	oldTool = NULL;

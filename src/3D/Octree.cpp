@@ -30,7 +30,6 @@
 #include <stddef.h>
 #include <wx/arrimpl.cpp>
 
-// this is a magic incantation which must be done!
 WX_DEFINE_OBJARRAY(ArrayOfOctree)
 
 OctreeCell::OctreeCell(bool isSolid)

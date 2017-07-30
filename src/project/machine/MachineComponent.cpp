@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : MachineComponent.cpp
-// Purpose            : A component of the machine.
+// Purpose            : A component of the machine
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -42,17 +42,6 @@ MachineComponent::~MachineComponent()
 {
 }
 
-void MachineComponent::SetColor(float r, float g, float b)
-{
-	if(isColorSet)
-		geometry.useColor = geometryColorTriangle;
-	else
-		geometry.useColor = geometryColorGlobal;
-	geometry.color.Set(r, g, b);
-	geometry.colorNewObjects.Set(r, g, b);
-	isColorSet = true;
-}
-
 void MachineComponent::InsertBox(AffineTransformMatrix matrix, float x, float y,
 		float z)
 {
@@ -75,6 +64,7 @@ void MachineComponent::InsertBox(AffineTransformMatrix matrix, float x, float y,
 	geometry.AddQuadTransform(p3, p2, p6, p7, matrix);
 	geometry.AddQuadTransform(p7, p6, p5, p4, matrix);
 }
+
 void MachineComponent::InsertCylinder(AffineTransformMatrix matrix, float h,
 		float r)
 {
@@ -169,6 +159,17 @@ bool MachineComponent::InsertDXF(const AffineTransformMatrix &matrix,
 		}
 	}
 	return true;
+}
+
+void MachineComponent::SetColor(float r, float g, float b)
+{
+	if(isColorSet)
+		geometry.useColor = geometryColorTriangle;
+	else
+		geometry.useColor = geometryColorGlobal;
+	geometry.color.Set(r, g, b);
+	geometry.colorNewObjects.Set(r, g, b);
+	isColorSet = true;
 }
 
 void MachineComponent::Paint(void) const

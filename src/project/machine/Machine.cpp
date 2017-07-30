@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : Machine.cpp
-// Purpose            : The machine
+// Purpose            : CNC machine
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
@@ -36,12 +36,134 @@
 Machine::Machine()
 {
 	initialized = false;
-	position.Zero();
+	position = MachinePosition();
 	ClearComponents();
+
+	//	conversionFactor = 0.01 / 2.54; // 1 cm = 2.54 inch
+	conversionFactor = 1.0; // Metric system
+	feed = 0.01; // Feed = 1 cm/s
+	movement = feedrate; // Move at feedrate
+	spindle = 0.0; // Spindle stopped
+}
+
+Machine::Machine(const Machine& other)
+{
+	throw("'Machine::Copy constructor' is unimplemented!");
+}
+
+Machine& Machine::operator =(const Machine& other)
+{
+	if(&other == this) return *this;
+	throw("'Machine::operator=' is unimplemented!");
+	return *this;
 }
 
 Machine::~Machine()
 {
+}
+
+void Machine::ClearComponents(void)
+{
+	componentWithMaterial = NULL;
+	componentWithTool = NULL;
+	components.clear();
+	AddComponent(_T("Base"));
+}
+
+bool Machine::Load(wxFileName const& fileName)
+{
+	if(!fileName.IsOk()) return false;
+	this->fileName = fileName;
+	return ReLoad();
+}
+
+bool Machine::ReLoad(void)
+{
+	if(!fileName.IsFileReadable()) return false;
+
+	bool flag = false;
+	if(fileName.GetExt().CmpNoCase(_T("lua")) == 0
+			|| fileName.GetExt().CmpNoCase(_T("txt")) == 0){
+		flag = true;
+		wxTextFile file(fileName.GetFullPath());
+		if(!file.Open(wxConvLocal) && !file.Open(wxConvFile)){
+			wxLogError(_T("Opening of the file failed!"));
+			return false;
+		}
+		wxString str;
+		machineDescription.Empty();
+		for(str = file.GetFirstLine(); !file.Eof(); str = file.GetNextLine()){
+			machineDescription += str + _T("\n");
+		}
+	}
+	if(fileName.GetExt().CmpNoCase(_T("zip")) == 0){
+//		wxLogMessage(fileName.GetFullPath());
+		wxFFileInputStream in(fileName.GetFullPath());
+		wxZipInputStream inzip(in);
+		wxZipEntry* entry;
+		while((entry = inzip.GetNextEntry())){
+			wxFileName temp(entry->GetName());
+			if(temp.GetExt().CmpNoCase(_T("lua")) == 0){
+				inzip.OpenEntry(*entry);
+				wxTextInputStream textin(inzip);
+				wxString str;
+				machineDescription.Empty();
+				while(inzip.CanRead()){
+					str = textin.ReadLine();
+					machineDescription += str + _T("\n");
+				}
+				inzip.CloseEntry();
+				flag = true;
+				break;
+			}
+		}
+	}
+
+	if(!flag){
+		wxLogError(_("File format for machine descriptions not supported."));
+		return false;
+	}
+
+	EvaluateDescription();
+	//wxLogMessage(machineDescription);
+	return IsInitialized();
+}
+
+void Machine::EvaluateDescription(void)
+{
+	wxLogMessage(_T("Machine::InsertMachineDescription"));
+	evaluator.LinkToMachine(this);
+	if(evaluator.EvaluateProgram())
+		initialized = true;
+	else
+		initialized = false;
+	Assemble();
+	textOut = evaluator.GetOutput();
+}
+
+bool Machine::IsInitialized(void) const
+{
+	return initialized;
+}
+
+void Machine::Assemble()
+{
+	if(initialized) evaluator.EvaluateAssembly();
+}
+
+void Machine::Paint(void) const
+{
+	for(std::list <MachineComponent>::const_iterator i = components.begin();
+			i != components.end(); ++i)
+		i->Paint();
+
+//	if(selectedTool >= 0 && selectedTool < tools.GetCount()){
+//		::glPushMatrix();
+//		::glMultMatrixd(machine.toolPosition.a);
+//		::glColor3f(0.7, 0.7, 0.7);
+//		tools[selectedTool].Paint();
+//		::glPopMatrix();
+//	}
 }
 
 void Machine::ToXml(wxXmlNode* parentNode)
@@ -108,21 +230,6 @@ bool Machine::FromXml(wxXmlNode* node)
 	return true;
 }
 
-void Machine::Paint(void) const
-{
-	for(std::list <MachineComponent>::const_iterator i = components.begin();
-			i != components.end(); ++i)
-		i->Paint();
-}
-
-void Machine::ClearComponents(void)
-{
-	componentWithMaterial = NULL;
-	componentWithTool = NULL;
-	components.clear();
-	AddComponent(_T("Base"));
-}
-
 bool Machine::AddComponent(wxString const& nameOfComponent)
 {
 	for(std::list <MachineComponent>::iterator i = components.begin();
@@ -157,82 +264,6 @@ bool Machine::PlaceComponent(wxString const& nameOfComponent,
 		}
 	}
 	return flag;
-}
-
-void Machine::Assemble()
-{
-	if(initialized) evaluator.EvaluateAssembly();
-}
-
-void Machine::EvaluateDescription(void)
-{
-	wxLogMessage(_T("Machine::InsertMachineDescription"));
-	evaluator.LinkToMachine(this);
-	if(evaluator.EvaluateProgram())
-		initialized = true;
-	else
-		initialized = false;
-	Assemble();
-	textOut = evaluator.GetOutput();
-}
-
-bool Machine::ReLoad(void)
-{
-	if(!fileName.IsFileReadable()) return false;
-
-	bool flag = false;
-	if(fileName.GetExt().CmpNoCase(_T("lua")) == 0
-			|| fileName.GetExt().CmpNoCase(_T("txt")) == 0){
-		flag = true;
-		wxTextFile file(fileName.GetFullPath());
-		if(!file.Open(wxConvLocal) && !file.Open(wxConvFile)){
-			wxLogError(_T("Opening of the file failed!"));
-			return false;
-		}
-		wxString str;
-		machineDescription.Empty();
-		for(str = file.GetFirstLine(); !file.Eof(); str = file.GetNextLine()){
-			machineDescription += str + _T("\n");
-		}
-	}
-	if(fileName.GetExt().CmpNoCase(_T("zip")) == 0){
-//		wxLogMessage(fileName.GetFullPath());
-		wxFFileInputStream in(fileName.GetFullPath());
-		wxZipInputStream inzip(in);
-		wxZipEntry* entry;
-		while((entry = inzip.GetNextEntry())){
-			wxFileName temp(entry->GetName());
-			if(temp.GetExt().CmpNoCase(_T("lua")) == 0){
-				inzip.OpenEntry(*entry);
-				wxTextInputStream textin(inzip);
-				wxString str;
-				machineDescription.Empty();
-				while(inzip.CanRead()){
-					str = textin.ReadLine();
-					machineDescription += str + _T("\n");
-				}
-				inzip.CloseEntry();
-				flag = true;
-				break;
-			}
-		}
-	}
-
-	if(!flag){
-		wxLogError(_("File format for machine descriptions not supported."));
-		return false;
-	}
-
-	EvaluateDescription();
-	//wxLogMessage(machineDescription);
-	return IsInitialized();
-}
-
-bool Machine::Load(wxFileName const& fileName)
-{
-	if(!fileName.IsOk()) return false;
-	this->fileName = fileName;
-	return ReLoad();
 }
 
 bool Machine::LoadGeometryIntoComponent(const wxString& filename,
@@ -287,6 +318,11 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 	textOut += filename;
 	textOut += _T("\nFile not found at all!\n");
 	return false;
+}
+
+Vector3 Machine::GetCenter(void) const
+{
+	return workpiecePosition.GetCenter();
 }
 
 bool Machine::LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,

@@ -23,17 +23,27 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 ///////////////////////////////////////////////////////////////////////////////
-
 #ifndef MACHINESIMULATOR_H_
 #define MACHINESIMULATOR_H_
 
+/*!\class MachineSimulator
+ * \ingroup Machine
+ * \brief Simlator of the movement and operation of the machine.
+ *
+ * Small class coordinationg the advancements of the Machine during the
+ * simulation cycle. It also coordinates the setup and processing of the
+ * Workpieces in the machine.
+ */
+
+#include "Machine.h"
+
 #include "../ToolBox.h"
 #include "../ToolPath.h"
-#include "Machine.h"
+#include "../Workpiece.h"
 #include "MachinePosition.h"
+#include "../generator/DexelTarget.h"
 
 #include <wx/filename.h>
-
 #include <vector>
 
 class MachineSimulator {
@@ -42,22 +52,29 @@ public:
 	MachineSimulator();
 	virtual ~MachineSimulator();
 
-	//Member variables
-public:
-
-	Machine machine;
-	std::vector<MachinePosition> position;
-
-	float tStep;
-	unsigned long step;
-
-	//Methods
-public:
+	void InsertWorkpiece(Workpiece* workpiece);
+	void InsertToolPath(ToolPath* toolpath);
 	void InsertMachine(Machine* machine);
+	void InitSimulation(size_t maxCells);
 	void Reset(void);
+	void Rewind(void);
 	void Step(float tTarget);
+	void FForward(void);
 
 	bool ReadGCodeFile(wxFileName fileName);
+
+	void Paint(void) const;
+
+	//Member variables
+public:
+	Workpiece* workpiece;
+	ToolPath* toolpath;
+	Machine* machine;
+
+	DexelTarget simulation;
+
+	float tStep;
+	size_t step;
 };
 
 #endif /* MACHINESIMULATOR_H_ */

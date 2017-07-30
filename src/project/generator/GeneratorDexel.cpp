@@ -161,7 +161,7 @@ void GeneratorDexel::GenerateToolpath(void)
 //	target.CleanOutlier();
 	outside.HardInvert();
 
-	// Draw a single cell line on the outside of the area to kepp the tool inside the
+	// Draw a single cell line on the outside of the area to keep the tool inside the
 	// pocket.
 	//TODO Turn this feature off, if the working area is bigger or the same size as the workpiece in XY.
 	outside.MarkOutline();

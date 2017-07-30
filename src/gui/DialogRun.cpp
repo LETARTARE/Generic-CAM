@@ -99,15 +99,15 @@ bool DialogRun::TransferDataToWindow(void)
 		m_listCtrlTools->InsertColumn(2, _("Diameter"), wxLIST_FORMAT_RIGHT,
 				2 * w);
 
-		for(i = 0; i < project->run[selected].tools.GetCount(); i++){
+		for(i = 0; i < project->run[selected].machine.tools.GetCount(); i++){
 			m_listCtrlTools->InsertItem(i,
 					wxString::Format(_T("%i"),
-							project->run[selected].tools[i].slotNr));
+							project->run[selected].machine.tools[i].slotNr));
 			m_listCtrlTools->SetItem(i, 1,
-					project->run[selected].tools[i].toolName);
+					project->run[selected].machine.tools[i].toolName);
 			m_listCtrlTools->SetItem(i, 2,
 					settings->SmallDistance.TextFromSIWithUnit(
-							project->run[selected].tools[i].GetMaxDiameter(),
+							project->run[selected].machine.tools[i].GetMaxDiameter(),
 							1));
 		}
 	}else{
@@ -241,7 +241,7 @@ void DialogRun::OnToolRemove(wxCommandEvent& event)
 	commandProcessor->Submit(
 			new CommandRunToolRemove(
 					_(
-							"Removed tool ") + project->run[runNr].tools[index].toolName+_(" from run"),
+							"Removed tool ") + project->run[runNr].machine.tools[index].toolName+_(" from run"),
 					project, runNr, index));
 	TransferDataToWindow();
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESH3DVIEW);

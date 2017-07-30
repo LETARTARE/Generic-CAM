@@ -102,10 +102,12 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 		m_choiceTool->Clear();
 		m_choiceTool->Append(_T(""));
 		if(selectedRun >= 0){
-			for(int n = 0; n < project->run[selectedRun].tools.GetCount(); n++){
+			for(int n = 0;
+					n < project->run[selectedRun].machine.tools.GetCount();
+					n++){
 				m_choiceTool->Append(
 						wxString::Format(_T("T%u - "), n + 1)
-								+ project->run[selectedRun].tools[n].toolName);
+								+ project->run[selectedRun].machine.tools[n].toolName);
 			}
 		}
 
@@ -200,7 +202,7 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 			m_textCtrlInfo->SetValue(_T(""));
 		}
 
-		Tool * tool = &(project->run[selectedRun].tools[slotNr]);
+		Tool * tool = &(project->run[selectedRun].machine.tools[slotNr]);
 		if(tool != NULL){
 			m_textCtrlToolDiameter->SetValue(
 					settings->SmallDistance.TextFromSI(tool->GetMaxDiameter()));

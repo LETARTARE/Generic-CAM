@@ -75,20 +75,20 @@ void GeneratorTest::GenerateToolpath(void)
 	output.Empty();
 	const Run* const run = this->parent;
 	assert(run != NULL);
-	if(refTool >= run->tools.GetCount()){
+	if(refTool >= run->machine.tools.GetCount()){
 		output = _T("Tool empty.");
 		errorOccured = true;
 		return;
 	}
 	GeneratorDexel::GenerateToolpath();
-	const Tool* const tool = &(run->tools[refTool]);
+	const Tool* const tool = &(run->machine.tools[refTool]);
 
 	const double maxCutDepth = tool->GetCuttingDepth();
 
 	const double tolerance = 0.0001; // 1/10 mm
 
 	ToolPath tp;
-	MachinePosition m;
+	GCodeBlock m;
 
 	DexelTarget toolShape;
 	toolShape.SetupTool(*tool, target.GetSizeRX(), target.GetSizeRY());
@@ -104,10 +104,10 @@ void GeneratorTest::GenerateToolpath(void)
 	double level = temp.GetSizeZ(); // at upper surface
 
 	// Position at start (! not a toolpath position)
-	m.axisX = 0.0;
-	m.axisY = 0.0;
-	m.axisZ = temp.GetSizeZ() + freeHeight;
-	m.isCutting = false;
+	m.X = 0.0;
+	m.Y = 0.0;
+	m.Z = temp.GetSizeZ() + freeHeight;
+	m.Rapid();
 
 	ArrayOfPolygon25 pgs;
 	Polygon25 pg;
@@ -151,17 +151,17 @@ void GeneratorTest::GenerateToolpath(void)
 		for(size_t i = pgs.GetCount(); i > 0; i--){
 			if(pgs[i - 1].elements.GetCount() == 0) continue;
 
-			pgs[i - 1].RotatePolygonStart(m.axisX, m.axisY);
+			pgs[i - 1].RotatePolygonStart(m.X, m.Y);
 
 			if(!isMillUp){
-				const double d2 = (m.axisX - pgs[i - 1].elements[0].x)
-						* (m.axisX - pgs[i - 1].elements[0].x)
-						+ (m.axisY - pgs[i - 1].elements[0].y)
-								* (m.axisY - pgs[i - 1].elements[0].y);
+				const double d2 = (m.X - pgs[i - 1].elements[0].x)
+						* (m.X - pgs[i - 1].elements[0].x)
+						+ (m.Y - pgs[i - 1].elements[0].y)
+								* (m.Y - pgs[i - 1].elements[0].y);
 				if(d2 > (0.008 * 0.008)){
 					// Move tool out of material to travel to next polygon.
-					m.isCutting = false;
-					m.axisZ = temp.GetSizeZ() + freeHeight;
+					m.Rapid();
+					m.Z = temp.GetSizeZ() + freeHeight;
 					tp.positions.Add(m);
 					isMillUp = true;
 				}
@@ -169,20 +169,20 @@ void GeneratorTest::GenerateToolpath(void)
 
 			if(isMillUp){
 				// Move tool to next position
-				m.axisX = pgs[i - 1].elements[0].x;
-				m.axisY = pgs[i - 1].elements[0].y;
-				m.axisZ = temp.GetSizeZ() + freeHeight;
-				m.isCutting = false;
+				m.X = pgs[i - 1].elements[0].x;
+				m.Y = pgs[i - 1].elements[0].y;
+				m.Z = temp.GetSizeZ() + freeHeight;
+				m.Rapid();
 				tp.positions.Add(m);
 			}
-			// Add polyg.positions[i].axisX,on
-			m.isCutting = true;
+			// Add polyg.positions[i].X,on
+			m.FeedSpeed();
 			isMillUp = false;
 
 			for(size_t j = 0; j < pgs[i - 1].elements.GetCount(); j++){
-				m.axisX = pgs[i - 1].elements[j].x;
-				m.axisY = pgs[i - 1].elements[j].y;
-				m.axisZ = pgs[i - 1].elements[j].z;
+				m.X = pgs[i - 1].elements[j].x;
+				m.Y = pgs[i - 1].elements[j].y;
+				m.Z = pgs[i - 1].elements[j].z;
 				tp.positions.Add(m);
 			}
 		}
@@ -198,8 +198,8 @@ void GeneratorTest::GenerateToolpath(void)
 		}
 
 		// Move tool out of material
-		m.axisZ = temp.GetSizeZ() + freeHeight;
-		m.isCutting = false;
+		m.Z = temp.GetSizeZ() + freeHeight;
+		m.Rapid();
 		isMillUp = true;
 		tp.positions.Add(m);
 #ifdef _DEBUGMODE

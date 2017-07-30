@@ -192,10 +192,10 @@ bool DisplaySettings::GetConfigFrom(wxConfig * config)
 	rightEyeB = lval;
 
 	double dval;
-	config->Read(_T("Stereo3DEyeDistance"), &dval, 0.1);
-	eyeDistance = dval;
-	config->Read(_T("Stereo3DFocalDistance"), &dval, 0.50);
-	focalDistance = dval;
+	config->Read(_T("Stereo3DEyeDistance"), &dval, 100);
+	eyeDistance = dval / 1000.0;
+	config->Read(_T("Stereo3DFocalDistance"), &dval, 500);
+	focalDistance = dval / 1000.0;
 
 	return true;
 }
@@ -226,8 +226,8 @@ bool DisplaySettings::WriteConfigTo(wxConfig * config)
 	config->Write(_T("Stereo3DColorRightEyeRed"), (long) rightEyeR);
 	config->Write(_T("Stereo3DColorRightEyeGreen"), (long) rightEyeG);
 	config->Write(_T("Stereo3DColorRightEyeBlue"), (long) rightEyeB);
-	config->Write(_T("Stereo3DEyeDistance"), (double) eyeDistance);
-	config->Write(_T("Stereo3DFocalDistance"), (double) focalDistance);
+	config->Write(_T("Stereo3DEyeDistance"), (double) eyeDistance * 1000.0);
+	config->Write(_T("Stereo3DFocalDistance"), (double) focalDistance * 1000.0);
 
 	return true;
 }

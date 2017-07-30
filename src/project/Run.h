@@ -43,6 +43,7 @@
 #include "FlipDrillPattern.h"
 #include "Workpiece.h"
 #include "machine/Machine.h"
+#include "machine/MachineSimulator.h"
 
 #include "../3D/Geometry.h"
 #include "../3D/OpenGLImage.h"
@@ -66,29 +67,25 @@ public:
 
 	// Member variables
 public:
-	Project * parent; ///< Pointer back to the Project this Run belongs to.
 	wxString name;
-
+	Project * parent; ///< Pointer back to the Project this Run belongs to.
 	int prevRun; ///< Link to the previous Run
-	int refWorkpiece; ///< Workpiece reference
 
 	Machine machine; ///< Machine used in this run
-	ArrayOfTool tools; ///< Tool%s in the Machine
 	ArrayOfGeneratorPointer generators; ///< List of Generator%s applied to the workpiece in this run
+	MachineSimulator simulator; ///< Simulator
 
+	int refWorkpiece; ///< Workpiece reference
 	AffineTransformMatrix workpiecePlacement; //!< For flipping the workpiece to machine the other sides.
+
 	FlipDrillPattern pattern; //!< Experimental: FlipDrillPattern
 
-	float touchoffHeight; ///< Flag to set the position of the touchoff. This can be below the workpiece or at the top of it. Not to be neglected or the machine-bed will get a scar.
+	float touchoffHeight; ///< Level of the touchoff. This can be below the workpiece or at the top of it. Not to be neglected or the machine-bed will get a scar.
 
 	bool selected; ///< Flag if this run is selected.
 private:
-	int selectedTool;
+//	int selectedTool;
 	OpenGLImage touchpoint;
-
-//	bool modified;
-//	int workpieceNr;
-//	ArrayOfToolPath toolpaths;
 
 private:
 	mutable GLuint textureID;
@@ -99,10 +96,10 @@ public:
 	void Update(void);
 
 	void GenerateToolpaths(void);
-	bool SaveToolpaths(wxFileName fileName);
+	bool SaveToolpaths(wxFileName fileName, ToolPath::Dialect dialect);
 
 	Vector3 GetCenter(void) const;
-	void Paint(void) const;
+	void Paint(bool showAnimation = false) const;
 
 	void ToStream(wxTextOutputStream & stream);
 	bool FromStream(wxTextInputStream & stream, int runNr, Project * project);
@@ -112,7 +109,7 @@ public:
 private:
 	Workpiece* GetWorkpiece(void);
 	const Workpiece* GetWorkpiece(void) const;
-
+	ToolPath* GetSelectedToolpath(void);
 };
 WX_DECLARE_OBJARRAY(Run, ArrayOfRun);
 

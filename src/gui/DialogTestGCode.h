@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ProtoToolpath.h
-// Purpose            :
-// Thread Safe        : No
+// Name               : DialogTestGCode.h
+// Purpose            : 
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
-// Author             : tobiassch
-// Created            : 03.01.2017
+// Author             : Tobias Schaefer
+// Created            : 12.07.2017
 // Copyright          : (C) 2017 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,29 +24,24 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef PROTOTOOLPATH_H_
-#define PROTOTOOLPATH_H_
+#ifndef DIALOGTESTGCODE_H_
+#define DIALOGTESTGCODE_H_
 
-/*!\class ProtoToolpath
- * \brief Polygon-loop with additional information
- *
- * Toolpaths are generated in the wrong order. This class contains the
- * sections of a toolpath for later sorting and joining.
- */
+#include "../StdInclude.h"
+#include "../project/machine/GCodeBlock.h"
+#include "gui.h"
 
-#include "../../3D/Polygon25.h"
-
-class ProtoToolpath:public Polygon25 {
+class DialogTestGCode:public GUITestGCode {
 public:
-	ProtoToolpath();
-	virtual ~ProtoToolpath();
+	DialogTestGCode(wxWindow* parent, DisplaySettings* settings);
+	virtual ~DialogTestGCode();
 
-public:
-	int parent;
-	int child;
-	int next;
+	bool TransferDataToWindow(void);
 
-	int level;
+	void OnText(wxCommandEvent& event);
+	void OnClear(wxCommandEvent& event);
+
+	DisplaySettings* settings;
 };
 
-#endif /* PROTOTOOLPATH_H_ */
+#endif /* DIALOGTESTGCODE_H_ */

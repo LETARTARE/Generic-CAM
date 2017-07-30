@@ -46,7 +46,7 @@
  *
  */
 
-#include "machine/MachinePosition.h"
+#include "machine/GCodeBlock.h"
 #include "../3D/AffineTransformMatrix.h"
 #include "../3D/Vector3.h"
 
@@ -65,12 +65,20 @@ public:
 	ToolPath(const ToolPath & other);
 	virtual ~ToolPath();
 
+	static ToolPath SafetyBlock(void);
+	static ToolPath EndBlock(void);
+
 	// Member variables
 public:
 
-	ArrayOfMachinePosition positions;
-	MachinePosition minPosition;
-	MachinePosition maxPosition;
+	enum Dialect {
+		RS274NGC, //!< "The NIST RS274NGC Interpreter - Version 3" (NISTIR 6556, August 17, 2000)
+		FanucM //!< Dialect of the Fanuc-M milling simulator
+	};
+
+	ArrayOfGCodeBlock positions;
+	GCodeBlock minPosition;
+	GCodeBlock maxPosition;
 
 	Vector3 colorMoving;
 	Vector3 colorCutting;
@@ -88,7 +96,9 @@ public:
 	bool IsEmpty(void) const;
 	void ApplyTransformation(const AffineTransformMatrix &matrix);
 	void Paint(void) const;
-	void CleanPath(double tolerance = 0.0002);
+	void Translate(Dialect target);
+	void CleanPath(const double tolerance = 0.0002);
+	void DiffPath(const double tolerance = 0.0002);
 	bool WriteToFile(wxTextFile &f);
 	bool ReadGCodeFile(wxFileName fileName);
 	void CalculateMinMaxValues(void);
