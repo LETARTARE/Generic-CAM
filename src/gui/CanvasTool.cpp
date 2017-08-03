@@ -25,13 +25,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "CanvasTool.h"
+#include "../Config.h"
 
 CanvasTool::CanvasTool(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 		const wxSize& size, long style, const wxString& name) :
 		OpenGLCanvas(parent, id, pos, size, style, name)
 {
 	tool = NULL;
-
 }
 
 CanvasTool::~CanvasTool()
@@ -41,6 +41,15 @@ CanvasTool::~CanvasTool()
 void CanvasTool::InsertTool(Tool& t)
 {
 	tool = &t;
+#ifdef _DEBUGMODE
+	if(tool != NULL){
+		debug.SetupTool(*tool, 0.0001, 0.0001);
+		debug.NegateZ();
+		debug.displayField = true;
+	}else{
+		debug.displayField = false;
+	}
+#endif
 }
 
 void CanvasTool::RenderCoordinateSystem(void)
@@ -72,17 +81,31 @@ void CanvasTool::Render()
 {
 	float scaleFactor = 10.0;
 	RenderCoordinateSystem();
+
 //#if defined (__WIN32__)
 //	::glEnable(GL_NORMALIZE);
 //#else
 //	::glEnable( GL_RESCALE_NORMAL);
 //#endif
+
 	::glScalef(scaleFactor, scaleFactor, scaleFactor);
 	::glColor3f(0.7, 0.7, 0.7);
-	if(tool != NULL) tool->Paint();
+
+	if(tool != NULL){
+		tool->Paint();
+		if(debug.displayField){
+			glPushMatrix();
+			glTranslatef(0.01 + tool->GetMaxDiameter(), -debug.GetSizeY() / 2,
+					tool->GetPositiveLength());
+			debug.Paint();
+			glPopMatrix();
+		}
+	}
+
 //#if defined (__WIN32__)
 //	::glDisable(GL_NORMALIZE);
 //#else
 //	::glDisable(GL_RESCALE_NORMAL);
 //#endif
+
 }

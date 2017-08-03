@@ -439,9 +439,8 @@ void GeneratorFast::GenerateToolpath(void)
 
 //	for(size_t i = 0; i < tp.positions.GetCount(); i++)
 //		tp.positions[i].Z -= temp.GetSizeZ();
-
+	tp.FlagAll(true, true, true);
 	toolpath = tp;
-	target.Refresh();
 	return;
 	//
 	//	double level = temp.GetSizeZ() - 0.0005;

@@ -36,6 +36,10 @@ WX_DEFINE_OBJARRAY(ArrayOfGCodeBlock)
 
 GCodeBlock::GCodeBlock(wxString block, double conversionFactor)
 {
+	tStart = 0.0;
+	duration = 0.0;
+	length = 0.0;
+
 	this->conversionFactor = conversionFactor;
 	A = 0.0;
 	B = 0.0;
@@ -446,20 +450,13 @@ wxString GCodeBlock::GetCode(void) const
 {
 	wxString temp;
 
-	if(T >= 0) temp += wxString::Format(_T(" T%u"), T);
-	if(S >= -FLT_EPSILON) temp += wxString::Format(_T(" S%g"), S * 60);
-
 	for(uint_fast8_t n = 0; n < maxMModes; ++n){
 		if(M[n] < 0) continue;
 		temp += wxString::Format(_T(" M%u"), M[n]);
 	}
 
-	if(D >= 0) temp += wxString::Format(_T(" D%u"), D);
-	if(H >= 0) temp += wxString::Format(_T(" H%u"), H);
-	if(L >= 0) temp += wxString::Format(_T(" L%u"), L);
-
-	if(F >= -FLT_EPSILON) temp += wxString::Format(_T(" F%g"),
-			F * 60.0 / conversionFactor);
+	if(T >= 0) temp += wxString::Format(_T(" T%u"), T);
+	if(S >= -FLT_EPSILON) temp += wxString::Format(_T(" S%g"), S * 60);
 
 	for(uint_fast8_t n = 0; n < maxGModes; ++n){
 		if(G[n] < 0) continue;
@@ -471,6 +468,21 @@ wxString GCodeBlock::GetCode(void) const
 			temp += wxString::Format(_T(" G%u.%u"), gmaj, gmin);
 		}
 	}
+
+	if(D >= 0) temp += wxString::Format(_T(" D%u"), D);
+	if(H >= 0) temp += wxString::Format(_T(" H%u"), H);
+	if(L >= 0) temp += wxString::Format(_T(" L%u"), L);
+
+	if(RFlag){
+		temp += wxString::Format(_T(" R%g"), R / conversionFactor);
+	}
+
+	if(P >= -FLT_EPSILON) temp += wxString::Format(_T(" P%g"), P);
+	if(Q >= -FLT_EPSILON) temp += wxString::Format(_T(" Q%g"),
+			Q / conversionFactor);
+
+	if(F >= -FLT_EPSILON) temp += wxString::Format(_T(" F%g"),
+			F * 60.0 / conversionFactor);
 
 	if(XFlag){
 		temp += wxString::Format(_T(" X%g"), X / conversionFactor);
@@ -508,15 +520,12 @@ wxString GCodeBlock::GetCode(void) const
 	if(KFlag){
 		temp += wxString::Format(_T(" K%g"), K / conversionFactor);
 	}
-	if(RFlag){
-		temp += wxString::Format(_T(" R%g"), R / conversionFactor);
-	}
 
-	if(P >= -FLT_EPSILON) temp += wxString::Format(_T(" P%g"), P);
-	if(Q >= -FLT_EPSILON) temp += wxString::Format(_T(" Q%g"),
-			Q / conversionFactor);
+	// Convert , to . on every machine.
+	for(size_t n = 0; n < temp.Length(); n++)
+		if(temp[n] == ',') temp[n] = '.';
 
-	if(N >= 0) temp = wxString::Format(_T(" N%u"), N) + temp;
+	if(N >= 0) temp = wxString::Format(_T(" N%05u"), N) + temp;
 	if(block_delete) temp = _T("/") + temp;
 	if(!Comment.empty()){
 		if(message){
@@ -601,7 +610,6 @@ static const int Mindex[120] =
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, 4, 4, 10, 10, 10, 10, 10, 10,
 			10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10};
 
-//TODO: Make error messages translatable.
 void GCodeBlock::Update(char key, bool negative, int numberI, double numberD)
 {
 	if(negative){
@@ -818,6 +826,138 @@ void GCodeBlock::Update(char key, bool negative, int numberI, double numberD)
 	}
 }
 
+int GCodeBlock::Motion(void) const
+{
+	if(G[1] >= 0) return G[1] / 10;
+	return -1;
+}
+
+bool GCodeBlock::IsStateChange(void) const
+{
+	for(uint_fast8_t n = 2; n < maxGModes; n++)
+		if(G[n] >= 0) return false;
+	for(uint_fast8_t n = 0; n < maxMModes; n++)
+		if(M[n] >= 0) return false;
+
+	if(XFlag || YFlag || ZFlag) return false;
+	if(F >= 0) return false;
+	if(S >= 0) return false;
+	if(T >= 0) return false;
+
+	return true;
+
+}
+
+bool GCodeBlock::IsMotion(void) const
+{
+	const uint_fast8_t c = G[1] / 10;
+	if(c >= 0 && c <= 3) return true;
+	if(c >= 80 && c <= 89) return true;
+	return false;
+}
+
+bool GCodeBlock::IsLinearMotion(void) const
+{
+	if(G[1] == 0) return true;
+	if(G[1] == 10) return true;
+	return false;
+}
+
+bool GCodeBlock::IsPureLinearMotion(void) const
+{
+	if(G[1] != 0 && G[1] != 10) return false;
+	if(G[0] >= 0) return false;
+	for(uint_fast8_t n = 2; n < maxGModes; n++)
+		if(G[n] >= 0) return false;
+	for(uint_fast8_t n = 0; n < maxMModes; n++)
+		if(M[n] >= 0) return false;
+	if(AFlag || BFlag || CFlag) return false;
+	if(UFlag || VFlag || WFlag) return false;
+	if(IFlag || JFlag || KFlag) return false;
+	if(RFlag) return false;
+	if(message) return false;
+	if(D >= 0 || F >= 0.0 || H >= 0.0) return false;
+	if(L >= 0 || P >= 0.0 || Q >= 0.0) return false;
+	if(S >= 0 || T >= 0.0) return false;
+	return true;
+}
+
+//TODO: Make error messages translatable.
+bool GCodeBlock::IsCutting(void) const
+{
+	return G[1] > 0; // neither empty nor rapid motion selected
+}
+
+void GCodeBlock::CopySelective(const GCodeBlock& other)
+{
+	if(other.AFlag){
+		A = other.A;
+		AFlag = true;
+	}
+	if(other.BFlag){
+		B = other.B;
+		BFlag = true;
+	}
+	if(other.CFlag){
+		C = other.C;
+		CFlag = true;
+	}
+	if(other.message) Comment = other.Comment;
+	if(other.D >= 0) D = other.D;
+	if(other.F >= 0) F = other.F;
+	for(uint_fast8_t n = 0; n < maxGModes; ++n)
+		if(other.G[n] >= 0) G[n] = other.G[n];
+	if(other.H >= 0) H = other.H;
+	if(other.IFlag){
+		I = other.I;
+		IFlag = true;
+	}
+	if(other.JFlag){
+		J = other.J;
+		JFlag = true;
+	}
+	if(other.KFlag){
+		K = other.K;
+		KFlag = true;
+	}
+	if(other.L >= 0) L = other.L;
+	for(uint_fast8_t n = 0; n < maxMModes; ++n)
+		if(other.M[n] >= 0) M[n] = other.M[n];
+	N = other.N;
+	if(other.P >= 0) P = other.P;
+	if(other.Q >= 0) Q = other.Q;
+	if(other.RFlag){
+		R = other.R;
+		RFlag = true;
+	}
+	if(other.S >= 0) S = other.S;
+	if(other.T >= 0) T = other.T;
+	if(other.UFlag){
+		U = other.U;
+		UFlag = true;
+	}
+	if(other.VFlag){
+		V = other.V;
+		VFlag = true;
+	}
+	if(other.WFlag){
+		W = other.W;
+		WFlag = true;
+	}
+	if(other.XFlag){
+		X = other.X;
+		XFlag = true;
+	}
+	if(other.YFlag){
+		Y = other.Y;
+		YFlag = true;
+	}
+	if(other.ZFlag){
+		Z = other.Z;
+		ZFlag = true;
+	}
+}
+
 void GCodeBlock::ClearGM(void)
 {
 	for(uint_fast8_t n = 0; n < maxGModes; ++n)
@@ -868,13 +1008,3 @@ void GCodeBlock::ArcCCW(void)
 	SetG(3);
 }
 
-bool GCodeBlock::IsCutting(void) const
-{
-	return G[1] > 0; // neither empty nor rapid motion selected
-}
-
-int GCodeBlock::Motion(void) const
-{
-	if(G[1] >= 0) return G[1] / 10;
-	return -1;
-}

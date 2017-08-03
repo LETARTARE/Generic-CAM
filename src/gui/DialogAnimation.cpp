@@ -26,46 +26,130 @@
 
 #include "DialogAnimation.h"
 
+#include <math.h>
+
 #include "IDs.h"
 
 DialogAnimation::DialogAnimation(wxWindow* parent, Project *project) :
 		GUIAnimation(parent)
 {
 	this->project = project;
+	this->run = NULL;
+	this->simulator = NULL;
+	loopGuard = false;
+
+	timer.SetOwner(this);
+	this->Connect(wxEVT_TIMER, wxTimerEventHandler(DialogAnimation::OnTimer),
+	NULL, this);
 }
 
 DialogAnimation::~DialogAnimation()
 {
-	return;
+	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(DialogAnimation::OnTimer),
+	NULL, this);
 }
 
 int DialogAnimation::GetSelectedRun(void)
 {
 	if(project == NULL) return -1;
-	int selected = -1;
-	for(size_t i = 0; i < project->run.GetCount(); i++){
-		if(selected == -1 && project->run[i].selected) selected = i;
-	}
-	return selected;
+	return project->GetFirstSelectedRun();
 }
 
+void DialogAnimation::InitSimulation(void)
+{
+	int runNr = GetSelectedRun();
+	if(runNr >= 0){
+		run = &(project->run[runNr]);
+		simulator = &(run->simulator);
+		simulator->InsertMachine(&(run->machine));
+		simulator->InsertWorkpiece(run->GetWorkpiece());
+		simulator->InsertToolPath(run->GetFirstSelectedToolpath());
+		simulator->InitSimulation(1e5);
+	}else{
+		run = NULL;
+		if(simulator != NULL){
+			simulator->InsertMachine(NULL);
+			simulator->InsertWorkpiece(NULL);
+			simulator->InsertToolPath(NULL);
+		}
+		simulator = NULL;
+	}
+}
 bool DialogAnimation::TransferDataToWindow(void)
 {
-
-	int selected = -1;
+	if(loopGuard) return false;
 	m_choiceToolpath->Clear();
 	m_choiceToolpath->Append(_T(""));
 
-	for(size_t i = 0; i < project->run.GetCount(); i++){
-		m_choiceToolpath->Append(project->run[i].name);
-		if(selected == -1 && project->run[i].selected) selected = i;
+	int selected = -1;
+	if(project != NULL){
+		for(size_t i = 0; i < project->run.GetCount(); i++){
+			m_choiceToolpath->Append(project->run[i].name);
+			if(selected == -1 && project->run[i].selected) selected = i;
+		}
+		m_choiceToolpath->SetSelection(selected + 1);
+	}else{
+		m_choiceToolpath->Append(_T("No run found."));
+		m_choiceToolpath->SetSelection(0);
 	}
-	m_choiceToolpath->SetSelection(selected + 1);
 
-	return true;
-}
-bool DialogAnimation::TransferDataFromWindow(void)
-{
+	if(this->IsShown()){
+		InitSimulation();
+	}
+
+	loopGuard = true;
+	if(simulator != NULL && simulator->toolpath != NULL){
+		m_textCtrlMaxTime->SetValue(
+				SecondsToTC(simulator->toolpath->MaxTime()));
+		m_textCtrlTime->SetValue(SecondsToTC(simulator->tStep));
+
+		if(simulator->step >= 2){
+			m_textCtrl0->SetValue(
+					simulator->toolpath->positions[(simulator->step) - 2].GetCode());
+		}else{
+			m_textCtrl0->SetValue(_T(""));
+		}
+		if(simulator->step >= 1){
+			m_textCtrl1->SetValue(
+					simulator->toolpath->positions[(simulator->step) - 1].GetCode());
+		}else{
+			m_textCtrl1->SetValue(_T(""));
+		}
+		if(simulator->step < simulator->toolpath->positions.GetCount()){
+			m_textCtrl2->SetValue(
+					simulator->toolpath->positions[(simulator->step)].GetCode());
+		}else{
+			m_textCtrl2->SetValue(_T(""));
+		}
+		if((simulator->step + 1) < simulator->toolpath->positions.GetCount()){
+			m_textCtrl3->SetValue(
+					simulator->toolpath->positions[(simulator->step + 1)].GetCode());
+		}else{
+			m_textCtrl3->SetValue(_T(""));
+		}
+		if((simulator->step + 2) < simulator->toolpath->positions.GetCount()){
+			m_textCtrl4->SetValue(
+					simulator->toolpath->positions[(simulator->step + 2)].GetCode());
+		}else{
+			m_textCtrl4->SetValue(_T(""));
+		}
+	}else{
+		m_textCtrlMaxTime->SetValue(SecondsToTC(0));
+		m_textCtrlTime->SetValue(SecondsToTC(0));
+
+		m_textCtrl0->SetValue(_T(""));
+		m_textCtrl1->SetValue(_T(""));
+		m_textCtrl2->SetValue(_T(""));
+		m_textCtrl3->SetValue(_T(""));
+		m_textCtrl4->SetValue(_T(""));
+	}
+
+	wxCommandEvent refreshEvent(wxEVT_COMMAND_MENU_SELECTED,
+	ID_UPDATESIMULATION);
+	ProcessEvent(refreshEvent);
+
+	loopGuard = false;
+
 	return true;
 }
 
@@ -78,27 +162,29 @@ void DialogAnimation::OnXClose(wxCloseEvent &event)
 
 void DialogAnimation::OnSelectToolpath(wxCommandEvent& event)
 {
+//	InitSimulation();
+	TransferDataToWindow();
 }
 
 void DialogAnimation::OnChangeTime(wxCommandEvent& event)
 {
+
+	PositionSlider();
+	TransferDataToWindow();
 }
 
 void DialogAnimation::OnScroll(wxScrollEvent& event)
 {
-	if(project == NULL) return;
+	if(loopGuard) return;
+	if(simulator == NULL) return;
+	if(simulator->toolpath == NULL) return;
 
-	const int runNr = GetSelectedRun();
-	if(runNr < 0 || runNr >= project->run.GetCount()) return;
-	const Run * const run = &(project->run[runNr]);
+	double target = simulator->toolpath->MaxTime()
+			/ (double) (m_sliderTime->GetMax() - m_sliderTime->GetMin())
+			* (double) (event.GetPosition() - m_sliderTime->GetMin());
 
-	const int workpieceNr = run->refWorkpiece;
-	if(workpieceNr < 0 || workpieceNr >= project->workpieces.GetCount()) return;
-	Workpiece * const workpiece = &(project->workpieces[workpieceNr]);
-
-	const int generatorNr = 0;
-	if(generatorNr < 0 || generatorNr >= run->generators.GetCount()) return;
-	const Generator * const generator = run->generators[generatorNr];
+	simulator->Step(target);
+	TransferDataToWindow();
 
 //	const int toolNr = generator->refTool;
 //	if(toolNr < 0 || toolNr >= run->tools.GetCount()) return;
@@ -107,27 +193,88 @@ void DialogAnimation::OnScroll(wxScrollEvent& event)
 //	workpiece->InitSimulation(1000000);
 //	workpiece->simulation.Simulate(generator->toolpath, *tool);
 
-	wxCommandEvent refreshEvent(wxEVT_COMMAND_MENU_SELECTED,
-			ID_UPDATESIMULATION);
-	ProcessEvent(refreshEvent);
 }
 
 void DialogAnimation::OnFirst(wxCommandEvent& event)
 {
+	if(simulator == NULL) return;
+	simulator->Step(0);
+	PositionSlider();
+	TransferDataToWindow();
 }
 
 void DialogAnimation::OnPrev(wxCommandEvent& event)
 {
+	if(simulator == NULL) return;
+	simulator->Previous();
+	PositionSlider();
+	TransferDataToWindow();
 }
 
 void DialogAnimation::OnPlayStop(wxCommandEvent& event)
 {
+	if(simulator == NULL) return;
+	if(!timer.IsRunning()){
+		timer.Start(100);
+	}else{
+		timer.Stop();
+	}
+	PositionSlider();
+	TransferDataToWindow();
 }
 
 void DialogAnimation::OnNext(wxCommandEvent& event)
 {
+	if(simulator == NULL) return;
+	simulator->Next();
+	PositionSlider();
+	TransferDataToWindow();
 }
 
 void DialogAnimation::OnLast(wxCommandEvent& event)
 {
+	if(simulator == NULL) return;
+	if(simulator->toolpath == NULL) return;
+	simulator->Last();
+	PositionSlider();
+	TransferDataToWindow();
+}
+
+void DialogAnimation::PositionSlider(void)
+{
+	if(loopGuard) return;
+	loopGuard = true;
+	if(simulator != NULL && simulator->toolpath != NULL){
+		m_sliderTime->SetValue(
+				((double) (m_sliderTime->GetMax() - m_sliderTime->GetMin())
+						/ simulator->toolpath->MaxTime() * simulator->tStep)
+						+ m_sliderTime->GetMin());
+		m_sliderTime->Enable(true);
+	}else{
+		m_sliderTime->SetValue(m_sliderTime->GetMin());
+		m_sliderTime->Enable(false);
+	}
+	loopGuard = false;
+}
+
+void DialogAnimation::OnTimer(wxTimerEvent& event)
+{
+	if(!this->IsShown()) timer.Stop();
+	if(loopGuard) return;
+	if(simulator == NULL) return;
+	if(simulator->toolpath == NULL) return;
+	double target = simulator->tStep + 0.5;
+	if(target >= simulator->toolpath->MaxTime()){
+		timer.Stop();
+		target = simulator->toolpath->MaxTime();
+	}
+	simulator->Step(target);
+	PositionSlider();
+	TransferDataToWindow();
+}
+
+wxString DialogAnimation::SecondsToTC(const double t)
+{
+	return wxString::Format(_T("%02i:%02i:%02i"), (int) floor(t / 3600.0),
+			((int) floor(t / 60.0)) % 60, ((int) floor(t)) % 60);
 }

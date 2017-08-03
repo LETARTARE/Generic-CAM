@@ -99,9 +99,13 @@ public:
 	void Translate(Dialect target);
 	void CleanPath(const double tolerance = 0.0002);
 	void DiffPath(const double tolerance = 0.0002);
+	void FlagAll(bool XYZ = true, bool IJK = false, bool R = false, bool ABC =
+			false, bool UVW = false);
 	bool WriteToFile(wxTextFile &f);
 	bool ReadGCodeFile(wxFileName fileName);
 	void CalculateMinMaxValues(void);
+	double MaxTime(void) const;
+
 };
 
 #endif /* TOOLPATH_H_ */

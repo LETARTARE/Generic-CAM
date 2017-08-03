@@ -26,30 +26,19 @@
 
 #include "MachineSimulator.h"
 
+#include <float.h>
+
 #include <wx/textfile.h>
 
 MachineSimulator::MachineSimulator()
 {
+	initialized = false;
 	tStep = 0;
 	step = 0;
-
-//	position.reserve(100);
-//	position.push_back(MachinePosition(0.1, 0.1, -0.0));
-//	position.push_back(MachinePosition(0.1, 0.1, -0.1));
-//	position.push_back(MachinePosition(0.1, 0.1, -0.0));
-//	position.push_back(MachinePosition(0.1, 0.2, -0.0));
-//	position.push_back(MachinePosition(0.2, 0.2, -0.0));
-//	position.push_back(MachinePosition(0.1, 0.1, -0.0));
-
-	AffineTransformMatrix a, b;
-
-	a.TranslateGlobal(-0.05, 0, 0);
-	b.TranslateGlobal(+0.05, 0.1, 0);
 
 	machine = NULL;
 	workpiece = NULL;
 	toolpath = NULL;
-
 }
 
 MachineSimulator::~MachineSimulator()
@@ -58,40 +47,112 @@ MachineSimulator::~MachineSimulator()
 
 void MachineSimulator::InsertWorkpiece(Workpiece* workpiece)
 {
+	if(this->workpiece == workpiece && workpiece != NULL) return;
 	this->workpiece = workpiece;
+	initialized = false;
 }
 
 void MachineSimulator::InsertToolPath(ToolPath* toolpath)
 {
+	if(this->toolpath == toolpath && toolpath != NULL) return;
 	this->toolpath = toolpath;
+	initialized = false;
 }
 
 void MachineSimulator::InsertMachine(Machine* machine)
 {
+	if(this->machine == machine && machine != NULL) return;
 	this->machine = machine;
+	initialized = false;
+}
+
+void MachineSimulator::InitSimulation(size_t maxCells)
+{
+	if(workpiece == NULL) return;
+	const double area = workpiece->GetSizeX() * workpiece->GetSizeY();
+	const double L = sqrt(area / (double) maxCells);
+	size_t nx = floor(workpiece->GetSizeX() / L);
+	size_t ny = floor(workpiece->GetSizeY() / L);
+	if(nx == 0 || ny == 0) return;
+	if(nx != simulation.GetXCount() || ny != simulation.GetYCount()) initialized =
+			false;
+
+	if(!initialized){
+		const double dx = workpiece->GetSizeX() / (double) nx;
+		const double dy = workpiece->GetSizeY() / (double) ny;
+		simulation.SetupBox(workpiece->GetSizeX(), workpiece->GetSizeY(),
+				workpiece->GetSizeZ(), dx, dy);
+		if(machine != NULL && toolpath != NULL){
+			machine->Reset();
+			offset = machine->workpiecePosition.GetCenter()
+					- machine->toolPosition.GetCenter();
+			offset.z += machine->toolLength;
+			machine->DryRunToolPath(toolpath);
+		}
+		tStep = 0;
+		step = 0;
+		initialized = true;
+	}
+	simulation.displayBox = true;
 }
 
 void MachineSimulator::Reset(void)
 {
+	if(!initialized) return;
+	const double dx = simulation.GetSizeRX();
+	const double dy = simulation.GetSizeRY();
+	simulation.SetupBox(workpiece->GetSizeX(), workpiece->GetSizeY(),
+			workpiece->GetSizeZ(), dx, dy);
+	tStep = 0;
 	step = 0;
+	if(machine != NULL){
+		machine->Reset();
+		offset = machine->workpiecePosition.GetCenter()
+				- machine->toolPosition.GetCenter();
+		offset.z += machine->toolLength;
+		if(toolpath != NULL && !toolpath->positions.IsEmpty()){
+			machine->ProcessGCode(toolpath->positions[0]);
+		}
+	}
 }
 
-void MachineSimulator::Rewind(void)
+void MachineSimulator::Previous(void)
 {
+	if(toolpath == NULL) return;
+	if(step > 1) Step(toolpath->positions[step - 1].tStart + FLT_EPSILON);
 }
 
 void MachineSimulator::Step(float tTarget)
 {
+	if(!initialized) return;
+	if(machine == NULL) return;
+	if(toolpath == NULL) return;
+
 	if(tTarget < tStep){
-		tStep = 0;
-		step = 0;
+		Reset();
 	}
 
-//	while(step + 1 < position.size()
-//			&& tTarget > tStep + position[step].duration){
-//		tStep += position[step].duration;
-//		step++;
-//	}
+	Polygon3 temp;
+	temp.InsertPoint(machine->position.X - offset.x,
+			machine->position.Y - offset.y, machine->position.Z - offset.z);
+	while(step + 1 < toolpath->positions.GetCount() && tTarget > tStep){
+		step++;
+		tStep = toolpath->positions[step].tStart
+				+ toolpath->positions[step].duration;
+		machine->ProcessGCode(toolpath->positions[step]);
+		temp.InsertPoint(machine->position.X - offset.x,
+				machine->position.Y - offset.y, machine->position.Z - offset.z);
+	}
+	machine->Assemble();
+
+	if(machine->toolSlot > 0){
+		const Tool* tool = &(machine->tools[machine->toolSlot - 1]);
+		DexelTarget dex;
+		dex.SetupTool(*tool, simulation.GetSizeRX(), simulation.GetSizeRY());
+//		dex.MirrorZ();
+//		dex.NegateZ();
+		simulation.PolygonCutInTarget(temp, dex);
+	}
 
 //	if(step + 1 == position.size()){
 //		machine->position = position[step];
@@ -102,32 +163,26 @@ void MachineSimulator::Step(float tTarget)
 //	}
 }
 
-void MachineSimulator::FForward(void)
+void MachineSimulator::Next(void)
 {
+	if(toolpath == NULL) return;
+	if(step + 1 < toolpath->positions.GetCount()) Step(
+			toolpath->positions[step + 1].tStart + FLT_EPSILON);
 }
 
-void MachineSimulator::InitSimulation(size_t maxCells)
+void MachineSimulator::Last(void)
 {
-	const double area = workpiece->GetSizeX() * workpiece->GetSizeY();
-	const double L = sqrt(area / (double) maxCells);
-	size_t nx = floor(workpiece->GetSizeX() / L);
-	size_t ny = floor(workpiece->GetSizeY() / L);
-	if(nx == 0 || ny == 0) return;
-	const double dx = workpiece->GetSizeX() / (double) nx;
-	const double dy = workpiece->GetSizeY() / (double) ny;
-	simulation.SetupBox(workpiece->GetSizeX(), workpiece->GetSizeY(),
-			workpiece->GetSizeZ(), dx, dy);
-	simulation.displayBox = true;
-}
-
-bool MachineSimulator::ReadGCodeFile(wxFileName fileName)
-{
-	return false;
+	if(toolpath == NULL) return;
+	Step(toolpath->MaxTime() - FLT_EPSILON);
 }
 
 void MachineSimulator::Paint(void) const
 {
+	if(!initialized) return;
 	if(workpiece == NULL) return;
+//	if(machine == NULL) return;
+//	if(toolpath == NULL) return;
+
 	glPushMatrix();
 	glMultMatrixd(workpiece->matrix.a);
 	simulation.Paint();

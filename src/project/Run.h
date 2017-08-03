@@ -106,10 +106,10 @@ public:
 
 	void ToolpathToStream(wxTextOutputStream & stream);
 
-private:
 	Workpiece* GetWorkpiece(void);
 	const Workpiece* GetWorkpiece(void) const;
-	ToolPath* GetSelectedToolpath(void);
+	ToolPath* GetFirstSelectedToolpath(void);
+	const ToolPath* GetFirstSelectedToolpath(void) const;
 };
 WX_DECLARE_OBJARRAY(Run, ArrayOfRun);
 

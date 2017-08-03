@@ -88,7 +88,6 @@ void GeneratorTest::GenerateToolpath(void)
 	const double tolerance = 0.0001; // 1/10 mm
 
 	ToolPath tp;
-	GCodeBlock m;
 
 	DexelTarget toolShape;
 	toolShape.SetupTool(*tool, target.GetSizeRX(), target.GetSizeRY());
@@ -103,11 +102,12 @@ void GeneratorTest::GenerateToolpath(void)
 	temp.InvertTop();
 	double level = temp.GetSizeZ(); // at upper surface
 
-	// Position at start (! not a toolpath position)
+	GCodeBlock m;
 	m.X = 0.0;
 	m.Y = 0.0;
 	m.Z = temp.GetSizeZ() + freeHeight;
 	m.Rapid();
+
 
 	ArrayOfPolygon25 pgs;
 	Polygon25 pg;
@@ -208,5 +208,6 @@ void GeneratorTest::GenerateToolpath(void)
 #endif
 	}
 //	debug = temp;
+	tp.FlagAll(true);
 	toolpath = tp;
 }

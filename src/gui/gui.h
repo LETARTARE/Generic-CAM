@@ -890,6 +890,11 @@ class GUIAnimation : public wxFrame
 	protected:
 		wxStaticText* m_staticText70;
 		wxChoice* m_choiceToolpath;
+		wxTextCtrl* m_textCtrl0;
+		wxTextCtrl* m_textCtrl1;
+		wxTextCtrl* m_textCtrl2;
+		wxTextCtrl* m_textCtrl3;
+		wxTextCtrl* m_textCtrl4;
 		wxStaticText* m_staticText71;
 		wxTextCtrl* m_textCtrlTime;
 		wxStaticText* m_staticText72;
@@ -915,7 +920,7 @@ class GUIAnimation : public wxFrame
 	
 	public:
 		
-		GUIAnimation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolpath Animation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 478,187 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
+		GUIAnimation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolpath Animation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 488,332 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
 		~GUIAnimation();
 	
 };

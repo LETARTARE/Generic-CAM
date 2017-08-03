@@ -72,7 +72,7 @@ private:
 	bool GetSelection(void);
 	void SetSelection(bool selection = true);
 
-	bool prohibitVariableUpdate; ///< Cancel update loops. Tree updates variable updates tree updates variable updates ...
+	bool loopGuard; ///< Cancel update loops. Tree updates variable updates tree updates variable updates ...
 
 	bool levelModified;
 	wxTreeItemIdValue cookie;

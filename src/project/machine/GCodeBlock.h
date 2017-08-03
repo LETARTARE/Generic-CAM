@@ -32,6 +32,18 @@
  * \brief Single G-Code block
  *
  * Contains all parameters and values in a line of G-Code. This is called a block.
+ *
+ * All supported G-Codes:
+ *
+ * 0 1 2 3 4 10 17 18 19 20 21 28 30 32 33 38.2 40 41 42 43 49 50 52 53 54 55 56 57 58 59 59.1 59.2 59.3 61 61.1 64 80 81 82 83 84 85 86 87 88 89 90 91 92 92.1 92.2 92.3 93 94 96 97 98 99
+ *
+ *
+ * All Supported M-Codes:
+ *
+ * 0 1 2 3 4 5 6 7 8 9 30 48 49 60 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119
+ *
+ * These are valid codes for a GCodeBlock. The MachineSimulator may have problems with some of these.
+ *
  */
 
 #include <wx/string.h>
@@ -46,6 +58,8 @@ public:
 	GCodeBlock(wxString block = _T(""), double conversionFactor = 0.001);
 	wxString GetCode(void) const;
 
+	void CopySelective(const GCodeBlock &other);
+
 	void ClearGM(void);
 	void SetG(unsigned int nr, unsigned char subnr = 0);
 	void SetM(unsigned int nr);
@@ -55,13 +69,19 @@ public:
 	void ArcCW(void);
 	void ArcCCW(void);
 
-	bool IsCutting(void) const;
 	int Motion(void) const;
+
+	bool IsStateChange(void) const;
+	bool IsMotion(void) const;
+	bool IsLinearMotion(void) const;
+	bool IsPureLinearMotion(void) const;
+	bool IsCutting(void) const;
 
 	double conversionFactor; //!< Current conversion factor (for mm: 0.001, for inch: 0.0254)
 
-	double dt; //!< estimated duration for this block. Calculated in Machine.
-	double dL; //!< distance the head moves in XYZ. Calculated in Machine.
+	double tStart; //!< time this block is passed to the Machine. The Machine begins moving afterwards. Calculated in Machine.
+	double duration; //!< estimated duration for this block. Calculated in Machine.
+	double length; //!< distance the head moves in XYZ. Calculated in Machine.
 
 	bool block_delete; //!< Enable block delete switch for this block
 	bool message; //!< is the comment a message (displayed to the user on the machine)?

@@ -55,13 +55,14 @@ public:
 	void InsertWorkpiece(Workpiece* workpiece);
 	void InsertToolPath(ToolPath* toolpath);
 	void InsertMachine(Machine* machine);
-	void InitSimulation(size_t maxCells);
-	void Reset(void);
-	void Rewind(void);
-	void Step(float tTarget);
-	void FForward(void);
 
-	bool ReadGCodeFile(wxFileName fileName);
+	void InitSimulation(size_t maxCells);
+
+	void Reset(void);
+	void Previous(void);
+	void Step(float tTarget);
+	void Next(void);
+	void Last(void);
 
 	void Paint(void) const;
 
@@ -73,8 +74,13 @@ public:
 
 	DexelTarget simulation;
 
+	bool initialized;
+
+	Vector3 offset;
+
 	float tStep;
 	size_t step;
+
 };
 
 #endif /* MACHINESIMULATOR_H_ */

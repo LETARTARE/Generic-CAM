@@ -72,7 +72,7 @@ public:
 
 public:
 	// Common settings for all toolpath generators
-	unsigned int refTool; //!< Reference number of a Tool from Run
+	unsigned int refTool; //!< Reference number of a Tool from Run //TODO:: Check for consistency over all classes.
 	float freeHeight; //!< Distance from the top of the material for fast travel
 	float marginBelow; //!< Distance to the final shape below the tool
 	float marginSide; //!< Distance to the final shape next to the tool

@@ -44,7 +44,7 @@ TreeSetup::TreeSetup(wxTreeCtrl * tree, Project * project)
 	long style = this->tree->GetWindowStyle() ^ wxTR_NO_LINES;
 	this->tree->SetWindowStyle(style);
 
-	this->prohibitVariableUpdate = false;
+	this->loopGuard = false;
 	this->levelModified = false;
 
 	tree->DeleteAllItems();
@@ -237,12 +237,15 @@ void TreeSetup::SetSelection(bool selection)
 
 void TreeSetup::UpdateSelection(void)
 {
+	// The function UpdateSelection uses this flag to temporally disable variable update.
+	if(loopGuard) return;
+
 	// Check if all groups are ok.
 	if(!groupObjects.IsOk()) return;
 
 	// Disable the function variable update. This function would otherwise
 	// be called by the main window, whenever a selection changes.
-	prohibitVariableUpdate = true;
+	loopGuard = true;
 
 	// Updates for Objects:
 	{
@@ -320,14 +323,14 @@ void TreeSetup::UpdateSelection(void)
 			temp = tree->GetNextSibling(temp);
 		}
 	}
-	prohibitVariableUpdate = false;
+	loopGuard = false;
 	UpdateVariables();
 }
 
 void TreeSetup::UpdateVariables(void)
 {
 	// The function UpdateSelection uses this flag to temporally disable variable update.
-	if(prohibitVariableUpdate) return;
+	if(loopGuard) return;
 
 	if(!groupObjects.IsOk()) return;
 
@@ -391,9 +394,9 @@ void TreeSetup::UpdateVariables(void)
 					project->run[data->nr].selected = (tree->IsSelected(temp)
 							| toolpathSelected);
 					if(toolpathSelected){
-						prohibitVariableUpdate = true;
+						loopGuard = true;
 						tree->SelectItem(temp, toolpathSelected);
-						prohibitVariableUpdate = false;
+						loopGuard = false;
 					}
 				}
 
@@ -405,6 +408,9 @@ void TreeSetup::UpdateVariables(void)
 
 void TreeSetup::Update(void)
 {
+	// The function UpdateSelection uses this flag to temporally disable variable update.
+	if(loopGuard) return;
+
 	wxTreeItemId root = tree->GetRootItem();
 	if(!root.IsOk()){
 		root = tree->AddRoot(project->name, -1, -1, new TreeItem(itemProject));

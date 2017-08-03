@@ -49,7 +49,7 @@ Run::Run()
 	parent = NULL;
 	textureID = 0;
 	isOGLInit = false;
-	touchoffHeight = 0.027;
+	touchoffHeight = 0.00;
 	prevRun = -1;
 	touchpoint = wxImage(touchpoint_xpm);
 	touchpoint.SetAlphaColor(255, 255, 255);
@@ -75,23 +75,38 @@ Run::~Run()
 		delete generators[i];
 }
 
-void Run::GenerateToolpaths(void)
-{
-	Update();
-	for(size_t i = 0; i < generators.GetCount(); i++){
-		assert(generators[i] != NULL);
-		generators[i]->GenerateToolpath();
-	}
-}
-
 void Run::Update(void)
 {
 	for(size_t i = 0; i < generators.GetCount(); i++){
 		assert(generators[i] != NULL);
 		generators[i]->parent = this;
 	}
-	simulator.InsertToolPath(this->GetSelectedToolpath());
-	simulator.InsertWorkpiece(this->GetWorkpiece());
+}
+
+void Run::GenerateToolpaths(void)
+{
+	Update();
+	for(size_t i = 0; i < generators.GetCount(); i++){
+		assert(generators[i] != NULL);
+		generators[i]->GenerateToolpath();
+		if(!generators[i]->toolpath.positions.IsEmpty()){
+			{
+				GCodeBlock temp(_T("(Set spindle speed 1/min)"));
+				temp.S = 200; // 1/s
+				generators[i]->toolpath.positions.Insert(temp, 0);
+			}
+			{
+				GCodeBlock temp(_T("(Set feed-speed mm/min)"));
+				temp.F = 0.02;
+				generators[i]->toolpath.positions.Insert(temp, 1);
+			}
+			{
+				GCodeBlock temp(_T("M6 (Select tool)"));
+				temp.T = generators[i]->refTool + 1;
+				generators[i]->toolpath.positions.Insert(temp, 2);
+			}
+		}
+	}
 }
 
 bool Run::SaveToolpaths(wxFileName fileName, ToolPath::Dialect dialect)
@@ -99,12 +114,15 @@ bool Run::SaveToolpaths(wxFileName fileName, ToolPath::Dialect dialect)
 	ToolPath generated;
 	for(size_t i = 0; i < generators.GetCount(); i++){
 		assert(generators[i] != NULL);
-		AffineTransformMatrix matrix;
-		matrix.TranslateGlobal(generators[i]->area.xmin,
-				generators[i]->area.ymin, generators[i]->area.zmin);
-		ToolPath moved = generators[i]->toolpath;
-		moved.ApplyTransformation(matrix);
-		generated += moved;
+
+		//TODO: Remove this?
+//		AffineTransformMatrix matrix;
+//		matrix.TranslateGlobal(generators[i]->area.xmin,
+//				generators[i]->area.ymin, generators[i]->area.zmin);
+//		ToolPath moved = generators[i]->toolpath;
+//		moved.ApplyTransformation(matrix);
+//		generated += moved;
+		generated += generators[i]->toolpath;
 	}
 
 	// Move toolpath down by the touchoff height.
@@ -115,11 +133,8 @@ bool Run::SaveToolpaths(wxFileName fileName, ToolPath::Dialect dialect)
 	generated.CleanPath(0.0003);
 	generated.DiffPath(0.0003);
 
-	// TODO: Move the following lines into the toolpath generators.
 	ToolPath startup;
-	startup.positions.Add(GCodeBlock(_T("F3000 (Feedrate mm/min)")));
-	startup.positions.Add(GCodeBlock(_T("T1 M6 (Tool 1, Select tool)")));
-	startup.positions.Add(GCodeBlock(_T("S10000 (Spindle speed rpm)")));
+	startup.positions.Add(GCodeBlock(_T("S1000 (Spindle speed rpm)")));
 	startup.positions.Add(GCodeBlock(_T("M3 (Start spindel)")));
 	startup.positions.Add(
 			GCodeBlock(
@@ -144,11 +159,15 @@ bool Run::SaveToolpaths(wxFileName fileName, ToolPath::Dialect dialect)
 		const wxTextFileType fileType = wxTextFileType_Dos;
 		f.AddLine(_T("G21"), fileType);
 		temp.CalculateMinMaxValues();
+		// Touch-off always from to of the workpiece for Fanuc-M.
+		for(size_t i = 0; i < temp.positions.GetCount(); i++)
+			temp.positions[i].Z -= temp.maxPosition.Z;
 		f.AddLine(
 				wxString::Format(_T("[billet x%g y%g z%g"),
 						(temp.maxPosition.X - temp.minPosition.X) * 1000.0,
 						(temp.maxPosition.Y - temp.minPosition.Y) * 1000.0,
-						(-temp.minPosition.Z) * 1000.0 + 0.1), fileType);
+						(temp.maxPosition.Z - temp.minPosition.Z) * 1000.0
+								+ 0.1), fileType);
 		f.AddLine(
 				wxString::Format(_T("[edgemove x%g y%g"),
 						temp.minPosition.X * 1000.0,
@@ -330,7 +349,15 @@ const Workpiece* Run::GetWorkpiece(void) const
 	return &(parent->workpieces[refWorkpiece]);
 }
 
-ToolPath* Run::GetSelectedToolpath(void)
+ToolPath* Run::GetFirstSelectedToolpath(void)
+{
+	for(size_t n = 0; n < generators.GetCount(); n++){
+		if(((generators[n]))->selected) return &((generators[n])->toolpath);
+	}
+	return NULL;
+}
+
+const ToolPath* Run::GetFirstSelectedToolpath(void) const
 {
 	for(size_t n = 0; n < generators.GetCount(); n++){
 		if(((generators[n]))->selected) return &((generators[n])->toolpath);

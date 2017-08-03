@@ -81,7 +81,7 @@ public:
 
 //TODO: Base Imprinter on BoundingBox
 class Imprinter {
-	friend class GeneratorTest;
+	friend class GeneratorTest; //TODO: Remove this friend class.
 public:
 	enum face_t {
 		facing_up, facing_down, facing_side, other
@@ -130,6 +130,18 @@ public:
 	double GetSizeRY(void) const
 	{
 		return ry;
+	}
+	size_t GetCellCount(void) const
+	{
+		return N;
+	}
+	size_t GetXCount(void) const
+	{
+		return nx;
+	}
+	size_t GetYCount(void) const
+	{
+		return ny;
 	}
 
 	void Refresh();
@@ -224,7 +236,7 @@ private:
 	// Member variables
 public:
 
-	bool displayBox;  ///< Display the up surface as a continuous plane.
+	bool displayBox; ///< Display the up surface as a continuous plane.
 	bool displayField; ///< Display the up and down surface as planar squares.
 	bool displayAboveDown; ///< Display the above down surface as a grid.
 	bool displayBelowUp; ///< Display the below up surface as a grid.

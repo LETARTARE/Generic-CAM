@@ -75,6 +75,8 @@
 #include <wx/string.h>
 #include <list>
 
+#include "../ToolPath.h"
+
 class Machine {
 	friend class LUACodeEvaluator;
 	//Constructor / Destructor
@@ -99,8 +101,11 @@ public:
 	void ToXml(wxXmlNode* parentNode);
 	bool FromXml(wxXmlNode* node);
 
+	void DryRunToolPath(ToolPath* tp); //!< Rough estimation of the duration of a toolpath. Quick and dirty stand-alone machine simulator.
+
+	void Reset();
+	void SetTouchoffHeight(double height = 0.0);
 	void ProcessGCode(const GCodeBlock &block, const double pos = 1.0);
-	double GetDuration(void) const;
 	void Step(const double pos = 1.0);
 
 	// Member variables
@@ -109,16 +114,21 @@ public:
 	wxString machineDescription; //!< Lua script describing the machine.
 	wxString textOut; //!< Errors and output of the Lua script.
 
+	GCodeBlock current;
+	MachinePosition base;
 	MachinePosition position; //!< Absolute Position of the Machine
-	MachinePosition offset; //!< Offset from absolute origin to workpiece origin
+	MachinePosition origin[10]; //!< Offset from absolute origin to workpiece origin
 
+	unsigned char activeCoordinateSystem;
 	int spindle; //!< Spindle speed (1/s)
 	double feed; //!< Feedrate (m/s)
 	ArrayOfTool tools; ///< Tool%s in the Machine
+	int activeTool;
+	unsigned int toolSlot;
+	double toolLength;
 	enum Movement {
 		rapid = 0, feedrate = 1, arc_cw = 2, arc_ccw = 3
 	} movement;
-	double conversionFactor;
 
 	AffineTransformMatrix toolPosition;
 	AffineTransformMatrix workpiecePosition;
@@ -133,6 +143,8 @@ private:
 	bool LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
 			const wxString &filename, MachineComponent* component,
 			const AffineTransformMatrix &matrix);
+
+	void InterpolatePosition(double t);
 
 	bool initialized;
 	LUACodeEvaluator evaluator;

@@ -32,18 +32,13 @@
 #include <wx/textfile.h>
 #include <wx/log.h>
 #include <GL/gl.h>
+#include <float.h>
 
 Machine::Machine()
 {
 	initialized = false;
-	position = MachinePosition();
+	Reset();
 	ClearComponents();
-
-	//	conversionFactor = 0.01 / 2.54; // 1 cm = 2.54 inch
-	conversionFactor = 1.0; // Metric system
-	feed = 0.01; // Feed = 1 cm/s
-	movement = feedrate; // Move at feedrate
-	spindle = 0.0; // Spindle stopped
 }
 
 Machine::Machine(const Machine& other)
@@ -156,14 +151,13 @@ void Machine::Paint(void) const
 	for(std::list <MachineComponent>::const_iterator i = components.begin();
 			i != components.end(); ++i)
 		i->Paint();
-
-//	if(selectedTool >= 0 && selectedTool < tools.GetCount()){
-//		::glPushMatrix();
-//		::glMultMatrixd(machine.toolPosition.a);
-//		::glColor3f(0.7, 0.7, 0.7);
-//		tools[selectedTool].Paint();
-//		::glPopMatrix();
-//	}
+	if(toolSlot > 0 && toolSlot <= tools.GetCount()){
+		::glPushMatrix();
+		::glMultMatrixd(toolPosition.a);
+		::glColor3f(0.7, 0.7, 0.7);
+		tools[toolSlot - 1].Paint();
+		::glPopMatrix();
+	}
 }
 
 void Machine::ToXml(wxXmlNode* parentNode)
@@ -320,11 +314,6 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 	return false;
 }
 
-Vector3 Machine::GetCenter(void) const
-{
-	return workpiecePosition.GetCenter();
-}
-
 bool Machine::LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
 		const wxString &filename, MachineComponent* component,
 		const AffineTransformMatrix& matrix)
@@ -355,4 +344,182 @@ bool Machine::LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
 		}
 	}
 	return false;
+}
+
+Vector3 Machine::GetCenter(void) const
+{
+	return workpiecePosition.GetCenter();
+}
+
+void Machine::DryRunToolPath(ToolPath* tp)
+{
+	double F = 1e-3;
+	double t = 0;
+	uint_fast8_t actc = 1;
+	uint_fast8_t mode = 1;
+	MachinePosition pos;
+	MachinePosition old;
+	MachinePosition off[10];
+	for(size_t i = 0; i < tp->positions.GetCount(); i++){
+		double dt = 0.0;
+		old = pos;
+		if(tp->positions[i].F > -FLT_EPSILON) F = tp->positions[i].F;
+		if(tp->positions[i].G[0] == 40) dt += tp->positions[i].P;
+		const bool machineCoordinates = (tp->positions[i].G[0] == 530);
+		if(tp->positions[i].G[12] == 540) actc = 1;
+		if(tp->positions[i].G[12] == 550) actc = 2;
+		if(tp->positions[i].G[12] == 560) actc = 3;
+		if(tp->positions[i].G[12] == 570) actc = 4;
+		if(tp->positions[i].G[12] == 580) actc = 5;
+		if(tp->positions[i].G[12] == 590) actc = 6;
+		if(tp->positions[i].G[12] == 591) actc = 7;
+		if(tp->positions[i].G[12] == 592) actc = 8;
+		if(tp->positions[i].G[12] == 593) actc = 9;
+		if(tp->positions[i].G[1] == 0) mode = 0;
+		if(tp->positions[i].G[1] == 10) mode = 1;
+		if(tp->positions[i].G[1] == 20) mode = 2;
+		if(tp->positions[i].G[1] == 30) mode = 3;
+		if(tp->positions[i].XFlag) pos.X = tp->positions[i].X;
+		if(tp->positions[i].YFlag) pos.Y = tp->positions[i].Y;
+		if(tp->positions[i].ZFlag) pos.Z = tp->positions[i].Z;
+		if(tp->positions[i].AFlag) pos.A = tp->positions[i].A;
+		if(tp->positions[i].BFlag) pos.B = tp->positions[i].B;
+		if(tp->positions[i].CFlag) pos.C = tp->positions[i].C;
+		if(tp->positions[i].UFlag) pos.U = tp->positions[i].U;
+		if(tp->positions[i].VFlag) pos.V = tp->positions[i].V;
+		if(tp->positions[i].WFlag) pos.W = tp->positions[i].W;
+		if(!machineCoordinates){
+			pos += off[actc];
+		}
+		tp->positions[i].length = sqrt(
+				(pos.X - old.X) * (pos.X - old.X)
+						+ (pos.Y - old.Y) * (pos.Y - old.Y)
+						+ (pos.Z - old.Z) * (pos.Z - old.Z));
+		switch(mode){
+		case 0:
+			dt += tp->positions[i].length / F;
+			break;
+		case 1:
+			dt += tp->positions[i].length / F;
+			break;
+		default:
+			break;
+		}
+		tp->positions[i].duration = dt;
+		tp->positions[i].tStart = t;
+		t += dt;
+	}
+}
+
+void Machine::Reset()
+{
+	position = MachinePosition();
+	activeCoordinateSystem = 1;
+	activeTool = 0;
+	feed = 0.01; // Feed = 1 cm/s
+	movement = feedrate; // Move at feedrate
+	spindle = 0.0; // Spindle stopped
+	current = GCodeBlock();
+	Assemble();
+	SetTouchoffHeight();
+}
+
+void Machine::SetTouchoffHeight(double height)
+{
+//	workpiecePosition.TakeMatrixApart();
+	Vector3 wpOrigin = workpiecePosition.GetCenter() - toolPosition.GetCenter();
+	origin[1].X = wpOrigin.x;
+	origin[1].Y = wpOrigin.y;
+	origin[1].Z = wpOrigin.z + height;
+}
+
+void Machine::ProcessGCode(const GCodeBlock& block, const double pos)
+{
+	InterpolatePosition(DBL_MAX);
+	base = position;
+	current.CopySelective(block);
+	if(current.F > 0) feed = current.F;
+
+	// Change tool
+	if(current.M[6] == 6){
+		current.M[6] = -1;
+		activeTool = current.T;
+		toolSlot = 0;
+		toolLength = 0.0;
+		for(size_t n = 0; n < tools.GetCount(); n++){
+			if(tools[n].slotNr == activeTool){
+				toolSlot = n + 1;
+				toolLength = tools[n].GetPositiveLength();
+			}
+		}
+	}
+	if(current.M[7] == 3) spindle = current.S;
+	if(current.M[7] == 4) spindle = -current.S;
+	if(current.M[7] == 5) spindle = 0;
+	const bool machineCoordinates = (current.G[0] == 530);
+	if(current.G[12] == 540) activeCoordinateSystem = 1;
+	if(current.G[12] == 550) activeCoordinateSystem = 2;
+	if(current.G[12] == 560) activeCoordinateSystem = 3;
+	if(current.G[12] == 570) activeCoordinateSystem = 4;
+	if(current.G[12] == 580) activeCoordinateSystem = 5;
+	if(current.G[12] == 590) activeCoordinateSystem = 6;
+	if(current.G[12] == 591) activeCoordinateSystem = 7;
+	if(current.G[12] == 592) activeCoordinateSystem = 8;
+	if(current.G[12] == 593) activeCoordinateSystem = 9;
+
+	InterpolatePosition(DBL_MAX);
+}
+
+void Machine::Step(const double pos)
+{
+}
+
+void Machine::InterpolatePosition(double t)
+{
+	const unsigned char c = (current.G[0] == 530)? 0 : activeCoordinateSystem;
+	if(t >= (current.tStart + current.duration - FLT_EPSILON)){
+		if(current.XFlag) position.X = current.X + origin[c].X;
+		if(current.YFlag) position.Y = current.Y + origin[c].Y;
+		if(current.ZFlag) position.Z = current.Z + origin[c].Z + toolLength; // TODO: Move into coordinate system setup.
+		if(current.AFlag) position.A = current.A + origin[c].A;
+		if(current.BFlag) position.B = current.B + origin[c].B;
+		if(current.CFlag) position.C = current.C + origin[c].C;
+		if(current.UFlag) position.U = current.U + origin[c].U;
+		if(current.VFlag) position.V = current.V + origin[c].V;
+		if(current.WFlag) position.W = current.W + origin[c].W;
+		return;
+	}
+	if(t < (current.tStart + FLT_EPSILON)){
+		position.X = base.X;
+		position.Y = base.Y;
+		position.Z = base.Z;
+		position.A = base.A;
+		position.B = base.B;
+		position.C = base.C;
+		position.U = base.U;
+		position.V = base.V;
+		position.W = base.W;
+		return;
+	}
+	const double fn = fmin(fmax((t - current.tStart) / current.duration, 0.0),
+			1.0);
+	const double fo = 1.0 - fn;
+	position.X = base.X * fo;
+	position.Y = base.Y * fo;
+	position.Z = base.Z * fo;
+	position.A = base.A * fo;
+	position.B = base.B * fo;
+	position.C = base.C * fo;
+	position.U = base.U * fo;
+	position.V = base.V * fo;
+	position.W = base.W * fo;
+	if(current.XFlag) position.X += (current.X + origin[c].X) * fn;
+	if(current.YFlag) position.Y += (current.Y + origin[c].Y) * fn;
+	if(current.ZFlag) position.Z += (current.Z + origin[c].Z + toolLength) * fn;
+	if(current.AFlag) position.A += (current.A + origin[c].A) * fn;
+	if(current.BFlag) position.B += (current.B + origin[c].B) * fn;
+	if(current.CFlag) position.C += (current.C + origin[c].C) * fn;
+	if(current.UFlag) position.U += (current.U + origin[c].U) * fn;
+	if(current.VFlag) position.V += (current.V + origin[c].V) * fn;
+	if(current.WFlag) position.W += (current.W + origin[c].W) * fn;
 }

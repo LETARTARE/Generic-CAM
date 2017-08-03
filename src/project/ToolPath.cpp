@@ -195,8 +195,11 @@ void ToolPath::Paint(void) const
 {
 	::glBegin(GL_LINE_STRIP);
 	::glNormal3f(0, 0, 1);
+	int_fast8_t mode = 0;
 	for(size_t i = 0; i < positions.GetCount(); i++){
-		if(positions[i].IsCutting())
+		if(!positions[i].XFlag && !positions[i].YFlag && !positions[i].ZFlag) continue;
+		if(positions[i].G[1] >= 0) mode = positions[i].G[1];
+		if(mode > 0)
 			::glColor3f(colorCutting.x, colorCutting.y, colorCutting.z);
 		else
 			::glColor3f(colorMoving.x, colorMoving.y, colorMoving.z);
@@ -240,6 +243,8 @@ void ToolPath::CleanPath(const double tolerance)
 	ArrayOfGCodeBlock temp;
 	if(positions.GetCount() < 2) return;
 
+	//TODO: Review & update algorithm. (not sure, if it always works as intended)
+
 //	bool isOnLine;
 //	bool isSameSort;
 //
@@ -250,14 +255,17 @@ void ToolPath::CleanPath(const double tolerance)
 //	double dg;
 	const double t2 = tolerance * tolerance;
 	size_t lastWritten = 0;
-	temp.Add(positions[lastWritten]);
-	unsigned char lastGCode = positions[lastWritten].Motion();
-//	unsigned char gCode;
+	if(!positions[lastWritten].IsPureLinearMotion()){
+		temp.Add(positions[lastWritten]);
+	}
+	uint_fast8_t lastGCode = -1;
+	uint_fast8_t gCode = 0;
 	size_t i;
 	for(i = 1; i < positions.GetCount(); i++){
-		bool isOnLine = true;
-		bool isSameSort = true;
-		unsigned char gCode = positions[i].Motion();
+		bool isSameSort = positions[i].IsPureLinearMotion();
+		bool isOnLine = isSameSort;
+		if(positions[i].G[1] >= 0) gCode = positions[i].Motion();
+		if(i == 0) isSameSort = false;
 		if(gCode != lastGCode) isSameSort = false;
 		if(lastGCode != 0 && lastGCode != 1) isSameSort = false;
 
@@ -280,12 +288,9 @@ void ToolPath::CleanPath(const double tolerance)
 						break;
 					}
 
-					double hx = gx * s;
-					double hy = gy * s;
-					double hz = gz * s;
-					hx -= px;
-					hy -= py;
-					hz -= pz;
+					const double hx = gx * s - px;
+					const double hy = gy * s - py;
+					const double hz = gz * s - pz;
 					const double d2 = hx * hx + hy * hy + hz * hz;
 
 					if(d2 > t2){
@@ -317,40 +322,72 @@ void ToolPath::CleanPath(const double tolerance)
 	positions = temp;
 }
 
+void ToolPath::FlagAll(bool XYZ, bool IJK, bool R, bool ABC, bool UVW)
+{
+	for(size_t i = 0; i < positions.GetCount(); i++){
+#ifdef _DEBUGMODE
+		positions[i].N = i;
+#endif
+		if(XYZ){
+			positions[i].XFlag = true;
+			positions[i].YFlag = true;
+			positions[i].ZFlag = true;
+		}
+		if(IJK){
+			positions[i].IFlag = true;
+			positions[i].JFlag = true;
+			positions[i].KFlag = true;
+		}
+		if(R){
+			positions[i].RFlag = true;
+		}
+		if(ABC){
+			positions[i].AFlag = true;
+			positions[i].BFlag = true;
+			positions[i].CFlag = true;
+		}
+		if(UVW){
+			positions[i].UFlag = true;
+			positions[i].VFlag = true;
+			positions[i].WFlag = true;
+		}
+	}
+}
+
 void ToolPath::DiffPath(const double tolerance)
 {
 	if(positions.GetCount() < 1) return;
-	positions[0].XFlag = true;
-	positions[0].YFlag = true;
-	positions[0].ZFlag = true;
-	positions[0].AFlag = true;
-	positions[0].BFlag = true;
-	positions[0].CFlag = true;
-	positions[0].UFlag = true;
-	positions[0].VFlag = true;
-	positions[0].WFlag = true;
-	positions[0].IFlag = true;
-	positions[0].JFlag = true;
-	positions[0].KFlag = true;
-	positions[0].RFlag = true;
-	GCodeBlock oldPos = positions[0];
-
+	GCodeBlock pos = positions[0];
 	for(size_t i = 1; i < positions.GetCount(); i++){
-		GCodeBlock newPos = positions[i];
-		positions[i].XFlag = (fabs(oldPos.X - positions[i].X) > tolerance);
-		positions[i].YFlag = (fabs(oldPos.Y - positions[i].Y) > tolerance);
-		positions[i].ZFlag = (fabs(oldPos.Z - positions[i].Z) > tolerance);
-		positions[i].AFlag = (fabs(oldPos.A - positions[i].A) > tolerance);
-		positions[i].BFlag = (fabs(oldPos.B - positions[i].B) > tolerance);
-		positions[i].CFlag = (fabs(oldPos.C - positions[i].C) > tolerance);
-		positions[i].UFlag = (fabs(oldPos.U - positions[i].U) > tolerance);
-		positions[i].VFlag = (fabs(oldPos.V - positions[i].V) > tolerance);
-		positions[i].WFlag = (fabs(oldPos.W - positions[i].W) > tolerance);
-		positions[i].RFlag = (fabs(oldPos.R - positions[i].R) > tolerance);
-
-		if(oldPos.G[1] == positions[i].G[1]) positions[i].G[1] = -1;
-
-		oldPos = newPos;
+		if(pos.XFlag && fabs(pos.X - positions[i].X) <= tolerance) positions[i].XFlag =
+				false;
+		if(pos.YFlag && fabs(pos.Y - positions[i].Y) <= tolerance) positions[i].YFlag =
+				false;
+		if(pos.ZFlag && fabs(pos.Z - positions[i].Z) <= tolerance) positions[i].ZFlag =
+				false;
+		if(pos.AFlag && fabs(pos.A - positions[i].A) <= tolerance) positions[i].AFlag =
+				false;
+		if(pos.BFlag && fabs(pos.B - positions[i].B) <= tolerance) positions[i].BFlag =
+				false;
+		if(pos.CFlag && fabs(pos.C - positions[i].C) <= tolerance) positions[i].CFlag =
+				false;
+		if(pos.UFlag && fabs(pos.U - positions[i].U) <= tolerance) positions[i].UFlag =
+				false;
+		if(pos.VFlag && fabs(pos.V - positions[i].V) <= tolerance) positions[i].VFlag =
+				false;
+		if(pos.WFlag && fabs(pos.W - positions[i].W) <= tolerance) positions[i].WFlag =
+				false;
+		if(pos.IFlag && fabs(pos.I - positions[i].I) <= tolerance) positions[i].IFlag =
+				false;
+		if(pos.JFlag && fabs(pos.J - positions[i].J) <= tolerance) positions[i].JFlag =
+				false;
+		if(pos.KFlag && fabs(pos.K - positions[i].K) <= tolerance) positions[i].KFlag =
+				false;
+		if(pos.RFlag && fabs(pos.R - positions[i].R) <= tolerance) positions[i].RFlag =
+				false;
+		if(pos.G[1] >= 0 && pos.G[1] == positions[i].G[1]) positions[i].G[1] =
+				-1;
+		pos.CopySelective(positions[i]);
 	}
 }
 
@@ -401,4 +438,11 @@ bool ToolPath::ReadGCodeFile(wxFileName fileName)
 	file.Close();
 	info.Empty();
 	return true;
+}
+
+double ToolPath::MaxTime(void) const
+{
+	if(positions.IsEmpty()) return 0.0;
+	return positions[positions.GetCount() - 1].tStart
+			+ positions[positions.GetCount() - 1].duration;
 }

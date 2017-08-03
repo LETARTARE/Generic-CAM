@@ -157,13 +157,11 @@ Imprinter::~Imprinter()
 bool Imprinter::SetupField(const size_t sizeX, const size_t sizeY,
 		const double resolutionX, const double resolutionY)
 {
-	if(field != NULL) delete[] field;
-	field = NULL;
-
-	if(sizeX < 1) return false;
-	if(sizeY < 1) return false;
-	if(resolutionX <= 0.0) return false;
-	if(resolutionY <= 0.0) return false;
+	if(sizeX < 1 || sizeY < 1 || resolutionX <= 0.0 || resolutionY <= 0.0){
+		if(field != NULL) delete[] field;
+		field = NULL;
+		return false;
+	}
 
 	rx = resolutionX;
 	ry = resolutionY;
@@ -172,9 +170,14 @@ bool Imprinter::SetupField(const size_t sizeX, const size_t sizeY,
 
 	sx = (double) nx * rx;
 	sy = (double) ny * ry;
-	N = nx * ny;
 
-	field = new ImprinterElement[N];
+	if(nx * ny != N || field == NULL){
+		if(field != NULL) delete[] field;
+		field = NULL;
+		N = nx * ny;
+		field = new ImprinterElement[N];
+	}
+
 	refresh = true;
 	return true;
 }

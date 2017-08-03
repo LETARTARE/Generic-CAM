@@ -30,35 +30,44 @@
 #include "../StdInclude.h"
 #include "gui.h"
 
+#include <wx/timer.h>
+
 class DialogAnimation:public GUIAnimation {
 	// Constructor/ Destructor
 public:
 	DialogAnimation(wxWindow *parent, Project *project);
 	virtual ~DialogAnimation();
 
-	// Member Variables
-public:
-	Project* project;
-
-	// Methods
-public:
-
-	int GetSelectedRun(void);
-
 	bool TransferDataToWindow(void);
-	bool TransferDataFromWindow(void);
 
 	void OnXClose(wxCloseEvent& event);
 
 	void OnSelectToolpath(wxCommandEvent& event);
 	void OnChangeTime(wxCommandEvent& event);
 	void OnScroll(wxScrollEvent& event);
+	void OnTimer(wxTimerEvent& event);
 
 	void OnFirst(wxCommandEvent& event);
 	void OnPrev(wxCommandEvent& event);
 	void OnPlayStop(wxCommandEvent& event);
 	void OnNext(wxCommandEvent& event);
 	void OnLast(wxCommandEvent& event);
+
+private:
+	void PositionSlider(void);
+	int GetSelectedRun(void);
+	void InitSimulation(void);
+	wxString SecondsToTC(const double t);
+
+	// Member Variables
+public:
+	Project* project;
+	Run* run;
+	MachineSimulator* simulator;
+
+private:
+	bool loopGuard;
+	wxTimer timer;
 };
 
 #endif /* ANIMATIONFRAME_H_ */
