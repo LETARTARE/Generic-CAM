@@ -81,7 +81,6 @@ public:
 	void PaintObjects(void) const;
 	void PaintWorkpiece(void) const;
 	void PaintRun(void) const;
-	void PaintAnimation(void) const;
 
 	int GetFirstSelectedObject(void) const;
 	int GetFirstSelectedWorkpiece(void) const;

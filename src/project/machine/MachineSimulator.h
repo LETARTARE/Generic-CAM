@@ -30,7 +30,7 @@
  * \ingroup Machine
  * \brief Simlator of the movement and operation of the machine.
  *
- * Small class coordinationg the advancements of the Machine during the
+ * Small class coordinating the advancements of the Machine during the
  * simulation cycle. It also coordinates the setup and processing of the
  * Workpieces in the machine.
  */

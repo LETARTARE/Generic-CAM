@@ -42,7 +42,7 @@ DialogRun::DialogRun(wxWindow* parent, Project* project, ToolBox * toolbox,
 	this->toolbox = toolbox;
 	this->commandProcessor = commandProcessor;
 	this->settings = settings;
-	lockUpdate = false;
+	loopGuard = false;
 }
 
 DialogRun::~DialogRun()
@@ -51,7 +51,7 @@ DialogRun::~DialogRun()
 
 bool DialogRun::TransferDataToWindow(void)
 {
-	if(lockUpdate) return false;
+	if(loopGuard) return false;
 	size_t i;
 	int selected = -1;
 	m_choiceRun->Clear();
@@ -61,9 +61,9 @@ bool DialogRun::TransferDataToWindow(void)
 		m_choiceRun->Append(project->run[i].name);
 		if(selected == -1 && project->run[i].selected) selected = i;
 	}
-	lockUpdate = true;
+	loopGuard = true;
 	m_choiceRun->SetSelection(selected + 1);
-	lockUpdate = false;
+	loopGuard = false;
 	m_choiceWorkpiece->Clear();
 	m_choiceWorkpiece->Append(_T(""));
 	for(i = 0; i < project->workpieces.GetCount(); i++)
@@ -78,14 +78,14 @@ bool DialogRun::TransferDataToWindow(void)
 	}
 	for(i = m_choiceTool->GetCount(); i > toolbox->GetToolCount(); i--)
 		m_choiceTool->Delete(i - 1);
-	lockUpdate = true;
+	loopGuard = true;
 	if(m_choiceTool->GetSelection() < 0) m_choiceTool->SetSelection(0);
-	lockUpdate = false;
+	loopGuard = false;
 	if(selected >= 0){
-		lockUpdate = true;
+		loopGuard = true;
 		m_choiceWorkpiece->SetSelection(
 				project->run[selected].refWorkpiece + 1);
-		lockUpdate = false;
+		loopGuard = false;
 		m_textCtrlMachineName->SetValue(
 				project->run[selected].machine.fileName.GetName());
 
@@ -113,9 +113,9 @@ bool DialogRun::TransferDataToWindow(void)
 	}else{
 		m_listCtrlTools->ClearAll();
 		m_textCtrlMachineName->SetValue(_T(""));
-		lockUpdate = true;
+		loopGuard = true;
 		m_choiceWorkpiece->SetSelection(0);
-		lockUpdate = false;
+		loopGuard = false;
 	}
 
 	return true;
@@ -140,12 +140,12 @@ void DialogRun::OnClose(wxCommandEvent& event)
 
 void DialogRun::OnRunSelect(wxCommandEvent& event)
 {
-	if(lockUpdate) return;
+	if(loopGuard) return;
 	int id = m_choiceRun->GetSelection() - 1;
 
 	size_t n;
 	for(n = 0; n < project->run.GetCount(); n++)
-		project->run[n].selected = (n == id);
+		project->run[n].Select(n == id);
 
 	// Tell the main frame to update the selection in the treeview via custom command.
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHMAINGUI);
@@ -154,7 +154,7 @@ void DialogRun::OnRunSelect(wxCommandEvent& event)
 
 void DialogRun::OnWorkpieceSelect(wxCommandEvent& event)
 {
-	if(lockUpdate) return;
+	if(loopGuard) return;
 	const int selected = GetSelected();
 	if(selected < 0) return;
 	int temp = m_choiceWorkpiece->GetSelection() - 1;

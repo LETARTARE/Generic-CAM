@@ -86,7 +86,6 @@ void MachineSimulator::InitSimulation(size_t maxCells)
 			machine->Reset();
 			offset = machine->workpiecePosition.GetCenter()
 					- machine->toolPosition.GetCenter();
-			offset.z += machine->toolLength;
 			machine->DryRunToolPath(toolpath);
 		}
 		tStep = 0;
@@ -109,7 +108,6 @@ void MachineSimulator::Reset(void)
 		machine->Reset();
 		offset = machine->workpiecePosition.GetCenter()
 				- machine->toolPosition.GetCenter();
-		offset.z += machine->toolLength;
 		if(toolpath != NULL && !toolpath->positions.IsEmpty()){
 			machine->ProcessGCode(toolpath->positions[0]);
 		}
@@ -140,8 +138,10 @@ void MachineSimulator::Step(float tTarget)
 		tStep = toolpath->positions[step].tStart
 				+ toolpath->positions[step].duration;
 		machine->ProcessGCode(toolpath->positions[step]);
+		const double toolLength = machine->toolLength;
 		temp.InsertPoint(machine->position.X - offset.x,
-				machine->position.Y - offset.y, machine->position.Z - offset.z);
+				machine->position.Y - offset.y,
+				machine->position.Z - offset.z - toolLength);
 	}
 	machine->Assemble();
 

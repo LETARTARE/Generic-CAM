@@ -110,7 +110,7 @@ void ObjectPlacement::Update(void)
 void ObjectPlacement::ToStream(wxTextOutputStream& stream)
 {
 	stream << _T("ObjectRef: ");
-	stream << wxString::Format(_T("%i"), refObject);
+	stream << wxString::Format(_T("%zu"), refObject);
 	stream << endl;
 	stream << _T("Matrix: ");
 	matrix.ToStream(stream);

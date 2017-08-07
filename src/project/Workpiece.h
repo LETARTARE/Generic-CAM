@@ -59,14 +59,13 @@ public:
 	ArrayOfObjectPlacement placements;
 	ArrayOfSupport supports;
 
-	Geometry geometry;
+	int refObject; //!< Use an loaded Object as the Workpiece definition.
 
 	bool selected;
 
 //	volatile bool hasRunningGenerator;
 
 private:
-
 	//TODO: Replace the BooleanBox with the simulation or geometry.
 	BooleanBox bbox; ///< Redundant?
 

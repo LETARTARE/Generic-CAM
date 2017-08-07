@@ -61,13 +61,39 @@ void DialogWorkpiece::OnManageStock(wxCommandEvent& event)
 void DialogWorkpiece::OnAddStock(wxCommandEvent& event)
 {
 	int selected = m_choiceStock->GetSelection();
-	if(selected < 0 || selected >= stock->stockMaterials.GetCount()) return;
-	wxString name = stock->stockMaterials[selected].name;
-	CommandWorkpieceAdd * command = new CommandWorkpieceAdd(
-	_("Add Workpiece ") + name, project, stock->stockMaterials[selected]);
-	commandProcessor->Submit(command);
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
-	ProcessEvent(selectEvent);
+	if(selected >= 0 && selected < stock->stockMaterials.GetCount()){
+
+		wxString name = stock->stockMaterials[selected].name;
+		CommandWorkpieceAdd * command = new CommandWorkpieceAdd(
+		_("Add Workpiece ") + name, project,
+				stock->stockMaterials[selected]);
+		commandProcessor->Submit(command);
+		wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
+		ProcessEvent(selectEvent);
+	}
+
+	if(project == NULL) return;
+
+	if(selected > stock->stockMaterials.GetCount()
+			&& selected
+					<= stock->stockMaterials.GetCount()
+							+ project->objects.GetCount()){
+
+		const size_t objectNr = selected - stock->stockMaterials.GetCount() - 1;
+		StockMaterial tempStock;
+		project->objects[objectNr].Update();
+		tempStock.sx = project->objects[objectNr].bbox.GetSizeX();
+		tempStock.sy = project->objects[objectNr].bbox.GetSizeY();
+		tempStock.sz = project->objects[objectNr].bbox.GetSizeZ();
+		tempStock.name = project->objects[objectNr].name;
+		wxString name = tempStock.name;
+		CommandWorkpieceAdd * command = new CommandWorkpieceAdd(
+		_("Add Object as Workpiece ") + name, project, tempStock,
+				objectNr);
+		commandProcessor->Submit(command);
+		wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
+		ProcessEvent(selectEvent);
+	}
 }
 
 void DialogWorkpiece::OnDBLClick(wxGridEvent& event)
@@ -85,7 +111,7 @@ void DialogWorkpiece::OnDBLClick(wxGridEvent& event)
 							_("Remove Object from Workpiece"), project,
 							workpieceNr, placementNr));
 			wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-					ID_REFRESHALL);
+			ID_REFRESHALL);
 			ProcessEvent(selectEvent);
 			return;
 		}
@@ -111,8 +137,7 @@ bool DialogWorkpiece::TransferDataToWindow(void)
 	if(project == NULL) return false;
 
 	wxSize sz = m_grid->GetClientSize();
-	unsigned int w = sz.x / (3 + project->workpieces.GetCount());
-	size_t i, j;
+	const unsigned int w = sz.x / (3 + project->workpieces.GetCount());
 
 	// Resize grid
 	if(m_grid->GetNumberRows() > project->objects.GetCount()){
@@ -134,47 +159,60 @@ bool DialogWorkpiece::TransferDataToWindow(void)
 
 	// Relabel rows and columns
 	m_grid->SetRowLabelSize(3 * w);
-	for(i = 0; i < project->workpieces.GetCount(); i++){
+	for(size_t i = 0; i < project->workpieces.GetCount(); i++){
 		m_grid->SetColLabelValue(i, project->workpieces[i].name);
 		m_grid->SetColSize(i, w);
 	}
-	for(i = 0; i < project->objects.GetCount(); i++){
+	for(size_t i = 0; i < project->objects.GetCount(); i++){
 		m_grid->SetRowLabelValue(i, project->objects[i].name);
 	}
 	m_grid->ClearGrid();
 
-	size_t workpieceNr, objectNr;
-	for(workpieceNr = 0; workpieceNr < project->workpieces.GetCount();
+	for(size_t workpieceNr = 0; workpieceNr < project->workpieces.GetCount();
 			workpieceNr++){
-		for(j = 0; j < project->workpieces[workpieceNr].placements.GetCount();
+		for(size_t j = 0;
+				j < project->workpieces[workpieceNr].placements.GetCount();
 				j++){
-			objectNr = project->workpieces[workpieceNr].placements[j].refObject;
+			const size_t objectNr =
+					project->workpieces[workpieceNr].placements[j].refObject;
 			m_grid->SetCellValue(objectNr, workpieceNr, _T("X"));
 		}
 	}
 
 	// Update available stock material
-	for(i = 0; i < stock->stockMaterials.GetCount(); i++){
-		if(i >= m_choiceStock->GetCount()){
+	size_t nrMaterials = stock->stockMaterials.GetCount() + 1
+			+ project->objects.GetCount();
+
+	size_t c = 0;
+	for(size_t i = 0; i < stock->stockMaterials.GetCount(); i++){
+		if(c >= m_choiceStock->GetCount()){
 			m_choiceStock->Append(stock->stockMaterials[i].name);
 		}else{
-			m_choiceStock->SetString(i, stock->stockMaterials[i].name);
+			m_choiceStock->SetString(c, stock->stockMaterials[i].name);
 		}
+		c++;
 	}
-	for(i = m_choiceStock->GetCount(); i > stock->stockMaterials.GetCount();
-			i--)
+	if(c >= m_choiceStock->GetCount()){
+		m_choiceStock->Append(_T("-----"));
+	}else{
+		m_choiceStock->SetString(c, _T("-----"));
+	}
+	c++;
+	for(size_t i = 0; i < project->objects.GetCount(); i++){
+		if(c >= m_choiceStock->GetCount()){
+			m_choiceStock->Append(project->objects[i].name);
+		}else{
+			m_choiceStock->SetString(c, project->objects[i].name);
+		}
+		c++;
+	}
+	for(size_t i = m_choiceStock->GetCount(); i > nrMaterials; i--)
 		m_choiceStock->Delete(i - 1);
 
 	if(m_choiceStock->GetSelection() < 0
 			|| m_choiceStock->GetSelection() > m_choiceStock->GetCount()){
 		m_choiceStock->SetSelection(0);
 	}
-
-	return true;
-}
-
-bool DialogWorkpiece::TransferDataFromWindow(void)
-{
 
 	return true;
 }

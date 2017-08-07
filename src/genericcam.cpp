@@ -57,6 +57,7 @@ GenericCAMApp::GenericCAMApp()
 
 	//CHECK: Why does wxLOCALE_CONV_ENCODING not work?
 	if(!locale.Init(selectedLanguage, wxLOCALE_CONV_ENCODING)){
+//	if(!locale.Init(selectedLanguage, wxLOCALE_DONT_LOAD_DEFAULT)){
 		wxLogError(_T("This language is not supported by the system."));
 		return;
 	}

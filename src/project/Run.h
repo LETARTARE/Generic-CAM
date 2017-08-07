@@ -83,6 +83,7 @@ public:
 	float touchoffHeight; ///< Level of the touchoff. This can be below the workpiece or at the top of it. Not to be neglected or the machine-bed will get a scar.
 
 	bool selected; ///< Flag if this run is selected.
+	bool showSimulation;
 private:
 //	int selectedTool;
 	OpenGLImage touchpoint;
@@ -94,12 +95,13 @@ private:
 	// Methods
 public:
 	void Update(void);
+	void Select(bool select = true);
 
 	void GenerateToolpaths(void);
 	bool SaveToolpaths(wxFileName fileName, ToolPath::Dialect dialect);
 
 	Vector3 GetCenter(void) const;
-	void Paint(bool showAnimation = false) const;
+	void Paint(void) const;
 
 	void ToStream(wxTextOutputStream & stream);
 	bool FromStream(wxTextInputStream & stream, int runNr, Project * project);

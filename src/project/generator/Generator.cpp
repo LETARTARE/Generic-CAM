@@ -85,10 +85,10 @@ void Generator::CopyParameterFrom(const Generator * other)
 
 void Generator::Paint(void) const
 {
-	glPushMatrix();
-	glTranslatef(area.xmin, area.ymin, area.zmin);
+//	glPushMatrix();
+//	glTranslatef(area.xmin, area.ymin, area.zmin);
 	toolpath.Paint();
-	glPopMatrix();
+//	glPopMatrix();
 }
 
 void Generator::ToStream(wxTextOutputStream& stream)

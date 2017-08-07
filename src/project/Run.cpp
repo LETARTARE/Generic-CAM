@@ -49,6 +49,7 @@ Run::Run()
 	parent = NULL;
 	textureID = 0;
 	isOGLInit = false;
+	showSimulation = false;
 	touchoffHeight = 0.00;
 	prevRun = -1;
 	touchpoint = wxImage(touchpoint_xpm);
@@ -190,7 +191,7 @@ bool Run::SaveToolpaths(wxFileName fileName, ToolPath::Dialect dialect)
 	return flag;
 }
 
-void Run::Paint(bool showAnimation) const
+void Run::Paint(void) const
 {
 	const Project * pr = parent;
 	if(pr == NULL) return;
@@ -208,7 +209,7 @@ void Run::Paint(bool showAnimation) const
 		::glPushMatrix();
 		::glMultMatrixd(machine.workpiecePosition.a);
 		::glMultMatrixd(workpiecePlacement.a);
-		if(showAnimation){
+		if(showSimulation){
 			simulator.Paint();
 		}else{
 			pr->workpieces[refWorkpiece].Paint();
@@ -226,7 +227,7 @@ void Run::Paint(bool showAnimation) const
 		}
 
 		// Draw the "Touchpoint" symbol
-		const float s = 0.02;
+		const float s = 0.03;
 		glTranslatef(0, 0, touchoffHeight);
 
 		glScalef(s, s, s);
@@ -254,20 +255,20 @@ void Run::ToStream(wxTextOutputStream& stream)
 {
 	stream << _T("Name:") << endl;
 	stream << name << endl;
-	stream << wxString::Format(_T("WorkpieceRef: %u"), refWorkpiece) << endl;
-	stream << wxString::Format(_T("Tools: %u"), machine.tools.GetCount())
+	stream << wxString::Format(_T("WorkpieceRef: %i"), refWorkpiece) << endl;
+	stream << wxString::Format(_T("Tools: %zu"), machine.tools.GetCount())
 			<< endl;
 	for(size_t n = 0; n < machine.tools.GetCount(); n++){
-		stream << wxString::Format(_T("Tool: %u"), n) << endl;
+		stream << wxString::Format(_T("Tool: %zu"), n) << endl;
 		machine.tools[n].ToStream(stream);
 	}
 	stream << _T("Machine:") << endl;
 	stream << machine.fileName.GetFullPath() << endl;
 	GeneratorCollection gc;
-	stream << wxString::Format(_T("Generators: %u"), generators.GetCount())
+	stream << wxString::Format(_T("Generators: %zu"), generators.GetCount())
 			<< endl;
 	for(size_t n = 0; n < generators.GetCount(); n++){
-		stream << wxString::Format(_T("Generator: %u"), n) << endl;
+		stream << wxString::Format(_T("Generator: %zu"), n) << endl;
 		size_t g;
 		if(!gc.FindGenerator(generators[n], &g)) throw(__FILE__ "Cannot find generator.");
 		stream << gc.GetName(g) << endl;
@@ -363,4 +364,10 @@ const ToolPath* Run::GetFirstSelectedToolpath(void) const
 		if(((generators[n]))->selected) return &((generators[n])->toolpath);
 	}
 	return NULL;
+}
+
+void Run::Select(bool select)
+{
+	selected = select;
+	showSimulation = false;
 }

@@ -79,11 +79,7 @@ void CanvasMain::Render()
 	case displayRun:
 	{
 		glLoadName(3);
-		if(displayAnimation){
-			project->PaintAnimation();
-		}else{
-			project->PaintRun();
-		}
+		project->PaintRun();
 		break;
 	}
 	}

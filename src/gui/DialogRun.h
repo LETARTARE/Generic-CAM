@@ -52,7 +52,7 @@ private:
 	DisplaySettings * settings;
 	wxCommandProcessor * commandProcessor;
 
-	bool lockUpdate;
+	bool loopGuard;
 
 	// Methods
 public:

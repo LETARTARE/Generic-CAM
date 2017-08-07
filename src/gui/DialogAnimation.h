@@ -41,8 +41,9 @@ public:
 	bool TransferDataToWindow(void);
 
 	void OnXClose(wxCloseEvent& event);
-
+	void OnClose(wxCommandEvent& event);
 	void OnSelectToolpath(wxCommandEvent& event);
+	void OnChangeSimulation(wxCommandEvent& event);
 	void OnChangeTime(wxCommandEvent& event);
 	void OnScroll(wxScrollEvent& event);
 	void OnTimer(wxTimerEvent& event);
@@ -64,6 +65,8 @@ public:
 	Project* project;
 	Run* run;
 	MachineSimulator* simulator;
+
+	bool simulateWorkpiece;
 
 private:
 	bool loopGuard;

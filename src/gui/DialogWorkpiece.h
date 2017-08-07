@@ -56,7 +56,6 @@ public:
 	void OnDBLClick(wxGridEvent& event);
 	void OnSize(wxSizeEvent& event);
 	bool TransferDataToWindow(void);
-	bool TransferDataFromWindow(void);
 
 };
 

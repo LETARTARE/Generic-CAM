@@ -391,7 +391,7 @@ void TreeSetup::UpdateVariables(void)
 				}
 
 				if(data->nr >= 0 && data->nr < N){
-					project->run[data->nr].selected = (tree->IsSelected(temp)
+					project->run[data->nr].Select (tree->IsSelected(temp)
 							| toolpathSelected);
 					if(toolpathSelected){
 						loopGuard = true;

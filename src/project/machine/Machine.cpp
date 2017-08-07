@@ -416,6 +416,7 @@ void Machine::Reset()
 	position = MachinePosition();
 	activeCoordinateSystem = 1;
 	activeTool = 0;
+	toolSlot = 0;
 	feed = 0.01; // Feed = 1 cm/s
 	movement = feedrate; // Move at feedrate
 	spindle = 0.0; // Spindle stopped

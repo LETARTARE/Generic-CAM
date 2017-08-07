@@ -179,28 +179,28 @@ bool Project::Save(wxFileName fileName)
 	txt << _T("Name:") << endl;
 	txt << this->name << endl;
 
-	txt << wxString::Format(_T("Objects: %u"), objects.GetCount()) << endl;
+	txt << wxString::Format(_T("Objects: %zu"), objects.GetCount()) << endl;
 	for(size_t n = 0; n < objects.GetCount(); n++){
-		txt << wxString::Format(_T("Object: %u"), n) << endl;
+		txt << wxString::Format(_T("Object: %zu"), n) << endl;
 		objects[n].ToStream(txt, n);
 	}
 
-	txt << wxString::Format(_T("Workpieces: %u"), workpieces.GetCount())
+	txt << wxString::Format(_T("Workpieces: %zu"), workpieces.GetCount())
 			<< endl;
 	for(size_t n = 0; n < workpieces.GetCount(); n++){
-		txt << wxString::Format(_T("Workpiece: %u"), n) << endl;
+		txt << wxString::Format(_T("Workpiece: %zu"), n) << endl;
 		workpieces[n].ToStream(txt);
 	}
-	txt << wxString::Format(_T("Run: %u"), run.GetCount()) << endl;
+	txt << wxString::Format(_T("Run: %zu"), run.GetCount()) << endl;
 	for(size_t n = 0; n < run.GetCount(); n++){
-		txt << wxString::Format(_T("Run: %u"), n) << endl;
+		txt << wxString::Format(_T("Run: %zu"), n) << endl;
 		run[n].ToStream(txt);
 	}
 
 	for(size_t n = 0; n < objects.GetCount(); n++){
 		for(size_t m = 0; m < objects[n].geometries.GetCount(); m++){
 			wxString tempName = wxString::Format(
-					_T("object_%u_geometry_%u.stl"), n, m);
+					_T("object_%zu_geometry_%zu.stl"), n, m);
 			zip.PutNextEntry(tempName);
 			FileSTL::WriteStream(zip, objects[n].geometries[m]);
 		}
@@ -532,19 +532,6 @@ void Project::PaintRun(void) const
 	glTranslatef(-center.x, -center.y, -center.z);
 	glPushName(i + 1);
 	run[i].Paint();
-	glPopName();
-	glPopMatrix();
-}
-
-void Project::PaintAnimation(void) const
-{
-	const int i = GetFirstSelectedRun();
-	if(i < 0) return;
-	Vector3 center = run[i].GetCenter();
-	glPushMatrix();
-	glTranslatef(-center.x, -center.y, -center.z);
-	glPushName(i + 1);
-	run[i].Paint(true);
 	glPopName();
 	glPopMatrix();
 }

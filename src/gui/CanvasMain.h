@@ -56,9 +56,9 @@ public:
 
 	bool displayCoordinateSystem;
 	DisplayType display;
-	bool displayAnimation;
 
 private:
+	bool displayAnimation;
 	bool displayGeometry;
 	bool displayMachine;
 	bool displayStock;

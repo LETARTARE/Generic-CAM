@@ -84,7 +84,7 @@ FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 #endif
 
 	logWindow = new wxLogWindow(this, _("Generic CAM - log window"), false,
-			true);
+			false);
 
 // Setup configuration
 	this->config = config;
@@ -218,7 +218,7 @@ bool FrameMain::TransferDataToWindow(void)
 	tree->Update();
 
 //	m_menuToolpath->Check(ID_GENERATORAUTOMATIC, project.processToolpath);
-	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
+	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
 	//TODO: Reactivate
 //	m_toolBar->ToggleTool(ID_DISPLAYMACHINE, project.displayMachine);
 //	m_toolBar->ToggleTool(ID_DISPLAYMATERIAL, project.displayGeometry);
@@ -228,7 +228,7 @@ bool FrameMain::TransferDataToWindow(void)
 	temp += project.name;
 	this->SetTitle(temp);
 
-	m_canvas->displayAnimation = dialogAnimation->IsShown();
+//	m_canvas->displayAnimation = dialogAnimation->IsShown();
 
 	dialogObjectTransformation->TransferDataToWindow();
 	dialogStockMaterial->TransferDataToWindow();
@@ -312,7 +312,7 @@ void FrameMain::OnTimer(wxTimerEvent& event)
 	temp = wxString::Format(_T("x: %4u y: %4u  - %4u %4u %4u %4u"), m_canvas->x,
 			m_canvas->y, m_canvas->c0, m_canvas->ct1, m_canvas->ct2,
 			m_canvas->ct3);
-	m_statusBar->SetStatusText(temp, 0);
+	m_statusBar->SetStatusText(temp, 1);
 
 //	if(project.processToolpath){
 //		if(project.GenerateToolpaths()) TransferDataToWindow();
@@ -472,7 +472,7 @@ void FrameMain::OnActivateRightClickMenu(wxTreeEvent& event)
 	wxTreeItemId id = event.GetItem();
 	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
 
-	wxLogMessage(_T("RKMenu: %u - %u"), data->dataType, data->nr);
+//	wxLogMessage(_T("RKMenu: %i - %i"), (int)data->dataType, (int)data->nr);
 
 	wxMenu menu(_T(""));
 
@@ -597,7 +597,7 @@ void FrameMain::OnSelectionChanged(wxTreeEvent& event)
 			// Only allow one item selected at a time
 			size_t n;
 			for(n = 0; n < project.run.GetCount(); n++)
-				project.run[n].selected = (n == data->nr);
+				project.run[n].Select(n == data->nr);
 			tree->UpdateSelection();
 		}
 	}
@@ -1123,7 +1123,7 @@ void FrameMain::OnActivateStereo3D(wxCommandEvent& event)
 	}else{
 		m_canvas->stereoMode = stereoOff;
 	}
-	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
+	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
 	TransferDataToWindow();
 }
 

@@ -27,7 +27,8 @@
 #include "DialogAnimation.h"
 
 #include <math.h>
-
+#include "../icon/play.xpm"
+#include "../icon/stop.xpm"
 #include "IDs.h"
 
 DialogAnimation::DialogAnimation(wxWindow* parent, Project *project) :
@@ -37,7 +38,7 @@ DialogAnimation::DialogAnimation(wxWindow* parent, Project *project) :
 	this->run = NULL;
 	this->simulator = NULL;
 	loopGuard = false;
-
+	simulateWorkpiece = true;
 	timer.SetOwner(this);
 	this->Connect(wxEVT_TIMER, wxTimerEventHandler(DialogAnimation::OnTimer),
 	NULL, this);
@@ -78,6 +79,9 @@ void DialogAnimation::InitSimulation(void)
 bool DialogAnimation::TransferDataToWindow(void)
 {
 	if(loopGuard) return false;
+
+	simulateWorkpiece = m_checkBoxSimulateWorkpiece->GetValue();
+
 	m_choiceToolpath->Clear();
 	m_choiceToolpath->Append(_T(""));
 
@@ -88,6 +92,9 @@ bool DialogAnimation::TransferDataToWindow(void)
 			if(selected == -1 && project->run[i].selected) selected = i;
 		}
 		m_choiceToolpath->SetSelection(selected + 1);
+		if(selected >= 0 && this->IsShown()){
+			project->run[selected].showSimulation = simulateWorkpiece;
+		}
 	}else{
 		m_choiceToolpath->Append(_T("No run found."));
 		m_choiceToolpath->SetSelection(0);
@@ -98,6 +105,12 @@ bool DialogAnimation::TransferDataToWindow(void)
 	}
 
 	loopGuard = true;
+
+	if(timer.IsRunning()){
+		m_bpButtonPlayStop->SetBitmapLabel(wxIcon(stop_xpm));
+	}else{
+		m_bpButtonPlayStop->SetBitmapLabel(wxIcon(play_xpm));
+	}
 	if(simulator != NULL && simulator->toolpath != NULL){
 		m_textCtrlMaxTime->SetValue(
 				SecondsToTC(simulator->toolpath->MaxTime()));
@@ -155,6 +168,27 @@ bool DialogAnimation::TransferDataToWindow(void)
 
 void DialogAnimation::OnXClose(wxCloseEvent &event)
 {
+	if(timer.IsRunning()){
+		timer.Stop();
+		TransferDataToWindow();
+	}
+	int selectedRun = GetSelectedRun();
+	if(project != NULL && selectedRun >= 0) project->run[selectedRun].showSimulation =
+			false;
+	this->Show(false);
+	wxCommandEvent refreshEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
+	ProcessEvent(refreshEvent);
+}
+
+void DialogAnimation::OnClose(wxCommandEvent& event)
+{
+	if(timer.IsRunning()){
+		timer.Stop();
+		TransferDataToWindow();
+	}
+	int selectedRun = GetSelectedRun();
+	if(project != NULL && selectedRun >= 0) project->run[selectedRun].showSimulation =
+			false;
 	this->Show(false);
 	wxCommandEvent refreshEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
 	ProcessEvent(refreshEvent);
@@ -270,6 +304,12 @@ void DialogAnimation::OnTimer(wxTimerEvent& event)
 	}
 	simulator->Step(target);
 	PositionSlider();
+	TransferDataToWindow();
+}
+
+void DialogAnimation::OnChangeSimulation(wxCommandEvent& event)
+{
+	simulateWorkpiece = m_checkBoxSimulateWorkpiece->GetValue();
 	TransferDataToWindow();
 }
 

@@ -611,17 +611,17 @@ class GUIMachineDebugger : public wxFrame
 	
 	public:
 		
-		GUIMachineDebugger( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine debugger"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 771,594 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		GUIMachineDebugger( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine debugger"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 831,596 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		~GUIMachineDebugger();
 		void m_splitter2OnIdle( wxIdleEvent& )
 		{
-		m_splitter2->SetSashPosition( 325 );
+		m_splitter2->SetSashPosition( 326 );
 		m_splitter2->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIMachineDebugger::m_splitter2OnIdle ), NULL, this );
 		}
 		
 		void m_splitter3OnIdle( wxIdleEvent& )
 		{
-		m_splitter3->SetSashPosition( 222 );
+		m_splitter3->SetSashPosition( 409 );
 		m_splitter3->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIMachineDebugger::m_splitter3OnIdle ), NULL, this );
 		}
 		
@@ -900,27 +900,32 @@ class GUIAnimation : public wxFrame
 		wxStaticText* m_staticText72;
 		wxTextCtrl* m_textCtrlMaxTime;
 		wxSlider* m_sliderTime;
+		wxCheckBox* m_checkBoxSimulateWorkpiece;
 		wxBitmapButton* m_bpButtonFirst;
 		wxBitmapButton* m_bpButtonPrev;
 		wxBitmapButton* m_bpButtonPlayStop;
 		wxBitmapButton* m_bpButtonNext;
 		wxBitmapButton* m_bpButtonLast;
 		
+		wxButton* m_buttonClose;
+		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;
 		virtual void OnSelectToolpath( wxCommandEvent& event ) = 0;
 		virtual void OnChangeTime( wxCommandEvent& event ) = 0;
 		virtual void OnScroll( wxScrollEvent& event ) = 0;
+		virtual void OnChangeSimulation( wxCommandEvent& event ) = 0;
 		virtual void OnFirst( wxCommandEvent& event ) = 0;
 		virtual void OnPrev( wxCommandEvent& event ) = 0;
 		virtual void OnPlayStop( wxCommandEvent& event ) = 0;
 		virtual void OnNext( wxCommandEvent& event ) = 0;
 		virtual void OnLast( wxCommandEvent& event ) = 0;
+		virtual void OnClose( wxCommandEvent& event ) = 0;
 		
 	
 	public:
 		
-		GUIAnimation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolpath Animation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 488,332 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
+		GUIAnimation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolpath Animation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 558,413 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
 		~GUIAnimation();
 	
 };

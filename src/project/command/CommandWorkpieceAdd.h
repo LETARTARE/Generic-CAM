@@ -39,7 +39,7 @@
 class CommandWorkpieceAdd:public wxCommand {
 public:
 	CommandWorkpieceAdd(const wxString& name, Project * project,
-			StockMaterial stock);
+			StockMaterial stock, int refObject = -1);
 	virtual ~CommandWorkpieceAdd();
 
 	bool Do(void);
@@ -48,6 +48,7 @@ public:
 protected:
 	Project * project;
 	StockMaterial stock;
+	int refObject;
 };
 
 #endif /* COMMANDWORKPIECEADD_H_ */

@@ -188,7 +188,7 @@ bool Object::ReloadObject(void)
 				g.InsertTrianglesFrom(temp.geometry[i]);
 				if(g.name.IsEmpty()){
 					g.name = fileName.GetName()
-							+ wxString::Format(_T(" - %u"), i);
+							+ wxString::Format(_T(" - %lu"), i);
 				}
 				g.color.Set((float) rand() / (float) RAND_MAX / 2.0 + 0.5,
 						(float) rand() / (float) RAND_MAX / 2.0 + 0.5,
@@ -238,16 +238,16 @@ void Object::ToStream(wxTextOutputStream& stream, size_t n)
 	stream << ((show)? 1 : 0);
 	stream << endl;
 	stream << _T("Geometries: ");
-	stream << wxString::Format(_T("%u"), geometries.GetCount());
+	stream << wxString::Format(_T("%zu"), geometries.GetCount());
 	stream << endl;
 	for(size_t m = 0; m < geometries.GetCount(); m++){
 		stream << _T("Geometry: ");
-		stream << wxString::Format(_T("%u"), m);
+		stream << wxString::Format(_T("%zu"), m);
 		stream << endl;
 		stream << _T("Name:") << endl;
 		stream << geometries[m].name << endl;
 		stream << _T("Filename:") << endl;
-		stream << wxString::Format(_T("object_%u_geometry_%u.stl"), n, m)
+		stream << wxString::Format(_T("object_%zu_geometry_%zu.stl"), n, m)
 				<< endl;
 		stream << _T("Matrix: ");
 		geometries[m].matrix.ToStream(stream);

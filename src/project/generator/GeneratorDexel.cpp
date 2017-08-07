@@ -80,9 +80,10 @@ void GeneratorDexel::Paint(void) const
 
 void GeneratorDexel::GenerateToolpath(void)
 {
+	// Granularity
+	const double resX = 0.001; // = 1 mm
+	const double resY = 0.001; // = 1 mm
 
-	const double resX = 0.001;
-	const double resY = 0.001;
 
 	target.SetupBox(area.GetSizeX(), area.GetSizeY(), area.GetSizeZ(), resX,
 			resY);

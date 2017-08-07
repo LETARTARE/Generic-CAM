@@ -27,11 +27,12 @@
 #include "CommandWorkpieceAdd.h"
 
 CommandWorkpieceAdd::CommandWorkpieceAdd(const wxString& name, Project* project,
-		StockMaterial stock) :
+		StockMaterial stock, int refObject) :
 		wxCommand(true, name)
 {
 	this->project = project;
 	this->stock = stock;
+	this->refObject = refObject;
 }
 
 CommandWorkpieceAdd::~CommandWorkpieceAdd()
@@ -41,7 +42,7 @@ CommandWorkpieceAdd::~CommandWorkpieceAdd()
 bool CommandWorkpieceAdd::Do(void)
 {
 	Workpiece temp(stock);
-	temp.parent = project;
+	temp.refObject = refObject;
 	project->workpieces.Add(temp);
 	project->Update();
 	return true;

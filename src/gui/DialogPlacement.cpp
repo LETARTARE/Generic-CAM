@@ -181,10 +181,9 @@ void DialogPlacement::OnSelectObject(wxCommandEvent& event)
 	int wpNr = m_choiceWorkpiece->GetSelection() - 1;
 	if(wpNr < 0) return;
 	int plNr = m_choicePlacement->GetSelection() - 1;
-	size_t n;
-	for(n = 0; n < project->workpieces.GetCount(); n++)
+	for(size_t n = 0; n < project->workpieces.GetCount(); n++)
 		project->workpieces[n].selected = (n == wpNr);
-	for(n = 0; n < project->workpieces[wpNr].placements.GetCount(); n++)
+	for(size_t n = 0; n < project->workpieces[wpNr].placements.GetCount(); n++)
 		project->workpieces[wpNr].placements[n].selected = (n == plNr);
 
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHMAINGUI);

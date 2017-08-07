@@ -35,20 +35,17 @@ Workpiece::Workpiece()
 {
 	parent = NULL;
 	selected = false;
-//	modified = false;
-//	hasRunningGenerator = false;
-//	handle = 0;
+	refObject = -1;
 }
 
 Workpiece::Workpiece(const StockMaterial &material)
 {
 	parent = NULL;
-	color = material.color;
 	selected = false;
+	refObject = -1;
+
+	color = material.color;
 	name = material.name;
-//	modified = false;
-//	handle = 0;
-//	hasRunningGenerator = false;
 	SetSize(material.sx, material.sy, material.sz);
 }
 
@@ -66,7 +63,15 @@ void Workpiece::Paint(void) const
 	glMultMatrixd(this->matrix.a);
 
 //	BoundingBox::Paint();
-	bbox.Paint();
+
+	if(refObject >= 0 && refObject < project->objects.GetCount()){
+		glColor4f(0.5, 0.5, 0.5, 0.3);
+//		BoundingBox::Paint();
+		project->objects[refObject].Paint(false);
+	}else{
+		glColor4f(0.5, 0.5, 0.5, 1.0);
+		bbox.Paint();
+	}
 
 	for(size_t j = 0; j < placements.GetCount(); j++){
 //		const float x = placements[j].matrix.a[12];
@@ -110,13 +115,24 @@ void Workpiece::Update(void)
 	const Project* project = this->parent;
 	if(project == NULL) return;
 
-	bbox.SetSize(GetSizeX(), GetSizeY(), GetSizeZ());
-	for(size_t j = 0; j < placements.GetCount(); j++){
-		placements[j].parent = this;
-		placements[j].Update();
-		bbox -= BooleanBox(placements[j].xmin, placements[j].ymin, 0,
-				placements[j].xmax, placements[j].ymax, GetSizeZ());
+	if(refObject >= 0 && refObject < project->objects.GetCount()){
+		SetSize(project->objects[refObject].bbox.GetSizeX(),
+				project->objects[refObject].bbox.GetSizeY(),
+				project->objects[refObject].bbox.GetSizeZ());
+		for(size_t j = 0; j < placements.GetCount(); j++){
+			placements[j].parent = this;
+			placements[j].Update();
+		}
+	}else{
+		bbox.SetSize(GetSizeX(), GetSizeY(), GetSizeZ());
+		for(size_t j = 0; j < placements.GetCount(); j++){
+			placements[j].parent = this;
+			placements[j].Update();
+			bbox -= BooleanBox(placements[j].xmin, placements[j].ymin, 0,
+					placements[j].xmax, placements[j].ymax, GetSizeZ());
+		}
 	}
+
 }
 
 //void Workpiece::SortTargets(void)
@@ -155,12 +171,13 @@ void Workpiece::ToStream(wxTextOutputStream& stream)
 {
 	stream << _T("Name:") << endl;
 	stream << name << endl;
+	stream << wxString::Format(_T("ObjectRef: %i"), refObject) << endl;
 	stream << _T("Matrix: ");
 	matrix.ToStream(stream);
 	stream << endl;
 	BoundingBox::ToStream(stream);
 	stream << _T("Placements: ");
-	stream << wxString::Format(_T("%u"), placements.GetCount());
+	stream << wxString::Format(_T("%zu"), placements.GetCount());
 	stream << endl;
 	for(size_t n = 0; n < placements.GetCount(); n++)
 		placements[n].ToStream(stream);
@@ -175,6 +192,9 @@ bool Workpiece::FromStream(wxTextInputStream& stream)
 	temp = stream.ReadLine();
 	if(temp.Cmp(_T("Name:")) != 0) return false;
 	name = stream.ReadLine();
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("ObjectRef:")) != 0) return false;
+	refObject = stream.Read32S();
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Matrix:")) != 0) return false;
 	matrix.FromStream(stream);

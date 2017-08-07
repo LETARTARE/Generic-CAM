@@ -85,7 +85,7 @@ FlipDrillPattern::FlipDrillPattern()
 
 void FlipDrillPattern::Paint(void) const
 {
-	toolpath.Paint();
+//	toolpath.Paint();
 	outLine.Paint();
 }
 

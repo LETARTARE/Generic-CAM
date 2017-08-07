@@ -209,5 +209,9 @@ void GeneratorTest::GenerateToolpath(void)
 	}
 //	debug = temp;
 	tp.FlagAll(true);
+
+	AffineTransformMatrix shiftback;
+	shiftback.TranslateGlobal(area.xmin,area.ymin,area.zmin);
+	tp.ApplyTransformation(shiftback);
 	toolpath = tp;
 }

@@ -439,7 +439,7 @@ GCodeBlock::GCodeBlock(wxString block, double conversionFactor)
 		if(n == BL && state != 4 && state != 0) error = _T(
 				"Missing closing character at end of line.");
 		if(!error.IsEmpty()){
-			error = wxString::Format(_T("Column %u: "), n) + error;
+			error = wxString::Format(_T("Column %lu: "), n) + error;
 			error += _T("\nafter ") + block.Left(n) + _T("<");
 			break;
 		}
@@ -452,10 +452,10 @@ wxString GCodeBlock::GetCode(void) const
 
 	for(uint_fast8_t n = 0; n < maxMModes; ++n){
 		if(M[n] < 0) continue;
-		temp += wxString::Format(_T(" M%u"), M[n]);
+		temp += wxString::Format(_T(" M%i"), M[n]);
 	}
 
-	if(T >= 0) temp += wxString::Format(_T(" T%u"), T);
+	if(T >= 0) temp += wxString::Format(_T(" T%i"), T);
 	if(S >= -FLT_EPSILON) temp += wxString::Format(_T(" S%g"), S * 60);
 
 	for(uint_fast8_t n = 0; n < maxGModes; ++n){
@@ -463,15 +463,15 @@ wxString GCodeBlock::GetCode(void) const
 		const uint_fast16_t gmaj = (G[n] / 10);
 		const uint_fast8_t gmin = (G[n] % 10);
 		if(gmin == 0){
-			temp += wxString::Format(_T(" G%u"), gmaj);
+			temp += wxString::Format(_T(" G%lu"), gmaj);
 		}else{
-			temp += wxString::Format(_T(" G%u.%u"), gmaj, gmin);
+			temp += wxString::Format(_T(" G%lu.%lu"), gmaj, gmin);
 		}
 	}
 
-	if(D >= 0) temp += wxString::Format(_T(" D%u"), D);
-	if(H >= 0) temp += wxString::Format(_T(" H%u"), H);
-	if(L >= 0) temp += wxString::Format(_T(" L%u"), L);
+	if(D >= 0) temp += wxString::Format(_T(" D%i"), D);
+	if(H >= 0) temp += wxString::Format(_T(" H%i"), H);
+	if(L >= 0) temp += wxString::Format(_T(" L%i"), L);
 
 	if(RFlag){
 		temp += wxString::Format(_T(" R%g"), R / conversionFactor);
@@ -525,7 +525,7 @@ wxString GCodeBlock::GetCode(void) const
 	for(size_t n = 0; n < temp.Length(); n++)
 		if(temp[n] == ',') temp[n] = '.';
 
-	if(N >= 0) temp = wxString::Format(_T(" N%05u"), N) + temp;
+	if(N >= 0) temp = wxString::Format(_T(" N%05i"), N) + temp;
 	if(block_delete) temp = _T("/") + temp;
 	if(!Comment.empty()){
 		if(message){

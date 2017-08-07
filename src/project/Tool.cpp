@@ -388,7 +388,7 @@ void Tool::ToStream(wxTextOutputStream & stream)
 	stream << slotNr << _T(" ");
 	stream << endl;
 	stream << _T("Elements: ");
-	stream << wxString::Format(_T("%u"), elements.GetCount());
+	stream << wxString::Format(_T("%zu"), elements.GetCount());
 	stream << endl;
 	for(size_t n = 0; n < elements.GetCount(); n++){
 		stream << elements[n].ToString() << endl;
