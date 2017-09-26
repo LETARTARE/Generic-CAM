@@ -77,12 +77,11 @@ public:
 	//! Insert a single Triangle.
 	void Insert(const Triangle& tri);
 
-	/*!\brief Translate BoundingBox by matrix
+	/*!\brief Transform BoundingBox by matrix
 	 *
-	 * Only the translatory components are used.
 	 * @param matrix AffineTransformMatrix
 	 */
-	void Translate(const AffineTransformMatrix matrix);
+	void Transform(const AffineTransformMatrix matrix);
 
 	//! Check if the box is empty.
 	bool IsEmpty(void) const;

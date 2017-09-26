@@ -208,11 +208,13 @@ void Run::Paint(void) const
 	if(refWorkpiece > -1){
 		::glPushMatrix();
 		::glMultMatrixd(machine.workpiecePosition.a);
-		::glMultMatrixd(workpiecePlacement.a);
 		if(showSimulation){
 			simulator.Paint();
 		}else{
+			::glPushMatrix();
+			::glMultMatrixd(workpiecePlacement.a);
 			pr->workpieces[refWorkpiece].Paint();
+			::glPopMatrix();
 			bool anySelected = false;
 			for(size_t n = 0; n < generators.GetCount(); n++){
 				assert(generators[n] != NULL);
@@ -256,6 +258,9 @@ void Run::ToStream(wxTextOutputStream& stream)
 	stream << _T("Name:") << endl;
 	stream << name << endl;
 	stream << wxString::Format(_T("WorkpieceRef: %i"), refWorkpiece) << endl;
+	stream << _T("WorkpiecePlacement: ");
+	workpiecePlacement.ToStream(stream);
+	stream << endl;
 	stream << wxString::Format(_T("Tools: %zu"), machine.tools.GetCount())
 			<< endl;
 	for(size_t n = 0; n < machine.tools.GetCount(); n++){
@@ -285,6 +290,9 @@ bool Run::FromStream(wxTextInputStream& stream, int runNr, Project * project)
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("WorkpieceRef:")) != 0) return false;
 	refWorkpiece = stream.Read32S();
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("WorkpiecePlacement:")) != 0) return false;
+	workpiecePlacement.FromStream(stream);
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Tools:")) != 0) return false;
 	size_t NTools = stream.Read32S();

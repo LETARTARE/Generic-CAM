@@ -41,8 +41,8 @@ StockMaterial::StockMaterial()
 
 	maxToolSpeed = 10000.0 / 60.0;
 	maxFeedrate = 5.0 / 60.0;
-	thermalConductivity = 100;
-	ignitionTemperature = 280 + 273.15;
+	thermalConductivity = 1;
+	maxTemperature = 280 + 273.15;
 
 	color.Set(1.0, 0.8, 0.1);
 	available = false;
@@ -200,7 +200,7 @@ void StockMaterial::ToStream(wxTextOutputStream& stream)
 	stream << maxToolSpeed << _T(" ");
 	stream << maxFeedrate << _T(" ");
 	stream << thermalConductivity << _T(" ");
-	stream << ignitionTemperature << endl;
+	stream << maxTemperature << endl;
 	stream << _T("Color: ");
 	stream << color.x << _T(" ");
 	stream << color.y << _T(" ");
@@ -224,7 +224,7 @@ bool StockMaterial::FromStream(wxTextInputStream& stream)
 	stream >> maxToolSpeed;
 	stream >> maxFeedrate;
 	stream >> thermalConductivity;
-	stream >> ignitionTemperature;
+	stream >> maxTemperature;
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Color:")) != 0) return false;
 	stream >> color.x;

@@ -85,6 +85,11 @@ bool SerialPort::Open(int nPort, int nBaud)
 	return Open(szPort, nBaud);
 }
 
+bool SerialPort::Open(const std::string& Port, int nBaud)
+{
+	return Open(Port.c_str(), nBaud);
+}
+
 bool SerialPort::Open(const char *Port, int nBaud)
 {
 	if(Port == NULL) return false;
@@ -263,6 +268,16 @@ bool SerialPort::Open(const char *Port, int nBaud)
 	return (Opened);
 }
 
+int SerialPort::GetHandle(void) const
+{
+#ifdef __WIN
+	return m_hIDComDev;
+#endif
+#ifdef __LINUX
+	return fd;
+#endif
+}
+
 bool SerialPort::Close(void)
 {
 	if(!Opened) return true;
@@ -312,24 +327,40 @@ bool SerialPort::WriteCommByte(unsigned char ucByte)
 }
 #endif
 
-int SerialPort::SendData(const char *buffer, unsigned int size)
+int SerialPort::SendData(const char *buffer, size_t size)
 {
 #ifdef __WIN
 	if(m_hIDComDev == NULL) return (0);
-
 	DWORD dwBytesWritten = 0;
-	for(unsigned int i = 0; i < size; i++){
+	for(size_t i = 0; i < size; i++){
 		WriteCommByte(buffer[i]);
 		dwBytesWritten++;
 	}
-
 	return ((int) dwBytesWritten);
 #endif
 #ifdef __LINUX
 	if(!Opened) return 0;
 	int dwBytesWritten = 0;
-
 	dwBytesWritten = write(fd, buffer, size);
+	return ((int) dwBytesWritten);
+#endif
+}
+
+int SerialPort::SendData(std::string data)
+{
+#ifdef __WIN
+	if(m_hIDComDev == NULL) return (0);
+	DWORD dwBytesWritten = 0;
+	for(size_t i = 0; i < size; i++){
+		WriteCommByte(data[i]);
+		dwBytesWritten++;
+	}
+	return ((int) dwBytesWritten);
+#endif
+#ifdef __LINUX
+	if(!Opened) return 0;
+	int dwBytesWritten = 0;
+	dwBytesWritten = write(fd, data.c_str(), data.size());
 	return ((int) dwBytesWritten);
 #endif
 }
@@ -359,7 +390,7 @@ int SerialPort::ReadDataWaiting(void)
 #endif
 }
 
-int SerialPort::ReadData(char *buffer, unsigned int limit)
+int SerialPort::ReadData(char *buffer, size_t limit)
 {
 #ifdef __WIN
 
@@ -467,4 +498,3 @@ void SerialPort::WaitTXFinish(void)
 	tcdrain(fd);
 #endif
 }
-

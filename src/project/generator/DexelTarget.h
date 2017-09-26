@@ -95,6 +95,8 @@ public:
 	bool FindStartCutting(int &x, int &y);
 	Polygon25 FindCut(int &x, int &y);
 
+	void FillBlock(double maxLevel, double minLevel = 0.0);
+
 	// Polygon3 Methods
 
 	void PolygonCutInTarget(Polygon3 &polygon, DexelTarget &tool);

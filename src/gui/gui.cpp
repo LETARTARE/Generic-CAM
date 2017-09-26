@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Dec 21 2009)
+// C++ code generated with wxFormBuilder (version Aug 20 2017)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -47,7 +47,8 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuProject->Append( m_menuItemProjectLoad );
 	
 	m_menuProjectRecent = new wxMenu();
-	m_menuProject->Append( -1, _("Load &Recent"), m_menuProjectRecent );
+	wxMenuItem* m_menuProjectRecentItem = new wxMenuItem( m_menuProject, wxID_ANY, _("Load &Recent"), wxEmptyString, wxITEM_NORMAL, m_menuProjectRecent );
+	m_menuProject->Append( m_menuProjectRecentItem );
 	
 	wxMenuItem* m_menuItemProjectSave;
 	m_menuItemProjectSave = new wxMenuItem( m_menuProject, wxID_SAVE, wxString( _("&Save Project") ) + wxT('\t') + wxT("CTRL+S"), wxEmptyString, wxITEM_NORMAL );
@@ -57,14 +58,13 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemProjectSaveAs = new wxMenuItem( m_menuProject, wxID_SAVEAS, wxString( _("Save Project &as...") ) + wxT('\t') + wxT("CTRL+SHIFT+S"), wxEmptyString, wxITEM_NORMAL );
 	m_menuProject->Append( m_menuItemProjectSaveAs );
 	
-	wxMenuItem* m_separator4;
-	m_separator4 = m_menuProject->AppendSeparator();
+	m_menuProject->AppendSeparator();
 	
 	wxMenuItem* m_menuItemQuit;
 	m_menuItemQuit = new wxMenuItem( m_menuProject, wxID_EXIT, wxString( _("&Quit") ) + wxT('\t') + wxT("CTRL+Q"), _("Exit the program"), wxITEM_NORMAL );
 	m_menuProject->Append( m_menuItemQuit );
 	
-	m_menubar->Append( m_menuProject, _("&Project") );
+	m_menubar->Append( m_menuProject, _("&Project") ); 
 	
 	m_menuEdit = new wxMenu();
 	wxMenuItem* m_menuItemUndo;
@@ -75,7 +75,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemRedo = new wxMenuItem( m_menuEdit, wxID_REDO, wxString( _("&Redo") ) + wxT('\t') + wxT("CTRL+Y"), _("Redo last undone command"), wxITEM_NORMAL );
 	m_menuEdit->Append( m_menuItemRedo );
 	
-	m_menubar->Append( m_menuEdit, _("&Edit") );
+	m_menubar->Append( m_menuEdit, _("&Edit") ); 
 	
 	m_menuObject = new wxMenu();
 	wxMenuItem* m_menuItemObjectModify;
@@ -86,8 +86,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemObjectFlipNormals = new wxMenuItem( m_menuObject, ID_OBJECTFLIPNORMALS, wxString( _("&Flip Normals") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuObject->Append( m_menuItemObjectFlipNormals );
 	
-	wxMenuItem* m_separator8;
-	m_separator8 = m_menuObject->AppendSeparator();
+	m_menuObject->AppendSeparator();
 	
 	wxMenuItem* m_menuItemObjectLoad;
 	m_menuItemObjectLoad = new wxMenuItem( m_menuObject, ID_OBJECTLOAD, wxString( _("&Load Object File...") ) + wxT('\t') + wxT("CTRL+O"), wxEmptyString, wxITEM_NORMAL );
@@ -101,7 +100,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemObjectDelete = new wxMenuItem( m_menuObject, ID_OBJECTDELETE, wxString( _("&Delete Object") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuObject->Append( m_menuItemObjectDelete );
 	
-	m_menubar->Append( m_menuObject, _("&Object") );
+	m_menubar->Append( m_menuObject, _("&Object") ); 
 	
 	m_menuStock = new wxMenu();
 	wxMenuItem* m_menuItemStockOrganize;
@@ -112,8 +111,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemStockToWorkpiece = new wxMenuItem( m_menuStock, ID_WORKPIECEADD, wxString( _("&Add Stock to Project") ) , _("Add stock material to project as workpiece."), wxITEM_NORMAL );
 	m_menuStock->Append( m_menuItemStockToWorkpiece );
 	
-	wxMenuItem* m_separator16;
-	m_separator16 = m_menuStock->AppendSeparator();
+	m_menuStock->AppendSeparator();
 	
 	wxMenuItem* m_menuItemStockLoad;
 	m_menuItemStockLoad = new wxMenuItem( m_menuStock, ID_STOCKLOAD, wxString( _("&Load Stock...") ) , wxEmptyString, wxITEM_NORMAL );
@@ -123,7 +121,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemStockSave = new wxMenuItem( m_menuStock, ID_STOCKSAVE, wxString( _("&Save Stock...") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuStock->Append( m_menuItemStockSave );
 	
-	m_menubar->Append( m_menuStock, _("&Stock") );
+	m_menubar->Append( m_menuStock, _("&Stock") ); 
 	
 	m_menuWorkpiece = new wxMenu();
 	wxMenuItem* m_menuItemWorkpieceSetup;
@@ -138,7 +136,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemWorkpieceDeleteUnused = new wxMenuItem( m_menuWorkpiece, ID_WORKPIECEDELETEUNUSED, wxString( _("Delete &unused Workpieces") ) , _("Remove all workpieces, that have no objects linked to them."), wxITEM_NORMAL );
 	m_menuWorkpiece->Append( m_menuItemWorkpieceDeleteUnused );
 	
-	m_menubar->Append( m_menuWorkpiece, _("&Workpiece") );
+	m_menubar->Append( m_menuWorkpiece, _("&Workpiece") ); 
 	
 	m_menuMachine = new wxMenu();
 	wxMenuItem* m_menuItemMachineLoad;
@@ -149,8 +147,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemMachineReload = new wxMenuItem( m_menuMachine, ID_MACHINERELOAD, wxString( _("&Reload Machine") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuMachine->Append( m_menuItemMachineReload );
 	
-	wxMenuItem* m_separator10;
-	m_separator10 = m_menuMachine->AppendSeparator();
+	m_menuMachine->AppendSeparator();
 	
 	wxMenuItem* m_menuItemMachineDebugger;
 	m_menuItemMachineDebugger = new wxMenuItem( m_menuMachine, ID_MACHINEDEBUGGER, wxString( _("&Open Machine Debugger") ) + wxT('\t') + wxT("CTRL+D"), wxEmptyString, wxITEM_NORMAL );
@@ -161,7 +158,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuMachine->Append( m_menuItemFlipDrill );
 	m_menuItemFlipDrill->Enable( false );
 	
-	m_menubar->Append( m_menuMachine, _("&Machine") );
+	m_menubar->Append( m_menuMachine, _("&Machine") ); 
 	
 	m_menuToolbox = new wxMenu();
 	wxMenuItem* m_menuItemToolboxEdit;
@@ -176,7 +173,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemToolboxSave = new wxMenuItem( m_menuToolbox, ID_TOOLBOXSAVE, wxString( _("&Save Toolbox...") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuToolbox->Append( m_menuItemToolboxSave );
 	
-	m_menubar->Append( m_menuToolbox, _("&Toolbox") );
+	m_menubar->Append( m_menuToolbox, _("&Toolbox") ); 
 	
 	m_menuRun = new wxMenu();
 	wxMenuItem* m_menuItemRunSetup;
@@ -191,15 +188,14 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemRunDelete = new wxMenuItem( m_menuRun, ID_RUNDELETE, wxString( _("&Delete Run") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuRun->Append( m_menuItemRunDelete );
 	
-	m_menubar->Append( m_menuRun, _("&Run") );
+	m_menubar->Append( m_menuRun, _("&Run") ); 
 	
 	m_menuToolpath = new wxMenu();
 	wxMenuItem* m_menuItemGeneratorSetup;
 	m_menuItemGeneratorSetup = new wxMenuItem( m_menuToolpath, ID_GENERATORSETUP, wxString( _("&Setup Generators") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuToolpath->Append( m_menuItemGeneratorSetup );
 	
-	wxMenuItem* m_separator18;
-	m_separator18 = m_menuToolpath->AppendSeparator();
+	m_menuToolpath->AppendSeparator();
 	
 	wxMenuItem* m_menuItemGeneratorStart;
 	m_menuItemGeneratorStart = new wxMenuItem( m_menuToolpath, ID_GENERATORSTART, wxString( _("Start &Generators") ) + wxT('\t') + wxT("CTRL+G"), _("Start the generation of any ungenerated toolpaths."), wxITEM_NORMAL );
@@ -215,10 +211,10 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuToolpath->Append( m_menuItemGeneratorRestart );
 	m_menuItemGeneratorRestart->Enable( false );
 	
-	wxMenuItem* m_separator19;
-	m_separator19 = m_menuToolpath->AppendSeparator();
+	m_menuToolpath->AppendSeparator();
 	
 	m_menuDialect = new wxMenu();
+	wxMenuItem* m_menuDialectItem = new wxMenuItem( m_menuToolpath, wxID_ANY, _("Dialect"), wxEmptyString, wxITEM_NORMAL, m_menuDialect );
 	wxMenuItem* m_menuItemDialectRS274NGC;
 	m_menuItemDialectRS274NGC = new wxMenuItem( m_menuDialect, ID_DIALECT_RS274NGC, wxString( _("RS274NGC") ) , _("Dialect according to the document \"The NIST RS274NGC Interpreter - Version 3\" by Thomas R. Kramer, Frederick M. Proctor and Elena Messina (NISTIR 6556, August 17, 2000).\n\n"), wxITEM_RADIO );
 	m_menuDialect->Append( m_menuItemDialectRS274NGC );
@@ -228,20 +224,19 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemDialectFanucM = new wxMenuItem( m_menuDialect, ID_DIALECT_FANUCM, wxString( _("Fanuc-M") ) , _("Dialect used by the Fanuc-M milling simulator."), wxITEM_RADIO );
 	m_menuDialect->Append( m_menuItemDialectFanucM );
 	
-	m_menuToolpath->Append( -1, _("Dialect"), m_menuDialect );
+	m_menuToolpath->Append( m_menuDialectItem );
 	
 	wxMenuItem* m_menuItemGeneratorSaveToolpath;
 	m_menuItemGeneratorSaveToolpath = new wxMenuItem( m_menuToolpath, ID_TOOLPATHSAVE, wxString( _("Save &Toolpath") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuToolpath->Append( m_menuItemGeneratorSaveToolpath );
 	
-	wxMenuItem* m_separator5;
-	m_separator5 = m_menuToolpath->AppendSeparator();
+	m_menuToolpath->AppendSeparator();
 	
 	wxMenuItem* m_menuItemShowAnimationControl;
 	m_menuItemShowAnimationControl = new wxMenuItem( m_menuToolpath, wxID_ANY, wxString( _("Show Animation &Control") ) + wxT('\t') + wxT("Ctrl+A"), wxEmptyString, wxITEM_NORMAL );
 	m_menuToolpath->Append( m_menuItemShowAnimationControl );
 	
-	m_menubar->Append( m_menuToolpath, _("Tool&path") );
+	m_menubar->Append( m_menuToolpath, _("Tool&path") ); 
 	
 	m_menuSettings = new wxMenu();
 	wxMenuItem* m_menuItemSetupLanguage;
@@ -252,8 +247,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemActivateStereo3D = new wxMenuItem( m_menuSettings, ID_VIEWSTEREO3D, wxString( _("Stereo &3D") ) + wxT('\t') + wxT("CTRL+3"), wxEmptyString, wxITEM_CHECK );
 	m_menuSettings->Append( m_menuItemActivateStereo3D );
 	
-	wxMenuItem* m_separator71;
-	m_separator71 = m_menuSettings->AppendSeparator();
+	m_menuSettings->AppendSeparator();
 	
 	wxMenuItem* m_menuItemSetupController;
 	m_menuItemSetupController = new wxMenuItem( m_menuSettings, ID_SETUPCONTROLLER, wxString( _("Setup 6DOF &Controller") ) , wxEmptyString, wxITEM_NORMAL );
@@ -267,7 +261,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemSetupUnits = new wxMenuItem( m_menuSettings, ID_SETUPUNITS, wxString( _("Setup &Units") ) + wxT('\t') + wxT("CTRL+U"), wxEmptyString, wxITEM_NORMAL );
 	m_menuSettings->Append( m_menuItemSetupUnits );
 	
-	m_menubar->Append( m_menuSettings, _("S&ettings") );
+	m_menubar->Append( m_menuSettings, _("S&ettings") ); 
 	
 	m_menuView = new wxMenu();
 	wxMenuItem* m_menuItemCloseAdditionalWindows;
@@ -278,8 +272,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemLogShow = new wxMenuItem( m_menuView, ID_LOGSHOW, wxString( _("Show &Log Window") ) + wxT('\t') + wxT("CTRL+SHIFT+L"), wxEmptyString, wxITEM_NORMAL );
 	m_menuView->Append( m_menuItemLogShow );
 	
-	wxMenuItem* m_separator11;
-	m_separator11 = m_menuView->AppendSeparator();
+	m_menuView->AppendSeparator();
 	
 	wxMenuItem* m_menuItemTop;
 	m_menuItemTop = new wxMenuItem( m_menuView, ID_VIEWTOP, wxString( _("View from Top") ) + wxT('\t') + wxT("KP_7"), wxEmptyString, wxITEM_NORMAL );
@@ -305,28 +298,26 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_menuItemLeft = new wxMenuItem( m_menuView, ID_VIEWLEFT, wxString( _("View from Left") ) + wxT('\t') + wxT("CTRL+KP_3"), wxEmptyString, wxITEM_NORMAL );
 	m_menuView->Append( m_menuItemLeft );
 	
-	m_menubar->Append( m_menuView, _("&View") );
+	m_menubar->Append( m_menuView, _("&View") ); 
 	
 	m_menuHelp = new wxMenu();
 	wxMenuItem* m_menuItemHelp;
 	m_menuItemHelp = new wxMenuItem( m_menuHelp, wxID_HELP, wxString( _("&Help") ) + wxT('\t') + wxT("F1"), wxEmptyString, wxITEM_NORMAL );
 	m_menuHelp->Append( m_menuItemHelp );
 	
-	wxMenuItem* m_separator181;
-	m_separator181 = m_menuHelp->AppendSeparator();
+	m_menuHelp->AppendSeparator();
 	
 	wxMenuItem* m_menuItemTestGCode;
 	m_menuItemTestGCode = new wxMenuItem( m_menuHelp, ID_TESTGCODE, wxString( _("Test G-Code") ) + wxT('\t') + wxT("CTRL+SHIFT+G"), _("Analyse a line (block) of G-Code with the implemented parser."), wxITEM_NORMAL );
 	m_menuHelp->Append( m_menuItemTestGCode );
 	
-	wxMenuItem* m_separator191;
-	m_separator191 = m_menuHelp->AppendSeparator();
+	m_menuHelp->AppendSeparator();
 	
 	wxMenuItem* m_menuAbout;
 	m_menuAbout = new wxMenuItem( m_menuHelp, wxID_ABOUT, wxString( _("&About") ) , _("About the program"), wxITEM_NORMAL );
 	m_menuHelp->Append( m_menuAbout );
 	
-	m_menubar->Append( m_menuHelp, _("&Help") );
+	m_menubar->Append( m_menuHelp, _("&Help") ); 
 	
 	this->SetMenuBar( m_menubar );
 	
@@ -334,14 +325,16 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	bSizer = new wxBoxSizer( wxVERTICAL );
 	
 	m_splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3DSASH|wxSP_LIVE_UPDATE );
-	m_splitter->SetMinimumPaneSize( 100 );
 	m_splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( GUIMain::m_splitterOnIdle ), NULL, this );
+	m_splitter->SetMinimumPaneSize( 100 );
+	
 	m_panelTree = new wxPanel( m_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizerTree;
 	bSizerTree = new wxBoxSizer( wxVERTICAL );
 	
 	m_tree = new wxTreeCtrl( m_panelTree, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_EDIT_LABELS|wxTR_EXTENDED|wxTR_FULL_ROW_HIGHLIGHT|wxTR_HAS_BUTTONS|wxTR_MULTIPLE|wxTR_NO_LINES|wxTR_SINGLE );
 	bSizerTree->Add( m_tree, 1, wxALL|wxEXPAND, 5 );
+	
 	
 	m_panelTree->SetSizer( bSizerTree );
 	m_panelTree->Layout();
@@ -353,11 +346,13 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_canvas = new CanvasMain(m_panelCanvasMain);
 	bSizerMainCanvas->Add( m_canvas, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
+	
 	m_panelCanvasMain->SetSizer( bSizerMainCanvas );
 	m_panelCanvasMain->Layout();
 	bSizerMainCanvas->Fit( m_panelCanvasMain );
 	m_splitter->SplitVertically( m_panelTree, m_panelCanvasMain, 250 );
 	bSizer->Add( m_splitter, 1, wxEXPAND, 5 );
+	
 	
 	this->SetSizer( bSizer );
 	this->Layout();
@@ -367,14 +362,21 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_toolBar->Enable( false );
 	m_toolBar->Hide();
 	
-	m_toolBar->AddTool( wxID_UNDO, _("tool"), wxBitmap( undo_xpm ), wxNullBitmap, wxITEM_NORMAL, _("Undo"), _("Undo") );
-	m_toolBar->AddTool( wxID_REDO, _("tool"), wxBitmap( redo_xpm ), wxNullBitmap, wxITEM_NORMAL, _("Redo"), _("Redo") );
-	m_toolBar->AddSeparator();
-	m_toolBar->AddTool( ID_DISPLAYMACHINE, _("tool"), wxBitmap( machine_xpm ), wxNullBitmap, wxITEM_CHECK, _("Display machine"), _("Display machine") );
-	m_toolBar->AddTool( ID_DISPLAYMATERIAL, _("tool"), wxBitmap( material_xpm ), wxNullBitmap, wxITEM_CHECK, _("Display material"), _("Display material") );
-	m_toolBar->AddSeparator();
-	m_toolBar->AddTool( ID_GENERATORSETUP, _("tool"), wxBitmap( tool_drilling_xpm ), wxNullBitmap, wxITEM_NORMAL, _("Show the dialog to add, update and remove toolpath generators."), _("Add / setup toolpath generators") );
-	m_toolBar->Realize();
+	m_toolUndo = m_toolBar->AddTool( wxID_UNDO, _("tool"), wxBitmap( undo_xpm ), wxNullBitmap, wxITEM_NORMAL, _("Undo"), _("Undo"), NULL ); 
+	
+	m_toolRedo = m_toolBar->AddTool( wxID_REDO, _("tool"), wxBitmap( redo_xpm ), wxNullBitmap, wxITEM_NORMAL, _("Redo"), _("Redo"), NULL ); 
+	
+	m_toolBar->AddSeparator(); 
+	
+	m_toolDisplayMachine = m_toolBar->AddTool( ID_DISPLAYMACHINE, _("tool"), wxBitmap( machine_xpm ), wxNullBitmap, wxITEM_CHECK, _("Display machine"), _("Display machine"), NULL ); 
+	
+	m_toolDisplayMaterial = m_toolBar->AddTool( ID_DISPLAYMATERIAL, _("tool"), wxBitmap( material_xpm ), wxNullBitmap, wxITEM_CHECK, _("Display material"), _("Display material"), NULL ); 
+	
+	m_toolBar->AddSeparator(); 
+	
+	m_toolGeneratorSetup = m_toolBar->AddTool( ID_GENERATORSETUP, _("tool"), wxBitmap( tool_drilling_xpm ), wxNullBitmap, wxITEM_NORMAL, _("Show the dialog to add, update and remove toolpath generators."), _("Add / setup toolpath generators"), NULL ); 
+	
+	m_toolBar->Realize(); 
 	
 	
 	this->Centre( wxBOTH );
@@ -439,67 +441,67 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	m_tree->Connect( wxEVT_COMMAND_TREE_SEL_CHANGING, wxTreeEventHandler( GUIMain::OnSelectionChanging ), NULL, this );
 	m_canvas->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( GUIMain::On3DDClick ), NULL, this );
 	m_canvas->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( GUIMain::On3DSelect ), NULL, this );
-	this->Connect( wxID_UNDO, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnUndo ) );
-	this->Connect( wxID_REDO, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnRedo ) );
-	this->Connect( ID_DISPLAYMACHINE, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnToolbarButton ) );
-	this->Connect( ID_DISPLAYMATERIAL, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnToolbarButton ) );
-	this->Connect( ID_GENERATORSETUP, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnGeneratorSetup ) );
+	this->Connect( m_toolUndo->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnUndo ) );
+	this->Connect( m_toolRedo->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnRedo ) );
+	this->Connect( m_toolDisplayMachine->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnToolbarButton ) );
+	this->Connect( m_toolDisplayMaterial->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnToolbarButton ) );
+	this->Connect( m_toolGeneratorSetup->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnGeneratorSetup ) );
 }
 
 GUIMain::~GUIMain()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIMain::OnIdle ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnProjectNew ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnProjectRename ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnProjectLoad ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnProjectSave ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnProjectSaveAs ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnQuit ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnUndo ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRedo ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnObjectModify ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnObjectFlipNormals ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnObjectLoad ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnObjectRename ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnObjectDelete ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnStockEdit ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnWorkpieceAdd ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnWorkpieceSetup ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnWorkpieceDelete ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnWorkpieceDeleteUnused ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnMachineLoad ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnMachineReload ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnMachineDebugger ) );
+	this->Disconnect( wxID_NEW, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnProjectNew ) );
+	this->Disconnect( ID_PROJECTRENAME, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnProjectRename ) );
+	this->Disconnect( wxID_OPEN, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnProjectLoad ) );
+	this->Disconnect( wxID_SAVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnProjectSave ) );
+	this->Disconnect( wxID_SAVEAS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnProjectSaveAs ) );
+	this->Disconnect( wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnQuit ) );
+	this->Disconnect( wxID_UNDO, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnUndo ) );
+	this->Disconnect( wxID_REDO, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRedo ) );
+	this->Disconnect( ID_OBJECTMODIFY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnObjectModify ) );
+	this->Disconnect( ID_OBJECTFLIPNORMALS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnObjectFlipNormals ) );
+	this->Disconnect( ID_OBJECTLOAD, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnObjectLoad ) );
+	this->Disconnect( ID_OBJECTRENAME, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnObjectRename ) );
+	this->Disconnect( ID_OBJECTDELETE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnObjectDelete ) );
+	this->Disconnect( ID_STOCKORGANIZE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnStockEdit ) );
+	this->Disconnect( ID_WORKPIECEADD, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnWorkpieceAdd ) );
+	this->Disconnect( ID_WORKPIECESETUP, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnWorkpieceSetup ) );
+	this->Disconnect( ID_WORKPIECEDELETE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnWorkpieceDelete ) );
+	this->Disconnect( ID_WORKPIECEDELETEUNUSED, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnWorkpieceDeleteUnused ) );
+	this->Disconnect( ID_MACHINELOAD, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnMachineLoad ) );
+	this->Disconnect( ID_MACHINERELOAD, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnMachineReload ) );
+	this->Disconnect( ID_MACHINEDEBUGGER, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnMachineDebugger ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnFlipDrillSetup ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnToolboxEdit ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnToolboxLoad ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnToolboxSave ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunEdit ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunAdd ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunDelete ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorSetup ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorStart ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorAutomatic ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorRestart ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorSaveToolpath ) );
+	this->Disconnect( ID_TOOLBOXEDIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnToolboxEdit ) );
+	this->Disconnect( ID_TOOLBOXLOAD, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnToolboxLoad ) );
+	this->Disconnect( ID_TOOLBOXSAVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnToolboxSave ) );
+	this->Disconnect( ID_RUNEDIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunEdit ) );
+	this->Disconnect( ID_RUNADD, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunAdd ) );
+	this->Disconnect( ID_RUNDELETE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnRunDelete ) );
+	this->Disconnect( ID_GENERATORSETUP, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorSetup ) );
+	this->Disconnect( ID_GENERATORSTART, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorStart ) );
+	this->Disconnect( ID_GENERATORAUTOMATIC, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorAutomatic ) );
+	this->Disconnect( ID_GENERATORRESTART, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorRestart ) );
+	this->Disconnect( ID_TOOLPATHSAVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnGeneratorSaveToolpath ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnShowAnimationControl ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnChangeLanguage ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnActivateStereo3D ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnSetupController ) );
+	this->Disconnect( ID_VIEWSTEREO3D, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnActivateStereo3D ) );
+	this->Disconnect( ID_SETUPCONTROLLER, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnSetupController ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnSetupStereo3D ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnSetupUnits ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnExtraWindowClose ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnShowLogWindow ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnHelp ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnTestGCode ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnAbout ) );
+	this->Disconnect( ID_SETUPUNITS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnSetupUnits ) );
+	this->Disconnect( ID_CLOSEEXTRAWINDOWS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnExtraWindowClose ) );
+	this->Disconnect( ID_LOGSHOW, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnShowLogWindow ) );
+	this->Disconnect( ID_VIEWTOP, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
+	this->Disconnect( ID_VIEWBOTTOM, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
+	this->Disconnect( ID_VIEWFRONT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
+	this->Disconnect( ID_VIEWBACK, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
+	this->Disconnect( ID_VIEWRIGHT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
+	this->Disconnect( ID_VIEWLEFT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnViewSet ) );
+	this->Disconnect( wxID_HELP, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnHelp ) );
+	this->Disconnect( ID_TESTGCODE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnTestGCode ) );
+	this->Disconnect( wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnAbout ) );
 	m_tree->Disconnect( wxEVT_COMMAND_TREE_BEGIN_LABEL_EDIT, wxTreeEventHandler( GUIMain::OnBeginLabelEdit ), NULL, this );
 	m_tree->Disconnect( wxEVT_COMMAND_TREE_END_LABEL_EDIT, wxTreeEventHandler( GUIMain::OnEndLabelEdit ), NULL, this );
 	m_tree->Disconnect( wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler( GUIMain::OnActivate ), NULL, this );
@@ -508,11 +510,12 @@ GUIMain::~GUIMain()
 	m_tree->Disconnect( wxEVT_COMMAND_TREE_SEL_CHANGING, wxTreeEventHandler( GUIMain::OnSelectionChanging ), NULL, this );
 	m_canvas->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( GUIMain::On3DDClick ), NULL, this );
 	m_canvas->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( GUIMain::On3DSelect ), NULL, this );
-	this->Disconnect( wxID_UNDO, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnUndo ) );
-	this->Disconnect( wxID_REDO, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnRedo ) );
-	this->Disconnect( ID_DISPLAYMACHINE, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnToolbarButton ) );
-	this->Disconnect( ID_DISPLAYMATERIAL, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnToolbarButton ) );
-	this->Disconnect( ID_GENERATORSETUP, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnGeneratorSetup ) );
+	this->Disconnect( m_toolUndo->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnUndo ) );
+	this->Disconnect( m_toolRedo->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnRedo ) );
+	this->Disconnect( m_toolDisplayMachine->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnToolbarButton ) );
+	this->Disconnect( m_toolDisplayMaterial->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnToolbarButton ) );
+	this->Disconnect( m_toolGeneratorSetup->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( GUIMain::OnGeneratorSetup ) );
+	
 }
 
 GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -533,14 +536,13 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	m_menuItemFlipNormals = new wxMenuItem( m_menuObject, ID_OBJECTFLIPNORMALS, wxString( _("Flip normal vectors") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuObject->Append( m_menuItemFlipNormals );
 	
-	wxMenuItem* m_separator;
-	m_separator = m_menuObject->AppendSeparator();
+	m_menuObject->AppendSeparator();
 	
 	wxMenuItem* m_menuItemClose;
 	m_menuItemClose = new wxMenuItem( m_menuObject, wxID_CLOSE, wxString( _("&Close Window") ) + wxT('\t') + wxT("Ctrl+W"), wxEmptyString, wxITEM_NORMAL );
 	m_menuObject->Append( m_menuItemClose );
 	
-	m_menubar->Append( m_menuObject, _("&Object") );
+	m_menubar->Append( m_menuObject, _("&Object") ); 
 	
 	m_menuEdit = new wxMenu();
 	wxMenuItem* m_menuItemUndo;
@@ -551,14 +553,14 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	m_menuItemRedo = new wxMenuItem( m_menuEdit, wxID_REDO, wxString( _("Redo") ) + wxT('\t') + wxT("CTRL+Y"), wxEmptyString, wxITEM_NORMAL );
 	m_menuEdit->Append( m_menuItemRedo );
 	
-	m_menubar->Append( m_menuEdit, _("&Edit") );
+	m_menubar->Append( m_menuEdit, _("&Edit") ); 
 	
 	m_menuSettings = new wxMenu();
 	wxMenuItem* m_menuItemSetupUnits;
 	m_menuItemSetupUnits = new wxMenuItem( m_menuSettings, ID_SETUPUNITS, wxString( _("Setup &Units") ) + wxT('\t') + wxT("CTRL+U"), wxEmptyString, wxITEM_NORMAL );
 	m_menuSettings->Append( m_menuItemSetupUnits );
 	
-	m_menubar->Append( m_menuSettings, _("&Settings") );
+	m_menubar->Append( m_menuSettings, _("&Settings") ); 
 	
 	this->SetMenuBar( m_menubar );
 	
@@ -576,43 +578,45 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	m_choiceObjectSelection->SetSelection( 0 );
 	bSizerTop->Add( m_choiceObjectSelection, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	bSizerMain->Add( bSizerTop, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxStaticBoxSizer* sbSizerSize;
 	sbSizerSize = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Current size of object") ), wxHORIZONTAL );
 	
-	m_staticText37 = new wxStaticText( this, wxID_ANY, _("X:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText37 = new wxStaticText( sbSizerSize->GetStaticBox(), wxID_ANY, _("X:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText37->Wrap( -1 );
 	sbSizerSize->Add( m_staticText37, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlSizeX = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxTE_RIGHT );
+	m_textCtrlSizeX = new wxTextCtrl( sbSizerSize->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxTE_RIGHT );
 	sbSizerSize->Add( m_textCtrlSizeX, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextUnitX = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitX = new wxStaticText( sbSizerSize->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitX->Wrap( -1 );
 	sbSizerSize->Add( m_staticTextUnitX, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText38 = new wxStaticText( this, wxID_ANY, _("Y:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText38 = new wxStaticText( sbSizerSize->GetStaticBox(), wxID_ANY, _("Y:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText38->Wrap( -1 );
 	sbSizerSize->Add( m_staticText38, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlSizeY = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxTE_RIGHT );
+	m_textCtrlSizeY = new wxTextCtrl( sbSizerSize->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxTE_RIGHT );
 	sbSizerSize->Add( m_textCtrlSizeY, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextUnitY = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitY = new wxStaticText( sbSizerSize->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitY->Wrap( -1 );
 	sbSizerSize->Add( m_staticTextUnitY, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText39 = new wxStaticText( this, wxID_ANY, _("Z:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText39 = new wxStaticText( sbSizerSize->GetStaticBox(), wxID_ANY, _("Z:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText39->Wrap( -1 );
 	sbSizerSize->Add( m_staticText39, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlSizeZ = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxTE_RIGHT );
+	m_textCtrlSizeZ = new wxTextCtrl( sbSizerSize->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxTE_RIGHT );
 	sbSizerSize->Add( m_textCtrlSizeZ, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextUnitZ = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitZ = new wxStaticText( sbSizerSize->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitZ->Wrap( -1 );
 	sbSizerSize->Add( m_staticTextUnitZ, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
 	
 	bSizerMain->Add( sbSizerSize, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
@@ -624,11 +628,12 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	wxStaticBoxSizer* sbSizer11;
 	sbSizer11 = new wxStaticBoxSizer( new wxStaticBox( m_panelScale, wxID_ANY, _("Quick scale:") ), wxHORIZONTAL );
 	
-	m_buttonMultTen = new wxButton( m_panelScale, ID_MULTTEN, _("XYZ * 10"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonMultTen = new wxButton( sbSizer11->GetStaticBox(), ID_MULTTEN, _("XYZ * 10"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer11->Add( m_buttonMultTen, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_buttonDivTen = new wxButton( m_panelScale, ID_DIVTEN, _("XYZ / 10"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonDivTen = new wxButton( sbSizer11->GetStaticBox(), ID_DIVTEN, _("XYZ / 10"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer11->Add( m_buttonDivTen, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
 	
 	bSizer29->Add( sbSizer11, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -643,53 +648,55 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	fgSizer91->SetFlexibleDirection( wxBOTH );
 	fgSizer91->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText44 = new wxStaticText( m_panelScale, wxID_ANY, _("X ="), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText44 = new wxStaticText( sbSizer101->GetStaticBox(), wxID_ANY, _("X ="), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText44->Wrap( -1 );
 	fgSizer91->Add( m_staticText44, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlScaleUnitX = new wxTextCtrl( m_panelScale, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlScaleUnitX = new wxTextCtrl( sbSizer101->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	fgSizer91->Add( m_textCtrlScaleUnitX, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextUnitX2 = new wxStaticText( m_panelScale, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitX2 = new wxStaticText( sbSizer101->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitX2->Wrap( -1 );
 	fgSizer91->Add( m_staticTextUnitX2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_button19 = new wxButton( m_panelScale, ID_SCALEUNITX, _("Calculate"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button19 = new wxButton( sbSizer101->GetStaticBox(), ID_SCALEUNITX, _("Calculate"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer91->Add( m_button19, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText46 = new wxStaticText( m_panelScale, wxID_ANY, _("Y ="), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText46 = new wxStaticText( sbSizer101->GetStaticBox(), wxID_ANY, _("Y ="), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText46->Wrap( -1 );
 	fgSizer91->Add( m_staticText46, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlScaleUnitY = new wxTextCtrl( m_panelScale, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlScaleUnitY = new wxTextCtrl( sbSizer101->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	fgSizer91->Add( m_textCtrlScaleUnitY, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextUnitY2 = new wxStaticText( m_panelScale, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitY2 = new wxStaticText( sbSizer101->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitY2->Wrap( -1 );
 	fgSizer91->Add( m_staticTextUnitY2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_button21 = new wxButton( m_panelScale, ID_SCALEUNITY, _("Calculate"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button21 = new wxButton( sbSizer101->GetStaticBox(), ID_SCALEUNITY, _("Calculate"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer91->Add( m_button21, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText52 = new wxStaticText( m_panelScale, wxID_ANY, _("Z ="), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText52 = new wxStaticText( sbSizer101->GetStaticBox(), wxID_ANY, _("Z ="), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText52->Wrap( -1 );
 	fgSizer91->Add( m_staticText52, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlScaleUnitZ = new wxTextCtrl( m_panelScale, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlScaleUnitZ = new wxTextCtrl( sbSizer101->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	fgSizer91->Add( m_textCtrlScaleUnitZ, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextUnitZ2 = new wxStaticText( m_panelScale, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitZ2 = new wxStaticText( sbSizer101->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitZ2->Wrap( -1 );
 	fgSizer91->Add( m_staticTextUnitZ2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_button23 = new wxButton( m_panelScale, ID_SCALEUNITZ, _("Calculate"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button23 = new wxButton( sbSizer101->GetStaticBox(), ID_SCALEUNITZ, _("Calculate"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer91->Add( m_button23, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
 	
 	sbSizer101->Add( fgSizer91, 0, wxEXPAND, 5 );
 	
-	m_checkBoxScaleProportionally = new wxCheckBox( m_panelScale, wxID_ANY, _("Scale proportionally"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxScaleProportionally = new wxCheckBox( sbSizer101->GetStaticBox(), wxID_ANY, _("Scale proportionally"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_checkBoxScaleProportionally->SetValue(true); 
 	sbSizer101->Add( m_checkBoxScaleProportionally, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
 	
 	bSizer24->Add( sbSizer101, 0, wxEXPAND, 5 );
 	
@@ -701,67 +708,71 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	fgSizer6->SetFlexibleDirection( wxBOTH );
 	fgSizer6->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText50 = new wxStaticText( m_panelScale, wxID_ANY, _("X:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText50 = new wxStaticText( sbSizer4->GetStaticBox(), wxID_ANY, _("X:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText50->Wrap( -1 );
 	fgSizer6->Add( m_staticText50, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
 	
-	m_textCtrlScalePercentX = new wxTextCtrl( m_panelScale, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlScalePercentX = new wxTextCtrl( sbSizer4->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	fgSizer6->Add( m_textCtrlScalePercentX, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText51 = new wxStaticText( m_panelScale, wxID_ANY, _("%"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText51 = new wxStaticText( sbSizer4->GetStaticBox(), wxID_ANY, _("%"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText51->Wrap( -1 );
 	fgSizer6->Add( m_staticText51, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_button20 = new wxButton( m_panelScale, ID_SCALEPERCENTX, _("Scale"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button20 = new wxButton( sbSizer4->GetStaticBox(), ID_SCALEPERCENTX, _("Scale"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer6->Add( m_button20, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText48 = new wxStaticText( m_panelScale, wxID_ANY, _("Y:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText48 = new wxStaticText( sbSizer4->GetStaticBox(), wxID_ANY, _("Y:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText48->Wrap( -1 );
 	fgSizer6->Add( m_staticText48, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
 	
-	m_textCtrlScalePercentY = new wxTextCtrl( m_panelScale, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlScalePercentY = new wxTextCtrl( sbSizer4->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	fgSizer6->Add( m_textCtrlScalePercentY, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText55 = new wxStaticText( m_panelScale, wxID_ANY, _("%"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText55 = new wxStaticText( sbSizer4->GetStaticBox(), wxID_ANY, _("%"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText55->Wrap( -1 );
 	fgSizer6->Add( m_staticText55, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_button22 = new wxButton( m_panelScale, ID_SCALEPERCENTY, _("Scale"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button22 = new wxButton( sbSizer4->GetStaticBox(), ID_SCALEPERCENTY, _("Scale"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer6->Add( m_button22, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText54 = new wxStaticText( m_panelScale, wxID_ANY, _("Z:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText54 = new wxStaticText( sbSizer4->GetStaticBox(), wxID_ANY, _("Z:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText54->Wrap( -1 );
 	fgSizer6->Add( m_staticText54, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
 	
-	m_textCtrlScalePercentZ = new wxTextCtrl( m_panelScale, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlScalePercentZ = new wxTextCtrl( sbSizer4->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	fgSizer6->Add( m_textCtrlScalePercentZ, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText43 = new wxStaticText( m_panelScale, wxID_ANY, _("%"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText43 = new wxStaticText( sbSizer4->GetStaticBox(), wxID_ANY, _("%"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText43->Wrap( -1 );
 	fgSizer6->Add( m_staticText43, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_button24 = new wxButton( m_panelScale, ID_SCALEPERCENTZ, _("Scale"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button24 = new wxButton( sbSizer4->GetStaticBox(), ID_SCALEPERCENTZ, _("Scale"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer6->Add( m_button24, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText68 = new wxStaticText( m_panelScale, wxID_ANY, _("Proportional:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText68 = new wxStaticText( sbSizer4->GetStaticBox(), wxID_ANY, _("Proportional:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText68->Wrap( -1 );
 	fgSizer6->Add( m_staticText68, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlScalePercent = new wxTextCtrl( m_panelScale, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlScalePercent = new wxTextCtrl( sbSizer4->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	fgSizer6->Add( m_textCtrlScalePercent, 0, wxALL, 5 );
 	
-	m_staticText49 = new wxStaticText( m_panelScale, wxID_ANY, _("%"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText49 = new wxStaticText( sbSizer4->GetStaticBox(), wxID_ANY, _("%"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText49->Wrap( -1 );
 	fgSizer6->Add( m_staticText49, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_button15 = new wxButton( m_panelScale, ID_SCALEPERCENT, _("Scale"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button15 = new wxButton( sbSizer4->GetStaticBox(), ID_SCALEPERCENT, _("Scale"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer6->Add( m_button15, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
 	
 	sbSizer4->Add( fgSizer6, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
+	
 	bSizer24->Add( sbSizer4, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
+	
 	bSizer29->Add( bSizer24, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	m_panelScale->SetSizer( bSizer29 );
 	m_panelScale->Layout();
@@ -780,16 +791,17 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	wxBoxSizer* bSizer37;
 	bSizer37 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_staticText62 = new wxStaticText( m_panelMove, wxID_ANY, _("Step:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText62 = new wxStaticText( sbSizer9->GetStaticBox(), wxID_ANY, _("Step:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText62->Wrap( -1 );
 	bSizer37->Add( m_staticText62, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlMoveStep = new wxTextCtrl( m_panelMove, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlMoveStep = new wxTextCtrl( sbSizer9->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	bSizer37->Add( m_textCtrlMoveStep, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextUnitMove = new wxStaticText( m_panelMove, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitMove = new wxStaticText( sbSizer9->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitMove->Wrap( -1 );
 	bSizer37->Add( m_staticTextUnitMove, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
 	
 	sbSizer9->Add( bSizer37, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
@@ -801,31 +813,33 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	
 	fgSizer8->Add( 0, 0, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
-	m_bpButton6 = new wxBitmapButton( m_panelMove, ID_MOVEZP, wxBitmap( arrowzp_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	m_bpButton6 = new wxBitmapButton( sbSizer9->GetStaticBox(), ID_MOVEZP, wxBitmap( arrowzp_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	fgSizer8->Add( m_bpButton6, 0, wxTOP|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_bpButton7 = new wxBitmapButton( m_panelMove, ID_MOVEYP, wxBitmap( arrowyp_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	m_bpButton7 = new wxBitmapButton( sbSizer9->GetStaticBox(), ID_MOVEYP, wxBitmap( arrowyp_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	fgSizer8->Add( m_bpButton7, 0, wxTOP|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_bpButton8 = new wxBitmapButton( m_panelMove, ID_MOVEXN, wxBitmap( arrowxn_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	m_bpButton8 = new wxBitmapButton( sbSizer9->GetStaticBox(), ID_MOVEXN, wxBitmap( arrowxn_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	fgSizer8->Add( m_bpButton8, 0, wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
 	fgSizer8->Add( 0, 0, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_bpButton9 = new wxBitmapButton( m_panelMove, ID_MOVEXP, wxBitmap( arrowxp_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	m_bpButton9 = new wxBitmapButton( sbSizer9->GetStaticBox(), ID_MOVEXP, wxBitmap( arrowxp_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	fgSizer8->Add( m_bpButton9, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_bpButton10 = new wxBitmapButton( m_panelMove, ID_MOVEYN, wxBitmap( arrowyn_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	m_bpButton10 = new wxBitmapButton( sbSizer9->GetStaticBox(), ID_MOVEYN, wxBitmap( arrowyn_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	fgSizer8->Add( m_bpButton10, 0, wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_bpButton11 = new wxBitmapButton( m_panelMove, ID_MOVEZN, wxBitmap( arrowzn_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	m_bpButton11 = new wxBitmapButton( sbSizer9->GetStaticBox(), ID_MOVEZN, wxBitmap( arrowzn_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	fgSizer8->Add( m_bpButton11, 0, wxBOTTOM|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	
 	fgSizer8->Add( 0, 0, 1, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
+	
 	sbSizer9->Add( fgSizer8, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	bSizer34->Add( sbSizer9, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -835,22 +849,24 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	wxStaticBoxSizer* sbSizer5;
 	sbSizer5 = new wxStaticBoxSizer( new wxStaticBox( m_panelMove, wxID_ANY, _("Align") ), wxVERTICAL );
 	
-	m_button18 = new wxButton( m_panelMove, ID_ALIGNTOP, _("Align with top"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button18 = new wxButton( sbSizer5->GetStaticBox(), ID_ALIGNTOP, _("Align with top"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer5->Add( m_button18, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
-	m_button17 = new wxButton( m_panelMove, ID_ALIGNMIDDLE, _("Align with middle"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button17 = new wxButton( sbSizer5->GetStaticBox(), ID_ALIGNMIDDLE, _("Align with middle"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer5->Add( m_button17, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
-	m_button16 = new wxButton( m_panelMove, ID_ALIGNBOTTOM, _("Align with bottom"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button16 = new wxButton( sbSizer5->GetStaticBox(), ID_ALIGNBOTTOM, _("Align with bottom"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer5->Add( m_button16, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
-	m_button50 = new wxButton( m_panelMove, ID_ALIGNCENTER, _("Center"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button50 = new wxButton( sbSizer5->GetStaticBox(), ID_ALIGNCENTER, _("Center"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer5->Add( m_button50, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	bSizer34->Add( sbSizer5, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
 	bSizer34->Add( 0, 0, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
 	
 	m_panelMove->SetSizer( bSizer34 );
 	m_panelMove->Layout();
@@ -869,16 +885,17 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	wxBoxSizer* bSizer40;
 	bSizer40 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_staticText76 = new wxStaticText( m_panelRotate, wxID_ANY, _("Step:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText76 = new wxStaticText( sbSizer8->GetStaticBox(), wxID_ANY, _("Step:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText76->Wrap( -1 );
 	bSizer40->Add( m_staticText76, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlRotateStep = new wxTextCtrl( m_panelRotate, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlRotateStep = new wxTextCtrl( sbSizer8->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	bSizer40->Add( m_textCtrlRotateStep, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextUnitAngle = new wxStaticText( m_panelRotate, wxID_ANY, _("deg"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitAngle = new wxStaticText( sbSizer8->GetStaticBox(), wxID_ANY, _("deg"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitAngle->Wrap( -1 );
 	bSizer40->Add( m_staticTextUnitAngle, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	
 	
 	sbSizer8->Add( bSizer40, 1, wxEXPAND, 5 );
 	
@@ -887,39 +904,42 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	fgSizer9->SetFlexibleDirection( wxBOTH );
 	fgSizer9->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_button32 = new wxButton( m_panelRotate, ID_ROTATEYN, _("Y -"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button32 = new wxButton( sbSizer8->GetStaticBox(), ID_ROTATEYN, _("Y -"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer9->Add( m_button32, 0, wxALL, 5 );
 	
-	m_button33 = new wxButton( m_panelRotate, ID_ROTATEXN, _("X -"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button33 = new wxButton( sbSizer8->GetStaticBox(), ID_ROTATEXN, _("X -"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer9->Add( m_button33, 0, wxALL, 5 );
 	
-	m_button28 = new wxButton( m_panelRotate, ID_ROTATEYP, _("Y +"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button28 = new wxButton( sbSizer8->GetStaticBox(), ID_ROTATEYP, _("Y +"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer9->Add( m_button28, 0, wxALL, 5 );
 	
-	m_button29 = new wxButton( m_panelRotate, ID_ROTATEZN, _("Z -"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button29 = new wxButton( sbSizer8->GetStaticBox(), ID_ROTATEZN, _("Z -"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer9->Add( m_button29, 0, wxALL, 5 );
 	
 	
 	fgSizer9->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_button30 = new wxButton( m_panelRotate, ID_ROTATEZP, _("Z +"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button30 = new wxButton( sbSizer8->GetStaticBox(), ID_ROTATEZP, _("Z +"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer9->Add( m_button30, 0, wxALL, 5 );
 	
 	
 	fgSizer9->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_button31 = new wxButton( m_panelRotate, ID_ROTATEXP, _("X +"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button31 = new wxButton( sbSizer8->GetStaticBox(), ID_ROTATEXP, _("X +"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer9->Add( m_button31, 0, wxALL, 5 );
 	
 	
 	fgSizer9->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	
 	sbSizer8->Add( fgSizer9, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	bSizer291->Add( sbSizer8, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	
 	bSizer291->Add( 0, 0, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	m_panelRotate->SetSizer( bSizer291 );
 	m_panelRotate->Layout();
@@ -935,14 +955,15 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	wxStaticBoxSizer* sbSizer10;
 	sbSizer10 = new wxStaticBoxSizer( new wxStaticBox( m_panelMirror, wxID_ANY, _("Mirror on") ), wxVERTICAL );
 	
-	m_button39 = new wxButton( m_panelMirror, ID_FLIPX, _("X axis"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button39 = new wxButton( sbSizer10->GetStaticBox(), ID_FLIPX, _("X axis"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer10->Add( m_button39, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
-	m_button40 = new wxButton( m_panelMirror, ID_FLIPY, _("Y axis"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button40 = new wxButton( sbSizer10->GetStaticBox(), ID_FLIPY, _("Y axis"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer10->Add( m_button40, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
-	m_button41 = new wxButton( m_panelMirror, ID_FLIPZ, _("Z axis"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button41 = new wxButton( sbSizer10->GetStaticBox(), ID_FLIPZ, _("Z axis"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer10->Add( m_button41, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
 	
 	bSizer36->Add( sbSizer10, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -955,12 +976,14 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	
 	bSizer36->Add( 0, 0, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
+	
 	m_panelMirror->SetSizer( bSizer36 );
 	m_panelMirror->Layout();
 	bSizer36->Fit( m_panelMirror );
 	m_notebook->AddPage( m_panelMirror, _("Mirror"), false );
 	
 	bSizerMain->Add( m_notebook, 1, wxALL|wxEXPAND, 5 );
+	
 	
 	this->SetSizer( bSizerMain );
 	this->Layout();
@@ -1005,7 +1028,7 @@ GUIObjectTransformation::~GUIObjectTransformation()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIObjectTransformation::OnXClose ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIObjectTransformation::OnClose ) );
+	this->Disconnect( wxID_CLOSE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIObjectTransformation::OnClose ) );
 	m_colourPickerObject->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( GUIObjectTransformation::OnChangeObjectColor ), NULL, this );
 	m_choiceObjectSelection->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIObjectTransformation::OnSelectObject ), NULL, this );
 	m_buttonMultTen->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
@@ -1037,6 +1060,7 @@ GUIObjectTransformation::~GUIObjectTransformation()
 	m_button40->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_button41->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnTransform ), NULL, this );
 	m_buttonFlipNormalVectors->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIObjectTransformation::OnFlipNormals ), NULL, this );
+	
 }
 
 GUIStockMaterial::GUIStockMaterial( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -1053,21 +1077,20 @@ GUIStockMaterial::GUIStockMaterial( wxWindow* parent, wxWindowID id, const wxStr
 	m_menuItemSaveStock = new wxMenuItem( m_menuStock, ID_STOCKSAVE, wxString( _("&Save Stocklist...") ) + wxT('\t') + wxT("Ctrl+S"), wxEmptyString, wxITEM_NORMAL );
 	m_menuStock->Append( m_menuItemSaveStock );
 	
-	wxMenuItem* m_separator;
-	m_separator = m_menuStock->AppendSeparator();
+	m_menuStock->AppendSeparator();
 	
 	wxMenuItem* m_menuItemClose;
 	m_menuItemClose = new wxMenuItem( m_menuStock, wxID_CLOSE, wxString( _("&Close Window") ) + wxT('\t') + wxT("Ctrl+W"), wxEmptyString, wxITEM_NORMAL );
 	m_menuStock->Append( m_menuItemClose );
 	
-	m_menubar->Append( m_menuStock, _("&Stock") );
+	m_menubar->Append( m_menuStock, _("&Stock") ); 
 	
 	m_menuSettings = new wxMenu();
 	wxMenuItem* m_menuItemUnits;
 	m_menuItemUnits = new wxMenuItem( m_menuSettings, ID_SETUPUNITS, wxString( _("Setup &Units") ) + wxT('\t') + wxT("CTRL+U"), wxEmptyString, wxITEM_NORMAL );
 	m_menuSettings->Append( m_menuItemUnits );
 	
-	m_menubar->Append( m_menuSettings, _("S&ettings") );
+	m_menubar->Append( m_menuSettings, _("S&ettings") ); 
 	
 	this->SetMenuBar( m_menubar );
 	
@@ -1089,6 +1112,7 @@ GUIStockMaterial::GUIStockMaterial( wxWindow* parent, wxWindowID id, const wxStr
 	
 	
 	bSizerTop->Add( 0, 0, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
 	
 	bSizerMain->Add( bSizerTop, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
@@ -1133,6 +1157,7 @@ GUIStockMaterial::GUIStockMaterial( wxWindow* parent, wxWindowID id, const wxStr
 	m_staticTextUnitZ->Wrap( -1 );
 	fgSizerCols->Add( m_staticTextUnitZ, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	bSizerSize->Add( fgSizerCols, 0, wxALIGN_BOTTOM, 5 );
 	
 	wxBoxSizer* bSizer53;
@@ -1165,9 +1190,12 @@ GUIStockMaterial::GUIStockMaterial( wxWindow* parent, wxWindowID id, const wxStr
 	m_staticTextUnitLinearSpeed->Wrap( -1 );
 	fgSizer13->Add( m_staticTextUnitLinearSpeed, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	bSizer53->Add( fgSizer13, 0, 0, 5 );
 	
+	
 	bSizerSize->Add( bSizer53, 0, wxALIGN_BOTTOM, 5 );
+	
 	
 	bSizerMain->Add( bSizerSize, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -1185,10 +1213,12 @@ GUIStockMaterial::GUIStockMaterial( wxWindow* parent, wxWindowID id, const wxStr
 	m_buttonStockDelete = new wxButton( this, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizerButtons->Add( m_buttonStockDelete, 0, wxALL, 5 );
 	
+	
 	bSizerMain->Add( bSizerButtons, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_listCtrl = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VRULES );
 	bSizerMain->Add( m_listCtrl, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	this->SetSizer( bSizerMain );
 	this->Layout();
@@ -1208,11 +1238,12 @@ GUIStockMaterial::~GUIStockMaterial()
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIStockMaterial::OnXClose ) );
 	this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( GUIStockMaterial::OnSize ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIStockMaterial::OnClose ) );
+	this->Disconnect( wxID_CLOSE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIStockMaterial::OnClose ) );
 	m_buttonStockAdd->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIStockMaterial::OnAddUpdate ), NULL, this );
 	m_buttonStockDelete->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIStockMaterial::OnDelete ), NULL, this );
 	m_listCtrl->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( GUIStockMaterial::OnActivate ), NULL, this );
 	m_listCtrl->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( GUIStockMaterial::OnSelected ), NULL, this );
+	
 }
 
 GUIWorkpiece::GUIWorkpiece( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -1225,14 +1256,13 @@ GUIWorkpiece::GUIWorkpiece( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menuItemManageStock = new wxMenuItem( m_menuStock, ID_STOCKORGANIZE, wxString( _("&Manage Stock") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuStock->Append( m_menuItemManageStock );
 	
-	wxMenuItem* m_separator13;
-	m_separator13 = m_menuStock->AppendSeparator();
+	m_menuStock->AppendSeparator();
 	
 	wxMenuItem* m_menuItemClose;
 	m_menuItemClose = new wxMenuItem( m_menuStock, wxID_CLOSE, wxString( _("&Close") ) + wxT('\t') + wxT("Ctrl+W"), wxEmptyString, wxITEM_NORMAL );
 	m_menuStock->Append( m_menuItemClose );
 	
-	m_menubar->Append( m_menuStock, _("&Stock") );
+	m_menubar->Append( m_menuStock, _("&Stock") ); 
 	
 	m_menuEdit = new wxMenu();
 	wxMenuItem* m_menuItemUndo;
@@ -1243,7 +1273,7 @@ GUIWorkpiece::GUIWorkpiece( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menuItemRedo = new wxMenuItem( m_menuEdit, wxID_REDO, wxString( _("&Redo") ) + wxT('\t') + wxT("CTRL+Y"), wxEmptyString, wxITEM_NORMAL );
 	m_menuEdit->Append( m_menuItemRedo );
 	
-	m_menubar->Append( m_menuEdit, _("&Edit") );
+	m_menubar->Append( m_menuEdit, _("&Edit") ); 
 	
 	this->SetMenuBar( m_menubar );
 	
@@ -1268,7 +1298,9 @@ GUIWorkpiece::GUIWorkpiece( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_buttonAdd = new wxButton( this, wxID_ANY, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizerSelector->Add( m_buttonAdd, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
+	
 	bSizerTop->Add( bSizerSelector, 0, 0, 5 );
+	
 	
 	bSizerMain->Add( bSizerTop, 0, wxEXPAND, 5 );
 	
@@ -1298,6 +1330,7 @@ GUIWorkpiece::GUIWorkpiece( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_grid->SetDefaultCellAlignment( wxALIGN_CENTRE, wxALIGN_CENTRE );
 	bSizerMain->Add( m_grid, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
+	
 	this->SetSizer( bSizerMain );
 	this->Layout();
 	
@@ -1315,10 +1348,11 @@ GUIWorkpiece::~GUIWorkpiece()
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIWorkpiece::OnXClose ) );
 	this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( GUIWorkpiece::OnSize ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIWorkpiece::OnClose ) );
+	this->Disconnect( wxID_CLOSE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIWorkpiece::OnClose ) );
 	m_buttonAdd->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIWorkpiece::OnAddStock ), NULL, this );
 	m_grid->Disconnect( wxEVT_GRID_CELL_LEFT_DCLICK, wxGridEventHandler( GUIWorkpiece::OnDBLClick ), NULL, this );
 	m_grid->Disconnect( wxEVT_SIZE, wxSizeEventHandler( GUIWorkpiece::OnSize ), NULL, this );
+	
 }
 
 GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -1331,7 +1365,7 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menuItemClose = new wxMenuItem( m_menuPlacement, wxID_CLOSE, wxString( _("&Close") ) + wxT('\t') + wxT("Ctrl+W"), wxEmptyString, wxITEM_NORMAL );
 	m_menuPlacement->Append( m_menuItemClose );
 	
-	m_menubar->Append( m_menuPlacement, _("&Placement") );
+	m_menubar->Append( m_menuPlacement, _("&Placement") ); 
 	
 	m_menuEdit = new wxMenu();
 	wxMenuItem* m_menuItemUndo;
@@ -1342,14 +1376,14 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_menuItemRedo = new wxMenuItem( m_menuEdit, wxID_REDO, wxString( _("&Redo") ) + wxT('\t') + wxT("CTRL+Y"), wxEmptyString, wxITEM_NORMAL );
 	m_menuEdit->Append( m_menuItemRedo );
 	
-	m_menubar->Append( m_menuEdit, _("&Edit") );
+	m_menubar->Append( m_menuEdit, _("&Edit") ); 
 	
 	m_menuSettings = new wxMenu();
 	wxMenuItem* m_menuItemSetupUnits;
 	m_menuItemSetupUnits = new wxMenuItem( m_menuSettings, ID_SETUPUNITS, wxString( _("Setup &Units") ) + wxT('\t') + wxT("CTRL+U"), wxEmptyString, wxITEM_NORMAL );
 	m_menuSettings->Append( m_menuItemSetupUnits );
 	
-	m_menubar->Append( m_menuSettings, _("&Settings") );
+	m_menubar->Append( m_menuSettings, _("&Settings") ); 
 	
 	this->SetMenuBar( m_menubar );
 	
@@ -1411,6 +1445,7 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_staticTextUnitZ->Wrap( -1 );
 	bSizer69->Add( m_staticTextUnitZ, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	bSizer68->Add( bSizer69, 0, 0, 5 );
 	
 	wxBoxSizer* bSizer70;
@@ -1429,6 +1464,7 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	m_sliderAngle = new wxSlider( this, wxID_ANY, 0, -180, 180, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
 	bSizer70->Add( m_sliderAngle, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
 	
 	bSizer68->Add( bSizer70, 0, wxEXPAND, 5 );
 	
@@ -1455,7 +1491,9 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_staticTextUnitDistance->Wrap( -1 );
 	bSizer71->Add( m_staticTextUnitDistance, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	bSizer68->Add( bSizer71, 0, wxEXPAND, 5 );
+	
 	
 	bSizer66->Add( bSizer68, 1, wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -1489,6 +1527,7 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	gSizer1->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	
 	bSizer66->Add( gSizer1, 0, wxALL|wxALIGN_BOTTOM, 5 );
 	
 	wxBoxSizer* bSizer67;
@@ -1503,12 +1542,15 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_buttonAlignBottom = new wxButton( this, ID_ALIGNBOTTOM, _("Align with Bottom"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer67->Add( m_buttonAlignBottom, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
+	
 	bSizer66->Add( bSizer67, 0, wxALIGN_BOTTOM, 5 );
+	
 	
 	bSizerMain->Add( bSizer66, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
 	m_topview = new PanelTopView(this);
 	bSizerMain->Add( m_topview, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
 	
 	this->SetSizer( bSizerMain );
 	this->Layout();
@@ -1541,7 +1583,7 @@ GUIPlacement::~GUIPlacement()
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIPlacement::OnXClose ) );
 	this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( GUIPlacement::OnSize ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIPlacement::OnClose ) );
+	this->Disconnect( wxID_CLOSE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIPlacement::OnClose ) );
 	m_choiceWorkpiece->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectWorkpiece ), NULL, this );
 	m_choicePlacement->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIPlacement::OnSelectObject ), NULL, this );
 	m_textCtrlX->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIPlacement::OnChange ), NULL, this );
@@ -1559,6 +1601,7 @@ GUIPlacement::~GUIPlacement()
 	m_buttonAlignTop->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
 	m_buttonAlignMiddle->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
 	m_buttonAlignBottom->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
+	
 }
 
 GUIRun::GUIRun( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -1571,14 +1614,13 @@ GUIRun::GUIRun( wxWindow* parent, wxWindowID id, const wxString& title, const wx
 	m_menuItemToolboxLoad = new wxMenuItem( m_menuToolbox, ID_TOOLBOXLOAD, wxString( _("&Load Toolbox") ) + wxT('\t') + wxT("Ctrl+L"), wxEmptyString, wxITEM_NORMAL );
 	m_menuToolbox->Append( m_menuItemToolboxLoad );
 	
-	wxMenuItem* m_separator9;
-	m_separator9 = m_menuToolbox->AppendSeparator();
+	m_menuToolbox->AppendSeparator();
 	
 	wxMenuItem* m_menuItemClose;
 	m_menuItemClose = new wxMenuItem( m_menuToolbox, wxID_CLOSE, wxString( _("&Close Window") ) + wxT('\t') + wxT("Ctrl+W"), wxEmptyString, wxITEM_NORMAL );
 	m_menuToolbox->Append( m_menuItemClose );
 	
-	m_menubar->Append( m_menuToolbox, _("&Toolbox") );
+	m_menubar->Append( m_menuToolbox, _("&Toolbox") ); 
 	
 	m_menuEdit = new wxMenu();
 	wxMenuItem* m_menuItemUndo;
@@ -1589,14 +1631,14 @@ GUIRun::GUIRun( wxWindow* parent, wxWindowID id, const wxString& title, const wx
 	m_menuItemRedo = new wxMenuItem( m_menuEdit, wxID_REDO, wxString( _("&Redo") ) + wxT('\t') + wxT("CTRL+Y"), wxEmptyString, wxITEM_NORMAL );
 	m_menuEdit->Append( m_menuItemRedo );
 	
-	m_menubar->Append( m_menuEdit, _("Edit") );
+	m_menubar->Append( m_menuEdit, _("Edit") ); 
 	
 	m_menuSettings = new wxMenu();
 	wxMenuItem* m_menuItemSetupUnits;
 	m_menuItemSetupUnits = new wxMenuItem( m_menuSettings, ID_SETUPUNITS, wxString( _("Setup &Units") ) + wxT('\t') + wxT("Ctrl+U"), wxEmptyString, wxITEM_NORMAL );
 	m_menuSettings->Append( m_menuItemSetupUnits );
 	
-	m_menubar->Append( m_menuSettings, _("&Settings") );
+	m_menubar->Append( m_menuSettings, _("&Settings") ); 
 	
 	this->SetMenuBar( m_menubar );
 	
@@ -1612,23 +1654,25 @@ GUIRun::GUIRun( wxWindow* parent, wxWindowID id, const wxString& title, const wx
 	sbSizerStock = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Workpiece") ), wxVERTICAL );
 	
 	wxArrayString m_choiceWorkpieceChoices;
-	m_choiceWorkpiece = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceWorkpieceChoices, 0 );
+	m_choiceWorkpiece = new wxChoice( sbSizerStock->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceWorkpieceChoices, 0 );
 	m_choiceWorkpiece->SetSelection( 0 );
 	sbSizerStock->Add( m_choiceWorkpiece, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxBoxSizer* bSizer15;
 	bSizer15 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_buttonRotX90 = new wxButton( this, ID_WORKPIECEROTATEX, _("rotate X"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonRotX90 = new wxButton( sbSizerStock->GetStaticBox(), ID_WORKPIECEROTATEX, _("rotate X"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer15->Add( m_buttonRotX90, 0, wxALL, 5 );
 	
-	m_buttonRotY90 = new wxButton( this, ID_WORKPIECEROTATEY, _("rotate Y"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonRotY90 = new wxButton( sbSizerStock->GetStaticBox(), ID_WORKPIECEROTATEY, _("rotate Y"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer15->Add( m_buttonRotY90, 0, wxALL, 5 );
 	
-	m_buttonRotZ90 = new wxButton( this, ID_WORKPIECEROTATEZ, _("rotate Z"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonRotZ90 = new wxButton( sbSizerStock->GetStaticBox(), ID_WORKPIECEROTATEZ, _("rotate Z"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer15->Add( m_buttonRotZ90, 0, wxALL, 5 );
 	
+	
 	sbSizerStock->Add( bSizer15, 0, wxALIGN_RIGHT, 5 );
+	
 	
 	bSizer51->Add( sbSizerStock, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -1638,15 +1682,16 @@ GUIRun::GUIRun( wxWindow* parent, wxWindowID id, const wxString& title, const wx
 	wxBoxSizer* bSizer61;
 	bSizer61 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_textCtrlMachineName = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	m_textCtrlMachineName = new wxTextCtrl( sbSizerMachine->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
 	bSizer61->Add( m_textCtrlMachineName, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_buttonLoadMachine = new wxButton( this, wxID_ANY, _("Load Machine"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonLoadMachine = new wxButton( sbSizerMachine->GetStaticBox(), wxID_ANY, _("Load Machine"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer61->Add( m_buttonLoadMachine, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
 	
 	sbSizerMachine->Add( bSizer61, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_staticText99 = new wxStaticText( this, wxID_ANY, _("Tools"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText99 = new wxStaticText( sbSizerMachine->GetStaticBox(), wxID_ANY, _("Tools"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText99->Wrap( -1 );
 	sbSizerMachine->Add( m_staticText99, 0, wxALL, 5 );
 	
@@ -1656,11 +1701,12 @@ GUIRun::GUIRun( wxWindow* parent, wxWindowID id, const wxString& title, const wx
 	wxBoxSizer* bSizer65;
 	bSizer65 = new wxBoxSizer( wxVERTICAL );
 	
-	m_listCtrlTools = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VRULES );
-	bSizer65->Add( m_listCtrlTools, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	m_listCtrlTools = new wxListCtrl( sbSizerMachine->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VRULES );
+	bSizer65->Add( m_listCtrlTools, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
-	m_buttonToolDelete = new wxButton( this, wxID_ANY, _("Remove from Machine"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonToolDelete = new wxButton( sbSizerMachine->GetStaticBox(), wxID_ANY, _("Remove from Machine"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer65->Add( m_buttonToolDelete, 0, wxALL, 5 );
+	
 	
 	bSizer62->Add( bSizer65, 1, wxEXPAND, 5 );
 	
@@ -1668,30 +1714,35 @@ GUIRun::GUIRun( wxWindow* parent, wxWindowID id, const wxString& title, const wx
 	bSizer63 = new wxBoxSizer( wxVERTICAL );
 	
 	wxArrayString m_choiceToolChoices;
-	m_choiceTool = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceToolChoices, 0 );
+	m_choiceTool = new wxChoice( sbSizerMachine->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceToolChoices, 0 );
 	m_choiceTool->SetSelection( 0 );
 	bSizer63->Add( m_choiceTool, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer64;
 	bSizer64 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_staticText100 = new wxStaticText( this, wxID_ANY, _("Toolslot:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText100 = new wxStaticText( sbSizerMachine->GetStaticBox(), wxID_ANY, _("Toolslot:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText100->Wrap( -1 );
 	bSizer64->Add( m_staticText100, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_spinCtrlToolSlot = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 100, 1 );
+	m_spinCtrlToolSlot = new wxSpinCtrl( sbSizerMachine->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 100, 1 );
 	bSizer64->Add( m_spinCtrlToolSlot, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_buttonToolAdd = new wxButton( this, wxID_ANY, _("Add to Machine"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonToolAdd = new wxButton( sbSizerMachine->GetStaticBox(), wxID_ANY, _("Add to Machine"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer64->Add( m_buttonToolAdd, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
+	
 	
 	bSizer63->Add( bSizer64, 0, wxALIGN_RIGHT, 5 );
 	
+	
 	bSizer62->Add( bSizer63, 1, wxEXPAND, 5 );
+	
 	
 	sbSizerMachine->Add( bSizer62, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
+	
 	bSizer51->Add( sbSizerMachine, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
 	
 	this->SetSizer( bSizer51 );
 	this->Layout();
@@ -1713,7 +1764,7 @@ GUIRun::~GUIRun()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIRun::OnXClose ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIRun::OnClose ) );
+	this->Disconnect( wxID_CLOSE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIRun::OnClose ) );
 	m_choiceRun->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIRun::OnRunSelect ), NULL, this );
 	m_choiceWorkpiece->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIRun::OnWorkpieceSelect ), NULL, this );
 	m_buttonRotX90->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIRun::OnRotate ), NULL, this );
@@ -1722,6 +1773,7 @@ GUIRun::~GUIRun()
 	m_buttonLoadMachine->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIRun::OnMachineLoad ), NULL, this );
 	m_buttonToolDelete->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIRun::OnToolRemove ), NULL, this );
 	m_buttonToolAdd->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIRun::OnToolAdd ), NULL, this );
+	
 }
 
 GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -1738,8 +1790,7 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	m_menuItemSave = new wxMenuItem( m_menuMachine, wxID_SAVE, wxString( _("&Save Machine Description") ) + wxT('\t') + wxT("CTRL+S"), wxEmptyString, wxITEM_NORMAL );
 	m_menuMachine->Append( m_menuItemSave );
 	
-	wxMenuItem* m_separator18;
-	m_separator18 = m_menuMachine->AppendSeparator();
+	m_menuMachine->AppendSeparator();
 	
 	wxMenuItem* m_menuItemMachineReevaluateScript;
 	m_menuItemMachineReevaluateScript = new wxMenuItem( m_menuMachine, wxID_ANY, wxString( _("&Evaluate Script") ) + wxT('\t') + wxT("CTRL+E"), wxEmptyString, wxITEM_NORMAL );
@@ -1749,21 +1800,20 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	m_menuItemShowControl = new wxMenuItem( m_menuMachine, ID_CONTROLLERSHOW, wxString( _("&Show Controller") ) + wxT('\t') + wxT("CTRL+SHIFT+C"), wxEmptyString, wxITEM_NORMAL );
 	m_menuMachine->Append( m_menuItemShowControl );
 	
-	wxMenuItem* m_separator12;
-	m_separator12 = m_menuMachine->AppendSeparator();
+	m_menuMachine->AppendSeparator();
 	
 	wxMenuItem* m_menuItemClose;
 	m_menuItemClose = new wxMenuItem( m_menuMachine, wxID_CLOSE, wxString( _("Close Window") ) + wxT('\t') + wxT("CTRL+W"), wxEmptyString, wxITEM_NORMAL );
 	m_menuMachine->Append( m_menuItemClose );
 	
-	m_menubar->Append( m_menuMachine, _("&Machine") );
+	m_menubar->Append( m_menuMachine, _("&Machine") ); 
 	
 	m_menuSettings = new wxMenu();
 	wxMenuItem* m_menuItemEnable3D;
 	m_menuItemEnable3D = new wxMenuItem( m_menuSettings, ID_VIEWSTEREO3D, wxString( _("Enable &3D") ) + wxT('\t') + wxT("CTRL+3"), wxEmptyString, wxITEM_CHECK );
 	m_menuSettings->Append( m_menuItemEnable3D );
 	
-	m_menubar->Append( m_menuSettings, _("&Settings") );
+	m_menubar->Append( m_menuSettings, _("&Settings") ); 
 	
 	this->SetMenuBar( m_menubar );
 	
@@ -1772,8 +1822,9 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	
 	m_splitter2 = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D );
 	m_splitter2->SetSashGravity( 0.3 );
-	m_splitter2->SetMinimumPaneSize( 200 );
 	m_splitter2->Connect( wxEVT_IDLE, wxIdleEventHandler( GUIMachineDebugger::m_splitter2OnIdle ), NULL, this );
+	m_splitter2->SetMinimumPaneSize( 200 );
+	
 	m_panel = new wxPanel( m_splitter2, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer39;
 	bSizer39 = new wxBoxSizer( wxVERTICAL );
@@ -1781,6 +1832,7 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	m_splitter3 = new wxSplitterWindow( m_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D );
 	m_splitter3->SetSashGravity( 0.5 );
 	m_splitter3->Connect( wxEVT_IDLE, wxIdleEventHandler( GUIMachineDebugger::m_splitter3OnIdle ), NULL, this );
+	
 	m_panelEditor = new wxPanel( m_splitter3, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer40;
 	bSizer40 = new wxBoxSizer( wxVERTICAL );
@@ -1790,6 +1842,7 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	
 	m_buttonRestart = new wxButton( m_panelEditor, wxID_ANY, _("Evaluate"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer40->Add( m_buttonRestart, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
 	
 	m_panelEditor->SetSizer( bSizer40 );
 	m_panelEditor->Layout();
@@ -1801,11 +1854,13 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	m_textCtrlOutput = new wxTextCtrl( m_panelOutput, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_DONTWRAP|wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH );
 	bSizer41->Add( m_textCtrlOutput, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
+	
 	m_panelOutput->SetSizer( bSizer41 );
 	m_panelOutput->Layout();
 	bSizer41->Fit( m_panelOutput );
 	m_splitter3->SplitHorizontally( m_panelEditor, m_panelOutput, 409 );
 	bSizer39->Add( m_splitter3, 1, wxEXPAND, 5 );
+	
 	
 	m_panel->SetSizer( bSizer39 );
 	m_panel->Layout();
@@ -1817,11 +1872,13 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	m_canvas = new CanvasMachine(m_panelMachineView);
 	bSizer38->Add( m_canvas, 1, wxALL|wxEXPAND, 5 );
 	
+	
 	m_panelMachineView->SetSizer( bSizer38 );
 	m_panelMachineView->Layout();
 	bSizer38->Fit( m_panelMachineView );
 	m_splitter2->SplitVertically( m_panel, m_panelMachineView, 326 );
 	bSizer37->Add( m_splitter2, 1, wxEXPAND, 5 );
+	
 	
 	this->SetSizer( bSizer37 );
 	this->Layout();
@@ -1842,13 +1899,14 @@ GUIMachineDebugger::~GUIMachineDebugger()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineDebugger::OnXClose ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineLoad ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineSave ) );
+	this->Disconnect( wxID_LOAD, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineLoad ) );
+	this->Disconnect( wxID_SAVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineSave ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnShowController ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnClose ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnChangeStereo3D ) );
+	this->Disconnect( ID_CONTROLLERSHOW, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnShowController ) );
+	this->Disconnect( wxID_CLOSE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnClose ) );
+	this->Disconnect( ID_VIEWSTEREO3D, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnChangeStereo3D ) );
 	m_buttonRestart->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ), NULL, this );
+	
 }
 
 GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -1865,7 +1923,7 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	m_menuItemClose = new wxMenuItem( m_menuDialog, ID_CONTROLLERSHOW, wxString( _("Hide &Controller") ) + wxT('\t') + wxT("CTRL+SHIFT+C"), wxEmptyString, wxITEM_NORMAL );
 	m_menuDialog->Append( m_menuItemClose );
 	
-	m_menubar9->Append( m_menuDialog, _("&Controller") );
+	m_menubar9->Append( m_menuDialog, _("&Controller") ); 
 	
 	this->SetMenuBar( m_menubar9 );
 	
@@ -1884,38 +1942,42 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	wxBoxSizer* bSizer42;
 	bSizer42 = new wxBoxSizer( wxVERTICAL );
 	
-	m_staticText69 = new wxStaticText( this, wxID_ANY, _("X:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText69 = new wxStaticText( sbSizer12->GetStaticBox(), wxID_ANY, _("X:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText69->Wrap( -1 );
 	bSizer42->Add( m_staticText69, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_sliderX = new wxSlider( this, ID_AXISX, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
+	m_sliderX = new wxSlider( sbSizer12->GetStaticBox(), ID_AXISX, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
 	bSizer42->Add( m_sliderX, 1, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	bSizer41->Add( bSizer42, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxBoxSizer* bSizer43;
 	bSizer43 = new wxBoxSizer( wxVERTICAL );
 	
-	m_staticText70 = new wxStaticText( this, wxID_ANY, _("Y:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText70 = new wxStaticText( sbSizer12->GetStaticBox(), wxID_ANY, _("Y:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText70->Wrap( -1 );
 	bSizer43->Add( m_staticText70, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_sliderY = new wxSlider( this, ID_AXISY, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
+	m_sliderY = new wxSlider( sbSizer12->GetStaticBox(), ID_AXISY, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
 	bSizer43->Add( m_sliderY, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	bSizer41->Add( bSizer43, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxBoxSizer* bSizer44;
 	bSizer44 = new wxBoxSizer( wxVERTICAL );
 	
-	m_staticText71 = new wxStaticText( this, wxID_ANY, _("Z:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText71 = new wxStaticText( sbSizer12->GetStaticBox(), wxID_ANY, _("Z:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText71->Wrap( -1 );
 	bSizer44->Add( m_staticText71, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_sliderZ = new wxSlider( this, ID_AXISZ, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
+	m_sliderZ = new wxSlider( sbSizer12->GetStaticBox(), ID_AXISZ, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
 	bSizer44->Add( m_sliderZ, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
+	
 	bSizer41->Add( bSizer44, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
 	
 	sbSizer12->Add( bSizer41, 1, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -1924,40 +1986,42 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	fgSizer10->SetFlexibleDirection( wxBOTH );
 	fgSizer10->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText73 = new wxStaticText( this, wxID_ANY, _("X:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText73 = new wxStaticText( sbSizer12->GetStaticBox(), wxID_ANY, _("X:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText73->Wrap( -1 );
 	fgSizer10->Add( m_staticText73, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_textCtrlX = new wxTextCtrl( this, ID_TEXTX, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
+	m_textCtrlX = new wxTextCtrl( sbSizer12->GetStaticBox(), ID_TEXTX, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
 	fgSizer10->Add( m_textCtrlX, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_staticTextUnitX = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitX = new wxStaticText( sbSizer12->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitX->Wrap( -1 );
 	fgSizer10->Add( m_staticTextUnitX, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText75 = new wxStaticText( this, wxID_ANY, _("Y:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText75 = new wxStaticText( sbSizer12->GetStaticBox(), wxID_ANY, _("Y:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText75->Wrap( -1 );
 	fgSizer10->Add( m_staticText75, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlY = new wxTextCtrl( this, ID_TEXTY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
+	m_textCtrlY = new wxTextCtrl( sbSizer12->GetStaticBox(), ID_TEXTY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
 	fgSizer10->Add( m_textCtrlY, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_staticTextUnitY = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitY = new wxStaticText( sbSizer12->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitY->Wrap( -1 );
 	fgSizer10->Add( m_staticTextUnitY, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText77 = new wxStaticText( this, wxID_ANY, _("Z:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText77 = new wxStaticText( sbSizer12->GetStaticBox(), wxID_ANY, _("Z:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText77->Wrap( -1 );
 	fgSizer10->Add( m_staticText77, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlZ = new wxTextCtrl( this, ID_TEXTZ, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
+	m_textCtrlZ = new wxTextCtrl( sbSizer12->GetStaticBox(), ID_TEXTZ, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
 	fgSizer10->Add( m_textCtrlZ, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_staticTextUnitZ = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitZ = new wxStaticText( sbSizer12->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitZ->Wrap( -1 );
 	fgSizer10->Add( m_staticTextUnitZ, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	sbSizer12->Add( fgSizer10, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	bSizer38->Add( sbSizer12, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
@@ -1970,38 +2034,42 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	wxBoxSizer* bSizer46;
 	bSizer46 = new wxBoxSizer( wxVERTICAL );
 	
-	m_staticText78 = new wxStaticText( this, wxID_ANY, _("A:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText78 = new wxStaticText( sbSizer14->GetStaticBox(), wxID_ANY, _("A:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText78->Wrap( -1 );
 	bSizer46->Add( m_staticText78, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_sliderA = new wxSlider( this, ID_AXISA, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
+	m_sliderA = new wxSlider( sbSizer14->GetStaticBox(), ID_AXISA, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
 	bSizer46->Add( m_sliderA, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
 	
 	bSizer45->Add( bSizer46, 0, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer47;
 	bSizer47 = new wxBoxSizer( wxVERTICAL );
 	
-	m_staticText79 = new wxStaticText( this, wxID_ANY, _("B:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText79 = new wxStaticText( sbSizer14->GetStaticBox(), wxID_ANY, _("B:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText79->Wrap( -1 );
 	bSizer47->Add( m_staticText79, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_sliderB = new wxSlider( this, ID_AXISB, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
+	m_sliderB = new wxSlider( sbSizer14->GetStaticBox(), ID_AXISB, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
 	bSizer47->Add( m_sliderB, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
 	
 	bSizer45->Add( bSizer47, 0, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer48;
 	bSizer48 = new wxBoxSizer( wxVERTICAL );
 	
-	m_staticText80 = new wxStaticText( this, wxID_ANY, _("C:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText80 = new wxStaticText( sbSizer14->GetStaticBox(), wxID_ANY, _("C:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText80->Wrap( -1 );
 	bSizer48->Add( m_staticText80, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_sliderC = new wxSlider( this, ID_AXISC, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
+	m_sliderC = new wxSlider( sbSizer14->GetStaticBox(), ID_AXISC, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
 	bSizer48->Add( m_sliderC, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
+	
 	bSizer45->Add( bSizer48, 0, wxEXPAND, 5 );
+	
 	
 	sbSizer14->Add( bSizer45, 1, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -2010,40 +2078,42 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	fgSizer101->SetFlexibleDirection( wxBOTH );
 	fgSizer101->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText731 = new wxStaticText( this, wxID_ANY, _("A:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText731 = new wxStaticText( sbSizer14->GetStaticBox(), wxID_ANY, _("A:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText731->Wrap( -1 );
 	fgSizer101->Add( m_staticText731, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_textCtrlA = new wxTextCtrl( this, ID_TEXTA, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
+	m_textCtrlA = new wxTextCtrl( sbSizer14->GetStaticBox(), ID_TEXTA, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
 	fgSizer101->Add( m_textCtrlA, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_staticTextUnitA = new wxStaticText( this, wxID_ANY, _("deg"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitA = new wxStaticText( sbSizer14->GetStaticBox(), wxID_ANY, _("deg"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitA->Wrap( -1 );
 	fgSizer101->Add( m_staticTextUnitA, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText751 = new wxStaticText( this, wxID_ANY, _("B:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText751 = new wxStaticText( sbSizer14->GetStaticBox(), wxID_ANY, _("B:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText751->Wrap( -1 );
 	fgSizer101->Add( m_staticText751, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_textCtrlB = new wxTextCtrl( this, ID_TEXTB, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
+	m_textCtrlB = new wxTextCtrl( sbSizer14->GetStaticBox(), ID_TEXTB, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
 	fgSizer101->Add( m_textCtrlB, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_staticTextUnitB = new wxStaticText( this, wxID_ANY, _("deg"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitB = new wxStaticText( sbSizer14->GetStaticBox(), wxID_ANY, _("deg"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitB->Wrap( -1 );
 	fgSizer101->Add( m_staticTextUnitB, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText771 = new wxStaticText( this, wxID_ANY, _("C:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText771 = new wxStaticText( sbSizer14->GetStaticBox(), wxID_ANY, _("C:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText771->Wrap( -1 );
 	fgSizer101->Add( m_staticText771, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_textCtrlC = new wxTextCtrl( this, ID_TEXTC, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
+	m_textCtrlC = new wxTextCtrl( sbSizer14->GetStaticBox(), ID_TEXTC, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
 	fgSizer101->Add( m_textCtrlC, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_staticTextUnitC = new wxStaticText( this, wxID_ANY, _("deg"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitC = new wxStaticText( sbSizer14->GetStaticBox(), wxID_ANY, _("deg"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitC->Wrap( -1 );
 	fgSizer101->Add( m_staticTextUnitC, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	sbSizer14->Add( fgSizer101, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	bSizer38->Add( sbSizer14, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -2056,38 +2126,42 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	wxBoxSizer* bSizer50;
 	bSizer50 = new wxBoxSizer( wxVERTICAL );
 	
-	m_staticText81 = new wxStaticText( this, wxID_ANY, _("U:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText81 = new wxStaticText( sbSizer13->GetStaticBox(), wxID_ANY, _("U:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText81->Wrap( -1 );
 	bSizer50->Add( m_staticText81, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_sliderU = new wxSlider( this, ID_AXISU, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
+	m_sliderU = new wxSlider( sbSizer13->GetStaticBox(), ID_AXISU, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
 	bSizer50->Add( m_sliderU, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
 	
 	bSizer49->Add( bSizer50, 0, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer51;
 	bSizer51 = new wxBoxSizer( wxVERTICAL );
 	
-	m_staticText82 = new wxStaticText( this, wxID_ANY, _("V:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText82 = new wxStaticText( sbSizer13->GetStaticBox(), wxID_ANY, _("V:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText82->Wrap( -1 );
 	bSizer51->Add( m_staticText82, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_sliderV = new wxSlider( this, ID_AXISV, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
+	m_sliderV = new wxSlider( sbSizer13->GetStaticBox(), ID_AXISV, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
 	bSizer51->Add( m_sliderV, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
 	
 	bSizer49->Add( bSizer51, 0, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer52;
 	bSizer52 = new wxBoxSizer( wxVERTICAL );
 	
-	m_staticText83 = new wxStaticText( this, wxID_ANY, _("W:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText83 = new wxStaticText( sbSizer13->GetStaticBox(), wxID_ANY, _("W:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText83->Wrap( -1 );
 	bSizer52->Add( m_staticText83, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_sliderW = new wxSlider( this, ID_AXISW, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
+	m_sliderW = new wxSlider( sbSizer13->GetStaticBox(), ID_AXISW, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_INVERSE|wxSL_VERTICAL );
 	bSizer52->Add( m_sliderW, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
+	
 	bSizer49->Add( bSizer52, 0, wxEXPAND, 5 );
+	
 	
 	sbSizer13->Add( bSizer49, 1, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -2096,45 +2170,48 @@ GUIMachineControl::GUIMachineControl( wxWindow* parent, wxWindowID id, const wxS
 	fgSizer102->SetFlexibleDirection( wxBOTH );
 	fgSizer102->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText732 = new wxStaticText( this, wxID_ANY, _("U:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText732 = new wxStaticText( sbSizer13->GetStaticBox(), wxID_ANY, _("U:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText732->Wrap( -1 );
 	fgSizer102->Add( m_staticText732, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_textCtrlU = new wxTextCtrl( this, ID_TEXTU, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
+	m_textCtrlU = new wxTextCtrl( sbSizer13->GetStaticBox(), ID_TEXTU, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
 	fgSizer102->Add( m_textCtrlU, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_staticTextUnitU = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitU = new wxStaticText( sbSizer13->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitU->Wrap( -1 );
 	fgSizer102->Add( m_staticTextUnitU, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText752 = new wxStaticText( this, wxID_ANY, _("V:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText752 = new wxStaticText( sbSizer13->GetStaticBox(), wxID_ANY, _("V:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText752->Wrap( -1 );
 	fgSizer102->Add( m_staticText752, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_textCtrlV = new wxTextCtrl( this, ID_TEXTV, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
+	m_textCtrlV = new wxTextCtrl( sbSizer13->GetStaticBox(), ID_TEXTV, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
 	fgSizer102->Add( m_textCtrlV, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextUnitV = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitV = new wxStaticText( sbSizer13->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitV->Wrap( -1 );
 	fgSizer102->Add( m_staticTextUnitV, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText772 = new wxStaticText( this, wxID_ANY, _("W:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText772 = new wxStaticText( sbSizer13->GetStaticBox(), wxID_ANY, _("W:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText772->Wrap( -1 );
 	fgSizer102->Add( m_staticText772, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_textCtrlW = new wxTextCtrl( this, ID_TEXTW, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
+	m_textCtrlW = new wxTextCtrl( sbSizer13->GetStaticBox(), ID_TEXTW, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_RIGHT );
 	fgSizer102->Add( m_textCtrlW, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextUnitW = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitW = new wxStaticText( sbSizer13->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitW->Wrap( -1 );
 	fgSizer102->Add( m_staticTextUnitW, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	sbSizer13->Add( fgSizer102, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	bSizer38->Add( sbSizer13, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
 	bSizer38->Add( 0, 0, 1, wxEXPAND, 5 );
+	
 	
 	this->SetSizer( bSizer38 );
 	this->Layout();
@@ -2363,6 +2440,7 @@ GUIMachineControl::~GUIMachineControl()
 	m_textCtrlU->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIMachineControl::OnTextChanged ), NULL, this );
 	m_textCtrlV->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIMachineControl::OnTextChanged ), NULL, this );
 	m_textCtrlW->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIMachineControl::OnTextChanged ), NULL, this );
+	
 }
 
 GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -2379,21 +2457,19 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_menuItemToolboxSave = new wxMenuItem( m_menuTools, ID_TOOLBOXSAVE, wxString( _("&Save Toolbox") ) + wxT('\t') + wxT("CTRL+S"), wxEmptyString, wxITEM_NORMAL );
 	m_menuTools->Append( m_menuItemToolboxSave );
 	
-	wxMenuItem* m_separator1;
-	m_separator1 = m_menuTools->AppendSeparator();
+	m_menuTools->AppendSeparator();
 	
 	wxMenuItem* m_menuItemWizard;
 	m_menuItemWizard = new wxMenuItem( m_menuTools, wxID_ANY, wxString( _("Shape &Wizard") ) + wxT('\t') + wxT("Ctrl+Shift+W"), wxEmptyString, wxITEM_NORMAL );
 	m_menuTools->Append( m_menuItemWizard );
 	
-	wxMenuItem* m_separator2;
-	m_separator2 = m_menuTools->AppendSeparator();
+	m_menuTools->AppendSeparator();
 	
 	wxMenuItem* m_menuItemClose;
 	m_menuItemClose = new wxMenuItem( m_menuTools, wxID_CLOSE, wxString( _("&Close Window") ) + wxT('\t') + wxT("Ctrl+W"), wxEmptyString, wxITEM_NORMAL );
 	m_menuTools->Append( m_menuItemClose );
 	
-	m_menubar->Append( m_menuTools, _("&Tools") );
+	m_menubar->Append( m_menuTools, _("&Tools") ); 
 	
 	m_menuSettings = new wxMenu();
 	wxMenuItem* m_menuItemUnitsSetup;
@@ -2404,7 +2480,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_menuItemStereo3D = new wxMenuItem( m_menuSettings, ID_VIEWSTEREO3D, wxString( _("&Stereo 3D") ) + wxT('\t') + wxT("CTRL+3"), wxEmptyString, wxITEM_CHECK );
 	m_menuSettings->Append( m_menuItemStereo3D );
 	
-	m_menubar->Append( m_menuSettings, _("&Settings") );
+	m_menubar->Append( m_menuSettings, _("&Settings") ); 
 	
 	this->SetMenuBar( m_menubar );
 	
@@ -2426,6 +2502,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_buttonToolDelete = new wxButton( this, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizerTop->Add( m_buttonToolDelete, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	bSizer->Add( bSizerTop, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxFlexGridSizer* fgSizerMain;
@@ -2444,63 +2521,63 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	fgSizer1->SetFlexibleDirection( wxBOTH );
 	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText8 = new wxStaticText( this, wxID_ANY, _("Shaft diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText8 = new wxStaticText( sbSizer1->GetStaticBox(), wxID_ANY, _("Shaft diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText8->Wrap( -1 );
 	fgSizer1->Add( m_staticText8, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlShaftDiameter = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlShaftDiameter = new wxTextCtrl( sbSizer1->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	m_textCtrlShaftDiameter->SetToolTip( _("Diameter of the part that disappears inside the chuck.") );
 	
 	fgSizer1->Add( m_textCtrlShaftDiameter, 0, wxALL, 5 );
 	
-	m_staticTextUnitShaftDiameter = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitShaftDiameter = new wxStaticText( sbSizer1->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitShaftDiameter->Wrap( -1 );
 	fgSizer1->Add( m_staticTextUnitShaftDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText10 = new wxStaticText( this, wxID_ANY, _("Shaft length:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText10 = new wxStaticText( sbSizer1->GetStaticBox(), wxID_ANY, _("Shaft length:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText10->Wrap( -1 );
 	fgSizer1->Add( m_staticText10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlShaftLength = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlShaftLength = new wxTextCtrl( sbSizer1->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	m_textCtrlShaftLength->SetToolTip( _("This is the length of the that disappears inside the chuck.") );
 	
 	fgSizer1->Add( m_textCtrlShaftLength, 0, wxALL, 5 );
 	
-	m_staticTextUnitShaftLength = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitShaftLength = new wxStaticText( sbSizer1->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitShaftLength->Wrap( -1 );
 	fgSizer1->Add( m_staticTextUnitShaftLength, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText13 = new wxStaticText( this, wxID_ANY, _("Maximum speed:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText13 = new wxStaticText( sbSizer1->GetStaticBox(), wxID_ANY, _("Maximum speed:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText13->Wrap( -1 );
 	fgSizer1->Add( m_staticText13, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlMaxSpeed = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlMaxSpeed = new wxTextCtrl( sbSizer1->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	m_textCtrlMaxSpeed->SetToolTip( _("Max. speed: Look at label on box you got the tools shipped in.") );
 	
 	fgSizer1->Add( m_textCtrlMaxSpeed, 0, wxALL, 5 );
 	
-	m_staticTextUnitMaxSpeed = new wxStaticText( this, wxID_ANY, _("rpm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitMaxSpeed = new wxStaticText( sbSizer1->GetStaticBox(), wxID_ANY, _("rpm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitMaxSpeed->Wrap( -1 );
 	fgSizer1->Add( m_staticTextUnitMaxSpeed, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText14 = new wxStaticText( this, wxID_ANY, _("Feed coefficient:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText14 = new wxStaticText( sbSizer1->GetStaticBox(), wxID_ANY, _("Feed coefficient:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText14->Wrap( -1 );
 	fgSizer1->Add( m_staticText14, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlFeedCoefficient = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlFeedCoefficient = new wxTextCtrl( sbSizer1->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	m_textCtrlFeedCoefficient->SetToolTip( _("Feed per tooth: How deep can a tooth cut per revolution. Usually in the range of 0.02 mm to 0.05 mm.") );
 	
 	fgSizer1->Add( m_textCtrlFeedCoefficient, 0, wxALL, 5 );
 	
-	m_staticTextUnitFeedCoefficient = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitFeedCoefficient = new wxStaticText( sbSizer1->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitFeedCoefficient->Wrap( -1 );
 	fgSizer1->Add( m_staticTextUnitFeedCoefficient, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextFlutes = new wxStaticText( this, wxID_ANY, _("Number of flutes:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextFlutes = new wxStaticText( sbSizer1->GetStaticBox(), wxID_ANY, _("Number of flutes:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextFlutes->Wrap( -1 );
 	fgSizer1->Add( m_staticTextFlutes, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlNrOfTeeth = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlNrOfTeeth = new wxTextCtrl( sbSizer1->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	m_textCtrlNrOfTeeth->SetToolTip( _("Number of teeth around the cutter.") );
 	
 	fgSizer1->Add( m_textCtrlNrOfTeeth, 0, wxALL, 5 );
@@ -2508,14 +2585,16 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	
 	fgSizer1->Add( 0, 0, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
+	
 	sbSizer1->Add( fgSizer1, 0, 0, 5 );
 	
-	m_staticText26 = new wxStaticText( this, wxID_ANY, _("Comment:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText26 = new wxStaticText( sbSizer1->GetStaticBox(), wxID_ANY, _("Comment:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText26->Wrap( -1 );
 	sbSizer1->Add( m_staticText26, 0, wxALL, 5 );
 	
-	m_textCtrlComment = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_WORDWRAP );
+	m_textCtrlComment = new wxTextCtrl( sbSizer1->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_WORDWRAP );
 	sbSizer1->Add( m_textCtrlComment, 1, wxALL|wxEXPAND, 5 );
+	
 	
 	fgSizerMain->Add( sbSizer1, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
@@ -2534,20 +2613,21 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_buttonShapeNew = new wxButton( this, wxID_ANY, _("New"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonShapeNew = new wxButton( sbSizer2->GetStaticBox(), wxID_ANY, _("New"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer4->Add( m_buttonShapeNew, 0, wxALL, 5 );
 	
-	m_buttonShapeUpdate = new wxButton( this, wxID_ANY, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonShapeUpdate = new wxButton( sbSizer2->GetStaticBox(), wxID_ANY, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer4->Add( m_buttonShapeUpdate, 0, wxALL, 5 );
 	
-	m_buttonShapeDelete = new wxButton( this, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonShapeDelete = new wxButton( sbSizer2->GetStaticBox(), wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer4->Add( m_buttonShapeDelete, 0, wxALL, 5 );
+	
 	
 	bSizer3->Add( bSizer4, 0, 0, 5 );
 	
 	wxString m_choiceTypeChoices[] = { _("Linear or bend line"), _("Corner: first diameter change, then height change"), _("Corner: first height change, then diameter change"), _("Sphere: radius at upper limit, calculate height"), _("Sphere: radius at lower limit, calculate height") };
 	int m_choiceTypeNChoices = sizeof( m_choiceTypeChoices ) / sizeof( wxString );
-	m_choiceType = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceTypeNChoices, m_choiceTypeChoices, 0 );
+	m_choiceType = new wxChoice( sbSizer2->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceTypeNChoices, m_choiceTypeChoices, 0 );
 	m_choiceType->SetSelection( 0 );
 	bSizer3->Add( m_choiceType, 0, wxALL, 5 );
 	
@@ -2556,69 +2636,75 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	fgSizer2->SetFlexibleDirection( wxBOTH );
 	fgSizer2->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText18 = new wxStaticText( this, wxID_ANY, _("Diameter"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText18 = new wxStaticText( sbSizer2->GetStaticBox(), wxID_ANY, _("Diameter"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText18->Wrap( -1 );
 	fgSizer2->Add( m_staticText18, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlDiameter = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlDiameter = new wxTextCtrl( sbSizer2->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_textCtrlDiameter->SetToolTip( _("Diameter of the tool at the end of this segment.") );
 	
 	fgSizer2->Add( m_textCtrlDiameter, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticTextUnitDiameter = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitDiameter = new wxStaticText( sbSizer2->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitDiameter->Wrap( -1 );
 	fgSizer2->Add( m_staticTextUnitDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText20 = new wxStaticText( this, wxID_ANY, _("Height"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText20 = new wxStaticText( sbSizer2->GetStaticBox(), wxID_ANY, _("Height"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText20->Wrap( -1 );
 	fgSizer2->Add( m_staticText20, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlHeight = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlHeight = new wxTextCtrl( sbSizer2->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_textCtrlHeight->SetToolTip( _("Height of this segment.") );
 	
 	fgSizer2->Add( m_textCtrlHeight, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticTextUnitHeight = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitHeight = new wxStaticText( sbSizer2->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitHeight->Wrap( -1 );
 	fgSizer2->Add( m_staticTextUnitHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText22 = new wxStaticText( this, wxID_ANY, _("Radius"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText22 = new wxStaticText( sbSizer2->GetStaticBox(), wxID_ANY, _("Radius"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText22->Wrap( -1 );
 	fgSizer2->Add( m_staticText22, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlRadius = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlRadius = new wxTextCtrl( sbSizer2->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_textCtrlRadius->SetToolTip( _("Radius of curvature:\nPositive radius = convex surface = bulged to the outside.\nNegative radius = concave surface = bulged to the inside.\nRadius of 0 = straight line. ") );
 	
 	fgSizer2->Add( m_textCtrlRadius, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticTextUnitRadius = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitRadius = new wxStaticText( sbSizer2->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitRadius->Wrap( -1 );
 	fgSizer2->Add( m_staticTextUnitRadius, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
 	fgSizer2->Add( 0, 0, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_checkBoxCutting = new wxCheckBox( this, wxID_ANY, _("surface is cutting"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxCutting = new wxCheckBox( sbSizer2->GetStaticBox(), wxID_ANY, _("surface is cutting"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer2->Add( m_checkBoxCutting, 0, wxALL, 5 );
 	
 	
 	fgSizer2->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	
 	bSizer3->Add( fgSizer2, 0, 0, 5 );
+	
 	
 	bSizer2->Add( bSizer3, 0, 0, 5 );
 	
-	m_listCtrl = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VRULES );
+	m_listCtrl = new wxListCtrl( sbSizer2->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VRULES );
 	bSizer2->Add( m_listCtrl, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
+	
 	sbSizer2->Add( bSizer2, 1, wxEXPAND, 5 );
+	
 	
 	fgSizerMain->Add( sbSizer2, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_canvas = new CanvasTool(this);
 	fgSizerMain->Add( m_canvas, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
+	
 	bSizer->Add( fgSizerMain, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
 	
 	this->SetSizer( bSizer );
 	this->Layout();
@@ -2650,8 +2736,8 @@ GUIToolbox::~GUIToolbox()
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIToolbox::OnXClose ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnShapeWizard ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnClose ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnChangeStereo3D ) );
+	this->Disconnect( wxID_CLOSE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnClose ) );
+	this->Disconnect( ID_VIEWSTEREO3D, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIToolbox::OnChangeStereo3D ) );
 	m_comboBoxToolSelector->Disconnect( wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler( GUIToolbox::OnToolSelect ), NULL, this );
 	m_comboBoxToolSelector->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnToolRename ), NULL, this );
 	m_buttonToolNew->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnToolNew ), NULL, this );
@@ -2667,6 +2753,7 @@ GUIToolbox::~GUIToolbox()
 	m_buttonShapeUpdate->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeUpdate ), NULL, this );
 	m_buttonShapeDelete->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeDelete ), NULL, this );
 	m_listCtrl->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( GUIToolbox::OnShapeSelect ), NULL, this );
+	
 }
 
 GUIToolWizard::GUIToolWizard( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -2681,6 +2768,7 @@ GUIToolWizard::GUIToolWizard( wxWindow* parent, wxWindowID id, const wxString& t
 	wxBoxSizer* bSizer1;
 	bSizer1 = new wxBoxSizer( wxHORIZONTAL );
 	
+	
 	m_panelCylinder->SetSizer( bSizer1 );
 	m_panelCylinder->Layout();
 	bSizer1->Fit( m_panelCylinder );
@@ -2689,6 +2777,7 @@ GUIToolWizard::GUIToolWizard( wxWindow* parent, wxWindowID id, const wxString& t
 	wxBoxSizer* bSizer2;
 	bSizer2 = new wxBoxSizer( wxHORIZONTAL );
 	
+	
 	m_panelSphere->SetSizer( bSizer2 );
 	m_panelSphere->Layout();
 	bSizer2->Fit( m_panelSphere );
@@ -2696,6 +2785,7 @@ GUIToolWizard::GUIToolWizard( wxWindow* parent, wxWindowID id, const wxString& t
 	m_panelCone = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer3;
 	bSizer3 = new wxBoxSizer( wxHORIZONTAL );
+	
 	
 	m_panelCone->SetSizer( bSizer3 );
 	m_panelCone->Layout();
@@ -2720,7 +2810,9 @@ GUIToolWizard::GUIToolWizard( wxWindow* parent, wxWindowID id, const wxString& t
 	m_buttonClose = new wxButton( this, wxID_CLOSE, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizerButtons->Add( m_buttonClose, 0, wxALL, 5 );
 	
+	
 	bSizer->Add( bSizerButtons, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	this->SetSizer( bSizer );
 	this->Layout();
@@ -2737,6 +2829,7 @@ GUIToolWizard::~GUIToolWizard()
 	m_buttonAdd->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolWizard::OnAddTool ), NULL, this );
 	m_buttonSetShape->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolWizard::OnSetShape ), NULL, this );
 	m_buttonClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolWizard::OnClose ), NULL, this );
+	
 }
 
 GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -2758,6 +2851,7 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	m_choiceRun->SetSelection( 0 );
 	bSizerRun->Add( m_choiceRun, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	bSizerMain->Add( bSizerRun, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizerGenerator;
@@ -2777,6 +2871,7 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	
 	bSizerGenerator->Add( m_buttonAddNew, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	bSizerMain->Add( bSizerGenerator, 0, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer851;
@@ -2792,81 +2887,84 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	fgSizerAreaCorrdinates->SetFlexibleDirection( wxBOTH );
 	fgSizerAreaCorrdinates->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticTextX = new wxStaticText( this, wxID_ANY, _("X start:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextX = new wxStaticText( sbSizerArea->GetStaticBox(), wxID_ANY, _("X start:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextX->Wrap( -1 );
 	fgSizerAreaCorrdinates->Add( m_staticTextX, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
 	
-	m_textCtrlX1 = new wxTextCtrl( this, ID_XSTART, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlX1 = new wxTextCtrl( sbSizerArea->GetStaticBox(), ID_XSTART, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	fgSizerAreaCorrdinates->Add( m_textCtrlX1, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_staticTextUnitX1 = new wxStaticText( this, wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitX1 = new wxStaticText( sbSizerArea->GetStaticBox(), wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitX1->Wrap( -1 );
 	fgSizerAreaCorrdinates->Add( m_staticTextUnitX1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText130 = new wxStaticText( this, wxID_ANY, _("end:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText130 = new wxStaticText( sbSizerArea->GetStaticBox(), wxID_ANY, _("end:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText130->Wrap( -1 );
 	fgSizerAreaCorrdinates->Add( m_staticText130, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
 	
-	m_textCtrlX2 = new wxTextCtrl( this, ID_XEND, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlX2 = new wxTextCtrl( sbSizerArea->GetStaticBox(), ID_XEND, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	fgSizerAreaCorrdinates->Add( m_textCtrlX2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_staticTextUnitX2 = new wxStaticText( this, wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitX2 = new wxStaticText( sbSizerArea->GetStaticBox(), wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitX2->Wrap( -1 );
 	fgSizerAreaCorrdinates->Add( m_staticTextUnitX2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextY = new wxStaticText( this, wxID_ANY, _("Y start:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextY = new wxStaticText( sbSizerArea->GetStaticBox(), wxID_ANY, _("Y start:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextY->Wrap( -1 );
 	fgSizerAreaCorrdinates->Add( m_staticTextY, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlY1 = new wxTextCtrl( this, ID_YSTART, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlY1 = new wxTextCtrl( sbSizerArea->GetStaticBox(), ID_YSTART, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	fgSizerAreaCorrdinates->Add( m_textCtrlY1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_staticTextUnitY1 = new wxStaticText( this, wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitY1 = new wxStaticText( sbSizerArea->GetStaticBox(), wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitY1->Wrap( -1 );
 	fgSizerAreaCorrdinates->Add( m_staticTextUnitY1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText132 = new wxStaticText( this, wxID_ANY, _("end:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText132 = new wxStaticText( sbSizerArea->GetStaticBox(), wxID_ANY, _("end:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText132->Wrap( -1 );
 	fgSizerAreaCorrdinates->Add( m_staticText132, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlY2 = new wxTextCtrl( this, ID_YEND, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlY2 = new wxTextCtrl( sbSizerArea->GetStaticBox(), ID_YEND, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	fgSizerAreaCorrdinates->Add( m_textCtrlY2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_staticTextUnitY2 = new wxStaticText( this, wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitY2 = new wxStaticText( sbSizerArea->GetStaticBox(), wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitY2->Wrap( -1 );
 	fgSizerAreaCorrdinates->Add( m_staticTextUnitY2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextZ = new wxStaticText( this, wxID_ANY, _("Z start:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextZ = new wxStaticText( sbSizerArea->GetStaticBox(), wxID_ANY, _("Z start:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextZ->Wrap( -1 );
 	fgSizerAreaCorrdinates->Add( m_staticTextZ, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlZ1 = new wxTextCtrl( this, ID_ZSTART, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlZ1 = new wxTextCtrl( sbSizerArea->GetStaticBox(), ID_ZSTART, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	fgSizerAreaCorrdinates->Add( m_textCtrlZ1, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
-	m_staticTextUnitZ1 = new wxStaticText( this, wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitZ1 = new wxStaticText( sbSizerArea->GetStaticBox(), wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitZ1->Wrap( -1 );
 	fgSizerAreaCorrdinates->Add( m_staticTextUnitZ1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText1312 = new wxStaticText( this, wxID_ANY, _("end:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1312 = new wxStaticText( sbSizerArea->GetStaticBox(), wxID_ANY, _("end:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1312->Wrap( -1 );
 	fgSizerAreaCorrdinates->Add( m_staticText1312, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
 	
-	m_textCtrlZ2 = new wxTextCtrl( this, ID_ZEND, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
+	m_textCtrlZ2 = new wxTextCtrl( sbSizerArea->GetStaticBox(), ID_ZEND, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT );
 	fgSizerAreaCorrdinates->Add( m_textCtrlZ2, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
-	m_staticTextUnitZ2 = new wxStaticText( this, wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitZ2 = new wxStaticText( sbSizerArea->GetStaticBox(), wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitZ2->Wrap( -1 );
 	fgSizerAreaCorrdinates->Add( m_staticTextUnitZ2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
 	
 	sbSizerArea->Add( fgSizerAreaCorrdinates, 0, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizerAreaSelect;
 	bSizerAreaSelect = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_buttonSelectAreaFromObject = new wxButton( this, ID_SELECTAREAOBJECT, _("from Object ..."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonSelectAreaFromObject = new wxButton( sbSizerArea->GetStaticBox(), ID_SELECTAREAOBJECT, _("from Object ..."), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizerAreaSelect->Add( m_buttonSelectAreaFromObject, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	sbSizerArea->Add( bSizerAreaSelect, 0, 0, 5 );
+	
 	
 	bSizer851->Add( sbSizerArea, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
@@ -2884,29 +2982,31 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	fgSizer18->SetFlexibleDirection( wxBOTH );
 	fgSizer18->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticTextSide = new wxStaticText( this, wxID_ANY, _("Side:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSide = new wxStaticText( sbSizerMargin->GetStaticBox(), wxID_ANY, _("Side:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextSide->Wrap( -1 );
 	fgSizer18->Add( m_staticTextSide, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlMarginSide = new wxTextCtrl( this, ID_MARGINSIDE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlMarginSide = new wxTextCtrl( sbSizerMargin->GetStaticBox(), ID_MARGINSIDE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer18->Add( m_textCtrlMarginSide, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextUnitMarginSide = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitMarginSide = new wxStaticText( sbSizerMargin->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitMarginSide->Wrap( -1 );
 	fgSizer18->Add( m_staticTextUnitMarginSide, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextBelow = new wxStaticText( this, wxID_ANY, _("Below:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextBelow = new wxStaticText( sbSizerMargin->GetStaticBox(), wxID_ANY, _("Below:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextBelow->Wrap( -1 );
 	fgSizer18->Add( m_staticTextBelow, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
 	
-	m_textCtrlMarginBelow = new wxTextCtrl( this, ID_MARGINBELOW, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlMarginBelow = new wxTextCtrl( sbSizerMargin->GetStaticBox(), ID_MARGINBELOW, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer18->Add( m_textCtrlMarginBelow, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_staticTextUnitMarginBelow = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitMarginBelow = new wxStaticText( sbSizerMargin->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitMarginBelow->Wrap( -1 );
 	fgSizer18->Add( m_staticTextUnitMarginBelow, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	sbSizerMargin->Add( fgSizer18, 1, wxEXPAND, 5 );
+	
 	
 	bSizer87->Add( sbSizerMargin, 0, wxEXPAND, 5 );
 	
@@ -2914,27 +3014,30 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	sbSizerTool = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Tool") ), wxVERTICAL );
 	
 	wxArrayString m_choiceToolChoices;
-	m_choiceTool = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceToolChoices, 0 );
+	m_choiceTool = new wxChoice( sbSizerTool->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceToolChoices, 0 );
 	m_choiceTool->SetSelection( 0 );
 	sbSizerTool->Add( m_choiceTool, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxBoxSizer* bSizer86;
 	bSizer86 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_staticTextDiameter = new wxStaticText( this, wxID_ANY, _("Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextDiameter = new wxStaticText( sbSizerTool->GetStaticBox(), wxID_ANY, _("Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextDiameter->Wrap( -1 );
 	bSizer86->Add( m_staticTextDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlToolDiameter = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	m_textCtrlToolDiameter = new wxTextCtrl( sbSizerTool->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
 	bSizer86->Add( m_textCtrlToolDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextUnitDiameter = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitDiameter = new wxStaticText( sbSizerTool->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitDiameter->Wrap( -1 );
 	bSizer86->Add( m_staticTextUnitDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	sbSizerTool->Add( bSizer86, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
+	
 	bSizer87->Add( sbSizerTool, 0, wxEXPAND, 5 );
+	
 	
 	bSizer88->Add( bSizer87, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -2944,30 +3047,35 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	wxBoxSizer* bSizer89;
 	bSizer89 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_staticTextFreeHeight = new wxStaticText( this, wxID_ANY, _("Free Height:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextFreeHeight = new wxStaticText( sbSizerFreeLevel->GetStaticBox(), wxID_ANY, _("Free Height:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextFreeHeight->Wrap( -1 );
 	bSizer89->Add( m_staticTextFreeHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlFreeHeight = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlFreeHeight = new wxTextCtrl( sbSizerFreeLevel->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer89->Add( m_textCtrlFreeHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextUnitFreeHeight = new wxStaticText( this, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitFreeHeight = new wxStaticText( sbSizerFreeLevel->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitFreeHeight->Wrap( -1 );
 	bSizer89->Add( m_staticTextUnitFreeHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	sbSizerFreeLevel->Add( bSizer89, 0, 0, 5 );
+	
 	
 	bSizer88->Add( sbSizerFreeLevel, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
+	
 	bSizer851->Add( bSizer88, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
 	
 	bSizerMain->Add( bSizer851, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxStaticBoxSizer* sbSizer18;
 	sbSizer18 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Generator Type:") ), wxVERTICAL );
 	
-	m_choicebookGenerator = new wxChoicebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT );
+	m_choicebookGenerator = new wxChoicebook( sbSizer18->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT );
 	sbSizer18->Add( m_choicebookGenerator, 1, wxEXPAND|wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	bSizerMain->Add( sbSizer18, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -2994,10 +3102,12 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	
 	bSizerButtons->Add( m_buttonClose, 0, wxALL, 5 );
 	
+	
 	bSizerMain->Add( bSizerButtons, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_textCtrlInfo = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
 	bSizerMain->Add( m_textCtrlInfo, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	this->SetSizer( bSizerMain );
 	this->Layout();
@@ -3046,6 +3156,7 @@ GUIToolpathGenerator::~GUIToolpathGenerator()
 	m_buttonReset->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolpathGenerator::OnResetChanges ), NULL, this );
 	m_buttonDelete->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolpathGenerator::OnDelete ), NULL, this );
 	m_buttonClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolpathGenerator::OnClose ), NULL, this );
+	
 }
 
 GUIAnimation::GUIAnimation( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -3068,27 +3179,29 @@ GUIAnimation::GUIAnimation( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_choiceToolpath->SetSelection( 0 );
 	bSizer30->Add( m_choiceToolpath, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	bSizer29->Add( bSizer30, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxStaticBoxSizer* sbSizer22;
 	sbSizer22 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("G-Codes") ), wxVERTICAL );
 	
-	m_textCtrl0 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxNO_BORDER );
+	m_textCtrl0 = new wxTextCtrl( sbSizer22->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxNO_BORDER );
 	sbSizer22->Add( m_textCtrl0, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrl1 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxNO_BORDER );
+	m_textCtrl1 = new wxTextCtrl( sbSizer22->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxNO_BORDER );
 	sbSizer22->Add( m_textCtrl1, 0, wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT|wxEXPAND, 5 );
 	
-	m_textCtrl2 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxNO_BORDER );
+	m_textCtrl2 = new wxTextCtrl( sbSizer22->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxNO_BORDER );
 	m_textCtrl2->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNSHADOW ) );
 	
 	sbSizer22->Add( m_textCtrl2, 0, wxEXPAND|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrl3 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxNO_BORDER );
+	m_textCtrl3 = new wxTextCtrl( sbSizer22->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxNO_BORDER );
 	sbSizer22->Add( m_textCtrl3, 0, wxEXPAND|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrl4 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxNO_BORDER );
+	m_textCtrl4 = new wxTextCtrl( sbSizer22->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxNO_BORDER );
 	sbSizer22->Add( m_textCtrl4, 0, wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
+	
 	
 	bSizer29->Add( sbSizer22, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -3109,6 +3222,7 @@ GUIAnimation::GUIAnimation( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_textCtrlMaxTime = new wxTextCtrl( this, wxID_ANY, _("00:00:00"), wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxTE_RIGHT );
 	bSizer31->Add( m_textCtrlMaxTime, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
+	
 	bSizer29->Add( bSizer31, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_sliderTime = new wxSlider( this, wxID_ANY, 0, 0, 2000, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
@@ -3124,13 +3238,9 @@ GUIAnimation::GUIAnimation( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_bpButtonFirst = new wxBitmapButton( this, wxID_ANY, wxBitmap( first_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	m_bpButtonFirst->SetToolTip( _("First") );
 	
-	m_bpButtonFirst->SetToolTip( _("First") );
-	
 	bSizer32->Add( m_bpButtonFirst, 0, wxALL, 5 );
 	
 	m_bpButtonPrev = new wxBitmapButton( this, wxID_ANY, wxBitmap( prev_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	m_bpButtonPrev->SetToolTip( _("Step back") );
-	
 	m_bpButtonPrev->SetToolTip( _("Step back") );
 	
 	bSizer32->Add( m_bpButtonPrev, 0, wxALL, 5 );
@@ -3138,13 +3248,9 @@ GUIAnimation::GUIAnimation( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_bpButtonPlayStop = new wxBitmapButton( this, wxID_ANY, wxBitmap( play_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	m_bpButtonPlayStop->SetToolTip( _("Play / Stop") );
 	
-	m_bpButtonPlayStop->SetToolTip( _("Play / Stop") );
-	
 	bSizer32->Add( m_bpButtonPlayStop, 0, wxALL, 5 );
 	
 	m_bpButtonNext = new wxBitmapButton( this, wxID_ANY, wxBitmap( next_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	m_bpButtonNext->SetToolTip( _("Step forward") );
-	
 	m_bpButtonNext->SetToolTip( _("Step forward") );
 	
 	bSizer32->Add( m_bpButtonNext, 0, wxALL, 5 );
@@ -3152,9 +3258,8 @@ GUIAnimation::GUIAnimation( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_bpButtonLast = new wxBitmapButton( this, wxID_ANY, wxBitmap( last_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	m_bpButtonLast->SetToolTip( _("Last") );
 	
-	m_bpButtonLast->SetToolTip( _("Last") );
-	
 	bSizer32->Add( m_bpButtonLast, 0, wxALL, 5 );
+	
 	
 	bSizer29->Add( bSizer32, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -3163,6 +3268,7 @@ GUIAnimation::GUIAnimation( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	m_buttonClose = new wxButton( this, wxID_ANY, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer29->Add( m_buttonClose, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	this->SetSizer( bSizer29 );
 	this->Layout();
@@ -3211,6 +3317,7 @@ GUIAnimation::~GUIAnimation()
 	m_bpButtonNext->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIAnimation::OnNext ), NULL, this );
 	m_bpButtonLast->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIAnimation::OnLast ), NULL, this );
 	m_buttonClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIAnimation::OnClose ), NULL, this );
+	
 }
 
 GUISetupUnits::GUISetupUnits( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -3229,70 +3336,72 @@ GUISetupUnits::GUISetupUnits( wxWindow* parent, wxWindowID id, const wxString& t
 	fgSizer6->SetFlexibleDirection( wxBOTH );
 	fgSizer6->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText57 = new wxStaticText( this, wxID_ANY, _("Length"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText57 = new wxStaticText( sbSizer6->GetStaticBox(), wxID_ANY, _("Length"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText57->Wrap( -1 );
 	fgSizer6->Add( m_staticText57, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxArrayString m_choiceUnitLengthChoices;
-	m_choiceUnitLength = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitLengthChoices, 0 );
+	m_choiceUnitLength = new wxChoice( sbSizer6->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitLengthChoices, 0 );
 	m_choiceUnitLength->SetSelection( 0 );
 	fgSizer6->Add( m_choiceUnitLength, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText58 = new wxStaticText( this, wxID_ANY, _("Linear Speed"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText58 = new wxStaticText( sbSizer6->GetStaticBox(), wxID_ANY, _("Linear Speed"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText58->Wrap( -1 );
 	fgSizer6->Add( m_staticText58, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxArrayString m_choiceUnitSpeedLinearChoices;
-	m_choiceUnitSpeedLinear = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitSpeedLinearChoices, 0 );
+	m_choiceUnitSpeedLinear = new wxChoice( sbSizer6->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitSpeedLinearChoices, 0 );
 	m_choiceUnitSpeedLinear->SetSelection( 0 );
 	fgSizer6->Add( m_choiceUnitSpeedLinear, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText59 = new wxStaticText( this, wxID_ANY, _("Rotational Speed"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText59 = new wxStaticText( sbSizer6->GetStaticBox(), wxID_ANY, _("Rotational Speed"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText59->Wrap( -1 );
 	fgSizer6->Add( m_staticText59, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxArrayString m_choiceUnitSpeedRotationalChoices;
-	m_choiceUnitSpeedRotational = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitSpeedRotationalChoices, 0 );
+	m_choiceUnitSpeedRotational = new wxChoice( sbSizer6->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitSpeedRotationalChoices, 0 );
 	m_choiceUnitSpeedRotational->SetSelection( 0 );
 	fgSizer6->Add( m_choiceUnitSpeedRotational, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText65 = new wxStaticText( this, wxID_ANY, _("Time"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText65 = new wxStaticText( sbSizer6->GetStaticBox(), wxID_ANY, _("Time"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText65->Wrap( -1 );
 	fgSizer6->Add( m_staticText65, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxArrayString m_choiceUnitTimeChoices;
-	m_choiceUnitTime = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitTimeChoices, 0 );
+	m_choiceUnitTime = new wxChoice( sbSizer6->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitTimeChoices, 0 );
 	m_choiceUnitTime->SetSelection( 0 );
 	fgSizer6->Add( m_choiceUnitTime, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
 	
-	m_staticText110 = new wxStaticText( this, wxID_ANY, _("Small Distance"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText110 = new wxStaticText( sbSizer6->GetStaticBox(), wxID_ANY, _("Small Distance"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText110->Wrap( -1 );
 	fgSizer6->Add( m_staticText110, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxArrayString m_choiceUnitSmallDistanceChoices;
-	m_choiceUnitSmallDistance = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitSmallDistanceChoices, 0 );
+	m_choiceUnitSmallDistance = new wxChoice( sbSizer6->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitSmallDistanceChoices, 0 );
 	m_choiceUnitSmallDistance->SetSelection( 0 );
 	fgSizer6->Add( m_choiceUnitSmallDistance, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText111 = new wxStaticText( this, wxID_ANY, _("Tolerance"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText111 = new wxStaticText( sbSizer6->GetStaticBox(), wxID_ANY, _("Tolerance"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText111->Wrap( -1 );
 	fgSizer6->Add( m_staticText111, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxArrayString m_choiceUnitToleranceChoices;
-	m_choiceUnitTolerance = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitToleranceChoices, 0 );
+	m_choiceUnitTolerance = new wxChoice( sbSizer6->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitToleranceChoices, 0 );
 	m_choiceUnitTolerance->SetSelection( 0 );
 	fgSizer6->Add( m_choiceUnitTolerance, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText112 = new wxStaticText( this, wxID_ANY, _("Angle"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText112 = new wxStaticText( sbSizer6->GetStaticBox(), wxID_ANY, _("Angle"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText112->Wrap( -1 );
 	fgSizer6->Add( m_staticText112, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxArrayString m_choiceUnitAngleChoices;
-	m_choiceUnitAngle = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitAngleChoices, 0 );
+	m_choiceUnitAngle = new wxChoice( sbSizer6->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceUnitAngleChoices, 0 );
 	m_choiceUnitAngle->SetSelection( 0 );
 	fgSizer6->Add( m_choiceUnitAngle, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
 	
+	
 	sbSizer6->Add( fgSizer6, 1, wxEXPAND, 5 );
+	
 	
 	bSizer25->Add( sbSizer6, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -3302,6 +3411,7 @@ GUISetupUnits::GUISetupUnits( wxWindow* parent, wxWindowID id, const wxString& t
 	m_staticText64 = new wxStaticText( this, wxID_ANY, _("Unit conversion is only used for displaying.\nInternally everything is stored in SI base units.\nPlease use Object->Modify to change object sizes."), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText64->Wrap( -1 );
 	bSizer25->Add( m_staticText64, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	this->SetSizer( bSizer25 );
 	this->Layout();
@@ -3329,6 +3439,7 @@ GUISetupUnits::~GUISetupUnits()
 	m_choiceUnitTolerance->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUISetupUnits::OnChangeUnit ), NULL, this );
 	m_choiceUnitAngle->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUISetupUnits::OnChangeUnit ), NULL, this );
 	m_buttonClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupUnits::OnClose ), NULL, this );
+	
 }
 
 GUIAbout::GUIAbout( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -3344,6 +3455,7 @@ GUIAbout::GUIAbout( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	m_button1 = new wxButton( this, wxID_CLOSE, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer3->Add( m_button1, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
+	
 	this->SetSizer( bSizer3 );
 	this->Layout();
 	
@@ -3355,6 +3467,7 @@ GUIAbout::~GUIAbout()
 {
 	// Disconnect Events
 	m_button1->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIAbout::OnClose ), NULL, this );
+	
 }
 
 StartupText::StartupText( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -3366,6 +3479,7 @@ StartupText::StartupText( wxWindow* parent, wxWindowID id, const wxString& title
 	
 	m_richText = new wxRichTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxVSCROLL|wxHSCROLL|wxNO_BORDER|wxWANTS_CHARS );
 	bSizer->Add( m_richText, 1, wxEXPAND | wxALL, 5 );
+	
 	
 	this->SetSizer( bSizer );
 	this->Layout();
@@ -3395,6 +3509,7 @@ GUITestGCode::GUITestGCode( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	bSizerB->Add( m_radioBtnG21, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	
 	bSizerV->Add( bSizerB, 0, 0, 5 );
 	
 	wxBoxSizer* bSizerH;
@@ -3410,6 +3525,7 @@ GUITestGCode::GUITestGCode( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	bSizerH->Add( m_buttonClear, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 	
+	
 	bSizerV->Add( bSizerH, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_textCtrlOutput = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
@@ -3421,6 +3537,7 @@ GUITestGCode::GUITestGCode( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_textCtrlRecreated->SetToolTip( _("Reconstruction of the G-Code block.") );
 	
 	bSizerV->Add( m_textCtrlRecreated, 0, wxEXPAND|wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	
 	this->SetSizer( bSizerV );
 	this->Layout();
@@ -3439,4 +3556,5 @@ GUITestGCode::~GUITestGCode()
 	m_radioBtnG21->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUITestGCode::OnText ), NULL, this );
 	m_textCtrlInput->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUITestGCode::OnText ), NULL, this );
 	m_buttonClear->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUITestGCode::OnClear ), NULL, this );
+	
 }

@@ -39,8 +39,9 @@
 #include "../ToolPath.h"
 #include "../../gui/DisplaySettings.h"
 #include "../../3D/BoundingBox.h"
-#include "../../3D/AffineTransformMatrix.h"
+//#include "../../3D/AffineTransformMatrix.h"
 
+#include "../../StdInclude.h"
 #include <wx/panel.h>
 #include <wx/string.h>
 #include <wx/txtstrm.h>

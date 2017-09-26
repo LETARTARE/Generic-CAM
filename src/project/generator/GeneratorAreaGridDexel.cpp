@@ -101,7 +101,7 @@ void GeneratorAreaGridDexel::GenerateToolpath(void)
 
 	DexelTarget surface = target;
 	DexelTarget toolShape;
-	toolShape.SetupTool(*tool, target.GetSizeRX(), target.GetSizeRY());
+	toolShape.SetupTool(*tool, target.GetResolutionX(), target.GetResolutionY());
 	toolShape.NegateZ();
 	surface.FoldRaise(toolShape);
 	surface.Limit();

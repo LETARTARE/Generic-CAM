@@ -2,671 +2,1390 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Generic CAM\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-24 12:52+0100\n"
-"PO-Revision-Date: 2013-02-24 12:52+0100\n"
+"POT-Creation-Date: 2017-08-30 21:58+0200\n"
+"PO-Revision-Date: 2017-08-30 21:58+0200\n"
 "Last-Translator: Tobias Schäfer <tobiassch@users.sourceforge.net>\n"
 "Language-Team: Tobias Schäfer <tobiassch@users.sourceforge.net>\n"
-"Language: \n"
+"Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
 "X-Poedit-Basepath: .\n"
-"X-Poedit-Language: German\n"
-"X-Poedit-Country: GERMANY\n"
 "X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 1.8.7.1\n"
 "X-Poedit-SearchPath-0: ../../src/.\n"
 
-#: ../../src/./GenericCAM.cpp:82
-msgid "<filepath of document to open>"
-msgstr "<Pfad zum zu öffnenden Dokument>"
-
-#: ../../src/./machine/LUACodeEvaluator.cpp:111
-msgid ""
-"\n"
-"---------- error while parsing ----------\n"
-msgstr ""
-"\n"
-"---------- Fehler beim Parsen ----------\n"
-
-#: ../../src/./machine/LUACodeEvaluator.cpp:117
-#: ../../src/./machine/LUACodeEvaluator.cpp:162
-msgid ""
-"\n"
-"---------- error while running ----------\n"
-msgstr ""
-"\n"
-"---------- Fehler beim Verarbeiten ----------\n"
-
-#: ../../src/./gui/MainFrame.cpp:58
-msgid "Generic CAM - log window"
-msgstr "Generic CAM - Protokollfenster"
-
-#: ../../src/./gui/MainFrame.cpp:155
-msgid "Project: "
-msgstr "Projekt:"
-
-#: ../../src/./gui/MainFrame.cpp:159
-msgid "Object: "
-msgstr "Objekt:"
-
-#: ../../src/./gui/MainFrame.cpp:168
-msgid "Stock material: "
-msgstr "Rohmeterial:"
-
-#: ../../src/./gui/MainFrame.cpp:175
-msgid "Machine: "
-msgstr "Maschine: "
-
-#: ../../src/./gui/MainFrame.cpp:178
-msgid "Toolbox: "
-msgstr "Werkzeugsammlung:"
-
-#: ../../src/./gui/MainFrame.cpp:185
-msgid "Run:"
-msgstr "Lauf:"
-
-#: ../../src/./gui/MainFrame.cpp:190
-msgid "Stock material"
-msgstr "Rohmaterial"
-
-#: ../../src/./gui/MainFrame.cpp:191
-msgid "Target"
-msgstr "Ziel"
-
-#: ../../src/./gui/MainFrame.cpp:192
-msgid "Toolpath"
-msgstr "Werkzeugpfad"
-
-#: ../../src/./gui/MainFrame.cpp:222
-msgid "Open Project..."
-msgstr "Projekt Öffnen..."
-
-#: ../../src/./gui/MainFrame.cpp:223
-#: ../../src/./gui/MainFrame.cpp:255
-#: ../../src/./gui/MainFrame.cpp:267
-msgid "Generic CAM Project (*.prj; *.xml)|*.prj;*.xml|All Files|*.*"
-msgstr "Generic CAM Projekt (*.prj; *.xml)|*.prj;*.xml|Alle Dateien|*.*"
-
-#: ../../src/./gui/MainFrame.cpp:254
-msgid "Save Project..."
-msgstr "Projekt speichern..."
-
-#: ../../src/./gui/MainFrame.cpp:266
-msgid "Save Project As..."
-msgstr "Projekt Speichern  unter..."
-
-#: ../../src/./gui/MainFrame.cpp:286
-msgid "Open..."
-msgstr "Öffnen..."
-
-#: ../../src/./gui/MainFrame.cpp:290
-msgid "All supported files (*.dxf; *.stl; *.gts)|*.dxf;*.stl;*.gts|DXF Files (*.dxf)|*.dxf|Stereolithography files (STL files) (*.stl)|*.stl|GTS files (*.gts)|*.gts|All files|*.*"
-msgstr "Alle unterstützten Formate (*.dxf; *.stl; *.gts)|*.dxf;*.stl;*.gts|DXF Dateien (*.dxf)|*.dxf|Stereolithography Dateien (STL Dateien) (*.stl)|*.stl|GTS Dateien (*.gts)|*.gts|Alle Dateien|*.*"
-
-#: ../../src/./gui/MainFrame.cpp:331
-msgid "Open machine description..."
-msgstr "Öffnen einer Maschinenbeschreibung..."
-
-#: ../../src/./gui/MainFrame.cpp:335
-msgid "Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"
-msgstr "Maschinenbeschreibungen (LUA Dateien)  (*.lua)|*.lua|Text Dateien  (*.txt)|*.txt|Alle Dateien|*.*"
-
-#: ../../src/./gui/MainFrame.cpp:390
-msgid "Open toolbox..."
-msgstr "Werkzeugsammlung öffnen..."
-
-#: ../../src/./gui/MainFrame.cpp:391
-#: ../../src/./gui/MainFrame.cpp:431
-msgid "Toolbox (*.xml)|*.xml|All files|*.*"
-msgstr "Werkzeugsammlung (*.xml)|*.xml|Alle Dateien|*.*"
-
-#: ../../src/./gui/MainFrame.cpp:430
-msgid "Save toolbox..."
-msgstr "Werkzeugsammlung speichern..."
-
-#: ../../src/./gui/MainFrame.cpp:491
-msgid "Open G-Code file..."
-msgstr "G-Codes laden..."
-
-#: ../../src/./gui/MainFrame.cpp:495
-#: ../../src/./gui/MainFrame.cpp:513
-msgid "G-Code File (*.tap *.cnc *.nc *.ngc *.txt)|*.tap;*.cnc;*.nc;*.ngc;*.txt|Text files (*.txt)|*.txt|All files|*.*"
-msgstr "G-Code Dateien (*.tap *.cnc *.nc *.ngc *.txt)|*.tap;*.cnc;*.nc;*.ngc;*.txt|Text Dateien (*.txt)|*.txt|Alle Dateien|*.*"
-
-#: ../../src/./gui/MainFrame.cpp:509
-msgid "Save G-Code file..."
-msgstr "G-Codes speichern..."
-
-#: ../../src/./gui/ToolboxFrame.cpp:82
-msgid "No tools in toolbox!"
-msgstr "Keine Werkzeuge in Sammlung gefunden!"
-
-#: ../../src/./gui/ToolboxFrame.cpp:117
-msgid "Type"
-msgstr "Typ"
-
-#: ../../src/./gui/ToolboxFrame.cpp:118
-msgid "Diameter"
-msgstr "Durchmesser"
-
-#: ../../src/./gui/ToolboxFrame.cpp:119
-msgid "Height"
-msgstr "Höhe"
-
-#: ../../src/./gui/ToolboxFrame.cpp:120
-msgid "Radius"
-msgstr "Radius"
-
-#: ../../src/./gui/ToolboxFrame.cpp:121
-msgid "Cutting"
-msgstr "Oberfläche schneidet"
-
-#: ../../src/./gui/ToolboxFrame.cpp:154
-msgid "Yes"
-msgstr "Ja"
-
-#: ../../src/./gui/ToolboxFrame.cpp:156
-msgid "No"
-msgstr "Nein"
-
-#: ../../src/./gui/StockFrame.cpp:66
-msgid "Name"
-msgstr "Name"
-
-#: ../../src/./gui/StockFrame.cpp:67
-msgid "X"
-msgstr "X"
-
-#: ../../src/./gui/StockFrame.cpp:68
-msgid "Y"
-msgstr "Y"
-
-#: ../../src/./gui/StockFrame.cpp:69
-msgid "Z"
-msgstr "Z"
-
-#: ../../src/./gui/StockFrame.cpp:70
-msgid "max. Speed"
-msgstr "Max. Geschwindigkeit"
-
-#: ../../src/./gui/StockFrame.cpp:71
-msgid "max. Feedrate"
-msgstr "Max. Vorschub"
-
-#: ../../src/./gui/Control6DOFDialog.cpp:41
+#: ../../src/./controller/DialogSetup6DOFController.cpp:40
 msgid "Spaceball by Spacetec IMC"
 msgstr "Spaceball von Spacetec IMC"
 
-#: ../../src/./gui/Control6DOFDialog.cpp:42
+#: ../../src/./controller/DialogSetup6DOFController.cpp:41
 msgid "Spaceorb by Spacetec IMC"
 msgstr "Spaceorb von Spacetec IMC"
 
-#: ../../src/./gui/Control6DOFDialog.cpp:44
+#: ../../src/./controller/DialogSetup6DOFController.cpp:43
 msgid "Spacemouse by Logitech/3DConnexion"
 msgstr "Spacemouse von Logitech / 3DConnexion"
 
-#: ../../src/./gui/ObjectFrame.cpp:62
-msgid "No objects in project!"
-msgstr "Keine Objekte im Projekt!"
-
-#: ../../src/./gui/gui.cpp:22
-msgid "&Create new project"
-msgstr "&Neues Projekt erzeugen"
-
-#: ../../src/./gui/gui.cpp:26
-msgid "&Load Project..."
-msgstr "&Projekt laden"
-
-#: ../../src/./gui/gui.cpp:30
-msgid "&Save Project as..."
-msgstr "Projekt speichern unter..."
-
-#: ../../src/./gui/gui.cpp:34
-msgid "&Save Project"
-msgstr "Projekt speichern"
-
-#: ../../src/./gui/gui.cpp:41
-msgid "&Quit"
-msgstr "&Beenden"
-
-#: ../../src/./gui/gui.cpp:41
-msgid "Exit the program"
-msgstr "Das Programm beenden"
-
-#: ../../src/./gui/gui.cpp:44
-msgid "&Project"
-msgstr "&Projekt"
-
-#: ../../src/./gui/gui.cpp:48
-msgid "&Load Object File"
-msgstr "Objekt laden"
-
-#: ../../src/./gui/gui.cpp:52
-msgid "&Modify Object"
-msgstr "Objekt bearbeiten"
-
-#: ../../src/./gui/gui.cpp:56
-msgid "Edit Subobjects"
-msgstr "Unterobjekte bearbeiten"
-
-#: ../../src/./gui/gui.cpp:56
-msgid "For DXF files"
-msgstr "Für DXF Dateien"
-
-#: ../../src/./gui/gui.cpp:61
-msgid "&Generate Targets"
-msgstr "Ziele erstellen"
-
-#: ../../src/./gui/gui.cpp:64
-#: ../../src/./gui/gui.cpp:942
-msgid "&Object"
-msgstr "&Objekt"
-
-#: ../../src/./gui/gui.cpp:68
-msgid "&Load Machine..."
-msgstr "Maschine laden..."
-
-#: ../../src/./gui/gui.cpp:72
-msgid "&Reload machine"
-msgstr "Maschine erneut laden"
-
-#: ../../src/./gui/gui.cpp:75
-msgid "&Machine"
-msgstr "&Maschine"
-
-#: ../../src/./gui/gui.cpp:79
-msgid "Edit Toolbox"
-msgstr "Werkzeugsammlung bearbeiten"
-
-#: ../../src/./gui/gui.cpp:83
-msgid "Load Toolbox..."
-msgstr "Werkzeugsammlung laden..."
-
-#: ../../src/./gui/gui.cpp:87
-msgid "Save Toolbox..."
-msgstr "Werkzeugsammlung speichern..."
-
-#: ../../src/./gui/gui.cpp:90
-msgid "&Toolbox"
-msgstr "Werkzeugsammlung"
-
-#: ../../src/./gui/gui.cpp:94
-msgid "&Organize Stock"
-msgstr "R&ohmaterial verwalten"
-
-#: ../../src/./gui/gui.cpp:98
-#: ../../src/./gui/gui.cpp:811
-msgid "&Load Stock..."
-msgstr "Rohmaterial laden..."
-
-#: ../../src/./gui/gui.cpp:102
-#: ../../src/./gui/gui.cpp:815
-msgid "&Save Stock..."
-msgstr "Rohmaterial speichern..."
-
-#: ../../src/./gui/gui.cpp:105
-#: ../../src/./gui/gui.cpp:825
-msgid "&Stock"
-msgstr "&Rohmaterial"
-
-#: ../../src/./gui/gui.cpp:109
-msgid "&Generate Toolpaths"
-msgstr "Werkzeugpfade erstellen"
-
-#: ../../src/./gui/gui.cpp:113
-msgid "Recollect Toolpaths"
-msgstr "Werkzeugpfade erneuern"
-
-#: ../../src/./gui/gui.cpp:117
-msgid "Clean Toolpaths"
-msgstr "Werkzeugpfade löschen"
-
-#: ../../src/./gui/gui.cpp:121
-msgid "&Flip Run"
-msgstr "Lauf spiegeln"
-
-#: ../../src/./gui/gui.cpp:128
-msgid "&Prepare Machinebed"
-msgstr "Maschinenbett vorbereiten"
-
-#: ../../src/./gui/gui.cpp:135
-msgid "L&oad G-Codes"
-msgstr "G-Codes laden"
-
-#: ../../src/./gui/gui.cpp:139
-msgid "&Save G-Codes"
-msgstr "G-Codes speichern"
-
-#: ../../src/./gui/gui.cpp:142
-msgid "Tool&path"
-msgstr "Werkzeugpfade"
-
-#: ../../src/./gui/gui.cpp:146
-msgid "Change Language"
-msgstr "Sprache ändern"
-
-#: ../../src/./gui/gui.cpp:146
-msgid "Change the programs language."
-msgstr "Die Sprache des Programm umschalten."
-
-#: ../../src/./gui/gui.cpp:153
-msgid "Setup 6DOF &controller"
-msgstr "Einstellung des 6DOF Kontrollers"
-
-#: ../../src/./gui/gui.cpp:157
-#: ../../src/./gui/gui.cpp:553
-msgid "&Stereo 3D"
-msgstr "Stereo 3D"
-
-#: ../../src/./gui/gui.cpp:161
-#: ../../src/./gui/gui.cpp:549
-#: ../../src/./gui/gui.cpp:829
-#: ../../src/./gui/gui.cpp:946
-msgid "Setup &Units"
-msgstr "Einstellung der Einheiten"
-
-#: ../../src/./gui/gui.cpp:165
-msgid "Show &Animation Control"
-msgstr "Anzeige der Animationssteuerung"
-
-#: ../../src/./gui/gui.cpp:168
-#: ../../src/./gui/gui.cpp:832
-msgid "S&ettings"
-msgstr "Einstellungen"
-
-#: ../../src/./gui/gui.cpp:172
-msgid "View from Top"
-msgstr "Ansicht von Oben"
-
-#: ../../src/./gui/gui.cpp:176
-msgid "View from Bottom"
-msgstr "Ansicht von Unten"
-
-#: ../../src/./gui/gui.cpp:180
-msgid "View from Front"
-msgstr "Ansicht von Vorne"
-
-#: ../../src/./gui/gui.cpp:184
-msgid "View from Back"
-msgstr "Ansicht von Hinten"
-
-#: ../../src/./gui/gui.cpp:188
-msgid "View from Left"
-msgstr "Ansicht von Links"
-
-#: ../../src/./gui/gui.cpp:192
-msgid "View from Right"
-msgstr "Ansicht von Rechts"
-
-#: ../../src/./gui/gui.cpp:195
-msgid "&View"
-msgstr "&Ansicht"
-
-#: ../../src/./gui/gui.cpp:199
-msgid "&About"
-msgstr "&Über..."
-
-#: ../../src/./gui/gui.cpp:199
-msgid "About the program"
-msgstr "Über das Programm"
-
-#: ../../src/./gui/gui.cpp:202
-msgid "&Help"
-msgstr "&Hilfe"
-
-#: ../../src/./gui/gui.cpp:239
-#: ../../src/./gui/gui.cpp:240
-msgid "tool"
-msgstr "Werkzeug"
-
-#: ../../src/./gui/gui.cpp:239
-msgid "Display machine"
-msgstr "Maschine anzeigen"
-
-#: ../../src/./gui/gui.cpp:240
-msgid "Display material"
-msgstr "Material anzeigen"
-
-#: ../../src/./gui/gui.cpp:328
-msgid ""
-"Generic CAM  Copyright (C) 2010  Tobias Schaefer\n"
-"\n"
-"French translation & additional debugging: Jacques-Louis Tartarin\n"
-"Italian Translation: Sandro Dalle Nogare\n"
-"\n"
-"Licence for Generic CAM:\n"
-"GNU General Public License version 3.0 (GPLv3)\n"
-"\n"
-"This program comes with ABSOLUTELY NO WARRANTY.\n"
-"This is free software, and you are welcome to redistribute it under certain conditions.\n"
-"\n"
-"You should have received a copy of the GNU General Public License along with this program.\n"
-"If not, see <http://www.gnu.org/licenses/>."
-msgstr ""
-
-#: ../../src/./gui/gui.cpp:331
-#: ../../src/./gui/gui.cpp:462
-#: ../../src/./gui/gui.cpp:1327
-msgid "Close"
-msgstr "Schließen"
-
-#: ../../src/./gui/gui.cpp:354
+#: ../../src/./controller/guiSetup6DOFController.cpp:19
 msgid "Serial port:"
 msgstr "Serieller Anschluss:"
 
-#: ../../src/./gui/gui.cpp:361
+#: ../../src/./controller/guiSetup6DOFController.cpp:26
 msgid "SpaceBall"
 msgstr "SpaceBall"
 
-#: ../../src/./gui/gui.cpp:361
+#: ../../src/./controller/guiSetup6DOFController.cpp:26
 msgid "SpaceOrb"
 msgstr "SpaceOrb"
 
-#: ../../src/./gui/gui.cpp:361
+#: ../../src/./controller/guiSetup6DOFController.cpp:26
 msgid "SpaceMouse"
 msgstr "SpaceMouse"
 
-#: ../../src/./gui/gui.cpp:363
+#: ../../src/./controller/guiSetup6DOFController.cpp:28
 msgid "Type of controller"
 msgstr "Art des Kontrollers"
 
-#: ../../src/./gui/gui.cpp:370
+#: ../../src/./controller/guiSetup6DOFController.cpp:35
 msgid "Tx"
 msgstr "Tx"
 
-#: ../../src/./gui/gui.cpp:384
+#: ../../src/./controller/guiSetup6DOFController.cpp:49
 msgid "Ty"
 msgstr "Ty"
 
-#: ../../src/./gui/gui.cpp:398
+#: ../../src/./controller/guiSetup6DOFController.cpp:63
 msgid "Tz"
 msgstr "Tz"
 
-#: ../../src/./gui/gui.cpp:412
+#: ../../src/./controller/guiSetup6DOFController.cpp:77
 msgid "Rx"
 msgstr "Rx"
 
-#: ../../src/./gui/gui.cpp:426
+#: ../../src/./controller/guiSetup6DOFController.cpp:91
 msgid "Ry"
 msgstr "Ry"
 
-#: ../../src/./gui/gui.cpp:440
+#: ../../src/./controller/guiSetup6DOFController.cpp:105
 msgid "Rz"
 msgstr "Rz"
 
-#: ../../src/./gui/gui.cpp:454
+#: ../../src/./controller/guiSetup6DOFController.cpp:119
 msgid "Connect"
 msgstr "Verbinden"
 
-#: ../../src/./gui/gui.cpp:457
+#: ../../src/./controller/guiSetup6DOFController.cpp:122
 msgid "Disconnect"
 msgstr "Verbindung beenden"
 
-#: ../../src/./gui/gui.cpp:494
-msgid "&Close"
+#: ../../src/./controller/guiSetup6DOFController.cpp:127
+#: ../../src/./gui/gui.cpp:2810 ../../src/./gui/gui.cpp:3100
+#: ../../src/./gui/gui.cpp:3269 ../../src/./gui/gui.cpp:3408
+#: ../../src/./gui/gui.cpp:3455
+msgid "Close"
 msgstr "Schließen"
 
-#: ../../src/./gui/gui.cpp:502
-#: ../../src/./gui/gui.cpp:542
-#: ../../src/./gui/gui.cpp:822
-#: ../../src/./gui/gui.cpp:939
+#: ../../src/./genericcam.cpp:89
+msgid "<filepath of document to open>"
+msgstr "<Pfad zum zu öffnenden Dokument>"
+
+#: ../../src/./gui/DialogMachineDebugger.cpp:117
+#: ../../src/./gui/FrameMain.cpp:951
+msgid "Open machine description..."
+msgstr "Öffnen einer Maschinenbeschreibung..."
+
+#: ../../src/./gui/DialogMachineDebugger.cpp:119
+#: ../../src/./gui/FrameMain.cpp:953
+msgid ""
+"All machine descriptions  (*.lua;*.zip)|*.lua;*.zip|Machine descriptions "
+"(LUA Files)  (*.lua)|*.lua|Packed Machine descriptions  (*.zip)|*.zip|Text "
+"files  (*.txt)|*.txt|All files|*.*"
+msgstr ""
+"Alle Maschinen-Beschreibungen  (*.lua;*.zip)|*.lua;*.zip|Maschinen-"
+"Beschreibungen (LUA Dateien)  (*.lua)|*.lua|Gepackte Maschinen-"
+"Beschreibungen  (*.zip)|*.zip|Text Dateien  (*.txt)|*.txt|Alle Dateien|*.*"
+
+#: ../../src/./gui/DialogMachineDebugger.cpp:144
+msgid "Save machine description..."
+msgstr "Maschinen-Beschreibung speichern..."
+
+#: ../../src/./gui/DialogMachineDebugger.cpp:146
+msgid ""
+"Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|"
+"All files|*.*"
+msgstr ""
+"Maschinen-Beschreibungen (LUA Dateien)  (*.lua)|*.lua|Text Dateien  (*.txt)|"
+"*.txt|Alle Dateien|*.*"
+
+#: ../../src/./gui/DialogObjectTransformation.cpp:80
+msgid "No objects in project!"
+msgstr "Keine Objekte im Projekt!"
+
+#: ../../src/./gui/DialogObjectTransformation.cpp:84
+msgid "Multiple objects selected."
+msgstr "Mehrere Objekte ausgewählt."
+
+#: ../../src/./gui/DialogObjectTransformation.cpp:509
+msgid "Set object color"
+msgstr "Objektfarbe festlegen"
+
+#: ../../src/./gui/DialogPlacement.cpp:217
+msgid "Set X position: "
+msgstr "X-Position setzen:"
+
+#: ../../src/./gui/DialogPlacement.cpp:223
+msgid "Set Y position: "
+msgstr "Y-Position setzen:"
+
+#: ../../src/./gui/DialogPlacement.cpp:229
+msgid "Set Z position: "
+msgstr "Z-Position setzen:"
+
+#: ../../src/./gui/DialogPlacement.cpp:236
+#: ../../src/./gui/DialogPlacement.cpp:286
+msgid "Rotate around Z: "
+msgstr "Drehung um Z-Achse:"
+
+#: ../../src/./gui/DialogPlacement.cpp:242
+msgid "Set slotwidth to: "
+msgstr "Schlitzbreite:"
+
+#: ../../src/./gui/DialogPlacement.cpp:247
+msgid "Set form to box"
+msgstr "Form als Box setzen."
+
+#: ../../src/./gui/DialogPlacement.cpp:251
+msgid "Set form to contour"
+msgstr "Form als Kontur setzen"
+
+#: ../../src/./gui/DialogPlacement.cpp:320
+msgid "Placement X+:"
+msgstr "Positionierung X+:"
+
+#: ../../src/./gui/DialogPlacement.cpp:325
+msgid "Placement X-: "
+msgstr "Positionierung X-:"
+
+#: ../../src/./gui/DialogPlacement.cpp:330
+msgid "Placement Y+:"
+msgstr "Positionierung Y+:"
+
+#: ../../src/./gui/DialogPlacement.cpp:335
+msgid "Placement Y-:"
+msgstr "Positionierung Y-:"
+
+#: ../../src/./gui/DialogPlacement.cpp:342 ../../src/./gui/gui.cpp:852
+msgid "Align with top"
+msgstr "An der Oberkante ausrichten"
+
+#: ../../src/./gui/DialogPlacement.cpp:348 ../../src/./gui/gui.cpp:855
+msgid "Align with middle"
+msgstr "An der Mitte ausrichten"
+
+#: ../../src/./gui/DialogPlacement.cpp:352 ../../src/./gui/gui.cpp:858
+msgid "Align with bottom"
+msgstr "Mit der Unterkante ausrichten"
+
+#: ../../src/./gui/DialogRun.cpp:96
+msgid "Toolslot"
+msgstr "Werkzeugaufnahme"
+
+#: ../../src/./gui/DialogRun.cpp:98 ../../src/./gui/gui.cpp:3014
+msgid "Tool"
+msgstr "Werkzeug"
+
+#: ../../src/./gui/DialogRun.cpp:99 ../../src/./gui/DialogToolbox.cpp:103
+#: ../../src/./gui/gui.cpp:2639
+msgid "Diameter"
+msgstr "Durchmesser"
+
+#: ../../src/./gui/DialogRun.cpp:165
+msgid "Set Workpiece to "
+msgstr "Werkstück festlegen "
+
+#: ../../src/./gui/DialogRun.cpp:170
+msgid "Removed Workpiece."
+msgstr "Werkstück entfernen."
+
+#: ../../src/./gui/DialogRun.cpp:198
+msgid "Rotate workpiece around X axis"
+msgstr "Werkstück um die X-Achse drehen"
+
+#: ../../src/./gui/DialogRun.cpp:202
+msgid "Rotate workpiece around Y axis"
+msgstr "Werkstück um die Y-Achse drehen"
+
+#: ../../src/./gui/DialogRun.cpp:206
+msgid "Rotate workpiece around Z axis"
+msgstr "Werkstück um die Z-Achse drehen"
+
+#: ../../src/./gui/DialogRun.cpp:244
+msgid "Removed tool "
+msgstr "Werkzeug entfernen "
+
+#: ../../src/./gui/DialogRun.cpp:244
+msgid " from run"
+msgstr " aus dem Maschienenlauf"
+
+#: ../../src/./gui/DialogRun.cpp:273
+msgid "Added tool to run "
+msgstr "Werkzeug zum Maschinenlauf hinzufügen "
+
+#: ../../src/./gui/DialogStockMaterial.cpp:60
+msgid "Name"
+msgstr "Name"
+
+#: ../../src/./gui/DialogStockMaterial.cpp:61
+msgid "X"
+msgstr "X"
+
+#: ../../src/./gui/DialogStockMaterial.cpp:62
+msgid "Y"
+msgstr "Y"
+
+#: ../../src/./gui/DialogStockMaterial.cpp:63
+msgid "Z"
+msgstr "Z"
+
+#: ../../src/./gui/DialogStockMaterial.cpp:64
+msgid "max. Speed"
+msgstr "Max. Geschwindigkeit"
+
+#: ../../src/./gui/DialogStockMaterial.cpp:65
+msgid "max. Feedrate"
+msgstr "Max. Vorschub"
+
+#: ../../src/./gui/DialogStockMaterial.cpp:66
+msgid "available"
+msgstr "verfügbar"
+
+#: ../../src/./gui/DialogToolbox.cpp:62
+msgid "No tools in toolbox!"
+msgstr "Keine Werkzeuge in Sammlung gefunden!"
+
+#: ../../src/./gui/DialogToolbox.cpp:102
+msgid "Type"
+msgstr "Typ"
+
+#: ../../src/./gui/DialogToolbox.cpp:104 ../../src/./gui/gui.cpp:2652
+msgid "Height"
+msgstr "Höhe"
+
+#: ../../src/./gui/DialogToolbox.cpp:105 ../../src/./gui/gui.cpp:2665
+msgid "Radius"
+msgstr "Radius"
+
+#: ../../src/./gui/DialogToolbox.cpp:106
+msgid "Cutting"
+msgstr "Oberfläche schneidet"
+
+#: ../../src/./gui/DialogToolbox.cpp:140
+msgid "Yes"
+msgstr "Ja"
+
+#: ../../src/./gui/DialogToolbox.cpp:142
+msgid "No"
+msgstr "Nein"
+
+#: ../../src/./gui/DialogToolbox.cpp:256
+msgid "Copy of "
+msgstr "Kopie von "
+
+#: ../../src/./gui/DialogToolpathGenerator.cpp:361
+msgid "Add generator to run "
+msgstr "Generator zum Maschinenlauf hinzufügen "
+
+#: ../../src/./gui/DialogToolpathGenerator.cpp:385
+msgid "Deleted generator from run "
+msgstr "Generator aus dem Maschinenlauf entfernen "
+
+#: ../../src/./gui/DialogToolpathGenerator.cpp:420
+msgid "Update generator on run "
+msgstr "Generator auf dem Maschinenlauf aktualisieren "
+
+#: ../../src/./gui/DialogToolpathGenerator.cpp:452
+msgid "Select one or more objects:"
+msgstr "Eins oder mehrere Objekte auswählen:"
+
+#: ../../src/./gui/DialogToolpathGenerator.cpp:453
+msgid "Select object(s)..."
+msgstr "Objecte auswählen..."
+
+#: ../../src/./gui/DialogWorkpiece.cpp:68
+msgid "Add Workpiece "
+msgstr "WErkstück hinzufügen "
+
+#: ../../src/./gui/DialogWorkpiece.cpp:91
+msgid "Add Object as Workpiece "
+msgstr "Objeckt zum Werkstück hinzufügen "
+
+#: ../../src/./gui/DialogWorkpiece.cpp:111
+msgid "Remove Object from Workpiece"
+msgstr "Object vom Wekrstück entfernen"
+
+#: ../../src/./gui/DialogWorkpiece.cpp:120
+msgid "Assign Object to Workpiece"
+msgstr "Objekt einem Werkstück zuweisen"
+
+#: ../../src/./gui/DnDFile.cpp:43
+msgid "File is invalid: "
+msgstr "Datei ist ungültig: "
+
+#: ../../src/./gui/DnDFile.cpp:52 ../../src/./gui/FrameMain.cpp:799
+msgid "Load Object: "
+msgstr "Objekt laden: "
+
+#: ../../src/./gui/DnDFile.cpp:61
+msgid "Not a valid project file: "
+msgstr "Keine gültige Projektdatei: "
+
+#: ../../src/./gui/DnDFile.cpp:71
+msgid "Unknown file extension: "
+msgstr "Unbekannte Dateierweiterung: "
+
+#: ../../src/./gui/FrameMain.cpp:86
+msgid "Generic CAM - log window"
+msgstr "Generic CAM - Protokollfenster"
+
+#: ../../src/./gui/FrameMain.cpp:434 ../../src/./gui/FrameMain.cpp:672
+msgid "Project renamed to "
+msgstr "Projekt umbenennen zu "
+
+#: ../../src/./gui/FrameMain.cpp:443 ../../src/./gui/FrameMain.cpp:827
+msgid "Object renamed to "
+msgstr "Object umbenennen zu "
+
+#: ../../src/./gui/FrameMain.cpp:452
+msgid "Workpiece renamed to "
+msgstr "Werkstück umbenennen zu "
+
+#: ../../src/./gui/FrameMain.cpp:461
+msgid "Run renamed to "
+msgstr "Maschinenlauf umbenennen zu "
+
+#: ../../src/./gui/FrameMain.cpp:665
+msgid "Enter new project name:"
+msgstr "Einen neuen Projektnamen eingeben:"
+
+#: ../../src/./gui/FrameMain.cpp:691
+msgid "Open Project..."
+msgstr "Projekt Öffnen..."
+
+#: ../../src/./gui/FrameMain.cpp:692
+msgid "Generic CAM Project (*.zip)|*.zip;*.ZIP|All Files|*.*"
+msgstr "Generic CAM Projekt (*.zip)|*.zip;*.ZIP|Alle Dateien|*.*"
+
+#: ../../src/./gui/FrameMain.cpp:732
+msgid "Save Project As..."
+msgstr "Projekt Speichern  unter..."
+
+#: ../../src/./gui/FrameMain.cpp:733
+msgid "Generic CAM Project (*.zip)|*.zip|All Files|*.*"
+msgstr "Generic CAM Projekt (*.zip)|*.zip|Alle Dateien|*.*"
+
+#: ../../src/./gui/FrameMain.cpp:777
+msgid "Open Object..."
+msgstr "Objekt laden..."
+
+#: ../../src/./gui/FrameMain.cpp:779
+msgid ""
+"All supported files (*.dxf; *.stl; *.gts)|*.dxf;*DXF;*.stl;*.STL;*.gts;*.GTS|"
+"DXF Files (*.dxf)|*.dxf;*.DXF|Stereolithography files (STL files) (*.stl)|*."
+"stl;*.STL|GTS files (*.gts)|*.gts;*.GTS|All files|*.*"
+msgstr ""
+"Alle unterstützten Dateiformate (*.dxf; *.stl; *.gts)|*.dxf;*DXF;*.stl;*.STL;"
+"*.gts;*.GTS|DXF Dateien (*.dxf)|*.dxf;*.DXF|Stereolithographie Dateien (STL "
+"Dateien) (*.stl)|*.stl;*.STL|GTS Dateien (*.gts)|*.gts;*.GTS|Alle Dateien|*.*"
+
+#: ../../src/./gui/FrameMain.cpp:819
+msgid "Enter new name:"
+msgstr "Neuen Namen eingeben:"
+
+#: ../../src/./gui/FrameMain.cpp:841
+msgid "Object "
+msgstr "Objekt "
+
+#: ../../src/./gui/FrameMain.cpp:841
+msgid " deleted."
+msgstr " gelöscht."
+
+#: ../../src/./gui/FrameMain.cpp:854
+msgid ": Flipped normal vectors"
+msgstr ": Normalen Vektoren umgeklappt"
+
+#: ../../src/./gui/FrameMain.cpp:893 ../../src/./gui/FrameMain.cpp:909
+msgid "Remove workpiece "
+msgstr "Werkstück entfernt "
+
+#: ../../src/./gui/FrameMain.cpp:921
+msgid "Add run"
+msgstr "Hinzugefügt zu Maschinenlauf"
+
+#: ../../src/./gui/FrameMain.cpp:922
+#, c-format
+msgid "Run #%u"
+msgstr "Maschinenlauf #%u"
+
+#: ../../src/./gui/FrameMain.cpp:941
+msgid "Remove run "
+msgstr "Maschinenlauf entfernen "
+
+#: ../../src/./gui/FrameMain.cpp:1006
+msgid "Open toolbox..."
+msgstr "Werkzeugsammlung öffnen..."
+
+#: ../../src/./gui/FrameMain.cpp:1007 ../../src/./gui/FrameMain.cpp:1028
+msgid "Toolbox (*.xml)|*.xml|All files|*.*"
+msgstr "Werkzeugsammlung (*.xml)|*.xml|Alle Dateien|*.*"
+
+#: ../../src/./gui/FrameMain.cpp:1027
+msgid "Save toolbox..."
+msgstr "Werkzeugsammlung speichern..."
+
+#: ../../src/./gui/FrameMain.cpp:1090
+msgid "Save toolpath..."
+msgstr "Werkzeugpfad speichern..."
+
+#: ../../src/./gui/FrameMain.cpp:1091
+msgid "G-Code file (*.nc)|*.nc|All files|*.*"
+msgstr "G-Code Datei (*.nc)|*.nc|Alle Dateien|*.*"
+
+#: ../../src/./gui/TreeSetup.cpp:425
+msgid "Objects"
+msgstr "Objekte"
+
+#: ../../src/./gui/TreeSetup.cpp:445 ../../src/./gui/gui.cpp:1654
+msgid "Workpiece"
+msgstr "Werkstück"
+
+#: ../../src/./gui/TreeSetup.cpp:470
+msgid "Run"
+msgstr "Maschinenlauf"
+
+#: ../../src/./gui/TreeSetup.cpp:478
+msgid "Machine: "
+msgstr "Maschine: "
+
+#: ../../src/./gui/TreeSetup.cpp:481
+msgid "Machine: -"
+msgstr "Maschine: -"
+
+#: ../../src/./gui/TreeSetup.cpp:487 ../../src/./gui/TreeSetup.cpp:490
+msgid "Workpiece: "
+msgstr "Werkstück: "
+
+#: ../../src/./gui/TreeSetup.cpp:498
+msgid "Toolpath - "
+msgstr "Werkzeugpfad - "
+
+#: ../../src/./gui/TreeSetup.cpp:510
+msgid "Toolpath - ?"
+msgstr "Werkzeugpfad - ?"
+
+#: ../../src/./gui/gui.cpp:38
+msgid "&Create new project"
+msgstr "&Neues Projekt erzeugen"
+
+#: ../../src/./gui/gui.cpp:42
+msgid "Re&name Project"
+msgstr "Projekt &umbenennen"
+
+#: ../../src/./gui/gui.cpp:46
+msgid "&Load Project..."
+msgstr "&Projekt laden"
+
+#: ../../src/./gui/gui.cpp:50
+msgid "Load &Recent"
+msgstr "&Letztes Projekt laden"
+
+#: ../../src/./gui/gui.cpp:54
+msgid "&Save Project"
+msgstr "Projekt speichern"
+
+#: ../../src/./gui/gui.cpp:58
+msgid "Save Project &as..."
+msgstr "Projekt speichern &unter..."
+
+#: ../../src/./gui/gui.cpp:64
+msgid "&Quit"
+msgstr "&Beenden"
+
+#: ../../src/./gui/gui.cpp:64
+msgid "Exit the program"
+msgstr "Das Programm beenden"
+
+#: ../../src/./gui/gui.cpp:67
+msgid "&Project"
+msgstr "&Projekt"
+
+#: ../../src/./gui/gui.cpp:71 ../../src/./gui/gui.cpp:1269
+#: ../../src/./gui/gui.cpp:1372 ../../src/./gui/gui.cpp:1627
+msgid "&Undo"
+msgstr "&Undo"
+
+#: ../../src/./gui/gui.cpp:71
+msgid "Undo last command"
+msgstr "Letzten Befehl ungeschehen machen"
+
+#: ../../src/./gui/gui.cpp:75 ../../src/./gui/gui.cpp:1273
+#: ../../src/./gui/gui.cpp:1376 ../../src/./gui/gui.cpp:1631
+msgid "&Redo"
+msgstr "&Redo"
+
+#: ../../src/./gui/gui.cpp:75
+msgid "Redo last undone command"
+msgstr "Letzten Befehl wiederholen"
+
+#: ../../src/./gui/gui.cpp:78 ../../src/./gui/gui.cpp:556
+#: ../../src/./gui/gui.cpp:1276 ../../src/./gui/gui.cpp:1379
+msgid "&Edit"
+msgstr "&Bearbeiten"
+
+#: ../../src/./gui/gui.cpp:82
+msgid "&Modify Object"
+msgstr "Objekt bearbeiten"
+
+#: ../../src/./gui/gui.cpp:86
+msgid "&Flip Normals"
+msgstr "&Flächen-Normale umklappen"
+
+#: ../../src/./gui/gui.cpp:92
+msgid "&Load Object File..."
+msgstr "Objekt &laden..."
+
+#: ../../src/./gui/gui.cpp:96 ../../src/./gui/gui.cpp:532
+msgid "&Rename Object"
+msgstr "Objekt &umbenennen"
+
+#: ../../src/./gui/gui.cpp:100
+msgid "&Delete Object"
+msgstr "Objekt &entfernen"
+
+#: ../../src/./gui/gui.cpp:103 ../../src/./gui/gui.cpp:545
+msgid "&Object"
+msgstr "&Objekt"
+
+#: ../../src/./gui/gui.cpp:107
+msgid "&Organize Stock"
+msgstr "R&ohmaterial verwalten"
+
+#: ../../src/./gui/gui.cpp:111
+msgid "&Add Stock to Project"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:111
+msgid "Add stock material to project as workpiece."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:117
+msgid "&Load Stock..."
+msgstr "Rohmaterial laden..."
+
+#: ../../src/./gui/gui.cpp:121
+msgid "&Save Stock..."
+msgstr "Rohmaterial speichern..."
+
+#: ../../src/./gui/gui.cpp:124 ../../src/./gui/gui.cpp:1086
+#: ../../src/./gui/gui.cpp:1265
+msgid "&Stock"
+msgstr "&Rohmaterial"
+
+#: ../../src/./gui/gui.cpp:128
+msgid "&Setup Workpiece"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:132
+msgid "&Delete Workpiece"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:132
+msgid "Remove the selected workpiece or workpieces."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:136
+msgid "Delete &unused Workpieces"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:136
+msgid "Remove all workpieces, that have no objects linked to them."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:139
+msgid "&Workpiece"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:143
+msgid "&Load Machine..."
+msgstr "Maschine laden..."
+
+#: ../../src/./gui/gui.cpp:143
+msgid "Load a machine for the selected run"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:147
+msgid "&Reload Machine"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:153
+msgid "&Open Machine Debugger"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:157
+msgid "Setup &Filp Drills"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:161 ../../src/./gui/gui.cpp:1809
+msgid "&Machine"
+msgstr "&Maschine"
+
+#: ../../src/./gui/gui.cpp:165
+msgid "&Edit Toolbox"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:169
+msgid "&Load Toolbox..."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:173
+msgid "&Save Toolbox..."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:176 ../../src/./gui/gui.cpp:1623
+msgid "&Toolbox"
+msgstr "Werkzeugsammlung"
+
+#: ../../src/./gui/gui.cpp:180
+msgid "&Setup Run"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:184
+msgid "&Add Run"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:188
+msgid "&Delete Run"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:191
+msgid "&Run"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:195
+msgid "&Setup Generators"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:201
+msgid "Start &Generators"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:201
+msgid "Start the generation of any ungenerated toolpaths."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:205
+msgid "&Automatic Generation"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:210
+msgid "&Restart Generation"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:217
+msgid "Dialect"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:219
+msgid "RS274NGC"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:219
+msgid ""
+"Dialect according to the document \"The NIST RS274NGC Interpreter - Version "
+"3\" by Thomas R. Kramer, Frederick M. Proctor and Elena Messina (NISTIR "
+"6556, August 17, 2000).\n"
+"\n"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:224
+msgid "Fanuc-M"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:224
+msgid "Dialect used by the Fanuc-M milling simulator."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:230
+msgid "Save &Toolpath"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:236
+msgid "Show Animation &Control"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:239
+msgid "Tool&path"
+msgstr "Werkzeugpfade"
+
+#: ../../src/./gui/gui.cpp:243
+msgid "Change Language"
+msgstr "Sprache ändern"
+
+#: ../../src/./gui/gui.cpp:243
+msgid "Change the programs language."
+msgstr "Die Sprache des Programm umschalten."
+
+#: ../../src/./gui/gui.cpp:247
+msgid "Stereo &3D"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:253
+msgid "Setup 6DOF &Controller"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:257
+msgid "Setup &Stereo 3D"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:261 ../../src/./gui/gui.cpp:560
+#: ../../src/./gui/gui.cpp:1090 ../../src/./gui/gui.cpp:1383
+#: ../../src/./gui/gui.cpp:1638 ../../src/./gui/gui.cpp:1919
+#: ../../src/./gui/gui.cpp:2476
+msgid "Setup &Units"
+msgstr "Einstellung der Einheiten"
+
+#: ../../src/./gui/gui.cpp:264 ../../src/./gui/gui.cpp:1093
+msgid "S&ettings"
+msgstr "Einstellungen"
+
+#: ../../src/./gui/gui.cpp:268
+msgid "&Close all Extra Windows"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:268
+msgid "Close all the dialogs. No data is lost."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:272
+msgid "Show &Log Window"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:278
+msgid "View from Top"
+msgstr "Ansicht von Oben"
+
+#: ../../src/./gui/gui.cpp:282
+msgid "View from Bottom"
+msgstr "Ansicht von Unten"
+
+#: ../../src/./gui/gui.cpp:286
+msgid "View from Front"
+msgstr "Ansicht von Vorne"
+
+#: ../../src/./gui/gui.cpp:290
+msgid "View from Back"
+msgstr "Ansicht von Hinten"
+
+#: ../../src/./gui/gui.cpp:294
+msgid "View from Right"
+msgstr "Ansicht von Rechts"
+
+#: ../../src/./gui/gui.cpp:298
+msgid "View from Left"
+msgstr "Ansicht von Links"
+
+#: ../../src/./gui/gui.cpp:301
+msgid "&View"
+msgstr "&Ansicht"
+
+#: ../../src/./gui/gui.cpp:305 ../../src/./gui/gui.cpp:320
+msgid "&Help"
+msgstr "&Hilfe"
+
+#: ../../src/./gui/gui.cpp:311
+msgid "Test G-Code"
+msgstr "G-Code testen"
+
+#: ../../src/./gui/gui.cpp:311
+msgid "Analyse a line (block) of G-Code with the implemented parser."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:317
+msgid "&About"
+msgstr "&Über..."
+
+#: ../../src/./gui/gui.cpp:317
+msgid "About the program"
+msgstr "Über das Programm"
+
+#: ../../src/./gui/gui.cpp:365 ../../src/./gui/gui.cpp:367
+#: ../../src/./gui/gui.cpp:371 ../../src/./gui/gui.cpp:373
+#: ../../src/./gui/gui.cpp:377
+msgid "tool"
+msgstr "Werkzeug"
+
+#: ../../src/./gui/gui.cpp:365 ../../src/./gui/gui.cpp:549
+msgid "Undo"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:367 ../../src/./gui/gui.cpp:553
+msgid "Redo"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:371
+msgid "Display machine"
+msgstr "Maschine anzeigen"
+
+#: ../../src/./gui/gui.cpp:373
+msgid "Display material"
+msgstr "Material anzeigen"
+
+#: ../../src/./gui/gui.cpp:377
+msgid "Show the dialog to add, update and remove toolpath generators."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:377
+msgid "Add / setup toolpath generators"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:528
+msgid "&Load Object"
+msgstr "Objekt laden"
+
+#: ../../src/./gui/gui.cpp:536 ../../src/./gui/gui.cpp:973
+msgid "Flip normal vectors"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:542 ../../src/./gui/gui.cpp:1083
+#: ../../src/./gui/gui.cpp:1620 ../../src/./gui/gui.cpp:2469
 msgid "&Close Window"
 msgstr "Fenster schließen"
 
-#: ../../src/./gui/gui.cpp:505
-msgid "Error"
-msgstr "Fehler"
-
-#: ../../src/./gui/gui.cpp:529
-msgid "&Load Toolbox"
-msgstr "Werkzeugsammlung laden"
-
-#: ../../src/./gui/gui.cpp:534
-msgid "&Save Toolbox"
-msgstr "Werkzeugsammlung speichern"
-
-#: ../../src/./gui/gui.cpp:545
-msgid "&Tools"
-msgstr "&Werkzeuge"
-
-#: ../../src/./gui/gui.cpp:556
-#: ../../src/./gui/gui.cpp:949
+#: ../../src/./gui/gui.cpp:563 ../../src/./gui/gui.cpp:1386
+#: ../../src/./gui/gui.cpp:1641 ../../src/./gui/gui.cpp:1816
+#: ../../src/./gui/gui.cpp:2483
 msgid "&Settings"
 msgstr "Einstellungen"
 
-#: ../../src/./gui/gui.cpp:566
-msgid "Combo!"
-msgstr "Combo!"
+#: ../../src/./gui/gui.cpp:585
+msgid "Current size of object"
+msgstr ""
 
-#: ../../src/./gui/gui.cpp:569
-#: ../../src/./gui/gui.cpp:687
-msgid "New"
-msgstr "Neu"
+#: ../../src/./gui/gui.cpp:587 ../../src/./gui/gui.cpp:711
+#: ../../src/./gui/gui.cpp:1415 ../../src/./gui/gui.cpp:1945
+#: ../../src/./gui/gui.cpp:1989
+msgid "X:"
+msgstr "X:"
 
-#: ../../src/./gui/gui.cpp:572
-#: ../../src/./gui/gui.cpp:690
-#: ../../src/./gui/gui.cpp:962
-msgid "Update"
-msgstr "Aktualisieren"
-
-#: ../../src/./gui/gui.cpp:575
-#: ../../src/./gui/gui.cpp:693
-msgid "Delete"
-msgstr "Löschen"
-
-#: ../../src/./gui/gui.cpp:589
-msgid "Tool definition"
-msgstr "Werkzeugdefinition"
-
-#: ../../src/./gui/gui.cpp:596
-msgid "Shaft diameter:"
-msgstr "Schaftdurchmesser:"
-
-#: ../../src/./gui/gui.cpp:601
-msgid "Diameter of the part that disappears inside the chuck."
-msgstr "Durchmesser des Werkzeugs in Höhe der Spannzange."
-
-#: ../../src/./gui/gui.cpp:605
-#: ../../src/./gui/gui.cpp:618
-#: ../../src/./gui/gui.cpp:644
-#: ../../src/./gui/gui.cpp:718
-#: ../../src/./gui/gui.cpp:731
-#: ../../src/./gui/gui.cpp:744
-#: ../../src/./gui/gui.cpp:854
-#: ../../src/./gui/gui.cpp:865
-#: ../../src/./gui/gui.cpp:876
-#: ../../src/./gui/gui.cpp:982
-#: ../../src/./gui/gui.cpp:993
-#: ../../src/./gui/gui.cpp:1004
-#: ../../src/./gui/gui.cpp:1053
-#: ../../src/./gui/gui.cpp:1084
-#: ../../src/./gui/gui.cpp:1115
-#: ../../src/./gui/gui.cpp:1297
-#: ../../src/./gui/gui.cpp:1307
-#: ../../src/./gui/gui.cpp:1368
-#: ../../src/./gui/gui.cpp:1416
-#: ../../src/./gui/gui.cpp:1427
-#: ../../src/./gui/gui.cpp:1438
-#: ../../src/./gui/gui.cpp:1449
+#: ../../src/./gui/gui.cpp:594 ../../src/./gui/gui.cpp:605
+#: ../../src/./gui/gui.cpp:616 ../../src/./gui/gui.cpp:658
+#: ../../src/./gui/gui.cpp:672 ../../src/./gui/gui.cpp:686
+#: ../../src/./gui/gui.cpp:801 ../../src/./gui/gui.cpp:1134
+#: ../../src/./gui/gui.cpp:1145 ../../src/./gui/gui.cpp:1156
+#: ../../src/./gui/gui.cpp:1996 ../../src/./gui/gui.cpp:2007
+#: ../../src/./gui/gui.cpp:2018 ../../src/./gui/gui.cpp:2180
+#: ../../src/./gui/gui.cpp:2191 ../../src/./gui/gui.cpp:2202
+#: ../../src/./gui/gui.cpp:2533 ../../src/./gui/gui.cpp:2546
+#: ../../src/./gui/gui.cpp:2572 ../../src/./gui/gui.cpp:2648
+#: ../../src/./gui/gui.cpp:2661 ../../src/./gui/gui.cpp:2674
+#: ../../src/./gui/gui.cpp:2992 ../../src/./gui/gui.cpp:3003
+#: ../../src/./gui/gui.cpp:3031 ../../src/./gui/gui.cpp:3057
 msgid "mm"
 msgstr "mm"
 
-#: ../../src/./gui/gui.cpp:609
-msgid "Shaft length:"
-msgstr "Schaftlänge:"
+#: ../../src/./gui/gui.cpp:598 ../../src/./gui/gui.cpp:725
+#: ../../src/./gui/gui.cpp:1426 ../../src/./gui/gui.cpp:1958
+#: ../../src/./gui/gui.cpp:2000
+msgid "Y:"
+msgstr "Y:"
 
-#: ../../src/./gui/gui.cpp:614
-msgid "This is the length of the that disappears inside the chuck."
-msgstr "Länge des Werkzeugs, die in der Spannzange verschwindet."
+#: ../../src/./gui/gui.cpp:609 ../../src/./gui/gui.cpp:739
+#: ../../src/./gui/gui.cpp:1437 ../../src/./gui/gui.cpp:1971
+#: ../../src/./gui/gui.cpp:2011
+msgid "Z:"
+msgstr "Z:"
 
-#: ../../src/./gui/gui.cpp:622
-msgid "Maximum speed:"
-msgstr "Maximale Geschwindigkeit:"
-
-#: ../../src/./gui/gui.cpp:627
-msgid "Max. speed: Look at label on box you got the tools shipped in."
-msgstr "Maximale Rotationsgeschwindigkeit des Werkzeugs."
+#: ../../src/./gui/gui.cpp:629
+msgid "Quick scale:"
+msgstr "Schnell skalieren:"
 
 #: ../../src/./gui/gui.cpp:631
-#: ../../src/./gui/gui.cpp:887
-#: ../../src/./gui/gui.cpp:1317
+msgid "XYZ * 10"
+msgstr "XYZ * 10"
+
+#: ../../src/./gui/gui.cpp:634
+msgid "XYZ / 10"
+msgstr "XYZ / 10"
+
+#: ../../src/./gui/gui.cpp:644
+msgid "Calculate scaling factors"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:651
+msgid "X ="
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:662 ../../src/./gui/gui.cpp:676
+#: ../../src/./gui/gui.cpp:690
+msgid "Calculate"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:665
+msgid "Y ="
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:679
+msgid "Z ="
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:696
+msgid "Scale proportionally"
+msgstr "Proportional skalieren"
+
+#: ../../src/./gui/gui.cpp:704
+msgid "Rescale"
+msgstr "Skalieren"
+
+#: ../../src/./gui/gui.cpp:718 ../../src/./gui/gui.cpp:732
+#: ../../src/./gui/gui.cpp:746 ../../src/./gui/gui.cpp:760
+msgid "%"
+msgstr "%"
+
+#: ../../src/./gui/gui.cpp:722 ../../src/./gui/gui.cpp:736
+#: ../../src/./gui/gui.cpp:750 ../../src/./gui/gui.cpp:764
+#: ../../src/./gui/gui.cpp:780
+msgid "Scale"
+msgstr "Skalieren"
+
+#: ../../src/./gui/gui.cpp:753
+msgid "Proportional:"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:789 ../../src/./gui/gui.cpp:874
+msgid "Move"
+msgstr "Verschieben"
+
+#: ../../src/./gui/gui.cpp:794 ../../src/./gui/gui.cpp:888
+msgid "Step:"
+msgstr "Schrittweite:"
+
+#: ../../src/./gui/gui.cpp:850
+msgid "Align"
+msgstr "Ausrichten"
+
+#: ../../src/./gui/gui.cpp:861
+msgid "Center"
+msgstr "Mitte"
+
+#: ../../src/./gui/gui.cpp:883
+msgid "Rotate stepwise"
+msgstr "Schrittweise rotieren"
+
+#: ../../src/./gui/gui.cpp:895 ../../src/./gui/gui.cpp:1461
+#: ../../src/./gui/gui.cpp:2088 ../../src/./gui/gui.cpp:2099
+#: ../../src/./gui/gui.cpp:2110
+msgid "deg"
+msgstr "deg"
+
+#: ../../src/./gui/gui.cpp:907
+msgid "Y -"
+msgstr "Y -"
+
+#: ../../src/./gui/gui.cpp:910
+msgid "X -"
+msgstr "X -"
+
+#: ../../src/./gui/gui.cpp:913
+msgid "Y +"
+msgstr "Y +"
+
+#: ../../src/./gui/gui.cpp:916
+msgid "Z -"
+msgstr "Z -"
+
+#: ../../src/./gui/gui.cpp:922
+msgid "Z +"
+msgstr "Z +"
+
+#: ../../src/./gui/gui.cpp:928
+msgid "X +"
+msgstr "X +"
+
+#: ../../src/./gui/gui.cpp:947
+msgid "Rotate"
+msgstr "Drehen"
+
+#: ../../src/./gui/gui.cpp:956
+msgid "Mirror on"
+msgstr "Spiegeln einschalten"
+
+#: ../../src/./gui/gui.cpp:958
+msgid "X axis"
+msgstr "X-Achse"
+
+#: ../../src/./gui/gui.cpp:961
+msgid "Y axis"
+msgstr "Y-Achse"
+
+#: ../../src/./gui/gui.cpp:964
+msgid "Z axis"
+msgstr "Z-Achse"
+
+#: ../../src/./gui/gui.cpp:983
+msgid "Mirror"
+msgstr "Spiegeln"
+
+#: ../../src/./gui/gui.cpp:1073
+msgid "&Load Stocklist..."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1077
+msgid "&Save Stocklist..."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1106
+msgid "Name:"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1127
+msgid "Length (in X):"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1138
+msgid "Width (in Y):"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1149
+msgid "Height (in Z):"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1171
+msgid "Max speed:"
+msgstr "Max. Geschwindigkeit:"
+
+#: ../../src/./gui/gui.cpp:1178 ../../src/./gui/gui.cpp:2559
 msgid "rpm"
 msgstr "rpm"
 
-#: ../../src/./gui/gui.cpp:635
+#: ../../src/./gui/gui.cpp:1182
+msgid "Max feedrate:"
+msgstr "Max. Vorschub:"
+
+#: ../../src/./gui/gui.cpp:1189
+msgid "mm/s"
+msgstr "mm/s"
+
+#: ../../src/./gui/gui.cpp:1202
+msgid "available in workshop"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1203
+msgid ""
+"Pieces of stock material can be set to \"available\". This allows the (not "
+"yet written) autosetup function to know what is really available in the "
+"workshop. Thus stock that is not available needs not to be deleted."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1210
+msgid "Add / Update"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1213 ../../src/./gui/gui.cpp:2502
+#: ../../src/./gui/gui.cpp:2622 ../../src/./gui/gui.cpp:3095
+msgid "Delete"
+msgstr "Löschen"
+
+#: ../../src/./gui/gui.cpp:1256
+msgid "&Manage Stock"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1262 ../../src/./gui/gui.cpp:1365
+msgid "&Close"
+msgstr "Schließen"
+
+#: ../../src/./gui/gui.cpp:1286
+msgid "Stock:"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1298
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: ../../src/./gui/gui.cpp:1368
+msgid "&Placement"
+msgstr "&Platzierung"
+
+#: ../../src/./gui/gui.cpp:1422 ../../src/./gui/gui.cpp:1433
+#: ../../src/./gui/gui.cpp:1444 ../../src/./gui/gui.cpp:1490
+#: ../../src/./gui/gui.cpp:2897 ../../src/./gui/gui.cpp:2908
+#: ../../src/./gui/gui.cpp:2919 ../../src/./gui/gui.cpp:2930
+#: ../../src/./gui/gui.cpp:2941 ../../src/./gui/gui.cpp:2952
+#: ../../src/./gui/guiSetupStereo3D.cpp:128
+#: ../../src/./gui/guiSetupStereo3D.cpp:147
+msgid "cm"
+msgstr "cm"
+
+#: ../../src/./gui/gui.cpp:1454
+msgid "Angle:"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1474
+msgid "Box"
+msgstr "Quader"
+
+#: ../../src/./gui/gui.cpp:1477
+msgid "Contour"
+msgstr "Kontur"
+
+#: ../../src/./gui/gui.cpp:1483
+msgid "Distance:"
+msgstr "Abstand:"
+
+#: ../../src/./gui/gui.cpp:1536
+msgid "Align with Top"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1539
+msgid "Align with Middle"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1542
+msgid "Align with Bottom"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1614 ../../src/./gui/gui.cpp:2453
+msgid "&Load Toolbox"
+msgstr "Werkzeugsammlung laden"
+
+#: ../../src/./gui/gui.cpp:1634
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: ../../src/./gui/gui.cpp:1664
+msgid "rotate X"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1667
+msgid "rotate Y"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1670
+msgid "rotate Z"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1680
+msgid "Machine"
+msgstr "Maschine"
+
+#: ../../src/./gui/gui.cpp:1688
+msgid "Load Machine"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1694
+msgid "Tools"
+msgstr "Werkzeuge"
+
+#: ../../src/./gui/gui.cpp:1707
+msgid "Remove from Machine"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1724
+msgid "Toolslot:"
+msgstr "Werkzeugaufnahme:"
+
+#: ../../src/./gui/gui.cpp:1731
+msgid "Add to Machine"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1786
+msgid "&Load Machine Description"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1790
+msgid "&Save Machine Description"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1796
+msgid "&Evaluate Script"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1800
+msgid "&Show Controller"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1806
+msgid "Close Window"
+msgstr "Fenster schließen"
+
+#: ../../src/./gui/gui.cpp:1813
+msgid "Enable &3D"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1843
+msgid "Evaluate"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1923
+msgid "Hide &Controller"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1926
+msgid "&Controller"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:1937
+msgid "Main Axis"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:2029
+msgid "Main Angles"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:2037 ../../src/./gui/gui.cpp:2081
+msgid "A:"
+msgstr "A:"
+
+#: ../../src/./gui/gui.cpp:2050 ../../src/./gui/gui.cpp:2092
+#: ../../src/./gui/guiSetupStereo3D.cpp:103
+#: ../../src/./gui/guiSetupStereo3D.cpp:174
+msgid "B:"
+msgstr "B:"
+
+#: ../../src/./gui/gui.cpp:2063 ../../src/./gui/gui.cpp:2103
+msgid "C:"
+msgstr "C:"
+
+#: ../../src/./gui/gui.cpp:2121
+msgid "Additional Axis"
+msgstr "Zusätzliche Achsen"
+
+#: ../../src/./gui/gui.cpp:2129 ../../src/./gui/gui.cpp:2173
+msgid "U:"
+msgstr "U:"
+
+#: ../../src/./gui/gui.cpp:2142 ../../src/./gui/gui.cpp:2184
+msgid "V:"
+msgstr "V:"
+
+#: ../../src/./gui/gui.cpp:2155 ../../src/./gui/gui.cpp:2195
+msgid "W:"
+msgstr "W:"
+
+#: ../../src/./gui/gui.cpp:2457
+msgid "&Save Toolbox"
+msgstr "Werkzeugsammlung speichern"
+
+#: ../../src/./gui/gui.cpp:2463
+msgid "Shape &Wizard"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:2472
+msgid "&Tools"
+msgstr "&Werkzeuge"
+
+#: ../../src/./gui/gui.cpp:2480
+msgid "&Stereo 3D"
+msgstr "Stereo 3D"
+
+#: ../../src/./gui/gui.cpp:2493
+msgid "Combo!"
+msgstr "Combo!"
+
+#: ../../src/./gui/gui.cpp:2496 ../../src/./gui/gui.cpp:2616
+msgid "New"
+msgstr "Neu"
+
+#: ../../src/./gui/gui.cpp:2499 ../../src/./gui/gui.cpp:2619
+#: ../../src/./gui/gui.cpp:3085
+msgid "Update"
+msgstr "Aktualisieren"
+
+#: ../../src/./gui/gui.cpp:2517
+msgid "Tool definition"
+msgstr "Werkzeugdefinition"
+
+#: ../../src/./gui/gui.cpp:2524
+msgid "Shaft diameter:"
+msgstr "Schaftdurchmesser:"
+
+#: ../../src/./gui/gui.cpp:2529
+msgid "Diameter of the part that disappears inside the chuck."
+msgstr "Durchmesser des Werkzeugs in Höhe der Spannzange."
+
+#: ../../src/./gui/gui.cpp:2537
+msgid "Shaft length:"
+msgstr "Schaftlänge:"
+
+#: ../../src/./gui/gui.cpp:2542
+msgid "This is the length of the that disappears inside the chuck."
+msgstr "Länge des Werkzeugs, die in der Spannzange verschwindet."
+
+#: ../../src/./gui/gui.cpp:2550
+msgid "Maximum speed:"
+msgstr "Maximale Geschwindigkeit:"
+
+#: ../../src/./gui/gui.cpp:2555
+msgid "Max. speed: Look at label on box you got the tools shipped in."
+msgstr "Maximale Rotationsgeschwindigkeit des Werkzeugs."
+
+#: ../../src/./gui/gui.cpp:2563
 msgid "Feed coefficient:"
 msgstr "Vorschubkoeffizient:"
 
-#: ../../src/./gui/gui.cpp:640
-msgid "Feed per tooth: How deep can a tooth cut per revolution. Usually in the range of 0.02 mm to 0.05 mm."
-msgstr "Vorschub pro Schneide: Wie tief kann eine schneide pro Umdrehung schneiden. Normalerweise zwischen 0.02 mm und 0.05 mm."
+#: ../../src/./gui/gui.cpp:2568
+msgid ""
+"Feed per tooth: How deep can a tooth cut per revolution. Usually in the "
+"range of 0.02 mm to 0.05 mm."
+msgstr ""
+"Vorschub pro Schneide: Wie tief kann eine schneide pro Umdrehung schneiden. "
+"Normalerweise zwischen 0.02 mm und 0.05 mm."
 
-#: ../../src/./gui/gui.cpp:648
-msgid "Number of teeth:"
-msgstr "Anzahl der Zähne:"
+#: ../../src/./gui/gui.cpp:2576
+msgid "Number of flutes:"
+msgstr "Schneidenzahl:"
 
-#: ../../src/./gui/gui.cpp:653
+#: ../../src/./gui/gui.cpp:2581
 msgid "Number of teeth around the cutter."
 msgstr "Anzahl der Schneiden, die das Werkzeug hat."
 
-#: ../../src/./gui/gui.cpp:663
+#: ../../src/./gui/gui.cpp:2591
 msgid "Comment:"
 msgstr "Kommentar:"
 
-#: ../../src/./gui/gui.cpp:676
+#: ../../src/./gui/gui.cpp:2605
 msgid "Tool shape"
 msgstr "Werkzeugform"
 
-#: ../../src/./gui/gui.cpp:698
+#: ../../src/./gui/gui.cpp:2628
 msgid "Linear or bend line"
 msgstr "Gerade oder gebogene Linie"
 
-#: ../../src/./gui/gui.cpp:698
+#: ../../src/./gui/gui.cpp:2628
 msgid "Corner: first diameter change, then height change"
 msgstr "Ecke: erst Durchmesseränderung, dann Höhenänderung"
 
-#: ../../src/./gui/gui.cpp:698
+#: ../../src/./gui/gui.cpp:2628
 msgid "Corner: first height change, then diameter change"
 msgstr "Ecke: erst Höhenänderung, dann Durchmesseränderung"
 
-#: ../../src/./gui/gui.cpp:698
+#: ../../src/./gui/gui.cpp:2628
 msgid "Sphere: radius at upper limit, calculate height"
 msgstr "Kugel: Radius an der oberen Grenze gegeben, Höhe berechnen"
 
-#: ../../src/./gui/gui.cpp:698
+#: ../../src/./gui/gui.cpp:2628
 msgid "Sphere: radius at lower limit, calculate height"
 msgstr "Kugel: Radius an der unteren Grenze gegeben, Höhe berechnen"
 
-#: ../../src/./gui/gui.cpp:714
+#: ../../src/./gui/gui.cpp:2644
 msgid "Diameter of the tool at the end of this segment."
 msgstr "Durchmesser des Werkzeugs am Ende dieses Segments."
 
-#: ../../src/./gui/gui.cpp:727
+#: ../../src/./gui/gui.cpp:2657
 msgid "Height of this segment."
 msgstr "Höhe dieses Segments."
 
-#: ../../src/./gui/gui.cpp:740
+#: ../../src/./gui/gui.cpp:2670
 msgid ""
 "Radius of curvature:\n"
 "Positive radius = convex surface = bulged to the outside.\n"
@@ -678,402 +1397,730 @@ msgstr ""
 "Negativer Radius = konkave Oberfläche = nach Innen gewölbt.\n"
 "Radius von 0 = Gerade Linie."
 
-#: ../../src/./gui/gui.cpp:752
+#: ../../src/./gui/gui.cpp:2681
 msgid "surface is cutting"
 msgstr "Oberfläche schneidet"
 
-#: ../../src/./gui/gui.cpp:847
-msgid "Size X:"
-msgstr "Grösse X:"
-
-#: ../../src/./gui/gui.cpp:858
-msgid "Size Y:"
-msgstr "Grösse Y:"
-
-#: ../../src/./gui/gui.cpp:869
-msgid "Size Z:"
-msgstr "Grösse Z:"
-
-#: ../../src/./gui/gui.cpp:880
-msgid "Max speed:"
-msgstr "Max. Geschwindigkeit:"
-
-#: ../../src/./gui/gui.cpp:891
-msgid "Max feedrate:"
-msgstr "Max. Vorschub:"
-
-#: ../../src/./gui/gui.cpp:898
-msgid "mm/s"
-msgstr "mm/s"
-
-#: ../../src/./gui/gui.cpp:924
-msgid "&Load Object"
-msgstr "Objekt laden"
-
-#: ../../src/./gui/gui.cpp:928
-msgid "&Reload Object"
-msgstr "Objekt erneut laden"
-
-#: ../../src/./gui/gui.cpp:932
-msgid "&Save Object As..."
-msgstr "Objekt &speichern unter..."
-
-#: ../../src/./gui/gui.cpp:959
-msgid " No objects in project!"
-msgstr "Keine Objekte im Projekt!"
-
-#: ../../src/./gui/gui.cpp:973
-msgid "Size of object"
-msgstr "Größe des Objekts"
-
-#: ../../src/./gui/gui.cpp:975
-#: ../../src/./gui/gui.cpp:1046
-#: ../../src/./gui/gui.cpp:1063
-msgid "X:"
-msgstr "X:"
-
-#: ../../src/./gui/gui.cpp:979
-#: ../../src/./gui/gui.cpp:990
-#: ../../src/./gui/gui.cpp:1001
-#: ../../src/./gui/gui.cpp:1379
-msgid "0"
-msgstr "0"
-
-#: ../../src/./gui/gui.cpp:986
-#: ../../src/./gui/gui.cpp:1077
-#: ../../src/./gui/gui.cpp:1094
-msgid "Y:"
-msgstr "Y:"
-
-#: ../../src/./gui/gui.cpp:997
-#: ../../src/./gui/gui.cpp:1108
-#: ../../src/./gui/gui.cpp:1125
-msgid "Z:"
-msgstr "Z:"
-
-#: ../../src/./gui/gui.cpp:1011
-msgid "Rescale"
-msgstr "Skalieren"
-
-#: ../../src/./gui/gui.cpp:1016
-msgid "Scale proportionally"
-msgstr "Proportional skalieren"
-
-#: ../../src/./gui/gui.cpp:1020
-msgid "XYZ * 10"
-msgstr "XYZ * 10"
-
-#: ../../src/./gui/gui.cpp:1023
-msgid "XYZ / 10"
-msgstr "XYZ / 10"
-
-#: ../../src/./gui/gui.cpp:1029
-#: ../../src/./gui/gui.cpp:1067
-#: ../../src/./gui/gui.cpp:1098
-#: ../../src/./gui/gui.cpp:1129
-msgid "100"
-msgstr "100"
-
-#: ../../src/./gui/gui.cpp:1032
-#: ../../src/./gui/gui.cpp:1070
-#: ../../src/./gui/gui.cpp:1101
-#: ../../src/./gui/gui.cpp:1132
-msgid "%"
-msgstr "%"
-
-#: ../../src/./gui/gui.cpp:1036
-#: ../../src/./gui/gui.cpp:1057
-#: ../../src/./gui/gui.cpp:1074
-#: ../../src/./gui/gui.cpp:1088
-#: ../../src/./gui/gui.cpp:1105
-#: ../../src/./gui/gui.cpp:1119
-#: ../../src/./gui/gui.cpp:1136
-#: ../../src/./gui/gui.cpp:1146
-msgid "Scale"
-msgstr "Skalieren"
-
-#: ../../src/./gui/gui.cpp:1050
-#: ../../src/./gui/gui.cpp:1081
-#: ../../src/./gui/gui.cpp:1112
-msgid "1"
-msgstr "1"
-
-#: ../../src/./gui/gui.cpp:1152
-msgid "label"
-msgstr "Marke"
-
-#: ../../src/./gui/gui.cpp:1159
-msgid "Y -90"
-msgstr "Y -90"
-
-#: ../../src/./gui/gui.cpp:1162
-msgid "X -90"
-msgstr "X -90"
-
-#: ../../src/./gui/gui.cpp:1165
-msgid "Y +90"
-msgstr "Y +90"
-
-#: ../../src/./gui/gui.cpp:1168
-msgid "Z -90"
-msgstr "Z -90"
-
-#: ../../src/./gui/gui.cpp:1174
-msgid "Z +90"
-msgstr "Z +90"
-
-#: ../../src/./gui/gui.cpp:1180
-msgid "X +90"
-msgstr "X +90"
-
-#: ../../src/./gui/gui.cpp:1193
-msgid "Rotate"
-msgstr "Drehen"
-
-#: ../../src/./gui/gui.cpp:1196
-msgid "Position"
-msgstr "Position"
-
-#: ../../src/./gui/gui.cpp:1201
-msgid "Align with stock origin"
-msgstr "Am Ursprungspunkt des Rohmaterials ausrichten"
-
-#: ../../src/./gui/gui.cpp:1204
-msgid "Align with middle of stock"
-msgstr "An der Mitte des Rohmaterial ausrichten"
-
-#: ../../src/./gui/gui.cpp:1207
-msgid "Align with top of stock"
-msgstr "An der Oberseite des Rohmaterials ausrichten"
-
-#: ../../src/./gui/gui.cpp:1215
-msgid "Move"
-msgstr "Verschieben"
-
-#: ../../src/./gui/gui.cpp:1286
-msgid "Units "
-msgstr "Einheiten"
-
-#: ../../src/./gui/gui.cpp:1293
-msgid "Length Units"
-msgstr "Längeneinheiten"
-
-#: ../../src/./gui/gui.cpp:1297
-#: ../../src/./gui/gui.cpp:1307
-msgid "um"
-msgstr "um"
-
-#: ../../src/./gui/gui.cpp:1297
-#: ../../src/./gui/gui.cpp:1307
-msgid "cm"
-msgstr "cm"
-
-#: ../../src/./gui/gui.cpp:1297
-#: ../../src/./gui/gui.cpp:1307
-msgid "m"
-msgstr "m"
-
-#: ../../src/./gui/gui.cpp:1297
-#: ../../src/./gui/gui.cpp:1307
-msgid "inch"
-msgstr "Zoll"
-
-#: ../../src/./gui/gui.cpp:1297
-#: ../../src/./gui/gui.cpp:1307
-msgid "mil"
-msgstr "mil"
-
-#: ../../src/./gui/gui.cpp:1303
-msgid "Tolerances"
-msgstr "Toleranzen"
-
-#: ../../src/./gui/gui.cpp:1313
-msgid "Rotational Speed"
-msgstr "Rotationsgeschwindigkeit"
-
-#: ../../src/./gui/gui.cpp:1317
-msgid "1/s"
-msgstr "1/s"
-
-#: ../../src/./gui/gui.cpp:1317
-msgid "1/min"
-msgstr "1/min"
-
-#: ../../src/./gui/gui.cpp:1317
-msgid "rad/s"
-msgstr "rad/s"
-
-#: ../../src/./gui/gui.cpp:1361
-msgid "Thickness of slice"
-msgstr "Dicke der Scheibe"
-
-#: ../../src/./gui/gui.cpp:1365
-msgid "30"
-msgstr "30"
-
-#: ../../src/./gui/gui.cpp:1372
-msgid "from stock material"
-msgstr "vom Rohmaterial übernehmen"
-
-#: ../../src/./gui/gui.cpp:1375
-msgid "Number of slices"
-msgstr "Anzahl der Scheiben"
-
-#: ../../src/./gui/gui.cpp:1393
-msgid "Slice"
-msgstr "Scheibe"
-
-#: ../../src/./gui/gui.cpp:1397
-msgid "Mould"
-msgstr "Gußform"
-
-#: ../../src/./gui/gui.cpp:1402
-msgid "Support Structure"
-msgstr "Stützstruktur"
-
-#: ../../src/./gui/gui.cpp:1409
-msgid "Slot around structure"
-msgstr "Schlitz um die Struktur"
-
-#: ../../src/./gui/gui.cpp:1413
-#: ../../src/./gui/gui.cpp:1435
-msgid "10"
-msgstr "10"
-
-#: ../../src/./gui/gui.cpp:1420
-msgid "Distance between supports"
-msgstr "Abstand zwischen Stützstrukturen"
-
-#: ../../src/./gui/gui.cpp:1424
-msgid "50"
-msgstr "50"
-
-#: ../../src/./gui/gui.cpp:1431
-msgid "Width of support"
-msgstr "Breite einer Stützstruktur"
-
-#: ../../src/./gui/gui.cpp:1442
-msgid "Height of support"
-msgstr "Höhe einer Stützstruktur"
-
-#: ../../src/./gui/gui.cpp:1446
-msgid "5"
-msgstr "5"
-
-#: ../../src/./gui/gui.cpp:1460
-msgid "Multiple targets per workpiece"
-msgstr "Mehrere Ziele pro Rohmaterial"
-
-#: ../../src/./gui/gui.cpp:1464
-msgid "Superstuff"
-msgstr "Superstuff"
-
-#: ../../src/./gui/gui.cpp:1471
-msgid "Generate"
-msgstr "Erzeugen"
-
-#: ../../src/./gui/gui.cpp:1500
-msgid "Toolpath:"
-msgstr "Werkzeugpfad:"
-
-#: ../../src/./gui/gui.cpp:1504
-msgid "No toolpath selected!"
-msgstr "Kein Werkzeugpfad ausgewählt!"
-
-#: ../../src/./gui/gui.cpp:1512
+#: ../../src/./gui/gui.cpp:2775
+msgid "Cylindric"
+msgstr "Zylindrisch"
+
+#: ../../src/./gui/gui.cpp:2784
+msgid "Sphere"
+msgstr "Kugel"
+
+#: ../../src/./gui/gui.cpp:2793
+msgid "Conic"
+msgstr "Konisch"
+
+#: ../../src/./gui/gui.cpp:2800
+msgid "Add new tool"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:2801
+msgid "Add a new tool to the toolbox."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:2805
+msgid "Set shape of current tool"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:2806
+msgid "Overwrite the shape of the current tool."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:2845 ../../src/./gui/gui.cpp:3172
+msgid "Run:"
+msgstr "Lauf:"
+
+#: ../../src/./gui/gui.cpp:2860
+msgid "Generator:"
+msgstr "Generator:"
+
+#: ../../src/./gui/gui.cpp:2869
+msgid "Add New"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:2870
+msgid "Add a new empty generator below the current one."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:2881
+msgid "Area:"
+msgstr "Bereich:"
+
+#: ../../src/./gui/gui.cpp:2890
+msgid "X start:"
+msgstr "X Start:"
+
+#: ../../src/./gui/gui.cpp:2901 ../../src/./gui/gui.cpp:2923
+#: ../../src/./gui/gui.cpp:2945
+msgid "end:"
+msgstr "Ende:"
+
+#: ../../src/./gui/gui.cpp:2912
+msgid "Y start:"
+msgstr "Y Start:"
+
+#: ../../src/./gui/gui.cpp:2934
+msgid "Z start:"
+msgstr "Z Start:"
+
+#: ../../src/./gui/gui.cpp:2962
+msgid "from Object ..."
+msgstr "von Objekt..."
+
+#: ../../src/./gui/gui.cpp:2978
+msgid "Margin:"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:2985
+msgid "Side:"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:2996
+msgid "Below:"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3024
+msgid "Diameter:"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3045
+msgid "Safety distance:"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3050
+msgid "Free Height:"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3074
+msgid "Generator Type:"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3086
+msgid "Update changes for the current generator."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3090
+msgid "Reset changes"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3091
+msgid "Reset the changes for this generator to the state of the last update."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3096
+msgid "Delete the current generator."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3101
+msgid "Close window."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3176
+msgid "No machine run available."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3186
+msgid "G-Codes"
+msgstr "G-Codes"
+
+#: ../../src/./gui/gui.cpp:3211
 msgid "Time:"
 msgstr "Dauer:"
 
-#: ../../src/./gui/gui.cpp:1516
-#: ../../src/./gui/gui.cpp:1523
+#: ../../src/./gui/gui.cpp:3215 ../../src/./gui/gui.cpp:3222
 msgid "00:00:00"
 msgstr "00:00:00"
 
-#: ../../src/./gui/gui.cpp:1519
+#: ../../src/./gui/gui.cpp:3218
 msgid "/"
 msgstr "/"
 
-#: ../../src/./gui/gui.cpp:1534
+#: ../../src/./gui/gui.cpp:3231
+msgid "Simulate workpiece"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3239
+msgid "First"
+msgstr "Anfang"
+
+#: ../../src/./gui/gui.cpp:3244
+msgid "Step back"
+msgstr "Zurück"
+
+#: ../../src/./gui/gui.cpp:3249
+msgid "Play / Stop"
+msgstr "Abspielen / Anhalten"
+
+#: ../../src/./gui/gui.cpp:3254
+msgid "Step forward"
+msgstr "Vorwärts"
+
+#: ../../src/./gui/gui.cpp:3259
 msgid "Last"
 msgstr "Ende"
 
-#: ../../src/./gui/gui.cpp:1537
-msgid "Begin"
-msgstr "Anfang"
+#: ../../src/./gui/gui.cpp:3332
+msgid "Units "
+msgstr "Einheiten"
 
-#: ../../src/./gui/gui.cpp:1540
-msgid "Play"
-msgstr "Wiedergabe"
+#: ../../src/./gui/gui.cpp:3339
+msgid "Length"
+msgstr "Länge"
 
-#: ../../src/./gui/gui.cpp:1543
-msgid "End"
-msgstr "Ende"
+#: ../../src/./gui/gui.cpp:3348
+msgid "Linear Speed"
+msgstr "Lineare Geschwindigkeit"
 
-#: ../../src/./gui/gui.cpp:1546
-msgid "Next"
-msgstr "Weiter"
+#: ../../src/./gui/gui.cpp:3357
+msgid "Rotational Speed"
+msgstr "Rotationsgeschwindigkeit"
 
-#: ../../src/./project/Project.cpp:61
-msgid "Untitled"
-msgstr "Ohne Titel"
+#: ../../src/./gui/gui.cpp:3366
+msgid "Time"
+msgstr "Zeit"
 
-#: ../../src/./project/Object.cpp:86
+#: ../../src/./gui/gui.cpp:3375
+msgid "Small Distance"
+msgstr "Kleine Abstände"
+
+#: ../../src/./gui/gui.cpp:3384
+msgid "Tolerance"
+msgstr "Toleranzen"
+
+#: ../../src/./gui/gui.cpp:3393
+msgid "Angle"
+msgstr "Winkel"
+
+#: ../../src/./gui/gui.cpp:3411
+msgid ""
+"Unit conversion is only used for displaying.\n"
+"Internally everything is stored in SI base units.\n"
+"Please use Object->Modify to change object sizes."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3452
+msgid ""
+"Generic CAM  Copyright (C) 2010 - 2015 Tobias Schaefer\n"
+"\n"
+"French translation & additional debugging: Jacques-Louis Tartarin\n"
+"Italian Translation: Sandro Dalle Nogare\n"
+"\n"
+"Licence for Generic CAM:\n"
+"GNU General Public License version 3.0 (GPLv3)\n"
+"\n"
+"This program comes with ABSOLUTELY NO WARRANTY.\n"
+"This is free software, and you are welcome to redistribute it under certain "
+"conditions.\n"
+"\n"
+"You should have received a copy of the GNU General Public License along with "
+"this program.\n"
+"If not, see <http://www.gnu.org/licenses/>."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3502
+msgid "G20 - inches"
+msgstr "G20 - Inch"
+
+#: ../../src/./gui/gui.cpp:3503
+msgid "Assume that in a previous block a G20 command was issued."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3507
+msgid "G21 - mm"
+msgstr "G21 - mm"
+
+#: ../../src/./gui/gui.cpp:3508
+msgid "Assume that in a previous block a G21 command was issued."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3519
+msgid "G-Code block to analyse."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3523
+msgid "Clear"
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3524
+msgid "Clear text int the input field."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3532
+msgid "Meaning of the G-Code."
+msgstr ""
+
+#: ../../src/./gui/gui.cpp:3537
+msgid "Reconstruction of the G-Code block."
+msgstr ""
+
+#: ../../src/./gui/guiSetupStereo3D.cpp:29
+msgid "Left Eye"
+msgstr "Linkes Auge"
+
+#: ../../src/./gui/guiSetupStereo3D.cpp:55
+msgid "Right Eye"
+msgstr "Rechtes Auge"
+
+#: ../../src/./gui/guiSetupStereo3D.cpp:78
+msgid "<-   Swap Colors   ->"
+msgstr "<-   Farben vertauschen   ->"
+
+#: ../../src/./gui/guiSetupStereo3D.cpp:89
+#: ../../src/./gui/guiSetupStereo3D.cpp:160
+msgid "R:"
+msgstr "R:"
+
+#: ../../src/./gui/guiSetupStereo3D.cpp:96
+#: ../../src/./gui/guiSetupStereo3D.cpp:167
+msgid "G:"
+msgstr "G:"
+
+#: ../../src/./gui/guiSetupStereo3D.cpp:121
+msgid "Eye Distance:"
+msgstr "Augenabstand:"
+
+#: ../../src/./gui/guiSetupStereo3D.cpp:140
+msgid "Focal Distance:"
+msgstr "Abstand des Fokuspunktes:"
+
+#: ../../src/./project/Object.cpp:156
 msgid "GTS file not readable!"
 msgstr "GTS Datei kann nicht geöffnet werden!"
 
-#: ../../src/./project/Object.cpp:106
+#: ../../src/./project/Object.cpp:177
 msgid "STL file not readable!"
 msgstr "STL Datei kann nicht geöffnet werden!"
 
-#: ../../src/./project/Object.cpp:127
+#: ../../src/./project/Object.cpp:209
 msgid "DXF file not readable!"
 msgstr "DXF Datei kann nicht geöffnet werden!"
 
-#: ../../src/./project/Toolbox.cpp:74
+#: ../../src/./project/Project.cpp:52
+msgid "Untitled"
+msgstr "Ohne Titel"
+
+#: ../../src/./project/StockFile.cpp:35
+msgid "Small board"
+msgstr ""
+
+#: ../../src/./project/StockFile.cpp:42
+msgid "4\" by 4\", 3 feet long"
+msgstr ""
+
+#: ../../src/./project/StockFile.cpp:49
+msgid "Cube 10cm x 10cm x 10cm"
+msgstr ""
+
+#: ../../src/./project/StockFile.cpp:56
+msgid "MFD board on left stack in my workshop"
+msgstr ""
+
+#: ../../src/./project/StockFile.cpp:64
+msgid "MDF Board 70 x 46 x 2.7 cm"
+msgstr ""
+
+#: ../../src/./project/ToolBox.cpp:70
 msgid "Standard cutter"
 msgstr " Standardfräser"
 
-#: ../../src/./project/Toolbox.cpp:75
+#: ../../src/./project/ToolBox.cpp:71
 msgid "all purpose cylindrical"
 msgstr "Zylindrischer Universalfräser"
 
-#: ../../src/./gui/gui.h:120
-msgid "Generic CAM"
-msgstr "Generic CAM"
+#: ../../src/./project/generator/GeneratorAreaGridDexel.cpp:52
+msgid "Area Grid (Dexel)"
+msgstr ""
 
-#: ../../src/./gui/gui.h:148
-msgid "About"
-msgstr "Über"
+#: ../../src/./project/generator/GeneratorLoadFromFile.cpp:106
+msgid "Load G-Code: Not a valid file: >"
+msgstr ""
 
-#: ../../src/./gui/gui.h:194
+#: ../../src/./project/generator/GeneratorLoadFromFile.cpp:113
+msgid "Load G-Code: Could not read file: >"
+msgstr ""
+
+#: ../../src/./project/generator/GeneratorNone.cpp:50
+msgid "None"
+msgstr ""
+
+#: ../../src/./project/generator/GeneratorPositioningDrills.cpp:69
+msgid "Positioning Drillings"
+msgstr ""
+
+#: ../../src/./project/machine/LUACodeEvaluator.cpp:186
+msgid ""
+"\n"
+"---------- error while parsing ----------\n"
+msgstr ""
+"\n"
+"---------- Fehler beim Parsen ----------\n"
+
+#: ../../src/./project/machine/LUACodeEvaluator.cpp:192
+#: ../../src/./project/machine/LUACodeEvaluator.cpp:240
+msgid ""
+"\n"
+"---------- error while running ----------\n"
+msgstr ""
+"\n"
+"---------- Fehler beim Verarbeiten ----------\n"
+
+#: ../../src/./project/machine/Machine.cpp:118
+msgid "File format for machine descriptions not supported."
+msgstr ""
+
+#: ../../src/./controller/guiSetup6DOFController.h:66
 msgid "Setup 6DOF Controller"
 msgstr "Einstellung des 6DOF Kontrollers"
 
-#: ../../src/./gui/gui.h:218
-msgid "An error occured"
-msgstr "Ein Fehler ist aufgetreten"
-
-#: ../../src/./gui/gui.h:295
-msgid "Toolbox"
-msgstr "Werkzeugsammlung"
-
-#: ../../src/./gui/gui.h:339
-msgid "Stock"
-msgstr "Rohmaterial"
-
-#: ../../src/./gui/gui.h:452
+#: ../../src/./gui/gui.h:373
 msgid "Object Editor"
 msgstr "Objekteditor"
 
-#: ../../src/./gui/gui.h:479
-msgid "Setup Units"
-msgstr "Einstellung der Einheiten"
+#: ../../src/./gui/gui.h:424
+msgid "Overview of all Stock Material"
+msgstr ""
 
-#: ../../src/./gui/gui.h:526
-msgid "Prepare Targets"
-msgstr "Ziele vorbereiten"
+#: ../../src/./gui/gui.h:456
+msgid "Add Objects to Workpieces"
+msgstr ""
+
+#: ../../src/./gui/gui.h:516
+msgid "Objects in Workpiece Placement"
+msgstr ""
 
 #: ../../src/./gui/gui.h:562
+msgid "Setup a Machine Run"
+msgstr ""
+
+#: ../../src/./gui/gui.h:603
+msgid "Machine debugger"
+msgstr ""
+
+#: ../../src/./gui/gui.h:687
+msgid "Machine Controller"
+msgstr ""
+
+#: ../../src/./gui/gui.h:761
+msgid "Toolbox"
+msgstr "Werkzeugsammlung"
+
+#: ../../src/./gui/gui.h:791
+msgid "Toolshape Wizard"
+msgstr ""
+
+#: ../../src/./gui/gui.h:865
+msgid "Add / Update Toolpath Generators"
+msgstr ""
+
+#: ../../src/./gui/gui.h:915
 msgid "Toolpath Animation"
 msgstr "Werkzeugpfad animieren"
 
+#: ../../src/./gui/gui.h:953
+msgid "Setup display units"
+msgstr ""
+
+#: ../../src/./gui/gui.h:976
+msgid "About"
+msgstr "Über"
+
+#: ../../src/./gui/gui.h:993
+msgid "Release Info"
+msgstr ""
+
+#: ../../src/./gui/gui.h:1021
+msgid "G-Code parser"
+msgstr ""
+
+#: ../../src/./gui/guiSetupStereo3D.h:99
+msgid "Setup Stereo "
+msgstr ""
+
+#~ msgid "Project: "
+#~ msgstr "Projekt:"
+
+#~ msgid "Object: "
+#~ msgstr "Objekt:"
+
+#~ msgid "Stock material: "
+#~ msgstr "Rohmeterial:"
+
+#~ msgid "Toolbox: "
+#~ msgstr "Werkzeugsammlung:"
+
+#~ msgid "Stock material"
+#~ msgstr "Rohmaterial"
+
+#~ msgid "Target"
+#~ msgstr "Ziel"
+
+#~ msgid "Toolpath"
+#~ msgstr "Werkzeugpfad"
+
+#~ msgid "Generic CAM Project (*.prj; *.xml)|*.prj;*.xml|All Files|*.*"
+#~ msgstr "Generic CAM Projekt (*.prj; *.xml)|*.prj;*.xml|Alle Dateien|*.*"
+
+#~ msgid "Save Project..."
+#~ msgstr "Projekt speichern..."
+
+#~ msgid "Open..."
+#~ msgstr "Öffnen..."
+
+#~ msgid ""
+#~ "All supported files (*.dxf; *.stl; *.gts)|*.dxf;*.stl;*.gts|DXF Files (*."
+#~ "dxf)|*.dxf|Stereolithography files (STL files) (*.stl)|*.stl|GTS files (*."
+#~ "gts)|*.gts|All files|*.*"
+#~ msgstr ""
+#~ "Alle unterstützten Formate (*.dxf; *.stl; *.gts)|*.dxf;*.stl;*.gts|DXF "
+#~ "Dateien (*.dxf)|*.dxf|Stereolithography Dateien (STL Dateien) (*.stl)|*."
+#~ "stl|GTS Dateien (*.gts)|*.gts|Alle Dateien|*.*"
+
+#~ msgid "Open G-Code file..."
+#~ msgstr "G-Codes laden..."
+
+#~ msgid ""
+#~ "G-Code File (*.tap *.cnc *.nc *.ngc *.txt)|*.tap;*.cnc;*.nc;*.ngc;*.txt|"
+#~ "Text files (*.txt)|*.txt|All files|*.*"
+#~ msgstr ""
+#~ "G-Code Dateien (*.tap *.cnc *.nc *.ngc *.txt)|*.tap;*.cnc;*.nc;*.ngc;*."
+#~ "txt|Text Dateien (*.txt)|*.txt|Alle Dateien|*.*"
+
+#~ msgid "Save G-Code file..."
+#~ msgstr "G-Codes speichern..."
+
+#~ msgid "&Save Project as..."
+#~ msgstr "Projekt speichern unter..."
+
+#~ msgid "&Load Object File"
+#~ msgstr "Objekt laden"
+
+#~ msgid "Edit Subobjects"
+#~ msgstr "Unterobjekte bearbeiten"
+
+#~ msgid "For DXF files"
+#~ msgstr "Für DXF Dateien"
+
+#~ msgid "&Generate Targets"
+#~ msgstr "Ziele erstellen"
+
+#~ msgid "&Reload machine"
+#~ msgstr "Maschine erneut laden"
+
+#~ msgid "Edit Toolbox"
+#~ msgstr "Werkzeugsammlung bearbeiten"
+
+#~ msgid "Load Toolbox..."
+#~ msgstr "Werkzeugsammlung laden..."
+
+#~ msgid "Save Toolbox..."
+#~ msgstr "Werkzeugsammlung speichern..."
+
+#~ msgid "&Generate Toolpaths"
+#~ msgstr "Werkzeugpfade erstellen"
+
+#~ msgid "Recollect Toolpaths"
+#~ msgstr "Werkzeugpfade erneuern"
+
+#~ msgid "Clean Toolpaths"
+#~ msgstr "Werkzeugpfade löschen"
+
+#~ msgid "&Flip Run"
+#~ msgstr "Lauf spiegeln"
+
+#~ msgid "&Prepare Machinebed"
+#~ msgstr "Maschinenbett vorbereiten"
+
+#~ msgid "L&oad G-Codes"
+#~ msgstr "G-Codes laden"
+
+#~ msgid "&Save G-Codes"
+#~ msgstr "G-Codes speichern"
+
+#~ msgid "Setup 6DOF &controller"
+#~ msgstr "Einstellung des 6DOF Kontrollers"
+
+#~ msgid "Show &Animation Control"
+#~ msgstr "Anzeige der Animationssteuerung"
+
+#~ msgid "Error"
+#~ msgstr "Fehler"
+
+#~ msgid "Number of teeth:"
+#~ msgstr "Anzahl der Zähne:"
+
+#~ msgid "Size X:"
+#~ msgstr "Grösse X:"
+
+#~ msgid "Size Y:"
+#~ msgstr "Grösse Y:"
+
+#~ msgid "Size Z:"
+#~ msgstr "Grösse Z:"
+
+#~ msgid "&Reload Object"
+#~ msgstr "Objekt erneut laden"
+
+#~ msgid "&Save Object As..."
+#~ msgstr "Objekt &speichern unter..."
+
+#~ msgid " No objects in project!"
+#~ msgstr "Keine Objekte im Projekt!"
+
+#~ msgid "Size of object"
+#~ msgstr "Größe des Objekts"
+
+#~ msgid "0"
+#~ msgstr "0"
+
+#~ msgid "100"
+#~ msgstr "100"
+
+#~ msgid "1"
+#~ msgstr "1"
+
+#~ msgid "label"
+#~ msgstr "Marke"
+
+#~ msgid "Y -90"
+#~ msgstr "Y -90"
+
+#~ msgid "X -90"
+#~ msgstr "X -90"
+
+#~ msgid "Y +90"
+#~ msgstr "Y +90"
+
+#~ msgid "Z -90"
+#~ msgstr "Z -90"
+
+#~ msgid "Z +90"
+#~ msgstr "Z +90"
+
+#~ msgid "X +90"
+#~ msgstr "X +90"
+
+#~ msgid "Position"
+#~ msgstr "Position"
+
+#~ msgid "Align with stock origin"
+#~ msgstr "Am Ursprungspunkt des Rohmaterials ausrichten"
+
+#~ msgid "Align with middle of stock"
+#~ msgstr "An der Mitte des Rohmaterial ausrichten"
+
+#~ msgid "Align with top of stock"
+#~ msgstr "An der Oberseite des Rohmaterials ausrichten"
+
+#~ msgid "Length Units"
+#~ msgstr "Längeneinheiten"
+
+#~ msgid "um"
+#~ msgstr "um"
+
+#~ msgid "m"
+#~ msgstr "m"
+
+#~ msgid "inch"
+#~ msgstr "Zoll"
+
+#~ msgid "mil"
+#~ msgstr "mil"
+
+#~ msgid "Tolerances"
+#~ msgstr "Toleranzen"
+
+#~ msgid "1/s"
+#~ msgstr "1/s"
+
+#~ msgid "1/min"
+#~ msgstr "1/min"
+
+#~ msgid "rad/s"
+#~ msgstr "rad/s"
+
+#~ msgid "Thickness of slice"
+#~ msgstr "Dicke der Scheibe"
+
+#~ msgid "30"
+#~ msgstr "30"
+
+#~ msgid "from stock material"
+#~ msgstr "vom Rohmaterial übernehmen"
+
+#~ msgid "Number of slices"
+#~ msgstr "Anzahl der Scheiben"
+
+#~ msgid "Slice"
+#~ msgstr "Scheibe"
+
+#~ msgid "Mould"
+#~ msgstr "Gußform"
+
+#~ msgid "Support Structure"
+#~ msgstr "Stützstruktur"
+
+#~ msgid "Slot around structure"
+#~ msgstr "Schlitz um die Struktur"
+
+#~ msgid "10"
+#~ msgstr "10"
+
+#~ msgid "Distance between supports"
+#~ msgstr "Abstand zwischen Stützstrukturen"
+
+#~ msgid "50"
+#~ msgstr "50"
+
+#~ msgid "Width of support"
+#~ msgstr "Breite einer Stützstruktur"
+
+#~ msgid "Height of support"
+#~ msgstr "Höhe einer Stützstruktur"
+
+#~ msgid "5"
+#~ msgstr "5"
+
+#~ msgid "Multiple targets per workpiece"
+#~ msgstr "Mehrere Ziele pro Rohmaterial"
+
+#~ msgid "Superstuff"
+#~ msgstr "Superstuff"
+
+#~ msgid "Generate"
+#~ msgstr "Erzeugen"
+
+#~ msgid "Toolpath:"
+#~ msgstr "Werkzeugpfad:"
+
+#~ msgid "No toolpath selected!"
+#~ msgstr "Kein Werkzeugpfad ausgewählt!"
+
+#~ msgid "Begin"
+#~ msgstr "Anfang"
+
+#~ msgid "Play"
+#~ msgstr "Wiedergabe"
+
+#~ msgid "End"
+#~ msgstr "Ende"
+
+#~ msgid "Next"
+#~ msgstr "Weiter"
+
+#~ msgid "Generic CAM"
+#~ msgstr "Generic CAM"
+
+#~ msgid "An error occured"
+#~ msgstr "Ein Fehler ist aufgetreten"
+
+#~ msgid "Stock"
+#~ msgstr "Rohmaterial"
+
+#~ msgid "Setup Units"
+#~ msgstr "Einstellung der Einheiten"
+
+#~ msgid "Prepare Targets"
+#~ msgstr "Ziele vorbereiten"

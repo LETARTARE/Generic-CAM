@@ -65,7 +65,7 @@ void DialogAnimation::InitSimulation(void)
 		simulator->InsertMachine(&(run->machine));
 		simulator->InsertWorkpiece(run->GetWorkpiece());
 		simulator->InsertToolPath(run->GetFirstSelectedToolpath());
-		simulator->InitSimulation(1e5);
+		simulator->InitSimulation(2e5);
 	}else{
 		run = NULL;
 		if(simulator != NULL){

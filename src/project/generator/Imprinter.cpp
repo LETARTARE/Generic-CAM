@@ -39,7 +39,6 @@ bool ImprinterElement::IsVisible(void)
 {
 	return (up > down);
 }
-
 void ImprinterElement::Swap(ImprinterElement& b)
 {
 //	std::swap(this,&b);
@@ -110,10 +109,12 @@ Imprinter& Imprinter::operator=(const Imprinter &b)
 	this->displayListIndex = 0;
 	this->refresh = true;
 
+	//TODO: Change to memcpy(...)
 	if(b.N > 0){
 		for(size_t i = 0; i < b.N; i++)
 			this->field[i] = b.field[i];
 	}
+
 	refresh = true;
 	return *this;
 }
@@ -180,6 +181,12 @@ bool Imprinter::SetupField(const size_t sizeX, const size_t sizeY,
 
 	refresh = true;
 	return true;
+}
+
+bool Imprinter::SetupFiled(const Imprinter& other)
+{
+	return SetupField(other.GetCountX(), other.GetCountY(),
+			other.GetResolutionX(), other.GetResolutionY());
 }
 
 void Imprinter::ClearField(void)
@@ -405,8 +412,17 @@ void Imprinter::Paint() const
 void Imprinter::Empty(void)
 {
 	for(size_t i = 0; i < N; i++){
-		field[i].up = 0;
+		field[i].up = 0.0;
 		field[i].down = sz;
+	}
+	refresh = true;
+}
+
+void Imprinter::Fill(void)
+{
+	for(size_t i = 0; i < N; i++){
+		field[i].up = sz;
+		field[i].down = 0.0;
 	}
 	refresh = true;
 }
@@ -693,13 +709,14 @@ void Imprinter::SetupSphere(double radius, const double resolutionX,
 			double d = (px - centerX) * (px - centerX)
 					+ (py - centerY) * (py - centerY);
 			d = radius * radius - d;
-			if(d >= 0.0)
+			if(d >= 0.0){
 				d = sqrt(d);
-			else
-				d = 0;
-			field[p].up = d;
-			field[p].down = -d;
-
+				field[p].up = d;
+				field[p].down = -d;
+			}else{
+				field[p].up = 0.0;
+				field[p].down = sz;
+			}
 			px += rx;
 			p++;
 		}
@@ -745,38 +762,10 @@ void Imprinter::SetupCylinder(double radius, double height,
 void Imprinter::SetupDisc(double radius, const double resolutionX,
 		const double resolutionY)
 {
-	const size_t cellsX = ceil(radius / resolutionX) * 2 + 1;
-	const size_t cellsY = ceil(radius / resolutionY) * 2 + 1;
-	if(!SetupField(cellsX, cellsY, resolutionX, resolutionY)) return;
-
-	sz = 5 * FLT_EPSILON;
-
-	const double centerX = (ceil(radius / resolutionX) + 0.5) * rx;
-	const double centerY = (ceil(radius / resolutionY) + 0.5) * ry;
-
-	size_t p = 0;
-	double py = ry / 2;
-	for(size_t j = 0; j < ny; j++){
-		double px = rx / 2;
-		for(size_t i = 0; i < nx; i++){
-			const double d = (px - centerX) * (px - centerX)
-					+ (py - centerY) * (py - centerY);
-			if(d <= radius * radius){
-				field[p].up = 5 * FLT_EPSILON;
-				field[p].down = 0.0;
-			}else{
-				field[p].up = 0.0;
-				field[p].down = sz;
-			}
-			px += rx;
-			p++;
-		}
-		py += ry;
-	}
-	refresh = true;
+	SetupCylinder(radius, 5.0 * FLT_EPSILON, resolutionX, resolutionY);
 }
 
-bool Imprinter::IsFilled(int x, int y, double height)
+bool Imprinter::IsFilled(int x, int y, double height) const
 {
 	if(x < 0 || y < 0 || x >= (int) nx || y >= (int) ny) return false;
 	size_t p = x + y * nx;
@@ -784,7 +773,7 @@ bool Imprinter::IsFilled(int x, int y, double height)
 	return false;
 }
 
-bool Imprinter::IsFilledAbove(int x, int y, double height)
+bool Imprinter::IsFilledAbove(int x, int y, double height) const
 {
 	if(x < 0 || y < 0 || x >= (int) nx || y >= (int) ny) return false;
 	size_t p = x + y * nx;
@@ -792,27 +781,27 @@ bool Imprinter::IsFilledAbove(int x, int y, double height)
 	return false;
 }
 
-bool Imprinter::IsFilledAbove(size_t p, double height)
+bool Imprinter::IsFilledAbove(size_t p, double height) const
 {
 	if(p > N) return false;
 	if(field[p].up >= height) return true;
 	return false;
 }
-bool Imprinter::IsFilled(size_t p, double height)
+bool Imprinter::IsFilled(size_t p, double height) const
 {
 	if(p > N) return false;
 	if(field[p].down <= height && field[p].up >= height) return true;
 	return false;
 }
 
-bool Imprinter::IsFilled(size_t p)
+bool Imprinter::IsFilled(size_t p) const
 {
 	if(p > N) return false;
 	if(field[p].down < field[p].up) return true;
 	return false;
 }
 
-bool Imprinter::IsVisible(int x, int y)
+bool Imprinter::IsVisible(int x, int y) const
 {
 	if(x < 0 || y < 0 || x >= (int) nx || y >= (int) ny) return false;
 	size_t p = x + y * nx;
@@ -820,14 +809,14 @@ bool Imprinter::IsVisible(int x, int y)
 	return false;
 }
 
-bool Imprinter::IsVisible(size_t p)
+bool Imprinter::IsVisible(size_t p) const
 {
 	if(p > N) return false;
 	if(field[p].down <= field[p].up) return true;
 	return false;
 }
 
-bool Imprinter::IsOnOuterBorder(size_t p)
+bool Imprinter::IsOnOuterBorder(size_t p) const
 {
 	if(p < nx) return true;
 	if(p >= N) return false;
@@ -838,7 +827,7 @@ bool Imprinter::IsOnOuterBorder(size_t p)
 	return false;
 }
 
-bool Imprinter::IsSurrounded(size_t p)
+bool Imprinter::IsSurrounded(size_t p) const
 {
 	if(IsOnOuterBorder(p)) return false;
 	size_t i = p - nx - 1;
@@ -856,7 +845,7 @@ bool Imprinter::IsSurrounded(size_t p)
 	return true;
 }
 
-bool Imprinter::IsStandAlone(size_t p, double height)
+bool Imprinter::IsStandAlone(size_t p, double height) const
 {
 	if(IsOnOuterBorder(p)) return false;
 	size_t i = p - nx - 1;
@@ -874,7 +863,7 @@ bool Imprinter::IsStandAlone(size_t p, double height)
 	return true;
 }
 
-double Imprinter::GetMeanLevel(int x, int y)
+double Imprinter::GetMeanLevel(int x, int y) const
 {
 	if(x < 0 || y < 0 || x >= (int) nx || y >= (int) ny) return -1.0;
 	size_t p = x + y * nx;
@@ -882,14 +871,14 @@ double Imprinter::GetMeanLevel(int x, int y)
 	return (field[p].up + field[p].down) / 2;
 }
 
-double Imprinter::GetMeanLevel(size_t p)
+double Imprinter::GetMeanLevel(size_t p) const
 {
 	if(p >= N) return -1.0;
 	if(!field[p].IsVisible()) return -1.0;
 	return (field[p].up + field[p].down) / 2;
 }
 
-double Imprinter::GetLevel(double x, double y)
+double Imprinter::GetLevel(double x, double y) const
 {
 	const int px = round((x - rx / 2) / rx);
 	const int py = round((y - ry / 2) / ry);
@@ -899,27 +888,108 @@ double Imprinter::GetLevel(double x, double y)
 	return field[p].up;
 }
 
-Imprinter & Imprinter::operator+=(const Imprinter &a)
+double Imprinter::GetMaxLevel(void) const
 {
-	if(this->N != a.N) return *this;
-	assert(this->N == a.N);
+	double x = -FLT_MAX;
+	for(size_t i = 0; i < N; i++)
+		if(field[i].IsVisible() && field[i].up > x) x = field[i].up;
+	return x;
+}
+
+Imprinter & Imprinter::operator|=(const Imprinter &other)
+{
+	if(this->N != other.N) return *this;
+	assert(this->N == other.N);
 	for(size_t i = 0; i < N; i++){
-		if(!(this->field[i].IsVisible())) this->field[i] = a.field[i];
+		if(!other.field[i].IsVisible()) continue;
+		if(!(this->field[i].IsVisible())){
+			this->field[i] = other.field[i];
+		}else{
+			if(other.field[i].up > this->field[i].up) this->field[i].up =
+					other.field[i].up;
+			if(other.field[i].down < this->field[i].down) this->field[i].down =
+					other.field[i].down;
+		}
 	}
 	refresh = true;
 	return *this;
 }
 
-const Imprinter Imprinter::operator+(const Imprinter& a) const
+const Imprinter Imprinter::operator|(const Imprinter& a) const
 {
 	Imprinter temp = *this;
-	temp += a;
+	temp |= a;
+	return temp;
+}
+
+Imprinter & Imprinter::operator-=(const Imprinter &other)
+{
+	if(this->N != other.N) return *this;
+	assert(this->N == other.N);
+	for(size_t i = 0; i < N; i++){
+		if(!other.field[i].IsVisible()) continue;
+		if(!this->field[i].IsVisible()) continue;
+		if(other.field[i].down < this->field[i].up) this->field[i].up =
+				other.field[i].down;
+	}
+	refresh = true;
+	return *this;
+}
+
+const Imprinter Imprinter::operator-(const Imprinter& a) const
+{
+	Imprinter temp = *this;
+	temp -= a;
+	return temp;
+}
+
+Imprinter & Imprinter::operator&=(const Imprinter &other)
+{
+	if(this->N != other.N) return *this;
+	assert(this->N == other.N);
+	for(size_t i = 0; i < N; i++){
+		if(!this->field[i].IsVisible()) continue;
+		if(!other.field[i].IsVisible()){
+			this->field[i].up = 0.0;
+			this->field[i].down = sz;
+			continue;
+		}
+		if(other.field[i].down > this->field[i].down) this->field[i].down =
+				other.field[i].down;
+		if(other.field[i].up < this->field[i].up) this->field[i].up =
+				other.field[i].up;
+	}
+	refresh = true;
+	return *this;
+}
+
+const Imprinter Imprinter::operator&(const Imprinter& a) const
+{
+	Imprinter temp = *this;
+	temp &= a;
+	return temp;
+}
+
+Imprinter & Imprinter::operator+=(const double value)
+{
+	for(size_t i = 0; i < N; i++){
+		this->field[i].up += value;
+		this->field[i].down += value;
+	}
+	refresh = true;
+	return *this;
+}
+
+const Imprinter Imprinter::operator+(const double value) const
+{
+	Imprinter temp = *this;
+	temp += value;
 	return temp;
 }
 
 void Imprinter::CleanOutlier(void)
 {
-	//TODO: Check function, it adds outliers instead of removing them.
+//TODO: Check function, it adds outliers instead of removing them.
 	return;
 	size_t i;
 	size_t j;
@@ -994,7 +1064,7 @@ void Imprinter::FoldRaise(const Imprinter &b)
 	const size_t cx = b.nx / 2;
 	const size_t cy = b.ny / 2;
 
-	// Init
+// Init
 	for(size_t i = 0; i < N; i++){
 		field[i].aboveDown = field[i].up;
 		field[i].belowUp = field[i].down;
@@ -1032,7 +1102,7 @@ void Imprinter::FoldRaise(const Imprinter &b)
 		}
 	}
 
-	// Finish
+// Finish
 	for(size_t i = 0; i < N; i++){
 		field[i].up = field[i].aboveDown;
 		field[i].down = field[i].belowUp;
@@ -1045,7 +1115,7 @@ void Imprinter::FoldReplace(const Imprinter &b)
 	const size_t cx = b.nx / 2;
 	const size_t cy = b.ny / 2;
 
-	// Init
+// Init
 	for(size_t i = 0; i < N; i++){
 		field[i].aboveDown = field[i].up;
 		field[i].belowUp = field[i].down;
@@ -1076,7 +1146,7 @@ void Imprinter::FoldReplace(const Imprinter &b)
 		}
 	}
 
-	// Finish
+// Finish
 	for(size_t i = 0; i < N; i++){
 		field[i].up = field[i].aboveDown;
 		field[i].down = field[i].belowUp;

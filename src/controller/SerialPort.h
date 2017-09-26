@@ -47,6 +47,7 @@
 #ifdef __LINUX
 #include <termios.h>
 #include <stdlib.h>
+#include <string>
 #endif
 
 class SerialPort {
@@ -57,10 +58,12 @@ public:
 
 	bool Open(int nPort = 2, int nBaud = 19200);
 	bool Open(const char *Port = NULL, int nBaud = 19200);
+	bool Open(const std::string &Port = NULL, int nBaud = 19200);
 	bool Close(void);
 
-	int ReadData(char *, unsigned int);
-	int SendData(const char *, unsigned int);
+	int ReadData(char *buffer, size_t limit);
+	int SendData(const char *buffer, size_t size);
+	int SendData(std::string data);
 	int ReadDataWaiting(void);
 	void FlushData(void);
 	inline bool IsOpen(void) const
@@ -71,6 +74,7 @@ public:
 	{
 		return (szPort);
 	}
+	int GetHandle(void) const;
 
 	void SetDTR(bool activate);
 	void SetRTS(bool activate);
@@ -81,7 +85,7 @@ public:
 
 protected:
 	bool Opened;
-	char szPort[15]; ///< Name of the open port.
+	char szPort[256]; ///< Name of the open port. //TODO: Use std::string ASAP.
 
 private:
 

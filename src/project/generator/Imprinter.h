@@ -35,8 +35,8 @@
  * It contains 2D arrays, that capture the levels of the upper and lower
  * surface of an object.
  *
- * The values of the cells are defined in the middle of the cell. They are shifted by
- * 1/2 dx and 1/2 dy respectively.
+ * The values of the cells are defined in the middle of each cell. They are
+ * shifted by 1/2 dx and 1/2 dy respectively.
  *
  * The setup of the objects is done directly by using the basic
  * functions to generate the objects or by imprinting 3D triangle-
@@ -46,6 +46,7 @@
  * object.
  *
  * The really fancy functions are found in DexelTarget.
+ *
  */
 
 #include "../../3D/AffineTransformMatrix.h"
@@ -53,6 +54,8 @@
 #include "../../3D/Vector3.h"
 
 #include <GL/gl.h>
+
+//TODO: Change in concept (together with Dexeltarget) there should be only be an up, down and normal vectors for up and down.
 
 class ImprinterElement {
 	// Constructor / Destructor
@@ -70,8 +73,9 @@ public:
 	float belowDown;
 
 	// TODO: Add a surface orientation to the dexel cells.
-	//	float normal; // 0..Pi/2<
-	//	float orientation; // 0..2Pi
+	//	float normalx;
+	//	float normaly;
+	//  normalz is sqrt(1-normalx*normalx-normaly*normaly)
 
 	// Methods
 public:
@@ -84,7 +88,10 @@ class Imprinter {
 	friend class GeneratorTest; //TODO: Remove this friend class.
 public:
 	enum face_t {
-		facing_up, facing_down, facing_side, other
+		facing_up, //!< Triangle facing up
+		facing_down, //!< Triangle facing down
+		facing_side, //!< Triangle facing to the side
+		other //!< Something else
 	};
 
 	// Constructor / Destructor
@@ -99,10 +106,11 @@ public:
 	// Methods
 public:
 
-	// **** Low level ****
+// **** Low level ****
 
 	bool SetupField(const size_t sizeX, const size_t sizeY,
 			const double resolutionX = 0.001, const double resolutionY = 0.001);
+	bool SetupFiled(const Imprinter& other);
 	void ClearField(void); ///< Deallocate the field from memory
 	size_t MemoryUsageInBytes(void) const;
 
@@ -123,23 +131,23 @@ public:
 	{
 		return sz;
 	}
-	double GetSizeRX(void) const
+	double GetResolutionX(void) const
 	{
 		return rx;
 	}
-	double GetSizeRY(void) const
+	double GetResolutionY(void) const
 	{
 		return ry;
 	}
-	size_t GetCellCount(void) const
+	size_t GetCountTotal(void) const
 	{
 		return N;
 	}
-	size_t GetXCount(void) const
+	size_t GetCountX(void) const
 	{
 		return nx;
 	}
-	size_t GetYCount(void) const
+	size_t GetCountY(void) const
 	{
 		return ny;
 	}
@@ -147,9 +155,11 @@ public:
 	void Refresh();
 	void Paint() const; ///< Paint the Imprinter at the origin in OpenGL.
 
-	// ***** Imprinting geometry *****
+// ***** Imprinting geometry *****
 
-	void Empty(void); ///< Empty all cells
+	void Empty(void); ///< Empty the volume
+	void Fill(void); ///< Fill the volume
+
 	void InitImprinting(void);
 	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c,
 			face_t facetype = other);
@@ -157,7 +167,7 @@ public:
 			const AffineTransformMatrix & shift);
 	void FinishImprint(void);
 
-	// ***** Basic shape setup *****
+// ***** Basic shape setup *****
 
 	/**\brief Setup a box */
 	bool SetupBox(const double sizeX, const double sizeY, const double sizeZ,
@@ -172,47 +182,89 @@ public:
 	void SetupDisc(double radius, const double resolutionX = 0.001,
 			const double resolutionY = 0.001);
 
-	// ***** Test functions *****
+// ***** Test functions *****
 
-	bool IsFilled(int x, int y, double height); ///< Test, if at cell[x,y] the level at height is filled.
-	bool IsFilled(size_t p, double height); ///< Test, if at cell[p] the level at height is filled.
-	bool IsFilledAbove(int x, int y, double height); ///< Test, if upper in cell(x,y) is above height.
-	bool IsFilledAbove(size_t p, double height); ///< Test, if upper in cell(x,y) is above height.
-	bool IsFilled(size_t p); ///< Test, if cell(p) has a particle somewhere.
-	bool IsVisible(int x, int y); ///< Synonymous with IsFilled
-	bool IsVisible(size_t p); ///< Synonymous with IsFilled
-	bool IsOnOuterBorder(size_t p); ///< Test, if cell belongs to the outermost row.
-	bool IsSurrounded(size_t p); ///< Test, if cell is not on outer border and surrounded by filled cells. Does not check cell itself.
-	bool IsStandAlone(size_t p, double height); ///< Test, if cell is not on outer border and surrounded by filled cells at a certain height. Does not check cell itself.
+	bool IsFilled(int x, int y, double height) const; ///< Test, if at cell[x,y] the level at height is filled.
+	bool IsFilled(size_t p, double height) const; ///< Test, if at cell[p] the level at height is filled.
+	bool IsFilledAbove(int x, int y, double height) const; ///< Test, if upper in cell(x,y) is above height.
+	bool IsFilledAbove(size_t p, double height) const; ///< Test, if upper in cell(x,y) is above height.
+	bool IsFilled(size_t p) const; ///< Test, if cell(p) has a particle somewhere.
+	bool IsVisible(int x, int y) const; ///< Synonymous with IsFilled
+	bool IsVisible(size_t p) const; ///< Synonymous with IsFilled
+	bool IsOnOuterBorder(size_t p) const; ///< Test, if cell belongs to the outermost row.
+	bool IsSurrounded(size_t p) const; ///< Test, if cell is not on outer border and surrounded by filled cells. Does not check cell itself.
+	bool IsStandAlone(size_t p, double height) const; ///< Test, if cell is not on outer border and surrounded by filled cells at a certain height. Does not check cell itself.
 
-	double GetMeanLevel(int x, int y); ///< Get the middle of the cell[x,y], otherwise return -1;
-	double GetMeanLevel(size_t p); ///< Get the middle of the cell[p], otherwise return -1;
-	double GetLevel(double x, double y); ///< Get the up-height at cell closest to point(x,y). Otherwise -1;
+	double GetMeanLevel(int x, int y) const; ///< Get the middle of the cell[x,y], otherwise return -1;
+	double GetMeanLevel(size_t p) const; ///< Get the middle of the cell[p], otherwise return -1;
+	double GetLevel(double x, double y) const; ///< Get the up-height at cell closest to point(x,y). Otherwise -1;
+	double GetMaxLevel(void) const; ///< Returns the max value of the visible elements in the field.
 
-	// ***** Manipulation *****
+// ***** Manipulation *****
 
-	/**\brief Addition/assignment operator
+	/**\brief Or assignment operator (= Union)
 	 *
 	 * Adds two Imprinter%s, if they have the same size.
 	 * If they are diffrently sized, nothing happens.
-	 * Additions is done, by copying every visible column from the
-	 * right operand into this Imprinter.
+	 * Additions is equivalent to a "or" (or union) operation on the volume.
 	 */
-	Imprinter & operator+=(const Imprinter &a);
+	Imprinter & operator|=(const Imprinter &other);
+
+	/**\brief Or operator (= Union)
+	 *
+	 * Adds two Imprinter%s, if they have the same size.
+	 * If they are diffrently sized, nothing happens.
+	 * Additions is equivalent to a "or" (or union) operation on the volume.
+	 */
+	const Imprinter operator|(const Imprinter& other) const;
+
+	/**\brief Subtraction assignment operator (= Diff)
+	 *
+	 * Subtract two Imprinter%s, if they have the same size.
+	 * If they are diffrently sized, nothing happens.
+	 * If the subtraction always removes material from the top.
+	 */
+	Imprinter & operator-=(const Imprinter &other);
+
+	/**\brief Subtraction operator (= Diff)
+	 *
+	 * Adds two Imprinter%s, if they have the same size.
+	 * If they are diffrently sized, nothing happens.
+	 * Additions is equivalent to a "or" (or union) operation on the volume.
+	 */
+	const Imprinter operator-(const Imprinter& other) const;
+
+	/**\brief And assignment operator (= Intersection)
+	 *
+	 * Intersect two Imprinter%s, if they have the same size.
+	 * If they are diffrently sized, nothing happens.
+	 */
+	Imprinter & operator&=(const Imprinter &other);
+
+	/**\brief And operator (= Intersection)
+	 *
+	 * Intersect two Imprinter%s, if they have the same size.
+	 * If they are diffrently sized, nothing happens.
+	 */
+	const Imprinter operator&(const Imprinter& other) const;
+
+	/**\brief Addition assignment operator
+	 *
+	 * Shifts the geometry of an imprinter up by value.
+	 */
+	Imprinter & operator+=(const double value);
 
 	/**\brief Addition operator
 	 *
-	 * Adds two Imprinter%s, if they have the same size.
-	 * If they are diffrently sized, nothing happens.
-	 * Additions is done, by copying every visible column from the
-	 * right operand into this Imprinter.
+	 * Shifts the geometry of an imprinter up by value.
 	 */
-	const Imprinter operator+(const Imprinter& a) const;
+	const Imprinter operator+(const double value) const;
 
 	void CleanOutlier(void); ///< Defunct.
 	void Limit(void); ///< Limit values of the field to the size of the Imprinter in z.
 	void FoldRaise(const Imprinter &b); ///< Folding operation of two Imprinters. Surface is only raised.
 	void FoldReplace(const Imprinter &b); ///< Folding operation. Model is replaced.
+
 	/**\brief Folding operation. Surface is dropped at position
 	 *
 	 * @param x Integer position of cell.
@@ -222,6 +274,7 @@ public:
 	 */
 	void ShiftDown(int x, int y, double z, const Imprinter &b);
 	void TouchErase(int x, int y, double z, double level, const Imprinter &b);
+
 	void HardInvert(void); ///< Invert field without contour.
 	void MaxFilling(void); ///< Fill up cells with particle to the max.
 	void InvertTop(void); ///< Invert the top levels height.

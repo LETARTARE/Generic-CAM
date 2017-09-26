@@ -226,7 +226,7 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 	for(n = 0; n < project->objects.GetCount(); ++n){
 		if(!project->objects[n].selected) continue;
 		BoundingBox temp = project->objects[n].bbox;
-		temp.Translate((project->objects[n].displayTransform));
+		temp.Transform((project->objects[n].displayTransform));
 		bbox.Insert(temp);
 	}
 

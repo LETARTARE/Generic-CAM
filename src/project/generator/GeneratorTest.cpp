@@ -90,16 +90,21 @@ void GeneratorTest::GenerateToolpath(void)
 	ToolPath tp;
 
 	DexelTarget toolShape;
-	toolShape.SetupTool(*tool, target.GetSizeRX(), target.GetSizeRY());
+	toolShape.SetupTool(*tool, target.GetResolutionX(),
+			target.GetResolutionY());
 
 	toolShape.NegateZ();
 	DexelTarget temp = target;
+	DexelTarget tempStart = start;
 	temp.FoldRaise(toolShape);
+	tempStart.FoldRaise(toolShape);
 	temp.Limit();
+	tempStart.Limit();
 	toolShape.NegateZ();
 
 	DexelTarget temptop = temp;
 	temp.InvertTop();
+	temp &= tempStart;
 	double level = temp.GetSizeZ(); // at upper surface
 
 	GCodeBlock m;
@@ -107,7 +112,6 @@ void GeneratorTest::GenerateToolpath(void)
 	m.Y = 0.0;
 	m.Z = temp.GetSizeZ() + freeHeight;
 	m.Rapid();
-
 
 	ArrayOfPolygon25 pgs;
 	Polygon25 pg;
@@ -203,7 +207,8 @@ void GeneratorTest::GenerateToolpath(void)
 		isMillUp = true;
 		tp.positions.Add(m);
 #ifdef _DEBUGMODE
-		wxLogMessage(wxString::Format(_T("Next Level: %.3f m"), level));
+		wxLogMessage
+		(wxString::Format(_T("Next Level: %.3f m"), level));
 //		level = -1;
 #endif
 	}
@@ -211,7 +216,7 @@ void GeneratorTest::GenerateToolpath(void)
 	tp.FlagAll(true);
 
 	AffineTransformMatrix shiftback;
-	shiftback.TranslateGlobal(area.xmin,area.ymin,area.zmin);
+	shiftback.TranslateGlobal(area.xmin, area.ymin, area.zmin);
 	tp.ApplyTransformation(shiftback);
 	toolpath = tp;
 }

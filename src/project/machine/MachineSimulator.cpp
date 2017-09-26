@@ -25,10 +25,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "MachineSimulator.h"
-
-#include <float.h>
+#include "../Project.h"
 
 #include <wx/textfile.h>
+#include <float.h>
 
 MachineSimulator::MachineSimulator()
 {
@@ -74,7 +74,7 @@ void MachineSimulator::InitSimulation(size_t maxCells)
 	size_t nx = floor(workpiece->GetSizeX() / L);
 	size_t ny = floor(workpiece->GetSizeY() / L);
 	if(nx == 0 || ny == 0) return;
-	if(nx != simulation.GetXCount() || ny != simulation.GetYCount()) initialized =
+	if(nx != simulation.GetCountX() || ny != simulation.GetCountY()) initialized =
 			false;
 
 	if(!initialized){
@@ -82,6 +82,24 @@ void MachineSimulator::InitSimulation(size_t maxCells)
 		const double dy = workpiece->GetSizeY() / (double) ny;
 		simulation.SetupBox(workpiece->GetSizeX(), workpiece->GetSizeY(),
 				workpiece->GetSizeZ(), dx, dy);
+
+		const Project* project = workpiece->parent;
+
+		if(project == NULL || workpiece->refObject < 0
+				|| workpiece->refObject >= project->objects.GetCount()){
+			simulation.Fill();
+		}else{
+			const Object* wpObject = &(project->objects[workpiece->refObject]);
+
+			AffineTransformMatrix tempMatrix;
+//				tempMatrix.TranslateGlobal(-area.xmin, -area.ymin, -area.zmin);
+			tempMatrix *= workpiece->matrix;
+
+			simulation.InitImprinting();
+			simulation.InsertObject(*wpObject, tempMatrix);
+			simulation.FinishImprint();
+		}
+
 		if(machine != NULL && toolpath != NULL){
 			machine->Reset();
 			offset = machine->workpiecePosition.GetCenter()
@@ -98,10 +116,28 @@ void MachineSimulator::InitSimulation(size_t maxCells)
 void MachineSimulator::Reset(void)
 {
 	if(!initialized) return;
-	const double dx = simulation.GetSizeRX();
-	const double dy = simulation.GetSizeRY();
-	simulation.SetupBox(workpiece->GetSizeX(), workpiece->GetSizeY(),
-			workpiece->GetSizeZ(), dx, dy);
+//	const double dx = simulation.GetResolutionX();
+//	const double dy = simulation.GetResolutionY();
+//	simulation.SetupBox(workpiece->GetSizeX(), workpiece->GetSizeY(),
+//			workpiece->GetSizeZ(), dx, dy);
+
+	const Project* project = workpiece->parent;
+
+	if(project == NULL || workpiece->refObject < 0
+			|| workpiece->refObject >= project->objects.GetCount()){
+		simulation.Fill();
+	}else{
+		const Object* wpObject = &(project->objects[workpiece->refObject]);
+
+		AffineTransformMatrix tempMatrix;
+		//				tempMatrix.TranslateGlobal(-area.xmin, -area.ymin, -area.zmin);
+		tempMatrix *= workpiece->matrix;
+
+		simulation.InitImprinting();
+		simulation.InsertObject(*wpObject, tempMatrix);
+		simulation.FinishImprint();
+	}
+
 	tStep = 0;
 	step = 0;
 	if(machine != NULL){
@@ -148,7 +184,8 @@ void MachineSimulator::Step(float tTarget)
 	if(machine->toolSlot > 0){
 		const Tool* tool = &(machine->tools[machine->toolSlot - 1]);
 		DexelTarget dex;
-		dex.SetupTool(*tool, simulation.GetSizeRX(), simulation.GetSizeRY());
+		dex.SetupTool(*tool, simulation.GetResolutionX(),
+				simulation.GetResolutionY());
 //		dex.MirrorZ();
 //		dex.NegateZ();
 		simulation.PolygonCutInTarget(temp, dex);

@@ -149,14 +149,25 @@ bool BoundingBox::IsVolumeZero(void) const
 	return false;
 }
 
-void BoundingBox::Translate(const AffineTransformMatrix matrix)
+void BoundingBox::Transform(const AffineTransformMatrix matrix)
 {
-	this->xmin += matrix.a[12];
-	this->ymin += matrix.a[13];
-	this->zmin += matrix.a[14];
-	this->xmax += matrix.a[12];
-	this->ymax += matrix.a[13];
-	this->zmax += matrix.a[14];
+	const Vector3 p0(this->xmin, this->ymin, this->zmin);
+	const Vector3 p1(this->xmax, this->ymin, this->zmin);
+	const Vector3 p2(this->xmin, this->ymax, this->zmin);
+	const Vector3 p3(this->xmax, this->ymax, this->zmin);
+	const Vector3 p4(this->xmin, this->ymin, this->zmax);
+	const Vector3 p5(this->xmax, this->ymin, this->zmax);
+	const Vector3 p6(this->xmin, this->ymax, this->zmax);
+	const Vector3 p7(this->xmax, this->ymax, this->zmax);
+	this->Clear();
+	this->Insert(matrix.Transform(p0));
+	this->Insert(matrix.Transform(p1));
+	this->Insert(matrix.Transform(p2));
+	this->Insert(matrix.Transform(p3));
+	this->Insert(matrix.Transform(p4));
+	this->Insert(matrix.Transform(p5));
+	this->Insert(matrix.Transform(p6));
+	this->Insert(matrix.Transform(p7));
 }
 
 void BoundingBox::SetSize(float sx, float sy, float sz, float origx,
@@ -236,70 +247,70 @@ void BoundingBox::Paint(void) const
 		const double dy = GetSizeY() * cornerLength;
 		const double dz = GetSizeZ() * cornerLength;
 
-		::glColor4f(color.x, color.y, color.z,alpha);
+		::glColor4f(color.x, color.y, color.z, alpha);
 
 		::glBegin(GL_LINES);
 
 		glNormal3d(0, -M_SQRT2, -M_SQRT2);
 		glVertex3d(xmin, ymin, zmin);
-		glVertex3d(xmin+dx, ymin, zmin);
+		glVertex3d(xmin + dx, ymin, zmin);
 		glVertex3d(xmax, ymin, zmin);
 		glVertex3d(xmax - dx, ymin, zmin);
 		glNormal3d(0, M_SQRT2, -M_SQRT2);
 		glVertex3d(xmin, ymax, zmin);
-		glVertex3d(xmin+dx, ymax, zmin);
+		glVertex3d(xmin + dx, ymax, zmin);
 		glVertex3d(xmax, ymax, zmin);
 		glVertex3d(xmax - dx, ymax, zmin);
 		glNormal3d(0, M_SQRT2, M_SQRT2);
 		glVertex3d(xmin, ymax, zmax);
-		glVertex3d(xmin+dx, ymax, zmax);
+		glVertex3d(xmin + dx, ymax, zmax);
 		glVertex3d(xmax, ymax, zmax);
 		glVertex3d(xmax - dx, ymax, zmax);
 		glNormal3d(0, -M_SQRT2, M_SQRT2);
 		glVertex3d(xmin, ymin, zmax);
-		glVertex3d(xmin+dx, ymin, zmax);
+		glVertex3d(xmin + dx, ymin, zmax);
 		glVertex3d(xmax, ymin, zmax);
 		glVertex3d(xmax - dx, ymin, zmax);
 
 		glNormal3d(-M_SQRT2, 0, -M_SQRT2);
 		glVertex3d(xmin, ymin, zmin);
-		glVertex3d(xmin, ymin+dy, zmin);
+		glVertex3d(xmin, ymin + dy, zmin);
 		glVertex3d(xmin, ymax, zmin);
 		glVertex3d(xmin, ymax - dy, zmin);
 		glNormal3d(M_SQRT2, 0, -M_SQRT2);
 		glVertex3d(xmax, ymin, zmin);
-		glVertex3d(xmax, ymin+dy, zmin);
+		glVertex3d(xmax, ymin + dy, zmin);
 		glVertex3d(xmax, ymax, zmin);
 		glVertex3d(xmax, ymax - dy, zmin);
 		glNormal3d(M_SQRT2, 0, M_SQRT2);
 		glVertex3d(xmax, ymin, zmax);
-		glVertex3d(xmax, ymin+dy, zmax);
+		glVertex3d(xmax, ymin + dy, zmax);
 		glVertex3d(xmax, ymax, zmax);
 		glVertex3d(xmax, ymax - dy, zmax);
 		glNormal3d(-M_SQRT2, 0, M_SQRT2);
 		glVertex3d(xmin, ymin, zmax);
-		glVertex3d(xmin, ymin+dy, zmax);
+		glVertex3d(xmin, ymin + dy, zmax);
 		glVertex3d(xmin, ymax, zmax);
 		glVertex3d(xmin, ymax - dy, zmax);
 
 		glNormal3d(-M_SQRT2, -M_SQRT2, 0);
 		glVertex3d(xmin, ymin, zmin);
-		glVertex3d(xmin, ymin, zmin+dz);
+		glVertex3d(xmin, ymin, zmin + dz);
 		glVertex3d(xmin, ymin, zmax);
 		glVertex3d(xmin, ymin, zmax - dz);
 		glNormal3d(M_SQRT2, -M_SQRT2, 0);
 		glVertex3d(xmax, ymin, zmin);
-		glVertex3d(xmax, ymin, zmin+dz);
+		glVertex3d(xmax, ymin, zmin + dz);
 		glVertex3d(xmax, ymin, zmax);
 		glVertex3d(xmax, ymin, zmax - dz);
 		glNormal3d(M_SQRT2, M_SQRT2, 0);
 		glVertex3d(xmax, ymax, zmin);
-		glVertex3d(xmax, ymax, zmin+dz);
+		glVertex3d(xmax, ymax, zmin + dz);
 		glVertex3d(xmax, ymax, zmax);
 		glVertex3d(xmax, ymax, zmax - dz);
 		glNormal3d(-M_SQRT2, M_SQRT2, 0);
 		glVertex3d(xmin, ymax, zmin);
-		glVertex3d(xmin, ymax, zmin+dz);
+		glVertex3d(xmin, ymax, zmin + dz);
 		glVertex3d(xmin, ymax, zmax);
 		glVertex3d(xmin, ymax, zmax - dz);
 

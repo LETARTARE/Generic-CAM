@@ -38,7 +38,7 @@ GeneratorDexel::GeneratorDexel()
 
 	target.displayField = false;
 
-	debug.displayField = false;
+	debug.displayField = true;
 }
 
 void GeneratorDexel::CopyParameterFrom(const Generator * other)
@@ -72,7 +72,7 @@ void GeneratorDexel::Paint(void) const
 	target.Paint();
 	glPopMatrix();
 	glPushMatrix();
-	glTranslatef(area.xmin - 0.0, area.ymin, area.zmin);
+	glTranslatef(area.xmin, area.ymin + area.GetSizeY(), area.zmin);
 	debug.Paint();
 	glPopMatrix();
 
@@ -84,11 +84,6 @@ void GeneratorDexel::GenerateToolpath(void)
 	const double resX = 0.001; // = 1 mm
 	const double resY = 0.001; // = 1 mm
 
-
-	target.SetupBox(area.GetSizeX(), area.GetSizeY(), area.GetSizeZ(), resX,
-			resY);
-	target.InitImprinting();
-
 	const Run* const run = this->parent;
 	assert(run != NULL);
 	const Project* const project = run->parent;
@@ -96,19 +91,39 @@ void GeneratorDexel::GenerateToolpath(void)
 	const Workpiece* const workpiece = &(project->workpieces[run->refWorkpiece]);
 	assert(workpiece != NULL);
 
-	AffineTransformMatrix tempMatrix;
+	BoundingBox tempArea = area;
+	tempArea.Transform(run->workpiecePlacement);
+	start.SetupBox(tempArea.GetSizeX(), tempArea.GetSizeY(),
+			tempArea.GetSizeZ(), resX, resY);
+
+	if(workpiece->refObject < 0
+			|| workpiece->refObject >= project->objects.GetCount()){
+		start.Fill();
+	}else{
+		const Object* wpObject = &(project->objects[workpiece->refObject]);
+
+		AffineTransformMatrix tempMatrix;
+		tempMatrix.TranslateGlobal(-area.xmin, -area.ymin, -area.zmin);
+		tempMatrix *= run->workpiecePlacement;
+
+		start.InitImprinting();
+		start.InsertObject(*wpObject, tempMatrix);
+		start.FinishImprint();
+
+	}
+
+	target = start;
+	target.InitImprinting();
 
 	DexelTarget outside(target);
-	outside.SetupBox(area.GetSizeX(), area.GetSizeY(), area.GetSizeZ(), resX,
-			resY);
-
-	outside.Empty();
+	outside.Fill();
 
 	for(size_t i = 0; i < workpiece->placements.GetCount(); i++){
 		const ObjectPlacement* const opl = &(workpiece->placements[i]);
-		size_t refObject = opl->refObject;
-		Object* object = &(project->objects[refObject]);
-		tempMatrix.SetIdentity();
+		const size_t refObject = opl->refObject;
+		const Object* object = &(project->objects[refObject]);
+		AffineTransformMatrix tempMatrix;
+		tempMatrix *= run->workpiecePlacement;
 		tempMatrix.TranslateGlobal(-area.xmin, -area.ymin, -area.zmin);
 		tempMatrix *= opl->matrix;
 		target.InsertObject(*object, tempMatrix);
@@ -153,7 +168,7 @@ void GeneratorDexel::GenerateToolpath(void)
 			temp.FinishImprint();
 		}
 
-		outside += temp;
+		outside |= temp;
 	}
 	for(size_t i = 0; i < workpiece->supports.GetCount(); i++){
 		//TODO: Insert supports into target.
@@ -167,7 +182,11 @@ void GeneratorDexel::GenerateToolpath(void)
 	//TODO Turn this feature off, if the working area is bigger or the same size as the workpiece in XY.
 	outside.MarkOutline();
 
-	target += outside;
+	outside &= start;
+	target |= outside;
+	target &= start;
+
+	debug = target;
 
 	target.Refresh();
 }

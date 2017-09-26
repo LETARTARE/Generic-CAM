@@ -94,6 +94,9 @@ void DexelTarget::InsertObject(const Object &object,
 void DexelTarget::SetupTool(const Tool &tool, const double resolutionX,
 		const double resolutionY)
 {
+	//TODO: Integrate the hack for the chuck protection in a more organized way.
+
+//	const double radius = fmax(tool.GetMaxDiameter() / 2.0, 50e-3 / 2.0);
 	const double radius = tool.GetMaxDiameter() / 2.0;
 	const double depth = tool.GetPositiveLength();
 
@@ -139,12 +142,24 @@ void DexelTarget::SetupTool(const Tool &tool, const double resolutionX,
 			// Turn tool around, so that it is pointing in -Z direction, tip at 0.
 			d = depth - d;
 			if(d < field[j].down) field[j].down = d;
+
+
 		}
 	}
 
+	// Insert an approximation to prevent the generator from moving the chuck into the
+	// workpiece.
+//	for(size_t j = 0; j < this->N; j++){
+//		if(field[j].up < ((25e-3) / 2) && field[j].down > depth) field[j].down =
+//				(depth);
+//		if(field[j].up < ((45e-3) / 2) && field[j].down > (depth + 20e-3)) field[j].down =
+//				(depth + 20e-3);
+//		if(field[j].down > (depth + 25e-3)) field[j].down = (depth + 25e-3);
+//	}
+
 	// Put a square cap on top of the tool.
 	for(size_t j = 0; j < this->N; j++)
-		field[j].up = depth;
+		field[j].up = depth;//+35e-3;
 
 	refresh = true;
 }
@@ -196,7 +211,7 @@ void DexelTarget::Paint(void) const
 void DexelTarget::Simulate(const ToolPath &toolpath, const Tool &tool)
 {
 	DexelTarget toolShape;
-	toolShape.SetupTool(tool, GetSizeRX(), GetSizeRY());
+	toolShape.SetupTool(tool, GetResolutionX(), GetResolutionY());
 	this->InitImprinting();
 	this->HardInvert();
 	Polygon3 temp;
@@ -1280,6 +1295,20 @@ void DexelTarget::AddSupport(Polygon3 &polygon, double distance, double height,
 		}
 	}
 
+}
+
+void DexelTarget::FillBlock(double maxLevel, double minLevel)
+{
+
+	for(size_t i = 0; i < N; i++){
+		if(field[i].IsVisible()){
+			if(field[i].up < maxLevel) field[i].up = maxLevel;
+			if(field[i].down < minLevel) field[i].down = minLevel;
+		}else{
+			field[i].up = maxLevel;
+			field[i].down = minLevel;
+		}
+	}
 }
 
 //Moves inside the matrial clockwise

@@ -1,15 +1,16 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Dec 21 2009)
+// C++ code generated with wxFormBuilder (version Aug 20 2017)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __gui__
-#define __gui__
+#ifndef __GUI_H__
+#define __GUI_H__
 
+#include <wx/artprov.h>
+#include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
-
 #include <wx/string.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
@@ -193,6 +194,11 @@ class GUIMain : public wxFrame
 		CanvasMain* m_canvas;
 		wxStatusBar* m_statusBar;
 		wxToolBar* m_toolBar;
+		wxToolBarToolBase* m_toolUndo; 
+		wxToolBarToolBase* m_toolRedo; 
+		wxToolBarToolBase* m_toolDisplayMachine; 
+		wxToolBarToolBase* m_toolDisplayMaterial; 
+		wxToolBarToolBase* m_toolGeneratorSetup; 
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnIdle( wxIdleEvent& event ) = 0;
@@ -255,13 +261,14 @@ class GUIMain : public wxFrame
 	public:
 		
 		GUIMain( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxPoint( -1,-1 ), const wxSize& size = wxSize( 803,627 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		
 		~GUIMain();
+		
 		void m_splitterOnIdle( wxIdleEvent& )
 		{
-		m_splitter->SetSashPosition( 250 );
-		m_splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIMain::m_splitterOnIdle ), NULL, this );
+			m_splitter->SetSashPosition( 250 );
+			m_splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIMain::m_splitterOnIdle ), NULL, this );
 		}
-		
 	
 };
 
@@ -322,27 +329,20 @@ class GUIObjectTransformation : public wxFrame
 		wxStaticText* m_staticText49;
 		wxButton* m_button15;
 		wxPanel* m_panelMove;
-		
 		wxStaticText* m_staticText62;
 		wxTextCtrl* m_textCtrlMoveStep;
 		wxStaticText* m_staticTextUnitMove;
-		
 		wxBitmapButton* m_bpButton6;
 		wxBitmapButton* m_bpButton7;
 		wxBitmapButton* m_bpButton8;
-		
 		wxBitmapButton* m_bpButton9;
 		wxBitmapButton* m_bpButton10;
 		wxBitmapButton* m_bpButton11;
-		
-		
 		wxButton* m_button18;
 		wxButton* m_button17;
 		wxButton* m_button16;
 		wxButton* m_button50;
-		
 		wxPanel* m_panelRotate;
-		
 		wxStaticText* m_staticText76;
 		wxTextCtrl* m_textCtrlRotateStep;
 		wxStaticText* m_staticTextUnitAngle;
@@ -350,20 +350,13 @@ class GUIObjectTransformation : public wxFrame
 		wxButton* m_button33;
 		wxButton* m_button28;
 		wxButton* m_button29;
-		
 		wxButton* m_button30;
-		
 		wxButton* m_button31;
-		
-		
 		wxPanel* m_panelMirror;
-		
 		wxButton* m_button39;
 		wxButton* m_button40;
 		wxButton* m_button41;
-		
 		wxButton* m_buttonFlipNormalVectors;
-		
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;
@@ -378,6 +371,7 @@ class GUIObjectTransformation : public wxFrame
 	public:
 		
 		GUIObjectTransformation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 709,468 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		
 		~GUIObjectTransformation();
 	
 };
@@ -393,10 +387,8 @@ class GUIStockMaterial : public wxFrame
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuStock;
 		wxMenu* m_menuSettings;
-		
 		wxStaticText* m_staticText96;
 		wxTextCtrl* m_textCtrlName;
-		
 		wxStaticText* m_staticText27;
 		wxTextCtrl* m_textCtrlX;
 		wxStaticText* m_staticTextUnitX;
@@ -430,6 +422,7 @@ class GUIStockMaterial : public wxFrame
 	public:
 		
 		GUIStockMaterial( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Overview of all Stock Material"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 765,557 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		
 		~GUIStockMaterial();
 	
 };
@@ -461,6 +454,7 @@ class GUIWorkpiece : public wxFrame
 	public:
 		
 		GUIWorkpiece( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Add Objects to Workpieces"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 559,457 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		
 		~GUIWorkpiece();
 	
 };
@@ -479,7 +473,6 @@ class GUIPlacement : public wxFrame
 		wxMenu* m_menuSettings;
 		wxChoice* m_choiceWorkpiece;
 		wxChoice* m_choicePlacement;
-		
 		wxStaticText* m_staticText100;
 		wxTextCtrl* m_textCtrlX;
 		wxStaticText* m_staticTextUnitX;
@@ -495,19 +488,13 @@ class GUIPlacement : public wxFrame
 		wxSlider* m_sliderAngle;
 		wxRadioButton* m_radioBtnBox;
 		wxRadioButton* m_radioBtnContour;
-		
 		wxStaticText* m_staticText108;
 		wxTextCtrl* m_textCtrlDistance;
 		wxStaticText* m_staticTextUnitDistance;
-		
 		wxBitmapButton* m_bpButtonYP;
-		
 		wxBitmapButton* m_bpButtonXN;
-		
 		wxBitmapButton* m_bpButtonXP;
-		
 		wxBitmapButton* m_bpButtonYM;
-		
 		wxButton* m_buttonAlignTop;
 		wxButton* m_buttonAlignMiddle;
 		wxButton* m_buttonAlignBottom;
@@ -527,6 +514,7 @@ class GUIPlacement : public wxFrame
 	public:
 		
 		GUIPlacement( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Objects in Workpiece Placement"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 773,726 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxFULL_REPAINT_ON_RESIZE|wxTAB_TRAVERSAL );
+		
 		~GUIPlacement();
 	
 };
@@ -572,6 +560,7 @@ class GUIRun : public wxFrame
 	public:
 		
 		GUIRun( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup a Machine Run"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 657,531 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		
 		~GUIRun();
 	
 };
@@ -612,19 +601,20 @@ class GUIMachineDebugger : public wxFrame
 	public:
 		
 		GUIMachineDebugger( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine debugger"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 831,596 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		
 		~GUIMachineDebugger();
+		
 		void m_splitter2OnIdle( wxIdleEvent& )
 		{
-		m_splitter2->SetSashPosition( 326 );
-		m_splitter2->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIMachineDebugger::m_splitter2OnIdle ), NULL, this );
+			m_splitter2->SetSashPosition( 326 );
+			m_splitter2->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIMachineDebugger::m_splitter2OnIdle ), NULL, this );
 		}
 		
 		void m_splitter3OnIdle( wxIdleEvent& )
 		{
-		m_splitter3->SetSashPosition( 409 );
-		m_splitter3->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIMachineDebugger::m_splitter3OnIdle ), NULL, this );
+			m_splitter3->SetSashPosition( 409 );
+			m_splitter3->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIMachineDebugger::m_splitter3OnIdle ), NULL, this );
 		}
-		
 	
 };
 
@@ -638,7 +628,6 @@ class GUIMachineControl : public wxFrame
 	protected:
 		wxMenuBar* m_menubar9;
 		wxMenu* m_menuDialog;
-		
 		wxStaticText* m_staticText69;
 		wxSlider* m_sliderX;
 		wxStaticText* m_staticText70;
@@ -685,7 +674,6 @@ class GUIMachineControl : public wxFrame
 		wxTextCtrl* m_textCtrlW;
 		wxStaticText* m_staticTextUnitW;
 		
-		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;
 		virtual void OnZero( wxMouseEvent& event ) = 0;
@@ -697,6 +685,7 @@ class GUIMachineControl : public wxFrame
 	public:
 		
 		GUIMachineControl( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine Controller"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 537,491 ), long style = wxCAPTION|wxCLOSE_BOX|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
+		
 		~GUIMachineControl();
 	
 };
@@ -730,7 +719,6 @@ class GUIToolbox : public wxFrame
 		wxStaticText* m_staticTextUnitFeedCoefficient;
 		wxStaticText* m_staticTextFlutes;
 		wxTextCtrl* m_textCtrlNrOfTeeth;
-		
 		wxStaticText* m_staticText26;
 		wxTextCtrl* m_textCtrlComment;
 		PanelTool* m_panel;
@@ -747,9 +735,7 @@ class GUIToolbox : public wxFrame
 		wxStaticText* m_staticText22;
 		wxTextCtrl* m_textCtrlRadius;
 		wxStaticText* m_staticTextUnitRadius;
-		
 		wxCheckBox* m_checkBoxCutting;
-		
 		wxListCtrl* m_listCtrl;
 		CanvasTool* m_canvas;
 		
@@ -773,6 +759,7 @@ class GUIToolbox : public wxFrame
 	public:
 		
 		GUIToolbox( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolbox"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 687,757 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		
 		~GUIToolbox();
 	
 };
@@ -801,7 +788,7 @@ class GUIToolWizard : public wxDialog
 	
 	public:
 		
-		GUIToolWizard( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolshape Wizard"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 479,400 ), long style = wxDEFAULT_DIALOG_STYLE );
+		GUIToolWizard( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolshape Wizard"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 479,400 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~GUIToolWizard();
 	
 };
@@ -876,6 +863,7 @@ class GUIToolpathGenerator : public wxFrame
 	public:
 		
 		GUIToolpathGenerator( wxWindow* parent, wxWindowID id = wxID_CLOSE, const wxString& title = _("Add / Update Toolpath Generators"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 826,802 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		
 		~GUIToolpathGenerator();
 	
 };
@@ -906,7 +894,6 @@ class GUIAnimation : public wxFrame
 		wxBitmapButton* m_bpButtonPlayStop;
 		wxBitmapButton* m_bpButtonNext;
 		wxBitmapButton* m_bpButtonLast;
-		
 		wxButton* m_buttonClose;
 		
 		// Virtual event handlers, overide them in your derived class
@@ -926,6 +913,7 @@ class GUIAnimation : public wxFrame
 	public:
 		
 		GUIAnimation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolpath Animation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 558,413 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
+		
 		~GUIAnimation();
 	
 };
@@ -963,6 +951,7 @@ class GUISetupUnits : public wxFrame
 	public:
 		
 		GUISetupUnits( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup display units"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxSTAY_ON_TOP|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		
 		~GUISetupUnits();
 	
 };
@@ -984,7 +973,7 @@ class GUIAbout : public wxDialog
 	
 	public:
 		
-		GUIAbout( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 504,373 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
+		GUIAbout( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 504,373 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP ); 
 		~GUIAbout();
 	
 };
@@ -1002,6 +991,7 @@ class StartupText : public wxFrame
 		wxRichTextCtrl* m_richText;
 		
 		StartupText( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Release Info"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 629,481 ), long style = wxCAPTION|wxCLOSE_BOX|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
+		
 		~StartupText();
 	
 };
@@ -1029,8 +1019,9 @@ class GUITestGCode : public wxFrame
 	public:
 		
 		GUITestGCode( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("G-Code parser"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxSTAY_ON_TOP|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		
 		~GUITestGCode();
 	
 };
 
-#endif //__gui__
+#endif //__GUI_H__

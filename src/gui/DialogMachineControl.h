@@ -44,11 +44,6 @@ public:
 
 	DisplaySettings * settings;
 
-	bool TransferDataToWindowSliders(void);
-	bool TransferDataFromWindowSliders(void);
-
-	bool TransferDataToWindowTextbox(void);
-
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 
@@ -65,6 +60,9 @@ public:
 	unsigned int lineSize;
 
 private:
+	bool TransferDataToWindowSliders(void);
+	bool TransferDataFromWindowSliders(void);
+	bool TransferDataToWindowTextbox(void);
 
 protected:
 	

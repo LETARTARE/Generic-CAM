@@ -133,8 +133,8 @@ bool GeneratorFast::IsDirectlyReachable(DexelTarget &target, double sx,
 	double dy = y - sy;
 	double dz = z - sz;
 	double d = sqrt(dx * dx + dy * dy);
-	double rx = target.GetSizeRX();
-	double ry = target.GetSizeRY();
+	double rx = target.GetResolutionX();
+	double ry = target.GetResolutionY();
 	size_t n = round(d / (rx + ry) * 2);
 	double px, py, pz, hz;
 	size_t i;
@@ -192,8 +192,8 @@ ToolPath GeneratorFast::MoveSavely(DexelTarget &target, double sx, double sy,
 	double px, py;
 	double hz;
 
-	double rx = target.GetSizeRX();
-	double ry = target.GetSizeRY();
+	double rx = target.GetResolutionX();
+	double ry = target.GetResolutionY();
 	double r = (rx + ry) / 2;
 
 	mp.X = sx;
@@ -288,7 +288,7 @@ void GeneratorFast::GenerateToolpath(void)
 	toolDiameter = tool->GetMaxDiameter();
 
 	DexelTarget discTool;
-	discTool.SetupTool(*tool, target.GetSizeRX(), target.GetSizeRY());
+	discTool.SetupTool(*tool, target.GetResolutionX(), target.GetResolutionY());
 	discTool.NegateZ();
 	DexelTarget temp = target;
 	DexelTarget temptop;
@@ -299,8 +299,8 @@ void GeneratorFast::GenerateToolpath(void)
 	temptop = temp;
 	temptop.InvertTop();
 
-	double rx = target.GetSizeRX();
-	double ry = target.GetSizeRY();
+	double rx = target.GetResolutionX();
+	double ry = target.GetResolutionY();
 	double rx2 = rx / 2;
 	double ry2 = ry / 2;
 

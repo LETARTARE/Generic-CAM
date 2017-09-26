@@ -34,6 +34,23 @@
  * Stock material as it can be found in the workshop. It is assumed that it is box-like.
  *
  * The stock material contains technical data of the material as well.
+ *
+ * \section Thermal conductivities:
+ *
+ * in W/(K*m)
+ *
+ * - Wood - 0.04 .. 0.4
+ * - Rubber - 0.15
+ * - Polypropylene - 0.25
+ * - Cement - 0.3
+ * - Glass - 1.1
+ * - Steel - 12 .. 45
+ * - Aluminium - 240
+ * - Gold - 310
+ * - Copper - 400
+ * - Silver - 430
+ * - Graphene - 5000 .. 5500
+ *
  */
 
 #include "../3D/AffineTransformMatrix.h"
@@ -55,10 +72,10 @@ public:
 
 	bool available; ///< Available in workshop
 
-	float maxToolSpeed; ///< Maximum rotational speed of the toolhead
-	float maxFeedrate; ///< Maximum forward feedrate
-	float thermalConductivity; ///< Thermal conductivity to calculate heat buildup
-	float ignitionTemperature; ///< Material ignites at this temperature
+	float maxToolSpeed; ///< Maximum rotational speed of the toolhead (1/s)
+	float maxFeedrate; ///< Maximum feedrate (m/s)
+	float thermalConductivity; ///< Thermal conductivity to calculate heat buildup in W/(K*m)
+	float maxTemperature; ///< Temperature where bad things start to happen (wood burning, plastics melting, steel changing characteristics, ...) (K)
 
 	Vector3 color; ///< Color of the material for rendering
 

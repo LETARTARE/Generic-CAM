@@ -72,9 +72,9 @@
 class Unit {
 	// Enumerations
 public:
-/*!\enum unit
- * \brief Predefined types of units (SI and otherwise)
- */
+	/*!\enum unit
+	 * \brief Predefined types of units (SI and otherwise)
+	 */
 	enum unit {
 		Unitless = 0, Second, Volume, Celsius
 	};
@@ -87,26 +87,6 @@ public:
 	Unit(wxString otherName);
 	Unit(const wxString SIName, const wxString otherName, const double factor);
 	Unit(unit predefinedUnit, wxString extra = _T("*"));
-
-	//Member variables
-public:
-
-private:
-	double factor; ///< 1 in SI = factor in non SI units
-	double power; ///<
-	wxString SIName; ///< The name in SI: m, m/s, 1/s, ...
-	wxString otherName; ///< The name in the "other" system: h, cm, dm, rpm, inch, mil, mm, ...
-
-	MathParser parser;
-
-	int m; ///< Power of Length
-	int kg; ///< Power of Mass
-	int s; ///< Power of Time
-	int A; ///< Power of Current
-	int K; ///< Power of Temperature (absolut)
-	int mol; ///< Power of Molar Mass
-	int cd; ///< Power of Brightness
-	int cur; ///< Power of Currency
 
 	// Methods
 public:
@@ -171,6 +151,25 @@ public:
 	{
 		return !(lhs == rhs);
 	}
+
+	//Member variables
+private:
+	double factor; ///< 1 in SI = factor in non SI units
+	double power; ///<
+	wxString SIName; ///< The name in SI: m, m/s, 1/s, ...
+	wxString otherName; ///< The name in the "other" system: h, cm, dm, rpm, inch, mil, mm, ...
+
+	MathParser parser;
+
+	int m; ///< Power of Length
+	int kg; ///< Power of Mass
+	int s; ///< Power of Time
+	int A; ///< Power of Current
+	int K; ///< Power of Temperature (absolut)
+	int mol; ///< Power of Molar Mass
+	int cd; ///< Power of Brightness
+	int cur; ///< Power of Currency
+
 };
 
 #endif /* UNIT_H_ */
