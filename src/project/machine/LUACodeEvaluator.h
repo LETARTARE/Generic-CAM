@@ -124,6 +124,8 @@ private:
 	 */
 	static void HookRoutine(lua_State * L, lua_Debug * ar);
 
+	void SetupState(void);
+
 	// Member Variables
 public:
 	wxString programOutput;

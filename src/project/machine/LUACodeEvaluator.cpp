@@ -36,33 +36,8 @@ LUACodeEvaluator::LUACodeEvaluator()
 {
 	linkedMachine = NULL;
 	componentToManipulate = NULL;
-
-	L = luaL_newstate();
-
+	SetupState();
 	availableLUACodeEvaluators.push_back(this);
-
-	luaopen_base(L);
-	luaopen_math(L);
-	luaopen_table(L);
-	luaopen_string(L);
-
-	lua_register(L, "print", print_glue);
-
-	lua_register(L, "identity", identity_glue);
-	lua_register(L, "box", box_glue);
-	lua_register(L, "cylinder", cylinder_glue);
-	lua_register(L, "setstyle", setstyle_glue);
-	lua_register(L, "addcomponent", addcomponent_glue);
-	lua_register(L, "toolholder", toolholder_glue);
-	lua_register(L, "tableorigin", tableorigin_glue);
-
-	lua_register(L, "translate", translate_glue);
-	lua_register(L, "rotate", rotate_glue);
-	lua_register(L, "scale", scale_glue);
-
-	lua_register(L, "placecomponent", placecomponent_glue);
-
-	lua_register(L, "loadgeometry", loadgeometry_glue);
 }
 
 LUACodeEvaluator::LUACodeEvaluator(const LUACodeEvaluator& other)
@@ -72,33 +47,8 @@ LUACodeEvaluator::LUACodeEvaluator(const LUACodeEvaluator& other)
 
 	linkedMachine = other.linkedMachine;
 	componentToManipulate = other.componentToManipulate;
-
-//	L = lua_open();
-	L = luaL_newstate();
-
+	SetupState();
 	availableLUACodeEvaluators.push_back(this);
-
-	luaopen_base(L);
-	luaopen_math(L);
-	luaopen_table(L);
-	luaopen_string(L);
-	lua_register(L, "print", print_glue);
-
-	lua_register(L, "identity", identity_glue);
-	lua_register(L, "box", box_glue);
-	lua_register(L, "cylinder", cylinder_glue);
-	lua_register(L, "setstyle", setstyle_glue);
-	lua_register(L, "addcomponent", addcomponent_glue);
-	lua_register(L, "toolholder", toolholder_glue);
-	lua_register(L, "tableorigin", tableorigin_glue);
-
-	lua_register(L, "translate", translate_glue);
-	lua_register(L, "rotate", rotate_glue);
-	lua_register(L, "scale", scale_glue);
-
-	lua_register(L, "placecomponent", placecomponent_glue);
-
-	lua_register(L, "loadgeometry", loadgeometry_glue);
 }
 
 LUACodeEvaluator& LUACodeEvaluator::operator =(const LUACodeEvaluator& other)
@@ -108,18 +58,28 @@ LUACodeEvaluator& LUACodeEvaluator::operator =(const LUACodeEvaluator& other)
 
 	linkedMachine = other.linkedMachine;
 	componentToManipulate = other.componentToManipulate;
+	SetupState();
+	availableLUACodeEvaluators.push_back(this);
+	return *this;
+}
 
-	// Starting with LUA 5.2 there is no lua_open() function anymore. It has been
-	// replaced by luaL_newstate().
-	//	L = lua_open();
+LUACodeEvaluator::~LUACodeEvaluator()
+{
+	availableLUACodeEvaluators.remove(this);
+	if(L != NULL) lua_close(L);
+	L = NULL;
+}
+
+void LUACodeEvaluator::SetupState(void)
+{
 	L = luaL_newstate();
 
-	availableLUACodeEvaluators.push_back(this);
-
-	luaopen_base(L);
-	luaopen_math(L);
-	luaopen_table(L);
-	luaopen_string(L);
+	luaL_requiref(L, "_G", luaopen_base, 1);
+	lua_pop(L, 1);
+	luaL_requiref(L, LUA_MATHLIBNAME, luaopen_math, 1);
+	lua_pop(L, 1);
+	luaL_requiref(L, LUA_TABLIBNAME, luaopen_table, 1);
+	lua_pop(L, 1);
 
 	lua_register(L, "print", print_glue);
 
@@ -138,15 +98,6 @@ LUACodeEvaluator& LUACodeEvaluator::operator =(const LUACodeEvaluator& other)
 	lua_register(L, "placecomponent", placecomponent_glue);
 
 	lua_register(L, "loadgeometry", loadgeometry_glue);
-
-	return *this;
-}
-
-LUACodeEvaluator::~LUACodeEvaluator()
-{
-	availableLUACodeEvaluators.remove(this);
-	if(L != NULL) lua_close(L);
-	L = NULL;
 }
 
 void LUACodeEvaluator::LinkToMachine(Machine* machine)
@@ -204,9 +155,8 @@ bool LUACodeEvaluator::EvaluateProgram()
 		for(std::list <MachineComponent>::iterator i =
 				linkedMachine->components.begin();
 				i != linkedMachine->components.end(); ++i){
-			wxLogMessage(
-					wxString::Format(_T("Component %u:"), n++)
-							+ i->nameOfComponent);
+			wxLogMessage
+			(wxString::Format(_T("Component %u:"), n++) + i->nameOfComponent);
 		}
 	}
 	return true;
