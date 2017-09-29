@@ -240,7 +240,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	
 	m_menuSettings = new wxMenu();
 	wxMenuItem* m_menuItemSetupLanguage;
-	m_menuItemSetupLanguage = new wxMenuItem( m_menuSettings, wxID_ANY, wxString( _("Change Language") ) , _("Change the programs language."), wxITEM_NORMAL );
+	m_menuItemSetupLanguage = new wxMenuItem( m_menuSettings, wxID_ANY, wxString( _("Change &Language") ) , _("Change the programs language."), wxITEM_NORMAL );
 	m_menuSettings->Append( m_menuItemSetupLanguage );
 	
 	wxMenuItem* m_menuItemActivateStereo3D;
@@ -256,6 +256,10 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	wxMenuItem* m_menuItemSetupStereo3D;
 	m_menuItemSetupStereo3D = new wxMenuItem( m_menuSettings, wxID_ANY, wxString( _("Setup &Stereo 3D") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuSettings->Append( m_menuItemSetupStereo3D );
+	
+	wxMenuItem* m_menuItemSetupMidi;
+	m_menuItemSetupMidi = new wxMenuItem( m_menuSettings, wxID_ANY, wxString( _("Setup &MIDI") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuSettings->Append( m_menuItemSetupMidi );
 	
 	wxMenuItem* m_menuItemSetupUnits;
 	m_menuItemSetupUnits = new wxMenuItem( m_menuSettings, ID_SETUPUNITS, wxString( _("Setup &Units") ) + wxT('\t') + wxT("CTRL+U"), wxEmptyString, wxITEM_NORMAL );
@@ -421,6 +425,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	this->Connect( m_menuItemActivateStereo3D->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnActivateStereo3D ) );
 	this->Connect( m_menuItemSetupController->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnSetupController ) );
 	this->Connect( m_menuItemSetupStereo3D->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnSetupStereo3D ) );
+	this->Connect( m_menuItemSetupMidi->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnSetupMidi ) );
 	this->Connect( m_menuItemSetupUnits->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnSetupUnits ) );
 	this->Connect( m_menuItemCloseAdditionalWindows->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnExtraWindowClose ) );
 	this->Connect( m_menuItemLogShow->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnShowLogWindow ) );
@@ -490,6 +495,7 @@ GUIMain::~GUIMain()
 	this->Disconnect( ID_VIEWSTEREO3D, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnActivateStereo3D ) );
 	this->Disconnect( ID_SETUPCONTROLLER, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnSetupController ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnSetupStereo3D ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnSetupMidi ) );
 	this->Disconnect( ID_SETUPUNITS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnSetupUnits ) );
 	this->Disconnect( ID_CLOSEEXTRAWINDOWS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnExtraWindowClose ) );
 	this->Disconnect( ID_LOGSHOW, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMain::OnShowLogWindow ) );
@@ -3449,7 +3455,7 @@ GUIAbout::GUIAbout( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	wxBoxSizer* bSizer3;
 	bSizer3 = new wxBoxSizer( wxVERTICAL );
 	
-	m_textCtrl12 = new wxTextCtrl( this, wxID_ANY, _("Generic CAM  Copyright (C) 2010 - 2015 Tobias Schaefer\n\nFrench translation & additional debugging: Jacques-Louis Tartarin\nItalian Translation: Sandro Dalle Nogare\n\nLicence for Generic CAM:\nGNU General Public License version 3.0 (GPLv3)\n\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it under certain conditions.\n\nYou should have received a copy of the GNU General Public License along with this program.\nIf not, see <http://www.gnu.org/licenses/>."), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_WORDWRAP );
+	m_textCtrl12 = new wxTextCtrl( this, wxID_ANY, _("Generic CAM  Copyright (C) 2010 - 2017 Tobias Schaefer\n\nFrench translation & additional debugging: Jacques-Louis Tartarin\nItalian Translation: Sandro Dalle Nogare\n\nLicence for Generic CAM:\nGNU General Public License version 3.0 (GPLv3)\n\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it under certain conditions.\n\nYou should have received a copy of the GNU General Public License along with this program.\nIf not, see <http://www.gnu.org/licenses/>."), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_WORDWRAP );
 	bSizer3->Add( m_textCtrl12, 1, wxALL|wxEXPAND, 5 );
 	
 	m_button1 = new wxButton( this, wxID_CLOSE, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -3556,5 +3562,100 @@ GUITestGCode::~GUITestGCode()
 	m_radioBtnG21->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUITestGCode::OnText ), NULL, this );
 	m_textCtrlInput->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUITestGCode::OnText ), NULL, this );
 	m_buttonClear->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUITestGCode::OnClear ), NULL, this );
+	
+}
+
+GUISetupMidi::GUISetupMidi( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer;
+	bSizer = new wxBoxSizer( wxVERTICAL );
+	
+	wxBoxSizer* bSizer84;
+	bSizer84 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_listBoxDevices = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_SINGLE ); 
+	bSizer84->Add( m_listBoxDevices, 1, wxALL|wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer85;
+	bSizer85 = new wxBoxSizer( wxVERTICAL );
+	
+	m_buttonRefresh = new wxButton( this, wxID_ANY, _("Refresh"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonRefresh->SetToolTip( _("Check library for connected devices.") );
+	
+	bSizer85->Add( m_buttonRefresh, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
+	m_buttonCycle = new wxButton( this, wxID_ANY, _("Cycle"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonCycle->SetToolTip( _("Close all connection and disconnect and reconnect to the underlying library.") );
+	
+	bSizer85->Add( m_buttonCycle, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	bSizer85->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_buttonConnect = new wxButton( this, wxID_ANY, _("Connect"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonConnect->SetToolTip( _("Connect to selected midi port.") );
+	
+	bSizer85->Add( m_buttonConnect, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_buttonDisconnect = new wxButton( this, wxID_ANY, _("Disconnect"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonDisconnect->SetToolTip( _("Disconnect from midi port.") );
+	
+	bSizer85->Add( m_buttonDisconnect, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	
+	
+	bSizer85->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_buttonClose = new wxButton( this, wxID_CLOSE, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonClose->SetToolTip( _("Close this window.") );
+	
+	bSizer85->Add( m_buttonClose, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
+	
+	bSizer84->Add( bSizer85, 0, wxEXPAND, 5 );
+	
+	
+	bSizer->Add( bSizer84, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer23;
+	sbSizer23 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Received Messages") ), wxVERTICAL );
+	
+	m_textCtrlReceived = new wxTextCtrl( sbSizer23->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
+	m_textCtrlReceived->SetToolTip( _("Doubleclick to clear.") );
+	
+	sbSizer23->Add( m_textCtrlReceived, 1, wxALL|wxEXPAND, 5 );
+	
+	
+	bSizer->Add( sbSizer23, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( bSizer );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUISetupMidi::OnCloseX ) );
+	m_listBoxDevices->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( GUISetupMidi::OnSelect ), NULL, this );
+	m_buttonRefresh->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupMidi::OnRefresh ), NULL, this );
+	m_buttonCycle->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupMidi::OnCycle ), NULL, this );
+	m_buttonConnect->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupMidi::OnConnect ), NULL, this );
+	m_buttonDisconnect->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupMidi::OnDisconnect ), NULL, this );
+	m_buttonClose->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupMidi::OnClose ), NULL, this );
+	m_textCtrlReceived->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( GUISetupMidi::OnClear ), NULL, this );
+}
+
+GUISetupMidi::~GUISetupMidi()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUISetupMidi::OnCloseX ) );
+	m_listBoxDevices->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( GUISetupMidi::OnSelect ), NULL, this );
+	m_buttonRefresh->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupMidi::OnRefresh ), NULL, this );
+	m_buttonCycle->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupMidi::OnCycle ), NULL, this );
+	m_buttonConnect->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupMidi::OnConnect ), NULL, this );
+	m_buttonDisconnect->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupMidi::OnDisconnect ), NULL, this );
+	m_buttonClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupMidi::OnClose ), NULL, this );
+	m_textCtrlReceived->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( GUISetupMidi::OnClear ), NULL, this );
 	
 }

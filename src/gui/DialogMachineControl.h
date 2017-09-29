@@ -33,6 +33,8 @@
  * ...
  */
 
+#include <wx/timer.h>
+#include "../controller/MidiPort.h"
 #include "../StdInclude.h"
 #include "../project/Project.h"
 #include "DisplaySettings.h"
@@ -40,7 +42,9 @@
 
 class DialogMachineControl:public GUIMachineControl {
 public:
-	DialogMachineControl(wxWindow * parent, DisplaySettings * settings);
+	DialogMachineControl(wxWindow * parent, DisplaySettings * settings, MidiPort * midi);
+	virtual ~DialogMachineControl();
+
 
 	DisplaySettings * settings;
 
@@ -59,6 +63,9 @@ public:
 	unsigned int pageSize;
 	unsigned int lineSize;
 
+	MidiPort * midi;
+	wxTimer timer;
+
 private:
 	bool TransferDataToWindowSliders(void);
 	bool TransferDataFromWindowSliders(void);
@@ -72,6 +79,9 @@ protected:
 	void OnZero(wxMouseEvent& event);
 	void OnTrack(wxScrollEvent& event);
 	void OnTextChanged(wxCommandEvent& event);
+
+	void OnTimer(wxTimerEvent& event);
+
 };
 
 #endif /* DIALOGMACHINECONTROL_H_ */

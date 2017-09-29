@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : DialogMachineDebugger.h
+// Name               : DialogSetupMidi.h
 // Purpose            : 
-// Thread Safe        : No
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 13.01.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 29.09.2017
+// Copyright          : (C) 2017 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,10 +24,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef DIALOGMACHINEDEBUGGER_H_
-#define DIALOGMACHINEDEBUGGER_H_
+#ifndef SRC_GUI_DIALOGSETUPMIDI_H_
+#define SRC_GUI_DIALOGSETUPMIDI_H_
 
-/*!\class DialogMachineDebugger
+/*!\class DialogSetupMidi
  * \brief ...
  *
  * ...
@@ -35,40 +35,33 @@
 
 #include "../StdInclude.h"
 #include "../controller/MidiPort.h"
-#include "../project/Project.h"
-#include "../project/machine/Machine.h"
-#include "DialogMachineControl.h"
-#include "DisplaySettings.h"
+#include <wx/timer.h>
+
 #include "gui.h"
 
-class DialogMachineDebugger:public GUIMachineDebugger {
+class DialogSetupMidi:public GUISetupMidi {
 public:
-	DialogMachineDebugger(wxWindow * parent, DisplaySettings * settings, MidiPort * midi);
-	virtual ~DialogMachineDebugger();
-	DisplaySettings * settings;
-
-	MidiPort * midi;
-
-	bool TransferDataToWindow(void);
-	bool TransferDataFromWindow(void);
+	DialogSetupMidi(wxWindow* parent, MidiPort* midi);
+	virtual ~DialogSetupMidi();
 
 private:
+	MidiPort* midi;
 
-	DialogMachineControl * machineControl;
+	wxTimer timer;
 
-	Machine machine;
+	// Methods
+	bool TransferDataToWindow(void);
+	bool TransferDataFromWindow(void);
+	void OnTimer(wxTimerEvent& event);
 
-protected:
-	void Update(wxCommandEvent& event);
-
-	void OnXClose(wxCloseEvent& event);
-	void OnMachineLoad(wxCommandEvent& event);
-	void OnMachineSave(wxCommandEvent& event);
+	void OnCloseX(wxCloseEvent& event);
+	void OnSelect(wxCommandEvent& event);
+	void OnRefresh(wxCommandEvent& event);
+	void OnCycle(wxCommandEvent& event);
+	void OnConnect(wxCommandEvent& event);
+	void OnDisconnect(wxCommandEvent& event);
 	void OnClose(wxCommandEvent& event);
-	void OnScriptEvaluate(wxCommandEvent& event);
-	void OnShowController(wxCommandEvent& event);
-	void OnChangeStereo3D(wxCommandEvent& event);
-
+	void OnClear(wxMouseEvent& event);
 };
 
-#endif /* DIALOGMACHINEDEBUGGER_H_ */
+#endif /* SRC_GUI_DIALOGSETUPMIDI_H_ */

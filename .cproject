@@ -44,6 +44,7 @@
 									<listOptionValue builtIn="false" value="GL"/>
 									<listOptionValue builtIn="false" value="GLU"/>
 									<listOptionValue builtIn="false" value="lua5.3"/>
+									<listOptionValue builtIn="false" value="portmidi"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1318683508" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths"/>
 								<option id="gnu.cpp.link.option.flags.284247766" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="`wx-config --libs richtext,gl,core,base,html,xml,adv`" valueType="string"/>

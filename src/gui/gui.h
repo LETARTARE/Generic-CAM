@@ -50,6 +50,7 @@
 #include <wx/dialog.h>
 #include <wx/choicebk.h>
 #include <wx/richtext/richtextctrl.h>
+#include <wx/listbox.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -240,6 +241,7 @@ class GUIMain : public wxFrame
 		virtual void OnActivateStereo3D( wxCommandEvent& event ) = 0;
 		virtual void OnSetupController( wxCommandEvent& event ) = 0;
 		virtual void OnSetupStereo3D( wxCommandEvent& event ) = 0;
+		virtual void OnSetupMidi( wxCommandEvent& event ) = 0;
 		virtual void OnSetupUnits( wxCommandEvent& event ) = 0;
 		virtual void OnExtraWindowClose( wxCommandEvent& event ) = 0;
 		virtual void OnShowLogWindow( wxCommandEvent& event ) = 0;
@@ -559,7 +561,7 @@ class GUIRun : public wxFrame
 	
 	public:
 		
-		GUIRun( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup a Machine Run"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 657,531 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIRun( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup a Machine Run"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 901,531 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~GUIRun();
 	
@@ -758,7 +760,7 @@ class GUIToolbox : public wxFrame
 	
 	public:
 		
-		GUIToolbox( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolbox"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 687,757 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIToolbox( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolbox"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 885,757 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~GUIToolbox();
 	
@@ -1021,6 +1023,41 @@ class GUITestGCode : public wxFrame
 		GUITestGCode( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("G-Code parser"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxSTAY_ON_TOP|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		
 		~GUITestGCode();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class GUISetupMidi
+///////////////////////////////////////////////////////////////////////////////
+class GUISetupMidi : public wxFrame 
+{
+	private:
+	
+	protected:
+		wxListBox* m_listBoxDevices;
+		wxButton* m_buttonRefresh;
+		wxButton* m_buttonCycle;
+		wxButton* m_buttonConnect;
+		wxButton* m_buttonDisconnect;
+		wxButton* m_buttonClose;
+		wxTextCtrl* m_textCtrlReceived;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnCloseX( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnSelect( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRefresh( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCycle( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnConnect( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDisconnect( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClear( wxMouseEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		GUISetupMidi( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup MIDI Connection"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 620,482 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		
+		~GUISetupMidi();
 	
 };
 

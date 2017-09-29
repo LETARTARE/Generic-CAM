@@ -31,15 +31,16 @@
 #include <wx/dir.h>
 
 DialogMachineDebugger::DialogMachineDebugger(wxWindow * parent,
-		DisplaySettings * settings) :
+		DisplaySettings * settings, MidiPort * midi) :
 		GUIMachineDebugger(parent)
 {
 
 	this->Connect(ID_UPDATEMACHINESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(DialogMachineDebugger::Update));
 
+	this->midi = midi;
 	this->settings = settings;
-	machineControl = new DialogMachineControl(this, settings);
+	machineControl = new DialogMachineControl(this, settings,midi);
 
 	m_canvas->InsertMachine(&machine);
 //	machine.Load(wxFileName(_T("machines/testmachine.lua")));

@@ -50,6 +50,7 @@
 #include "DialogAnimation.h"
 #include "DialogToolpathGenerator.h"
 #include "DialogSetupStereo3D.h"
+#include "DialogSetupMidi.h"
 #include "TreeSetup.h"
 
 #include "../project/Project.h"
@@ -57,13 +58,13 @@
 #include "../project/StockFile.h"
 
 #include "../controller/Control3D.h"
+#include "../controller/MidiPort.h"
 
 #include <wx/help.h>
 #include <wx/docview.h>
 #include <wx/config.h>
 #include <wx/log.h>
 #include <wx/cmdproc.h>
-
 
 class FrameMain:public GUIMain {
 	friend class DnDFile;
@@ -79,6 +80,7 @@ private:
 	wxConfig* config;
 	wxLocale* locale;
 	Control3D control;
+	MidiPort midi;
 	wxLogWindow* logWindow;
 	TreeSetup* tree;
 
@@ -105,6 +107,7 @@ private:
 	DialogToolpathGenerator * dialogToolpathGenerator;
 	DialogAnimation * dialogAnimation;
 	DialogSetupStereo3D * dialogSetupStereo3D;
+	DialogSetupMidi * dialogSetupMidi;
 
 	wxTimer timer; ///> Animation timer
 	float t;
@@ -169,6 +172,7 @@ private:
 	void OnActivateStereo3D(wxCommandEvent& event);
 	void OnSetupController(wxCommandEvent& event);
 	void OnSetupStereo3D(wxCommandEvent& event);
+	void OnSetupMidi(wxCommandEvent& event);
 	void OnSetupUnits(wxCommandEvent& event);
 	void OnExtraWindowClose(wxCommandEvent& event);
 	void OnShowLogWindow(wxCommandEvent& event);

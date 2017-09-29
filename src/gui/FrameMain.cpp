@@ -142,8 +142,9 @@ FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 			&settings);
 	dialogRun = new DialogRun(this, &project, &toolbox, &commandProcessor,
 			&settings);
-	dialogDebugger = new DialogMachineDebugger(this, &settings);
+	dialogDebugger = new DialogMachineDebugger(this, &settings, &midi);
 	dialogSetupStereo3D = new DialogSetupStereo3D(this, &settings);
+	dialogSetupMidi = new DialogSetupMidi(this, &midi);
 	dialogToolbox = new DialogToolbox(this, &project, &toolbox, &settings);
 	dialogToolpathGenerator = new DialogToolpathGenerator(this, &project,
 			&commandProcessor, &settings);
@@ -966,7 +967,8 @@ void FrameMain::OnMachineLoad(wxCommandEvent& event)
 		if(project.run[selected].machine.Load(fileName)){
 			settings.lastMachineDirectory = fileName.GetPath();
 		}else{
-			wxLogError(project.run[selected].machine.textOut);
+			wxLogError
+			(project.run[selected].machine.textOut);
 		}
 		TransferDataToWindow();
 	}
@@ -979,7 +981,8 @@ void FrameMain::OnMachineReload(wxCommandEvent& event)
 
 	if(!project.run[selected].machine.ReLoad()){
 
-		wxLogError(project.run[selected].machine.textOut);
+		wxLogError
+		(project.run[selected].machine.textOut);
 	}
 	TransferDataToWindow();
 }
@@ -1138,6 +1141,12 @@ void FrameMain::OnSetupStereo3D(wxCommandEvent& event)
 {
 	dialogSetupStereo3D->Show(true);
 	dialogSetupStereo3D->Raise();
+}
+
+void FrameMain::OnSetupMidi(wxCommandEvent& event)
+{
+	dialogSetupMidi->Show(true);
+	dialogSetupMidi->Raise();
 }
 
 void FrameMain::OnSetupUnits(wxCommandEvent& event)

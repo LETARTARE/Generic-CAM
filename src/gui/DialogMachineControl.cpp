@@ -30,13 +30,19 @@
 #include <math.h>
 
 DialogMachineControl::DialogMachineControl(wxWindow* parent,
-		DisplaySettings * settings) :
+		DisplaySettings * settings, MidiPort * midi) :
 		GUIMachineControl(parent)
 {
 	this->settings = settings;
+	this->midi = midi;
 	X = Y = Z = 0.0;
 	A = B = C = 0.0;
 	U = V = W = 0.0;
+
+	if(midi != NULL){
+		for(uint8_t n = 0; n < 10; n++)
+			midi->cc[n] = 64;
+	}
 
 	groupXYZLimit = 1.0;
 	groupABCLimit = M_PI;
@@ -45,6 +51,20 @@ DialogMachineControl::DialogMachineControl(wxWindow* parent,
 	sliderSteps = 201;
 	pageSize = 20;
 	lineSize = 1;
+
+	timer.SetOwner(this);
+	this->Connect(wxEVT_TIMER,
+			wxTimerEventHandler(DialogMachineControl::OnTimer),
+			NULL, this);
+	timer.Start(50);
+}
+
+DialogMachineControl::~DialogMachineControl()
+{
+	timer.Stop();
+	this->Disconnect(wxEVT_TIMER,
+			wxTimerEventHandler(DialogMachineControl::OnTimer),
+			NULL, this);
 }
 
 void DialogMachineControl::OnXClose(wxCloseEvent& event)
@@ -63,7 +83,7 @@ void DialogMachineControl::OnScroll(wxScrollEvent& event)
 	TransferDataFromWindowSliders();
 	TransferDataToWindowTextbox();
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-			ID_UPDATEMACHINESIMULATION);
+	ID_UPDATEMACHINESIMULATION);
 	ProcessEvent(selectEvent);
 }
 
@@ -72,7 +92,7 @@ void DialogMachineControl::OnTrack(wxScrollEvent& event)
 	TransferDataFromWindowSliders();
 	TransferDataToWindowTextbox();
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-			ID_UPDATEMACHINESIMULATION);
+	ID_UPDATEMACHINESIMULATION);
 	ProcessEvent(selectEvent);
 }
 
@@ -203,7 +223,7 @@ void DialogMachineControl::OnZero(wxMouseEvent& event)
 	}
 	TransferDataToWindow();
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-			ID_UPDATEMACHINESIMULATION);
+	ID_UPDATEMACHINESIMULATION);
 	ProcessEvent(selectEvent);
 }
 
@@ -250,6 +270,28 @@ void DialogMachineControl::OnTextChanged(wxCommandEvent& event)
 	}
 	TransferDataToWindowSliders();
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-			ID_UPDATEMACHINESIMULATION);
+	ID_UPDATEMACHINESIMULATION);
 	ProcessEvent(selectEvent);
+}
+
+void DialogMachineControl::OnTimer(wxTimerEvent& event)
+{
+	if(!IsShown()) return;
+	if(!midi->Poll()) return;
+
+	X = ((double) midi->cc[1] - 64.0) / 64.0;
+	Y = ((double) midi->cc[2] - 64.0) / 64.0;
+	Z = ((double) midi->cc[3] - 64.0) / 64.0;
+	A = ((double) midi->cc[4] - 64.0) / 64.0 * M_PI;
+	B = ((double) midi->cc[5] - 64.0) / 64.0 * M_PI;
+	C = ((double) midi->cc[6] - 64.0) / 64.0 * M_PI;
+	U = ((double) midi->cc[7] - 64.0) / 64.0;
+	V = ((double) midi->cc[8] - 64.0) / 64.0;
+	W = ((double) midi->cc[9] - 64.0) / 64.0;
+
+	TransferDataToWindowSliders();
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
+	ID_UPDATEMACHINESIMULATION);
+	ProcessEvent(selectEvent);
+
 }
