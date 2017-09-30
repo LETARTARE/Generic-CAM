@@ -47,10 +47,14 @@
  *
  * The really fancy functions are found in DexelTarget.
  *
+ *
+ *
+ *
+ *
  */
 
-#include "../../3D/AffineTransformMatrix.h"
 #include "../../3D/Geometry.h"
+#include "../../3D/AffineTransformMatrix.h"
 #include "../../3D/Vector3.h"
 
 #include <GL/gl.h>
@@ -73,14 +77,14 @@ public:
 	float belowDown;
 
 	// TODO: Add a surface orientation to the dexel cells.
-	//	float normalx;
-	//	float normaly;
+	float normalx;
+	float normaly;
 	//  normalz is sqrt(1-normalx*normalx-normaly*normaly)
 
 	// Methods
 public:
 	bool IsVisible(void); ///< A cell is visible, if the upper level is above the lower one.
-	void Swap(ImprinterElement& b); //TODO: Replace everywhere with std::swap(...)
+	void Swap(ImprinterElement& b);
 };
 
 //TODO: Base Imprinter on BoundingBox
@@ -96,69 +100,46 @@ public:
 
 	// Constructor / Destructor
 public:
-	Imprinter(const double sizeX = 0.01, const double sizeY = 0.01,
-			const double sizeZ = 0.05, const double resolutionX = 0.001,
-			const double resolutionY = 0.001);
+	Imprinter();
+	Imprinter(const size_t countX, const size_t countY,
+			const double resolutionX, const double resolutionY);
+	Imprinter(const double sizeX, const double sizeY, const double sizeZ,
+			const double resolutionX, const double resolutionY);
 	Imprinter(const Imprinter& ip); ///< Copy constructor
 	Imprinter& operator=(const Imprinter &b); ///< Assignment operator
 	virtual ~Imprinter();
+private:
+	void InitInstance(void);
 
 	// Methods
 public:
 
 // **** Low level ****
 
+	void PresetResolution(const double resolutionX, const double resolutionY =
+			-1);
+	void PresetResolution(const Imprinter &other);
+
 	bool SetupField(const size_t sizeX, const size_t sizeY,
-			const double resolutionX = 0.001, const double resolutionY = 0.001);
-	bool SetupFiled(const Imprinter& other);
+			const double resolutionX = -1, const double resolutionY = -1);
+	bool SetupField(const Imprinter& other);
 	void ClearField(void); ///< Deallocate the field from memory
+	bool IsMemoryAllocated(void) const; ///< Test, if memory has been allocated
 	size_t MemoryUsageInBytes(void) const;
 
-	/**\brief Test, if memory has been allocated */
-	bool IsMemoryAllocated(void) const
-	{
-		return (field == NULL);
-	}
-	double GetSizeX(void) const
-	{
-		return sx;
-	}
-	double GetSizeY(void) const
-	{
-		return sy;
-	}
-	double GetSizeZ(void) const
-	{
-		return sz;
-	}
-	double GetResolutionX(void) const
-	{
-		return rx;
-	}
-	double GetResolutionY(void) const
-	{
-		return ry;
-	}
-	size_t GetCountTotal(void) const
-	{
-		return N;
-	}
-	size_t GetCountX(void) const
-	{
-		return nx;
-	}
-	size_t GetCountY(void) const
-	{
-		return ny;
-	}
+	double GetSizeX(void) const;
+	double GetSizeY(void) const;
+	double GetSizeZ(void) const;
+	double GetResolutionX(void) const;
+	double GetResolutionY(void) const;
+	size_t GetCountTotal(void) const;
+	size_t GetCountX(void) const;
+	size_t GetCountY(void) const;
 
-	void Refresh();
+	void Refresh(); ///< Regenerates the OpenGL displaylist.
 	void Paint() const; ///< Paint the Imprinter at the origin in OpenGL.
 
 // ***** Imprinting geometry *****
-
-	void Empty(void); ///< Empty the volume
-	void Fill(void); ///< Fill the volume
 
 	void InitImprinting(void);
 	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c,
@@ -171,16 +152,16 @@ public:
 
 	/**\brief Setup a box */
 	bool SetupBox(const double sizeX, const double sizeY, const double sizeZ,
-			const double resolutionX = 0.001, const double resolutionY = 0.001);
+			const double resolutionX = -1, const double resolutionY = -1);
 	/**\brief Setup a sphere */
-	void SetupSphere(double radius, const double resolutionX = 0.001,
-			const double resolutionY = 0.001);
+	void SetupSphere(double radius, const double resolutionX = -1,
+			const double resolutionY = -1);
 	/**\brief Setup a cylinder */
 	void SetupCylinder(double radius, double height, const double resolutionX =
-			0.001, const double resolutionY = 0.001);
+			-1, const double resolutionY = -1);
 	/**\brief Setup a disc */
-	void SetupDisc(double radius, const double resolutionX = 0.001,
-			const double resolutionY = 0.001);
+	void SetupDisc(double radius, const double resolutionX = -1,
+			const double resolutionY = -1);
 
 // ***** Test functions *****
 
@@ -202,7 +183,10 @@ public:
 
 // ***** Manipulation *****
 
-	/**\brief Or assignment operator (= Union)
+	void Empty(void); ///< Empty the volume
+	void Fill(void); ///< Fill the volume
+
+	/**\brief OR assignment operator (= Union)
 	 *
 	 * Adds two Imprinter%s, if they have the same size.
 	 * If they are diffrently sized, nothing happens.
@@ -210,7 +194,7 @@ public:
 	 */
 	Imprinter & operator|=(const Imprinter &other);
 
-	/**\brief Or operator (= Union)
+	/**\brief OR operator (= Union)
 	 *
 	 * Adds two Imprinter%s, if they have the same size.
 	 * If they are diffrently sized, nothing happens.
@@ -218,7 +202,7 @@ public:
 	 */
 	const Imprinter operator|(const Imprinter& other) const;
 
-	/**\brief Subtraction assignment operator (= Diff)
+	/**\brief DIFF assignment operator (= Subtraction)
 	 *
 	 * Subtract two Imprinter%s, if they have the same size.
 	 * If they are diffrently sized, nothing happens.
@@ -226,7 +210,7 @@ public:
 	 */
 	Imprinter & operator-=(const Imprinter &other);
 
-	/**\brief Subtraction operator (= Diff)
+	/**\brief DIFF operator (= Subtraction)
 	 *
 	 * Adds two Imprinter%s, if they have the same size.
 	 * If they are diffrently sized, nothing happens.
@@ -234,14 +218,14 @@ public:
 	 */
 	const Imprinter operator-(const Imprinter& other) const;
 
-	/**\brief And assignment operator (= Intersection)
+	/**\brief INTERSECTION assignment operator (= And)
 	 *
 	 * Intersect two Imprinter%s, if they have the same size.
 	 * If they are diffrently sized, nothing happens.
 	 */
 	Imprinter & operator&=(const Imprinter &other);
 
-	/**\brief And operator (= Intersection)
+	/**\brief INTERSECTION operator (= And)
 	 *
 	 * Intersect two Imprinter%s, if they have the same size.
 	 * If they are diffrently sized, nothing happens.
@@ -260,10 +244,22 @@ public:
 	 */
 	const Imprinter operator+(const double value) const;
 
+// ***** Inverting *****
+
+	void HardInvert(void); ///< Invert field without contour.
+	void MaxFilling(void); ///< Fill up cells with particle to the max.
+	void InvertTop(void); ///< Invert the top levels height.
+	void NegateZ(void); ///< Invert around 0.
+	void MirrorY(void); ///< Mirror along the Y axis.
+	void MirrorZ(void); ///< Mirror along the Z axis.
+	void RotateX180(void); ///< Rotate along the X axis.
+
+// ***** Complex functions *****
+
 	void CleanOutlier(void); ///< Defunct.
 	void Limit(void); ///< Limit values of the field to the size of the Imprinter in z.
-	void FoldRaise(const Imprinter &b); ///< Folding operation of two Imprinters. Surface is only raised.
-	void FoldReplace(const Imprinter &b); ///< Folding operation. Model is replaced.
+
+// ***** Folding *****
 
 	/**\brief Folding operation. Surface is dropped at position
 	 *
@@ -274,17 +270,12 @@ public:
 	 */
 	void ShiftDown(int x, int y, double z, const Imprinter &b);
 	void TouchErase(int x, int y, double z, double level, const Imprinter &b);
-
-	void HardInvert(void); ///< Invert field without contour.
-	void MaxFilling(void); ///< Fill up cells with particle to the max.
-	void InvertTop(void); ///< Invert the top levels height.
-	void NegateZ(void); ///< Invert around 0.
-	void MirrorY(void); ///< Mirror along the Y axis.
-	void MirrorZ(void); ///< Mirror along the Z axis.
-	void RotateX180(void); ///< Rotate along the X axis.
+	void FoldRaise(const Imprinter &b); ///< Folding operation of two Imprinters. Surface is only raised.
+	void FoldReplace(const Imprinter &b); ///< Folding operation. Model is replaced.
 
 private:
-	Vector3 CellNormal(double p0, double p1, double p2, double p3) const;
+	Vector3 RecalculateCellNormals(double p0, double p1, double p2,
+			double p3) const;
 
 	// Member variables
 public:

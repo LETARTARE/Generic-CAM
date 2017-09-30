@@ -173,7 +173,9 @@ void GeneratorDexel::GenerateToolpath(void)
 	for(size_t i = 0; i < workpiece->supports.GetCount(); i++){
 		//TODO: Insert supports into target.
 	}
+
 	target.FinishImprint();
+	debug = target;
 //	target.CleanOutlier();
 	outside.HardInvert();
 
@@ -185,8 +187,6 @@ void GeneratorDexel::GenerateToolpath(void)
 	outside &= start;
 	target |= outside;
 	target &= start;
-
-	debug = target;
 
 	target.Refresh();
 }
