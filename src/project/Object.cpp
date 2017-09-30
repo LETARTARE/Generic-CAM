@@ -55,27 +55,28 @@ bool Object::IsEmpty(void) const
 	return (geometries.GetCount() == 0);
 }
 
-void Object::Paint(const bool absolutCoordinates) const
+void Object::Paint(const bool absolutCoordinates,
+		const GeometryColorStyle style) const
 {
 	if(!show) return;
 	glPushMatrix();
 	if(absolutCoordinates){
 		glMultMatrixd(displayTransform.a);
-#ifdef _DEBUGMODE
-		if(geometries.GetCount() > 0){
-			glColor3f(geometries[0].color.x, geometries[0].color.y,
-					geometries[0].color.z);
-		}
+//#ifdef _DEBUGMODE
+//		if(geometries.GetCount() > 0){
+//			glColor3f(geometries[0].color.x, geometries[0].color.y,
+//					geometries[0].color.z);
+//		}
 		// Paint a little dot at the origin of the Object.
-		glPointSize(5);
-		glBegin(GL_POINTS);
+//		glPointSize(5);
+//		glBegin(GL_POINTS);
 //		glVertex3i(0, 0, 0);
-		glEnd();
-#endif
+//		glEnd();
+//#endif
 	}
 	glMultMatrixd(matrix.a);
 	for(size_t i = 0; i < geometries.GetCount(); i++)
-		geometries[i].Paint();
+		geometries[i].Paint(style);
 	glPopMatrix();
 }
 

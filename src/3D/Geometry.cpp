@@ -81,7 +81,6 @@ void Geometry::ApplyTransformation(void)
 void Geometry::Paint(GeometryColorStyle style) const
 {
 	if(!visible) return;
-
 	if(style == geometryColorDefault) style = useColor;
 
 	// GL_RESCALE_NORMAL is faster, but doesn't work on non-uniform scaled models

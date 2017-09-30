@@ -49,7 +49,6 @@ bool DialogSetupMidi::TransferDataToWindow(void)
 	if(midi == NULL) return false;
 
 	const size_t N = midi->GetDeviceCount();
-	const int nsel = midi->GetOpenDevice();
 	m_listBoxDevices->Clear();
 	const size_t din = midi->GetDefaultInputDevice();
 	const size_t dout = midi->GetDefaultOutputDevice();
@@ -110,11 +109,58 @@ void DialogSetupMidi::OnDisconnect(wxCommandEvent& event)
 
 void DialogSetupMidi::OnTimer(wxTimerEvent& event)
 {
-	uint8_t status, channel, data;
-	while(midi->PollEvent(&status, &channel, &data)){
-		wxString temp = wxString::Format(
-				_T("Status: %3u Channel: %3u Data: %3u\n"), status, channel,
-				data);
+	uint8_t status, data1, data2;
+	uint8_t channel;
+	while(midi->PollEvent(&status, &data1, &data2)){
+		channel = status & 0xf;
+		status >>= 4;
+		wxString temp;
+		switch(status){
+		case 8:
+			temp = wxString::Format(
+					_T("Channel: %2u Note Off Data: %3u, %3u\n"), channel,
+					data1, data2);
+			break;
+		case 9:
+			temp = wxString::Format(_T("Channel: %2u Note On Data: %3u, %3u\n"),
+					channel, data1, data2);
+			break;
+		case 10:
+			temp = wxString::Format(
+					_T("Channel: %2u Polyphonic-Aftertouch Data: %3u, %3u\n"),
+					channel, data1, data2);
+			break;
+		case 11:
+			temp = wxString::Format(
+					_T("Channel: %2u Control Change: CC[%3u] = %3u\n"), channel,
+					data1, data2);
+			break;
+		case 12:
+			temp = wxString::Format(
+					_T("Channel: %2u Program Change Data: %3u, %3u\n"), channel,
+					data1, data2);
+			break;
+		case 13:
+			temp = wxString::Format(
+					_T("Channel: %2u Mono-Aftertouch Data: %3u, %3u\n"),
+					channel, data1, data2);
+			break;
+		case 14:
+			temp = wxString::Format(
+					_T("Channel: %2u Pitch Bend Data: %3u, %3u\n"), channel,
+					data1, data2);
+			break;
+		case 15:
+			temp = wxString::Format(_T("System Message %2u Data: %3u, %3u\n"),
+					channel, data1, data2);
+			break;
+		default:
+			temp = wxString::Format(
+					_T("Channel: %2u Status: %2u Data: %3u, %3u\n"), channel,
+					status, data1, data2);
+			break;
+		}
+
 		m_textCtrlReceived->AppendText(temp);
 	}
 }

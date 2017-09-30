@@ -76,7 +76,8 @@ public:
 
 	void TransformFromCenter(void); //!< Shifts the origin for transfomration on 'matrix' to the center of the object.
 
-	void Paint(const bool absolutCoordinates = false) const;
+	void Paint(const bool absolutCoordinates = false,
+			const GeometryColorStyle style = geometryColorDefault) const;
 
 	bool LoadObject(wxFileName fileName);
 	bool ReloadObject(void);

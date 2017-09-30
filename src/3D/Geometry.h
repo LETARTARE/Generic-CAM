@@ -42,7 +42,11 @@
  * Geometric data is stored in this class.
  */
 enum GeometryColorStyle {
-	geometryColorNone, geometryColorGlobal, geometryColorTriangle, geometryColorVertex, geometryColorDefault
+	geometryColorNone,
+	geometryColorGlobal,
+	geometryColorTriangle,
+	geometryColorVertex,
+	geometryColorDefault
 };
 
 class Geometry {

@@ -35,14 +35,16 @@ WX_DEFINE_OBJARRAY(ArrayOfBoundingBox)
 
 BoundingBox::BoundingBox()
 {
-	color.Set(0.3, 0.3, 0.3);
-	alpha = 0.5;
-	overlap = 0.01;
-	displayBox = false;
-	displaySides = true;
-
 	xmax = ymax = zmax = -DBL_MAX;
 	xmin = ymin = zmin = DBL_MAX;
+
+	color.Set(0.3, 0.3, 0.3);
+	alpha = 0.5;
+
+	overlap = 0.01;
+
+	displayBox = true;
+	displaySides = false;
 
 	this->Clear();
 }
@@ -52,6 +54,9 @@ BoundingBox::BoundingBox(float x1, float y1, float z1, float x2, float y2,
 {
 	color.Set(0.3, 0.3, 0.3);
 	alpha = 0.5;
+	overlap = 0.01;
+	displayBox = true;
+	displaySides = false;
 
 	if(x1 > x2) std::swap(x1, x2);
 	if(y1 > y2) std::swap(y1, y2);
@@ -251,73 +256,71 @@ void BoundingBox::Paint(void) const
 
 		::glBegin(GL_LINES);
 
-		glNormal3d(0, -M_SQRT2, -M_SQRT2);
+		glNormal3d(0, -M_SQRT1_2, -M_SQRT1_2);
 		glVertex3d(xmin, ymin, zmin);
 		glVertex3d(xmin + dx, ymin, zmin);
 		glVertex3d(xmax, ymin, zmin);
 		glVertex3d(xmax - dx, ymin, zmin);
-		glNormal3d(0, M_SQRT2, -M_SQRT2);
+		glNormal3d(0, M_SQRT1_2, -M_SQRT1_2);
 		glVertex3d(xmin, ymax, zmin);
 		glVertex3d(xmin + dx, ymax, zmin);
 		glVertex3d(xmax, ymax, zmin);
 		glVertex3d(xmax - dx, ymax, zmin);
-		glNormal3d(0, M_SQRT2, M_SQRT2);
+		glNormal3d(0, M_SQRT1_2, M_SQRT1_2);
 		glVertex3d(xmin, ymax, zmax);
 		glVertex3d(xmin + dx, ymax, zmax);
 		glVertex3d(xmax, ymax, zmax);
 		glVertex3d(xmax - dx, ymax, zmax);
-		glNormal3d(0, -M_SQRT2, M_SQRT2);
+		glNormal3d(0, -M_SQRT1_2, M_SQRT1_2);
 		glVertex3d(xmin, ymin, zmax);
 		glVertex3d(xmin + dx, ymin, zmax);
 		glVertex3d(xmax, ymin, zmax);
 		glVertex3d(xmax - dx, ymin, zmax);
 
-		glNormal3d(-M_SQRT2, 0, -M_SQRT2);
+		glNormal3d(-M_SQRT1_2, 0, -M_SQRT1_2);
 		glVertex3d(xmin, ymin, zmin);
 		glVertex3d(xmin, ymin + dy, zmin);
 		glVertex3d(xmin, ymax, zmin);
 		glVertex3d(xmin, ymax - dy, zmin);
-		glNormal3d(M_SQRT2, 0, -M_SQRT2);
+		glNormal3d(M_SQRT1_2, 0, -M_SQRT1_2);
 		glVertex3d(xmax, ymin, zmin);
 		glVertex3d(xmax, ymin + dy, zmin);
 		glVertex3d(xmax, ymax, zmin);
 		glVertex3d(xmax, ymax - dy, zmin);
-		glNormal3d(M_SQRT2, 0, M_SQRT2);
+		glNormal3d(M_SQRT1_2, 0, M_SQRT1_2);
 		glVertex3d(xmax, ymin, zmax);
 		glVertex3d(xmax, ymin + dy, zmax);
 		glVertex3d(xmax, ymax, zmax);
 		glVertex3d(xmax, ymax - dy, zmax);
-		glNormal3d(-M_SQRT2, 0, M_SQRT2);
+		glNormal3d(-M_SQRT1_2, 0, M_SQRT1_2);
 		glVertex3d(xmin, ymin, zmax);
 		glVertex3d(xmin, ymin + dy, zmax);
 		glVertex3d(xmin, ymax, zmax);
 		glVertex3d(xmin, ymax - dy, zmax);
 
-		glNormal3d(-M_SQRT2, -M_SQRT2, 0);
+		glNormal3d(-M_SQRT1_2, -M_SQRT1_2, 0);
 		glVertex3d(xmin, ymin, zmin);
 		glVertex3d(xmin, ymin, zmin + dz);
 		glVertex3d(xmin, ymin, zmax);
 		glVertex3d(xmin, ymin, zmax - dz);
-		glNormal3d(M_SQRT2, -M_SQRT2, 0);
+		glNormal3d(M_SQRT1_2, -M_SQRT1_2, 0);
 		glVertex3d(xmax, ymin, zmin);
 		glVertex3d(xmax, ymin, zmin + dz);
 		glVertex3d(xmax, ymin, zmax);
 		glVertex3d(xmax, ymin, zmax - dz);
-		glNormal3d(M_SQRT2, M_SQRT2, 0);
+		glNormal3d(M_SQRT1_2, M_SQRT1_2, 0);
 		glVertex3d(xmax, ymax, zmin);
 		glVertex3d(xmax, ymax, zmin + dz);
 		glVertex3d(xmax, ymax, zmax);
 		glVertex3d(xmax, ymax, zmax - dz);
-		glNormal3d(-M_SQRT2, M_SQRT2, 0);
+		glNormal3d(-M_SQRT1_2, M_SQRT1_2, 0);
 		glVertex3d(xmin, ymax, zmin);
 		glVertex3d(xmin, ymax, zmin + dz);
 		glVertex3d(xmin, ymax, zmax);
 		glVertex3d(xmin, ymax, zmax - dz);
 
 		::glEnd();
-
 	}
-
 }
 
 void BoundingBox::ToStream(wxTextOutputStream& stream) const

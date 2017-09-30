@@ -62,17 +62,6 @@ void Workpiece::Paint(void) const
 	glPushMatrix();
 	glMultMatrixd(this->matrix.a);
 
-//	BoundingBox::Paint();
-
-	if(refObject >= 0 && refObject < project->objects.GetCount()){
-		glColor4f(0.5, 0.5, 0.5, 0.3);
-//		BoundingBox::Paint();
-		project->objects[refObject].Paint(false);
-	}else{
-		glColor4f(0.5, 0.5, 0.5, 1.0);
-		bbox.Paint();
-	}
-
 	for(size_t j = 0; j < placements.GetCount(); j++){
 //		const float x = placements[j].matrix.a[12];
 //		const float y = placements[j].matrix.a[13];
@@ -107,6 +96,17 @@ void Workpiece::Paint(void) const
 //		BoundingBox::Paint();
 //		StockMaterial::PaintWireBox();
 	}
+
+	//	BoundingBox::Paint();
+	if(refObject >= 0 && refObject < project->objects.GetCount()){
+		glColor4f(0.5, 0.5, 0.5, 0.5);
+		//		BoundingBox::Paint();
+		project->objects[refObject].Paint(false, geometryColorNone);
+	}else{
+		glColor4f(0.5, 0.5, 0.5, 1.0);
+		bbox.Paint();
+	}
+
 	::glPopMatrix();
 }
 

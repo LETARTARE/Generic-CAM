@@ -211,10 +211,6 @@ void Run::Paint(void) const
 		if(showSimulation){
 			simulator.Paint();
 		}else{
-			::glPushMatrix();
-			::glMultMatrixd(workpiecePlacement.a);
-			pr->workpieces[refWorkpiece].Paint();
-			::glPopMatrix();
 			bool anySelected = false;
 			for(size_t n = 0; n < generators.GetCount(); n++){
 				assert(generators[n] != NULL);
@@ -226,6 +222,10 @@ void Run::Paint(void) const
 					generators[n]->Paint();
 				}
 			}
+			::glPushMatrix();
+			::glMultMatrixd(workpiecePlacement.a);
+			pr->workpieces[refWorkpiece].Paint();
+			::glPopMatrix();
 		}
 
 		// Draw the "Touchpoint" symbol
