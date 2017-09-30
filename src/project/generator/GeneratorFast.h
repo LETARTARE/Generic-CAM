@@ -73,7 +73,7 @@ private:
 	ToolPath GenerateDrill(double x, double y, double diameter, double depth);
 	bool IsDirectlyReachable(DexelTarget &target, double sx, double sy,
 			double sz, double x, double y, double z);
-	ToolPath MoveSavely(DexelTarget &target, double sx, double sy, double sz,
+	ToolPath MoveSafely(DexelTarget &target, double sx, double sy, double sz,
 			double x, double y, double z);
 
 };

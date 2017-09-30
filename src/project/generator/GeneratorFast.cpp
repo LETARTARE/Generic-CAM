@@ -180,7 +180,7 @@ void GeneratorFast::FromString(const wxString& text)
 {
 }
 
-ToolPath GeneratorFast::MoveSavely(DexelTarget &target, double sx, double sy,
+ToolPath GeneratorFast::MoveSafely(DexelTarget &target, double sx, double sy,
 		double sz, double x, double y, double z)
 {
 	ToolPath tp;
@@ -299,10 +299,10 @@ void GeneratorFast::GenerateToolpath(void)
 	temptop = temp;
 	temptop.InvertTop();
 
-	double rx = target.GetResolutionX();
-	double ry = target.GetResolutionY();
-	double rx2 = rx / 2;
-	double ry2 = ry / 2;
+	const double rx = target.GetResolutionX();
+	const double ry = target.GetResolutionY();
+	const double rx2 = rx / 2;
+	const double ry2 = ry / 2;
 
 	int cx, cy;
 	double d;
@@ -352,7 +352,7 @@ void GeneratorFast::GenerateToolpath(void)
 			//				+ rx2, cy * ry + ry2, level)) break;
 
 			poly = temptop.FindCut(cx, cy);
-			temp.PolygonDropOntoTarget(poly, level + raiseStep);
+			temp.PolygonDropOntoTarget(poly, level); // + raiseStep);
 
 			if(mp.Z > level){
 				// Drill down
@@ -377,7 +377,7 @@ void GeneratorFast::GenerateToolpath(void)
 						round((poly.elements[i].y - ry2) / ry), discTool);
 
 				if(i == 0){
-					tp += MoveSavely(temp, mp.X, mp.Y, mp.Z, poly.elements[i].x,
+					tp += MoveSafely(temp, mp.X, mp.Y, mp.Z, poly.elements[i].x,
 							poly.elements[i].y, poly.elements[i].z);
 				}
 				mp.X = poly.elements[i].x;
@@ -443,6 +443,7 @@ void GeneratorFast::GenerateToolpath(void)
 	AffineTransformMatrix shiftback;
 	shiftback.TranslateGlobal(area.xmin, area.ymin, area.zmin);
 	tp.ApplyTransformation(shiftback);
+
 	toolpath = tp;
 	return;
 	//
