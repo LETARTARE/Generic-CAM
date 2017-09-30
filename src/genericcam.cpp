@@ -55,9 +55,8 @@ GenericCAMApp::GenericCAMApp()
 			}
 	}
 
-	//CHECK: Why does wxLOCALE_CONV_ENCODING not work?
 	if(!locale.Init(selectedLanguage, wxLOCALE_DONT_LOAD_DEFAULT)){
-		wxLogError(_T("This language is not supported by the system."));
+		wxLogWarning(_T("This language is not supported by the system."));
 		return;
 	}
 
@@ -73,9 +72,11 @@ GenericCAMApp::GenericCAMApp()
 		temp =
 		_T("The translation catalog for ") + locale.GetCanonicalName() +
 		_T(" was not loaded !");
-		wxLogError(temp);
+		wxLogWarning(temp);
 	}
+	locale.AddCatalog("wxstd");
 }
+
 GenericCAMApp::~GenericCAMApp(void)
 {
 #if wxUSE_DEBUG_CONTEXT == 1
