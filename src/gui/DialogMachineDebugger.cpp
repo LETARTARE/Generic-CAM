@@ -147,7 +147,7 @@ void DialogMachineDebugger::OnMachineSave(wxCommandEvent& event)
 					"Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
 			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
-	if(machine.fileName.IsOk()) dialog.SetFilename(
+	if(machine.fileName.IsOk()) dialog.SetPath(
 			machine.fileName.GetFullPath());
 
 	if(dialog.ShowModal() == wxID_OK){

@@ -738,7 +738,7 @@ void FrameMain::OnProjectSaveAs(wxCommandEvent &event)
 		dialog.SetDirectory(settings.lastProjectDirectory);
 	}
 
-	if(project.fileName.IsOk()) dialog.SetFilename(
+	if(project.fileName.IsOk()) dialog.SetPath(
 			project.fileName.GetFullPath());
 
 	if(dialog.ShowModal() == wxID_OK){
@@ -1031,7 +1031,7 @@ void FrameMain::OnToolboxSave(wxCommandEvent &event)
 			_("Toolbox (*.xml)|*.xml|All files|*.*"),
 			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 	if(toolbox.fileName.IsOk()){
-		dialog.SetFilename(toolbox.fileName.GetFullPath());
+		dialog.SetPath(toolbox.fileName.GetFullPath());
 	}else{
 		if(wxDir::Exists(settings.lastToolboxDirectory)){
 			dialog.SetDirectory(settings.lastToolboxDirectory);

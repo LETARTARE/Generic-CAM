@@ -87,6 +87,7 @@ int Project::GetFirstSelectedRun(void) const
 bool Project::GenerateToolpaths(void)
 {
 	Update();
+
 	for(size_t n = 0; n < run.GetCount(); n++){
 		run[n].GenerateToolpaths();
 	}
@@ -443,7 +444,8 @@ void Project::LoadPattern(wxFileName fileName)
 {
 }
 
-bool Project::SaveToolpath(wxFileName fileName, int runNr, ToolPath::Dialect dialect)
+bool Project::SaveToolpath(wxFileName fileName, int runNr,
+		ToolPath::Dialect dialect)
 {
 	if(runNr < 0 || runNr > run.GetCount()) return false;
 	return run[runNr].SaveToolpaths(fileName, dialect);
