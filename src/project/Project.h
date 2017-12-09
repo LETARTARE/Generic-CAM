@@ -67,6 +67,11 @@ public:
 //	bool processToolpath;
 //	bool interruptProcessing;
 
+	// Granularity
+	double resX;
+	double resY;
+	//TODO Make the granularity a parameter.
+
 	// Methods
 public:
 	void Clear(void);

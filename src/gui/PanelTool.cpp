@@ -75,7 +75,7 @@ void PanelTool::OnPaint(wxPaintEvent& event)
 
 	float scaleX = (float) sz.x / tool->GetMaxDiameter();
 	float scaleY = (float) sz.y
-			/ (tool->GetPositiveLength() + tool->GetNegativeLength());
+			/ (tool->GetToolLength() + tool->GetNegativeLength());
 
 	float scaleFactor = (scaleX < scaleY)? scaleX : scaleY;
 	scaleFactor *= 0.9;

@@ -86,10 +86,25 @@ void Run::Update(void)
 
 void Run::GenerateToolpaths(void)
 {
+	assert(refWorkpiece >= 0);
+
+	const Workpiece* const workpiece = &(parent->workpieces[this->refWorkpiece]);
+	assert(workpiece != NULL);
+
 	Update();
+
+	simulator.InsertMachine(NULL); // TODO This forces the Simulator to update. This should be a more intuitive function.
+	simulator.InsertMachine(&machine);
+	simulator.InsertWorkpiece(NULL);
+	simulator.InsertToolPath(NULL);
+
+	simulator.InsertTarget((DexelTarget*) &(workpiece->model));
+
 	for(size_t i = 0; i < generators.GetCount(); i++){
 		assert(generators[i] != NULL);
+
 		generators[i]->GenerateToolpath();
+
 		if(!generators[i]->toolpath.positions.IsEmpty()){
 			{
 				GCodeBlock temp(_T("(Set spindle speed 1/min)"));
@@ -103,10 +118,13 @@ void Run::GenerateToolpaths(void)
 			}
 			{
 				GCodeBlock temp(_T("M6 (Select tool)"));
-				temp.T = generators[i]->refTool + 1;
+				temp.T = generators[i]->refTool + 1; //TODO Refactor the tool numbering/handling in the Machine.
 				generators[i]->toolpath.positions.Insert(temp, 2);
 			}
 		}
+		simulator.InsertToolPath(&(generators[i]->toolpath));
+		if(i == 0) simulator.InitSimulation(0);
+		simulator.Last();
 	}
 }
 
@@ -178,7 +196,7 @@ bool Run::SaveToolpaths(wxFileName fileName, ToolPath::Dialect dialect)
 					wxString::Format(_T("[tooldef t%u d%g z%g"),
 							machine.tools[i].slotNr,
 							machine.tools[i].GetMaxDiameter() * 1000.0,
-							machine.tools[i].GetPositiveLength() * 1000.0),
+							machine.tools[i].GetToolLength() * 1000.0),
 					fileType);
 		}
 	}
@@ -197,31 +215,36 @@ void Run::Paint(void) const
 	if(pr == NULL) return;
 
 	::glPushMatrix();
-
 	if(refWorkpiece > -1){
 		Vector3 center = pr->workpieces[refWorkpiece].GetCenter();
 		::glTranslatef(-center.x, -center.y, -center.z);
 	}
 
+
 	machine.Paint();
+
 
 	if(refWorkpiece > -1){
 		::glPushMatrix();
 		::glMultMatrixd(machine.workpiecePosition.a);
+
 		if(showSimulation){
 			simulator.Paint();
 		}else{
+
 			bool anySelected = false;
 			for(size_t n = 0; n < generators.GetCount(); n++){
 				assert(generators[n] != NULL);
 				if(generators[n]->selected) anySelected = true;
 			}
+
 			for(size_t n = 0; n < generators.GetCount(); n++){
 				assert(generators[n] != NULL);
 				if(!anySelected || generators[n]->selected){
 					generators[n]->Paint();
 				}
 			}
+
 			::glPushMatrix();
 			::glMultMatrixd(workpiecePlacement.a);
 			pr->workpieces[refWorkpiece].Paint();
@@ -230,8 +253,8 @@ void Run::Paint(void) const
 
 		// Draw the "Touchpoint" symbol
 		const float s = 0.03;
-		glTranslatef(0, 0, touchoffHeight);
 
+		glTranslatef(0, 0, touchoffHeight);
 		glScalef(s, s, s);
 		glRotatef(90, 1, 0, 0);
 		touchpoint.Paint();

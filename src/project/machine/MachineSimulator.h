@@ -33,6 +33,8 @@
  * Small class coordinating the advancements of the Machine during the
  * simulation cycle. It also coordinates the setup and processing of the
  * Workpieces in the machine.
+ *
+ * \todo Remove the quick simulator from the Machine. Everything should be simulated with the same code.
  */
 
 #include "Machine.h"
@@ -40,11 +42,11 @@
 #include "../ToolBox.h"
 #include "../ToolPath.h"
 #include "../Workpiece.h"
-#include "MachinePosition.h"
 #include "../generator/DexelTarget.h"
 
 #include <wx/filename.h>
 #include <vector>
+#include "CNCPosition.h"
 
 class MachineSimulator {
 	// Constructor/ Destructor
@@ -52,13 +54,14 @@ public:
 	MachineSimulator();
 	virtual ~MachineSimulator();
 
-	void InsertWorkpiece(Workpiece* workpiece);
-	void InsertToolPath(ToolPath* toolpath);
 	void InsertMachine(Machine* machine);
+	void InsertWorkpiece(Workpiece* workpiece);
+	void InsertTarget(DexelTarget* target);
+	void InsertToolPath(ToolPath* toolpath);
 
 	void InitSimulation(size_t maxCells);
 
-	void Reset(void);
+	void Reset(bool calculateTiming = true);
 	void Previous(void);
 	void Step(float tTarget);
 	void Next(void);
@@ -68,15 +71,16 @@ public:
 
 	//Member variables
 public:
-	Workpiece* workpiece;
-	ToolPath* toolpath;
-	Machine* machine;
+	Machine* machine; //!< Linked Machine to move around.
 
-	DexelTarget simulation;
+	Workpiece* workpiece; //!< Workpiece to start from. Alternative to basetarget.
+	DexelTarget* basetarget; //!< Target to start from. Alternative to workpiece. Stays unchanged.
+
+	DexelTarget target; //!< Target that is modified. Copied from basetarget or generated from workpiece.
+
+	ToolPath* toolpath; //!< Toolpath to apply to target.
 
 	bool initialized;
-
-	Vector3 offset;
 
 	float tStep;
 	size_t step;

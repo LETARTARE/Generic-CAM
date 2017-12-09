@@ -38,6 +38,7 @@
 #include "Support.h"
 #include "../3D/BooleanBox.h"
 #include "../3D/BoundingBox.h"
+#include "generator/DexelTarget.h"
 
 #include <wx/txtstrm.h>
 #include <wx/dynarray.h>
@@ -51,23 +52,32 @@ public:
 	Workpiece(const StockMaterial &material);
 	virtual ~Workpiece();
 
+	void PrepareModel(void);
+
 	// Member variables
 public:
-	Project * parent; //!< Pointer back to the Project this Workpiece belongs to.
 	wxString name;
-	AffineTransformMatrix matrix;
-	ArrayOfObjectPlacement placements;
-	ArrayOfSupport supports;
+	Project * parent; //!< Pointer back to the Project this Workpiece belongs to.
+	AffineTransformMatrix matrix; //!< Matrix for flipping and rotating the Workpiece.
+	ArrayOfObjectPlacement placements; //!< List of objects to place into the Workpiece.
+	ArrayOfSupport supports; //!< List of extra geometry used as support.
 
-	int refObject; //!< Use an loaded Object as the Workpiece definition.
+	int refObject; //!< Use an Object as the Workpiece definition.
 
 	bool selected;
+
+	// The result is of Type DexelTarget. It is written to from each Run during Toolpath generation.
+	// it keeps track on how the Workpiece look like at the moment. This Structure is read by the
+	// Toolpath Generators as a reference point to start from.
+	// This is not optimal. In the end the result has to be stored into a more flexible
+	// structure (OctreeSomething, perhaps).
+	DexelTarget model; ///< Result after the Generators have run
 
 //	volatile bool hasRunningGenerator;
 
 private:
-	//TODO: Replace the BooleanBox with the simulation or geometry.
-	BooleanBox bbox; ///< Redundant?
+	//TODO Sort out the different modes for Workpiece generation.
+	BooleanBox bbox; ///< A BooleanBox is used to generate the Workpiece from embedding the Objects into it.
 
 	// Methods
 public:

@@ -1,5 +1,6 @@
 
 *~
+*.bak
 genericcam
 
 /pdf
@@ -16,7 +17,7 @@ genericcam
 /toolpath
 /projekts
 
-/machines/Hermle\ 800.zip
+/machines/SetupArea/
 /*.zip
 
 /doc/html

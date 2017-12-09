@@ -32,7 +32,7 @@
  * \brief Generated Toolpath
  *
  *
- * \par Safety Block
+ * \section safetyblock Safety Block
  *  - \b G90 - Absolute positioning
  *  - \b G80 - Cancel all canned cycles
  *  - \b G40 - Tool radius compensation: off
@@ -43,6 +43,20 @@
  *  - \b G94 - Feedrate per minute
  *  - \b G64 - Default cutting mode
  *
+ * \section dialects Dialects
+ *
+ * \par RS274NGC
+ *
+ * The normal G-code. This will be understood by most of the machines available.
+ *
+ * \par Fanuc-M
+ *
+ * Farnuc-M is an old milling simulation software published by Fanuc. This simulator
+ * contains some special nuances:
+ *   - The dwelling command uses the X parameter for the dwell time instead of P.
+ *   - In the header of the file the setup of the machine and workpiece is described.
+ *   - Spindle speeds need to be clamped at 1000 rpm.
+ *   - References to A, B, C, U, V, W must not appear in the file.
  *
  */
 

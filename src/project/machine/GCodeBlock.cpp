@@ -36,9 +36,9 @@ WX_DEFINE_OBJARRAY(ArrayOfGCodeBlock)
 
 GCodeBlock::GCodeBlock(wxString block, double conversionFactor)
 {
-	tStart = 0.0;
+	t = 0.0;
 	duration = 0.0;
-	length = 0.0;
+//	length = 0.0;
 
 	this->conversionFactor = conversionFactor;
 	A = 0.0;

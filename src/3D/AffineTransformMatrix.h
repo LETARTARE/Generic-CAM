@@ -125,6 +125,9 @@ public:
 
 	Vector3 Transform(Vector3 const& v) const;
 	Vector3 TransformNoShift(Vector3 const& v) const;
+
+	double Distance(const AffineTransformMatrix &other) const;
+
 };
 
 WX_DECLARE_OBJARRAY(AffineTransformMatrix, ArrayOfAffineTransformMatrix);

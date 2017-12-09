@@ -1,0 +1,20 @@
+/** \defgroup CoordinateSystems Coordinate Systems
+
+There are three different ways to describe coordinate systems in this software:
+
+  - Vector3
+  - AffineTransformMatrix
+  - CNCPosition
+
+
+**/
+
+/** \class Vector3
+ * 	\ingroup CoordinateSystems
+**/
+/** \class AffineTransformMatrix
+ * 	\ingroup CoordinateSystems
+**/
+/** \class CNCPosition
+ * 	\ingroup CoordinateSystems
+**/

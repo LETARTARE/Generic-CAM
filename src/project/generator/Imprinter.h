@@ -87,7 +87,7 @@ public:
 	void Swap(ImprinterElement& b);
 };
 
-//TODO: Base Imprinter on BoundingBox
+//TODO Base Imprinter on BoundingBox
 class Imprinter {
 	friend class GeneratorTest; //TODO: Remove this friend class.
 public:

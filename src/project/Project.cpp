@@ -37,6 +37,7 @@
 
 #include <GL/gl.h>
 #include <math.h>
+#include <float.h>
 
 Project::Project()
 {
@@ -50,6 +51,9 @@ Project::~Project()
 void Project::Clear(void)
 {
 	name = _("Untitled");
+
+	resX = 0.001; // = 1 mm
+	resY = 0.001; // = 1 mm
 
 //	processToolpath = false;
 //	interruptProcessing = false;
@@ -88,7 +92,39 @@ bool Project::GenerateToolpaths(void)
 {
 	Update();
 
+	const AffineTransformMatrix rotx0 = AffineTransformMatrix::Identity();
+	const AffineTransformMatrix rotx180 = AffineTransformMatrix::RotateXYZ(M_PI,
+			0, 0);
+
+	for(size_t n = 0; n < workpieces.GetCount(); n++)
+		workpieces[n].PrepareModel();
+
 	for(size_t n = 0; n < run.GetCount(); n++){
+		const int wp = run[n].refWorkpiece;
+
+		if(n > 0){
+			AffineTransformMatrix lastPlacement;
+			for(size_t m = n; m-- > 0;){
+				if(wp == run[m].refWorkpiece){
+					lastPlacement = run[m].workpiecePlacement;
+					break;
+				}
+			}
+			lastPlacement = run[n].workpiecePlacement / lastPlacement;
+			for(uint_fast8_t m = 12; m <= 14; m++)
+				lastPlacement.a[m] = 0;
+
+			if(lastPlacement.Distance(rotx0) < FLT_EPSILON){
+				// Nothing to do
+			}else{
+				if(lastPlacement.Distance(rotx180) < FLT_EPSILON){
+					workpieces[wp].model.RotateX180();
+				}else{
+					throw("This type of rotation has not been programmed yet.");
+				}
+			}
+		}
+
 		run[n].GenerateToolpaths();
 	}
 	return true;

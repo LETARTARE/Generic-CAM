@@ -68,8 +68,6 @@ OpenGLCanvas::OpenGLCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 	leftEyeG = 0;
 	leftEyeB = 0;
 
-	ct1 = ct2 = ct3 = 0;
-
 	rotationMode = rotateInterwoven;
 
 	this->Connect(wxEVT_SIZE, wxSizeEventHandler(OpenGLCanvas::OnSize), NULL,
@@ -104,7 +102,7 @@ OpenGLCanvas::~OpenGLCanvas()
 {
 #ifdef _USE_6DOFCONTROLLER
 	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(OpenGLCanvas::OnTimer),
-	NULL, this);
+			NULL, this);
 #endif
 	this->Disconnect(wxEVT_RIGHT_DCLICK,
 			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
@@ -167,7 +165,7 @@ void OpenGLCanvas::SetupLighting()
 	glLightfv(GL_LIGHT0, GL_POSITION, position0);
 	glEnable(GL_LIGHT0);
 
-	::glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING);
 }
 
 void OpenGLCanvas::InitGL()
@@ -178,27 +176,27 @@ void OpenGLCanvas::InitGL()
 	// Is done in OnSize(...)
 	//	GLfloat attenuation[] =
 	//		{1.0f, -0.01f, -.000001f};
-	//::glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, attenuation, 0);
-	::glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-	::glEnable(GL_COLOR_MATERIAL);
+	//glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, attenuation, 0);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	glEnable(GL_COLOR_MATERIAL);
 
-	::glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//	::glBlendFunc(GL_ONE, GL_ZERO); // disable alpha blending
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//	glBlendFunc(GL_ONE, GL_ZERO); // disable alpha blending
 
-	::glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	::glClearDepth(1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearDepth(1.0f);
 
-	::glEnable(GL_BLEND);
-	::glEnable(GL_POINT_SMOOTH);
-	::glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glEnable(GL_POINT_SMOOTH);
+	glEnable(GL_DEPTH_TEST);
 #if defined (__WIN32__)
-	::glEnable(GL_NORMALIZE);
+	glEnable(GL_NORMALIZE);
 #else
-	::glEnable(GL_RESCALE_NORMAL);
+	glEnable(GL_RESCALE_NORMAL);
 #endif
-	::glFrontFace(GL_CCW);
-	::glCullFace(GL_BACK);
-	::glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
 
 	SetupLighting();
 
@@ -227,31 +225,32 @@ bool OpenGLCanvas::OnPick(OpenGLPick &result, wxPoint pos)
 	}
 	int w, h;
 	GetClientSize(&w, &h);
-	::glViewport(0, 0, (GLint) w, (GLint) h);
+	glViewport(0, 0, (GLint) w, (GLint) h);
 
-	::glClear(GL_DEPTH_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
 
-	::glSelectBuffer(result.GetBufferSize(), result.GetBuffer());
-	::glRenderMode(GL_SELECT);
-	::glInitNames();
-	::glPushName(0);
+	glSelectBuffer(result.GetBufferSize(), result.GetBuffer());
+	glRenderMode(GL_SELECT);
+	glInitNames();
+	glPushName(0); // This value ends up as the label for the background.
 
-	::glMatrixMode(GL_PROJECTION);
-	::glLoadIdentity();
+	glMatrixMode(GL_PROJECTION);
+	glCullFace(GL_BACK);
+	glLoadIdentity();
 
 	GLint viewport[4];
-	::glGetIntegerv(GL_VIEWPORT, viewport);
-	::gluPickMatrix(pos.x, viewport[3] - pos.y, 1, 1, viewport);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	gluPickMatrix(pos.x, viewport[3] - pos.y, 1, 1, viewport);
 
 	GLdouble ar = (GLdouble) w / (GLdouble) h; // Calculate perspective
-	::gluPerspective(45, ar, 0.01, 10);
-	::glMatrixMode(GL_MODELVIEW);
-	::glLoadIdentity();
+	gluPerspective(45, ar, 0.01, 10);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
-	::glTranslatef(0.0, 0.0, -focalDistance);
-	::glScalef(scale, scale, scale);
-	::glMultMatrixd(rotmat.a);
-	::glMultMatrixd(transmat.a);
+	glTranslatef(0.0, 0.0, -focalDistance);
+	glScalef(scale, scale, scale);
+	glMultMatrixd(rotmat.a);
+	glMultMatrixd(transmat.a);
 
 	Render();
 	glFlush();
@@ -268,10 +267,11 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	if(!GetContext()) return;
 #endif
 
+	//TODO: Rewrite the Context handling for wxWidgets >= 3.0
 	wxGLCanvas::SetCurrent(); // Link OpenGL to this area
 	wxPaintDC(this); // Set the clipping for this area
 
-	// Init OpenGL once, but after SetCurrent
+	// Init OpenGL once for each Canvas. Has to be done after SetCurrent.
 	if(!isInitialized){
 		InitGL();
 		isInitialized = true;
@@ -280,7 +280,7 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	// set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
 
 	GetClientSize(&w, &h);
-	::glViewport(0, 0, (GLint) w, (GLint) h);
+	glViewport(0, 0, (GLint) w, (GLint) h);
 
 	//	float specReflection[] = { 0.8f, 0.0f, 0.8f, 1.0f };
 	//	glMaterialfv(GL_FRONT, GL_SPECULAR, specReflection);
@@ -295,17 +295,17 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	// Background
 
 	if(stereoMode == stereoAnaglyph){
-		::glEnable(GL_COLOR_MATERIAL);
-		::glColor3ub(backgroundGrayLevel, backgroundGrayLevel,
+		glEnable(GL_COLOR_MATERIAL);
+		glColor3ub(backgroundGrayLevel, backgroundGrayLevel,
 				backgroundGrayLevel);
-		::glDisable(GL_COLOR_MATERIAL);
+		glDisable(GL_COLOR_MATERIAL);
 	}
 
-	::glMatrixMode(GL_PROJECTION);
-	::glLoadIdentity();
-	::gluOrtho2D(0, 1, 0, 1);
-	::glMatrixMode(GL_MODELVIEW);
-	::glLoadIdentity();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, 1, 0, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
 	glNormal3b(0, 0, 1);
 	glBegin(GL_QUADS);
@@ -322,34 +322,35 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	glClear( GL_DEPTH_BUFFER_BIT);
 //	}
 
-	::glMatrixMode(GL_PROJECTION);
-	::glLoadIdentity();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 	GLdouble ar = (GLdouble) w / (GLdouble) h; // Calculate perspective
-	::gluPerspective(45, ar, 0.01, 10);
+	gluPerspective(45, ar, 0.01, 10);
+	glMatrixMode(GL_MODELVIEW);
 
-	::glMatrixMode(GL_MODELVIEW);
-	::glLoadIdentity();
+	glCullFace(GL_BACK);
+	glLoadIdentity();
 
 	if(stereoMode == stereoAnaglyph){
-		::glColorMask((leftEyeR == 0)? GL_FALSE : GL_TRUE,
+		glColorMask((leftEyeR == 0)? GL_FALSE : GL_TRUE,
 				(leftEyeG == 0)? GL_FALSE : GL_TRUE,
 				(leftEyeB == 0)? GL_FALSE : GL_TRUE, GL_TRUE);
-		::glEnable(GL_COLOR_MATERIAL);
-		::glColor3ub(leftEyeR, leftEyeG, leftEyeB);
-		::glDisable(GL_COLOR_MATERIAL);
+		glEnable(GL_COLOR_MATERIAL);
+		glColor3ub(leftEyeR, leftEyeG, leftEyeB);
+		glDisable(GL_COLOR_MATERIAL);
 	}
 	if(stereoMode == stereoShutter){
-		::glDrawBuffer(GL_BACK_LEFT);
+		glDrawBuffer(GL_BACK_LEFT);
 	}
 
 	if(stereoMode != stereoOff){
-		::glRotatef(atan(eyeDistance / 2 / focalDistance) * 180.0 / M_PI, 0, 1,
+		glRotatef(atan(eyeDistance / 2 / focalDistance) * 180.0 / M_PI, 0, 1,
 				0);
-		::glTranslatef(eyeDistance / 2, 0, 0);
+		glTranslatef(eyeDistance / 2, 0, 0);
 	}
 
-	::glTranslatef(0.0, 0.0, -focalDistance);
-	::glScalef(scale, scale, scale);
+	glTranslatef(0.0, 0.0, -focalDistance);
+	glScalef(scale, scale, scale);
 
 	GLint viewport[4];
 	GLdouble modelview[16];
@@ -365,8 +366,8 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 			&winZ2);
 	unitAtOrigin = winX2 - winX1;
 
-	::glMultMatrixd(rotmat.a);
-	::glMultMatrixd(transmat.a);
+	glMultMatrixd(rotmat.a);
+	glMultMatrixd(transmat.a);
 	//	if(m_gllist == 0){
 	//		m_gllist = glGenLists(1); // Make one (1) empty display list.
 	//		glNewList(m_gllist, GL_COMPILE_AND_EXECUTE);
@@ -376,34 +377,36 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	//		glCallList(m_gllist);
 	//	}
 
-	if(stereoMode != stereoOff) ::glLoadIdentity();
+	if(stereoMode != stereoOff){
+		glCullFace(GL_BACK);
+		glLoadIdentity();
+        }
 
 	if(stereoMode == stereoAnaglyph){
-		::glColorMask((rightEyeR == 0)? GL_FALSE : GL_TRUE,
+		glColorMask((rightEyeR == 0)? GL_FALSE : GL_TRUE,
 				(rightEyeG == 0)? GL_FALSE : GL_TRUE,
 				(rightEyeB == 0)? GL_FALSE : GL_TRUE, GL_TRUE);
-		::glEnable(GL_COLOR_MATERIAL);
-		::glColor3ub(rightEyeR, rightEyeG, rightEyeB);
-		::glDisable(GL_COLOR_MATERIAL);
+		glEnable(GL_COLOR_MATERIAL);
+		glColor3ub(rightEyeR, rightEyeG, rightEyeB);
+		glDisable(GL_COLOR_MATERIAL);
 	}
 	if(stereoMode == stereoShutter){
-		::glDrawBuffer(GL_BACK_RIGHT);
+		glDrawBuffer(GL_BACK_RIGHT);
 	}
 
 	if(stereoMode != stereoOff){
 		glClear(GL_DEPTH_BUFFER_BIT);
-
-		::glRotatef(-atan(eyeDistance / 2 / focalDistance) * 180.0 / M_PI, 0, 1,
+		glRotatef(-atan(eyeDistance / 2 / focalDistance) * 180.0 / M_PI, 0, 1,
 				0);
-		::glTranslatef(-eyeDistance / 2, 0, 0);
-		::glTranslatef(0.0, 0.0, -focalDistance);
-		::glScalef(scale, scale, scale);
-		::glMultMatrixd(rotmat.a);
-		::glMultMatrixd(transmat.a);
+		glTranslatef(-eyeDistance / 2, 0, 0);
+		glTranslatef(0.0, 0.0, -focalDistance);
+		glScalef(scale, scale, scale);
+		glMultMatrixd(rotmat.a);
+		glMultMatrixd(transmat.a);
 		Render();
 		//glCallList(m_gllist);
 
-		::glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	}
 
 	glFlush();
@@ -413,7 +416,7 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 
 void OpenGLCanvas::Render()
 {
-	::glPushMatrix();
+	glPushMatrix();
 
 	GLfloat x = 1.0;
 	GLfloat y = 0.5;
@@ -424,75 +427,72 @@ void OpenGLCanvas::Render()
 	GLfloat ny = y / t;
 	GLfloat nz = z / t;
 
-	::glBegin(GL_QUADS);
-	::glNormal3f(nx, ny, nz);
-	::glVertex3f(x, y, z);
-	::glNormal3f(nx, -ny, nz);
-	::glVertex3f(x, -y, z);
-	::glNormal3f(nx, -ny, -nz);
-	::glVertex3f(x, -y, -z);
-	::glNormal3f(nx, ny, -nz);
-	::glVertex3f(x, y, -z);
+	glBegin(GL_QUADS);
+	glNormal3f(nx, ny, nz);
+	glVertex3f(x, y, z);
+	glNormal3f(nx, -ny, nz);
+	glVertex3f(x, -y, z);
+	glNormal3f(nx, -ny, -nz);
+	glVertex3f(x, -y, -z);
+	glNormal3f(nx, ny, -nz);
+	glVertex3f(x, y, -z);
 
-	::glNormal3f(-nx, ny, nz);
-	::glVertex3f(-x, y, z);
-	::glNormal3f(-nx, ny, -nz);
-	::glVertex3f(-x, y, -z);
-	::glNormal3f(-nx, -ny, -nz);
-	::glVertex3f(-x, -y, -z);
-	::glNormal3f(-nx, -ny, nz);
-	::glVertex3f(-x, -y, z);
+	glNormal3f(-nx, ny, nz);
+	glVertex3f(-x, y, z);
+	glNormal3f(-nx, ny, -nz);
+	glVertex3f(-x, y, -z);
+	glNormal3f(-nx, -ny, -nz);
+	glVertex3f(-x, -y, -z);
+	glNormal3f(-nx, -ny, nz);
+	glVertex3f(-x, -y, z);
 
-	::glNormal3f(nx, ny, nz);
-	::glVertex3f(x, y, z);
-	::glNormal3f(nx, ny, -nz);
-	::glVertex3f(x, y, -z);
-	::glNormal3f(-nx, ny, -nz);
-	::glVertex3f(-x, y, -z);
-	::glNormal3f(-nx, ny, nz);
-	::glVertex3f(-x, y, z);
+	glNormal3f(nx, ny, nz);
+	glVertex3f(x, y, z);
+	glNormal3f(nx, ny, -nz);
+	glVertex3f(x, y, -z);
+	glNormal3f(-nx, ny, -nz);
+	glVertex3f(-x, y, -z);
+	glNormal3f(-nx, ny, nz);
+	glVertex3f(-x, y, z);
 
-	::glNormal3f(nx, -ny, nz);
-	::glVertex3f(x, -y, z);
-	::glNormal3f(-nx, -ny, nz);
-	::glVertex3f(-x, -y, z);
-	::glNormal3f(-nx, -ny, -nz);
-	::glVertex3f(-x, -y, -z);
-	::glNormal3f(nx, -ny, -nz);
-	::glVertex3f(x, -y, -z);
+	glNormal3f(nx, -ny, nz);
+	glVertex3f(x, -y, z);
+	glNormal3f(-nx, -ny, nz);
+	glVertex3f(-x, -y, z);
+	glNormal3f(-nx, -ny, -nz);
+	glVertex3f(-x, -y, -z);
+	glNormal3f(nx, -ny, -nz);
+	glVertex3f(x, -y, -z);
 
-	::glNormal3f(nx, ny, nz);
-	::glVertex3f(x, y, z);
-	::glNormal3f(-nx, ny, nz);
-	::glVertex3f(-x, y, z);
-	::glNormal3f(-nx, -ny, nz);
-	::glVertex3f(-x, -y, z);
-	::glNormal3f(nx, -ny, nz);
-	::glVertex3f(x, -y, z);
+	glNormal3f(nx, ny, nz);
+	glVertex3f(x, y, z);
+	glNormal3f(-nx, ny, nz);
+	glVertex3f(-x, y, z);
+	glNormal3f(-nx, -ny, nz);
+	glVertex3f(-x, -y, z);
+	glNormal3f(nx, -ny, nz);
+	glVertex3f(x, -y, z);
 
-	::glNormal3f(nx, ny, -nz);
-	::glVertex3f(x, y, -z);
-	::glNormal3f(nx, -ny, -nz);
-	::glVertex3f(x, -y, -z);
-	::glNormal3f(-nx, -ny, -nz);
-	::glVertex3f(-x, -y, -z);
-	::glNormal3f(-nx, ny, -nz);
-	::glVertex3f(-x, y, -z);
+	glNormal3f(nx, ny, -nz);
+	glVertex3f(x, y, -z);
+	glNormal3f(nx, -ny, -nz);
+	glVertex3f(x, -y, -z);
+	glNormal3f(-nx, -ny, -nz);
+	glVertex3f(-x, -y, -z);
+	glNormal3f(-nx, ny, -nz);
+	glVertex3f(-x, y, -z);
 
-	::glEnd();
+	glEnd();
 
-	::glPopMatrix();
+	glPopMatrix();
 }
 
 void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 {
-	ct1++;
-
 	if(event.ButtonDown(wxMOUSE_BTN_RIGHT)
 			|| event.ButtonDown(wxMOUSE_BTN_MIDDLE)){
 		x = event.m_x;
 		y = event.m_y;
-		ct2++;
 	}
 	if(event.ButtonDClick(wxMOUSE_BTN_RIGHT)){
 		rotmat = AffineTransformMatrix::Identity();
@@ -501,7 +501,6 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 		turntableY = M_PI / 2;
 		x = event.m_x;
 		y = event.m_y;
-		ct2++;
 		this->Refresh();
 	}
 
@@ -538,7 +537,6 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 		}
 		x = event.m_x;
 		y = event.m_y;
-		ct3++;
 
 		this->Refresh();
 	}
@@ -551,7 +549,6 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 		rotmat.TranslateGlobal(dx, -dy, 0);
 		x = event.m_x;
 		y = event.m_y;
-		ct3++;
 
 		this->Refresh();
 	}
@@ -569,7 +566,6 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 #ifdef _USE_6DOFCONTROLLER
 void OpenGLCanvas::OnTimer(wxTimerEvent& event)
 {
-//	return;
 	if(control == NULL) return;
 
 	control->Pump();

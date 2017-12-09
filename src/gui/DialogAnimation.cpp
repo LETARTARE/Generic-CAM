@@ -116,13 +116,17 @@ bool DialogAnimation::TransferDataToWindow(void)
 				SecondsToTC(simulator->toolpath->MaxTime()));
 		m_textCtrlTime->SetValue(SecondsToTC(simulator->tStep));
 
-		if(simulator->step >= 2){
+		if(simulator->step >= 2
+				&& simulator->step
+						< (simulator->toolpath->positions.GetCount() + 2)){
 			m_textCtrl0->SetValue(
 					simulator->toolpath->positions[(simulator->step) - 2].GetCode());
 		}else{
 			m_textCtrl0->SetValue(_T(""));
 		}
-		if(simulator->step >= 1){
+		if(simulator->step >= 1
+				&& simulator->step
+						< (simulator->toolpath->positions.GetCount() + 1)){
 			m_textCtrl1->SetValue(
 					simulator->toolpath->positions[(simulator->step) - 1].GetCode());
 		}else{
@@ -196,13 +200,11 @@ void DialogAnimation::OnClose(wxCommandEvent& event)
 
 void DialogAnimation::OnSelectToolpath(wxCommandEvent& event)
 {
-//	InitSimulation();
 	TransferDataToWindow();
 }
 
 void DialogAnimation::OnChangeTime(wxCommandEvent& event)
 {
-
 	PositionSlider();
 	TransferDataToWindow();
 }
@@ -232,7 +234,7 @@ void DialogAnimation::OnScroll(wxScrollEvent& event)
 void DialogAnimation::OnFirst(wxCommandEvent& event)
 {
 	if(simulator == NULL) return;
-	simulator->Step(0);
+	simulator->Reset(true); // TODO Remove the true, the recalculation of the timing is only needed here, because it is not handled correctly.
 	PositionSlider();
 	TransferDataToWindow();
 }

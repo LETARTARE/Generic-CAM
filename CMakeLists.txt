@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 2.8)
 
 project(genericcam)
 
-find_package(wxWidgets COMPONENTS richtext gl core base xml adv REQUIRED)
+find_package(wxWidgets COMPONENTS richtext gl core base html xml adv REQUIRED)
 include( "${wxWidgets_USE_FILE}" )
 
 if(MINGW)
 	include_directories( "/usr/local/i586-mingw32/include/lua5.3" )
 #	set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -I/usr/local/i586-mingw32/include")
 else(MINGW)
-	include_directories( "/usr/include/lua5.1" )
+	include_directories( "/usr/include/lua5.3" )
 endif(MINGW)
 
 set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -Wno-write-strings")
@@ -53,6 +53,7 @@ if(MINGW)
 		opengl32
 		glu32
 		lua53
+		portmidi
 	)
 else(MINGW)
 	add_executable(genericcam src/genericcam.cpp)
@@ -62,8 +63,10 @@ else(MINGW)
 		project
 		3D
 		${wxWidgets_LIBRARIES}
+		GL
 		GLU
-		lua5.1
+		lua5.3
+		portmidi
 	)
 endif(MINGW)
 

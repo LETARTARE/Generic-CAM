@@ -38,7 +38,7 @@ GeneratorDexel::GeneratorDexel()
 
 	target.displayField = false;
 
-	debug.displayField = true;
+	debug.displayField = false;
 }
 
 void GeneratorDexel::CopyParameterFrom(const Generator * other)
@@ -80,10 +80,6 @@ void GeneratorDexel::Paint(void) const
 
 void GeneratorDexel::GenerateToolpath(void)
 {
-	// Granularity
-	const double resX = 0.001; // = 1 mm
-	const double resY = 0.001; // = 1 mm
-
 	const Run* const run = this->parent;
 	assert(run != NULL);
 	const Project* const project = run->parent;
@@ -91,40 +87,20 @@ void GeneratorDexel::GenerateToolpath(void)
 	const Workpiece* const workpiece = &(project->workpieces[run->refWorkpiece]);
 	assert(workpiece != NULL);
 
-	BoundingBox tempArea = area;
-	tempArea.Transform(run->workpiecePlacement);
-	start.SetupBox(tempArea.GetSizeX(), tempArea.GetSizeY(),
-			tempArea.GetSizeZ(), resX, resY);
-
-	if(workpiece->refObject < 0
-			|| workpiece->refObject >= project->objects.GetCount()){
-		start.Fill();
-	}else{
-		const Object* wpObject = &(project->objects[workpiece->refObject]);
-
-		AffineTransformMatrix tempMatrix;
-		tempMatrix.TranslateGlobal(-area.xmin, -area.ymin, -area.zmin);
-		tempMatrix *= run->workpiecePlacement;
-
-		start.InitImprinting();
-		start.InsertObject(*wpObject, tempMatrix);
-		start.FinishImprint();
-
-	}
-
+	start = workpiece->model;
 	target = start;
-	target.InitImprinting();
 
 	DexelTarget outside(target);
 	outside.Fill();
 
+	target.InitImprinting();
 	for(size_t i = 0; i < workpiece->placements.GetCount(); i++){
 		const ObjectPlacement* const opl = &(workpiece->placements[i]);
 		const size_t refObject = opl->refObject;
 		const Object* object = &(project->objects[refObject]);
 		AffineTransformMatrix tempMatrix;
 		tempMatrix *= run->workpiecePlacement;
-		tempMatrix.TranslateGlobal(-area.xmin, -area.ymin, -area.zmin);
+//		tempMatrix.TranslateGlobal(-area.xmin, -area.ymin, -area.zmin);
 		tempMatrix *= opl->matrix;
 		target.InsertObject(*object, tempMatrix);
 
@@ -134,7 +110,8 @@ void GeneratorDexel::GenerateToolpath(void)
 			temp.InsertObject(*object, tempMatrix);
 			temp.FinishImprint();
 			DexelTarget discSlot;
-			discSlot.SetupDisc(opl->slotWidth, resX, resY);
+			discSlot.SetupDisc(opl->slotWidth, start.GetResolutionX(),
+					start.GetResolutionY());
 			temp.FoldRaise(discSlot);
 		}else{
 			temp.InsertTriangle(
@@ -176,6 +153,8 @@ void GeneratorDexel::GenerateToolpath(void)
 
 	target.FinishImprint();
 	debug = target;
+	debug.displayField = true;
+
 //	target.CleanOutlier();
 	outside.HardInvert();
 

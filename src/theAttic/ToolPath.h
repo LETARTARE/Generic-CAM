@@ -60,7 +60,6 @@ public:
 
 };
 
-WX_DECLARE_OBJARRAY(Toolpath, ArrayOfToolpath)
-;
+WX_DECLARE_OBJARRAY(Toolpath, ArrayOfToolpath);
 
 #endif /* TOOLPATH_H_ */

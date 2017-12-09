@@ -318,27 +318,28 @@ void Tool::Paint(void) const
 	}
 	for(unsigned int i = 0; i < contour.Count(); i++){
 		::glBegin(GL_QUAD_STRIP);
+		//TODO Note that Z is flipped. this has to be passed into the GenerateContour function.
 		for(unsigned int j = 0; j <= resolution; j++){
-			::glNormal3f(cc[j] * contour[i].n1.x, ss[j] * contour[i].n1.x,
-					contour[i].n1.z);
-			::glVertex3f(cc[j] * contour[i].p1.x, ss[j] * contour[i].p1.x,
-					contour[i].p1.z);
 			::glNormal3f(cc[j] * contour[i].n2.x, ss[j] * contour[i].n2.x,
-					contour[i].n2.z);
+					-contour[i].n2.z);
 			::glVertex3f(cc[j] * contour[i].p2.x, ss[j] * contour[i].p2.x,
-					contour[i].p2.z);
+					-contour[i].p2.z);
+			::glNormal3f(cc[j] * contour[i].n1.x, ss[j] * contour[i].n1.x,
+					-contour[i].n1.z);
+			::glVertex3f(cc[j] * contour[i].p1.x, ss[j] * contour[i].p1.x,
+					-contour[i].p1.z);
 		}
 		::glEnd();
 	}
 }
 
-float Tool::GetPositiveLength(void) const
+float Tool::GetToolLength(void) const
 {
 	float maxLength = 0.0;
 	float zPosition = 0.0;
 	for(unsigned int i = 0; i < elements.Count(); i++){
 		zPosition += elements[i].h;
-		//TODO: Extend this for round elements. Round elements can extend further downwards than the start and endpoint.
+		//TODO: Extend this for round elements. Round elements can extend further downwards than the start or endpoint.
 		if(zPosition > maxLength) maxLength = zPosition;
 	}
 	return maxLength;

@@ -96,6 +96,9 @@ public:
 	void SetSize(float sx, float sy, float sz, float origx = 0.0, float origy =
 			0.0, float origz = 0.0);
 
+	void SetOrigin(float origx = 0.0, float origy = 0.0, float origz = 0.0);
+	void SetOrigin(const Vector3 &orig);
+
 	//! Get the volume of the box.
 	double GetVolume(void) const;
 

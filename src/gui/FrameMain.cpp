@@ -56,11 +56,13 @@
 #include "../icon/logo128.xpm"
 #endif
 
-#include <wx/icon.h>
-#include <wx/filename.h>
-#include <wx/textfile.h>
 #include <wx/msgdlg.h>
 #include <wx/progdlg.h>
+#include <wx/busyinfo.h>
+#include <wx/utils.h>
+#include <wx/icon.h>
+#include <wx/textfile.h>
+#include <wx/filename.h>
 #include <wx/dir.h>
 #include <unistd.h>
 
@@ -309,11 +311,6 @@ void FrameMain::OnTimer(wxTimerEvent& event)
 //			GetFreeSystemMemory() / 1024 / 1024);
 //
 //	m_statusBar->SetStatusText(temp, 1);
-
-	temp = wxString::Format(_T("x: %4u y: %4u  - %4u %4u %4u %4u"), m_canvas->x,
-			m_canvas->y, m_canvas->c0, m_canvas->ct1, m_canvas->ct2,
-			m_canvas->ct3);
-	m_statusBar->SetStatusText(temp, 1);
 
 //	if(project.processToolpath){
 //		if(project.GenerateToolpaths()) TransferDataToWindow();
@@ -738,8 +735,7 @@ void FrameMain::OnProjectSaveAs(wxCommandEvent &event)
 		dialog.SetDirectory(settings.lastProjectDirectory);
 	}
 
-	if(project.fileName.IsOk()) dialog.SetPath(
-			project.fileName.GetFullPath());
+	if(project.fileName.IsOk()) dialog.SetPath(project.fileName.GetFullPath());
 
 	if(dialog.ShowModal() == wxID_OK){
 		fileName = dialog.GetPath();
@@ -967,8 +963,7 @@ void FrameMain::OnMachineLoad(wxCommandEvent& event)
 		if(project.run[selected].machine.Load(fileName)){
 			settings.lastMachineDirectory = fileName.GetPath();
 		}else{
-			wxLogError
-			(project.run[selected].machine.textOut);
+			wxLogError(project.run[selected].machine.textOut);
 		}
 		TransferDataToWindow();
 	}
@@ -981,8 +976,7 @@ void FrameMain::OnMachineReload(wxCommandEvent& event)
 
 	if(!project.run[selected].machine.ReLoad()){
 
-		wxLogError
-		(project.run[selected].machine.textOut);
+		wxLogError(project.run[selected].machine.textOut);
 	}
 	TransferDataToWindow();
 }
@@ -1056,7 +1050,8 @@ void FrameMain::OnGeneratorSetup(wxCommandEvent& event)
 
 void FrameMain::OnGeneratorStart(wxCommandEvent& event)
 {
-
+	wxWindowDisabler disableAll;
+	wxBusyInfo wait(_("Generating Toolpaths..."),this);
 	project.GenerateToolpaths();
 
 //	project.PropagateChanges();

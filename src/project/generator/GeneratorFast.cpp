@@ -28,7 +28,7 @@
 #include <math.h>
 
 #include "../Project.h"
-#include "../machine/MachinePosition.h"
+#include "../machine/CNCPosition.h"
 
 GeneratorFast::GeneratorFast()
 {
@@ -440,9 +440,9 @@ void GeneratorFast::GenerateToolpath(void)
 //	for(size_t i = 0; i < tp.positions.GetCount(); i++)
 //		tp.positions[i].Z -= temp.GetSizeZ();
 	tp.FlagAll(true, true, true);
-	AffineTransformMatrix shiftback;
-	shiftback.TranslateGlobal(area.xmin, area.ymin, area.zmin);
-	tp.ApplyTransformation(shiftback);
+//	AffineTransformMatrix shiftback;
+//	shiftback.TranslateGlobal(area.xmin, area.ymin, area.zmin);
+//	tp.ApplyTransformation(shiftback);
 
 	toolpath = tp;
 	return;

@@ -96,7 +96,7 @@ void CanvasTool::Render()
 		if(debug.displayField){
 			glPushMatrix();
 			glTranslatef(0.01 + tool->GetMaxDiameter(), -debug.GetSizeY() / 2,
-					tool->GetPositiveLength());
+					tool->GetToolLength());
 			debug.Paint();
 			glPopMatrix();
 		}

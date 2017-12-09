@@ -219,3 +219,28 @@ Vector3 Workpiece::GetCenter(void) const
 	temp.z = this->zmin;
 	return temp;
 }
+
+void Workpiece::PrepareModel(void)
+{
+//	BoundingBox tempArea = *workpiece;
+//	tempArea.Transform(workpiecePlacement);
+	assert(parent!=NULL);
+
+	model.SetupBox(this->GetSizeX(), this->GetSizeY(), this->GetSizeZ(),
+			parent->resX, parent->resY);
+
+	if(refObject < 0 || refObject >= parent->objects.GetCount()){
+		// Provide a simple box.
+		model.Fill();
+	}else{
+		const Object* wpObject = &(parent->objects[refObject]);
+
+		AffineTransformMatrix tempMatrix;
+		tempMatrix.TranslateGlobal(-this->xmin, -this->ymin, -this->zmin);
+//		tempMatrix *= workpiecePlacement;
+
+		model.InitImprinting();
+		model.InsertObject(*wpObject, tempMatrix);
+		model.FinishImprint();
+	}
+}

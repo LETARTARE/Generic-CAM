@@ -172,16 +172,17 @@ bool LUACodeEvaluator::EvaluateAssembly()
 	programOutput.Empty();
 	matrix.SetIdentity();
 
-	InsertVariable(_T("AXIS_X"), linkedMachine->position.X);
-	InsertVariable(_T("AXIS_Y"), linkedMachine->position.Y);
-	InsertVariable(_T("AXIS_Z"), linkedMachine->position.Z);
+	InsertVariable(_T("AXIS_X"), linkedMachine->currentpos.X);
+	InsertVariable(_T("AXIS_Y"), linkedMachine->currentpos.Y);
+	InsertVariable(_T("AXIS_Z"),
+			linkedMachine->currentpos.Z + linkedMachine->toolLengthOffset);
 	// The rotational axes are in degrees.
-	InsertVariable(_T("AXIS_A"), linkedMachine->position.A * 180.0 / M_PI);
-	InsertVariable(_T("AXIS_B"), linkedMachine->position.B * 180.0 / M_PI);
-	InsertVariable(_T("AXIS_C"), linkedMachine->position.C * 180.0 / M_PI);
-	InsertVariable(_T("AXIS_U"), linkedMachine->position.U);
-	InsertVariable(_T("AXIS_V"), linkedMachine->position.V);
-	InsertVariable(_T("AXIS_W"), linkedMachine->position.W);
+	InsertVariable(_T("AXIS_A"), linkedMachine->currentpos.A * 180.0 / M_PI);
+	InsertVariable(_T("AXIS_B"), linkedMachine->currentpos.B * 180.0 / M_PI);
+	InsertVariable(_T("AXIS_C"), linkedMachine->currentpos.C * 180.0 / M_PI);
+	InsertVariable(_T("AXIS_U"), linkedMachine->currentpos.U);
+	InsertVariable(_T("AXIS_V"), linkedMachine->currentpos.V);
+	InsertVariable(_T("AXIS_W"), linkedMachine->currentpos.W);
 
 	lua_getglobal(L, "AssembleMachine");
 

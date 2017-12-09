@@ -68,6 +68,7 @@ public:
 	float d;
 	float h;
 	float r;
+	//TODO Change the type to an enum.
 	unsigned char t;
 	bool cutting;
 
@@ -106,7 +107,7 @@ private:
 public:
 	void Clear(void);
 
-	float GetPositiveLength(void) const; ///< Total length of the tool outside the chuck.
+	float GetToolLength(void) const; ///< Total length of the tool outside the chuck. (Distance between Controlled-Point and Gauge-Point).
 	float GetNegativeLength(void) const; ///< Length of the part, that disappears in the chuck.
 	float GetMaxDiameter(void) const; ///< Maximum diameter of the tool.
 	float GetCuttingDepth(void) const; ///< Length measured from the tip of the tool, that can cut.

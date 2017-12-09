@@ -33,7 +33,7 @@
 #include "../../3D/AffineTransformMatrix.h"
 #include "../../3D/Polygon25.h"
 #include "../../3D/Vector3.h"
-#include "../machine/MachinePosition.h"
+#include "../machine/CNCPosition.h"
 #include "../Project.h"
 #include "../ToolPath.h"
 #include "DexelTarget.h"
@@ -80,7 +80,9 @@ void GeneratorTest::GenerateToolpath(void)
 		errorOccured = true;
 		return;
 	}
+
 	GeneratorDexel::GenerateToolpath();
+
 	const Tool* const tool = &(run->machine.tools[refTool]);
 
 	const double maxCutDepth = tool->GetCuttingDepth();
@@ -207,16 +209,15 @@ void GeneratorTest::GenerateToolpath(void)
 		isMillUp = true;
 		tp.positions.Add(m);
 #ifdef _DEBUGMODE
-		wxLogMessage
-		(wxString::Format(_T("Next Level: %.3f m"), level));
+		wxLogMessage(wxString::Format(_T("Next Level: %.3f m"), level));
 //		level = -1;
 #endif
 	}
 //	debug = temp;
 	tp.FlagAll(true);
 
-	AffineTransformMatrix shiftback;
-	shiftback.TranslateGlobal(area.xmin, area.ymin, area.zmin);
-	tp.ApplyTransformation(shiftback);
+//	AffineTransformMatrix shiftback;
+//	shiftback.TranslateGlobal(area.xmin, area.ymin, area.zmin);
+//	tp.ApplyTransformation(shiftback);
 	toolpath = tp;
 }

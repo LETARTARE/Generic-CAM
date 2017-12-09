@@ -36,7 +36,27 @@
  * The machine itself contains another matrix used for placing the
  * workpiece in the machine.
  *
- * \todo: Implement copy and assignment constructors.
+ * Every operation run is centered around one Workpiece. (Please not that a
+ * workpiece may exist over the course several machine Run%s.)
+ *
+ *
+ *
+ * \dot
+ * digraph classes {
+ *    rankdir=LR;
+ *	  node [shape=record, fontname=Helvetica, fontsize=10];
+ *    ini [ label="Initialisation"];
+ *    tp1 [ label="Generated Toolpath"];
+ *    tp2 [ label="Generated Toolpath"];
+ *    cont [ label="..." shape=none];
+ *
+ *    ini -> tp1;
+ *    tp1 -> tp2;
+ *    tp2 -> cont;
+ *  }
+ *  \enddot
+ *
+ * \todo Implement copy and assignment constructors.
  */
 
 #include "generator/Generator.h"
@@ -77,6 +97,7 @@ public:
 
 	int refWorkpiece; ///< Workpiece reference
 	AffineTransformMatrix workpiecePlacement; //!< For flipping the workpiece to machine the other sides.
+
 
 	FlipDrillPattern pattern; //!< Experimental: FlipDrillPattern
 

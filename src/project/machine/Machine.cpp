@@ -36,17 +36,35 @@
 
 Machine::Machine()
 {
-	initialized = false;
-	Reset();
 	ClearComponents();
+	Reset();
+	initialized = false;
+	microstepMode = distanceBased;
+	microstepDistance = 0.001; // = 1mm;
+	microstepPosition = 0;
+
+	CNCPosition x(0, 0, 0, 0.3, -0.4, 0.1);
+	AffineTransformMatrix m = x.GetMatrix();
+
+	m = m.Inverse();
+
+	m.TakeMatrixApart();
+
+	CNCPosition y(m);
+
+	AffineTransformMatrix n = y.GetMatrix();
+	n.TakeMatrixApart();
+
+	n.TakeMatrixApart();
+
 }
 
-Machine::Machine(const Machine& other)
+Machine::Machine(const Machine &other)
 {
 	throw("'Machine::Copy constructor' is unimplemented!");
 }
 
-Machine& Machine::operator =(const Machine& other)
+Machine& Machine::operator =(const Machine &other)
 {
 	if(&other == this) return *this;
 	throw("'Machine::operator=' is unimplemented!");
@@ -65,7 +83,7 @@ void Machine::ClearComponents(void)
 	AddComponent(_T("Base"));
 }
 
-bool Machine::Load(wxFileName const& fileName)
+bool Machine::Load(wxFileName const &fileName)
 {
 	if(!fileName.IsOk()) return false;
 	this->fileName = fileName;
@@ -82,7 +100,8 @@ bool Machine::ReLoad(void)
 		flag = true;
 		wxTextFile file(fileName.GetFullPath());
 		if(!file.Open(wxConvLocal) && !file.Open(wxConvFile)){
-			wxLogError(_T("Opening of the file failed!"));
+			wxLogError
+			(_T("Opening of the file failed!"));
 			return false;
 		}
 		wxString str;
@@ -115,49 +134,14 @@ bool Machine::ReLoad(void)
 	}
 
 	if(!flag){
-		wxLogError(_("File format for machine descriptions not supported."));
+		wxLogError
+		(_("File format for machine descriptions not supported."));
 		return false;
 	}
 
 	EvaluateDescription();
-	//wxLogMessage(machineDescription);
+	Reset();
 	return IsInitialized();
-}
-
-void Machine::EvaluateDescription(void)
-{
-	wxLogMessage(_T("Machine::InsertMachineDescription"));
-	evaluator.LinkToMachine(this);
-	if(evaluator.EvaluateProgram())
-		initialized = true;
-	else
-		initialized = false;
-	Assemble();
-	textOut = evaluator.GetOutput();
-}
-
-bool Machine::IsInitialized(void) const
-{
-	return initialized;
-}
-
-void Machine::Assemble()
-{
-	if(initialized) evaluator.EvaluateAssembly();
-}
-
-void Machine::Paint(void) const
-{
-	for(std::list <MachineComponent>::const_iterator i = components.begin();
-			i != components.end(); ++i)
-		i->Paint();
-	if(toolSlot > 0 && toolSlot <= tools.GetCount()){
-		::glPushMatrix();
-		::glMultMatrixd(toolPosition.a);
-		::glColor3f(0.7, 0.7, 0.7);
-		tools[toolSlot - 1].Paint();
-		::glPopMatrix();
-	}
 }
 
 void Machine::ToXml(wxXmlNode* parentNode)
@@ -224,6 +208,98 @@ bool Machine::FromXml(wxXmlNode* node)
 	return true;
 }
 
+void Machine::EvaluateDescription(void)
+{
+	wxLogMessage
+	(_T("Machine::InsertMachineDescription"));
+	evaluator.LinkToMachine(this);
+	if(evaluator.EvaluateProgram())
+		initialized = true;
+	else
+		initialized = false;
+	Assemble();
+	textOut = evaluator.GetOutput();
+}
+
+bool Machine::IsInitialized(void) const
+{
+	return initialized;
+}
+
+void Machine::Assemble()
+{
+	if(initialized) evaluator.EvaluateAssembly();
+}
+
+void Machine::Paint(void) const
+{
+	for(std::list <MachineComponent>::const_iterator i = components.begin();
+			i != components.end(); ++i)
+		i->Paint();
+
+//	::glPushMatrix();
+//	::glMultMatrixd(toolPosition.a);
+//	PaintNullTool(0.10, 0.02);
+//	::glPopMatrix();
+
+	::glPushMatrix();
+	::glMultMatrixd(workpiecePosition.a);
+	PaintCoordinateSystem(0.1);
+//	AffineTransformMatrix temp = workpiecePosition.Inverse() * toolPosition;
+//	::glMultMatrixd(temp.a);
+
+	AffineTransformMatrix temp = (currentpos + offset0).GetMatrix();
+	temp.TranslateLocal(0, 0, toolLengthOffset);
+//	temp = temp.Inverse();
+	::glMultMatrixd(temp.a);
+	if(selectedToolSlot > 0 && selectedToolSlot <= tools.GetCount()){
+		::glColor3f(0.7, 0.7, 0.7);
+		tools[selectedToolSlot - 1].Paint();
+	}else{
+		PaintNullTool(0.05, 0.03);
+	}
+	::glPopMatrix();
+}
+
+void Machine::PaintNullTool(double length, double diameter) const
+{
+	const double radius = diameter / 2.0;
+	glBegin(GL_LINES);
+	glColor3f(0.6, 0.6, 1.0);
+	glNormal3f(0, 0, -1);
+	glVertex3d(0, 0, 0);
+	glVertex3d(0, 0, -length);
+	glColor3f(1.0, 0.6, 0.6);
+	glNormal3f(-1, 0, 0);
+	glVertex3d(-radius, 0, 0);
+	glNormal3f(1, 0, 0);
+	glVertex3d(radius, 0, 0);
+	glColor3f(0.6, 1.0, 0.6);
+	glNormal3f(0, -1, 0);
+	glVertex3d(0, -radius, 0);
+	glNormal3f(0, 1, 0);
+	glVertex3d(0, radius, 0);
+	glEnd();
+}
+
+void Machine::PaintCoordinateSystem(double diameter) const
+{
+	glBegin(GL_LINES);
+	glNormal3f(1, 0, 0);
+	glColor3f(1, 0, 0);
+	glVertex3f(0, 0, 0);
+	glVertex3d(diameter / 2.0, 0, 0);
+	glNormal3f(0, 1, 0);
+	glColor3f(0, 1, 0);
+	glVertex3f(0, 0, 0);
+	glVertex3d(0, diameter / 2.0, 0);
+	glNormal3f(0, 0, 1);
+	glColor3f(0, 0, 1);
+	glVertex3f(0, 0, 0);
+	glVertex3d(0, 0, diameter / 2.0);
+	glEnd();
+}
+
 bool Machine::AddComponent(wxString const& nameOfComponent)
 {
 	for(std::list <MachineComponent>::iterator i = components.begin();
@@ -274,7 +350,8 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 
 	// Case 0: The lua file is inside a zip, so is the rest of the data.
 	if(machinedirectory.GetExt().CmpNoCase(_T("zip")) == 0){
-		wxLogMessage(_T("Inside Zip file."));
+		wxLogMessage
+		(_T("Inside Zip file."));
 		return LoadGeometryIntoComponentFromZip(machinedirectory, filename,
 				component, matrix);
 	}
@@ -283,7 +360,8 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 	wxFileName zipFile(machinedirectory);
 	zipFile.SetExt(_T("zip"));
 	if(zipFile.IsFileReadable()){
-		wxLogMessage(_T("Zip file found."));
+		wxLogMessage
+		(_T("Zip file found."));
 		return LoadGeometryIntoComponentFromZip(zipFile, filename, component,
 				matrix);
 	}
@@ -300,9 +378,11 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 	zipFile.SetName(path[0]);
 	zipFile.SetExt(_T("zip"));
 	zipFile.SetPath(machinedirectory.GetPath());
-	wxLogMessage(zipFile.GetFullPath());
+	wxLogMessage
+	(zipFile.GetFullPath());
 	if(zipFile.IsFileReadable()){
-		wxLogMessage(_T("Extra-Zip file found."));
+		wxLogMessage
+		(_T("Extra-Zip file found."));
 		return LoadGeometryIntoComponentFromZip(zipFile, filename, component,
 				matrix);
 	}
@@ -336,9 +416,8 @@ bool Machine::LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
 				inzip.CloseEntry();
 				return true;
 			}else{
-				wxLogMessage(
-						_T(
-								"Geometries other than STL are not supported (yet)."));
+				wxLogMessage
+				(_T("Geometries other than STL are not supported (yet)."));
 			}
 			break;
 		}
@@ -346,181 +425,209 @@ bool Machine::LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
 	return false;
 }
 
+void Machine::Reset()
+{
+	currentpos = CNCPosition();
+	for(size_t i = 0; i < 10; i++)
+		coordSystem[i] = CNCPosition();
+	selectedCoordSystem = 1;
+	selectedTool = 0;
+	selectedToolSlot = 0;
+	feedRate = 0.01; // Feed = 1 cm/s
+	rapidMovement = false; // Move at feedrate
+	spindleSpeed = 0.0; // Spindle stopped
+	controlledpoint = CNCPosition();
+	mistCoolant = false;
+	floodCoolant = false;
+	activeUnits = mms;
+	selectedPlane = XY;
+	toolLengthOffset = 0.0;
+	codestate = GCodeBlock();
+	microsteps.clear();
+	Assemble();
+//	toolPosition.TakeMatrixApart();
+//			workpiecePosition.TakeMatrixApart();
+//			CNCPosition();
+//			offset0.X = toolPosition.tx-workpiecePosition.tx;
+//			offset0.Y = toolPosition.ty-workpiecePosition.ty;
+//			offset0.Z = toolPosition.tz-workpiecePosition.tz;
+//			offset0.A = toolPosition.rx-workpiecePosition.rx;
+
+	offset0 = CNCPosition(workpiecePosition.Inverse() * toolPosition);
+}
+
 Vector3 Machine::GetCenter(void) const
 {
 	return workpiecePosition.GetCenter();
 }
 
-void Machine::DryRunToolPath(ToolPath* tp)
+//void Machine::DryRunToolPath(ToolPath* tp)
+//{
+//	double F = 1e-3;
+//	double t = 0;
+//	uint_fast8_t actc = 1;
+//	uint_fast8_t mode = 1;
+//	MachinePosition pos;
+//	MachinePosition old;
+//	MachinePosition off[10];
+//	for(size_t i = 0; i < tp->positions.GetCount(); i++){
+//		double dt = 0.0;
+//		old = pos;
+//		if(tp->positions[i].F > -FLT_EPSILON) F = tp->positions[i].F;
+//		if(tp->positions[i].G[0] == 40) dt += tp->positions[i].P;
+//		const bool machineCoordinates = (tp->positions[i].G[0] == 530);
+//		if(tp->positions[i].G[12] == 540) actc = 1;
+//		if(tp->positions[i].G[12] == 550) actc = 2;
+//		if(tp->positions[i].G[12] == 560) actc = 3;
+//		if(tp->positions[i].G[12] == 570) actc = 4;
+//		if(tp->positions[i].G[12] == 580) actc = 5;
+//		if(tp->positions[i].G[12] == 590) actc = 6;
+//		if(tp->positions[i].G[12] == 591) actc = 7;
+//		if(tp->positions[i].G[12] == 592) actc = 8;
+//		if(tp->positions[i].G[12] == 593) actc = 9;
+//		if(tp->positions[i].G[1] == 0) mode = 0;
+//		if(tp->positions[i].G[1] == 10) mode = 1;
+//		if(tp->positions[i].G[1] == 20) mode = 2;
+//		if(tp->positions[i].G[1] == 30) mode = 3;
+//		if(tp->positions[i].XFlag) pos.X = tp->positions[i].X;
+//		if(tp->positions[i].YFlag) pos.Y = tp->positions[i].Y;
+//		if(tp->positions[i].ZFlag) pos.Z = tp->positions[i].Z;
+//		if(tp->positions[i].AFlag) pos.A = tp->positions[i].A;
+//		if(tp->positions[i].BFlag) pos.B = tp->positions[i].B;
+//		if(tp->positions[i].CFlag) pos.C = tp->positions[i].C;
+//		if(tp->positions[i].UFlag) pos.U = tp->positions[i].U;
+//		if(tp->positions[i].VFlag) pos.V = tp->positions[i].V;
+//		if(tp->positions[i].WFlag) pos.W = tp->positions[i].W;
+//		if(!machineCoordinates){
+//			pos += off[actc];
+//		}
+//		tp->positions[i].length = sqrt(
+//				(pos.X - old.X) * (pos.X - old.X)
+//						+ (pos.Y - old.Y) * (pos.Y - old.Y)
+//						+ (pos.Z - old.Z) * (pos.Z - old.Z));
+//		switch(mode){
+//		case 0:
+//			dt += tp->positions[i].length / F;
+//			break;
+//		case 1:
+//			dt += tp->positions[i].length / F;
+//			break;
+//		default:
+//			break;
+//		}
+//		tp->positions[i].duration = dt;
+//		tp->positions[i].tStart = t;
+//		t += dt;
+//	}
+//}
+
+void Machine::TouchoffPoint(const CNCPosition &point)
 {
-	double F = 1e-3;
-	double t = 0;
-	uint_fast8_t actc = 1;
-	uint_fast8_t mode = 1;
-	MachinePosition pos;
-	MachinePosition old;
-	MachinePosition off[10];
-	for(size_t i = 0; i < tp->positions.GetCount(); i++){
-		double dt = 0.0;
-		old = pos;
-		if(tp->positions[i].F > -FLT_EPSILON) F = tp->positions[i].F;
-		if(tp->positions[i].G[0] == 40) dt += tp->positions[i].P;
-		const bool machineCoordinates = (tp->positions[i].G[0] == 530);
-		if(tp->positions[i].G[12] == 540) actc = 1;
-		if(tp->positions[i].G[12] == 550) actc = 2;
-		if(tp->positions[i].G[12] == 560) actc = 3;
-		if(tp->positions[i].G[12] == 570) actc = 4;
-		if(tp->positions[i].G[12] == 580) actc = 5;
-		if(tp->positions[i].G[12] == 590) actc = 6;
-		if(tp->positions[i].G[12] == 591) actc = 7;
-		if(tp->positions[i].G[12] == 592) actc = 8;
-		if(tp->positions[i].G[12] == 593) actc = 9;
-		if(tp->positions[i].G[1] == 0) mode = 0;
-		if(tp->positions[i].G[1] == 10) mode = 1;
-		if(tp->positions[i].G[1] == 20) mode = 2;
-		if(tp->positions[i].G[1] == 30) mode = 3;
-		if(tp->positions[i].XFlag) pos.X = tp->positions[i].X;
-		if(tp->positions[i].YFlag) pos.Y = tp->positions[i].Y;
-		if(tp->positions[i].ZFlag) pos.Z = tp->positions[i].Z;
-		if(tp->positions[i].AFlag) pos.A = tp->positions[i].A;
-		if(tp->positions[i].BFlag) pos.B = tp->positions[i].B;
-		if(tp->positions[i].CFlag) pos.C = tp->positions[i].C;
-		if(tp->positions[i].UFlag) pos.U = tp->positions[i].U;
-		if(tp->positions[i].VFlag) pos.V = tp->positions[i].V;
-		if(tp->positions[i].WFlag) pos.W = tp->positions[i].W;
-		if(!machineCoordinates){
-			pos += off[actc];
-		}
-		tp->positions[i].length = sqrt(
-				(pos.X - old.X) * (pos.X - old.X)
-						+ (pos.Y - old.Y) * (pos.Y - old.Y)
-						+ (pos.Z - old.Z) * (pos.Z - old.Z));
-		switch(mode){
-		case 0:
-			dt += tp->positions[i].length / F;
-			break;
-		case 1:
-			dt += tp->positions[i].length / F;
-			break;
-		default:
-			break;
-		}
-		tp->positions[i].duration = dt;
-		tp->positions[i].tStart = t;
-		t += dt;
-	}
+	CNCPosition diff = point - coordSystem[1];
+	codestate.X -= diff.X;
+	codestate.Y -= diff.Y;
+	codestate.Z -= diff.Z;
+	coordSystem[1] = point;
 }
 
-void Machine::Reset()
+void Machine::TouchoffHeight(const double height)
 {
-	position = MachinePosition();
-	activeCoordinateSystem = 1;
-	activeTool = 0;
-	toolSlot = 0;
-	feed = 0.01; // Feed = 1 cm/s
-	movement = feedrate; // Move at feedrate
-	spindle = 0.0; // Spindle stopped
-	current = GCodeBlock();
-	Assemble();
-	SetTouchoffHeight();
+	AffineTransformMatrix temp;
+	temp.TranslateLocal(0, 0, height);
+	TouchoffPoint(CNCPosition(temp) - offset0);
 }
 
-void Machine::SetTouchoffHeight(double height)
+bool Machine::InterpretGCode(GCodeBlock* block, bool generateMicroSteps)
 {
-//	workpiecePosition.TakeMatrixApart();
-	Vector3 wpOrigin = workpiecePosition.GetCenter() - toolPosition.GetCenter();
-	origin[1].X = wpOrigin.x;
-	origin[1].Y = wpOrigin.y;
-	origin[1].Z = wpOrigin.z + height;
-}
+	lastpos = currentpos;
+	currentpos.dt = 0.0;
+	block->t = currentpos.t;
+	block->duration = 0.0;
+	codestate.CopySelective(*block);
 
-void Machine::ProcessGCode(const GCodeBlock& block, const double pos)
-{
-	InterpolatePosition(DBL_MAX);
-	base = position;
-	current.CopySelective(block);
-	if(current.F > 0) feed = current.F;
+	if(codestate.F > 0) feedRate = codestate.F;
 
 	// Change tool
-	if(current.M[6] == 6){
-		current.M[6] = -1;
-		activeTool = current.T;
-		toolSlot = 0;
-		toolLength = 0.0;
+	if(codestate.M[6] == 6){
+		codestate.M[6] = -1;
+		currentpos = coordSystem[0];
+		Interpolate(&lastpos, &currentpos, generateMicroSteps);
+		lastpos = currentpos;
+		block->duration += currentpos.dt;
+		currentpos.dt = 0.0;
+		selectedTool = codestate.T;
+		selectedToolSlot = 0;
+		toolLengthOffset = 0.0;
 		for(size_t n = 0; n < tools.GetCount(); n++){
-			if(tools[n].slotNr == activeTool){
-				toolSlot = n + 1;
-				toolLength = tools[n].GetPositiveLength();
+			if(tools[n].slotNr == selectedTool){
+				selectedToolSlot = n + 1;
+				toolLengthOffset = tools[n].GetToolLength();
 			}
 		}
 	}
-	if(current.M[7] == 3) spindle = current.S;
-	if(current.M[7] == 4) spindle = -current.S;
-	if(current.M[7] == 5) spindle = 0;
-	const bool machineCoordinates = (current.G[0] == 530);
-	if(current.G[12] == 540) activeCoordinateSystem = 1;
-	if(current.G[12] == 550) activeCoordinateSystem = 2;
-	if(current.G[12] == 560) activeCoordinateSystem = 3;
-	if(current.G[12] == 570) activeCoordinateSystem = 4;
-	if(current.G[12] == 580) activeCoordinateSystem = 5;
-	if(current.G[12] == 590) activeCoordinateSystem = 6;
-	if(current.G[12] == 591) activeCoordinateSystem = 7;
-	if(current.G[12] == 592) activeCoordinateSystem = 8;
-	if(current.G[12] == 593) activeCoordinateSystem = 9;
+	if(codestate.M[7] == 3) spindleSpeed = codestate.S;
+	if(codestate.M[7] == 4) spindleSpeed = -codestate.S;
+	if(codestate.M[7] == 5) spindleSpeed = 0;
 
-	InterpolatePosition(DBL_MAX);
+	const bool machineCoordinates = (codestate.G[0] == 530);
+
+	if(codestate.G[12] == 540) selectedCoordSystem = 1;
+	if(codestate.G[12] == 550) selectedCoordSystem = 2;
+	if(codestate.G[12] == 560) selectedCoordSystem = 3;
+	if(codestate.G[12] == 570) selectedCoordSystem = 4;
+	if(codestate.G[12] == 580) selectedCoordSystem = 5;
+	if(codestate.G[12] == 590) selectedCoordSystem = 6;
+	if(codestate.G[12] == 591) selectedCoordSystem = 7;
+	if(codestate.G[12] == 592) selectedCoordSystem = 8;
+	if(codestate.G[12] == 593) selectedCoordSystem = 9;
+
+	const unsigned char c = (machineCoordinates)? 0 : selectedCoordSystem;
+
+	currentpos.X = codestate.X + coordSystem[c].X;
+	currentpos.Y = codestate.Y + coordSystem[c].Y;
+	currentpos.Z = codestate.Z + coordSystem[c].Z;
+	currentpos.A = codestate.A + coordSystem[c].A;
+	currentpos.B = codestate.B + coordSystem[c].B;
+	currentpos.C = codestate.C + coordSystem[c].C;
+	currentpos.U = codestate.U + coordSystem[c].U;
+	currentpos.V = codestate.V + coordSystem[c].V;
+	currentpos.W = codestate.W + coordSystem[c].W;
+
+	Interpolate(&lastpos, &currentpos, generateMicroSteps);
+	block->duration += currentpos.dt;
+	return block->duration > FLT_EPSILON;
 }
 
-void Machine::Step(const double pos)
+bool Machine::Step(void)
 {
+	if((microstepPosition + 1) >= microsteps.size()) return false;
+	microstepPosition++;
+	controlledpoint = microsteps[microstepPosition];
+	return true;
 }
 
-void Machine::InterpolatePosition(double t)
+void Machine::Interpolate(CNCPosition *a, CNCPosition *b,
+		bool generateMicroSteps)
 {
-	const unsigned char c = (current.G[0] == 530)? 0 : activeCoordinateSystem;
-	if(t >= (current.tStart + current.duration - FLT_EPSILON)){
-		if(current.XFlag) position.X = current.X + origin[c].X;
-		if(current.YFlag) position.Y = current.Y + origin[c].Y;
-		if(current.ZFlag) position.Z = current.Z + origin[c].Z + toolLength; // TODO: Move into coordinate system setup.
-		if(current.AFlag) position.A = current.A + origin[c].A;
-		if(current.BFlag) position.B = current.B + origin[c].B;
-		if(current.CFlag) position.C = current.C + origin[c].C;
-		if(current.UFlag) position.U = current.U + origin[c].U;
-		if(current.VFlag) position.V = current.V + origin[c].V;
-		if(current.WFlag) position.W = current.W + origin[c].W;
-		return;
+	CNCPosition dp = *b - *a;
+	const double L = dp.AbsXYZ();
+	if(feedRate > 0.0){
+		b->dt = L / feedRate;
+	}else{
+		b->dt = 0.0;
 	}
-	if(t < (current.tStart + FLT_EPSILON)){
-		position.X = base.X;
-		position.Y = base.Y;
-		position.Z = base.Z;
-		position.A = base.A;
-		position.B = base.B;
-		position.C = base.C;
-		position.U = base.U;
-		position.V = base.V;
-		position.W = base.W;
-		return;
+	b->t = a->t + a->dt;
+	if(!generateMicroSteps) return;
+	if(L <= FLT_EPSILON) return;
+	const double r = fmin(fmin(gridDelta.X, gridDelta.Y), gridDelta.Z);
+	const size_t N = floor(L / r);
+	if(N == 0) return;
+	dp /= (double) N;
+	assert(dp.AbsXYZ() > 0);
+	CNCPosition p = *a + dp;
+	for(size_t n = 2; n < N; n++){
+		microsteps.push_back(p);
+		p += dp;
 	}
-	const double fn = fmin(fmax((t - current.tStart) / current.duration, 0.0),
-			1.0);
-	const double fo = 1.0 - fn;
-	position.X = base.X * fo;
-	position.Y = base.Y * fo;
-	position.Z = base.Z * fo;
-	position.A = base.A * fo;
-	position.B = base.B * fo;
-	position.C = base.C * fo;
-	position.U = base.U * fo;
-	position.V = base.V * fo;
-	position.W = base.W * fo;
-	if(current.XFlag) position.X += (current.X + origin[c].X) * fn;
-	if(current.YFlag) position.Y += (current.Y + origin[c].Y) * fn;
-	if(current.ZFlag) position.Z += (current.Z + origin[c].Z + toolLength) * fn;
-	if(current.AFlag) position.A += (current.A + origin[c].A) * fn;
-	if(current.BFlag) position.B += (current.B + origin[c].B) * fn;
-	if(current.CFlag) position.C += (current.C + origin[c].C) * fn;
-	if(current.UFlag) position.U += (current.U + origin[c].U) * fn;
-	if(current.VFlag) position.V += (current.V + origin[c].V) * fn;
-	if(current.WFlag) position.W += (current.W + origin[c].W) * fn;
+	microsteps.push_back(*b);
 }

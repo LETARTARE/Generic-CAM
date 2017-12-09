@@ -443,6 +443,6 @@ bool ToolPath::ReadGCodeFile(wxFileName fileName)
 double ToolPath::MaxTime(void) const
 {
 	if(positions.IsEmpty()) return 0.0;
-	return positions[positions.GetCount() - 1].tStart
+	return positions[positions.GetCount() - 1].t
 			+ positions[positions.GetCount() - 1].duration;
 }

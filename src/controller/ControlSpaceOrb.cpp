@@ -55,8 +55,8 @@ bool ControlSpaceOrb::ProcessPacket()
 	switch(Data[0]){
 	case 'R': /* Reset packet */
 		Data[idx - 1] = 0;
-		for(i = 1; i < idx && Data[i] == ' '; i++)
-			;
+		for(i = 1; i < idx && Data[i] == ' '; i++){
+		}
 		//printk(KERN_INFO "input%d: %s [%s] on serio%d\n",spaceorb->dev.number, spaceorb_name, spaceorb->data + i, spaceorb->serio->number);
 		break;
 	case 'D': /* Ball + button data */

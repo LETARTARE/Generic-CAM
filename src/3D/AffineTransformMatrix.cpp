@@ -154,7 +154,7 @@ void AffineTransformMatrix::TakeMatrixApart(void)
 	sy = sqrt(a[4] * a[4] + a[5] * a[5] + a[6] * a[6]);
 	sz = sqrt(a[8] * a[8] + a[9] * a[9] + a[10] * a[10]);
 
-	if(sx > 0.0){
+	if(fabs(sx) > 0.0){
 		b[0] = a[0] / sx;
 		b[1] = a[1] / sx;
 		b[2] = a[2] / sx;
@@ -163,7 +163,7 @@ void AffineTransformMatrix::TakeMatrixApart(void)
 		b[1] = 0.0;
 		b[2] = 0.0;
 	}
-	if(sy > 0.0){
+	if(fabs(sy) > 0.0){
 		b[4] = a[4] / sy;
 		b[5] = a[5] / sy;
 		b[6] = a[6] / sy;
@@ -172,7 +172,7 @@ void AffineTransformMatrix::TakeMatrixApart(void)
 		b[5] = 0.0;
 		b[6] = 0.0;
 	}
-	if(sz > 0.0){
+	if(fabs(sz) > 0.0){
 		b[8] = a[8] / sz;
 		b[9] = a[9] / sz;
 		b[10] = a[10] / sz;
@@ -183,7 +183,7 @@ void AffineTransformMatrix::TakeMatrixApart(void)
 	}
 
 	//FIXME: I think this if(...) is wrong, because b[0] can be 0.
-	if(b[0] != 0.0 || b[1] != 0.0){
+	if(fabs(b[0]) > 0.0 || fabs(b[1]) > 0.0){
 		rz = atan2(b[1], b[0]);
 	}else{
 		rz = 0.0;
@@ -191,7 +191,7 @@ void AffineTransformMatrix::TakeMatrixApart(void)
 	double coz = cos(rz);
 	double siz = sin(rz);
 
-	if(b[0] != 0.0 || b[1] != 0.0 || b[2] != 0.0){
+	if(fabs(b[0]) > 0.0 || fabs(b[1]) > 0.0 || fabs(b[2]) > 0.0){
 		ry = atan2(-b[2], sqrt(b[0] * b[0] + b[1] * b[1]));
 	}else{
 		ry = 0.0;
@@ -203,7 +203,7 @@ void AffineTransformMatrix::TakeMatrixApart(void)
 	b[1] = -b[4] * siz + b[5] * coz;
 	b[2] = b[5] * siy * siz + b[4] * coz * siy + b[6] * coy;
 
-	if(b[1] != 0.0 || b[2] != 0.0){
+	if(fabs(b[1]) > 0.0 || fabs(b[2]) > 0.0){
 		rx = atan2(b[2], b[1]);
 	}else{
 		rx = 0.0;
@@ -652,4 +652,12 @@ AffineTransformMatrix AffineTransformMatrix::RotateTrackball(const double& x1,
 	const Vector3 A = r1 * r2;
 	const double alpha = asin(A.Abs());
 	return AffineTransformMatrix::RotateAroundVector(A, alpha);
+}
+
+double AffineTransformMatrix::Distance(const AffineTransformMatrix& other) const
+{
+	double temp = 0.0;
+	for(uint_fast8_t n = 0; n < 16; n++)
+		temp += (a[n] - other.a[n]) * (a[n] - other.a[n]);
+	return sqrt(temp);
 }

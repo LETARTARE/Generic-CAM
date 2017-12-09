@@ -44,6 +44,7 @@
  *
  * These are valid codes for a GCodeBlock. The MachineSimulator may have problems with some of these.
  *
+ * \attention All values are stored in SI standard units. They are converted upon read-in.
  */
 
 #include <wx/string.h>
@@ -58,6 +59,11 @@ public:
 	GCodeBlock(wxString block = _T(""), double conversionFactor = 0.001);
 	wxString GetCode(void) const;
 
+
+	/*!\brief Copy only the changed values
+	 *
+	 * A G-Code block can have values that are marked as "not changed". These values are not copied.
+	 */
 	void CopySelective(const GCodeBlock &other);
 
 	void ClearGM(void);
@@ -77,13 +83,12 @@ public:
 	bool IsPureLinearMotion(void) const;
 	bool IsCutting(void) const;
 
-	double conversionFactor; //!< Current conversion factor (for mm: 0.001, for inch: 0.0254)
+	double conversionFactor; //!< Current conversion factor (0.001 mm per m or 0.0254 inch per m)
 
-	double tStart; //!< time this block is passed to the Machine. The Machine begins moving afterwards. Calculated in Machine.
-	double duration; //!< estimated duration for this block. Calculated in Machine.
-	double length; //!< distance the head moves in XYZ. Calculated in Machine.
+	double t; //!< time this block is passed to the Machine. The Machine starts moving at this point. Calculated in the MachineSimulator.
+	double duration; //!< estimated duration for this block. Calculated in the MachineSimulator.
 
-	bool block_delete; //!< Enable block delete switch for this block
+	bool block_delete; //!< Enable block-delete-switch sensitivity for this block
 	bool message; //!< is the comment a message (displayed to the user on the machine)?
 	double A; //!< Rotation around X axis in rad
 	bool AFlag;

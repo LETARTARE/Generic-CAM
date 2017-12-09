@@ -68,7 +68,6 @@
 
 #include "LUACodeEvaluator.h"
 #include "MachineComponent.h"
-#include "MachinePosition.h"
 #include "GCodeBlock.h"
 #include "../Tool.h"
 #include <wx/xml/xml.h>
@@ -76,37 +75,53 @@
 #include <list>
 
 #include "../ToolPath.h"
+#include "CNCPosition.h"
 
 class Machine {
 	friend class LUACodeEvaluator;
 	//Constructor / Destructor
 public:
 	Machine();
-	Machine(const Machine & other); //!< Copy constructor
-	Machine& operator=(const Machine& other); ///< Assignment operator
+	Machine(const Machine &other); //!< Copy constructor
+	Machine& operator=(const Machine &other); ///< Assignment operator
 	virtual ~Machine();
 
 public:
 	void ClearComponents(void); //!< Remove all loaded Geometry parts of the machine. Virtually removing the machine.
 	bool Load(wxFileName const& fileName); //!< Load a machine.
 	bool ReLoad(void); //!< Reload the machine from the file. E.g. after editing the file externally.
+	void ToXml(wxXmlNode* parentNode);
+	bool FromXml(wxXmlNode* node);
 
 	void EvaluateDescription(void);
 	bool IsInitialized(void) const;
 	void Assemble(void); //!< Place all components of the machine after reading the MachinePosition.
-
-	Vector3 GetCenter(void) const;
 	void Paint(void) const;
-
-	void ToXml(wxXmlNode* parentNode);
-	bool FromXml(wxXmlNode* node);
-
-	void DryRunToolPath(ToolPath* tp); //!< Rough estimation of the duration of a toolpath. Quick and dirty stand-alone machine simulator.
+	void PaintNullTool(double length, double diameter) const;
+	void PaintCoordinateSystem(double diameter) const;
+private:
+	bool PlaceComponent(wxString const& nameOfComponent,
+			AffineTransformMatrix const& matrix);
+	bool AddComponent(wxString const& nameOfComponent);
+	bool LoadGeometryIntoComponent(const wxString &filename,
+			MachineComponent* component, const AffineTransformMatrix &matrix);
+	bool LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
+			const wxString &filename, MachineComponent* component,
+			const AffineTransformMatrix &matrix);
+public:
 
 	void Reset();
-	void SetTouchoffHeight(double height = 0.0);
-	void ProcessGCode(const GCodeBlock &block, const double pos = 1.0);
-	void Step(const double pos = 1.0);
+
+	Vector3 GetCenter(void) const;
+
+	//TODO Remove the quick simulator
+//	void DryRunToolPath(ToolPath* tp); //!< Rough estimation of the duration of a toolpath. Quick and dirty stand-alone machine simulator.
+
+	void TouchoffPoint(const CNCPosition &point);
+	void TouchoffHeight(const double height);
+
+	bool InterpretGCode(GCodeBlock* block, bool generateMicroSteps = true);
+	bool Step(void);
 
 	// Member variables
 public:
@@ -114,47 +129,63 @@ public:
 	wxString machineDescription; //!< Lua script describing the machine.
 	wxString textOut; //!< Errors and output of the Lua script.
 
-	GCodeBlock current;
-	MachinePosition base;
-	MachinePosition position; //!< Absolute Position of the Machine
-	MachinePosition origin[10]; //!< Offset from absolute origin to workpiece origin
+	GCodeBlock codestate;
+	CNCPosition lastpos;
+	CNCPosition currentpos; //!< Absolute Position of the Machine
 
-	unsigned char activeCoordinateSystem;
-	int spindle; //!< Spindle speed (1/s)
-	double feed; //!< Feedrate (m/s)
+	unsigned char selectedCoordSystem;
+	CNCPosition coordSystem[10];
+
+	CNCPosition controlledpoint; //!< Position of the controlled point (= tip of the tool)
+	double feedRate; //!< Feedrate (m/s)
+	int spindleSpeed; //!< Spindle speed (1/s)
+	bool floodCoolant;
+	bool mistCoolant;
+	enum Units {
+		mms, inches
+	};
+	Units activeUnits;
+	enum Plane {
+		XY, YZ, XZ
+	};
+	Plane selectedPlane;
 	ArrayOfTool tools; ///< Tool%s in the Machine
-	int activeTool;
-	unsigned int toolSlot;
-	double toolLength;
-	enum Movement {
-		rapid = 0, feedrate = 1, arc_cw = 2, arc_ccw = 3
-	} movement;
+	int selectedTool;
+	unsigned int selectedToolSlot;
+	double toolLengthOffset;
+
+	bool rapidMovement;
 
 	AffineTransformMatrix toolPosition;
 	AffineTransformMatrix workpiecePosition;
 
+	CNCPosition offset0; //!< Offset from workpiece position to tool position zero. Used for rendering the machine and tools.
+
+	// *** For simulation ***
+	enum MicrostepMode {
+		distanceBased, timeBased, gridBased
+	};
+	MicrostepMode microstepMode;
+	double microstepDistance;
+	double microstepDt;
+	CNCPosition gridOrigin;
+	CNCPosition gridDelta;
+	size_t microstepPosition;
+	std::vector <CNCPosition> microsteps;
+
 private:
-	bool PlaceComponent(wxString const& nameOfComponent,
-			AffineTransformMatrix const& matrix);
-	bool AddComponent(wxString const& nameOfComponent);
-	bool LoadGeometryIntoComponent(const wxString &filename,
-			MachineComponent* component, const AffineTransformMatrix &matrix);
-
-	bool LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
-			const wxString &filename, MachineComponent* component,
-			const AffineTransformMatrix &matrix);
-
-	void InterpolatePosition(double t);
+	void Interpolate(CNCPosition *a, CNCPosition *b, bool generateMicroSteps);
 
 	bool initialized;
 	LUACodeEvaluator evaluator;
 	std::list <MachineComponent> components;
+
 	MachineComponent* componentWithTool;
+	AffineTransformMatrix toolPositionRelativ; //!< Position of the workpiece relative to the component it is connected to.
 	MachineComponent* componentWithMaterial;
+	AffineTransformMatrix workpiecePositionRelativ; //!< Position of the tool relative to the component it is connected to.
 
-	AffineTransformMatrix toolPositionRelativ;
-	AffineTransformMatrix workpiecePositionRelativ;
-
+	//TODO Test if the variables below are really needed
 	GCodeBlock newcode;
 	GCodeBlock oldcode;
 };

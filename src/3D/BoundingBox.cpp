@@ -186,6 +186,21 @@ void BoundingBox::SetSize(float sx, float sy, float sz, float origx,
 	zmax = zmin + sz;
 }
 
+void BoundingBox::SetOrigin(float origx, float origy, float origz)
+{
+	xmax = xmax - xmin + origx;
+	ymax = ymax - ymin + origy;
+	zmax = zmax - zmin + origz;
+	xmin = origx;
+	ymin = origy;
+	zmin = origz;
+}
+
+void BoundingBox::SetOrigin(const Vector3& orig)
+{
+	SetOrigin(orig.x, orig.y, orig.z);
+}
+
 double BoundingBox::GetVolume(void) const
 {
 	if(xmax <= xmin) return 0.0;
@@ -351,3 +366,4 @@ bool BoundingBox::FromStream(wxTextInputStream& stream)
 	stream >> alpha;
 	return true;
 }
+

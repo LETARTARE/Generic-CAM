@@ -59,15 +59,15 @@ DialogMachineDebugger::~DialogMachineDebugger()
 
 void DialogMachineDebugger::Update(wxCommandEvent& event)
 {
-	machine.position.X = machineControl->X;
-	machine.position.Y = machineControl->Y;
-	machine.position.Z = machineControl->Z;
-	machine.position.A = machineControl->A;
-	machine.position.B = machineControl->B;
-	machine.position.C = machineControl->C;
-	machine.position.U = machineControl->U;
-	machine.position.V = machineControl->V;
-	machine.position.W = machineControl->W;
+	machine.currentpos.X = machineControl->X;
+	machine.currentpos.Y = machineControl->Y;
+	machine.currentpos.Z = machineControl->Z;
+	machine.currentpos.A = machineControl->A;
+	machine.currentpos.B = machineControl->B;
+	machine.currentpos.C = machineControl->C;
+	machine.currentpos.U = machineControl->U;
+	machine.currentpos.V = machineControl->V;
+	machine.currentpos.W = machineControl->W;
 	machine.Assemble();
 	TransferDataToWindow();
 	this->Refresh();
@@ -110,6 +110,7 @@ void DialogMachineDebugger::OnScriptEvaluate(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
 	machine.EvaluateDescription();
+	machine.Reset();
 	TransferDataToWindow();
 }
 

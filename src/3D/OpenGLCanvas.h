@@ -27,17 +27,6 @@
 #ifndef OPENGLCANVAS_H_
 #define OPENGLCANVAS_H_
 
-#include "../Config.h"
-#ifdef _USE_6DOFCONTROLLER
-#include "../controller/Control3D.h"
-#include <wx/timer.h>
-#endif
-#ifdef _USE_3DPICKING
-#include "OpenGLPick.h"
-#endif
-#include "AffineTransformMatrix.h"
-#include <wx/glcanvas.h>
-
 /*!\class OpenGLCanvas
  * \ingroup View3D
  * \brief Extended wxGLCanvas
@@ -49,12 +38,28 @@
  *  * Stereo 3D (Anaglyph- and Shutterglasses)
  */
 
+#include "../Config.h"
+#ifdef _USE_6DOFCONTROLLER
+#include "../controller/Control3D.h"
+#include <wx/timer.h>
+#endif
+#ifdef _USE_3DPICKING
+#include "OpenGLPick.h"
+#endif
+#include "AffineTransformMatrix.h"
+#include <wx/glcanvas.h>
+#include <GL/gl.h>
+
 enum Stereo3DType {
-	stereoOff = 0, stereoAnaglyph, stereoShutter
+	stereoOff = 0, //!< No stereo effect
+	stereoAnaglyph, //!< Stereoeffect using colored glasses
+	stereoShutter //!< Stereoeffect using shutter-glasses
 };
 
 enum RotationType {
-	rotateTrackball, rotateInterwoven, rotateTurntable
+	rotateTrackball, //!< Use trackball style mouse control.
+	rotateInterwoven, //!< Rotate around the object using interwoven mouse movements.
+	rotateTurntable //!< Rotate the object like a turntable. X rotates always around the Z axis, while Y rotates around the X axis.
 };
 
 class OpenGLCanvas:public wxGLCanvas {
@@ -80,12 +85,10 @@ public:
 	unsigned char leftEyeB;
 
 	RotationType rotationMode;
-
-//protected:
-public:
-	//TODO: <-- remove
 	AffineTransformMatrix rotmat;
 	AffineTransformMatrix transmat;
+
+protected:
 	float scale;
 	float turntableX;
 	float turntableY;
@@ -96,18 +99,14 @@ private:
 	GLuint m_gllist;
 
 #ifdef _USE_6DOFCONTROLLER
-	Control3D* control; ///> Link to 6DOF-controller
-	wxTimer timer; ///> Timer for polling the controller
+	Control3D* control; //!< Link to 6DOF-controller
+	wxTimer timer; //!< Timer for polling the controller
 #endif
-public:
-	//TODO: <-- remove
-	int x; ///> Startpoint for mouse dragging
-	int y; ///> Startpoint for mouse dragging
-	int w; ///> Width of viewport
-	int h; ///> Height of viewport
-	unsigned int ct1;
-	unsigned int ct2;
-	unsigned int ct3;
+
+	int x; //!< Startpoint for mouse dragging
+	int y; //!< Startpoint for mouse dragging
+	int w; //!< Width of viewport
+	int h; //!< Height of viewport
 
 	// Methods
 public:

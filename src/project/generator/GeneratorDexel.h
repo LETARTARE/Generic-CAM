@@ -55,8 +55,10 @@ protected:
 
 	void GenerateToolpath(void);
 
-	DexelTarget target;
 	DexelTarget start;
+	DexelTarget target;
+	DexelTarget result;
+
 	DexelTarget debug;
 };
 

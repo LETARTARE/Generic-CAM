@@ -58,7 +58,8 @@
  * \note When extending this class:\n
  * The internal buffer is organized as a list of GLuint. Each record consists of\n
  *   [Number of levels N], [Near value], [Far value], [Name0], ..., [NameN]\n
- * Thus each record can have a different size.
+ * Thus each record can have a different size. All of this is hidden, when using the
+ * interface in this class.
  */
 
 #include <GL/gl.h>
@@ -88,7 +89,7 @@ protected:
 	GLsizei GetBufferSize(); //!< OpenGLCanvas requests the size of the buffer
 
 private:
-	void MoveBufferPos(GLuint hit); //!< Shift the pointer to the result buffer around.
+	void MoveBufferPos(GLuint hit); //!< Move the pointer in the result buffer.
 
 private:
 	GLsizei bufferSize;

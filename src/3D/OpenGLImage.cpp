@@ -213,7 +213,7 @@ void OpenGLImage::SetAlphaColor(unsigned char red, unsigned char green,
 
 uint32_t OpenGLImage::NextPowerOfTwo(uint32_t v)
 {
-	// Algorithm by Sean Anderson (Sepember 2001) and William Lewis (February 1997).
+	// Algorithm by Sean Anderson (September 2001) and William Lewis (February 1997).
 	// From http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
 	v--;
 	v |= v >> 1;
@@ -230,8 +230,9 @@ void OpenGLImage::Paint(void) const
 	Update();
 
 	glColor3f(1, 1, 1);
-	glBindTexture(GL_TEXTURE_2D, textureID);
 	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureID);
 	glBegin(GL_QUADS);
 	glNormal3f(0, 0, 1);
 	glTexCoord2f(0, this->tex_h);
@@ -243,6 +244,7 @@ void OpenGLImage::Paint(void) const
 	glTexCoord2f(0, 0);
 	glVertex3f(0, this->h, 0);
 	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
 }
 

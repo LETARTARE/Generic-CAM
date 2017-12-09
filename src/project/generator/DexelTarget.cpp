@@ -98,7 +98,7 @@ void DexelTarget::SetupTool(const Tool &tool, const double resolutionX,
 
 //	const double radius = fmax(tool.GetMaxDiameter() / 2.0, 50e-3 / 2.0);
 	const double radius = tool.GetMaxDiameter() / 2.0;
-	const double depth = tool.GetPositiveLength();
+	const double depth = tool.GetToolLength();
 
 	// Calculate the size to be odd, so there always a cell in the center.
 	const size_t cellsX = ceil(radius / resolutionX) * 2 + 1;
