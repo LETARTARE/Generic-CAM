@@ -30,6 +30,7 @@
 #include "../StdInclude.h"
 #include "gui.h"
 
+#include "../project/generator/DexelTarget.h"
 #include <wx/timer.h>
 
 class DialogAnimation:public GUIAnimation {
@@ -65,6 +66,8 @@ public:
 	Project* project;
 	Run* run;
 	MachineSimulator* simulator;
+
+	DexelTarget model;
 
 	bool simulateWorkpiece;
 

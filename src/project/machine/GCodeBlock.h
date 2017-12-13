@@ -44,6 +44,9 @@
  *
  * These are valid codes for a GCodeBlock. The MachineSimulator may have problems with some of these.
  *
+ * The boolean flags in the class are part of the NIST RS274NGC Interpreter. They are used to indicate if a
+ * value is actually changing in one code block.
+ *
  * \attention All values are stored in SI standard units. They are converted upon read-in.
  */
 

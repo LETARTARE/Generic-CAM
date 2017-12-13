@@ -68,11 +68,11 @@ void GeneratorDexel::Paint(void) const
 	area.Paint();
 
 	glPushMatrix();
-	glTranslatef(area.xmin, area.ymin, area.zmin);
+	glTranslatef(0, target.GetSizeY(), 0);
 	target.Paint();
 	glPopMatrix();
 	glPushMatrix();
-	glTranslatef(area.xmin, area.ymin + area.GetSizeY(), area.zmin);
+	glTranslatef(0, -target.GetSizeY(), 0);
 	debug.Paint();
 	glPopMatrix();
 
@@ -152,8 +152,9 @@ void GeneratorDexel::GenerateToolpath(void)
 	}
 
 	target.FinishImprint();
-	debug = target;
-	debug.displayField = true;
+	debug = start;
+//	debug.displayField = true;
+//	target.displayField = true;
 
 //	target.CleanOutlier();
 	outside.HardInvert();
@@ -164,8 +165,8 @@ void GeneratorDexel::GenerateToolpath(void)
 	outside.MarkOutline();
 
 	outside &= start;
-	target |= outside;
-	target &= start;
+//	target |= outside;
+//	target &= start;
 
 	target.Refresh();
 }

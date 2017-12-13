@@ -42,15 +42,17 @@
 #include <wx/slider.h>
 #include <wx/radiobut.h>
 #include "PanelTopView.h"
+#include <wx/listbox.h>
 #include <wx/spinctrl.h>
 #include "CanvasMachine.h"
 #include <wx/combobox.h>
 #include "PanelTool.h"
 #include "CanvasTool.h"
+#include <wx/radiobox.h>
+#include <wx/statline.h>
 #include <wx/dialog.h>
 #include <wx/choicebk.h>
 #include <wx/richtext/richtextctrl.h>
-#include <wx/listbox.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -540,13 +542,14 @@ class GUIRun : public wxFrame
 		wxButton* m_buttonRotZ90;
 		wxTextCtrl* m_textCtrlMachineName;
 		wxButton* m_buttonLoadMachine;
-		wxStaticText* m_staticText99;
-		wxListCtrl* m_listCtrlTools;
-		wxButton* m_buttonToolDelete;
-		wxChoice* m_choiceTool;
-		wxStaticText* m_staticText100;
+		wxStaticText* m_statiTextToolsAvailable;
+		wxListBox* m_listBoxTool;
+		wxStaticText* m_staticTextToolSlot;
 		wxSpinCtrl* m_spinCtrlToolSlot;
 		wxButton* m_buttonToolAdd;
+		wxStaticText* m_staticTextToolsInMachine;
+		wxListCtrl* m_listCtrlTools;
+		wxButton* m_buttonToolDelete;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;
@@ -555,8 +558,8 @@ class GUIRun : public wxFrame
 		virtual void OnWorkpieceSelect( wxCommandEvent& event ) = 0;
 		virtual void OnRotate( wxCommandEvent& event ) = 0;
 		virtual void OnMachineLoad( wxCommandEvent& event ) = 0;
-		virtual void OnToolRemove( wxCommandEvent& event ) = 0;
 		virtual void OnToolAdd( wxCommandEvent& event ) = 0;
+		virtual void OnToolRemove( wxCommandEvent& event ) = 0;
 		
 	
 	public:
@@ -774,10 +777,28 @@ class GUIToolWizard : public wxDialog
 	private:
 	
 	protected:
-		wxNotebook* m_notebook;
-		wxPanel* m_panelCylinder;
-		wxPanel* m_panelSphere;
-		wxPanel* m_panelCone;
+		wxRadioBox* m_radioBoxToolType;
+		wxStaticText* m_staticText128;
+		wxTextCtrl* m_textCtrl68;
+		wxStaticText* m_staticText129;
+		wxStaticText* m_staticText134;
+		wxTextCtrl* m_textCtrl71;
+		wxStaticText* m_staticText135;
+		wxStaticText* m_staticText138;
+		wxTextCtrl* m_textCtrl73;
+		wxStaticText* m_staticText139;
+		wxStaticLine* m_staticline1;
+		wxStaticLine* m_staticline2;
+		wxStaticLine* m_staticline3;
+		wxStaticText* m_staticText130;
+		wxTextCtrl* m_textCtrl69;
+		wxStaticText* m_staticText131;
+		wxStaticText* m_staticText136;
+		wxTextCtrl* m_textCtrl72;
+		wxStaticText* m_staticText137;
+		wxStaticText* m_staticText132;
+		wxTextCtrl* m_textCtrl70;
+		wxStaticText* m_staticText133;
 		wxButton* m_buttonAdd;
 		wxButton* m_buttonSetShape;
 		wxButton* m_buttonClose;
@@ -790,7 +811,7 @@ class GUIToolWizard : public wxDialog
 	
 	public:
 		
-		GUIToolWizard( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolshape Wizard"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 479,400 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		GUIToolWizard( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolshape Wizard"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~GUIToolWizard();
 	
 };

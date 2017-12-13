@@ -238,6 +238,35 @@ size_t Imprinter::MemoryUsageInBytes(void) const
 	return N * sizeof(ImprinterElement);
 }
 
+void Imprinter::CopyRescale(const Imprinter& other, const size_t cellCount)
+{
+
+	const double area = other.GetSizeX() * other.GetSizeY();
+	const double L = sqrt(area / (double) cellCount);
+	const size_t newnx = floor(other.GetSizeX() / L);
+	const size_t newny = floor(other.GetSizeY() / L);
+	const double dx = other.GetSizeX() / (double) newnx;
+	const double dy = other.GetSizeY() / (double) newny;
+	if(newnx != this->GetCountX() || newny != this->GetCountY() ||
+	fabs(other.GetSizeX() - (this->GetSizeX())) > FLT_EPSILON ||
+	fabs(other.GetSizeY() - (this->GetSizeY())) > FLT_EPSILON ||
+	fabs(other.GetSizeZ() - (this->GetSizeZ())) > FLT_EPSILON){
+		this->SetupBox(other.GetSizeX(), other.GetSizeY(), other.GetSizeZ(), dx,
+				dy);
+	}
+
+	double x = 0.0;
+	double y = 0.0;
+	for(size_t n = 0; n < N; n++){
+		this->field[n] = other.GetElement(x, y);
+		x += rx;
+		if(n % nx == 0){
+			x = 0.0;
+			y += ry;
+		}
+	}
+}
+
 double Imprinter::GetSizeX(void) const
 {
 	return sx;
@@ -993,6 +1022,26 @@ double Imprinter::GetLevel(double x, double y) const
 	const size_t p = px + py * nx;
 	if(!field[p].IsVisible()) return -1.0;
 	return field[p].up;
+}
+
+const ImprinterElement Imprinter::GetElement(double x, double y) const
+{
+	const int px = round((x - rx / 2) / rx);
+	const int py = round((y - ry / 2) / ry);
+	if(px < 0 || py < 0 || px >= (int) nx || py >= (int) ny){
+		ImprinterElement temp;
+		temp.up = 0.0;
+		temp.down = sz;
+		return temp;
+	}
+	const size_t p = px + py * nx;
+	if(!field[p].IsVisible()){
+		ImprinterElement temp;
+		temp.up = 0.0;
+		temp.down = sz;
+		return temp;
+	}
+	return field[p];
 }
 
 double Imprinter::GetMaxLevel(void) const

@@ -55,12 +55,27 @@ public:
 	virtual ~MachineSimulator();
 
 	void InsertMachine(Machine* machine);
-	void InsertWorkpiece(Workpiece* workpiece);
-	void InsertTarget(DexelTarget* target);
 	void InsertToolPath(ToolPath* toolpath);
+	void InsertTarget(DexelTarget* target); //!< Inserts a target into the simulator. This target remains unchanged.
+	const DexelTarget* GetTarget(void) const; //!< Returns the modified internal target.
 
-	void InitSimulation(size_t maxCells);
+	/*! \brief Return the G-code currently executed by the machine
+	 *
+	 * The default value pos = 0 returns the G-code that is/was currently executed.
+	 *
+	 * \param pos Return another G-code block around the current position (0 = current code, -1 = last code, 1 = next code)
+	 * \return wxString with the G-code block
+	 */
+	wxString GetCurrentGCode(int pos = 0) const;
+	double GetMaxTime(void) const;
+	double GetCurrentTime(void) const;
 
+	/*! \brief Return to the first G-code block
+	 *
+	 * Actually it reads in the first G-code but the machine does not move for the time t is set to 0.
+	 *
+	 * \param calculateTiming Only calculates the duration of each G-code, without interpolating or cutting. Used to get the timing right.
+	 */
 	void Reset(bool calculateTiming = true);
 	void Previous(void);
 	void Step(float tTarget);
@@ -70,21 +85,15 @@ public:
 	void Paint(void) const;
 
 	//Member variables
-public:
+private:
 	Machine* machine; //!< Linked Machine to move around.
-
-	Workpiece* workpiece; //!< Workpiece to start from. Alternative to basetarget.
-	DexelTarget* basetarget; //!< Target to start from. Alternative to workpiece. Stays unchanged.
-
-	DexelTarget target; //!< Target that is modified. Copied from basetarget or generated from workpiece.
-
 	ToolPath* toolpath; //!< Toolpath to apply to target.
+	DexelTarget* basetarget; //!< Provided target to initialize the internal copy from.
+	DexelTarget target; //!< Internal target to work on.
 
 	bool initialized;
-
 	float tStep;
 	size_t step;
-
 };
 
 #endif /* MACHINESIMULATOR_H_ */

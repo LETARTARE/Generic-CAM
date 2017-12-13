@@ -107,6 +107,8 @@ public:
 	ToolPath & operator+=(const ToolPath &a);
 	const ToolPath operator+(const ToolPath &a) const;
 	void Clear(void);
+	size_t GetCount(void) const;
+	wxString GetGCode(size_t pos) const;
 	bool IsEmpty(void) const;
 	void ApplyTransformation(const AffineTransformMatrix &matrix);
 	void Paint(void) const;

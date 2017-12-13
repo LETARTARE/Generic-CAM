@@ -61,16 +61,19 @@ void DialogAnimation::InitSimulation(void)
 	int runNr = GetSelectedRun();
 	if(runNr >= 0){
 		run = &(project->run[runNr]);
+		Workpiece * workpiece = run->GetWorkpiece();
 		simulator = &(run->simulator);
 		simulator->InsertMachine(&(run->machine));
-		simulator->InsertWorkpiece(run->GetWorkpiece());
 		simulator->InsertToolPath(run->GetFirstSelectedToolpath());
-		simulator->InitSimulation(2e5);
+		if(workpiece != NULL){
+			workpiece->PrepareModel();
+			model.CopyRescale(workpiece->model, 2e5);
+		}
+		simulator->InsertTarget(&model);
 	}else{
 		run = NULL;
 		if(simulator != NULL){
 			simulator->InsertMachine(NULL);
-			simulator->InsertWorkpiece(NULL);
 			simulator->InsertToolPath(NULL);
 		}
 		simulator = NULL;
@@ -111,45 +114,16 @@ bool DialogAnimation::TransferDataToWindow(void)
 	}else{
 		m_bpButtonPlayStop->SetBitmapLabel(wxIcon(play_xpm));
 	}
-	if(simulator != NULL && simulator->toolpath != NULL){
-		m_textCtrlMaxTime->SetValue(
-				SecondsToTC(simulator->toolpath->MaxTime()));
-		m_textCtrlTime->SetValue(SecondsToTC(simulator->tStep));
 
-		if(simulator->step >= 2
-				&& simulator->step
-						< (simulator->toolpath->positions.GetCount() + 2)){
-			m_textCtrl0->SetValue(
-					simulator->toolpath->positions[(simulator->step) - 2].GetCode());
-		}else{
-			m_textCtrl0->SetValue(_T(""));
-		}
-		if(simulator->step >= 1
-				&& simulator->step
-						< (simulator->toolpath->positions.GetCount() + 1)){
-			m_textCtrl1->SetValue(
-					simulator->toolpath->positions[(simulator->step) - 1].GetCode());
-		}else{
-			m_textCtrl1->SetValue(_T(""));
-		}
-		if(simulator->step < simulator->toolpath->positions.GetCount()){
-			m_textCtrl2->SetValue(
-					simulator->toolpath->positions[(simulator->step)].GetCode());
-		}else{
-			m_textCtrl2->SetValue(_T(""));
-		}
-		if((simulator->step + 1) < simulator->toolpath->positions.GetCount()){
-			m_textCtrl3->SetValue(
-					simulator->toolpath->positions[(simulator->step + 1)].GetCode());
-		}else{
-			m_textCtrl3->SetValue(_T(""));
-		}
-		if((simulator->step + 2) < simulator->toolpath->positions.GetCount()){
-			m_textCtrl4->SetValue(
-					simulator->toolpath->positions[(simulator->step + 2)].GetCode());
-		}else{
-			m_textCtrl4->SetValue(_T(""));
-		}
+	if(simulator != NULL){
+		m_textCtrlMaxTime->SetValue(SecondsToTC(simulator->GetMaxTime()));
+		m_textCtrlTime->SetValue(SecondsToTC(simulator->GetCurrentTime()));
+
+		m_textCtrl0->SetValue(simulator->GetCurrentGCode(-2));
+		m_textCtrl1->SetValue(simulator->GetCurrentGCode(-1));
+		m_textCtrl2->SetValue(simulator->GetCurrentGCode(0));
+		m_textCtrl3->SetValue(simulator->GetCurrentGCode(1));
+		m_textCtrl4->SetValue(simulator->GetCurrentGCode(2));
 	}else{
 		m_textCtrlMaxTime->SetValue(SecondsToTC(0));
 		m_textCtrlTime->SetValue(SecondsToTC(0));
@@ -213,9 +187,8 @@ void DialogAnimation::OnScroll(wxScrollEvent& event)
 {
 	if(loopGuard) return;
 	if(simulator == NULL) return;
-	if(simulator->toolpath == NULL) return;
 
-	double target = simulator->toolpath->MaxTime()
+	double target = simulator->GetMaxTime()
 			/ (double) (m_sliderTime->GetMax() - m_sliderTime->GetMin())
 			* (double) (event.GetPosition() - m_sliderTime->GetMin());
 
@@ -270,7 +243,6 @@ void DialogAnimation::OnNext(wxCommandEvent& event)
 void DialogAnimation::OnLast(wxCommandEvent& event)
 {
 	if(simulator == NULL) return;
-	if(simulator->toolpath == NULL) return;
 	simulator->Last();
 	PositionSlider();
 	TransferDataToWindow();
@@ -280,10 +252,10 @@ void DialogAnimation::PositionSlider(void)
 {
 	if(loopGuard) return;
 	loopGuard = true;
-	if(simulator != NULL && simulator->toolpath != NULL){
+	if(simulator != NULL){
 		m_sliderTime->SetValue(
 				((double) (m_sliderTime->GetMax() - m_sliderTime->GetMin())
-						/ simulator->toolpath->MaxTime() * simulator->tStep)
+						/ simulator->GetMaxTime() * simulator->GetCurrentTime())
 						+ m_sliderTime->GetMin());
 		m_sliderTime->Enable(true);
 	}else{
@@ -298,11 +270,10 @@ void DialogAnimation::OnTimer(wxTimerEvent& event)
 	if(!this->IsShown()) timer.Stop();
 	if(loopGuard) return;
 	if(simulator == NULL) return;
-	if(simulator->toolpath == NULL) return;
-	double target = simulator->tStep + 0.5;
-	if(target >= simulator->toolpath->MaxTime()){
+	double target = simulator->GetCurrentTime() + 0.5;
+	if(target >= simulator->GetMaxTime()){
 		timer.Stop();
-		target = simulator->toolpath->MaxTime();
+		target = simulator->GetMaxTime();
 	}
 	simulator->Step(target);
 	PositionSlider();

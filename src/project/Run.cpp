@@ -88,17 +88,12 @@ void Run::GenerateToolpaths(void)
 {
 	assert(refWorkpiece >= 0);
 
-	const Workpiece* const workpiece = &(parent->workpieces[this->refWorkpiece]);
+	Workpiece* const workpiece = &(parent->workpieces[this->refWorkpiece]);
 	assert(workpiece != NULL);
 
 	Update();
 
-	simulator.InsertMachine(NULL); // TODO This forces the Simulator to update. This should be a more intuitive function.
 	simulator.InsertMachine(&machine);
-	simulator.InsertWorkpiece(NULL);
-	simulator.InsertToolPath(NULL);
-
-	simulator.InsertTarget((DexelTarget*) &(workpiece->model));
 
 	for(size_t i = 0; i < generators.GetCount(); i++){
 		assert(generators[i] != NULL);
@@ -122,9 +117,12 @@ void Run::GenerateToolpaths(void)
 				generators[i]->toolpath.positions.Insert(temp, 2);
 			}
 		}
+
+		simulator.InsertTarget((DexelTarget*) &(workpiece->model));
 		simulator.InsertToolPath(&(generators[i]->toolpath));
-		if(i == 0) simulator.InitSimulation(0);
+		simulator.Reset(true);
 		simulator.Last();
+		(workpiece->model) = *(simulator.GetTarget());
 	}
 }
 
@@ -220,9 +218,7 @@ void Run::Paint(void) const
 		::glTranslatef(-center.x, -center.y, -center.z);
 	}
 
-
 	machine.Paint();
-
 
 	if(refWorkpiece > -1){
 		::glPushMatrix();

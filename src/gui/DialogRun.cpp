@@ -70,16 +70,16 @@ bool DialogRun::TransferDataToWindow(void)
 		m_choiceWorkpiece->Append(project->workpieces[i].name);
 
 	for(i = 0; i < toolbox->GetToolCount(); i++){
-		if(i >= m_choiceTool->GetCount()){
-			m_choiceTool->Append(toolbox->ToolIndex(i)->toolName);
+		if(i >= m_listBoxTool->GetCount()){
+			m_listBoxTool->Append(toolbox->ToolIndex(i)->toolName);
 		}else{
-			m_choiceTool->SetString(i, toolbox->ToolIndex(i)->toolName);
+			m_listBoxTool->SetString(i, toolbox->ToolIndex(i)->toolName);
 		}
 	}
-	for(i = m_choiceTool->GetCount(); i > toolbox->GetToolCount(); i--)
-		m_choiceTool->Delete(i - 1);
+	for(i = m_listBoxTool->GetCount(); i > toolbox->GetToolCount(); i--)
+		m_listBoxTool->Delete(i - 1);
 	loopGuard = true;
-	if(m_choiceTool->GetSelection() < 0) m_choiceTool->SetSelection(0);
+	if(m_listBoxTool->GetSelection() < 0) m_listBoxTool->SetSelection(0);
 	loopGuard = false;
 	if(selected >= 0){
 		loopGuard = true;
@@ -265,7 +265,7 @@ void DialogRun::OnToolAdd(wxCommandEvent& event)
 {
 	int selected = GetSelected();
 	if(selected < 0) return;
-	int toolNr = m_choiceTool->GetSelection();
+	int toolNr = m_listBoxTool->GetSelection();
 	if(toolNr < 0) return;
 	int slotNr = m_spinCtrlToolSlot->GetValue();
 	commandProcessor->Submit(
@@ -274,6 +274,7 @@ void DialogRun::OnToolAdd(wxCommandEvent& event)
 							+ toolbox->ToolIndex(toolNr)->toolName, project,
 					selected, *(toolbox->ToolIndex(toolNr)), slotNr));
 
+	m_spinCtrlToolSlot->SetValue(slotNr + 1);
 	TransferDataToWindow();
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESH3DVIEW);
 	ProcessEvent(selectEvent);

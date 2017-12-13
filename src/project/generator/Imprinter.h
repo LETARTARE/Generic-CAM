@@ -120,6 +120,8 @@ public:
 			-1);
 	void PresetResolution(const Imprinter &other);
 
+	void CopyRescale(const Imprinter &other, const size_t cellCount);
+
 	bool SetupField(const size_t sizeX, const size_t sizeY,
 			const double resolutionX = -1, const double resolutionY = -1);
 	bool SetupField(const Imprinter& other);
@@ -180,6 +182,7 @@ public:
 	double GetMeanLevel(size_t p) const; ///< Get the middle of the cell[p], otherwise return -1;
 	double GetLevel(double x, double y) const; ///< Get the up-height at cell closest to point(x,y). Otherwise -1;
 	double GetMaxLevel(void) const; ///< Returns the max value of the visible elements in the field.
+	const ImprinterElement GetElement(double x, double y) const;
 
 // ***** Manipulation *****
 

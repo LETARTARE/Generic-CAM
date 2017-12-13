@@ -446,3 +446,14 @@ double ToolPath::MaxTime(void) const
 	return positions[positions.GetCount() - 1].t
 			+ positions[positions.GetCount() - 1].duration;
 }
+
+size_t ToolPath::GetCount(void) const
+{
+	return positions.GetCount();
+}
+
+wxString ToolPath::GetGCode(size_t pos) const
+{
+	if(pos >= positions.GetCount()) return wxString(_T(""));
+	return positions[pos].GetCode();
+}
