@@ -161,6 +161,11 @@ public:
 
 	CNCPosition offset0; //!< Offset from workpiece position to tool position zero. Used for rendering the machine and tools.
 
+	static const size_t NR_IKAXIS = 10;
+	double IKaxis[NR_IKAXIS]; //!< Axes for IK based model.
+	bool IKaxisused[NR_IKAXIS]; //!< Is the axis really used in the machine?
+	bool calculateIK; //!< Does IK needs to be calculated anyway?
+
 	// *** For simulation ***
 	enum MicrostepMode {
 		distanceBased, timeBased, gridBased
@@ -175,6 +180,12 @@ public:
 
 private:
 	void Interpolate(CNCPosition *a, CNCPosition *b, bool generateMicroSteps);
+
+	void AxplusB(double* res, double* A = NULL, double x = 0.0,
+			double* B = NULL);
+	void Copy(double* res, double* A);
+	double LineSearch(double* A, double* B);
+	double GetE(void) const;
 
 	bool initialized;
 	LUACodeEvaluator evaluator;

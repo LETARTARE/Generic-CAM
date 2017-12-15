@@ -43,19 +43,20 @@ Machine::Machine()
 	microstepDistance = 0.001; // = 1mm;
 	microstepPosition = 0;
 
-	CNCPosition x(0, 0, 0, 0.3, -0.4, 0.1);
-	AffineTransformMatrix m = x.GetMatrix();
+	for(size_t n = 0; n < NR_IKAXIS; n++){
+		IKaxis[n] = 0.0;
+		IKaxisused[n] = false;
+	}
+	calculateIK = false;
 
-	m = m.Inverse();
-
-	m.TakeMatrixApart();
-
-	CNCPosition y(m);
-
-	AffineTransformMatrix n = y.GetMatrix();
-	n.TakeMatrixApart();
-
-	n.TakeMatrixApart();
+//	CNCPosition x(0, 0, 0, 0.3, -0.4, 0.1);
+//	AffineTransformMatrix m = x.GetMatrix();
+//	m = m.Inverse();
+//	m.TakeMatrixApart();
+//	CNCPosition y(m);
+//	AffineTransformMatrix n = y.GetMatrix();
+//	n.TakeMatrixApart();
+//	n.TakeMatrixApart();
 
 }
 
@@ -100,7 +101,8 @@ bool Machine::ReLoad(void)
 		flag = true;
 		wxTextFile file(fileName.GetFullPath());
 		if(!file.Open(wxConvLocal) && !file.Open(wxConvFile)){
-			wxLogError(_T("Opening of the file failed!"));
+			wxLogError
+			(_T("Opening of the file failed!"));
 			return false;
 		}
 		wxString str;
@@ -133,7 +135,8 @@ bool Machine::ReLoad(void)
 	}
 
 	if(!flag){
-		wxLogError(_("File format for machine descriptions not supported."));
+		wxLogError
+		(_("File format for machine descriptions not supported."));
 		return false;
 	}
 
@@ -208,24 +211,191 @@ bool Machine::FromXml(wxXmlNode* node)
 
 void Machine::EvaluateDescription(void)
 {
-	wxLogMessage(_T("Machine::InsertMachineDescription"));
+	wxLogMessage
+	(_T("Machine::InsertMachineDescription"));
 	evaluator.LinkToMachine(this);
-	if(evaluator.EvaluateProgram())
+	if(evaluator.EvaluateProgram()){
+
+		// Initialize IK
+		calculateIK = false;
+		double A0[NR_IKAXIS];
+		AffineTransformMatrix P0;
+		const double magicnumber = M_PI_4 / M_E;
+		for(size_t n = 0; n < NR_IKAXIS; n++)
+			IKaxis[n] = 0.0;
+		evaluator.EvaluateAssembly();
+		P0 = workpiecePosition.Inverse() * toolPosition;
+		for(size_t n = 0; n < NR_IKAXIS; n++){
+			for(size_t m = 0; m < NR_IKAXIS; m++)
+				IKaxis[m] = (n == m)? magicnumber : 0.0;
+			evaluator.EvaluateAssembly();
+			AffineTransformMatrix P = workpiecePosition.Inverse()
+					* toolPosition;
+			if(P.Distance(P0) > FLT_EPSILON){
+				IKaxisused[n] = true;
+				calculateIK = true;
+			}
+		}
+		for(size_t n = 0; n < NR_IKAXIS; n++)
+			IKaxis[n] = 0.0;
+
+		Assemble();
 		initialized = true;
-	else
+	}else{
 		initialized = false;
-	Assemble();
+	}
+
 	textOut = evaluator.GetOutput();
+}
+
+void Machine::AxplusB(double* res, double* A, double x, double* B)
+{
+	assert(res!=NULL);
+	if(A == NULL && B == NULL){
+		for(size_t n = 0; n < NR_IKAXIS; n++)
+			res[n] = 0.0;
+	}
+	if(A != NULL && B == NULL){
+		for(size_t n = 0; n < NR_IKAXIS; n++)
+			res[n] = A[n] * x;
+	}
+	if(A == NULL && B != NULL){
+		for(size_t n = 0; n < NR_IKAXIS; n++)
+			res[n] = B[n];
+	}
+	if(A != NULL && B != NULL){
+		for(size_t n = 0; n < NR_IKAXIS; n++)
+			res[n] = A[n] * x + B[n];
+	}
+}
+
+double Machine::LineSearch(double* A, double* B)
+{
+	//TODO: Use a 2nd order search.
+	Copy(IKaxis, B);
+	evaluator.EvaluateAssembly();
+	double E0 = GetE();
+	double step = 0.5;
+	double f = 1.0;
+	double opt = 0.0;
+	for(size_t m = 0; m < 10; m++){
+		AxplusB(IKaxis, A, f, B);
+		evaluator.EvaluateAssembly();
+		const double Etest = GetE();
+		if(Etest < E0){
+			E0 = Etest;
+			opt = f;
+			f += step;
+		}else{
+			f -= step;
+		}
+		step /= 2;
+	}
+	return opt;
+}
+
+void Machine::Copy(double* res, double* A)
+{
+	for(size_t n = 0; n < NR_IKAXIS; n++)
+		res[n] = A[n];
+}
+
+double Machine::GetE(void) const
+{
+	AffineTransformMatrix tpos = (currentpos + offset0).GetMatrix();
+	tpos.TranslateLocal(0, 0, toolLengthOffset);
+	AffineTransformMatrix cpos = workpiecePosition.Inverse() * toolPosition;
+
+	// Scalar product of the normal vectors (0,0,1) for both matrices.
+	const double normalaligned = tpos.a[8] * cpos.a[8] + tpos.a[9] * cpos.a[9]
+			+ tpos.a[10] * cpos.a[10];
+
+	Vector3 tc = tpos.GetCenter();
+	Vector3 cc = cpos.GetCenter();
+
+	return (tc - cc).Abs() + 2 * fabs(normalaligned - 1.0);
+
+//	return cpos.Distance(tpos);
+
+}
+
+void Machine::Assemble()
+{
+	if(!initialized) return;
+
+	if(!calculateIK){
+		evaluator.EvaluateAssembly();
+		return;
+	}
+
+	// Wonky IK implementation
+	double dax[NR_IKAXIS];
+	const double eps = 1e-4;
+
+	double old[NR_IKAXIS];
+	Copy(old, IKaxis);
+
+	evaluator.EvaluateAssembly();
+	double E0 = GetE();
+
+	for(size_t n = 0; n < NR_IKAXIS; n++){
+		if(IKaxisused[n]){
+			Copy(IKaxis, old);
+			IKaxis[n] = old[n] - eps;
+			evaluator.EvaluateAssembly();
+			const double Em = GetE();
+			IKaxis[n] = old[n] + eps;
+			evaluator.EvaluateAssembly();
+			const double Ep = GetE();
+			IKaxis[n] = old[n];
+
+			const double a = (Em - 2 * E0 + Ep) / (2 * eps * eps);
+			if(a > 10 && true){
+				dax[n] = (Em - Ep) / (4 * eps * a);
+			}else{
+				const double a1 = (E0 - Em) / eps;
+				const double a2 = (Ep - Em) / (2 * eps);
+				const double a3 = (Ep - E0) / eps;
+				uint_fast8_t c = 0;
+				double b = 0;
+				if(fabs(a1) > FLT_EPSILON){
+					b += -E0 / a1;
+					c++;
+				}
+				if(fabs(a2) > FLT_EPSILON){
+					b += -(Em + Ep) / 2.0 / a1;
+					c++;
+				}
+				if(fabs(a3) > FLT_EPSILON){
+					b += -E0 / a3;
+					c++;
+				}
+				if(c == 0){
+					dax[n] = 0.0;
+				}else{
+					double temp = b / (double) c;
+					IKaxis[n] = old[n] + temp;
+					evaluator.EvaluateAssembly();
+					const double Et = GetE();
+					if((E0 + Et) > FLT_EPSILON){
+						dax[n] = temp * E0 / (E0 + Et);
+					}else{
+						dax[n] = 0.0;
+					}
+				}
+			}
+		}else{
+			dax[n] = 0.0;
+		}
+	}
+	double f = LineSearch(dax, old);
+	AxplusB(IKaxis, dax, f, old);
+	evaluator.EvaluateAssembly();
 }
 
 bool Machine::IsInitialized(void) const
 {
 	return initialized;
-}
-
-void Machine::Assemble()
-{
-	if(initialized) evaluator.EvaluateAssembly();
 }
 
 void Machine::Paint(void) const
@@ -347,7 +517,8 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 
 	// Case 0: The lua file is inside a zip, so is the rest of the data.
 	if(machinedirectory.GetExt().CmpNoCase(_T("zip")) == 0){
-		wxLogMessage(_T("Inside Zip file."));
+		wxLogMessage
+		(_T("Inside Zip file."));
 		return LoadGeometryIntoComponentFromZip(machinedirectory, filename,
 				component, matrix);
 	}
@@ -356,7 +527,8 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 	wxFileName zipFile(machinedirectory);
 	zipFile.SetExt(_T("zip"));
 	if(zipFile.IsFileReadable()){
-		wxLogMessage(_T("Zip file found."));
+		wxLogMessage
+		(_T("Zip file found."));
 		return LoadGeometryIntoComponentFromZip(zipFile, filename, component,
 				matrix);
 	}
@@ -373,9 +545,11 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 	zipFile.SetName(path[0]);
 	zipFile.SetExt(_T("zip"));
 	zipFile.SetPath(machinedirectory.GetPath());
-	wxLogMessage(zipFile.GetFullPath());
+	wxLogMessage
+	(zipFile.GetFullPath());
 	if(zipFile.IsFileReadable()){
-		wxLogMessage(_T("Extra-Zip file found."));
+		wxLogMessage
+		(_T("Extra-Zip file found."));
 		return LoadGeometryIntoComponentFromZip(zipFile, filename, component,
 				matrix);
 	}
@@ -409,7 +583,8 @@ bool Machine::LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
 				inzip.CloseEntry();
 				return true;
 			}else{
-				wxLogMessage(_T("Geometries other than STL are not supported (yet)."));
+				wxLogMessage
+				(_T("Geometries other than STL are not supported (yet)."));
 			}
 			break;
 		}
@@ -436,6 +611,8 @@ void Machine::Reset()
 	toolLengthOffset = 0.0;
 	codestate = GCodeBlock();
 	microsteps.clear();
+	for(size_t n = 0; n < NR_IKAXIS; n++)
+		IKaxis[n] = 0.0;
 	Assemble();
 //	toolPosition.TakeMatrixApart();
 //			workpiecePosition.TakeMatrixApart();
@@ -623,3 +800,4 @@ void Machine::Interpolate(CNCPosition *a, CNCPosition *b,
 	}
 	microsteps.push_back(*b);
 }
+

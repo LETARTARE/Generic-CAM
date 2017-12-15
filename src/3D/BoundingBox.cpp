@@ -366,4 +366,3 @@ bool BoundingBox::FromStream(wxTextInputStream& stream)
 	stream >> alpha;
 	return true;
 }
-

@@ -155,7 +155,8 @@ bool LUACodeEvaluator::EvaluateProgram()
 		for(std::list <MachineComponent>::iterator i =
 				linkedMachine->components.begin();
 				i != linkedMachine->components.end(); ++i){
-			wxLogMessage(wxString::Format(_T("Component %u:"), n++) + i->nameOfComponent);
+			wxLogMessage
+			(wxString::Format(_T("Component %u:"), n++) + i->nameOfComponent);
 		}
 	}
 	return true;
@@ -182,6 +183,11 @@ bool LUACodeEvaluator::EvaluateAssembly()
 	InsertVariable(_T("AXIS_U"), linkedMachine->currentpos.U);
 	InsertVariable(_T("AXIS_V"), linkedMachine->currentpos.V);
 	InsertVariable(_T("AXIS_W"), linkedMachine->currentpos.W);
+
+	// Insert the axes for the IK solver
+	for(size_t n = 0; n < linkedMachine->NR_IKAXIS; n++)
+		InsertVariable(wxString::Format(_T("AXIS_%lu"), n + 1),
+				linkedMachine->IKaxis[n]);
 
 	lua_getglobal(L, "AssembleMachine");
 
