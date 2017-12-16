@@ -33,6 +33,7 @@
 #include <wx/log.h>
 #include <GL/gl.h>
 #include <float.h>
+#include <algorithm>
 
 Machine::Machine()
 {
@@ -101,8 +102,7 @@ bool Machine::ReLoad(void)
 		flag = true;
 		wxTextFile file(fileName.GetFullPath());
 		if(!file.Open(wxConvLocal) && !file.Open(wxConvFile)){
-			wxLogError
-			(_T("Opening of the file failed!"));
+			wxLogError(_T("Opening of the file failed!"));
 			return false;
 		}
 		wxString str;
@@ -135,8 +135,7 @@ bool Machine::ReLoad(void)
 	}
 
 	if(!flag){
-		wxLogError
-		(_("File format for machine descriptions not supported."));
+		wxLogError(_("File format for machine descriptions not supported."));
 		return false;
 	}
 
@@ -211,8 +210,7 @@ bool Machine::FromXml(wxXmlNode* node)
 
 void Machine::EvaluateDescription(void)
 {
-	wxLogMessage
-	(_T("Machine::InsertMachineDescription"));
+	wxLogMessage(_T("Machine::InsertMachineDescription"));
 	evaluator.LinkToMachine(this);
 	if(evaluator.EvaluateProgram()){
 
@@ -238,60 +236,16 @@ void Machine::EvaluateDescription(void)
 		}
 		for(size_t n = 0; n < NR_IKAXIS; n++)
 			IKaxis[n] = 0.0;
-
-		Assemble();
+		toolLengthOffset = 0.0;
+		currentpos = CNCPosition();
+		evaluator.EvaluateAssembly();
+		offset0 = CNCPosition(workpiecePosition.Inverse() * toolPosition);
 		initialized = true;
 	}else{
 		initialized = false;
 	}
 
 	textOut = evaluator.GetOutput();
-}
-
-void Machine::AxplusB(double* res, double* A, double x, double* B)
-{
-	assert(res!=NULL);
-	if(A == NULL && B == NULL){
-		for(size_t n = 0; n < NR_IKAXIS; n++)
-			res[n] = 0.0;
-	}
-	if(A != NULL && B == NULL){
-		for(size_t n = 0; n < NR_IKAXIS; n++)
-			res[n] = A[n] * x;
-	}
-	if(A == NULL && B != NULL){
-		for(size_t n = 0; n < NR_IKAXIS; n++)
-			res[n] = B[n];
-	}
-	if(A != NULL && B != NULL){
-		for(size_t n = 0; n < NR_IKAXIS; n++)
-			res[n] = A[n] * x + B[n];
-	}
-}
-
-double Machine::LineSearch(double* A, double* B)
-{
-	//TODO: Use a 2nd order search.
-	Copy(IKaxis, B);
-	evaluator.EvaluateAssembly();
-	double E0 = GetE();
-	double step = 0.5;
-	double f = 1.0;
-	double opt = 0.0;
-	for(size_t m = 0; m < 10; m++){
-		AxplusB(IKaxis, A, f, B);
-		evaluator.EvaluateAssembly();
-		const double Etest = GetE();
-		if(Etest < E0){
-			E0 = Etest;
-			opt = f;
-			f += step;
-		}else{
-			f -= step;
-		}
-		step /= 2;
-	}
-	return opt;
 }
 
 void Machine::Copy(double* res, double* A)
@@ -313,10 +267,14 @@ double Machine::GetE(void) const
 	Vector3 tc = tpos.GetCenter();
 	Vector3 cc = cpos.GetCenter();
 
-	return (tc - cc).Abs() + 2 * fabs(normalaligned - 1.0);
+	// Keep the axes rather straight.
+	double bend = 0.0;
+	for(size_t n = 0; n < NR_IKAXIS; n++){
+		if(IKaxisused[n]) bend += IKaxis[n] * IKaxis[n];
+	}
 
+	return (tc - cc).Abs() + 3 * fabs(normalaligned - 1.0) + sqrt(bend) / 1000;
 //	return cpos.Distance(tpos);
-
 }
 
 void Machine::Assemble()
@@ -328,68 +286,118 @@ void Machine::Assemble()
 		return;
 	}
 
-	// Wonky IK implementation
-	double dax[NR_IKAXIS];
-	const double eps = 1e-4;
+	// Nelder-Mead Solver
+	// https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method
 
-	double old[NR_IKAXIS];
-	Copy(old, IKaxis);
+	const double alpha = 1;
+	const double gamma = 2;
+	const double rho = 0.5;
+	const double sigma = 0.5;
 
-	evaluator.EvaluateAssembly();
-	double E0 = GetE();
+	const double Elimit = 0.01;
+	const double eps = 0.5;
 
-	for(size_t n = 0; n < NR_IKAXIS; n++){
-		if(IKaxisused[n]){
-			Copy(IKaxis, old);
-			IKaxis[n] = old[n] - eps;
-			evaluator.EvaluateAssembly();
-			const double Em = GetE();
-			IKaxis[n] = old[n] + eps;
-			evaluator.EvaluateAssembly();
-			const double Ep = GetE();
-			IKaxis[n] = old[n];
-
-			const double a = (Em - 2 * E0 + Ep) / (2 * eps * eps);
-			if(a > 10 && true){
-				dax[n] = (Em - Ep) / (4 * eps * a);
-			}else{
-				const double a1 = (E0 - Em) / eps;
-				const double a2 = (Ep - Em) / (2 * eps);
-				const double a3 = (Ep - E0) / eps;
-				uint_fast8_t c = 0;
-				double b = 0;
-				if(fabs(a1) > FLT_EPSILON){
-					b += -E0 / a1;
-					c++;
-				}
-				if(fabs(a2) > FLT_EPSILON){
-					b += -(Em + Ep) / 2.0 / a1;
-					c++;
-				}
-				if(fabs(a3) > FLT_EPSILON){
-					b += -E0 / a3;
-					c++;
-				}
-				if(c == 0){
-					dax[n] = 0.0;
-				}else{
-					double temp = b / (double) c;
-					IKaxis[n] = old[n] + temp;
-					evaluator.EvaluateAssembly();
-					const double Et = GetE();
-					if((E0 + Et) > FLT_EPSILON){
-						dax[n] = temp * E0 / (E0 + Et);
-					}else{
-						dax[n] = 0.0;
-					}
-				}
-			}
-		}else{
-			dax[n] = 0.0;
+	size_t N = 0;
+	double E[NR_IKAXIS + 1];
+	double C[(NR_IKAXIS + 1) * NR_IKAXIS];
+	for(size_t n = 0; n < (NR_IKAXIS + 1); n++){
+		Copy(C + n * NR_IKAXIS, IKaxis);
+		if(n < NR_IKAXIS){
+			C[n * (1 + NR_IKAXIS)] += eps;
+			if(IKaxisused[n]) N++;
 		}
 	}
-	double f = LineSearch(dax, old);
-	AxplusB(IKaxis, dax, f, old);
+	for(size_t n = 0; n < (NR_IKAXIS + 1); n++){
+		if(IKaxisused[n]){
+			Copy(IKaxis, C + n * NR_IKAXIS);
+			evaluator.EvaluateAssembly();
+			E[n] = GetE();
+		}else{
+			E[n] = FLT_MAX;
+		}
+	}
+	for(size_t m = 0; m < 100; m++){
+
+		// 1.) Sort
+		bool flag = true;
+		while(flag){
+			flag = false;
+			for(size_t n = 0; n < NR_IKAXIS; n++){
+				if(E[n] > E[n + 1]){
+					std::swap_ranges(C + n * NR_IKAXIS, C + (n + 1) * NR_IKAXIS,
+							C + (n + 1) * NR_IKAXIS);
+					std::swap(E[n], E[n + 1]);
+					flag = true;
+				}
+			}
+		}
+
+		if(E[0] < Elimit) break;
+
+		// 2.) Calculate centroid
+		double cent[NR_IKAXIS];
+		for(size_t n = 0; n < NR_IKAXIS; n++)
+			cent[n] = 0;
+		for(size_t n = 0; n < (NR_IKAXIS * N); n++)
+			cent[n % NR_IKAXIS] += C[n];
+		for(size_t n = 0; n < NR_IKAXIS; n++)
+			cent[n] /= (double) N;
+
+		// 3.) Reflection
+		double refl[NR_IKAXIS];
+		for(size_t n = 0; n < NR_IKAXIS; n++)
+			refl[n] = cent[n] + alpha * (cent[n] - C[n + NR_IKAXIS * N]);
+		Copy(IKaxis, refl);
+		evaluator.EvaluateAssembly();
+		double Erefl = GetE();
+		if(E[0] <= Erefl && Erefl < E[N - 1]){
+			Copy(C + NR_IKAXIS * N, refl);
+			E[N] = Erefl;
+			continue;
+		}
+
+		// 4.) Expansion
+		if(Erefl < E[0]){
+			double expa[NR_IKAXIS];
+			for(size_t n = 0; n < NR_IKAXIS; n++)
+				expa[n] = cent[n] + gamma * (refl[n] - cent[n]);
+			Copy(IKaxis, expa);
+			evaluator.EvaluateAssembly();
+			double Eexpa = GetE();
+			if(Eexpa < Erefl){
+				Copy(C + NR_IKAXIS * N, expa);
+				E[N] = Eexpa;
+				continue;
+			}else{
+				Copy(C + NR_IKAXIS * N, refl);
+				E[N] = Erefl;
+				continue;
+			}
+		}
+
+		// 5.) Contraction
+		double cont[NR_IKAXIS];
+		for(size_t n = 0; n < NR_IKAXIS; n++)
+			cont[n] = cent[n] + rho * (C[n + NR_IKAXIS * N] - cent[n]);
+		Copy(IKaxis, cont);
+		evaluator.EvaluateAssembly();
+		double Econt = GetE();
+		if(Econt < E[N]){
+			Copy(C + NR_IKAXIS * N, cont);
+			E[N] = Econt;
+			continue;
+		}
+
+		// 6.) Shrink
+		for(size_t n = NR_IKAXIS; n < (NR_IKAXIS * (N + 1)); n++)
+			C[n] = C[n % NR_IKAXIS] + sigma * (C[n] - C[n % NR_IKAXIS]);
+		for(size_t n = 1; n < (NR_IKAXIS + 1); n++){
+			Copy(IKaxis, C + n * NR_IKAXIS);
+			evaluator.EvaluateAssembly();
+			E[n] = GetE();
+		}
+	}
+	Copy(IKaxis, C);
 	evaluator.EvaluateAssembly();
 }
 
@@ -517,8 +525,7 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 
 	// Case 0: The lua file is inside a zip, so is the rest of the data.
 	if(machinedirectory.GetExt().CmpNoCase(_T("zip")) == 0){
-		wxLogMessage
-		(_T("Inside Zip file."));
+		wxLogMessage(_T("Inside Zip file."));
 		return LoadGeometryIntoComponentFromZip(machinedirectory, filename,
 				component, matrix);
 	}
@@ -527,8 +534,7 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 	wxFileName zipFile(machinedirectory);
 	zipFile.SetExt(_T("zip"));
 	if(zipFile.IsFileReadable()){
-		wxLogMessage
-		(_T("Zip file found."));
+		wxLogMessage(_T("Zip file found."));
 		return LoadGeometryIntoComponentFromZip(zipFile, filename, component,
 				matrix);
 	}
@@ -545,11 +551,9 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 	zipFile.SetName(path[0]);
 	zipFile.SetExt(_T("zip"));
 	zipFile.SetPath(machinedirectory.GetPath());
-	wxLogMessage
-	(zipFile.GetFullPath());
+	wxLogMessage(zipFile.GetFullPath());
 	if(zipFile.IsFileReadable()){
-		wxLogMessage
-		(_T("Extra-Zip file found."));
+		wxLogMessage(_T("Extra-Zip file found."));
 		return LoadGeometryIntoComponentFromZip(zipFile, filename, component,
 				matrix);
 	}
@@ -583,8 +587,7 @@ bool Machine::LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
 				inzip.CloseEntry();
 				return true;
 			}else{
-				wxLogMessage
-				(_T("Geometries other than STL are not supported (yet)."));
+				wxLogMessage(_T("Geometries other than STL are not supported (yet)."));
 			}
 			break;
 		}
@@ -614,81 +617,12 @@ void Machine::Reset()
 	for(size_t n = 0; n < NR_IKAXIS; n++)
 		IKaxis[n] = 0.0;
 	Assemble();
-//	toolPosition.TakeMatrixApart();
-//			workpiecePosition.TakeMatrixApart();
-//			CNCPosition();
-//			offset0.X = toolPosition.tx-workpiecePosition.tx;
-//			offset0.Y = toolPosition.ty-workpiecePosition.ty;
-//			offset0.Z = toolPosition.tz-workpiecePosition.tz;
-//			offset0.A = toolPosition.rx-workpiecePosition.rx;
-
-	offset0 = CNCPosition(workpiecePosition.Inverse() * toolPosition);
 }
 
 Vector3 Machine::GetCenter(void) const
 {
 	return workpiecePosition.GetCenter();
 }
-
-//void Machine::DryRunToolPath(ToolPath* tp)
-//{
-//	double F = 1e-3;
-//	double t = 0;
-//	uint_fast8_t actc = 1;
-//	uint_fast8_t mode = 1;
-//	MachinePosition pos;
-//	MachinePosition old;
-//	MachinePosition off[10];
-//	for(size_t i = 0; i < tp->positions.GetCount(); i++){
-//		double dt = 0.0;
-//		old = pos;
-//		if(tp->positions[i].F > -FLT_EPSILON) F = tp->positions[i].F;
-//		if(tp->positions[i].G[0] == 40) dt += tp->positions[i].P;
-//		const bool machineCoordinates = (tp->positions[i].G[0] == 530);
-//		if(tp->positions[i].G[12] == 540) actc = 1;
-//		if(tp->positions[i].G[12] == 550) actc = 2;
-//		if(tp->positions[i].G[12] == 560) actc = 3;
-//		if(tp->positions[i].G[12] == 570) actc = 4;
-//		if(tp->positions[i].G[12] == 580) actc = 5;
-//		if(tp->positions[i].G[12] == 590) actc = 6;
-//		if(tp->positions[i].G[12] == 591) actc = 7;
-//		if(tp->positions[i].G[12] == 592) actc = 8;
-//		if(tp->positions[i].G[12] == 593) actc = 9;
-//		if(tp->positions[i].G[1] == 0) mode = 0;
-//		if(tp->positions[i].G[1] == 10) mode = 1;
-//		if(tp->positions[i].G[1] == 20) mode = 2;
-//		if(tp->positions[i].G[1] == 30) mode = 3;
-//		if(tp->positions[i].XFlag) pos.X = tp->positions[i].X;
-//		if(tp->positions[i].YFlag) pos.Y = tp->positions[i].Y;
-//		if(tp->positions[i].ZFlag) pos.Z = tp->positions[i].Z;
-//		if(tp->positions[i].AFlag) pos.A = tp->positions[i].A;
-//		if(tp->positions[i].BFlag) pos.B = tp->positions[i].B;
-//		if(tp->positions[i].CFlag) pos.C = tp->positions[i].C;
-//		if(tp->positions[i].UFlag) pos.U = tp->positions[i].U;
-//		if(tp->positions[i].VFlag) pos.V = tp->positions[i].V;
-//		if(tp->positions[i].WFlag) pos.W = tp->positions[i].W;
-//		if(!machineCoordinates){
-//			pos += off[actc];
-//		}
-//		tp->positions[i].length = sqrt(
-//				(pos.X - old.X) * (pos.X - old.X)
-//						+ (pos.Y - old.Y) * (pos.Y - old.Y)
-//						+ (pos.Z - old.Z) * (pos.Z - old.Z));
-//		switch(mode){
-//		case 0:
-//			dt += tp->positions[i].length / F;
-//			break;
-//		case 1:
-//			dt += tp->positions[i].length / F;
-//			break;
-//		default:
-//			break;
-//		}
-//		tp->positions[i].duration = dt;
-//		tp->positions[i].tStart = t;
-//		t += dt;
-//	}
-//}
 
 void Machine::TouchoffPoint(const CNCPosition &point)
 {
@@ -800,4 +734,3 @@ void Machine::Interpolate(CNCPosition *a, CNCPosition *b,
 	}
 	microsteps.push_back(*b);
 }
-

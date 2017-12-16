@@ -114,9 +114,6 @@ public:
 
 	Vector3 GetCenter(void) const;
 
-	//TODO Remove the quick simulator
-//	void DryRunToolPath(ToolPath* tp); //!< Rough estimation of the duration of a toolpath. Quick and dirty stand-alone machine simulator.
-
 	void TouchoffPoint(const CNCPosition &point);
 	void TouchoffHeight(const double height);
 
@@ -181,10 +178,7 @@ public:
 private:
 	void Interpolate(CNCPosition *a, CNCPosition *b, bool generateMicroSteps);
 
-	void AxplusB(double* res, double* A = NULL, double x = 0.0,
-			double* B = NULL);
 	void Copy(double* res, double* A);
-	double LineSearch(double* A, double* B);
 	double GetE(void) const;
 
 	bool initialized;

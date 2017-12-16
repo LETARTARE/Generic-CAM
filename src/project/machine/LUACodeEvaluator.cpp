@@ -155,8 +155,7 @@ bool LUACodeEvaluator::EvaluateProgram()
 		for(std::list <MachineComponent>::iterator i =
 				linkedMachine->components.begin();
 				i != linkedMachine->components.end(); ++i){
-			wxLogMessage
-			(wxString::Format(_T("Component %u:"), n++) + i->nameOfComponent);
+			wxLogMessage(wxString::Format(_T("Component %u:"), n++) + i->nameOfComponent);
 		}
 	}
 	return true;

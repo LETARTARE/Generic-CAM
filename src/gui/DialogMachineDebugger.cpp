@@ -40,7 +40,7 @@ DialogMachineDebugger::DialogMachineDebugger(wxWindow * parent,
 
 	this->midi = midi;
 	this->settings = settings;
-	machineControl = new DialogMachineControl(this, settings,midi);
+	machineControl = new DialogMachineControl(this, settings, midi);
 
 	m_canvas->InsertMachine(&machine);
 //	machine.Load(wxFileName(_T("machines/testmachine.lua")));
@@ -111,6 +111,16 @@ void DialogMachineDebugger::OnScriptEvaluate(wxCommandEvent& event)
 	TransferDataFromWindow();
 	machine.EvaluateDescription();
 	machine.Reset();
+	machine.currentpos.X = machineControl->X;
+	machine.currentpos.Y = machineControl->Y;
+	machine.currentpos.Z = machineControl->Z;
+	machine.currentpos.A = machineControl->A;
+	machine.currentpos.B = machineControl->B;
+	machine.currentpos.C = machineControl->C;
+	machine.currentpos.U = machineControl->U;
+	machine.currentpos.V = machineControl->V;
+	machine.currentpos.W = machineControl->W;
+	machine.Assemble();
 	TransferDataToWindow();
 }
 
@@ -148,8 +158,7 @@ void DialogMachineDebugger::OnMachineSave(wxCommandEvent& event)
 					"Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
 			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
-	if(machine.fileName.IsOk()) dialog.SetPath(
-			machine.fileName.GetFullPath());
+	if(machine.fileName.IsOk()) dialog.SetPath(machine.fileName.GetFullPath());
 
 	if(dialog.ShowModal() == wxID_OK){
 		TransferDataFromWindow();
