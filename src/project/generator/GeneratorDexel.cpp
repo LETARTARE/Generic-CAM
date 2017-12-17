@@ -68,11 +68,11 @@ void GeneratorDexel::Paint(void) const
 	area.Paint();
 
 	glPushMatrix();
-	glTranslatef(0, target.GetSizeY(), 0);
+	glTranslatef(0, -target.GetSizeY(), 0);
 	target.Paint();
 	glPopMatrix();
 	glPushMatrix();
-	glTranslatef(0, -target.GetSizeY(), 0);
+	glTranslatef(0, -2 * target.GetSizeY(), 0);
 	debug.Paint();
 	glPopMatrix();
 
@@ -87,87 +87,74 @@ void GeneratorDexel::GenerateToolpath(void)
 	const Workpiece* const workpiece = &(project->workpieces[run->refWorkpiece]);
 	assert(workpiece != NULL);
 
+	// Start to Target:
+	// - Start: may have changes by previous toolpaths
+	// - Mask: work only in designated area
+	// - Temp: Remove workpiece OR remove immediate surroundings --> Set in WorkpiecePlacement
+
 	start = workpiece->model;
+
+	DexelTarget mask;
+	mask = start;
+	mask.Fill();
+	DexelTarget temp;
+	temp = mask;
+	temp.InitImprinting();
+	temp.InsertTriangle(Vector3(area.xmin, area.ymin, area.zmax),
+			Vector3(area.xmax, area.ymin, area.zmax),
+			Vector3(area.xmax, area.ymax, area.zmax), Imprinter::facing_up);
+	temp.InsertTriangle(Vector3(area.xmin, area.ymin, area.zmax),
+			Vector3(area.xmin, area.ymax, area.zmax),
+			Vector3(area.xmax, area.ymax, area.zmax), Imprinter::facing_up);
+	temp.InsertTriangle(Vector3(area.xmin, area.ymin, area.zmin),
+			Vector3(area.xmax, area.ymin, area.zmin),
+			Vector3(area.xmax, area.ymax, area.zmin), Imprinter::facing_down);
+	temp.InsertTriangle(Vector3(area.xmin, area.ymin, area.zmin),
+			Vector3(area.xmin, area.ymax, area.zmin),
+			Vector3(area.xmax, area.ymax, area.zmin), Imprinter::facing_down);
+	temp.FinishImprint();
+	mask -= temp;
+
 	target = start;
-
-	DexelTarget outside(target);
-	outside.Fill();
-
 	target.InitImprinting();
+
 	for(size_t i = 0; i < workpiece->placements.GetCount(); i++){
 		const ObjectPlacement* const opl = &(workpiece->placements[i]);
 		const size_t refObject = opl->refObject;
 		const Object* object = &(project->objects[refObject]);
 		AffineTransformMatrix tempMatrix;
 		tempMatrix *= run->workpiecePlacement;
-//		tempMatrix.TranslateGlobal(-area.xmin, -area.ymin, -area.zmin);
 		tempMatrix *= opl->matrix;
 		target.InsertObject(*object, tempMatrix);
 
-		DexelTarget temp(target);
-		temp.InitImprinting();
+		DexelTarget temp(mask);
 		if(opl->useContour){
+			temp.InitImprinting();
 			temp.InsertObject(*object, tempMatrix);
 			temp.FinishImprint();
 			DexelTarget discSlot;
-			discSlot.SetupDisc(opl->slotWidth, start.GetResolutionX(),
-					start.GetResolutionY());
+			discSlot.SetupDisc(opl->slotWidth, mask.GetResolutionX(),
+					mask.GetResolutionY());
 			temp.FoldRaise(discSlot);
+			temp.HardInvert();
 		}else{
-			temp.InsertTriangle(
-					Vector3(opl->xmin - area.xmin, opl->ymin - area.ymin,
-							opl->zmax - area.zmin),
-					Vector3(opl->xmax - area.xmin, opl->ymin - area.ymin,
-							opl->zmax - area.zmin),
-					Vector3(opl->xmax - area.xmin, opl->ymax - area.ymin,
-							opl->zmax - area.zmin), Imprinter::facing_up);
-			temp.InsertTriangle(
-					Vector3(opl->xmin - area.xmin, opl->ymin - area.ymin,
-							opl->zmax - area.zmin),
-					Vector3(opl->xmin - area.xmin, opl->ymax - area.ymin,
-							opl->zmax - area.zmin),
-					Vector3(opl->xmax - area.xmin, opl->ymax - area.ymin,
-							opl->zmax - area.zmin), Imprinter::facing_up);
-			temp.InsertTriangle(
-					Vector3(opl->xmin - area.xmin, opl->ymin - area.ymin,
-							opl->zmin - area.zmin),
-					Vector3(opl->xmax - area.xmin, opl->ymin - area.ymin,
-							opl->zmin - area.zmin),
-					Vector3(opl->xmax - area.xmin, opl->ymax - area.ymin,
-							opl->zmin - area.zmin), Imprinter::facing_down);
-			temp.InsertTriangle(
-					Vector3(opl->xmin - area.xmin, opl->ymin - area.ymin,
-							opl->zmin - area.zmin),
-					Vector3(opl->xmin - area.xmin, opl->ymax - area.ymin,
-							opl->zmin - area.zmin),
-					Vector3(opl->xmax - area.xmin, opl->ymax - area.ymin,
-							opl->zmin - area.zmin), Imprinter::facing_down);
-			temp.FinishImprint();
+			temp.Empty();
 		}
-
-		outside |= temp;
+		mask |= temp;
 	}
+	target.FinishImprint();
 	for(size_t i = 0; i < workpiece->supports.GetCount(); i++){
 		//TODO: Insert supports into target.
 	}
 
-	target.FinishImprint();
-	debug = start;
+	temp = start;
+	temp &= mask;
+	target |= temp;
+
 //	debug.displayField = true;
 //	target.displayField = true;
 
 //	target.CleanOutlier();
-	outside.HardInvert();
-
-	// Draw a single cell line on the outside of the area to keep the tool inside the
-	// pocket.
-	//TODO Turn this feature off, if the working area is bigger or the same size as the workpiece in XY.
-	outside.MarkOutline();
-
-	outside &= start;
-//	target |= outside;
-//	target &= start;
-
 	target.Refresh();
 }
 

@@ -61,30 +61,34 @@ CNCPosition::CNCPosition(const AffineTransformMatrix& matrix)
 	const double a0 = matrix.a[0];
 	const double a1 = matrix.a[1];
 	const double a2 = matrix.a[2];
-//	const double a4 = matrix.a[4];
+	const double a4 = matrix.a[4];
 	const double a5 = matrix.a[5];
 	const double a6 = matrix.a[6];
-//	const double a8 = matrix.a[8];
-//	const double a9 = matrix.a[9];
+	const double a8 = matrix.a[8];
+	const double a9 = matrix.a[9];
 	const double a10 = matrix.a[10];
 
 	const double siy = -a2;
 	const double coy = (sqrt(a0 * a0 + a1 * a1) + sqrt(a6 * a6 + a10 * a10))
 			/ 2.0;
+	double cox;
+	double six;
+	double coz;
+	double siz;
 
-	// Note that this only breaks on machine->Reset().
-	assert(coy > FLT_EPSILON); // Singularity in matrix: System rotated exactly +/- 90 degres on the Y axis
-
-	const double cox = a10 / coy;
-	const double six = a6 / coy;
-	const double coz = a0 / coy;
-	const double siz = a1 / coy;
-
+	// Singularity in matrix: System rotated exactly +/- 90 degres on the Y axis
+	if(coy > FLT_EPSILON){
+		cox = a10 / coy;
+		six = a6 / coy;
+		coz = a0 / coy;
+		siz = a1 / coy;
+	}else{
+		cox = a5 - a8 / a2;
+		six = -a9 - a4 / a2;
+		coz = 1;
+		siz = 0;
+	}
 	const double test = six * siy * siz + cox * coz;
-
-	X = matrix.a[12];
-	Y = matrix.a[13];
-	Z = matrix.a[14];
 
 	if(test * a5 >= 0){
 		A = atan2(six, cox);
@@ -96,6 +100,10 @@ CNCPosition::CNCPosition(const AffineTransformMatrix& matrix)
 		B = atan2(siy, -coy);
 		C = atan2(-siz, -coz);
 	}
+
+	X = matrix.a[12];
+	Y = matrix.a[13];
+	Z = matrix.a[14];
 	U = 0;
 	V = 0;
 	W = 0;
