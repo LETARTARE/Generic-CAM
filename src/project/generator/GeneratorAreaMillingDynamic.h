@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GeneratorFast.h
+// Name               : GeneratorAreaMillingDynamic.h
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,8 +24,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef GENERATORFAST_H_
-#define GENERATORFAST_H_
+#ifndef GENERATORAREAMILLINGDYNAMIC_H_
+#define GENERATORAREAMILLINGDYNAMIC_H_
 
 #include "GeneratorDexel.h"
 
@@ -38,33 +38,39 @@
  *
  * ...
  */
-class GeneratorFast:public GeneratorDexel {
+class GeneratorAreaMillingDynamic:public GeneratorDexel {
 	// Constructor/ Destructor
 public:
-	GeneratorFast();
-	virtual ~GeneratorFast();
+	GeneratorAreaMillingDynamic();
+	virtual ~GeneratorAreaMillingDynamic();
 
 	virtual void CopyParameterFrom(const Generator * other);
 	virtual wxString GetName(void) const;
 	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
 	virtual void TransferDataToPanel(void) const;
 	virtual void TransferDataFromPanel(void);
-	virtual wxString ToString(void) const;
-	virtual void FromString(const wxString & text);
 
 	virtual void GenerateToolpath(void);
 
 	//Member variables:
 public:
-
+	double toolDiameter;
 	double freeHeightAboveMaterial;
 	double maxSingleStep;
 	double raiseStep;
-
 	double dropStep;
 
 private:
-	double toolDiameter;
+
+	wxStaticText* m_staticText10;
+	wxTextCtrl* m_textCtrlMaxSingleStep;
+	wxStaticText* m_staticTextUnit1;
+	wxStaticText* m_staticText12;
+	wxTextCtrl* m_textCtrlRaiseStep;
+	wxStaticText* m_staticTextUnit2;
+	wxStaticText* m_staticText14;
+	wxTextCtrl* m_textCtrlDropStep;
+	wxStaticText* m_staticTextUnit3;
 
 	//Methods:
 
@@ -78,4 +84,4 @@ private:
 
 };
 
-#endif /* GENERATORFAST_H_ */
+#endif /* GENERATORAREAMILLINGDYNAMIC_H_ */

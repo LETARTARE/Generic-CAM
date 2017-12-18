@@ -36,17 +36,19 @@
 
 #include "../../3D/Polygon25.h"
 
+#include <wx/dynarray.h>
+
 class ProtoToolpath:public Polygon25 {
 public:
 	ProtoToolpath();
 	virtual ~ProtoToolpath();
 
 public:
+	bool inserted;
 	int parent;
-	int child;
-	int next;
-
-	int level;
 };
+
+WX_DECLARE_OBJARRAY(ProtoToolpath, ArrayOfProtoToolpath);
+
 
 #endif /* PROTOTOOLPATH_H_ */

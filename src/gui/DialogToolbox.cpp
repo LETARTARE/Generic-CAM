@@ -80,7 +80,7 @@ bool DialogToolbox::TransferDataToWindow(void)
 	m_textCtrlShaftLength->SetValue(
 			settings->SmallDistance.TextFromSI(tempTool.shaftLength));
 	m_textCtrlMaxSpeed->SetValue(
-			settings->RotationalSpeed.TextFromSI(tempTool.maxSpeed, 0));
+			settings->RotationalSpeed.TextFromSI(tempTool.maxSpeed));
 	m_textCtrlFeedCoefficient->SetValue(
 			settings->SmallDistance.TextFromSI(tempTool.feedCoefficient));
 	m_textCtrlNrOfTeeth->SetValue(

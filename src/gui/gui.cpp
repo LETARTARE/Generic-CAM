@@ -1477,14 +1477,11 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	wxBoxSizer* bSizer71;
 	bSizer71 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_radioBtnBox = new wxRadioButton( this, ID_FORMBOX, _("Box"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP );
-	bSizer71->Add( m_radioBtnBox, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_checkBoxContour = new wxCheckBox( this, ID_FORMCONTOUR, _("Contour"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxContour->SetValue(true); 
+	m_checkBoxContour->SetToolTip( _("Only remove the material in the close vincinity of the object.") );
 	
-	m_radioBtnContour = new wxRadioButton( this, ID_FORMCONTOUR, _("Contour"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer71->Add( m_radioBtnContour, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	
-	bSizer71->Add( 0, 0, 1, wxEXPAND, 5 );
+	bSizer71->Add( m_checkBoxContour, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
 	m_staticText108 = new wxStaticText( this, wxID_ANY, _("Distance:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText108->Wrap( -1 );
@@ -1496,6 +1493,9 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_staticTextUnitDistance = new wxStaticText( this, wxID_ANY, _("cm"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextUnitDistance->Wrap( -1 );
 	bSizer71->Add( m_staticTextUnitDistance, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	bSizer71->Add( 0, 0, 1, wxEXPAND, 5 );
 	
 	
 	bSizer68->Add( bSizer71, 0, wxEXPAND, 5 );
@@ -1572,8 +1572,7 @@ GUIPlacement::GUIPlacement( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_textCtrlZ->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIPlacement::OnChange ), NULL, this );
 	m_textCtrlAngle->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIPlacement::OnChange ), NULL, this );
 	m_sliderAngle->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUIPlacement::OnChangeSlider ), NULL, this );
-	m_radioBtnBox->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUIPlacement::OnChange ), NULL, this );
-	m_radioBtnContour->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUIPlacement::OnChange ), NULL, this );
+	m_checkBoxContour->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIPlacement::OnChange ), NULL, this );
 	m_textCtrlDistance->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIPlacement::OnChange ), NULL, this );
 	m_bpButtonYP->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
 	m_bpButtonXN->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
@@ -1597,8 +1596,7 @@ GUIPlacement::~GUIPlacement()
 	m_textCtrlZ->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIPlacement::OnChange ), NULL, this );
 	m_textCtrlAngle->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIPlacement::OnChange ), NULL, this );
 	m_sliderAngle->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( GUIPlacement::OnChangeSlider ), NULL, this );
-	m_radioBtnBox->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUIPlacement::OnChange ), NULL, this );
-	m_radioBtnContour->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUIPlacement::OnChange ), NULL, this );
+	m_checkBoxContour->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIPlacement::OnChange ), NULL, this );
 	m_textCtrlDistance->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIPlacement::OnChange ), NULL, this );
 	m_bpButtonYP->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
 	m_bpButtonXN->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIPlacement::OnTransform ), NULL, this );
@@ -2778,9 +2776,9 @@ GUIToolWizard::GUIToolWizard( wxWindow* parent, wxWindowID id, const wxString& t
 	wxBoxSizer* bSizer87;
 	bSizer87 = new wxBoxSizer( wxVERTICAL );
 	
-	wxString m_radioBoxToolTypeChoices[] = { _("Cylinder"), _("Sphere"), _("Conic") };
+	wxString m_radioBoxToolTypeChoices[] = { _("Flat nose (cylindric)"), _("Ball nose (spheric)"), _("Bull nose (mixing ball and flat)"), _("Camfer (triangle)") };
 	int m_radioBoxToolTypeNChoices = sizeof( m_radioBoxToolTypeChoices ) / sizeof( wxString );
-	m_radioBoxToolType = new wxRadioBox( this, wxID_ANY, _("Type"), wxDefaultPosition, wxDefaultSize, m_radioBoxToolTypeNChoices, m_radioBoxToolTypeChoices, 1, wxRA_SPECIFY_ROWS );
+	m_radioBoxToolType = new wxRadioBox( this, wxID_ANY, _("Type"), wxDefaultPosition, wxDefaultSize, m_radioBoxToolTypeNChoices, m_radioBoxToolTypeChoices, 2, wxRA_SPECIFY_ROWS );
 	m_radioBoxToolType->SetSelection( 0 );
 	bSizer87->Add( m_radioBoxToolType, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxTOP|wxBOTTOM, 5 );
 	

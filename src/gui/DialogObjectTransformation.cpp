@@ -101,13 +101,13 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 	if(selection >= 0){
 		m_textCtrlSizeX->SetValue(
 				settings->Distance.TextFromSI(
-						project->objects[selection].bbox.GetSizeX(), 3));
+						project->objects[selection].bbox.GetSizeX()));
 		m_textCtrlSizeY->SetValue(
 				settings->Distance.TextFromSI(
-						project->objects[selection].bbox.GetSizeY(), 3));
+						project->objects[selection].bbox.GetSizeY()));
 		m_textCtrlSizeZ->SetValue(
 				settings->Distance.TextFromSI(
-						project->objects[selection].bbox.GetSizeZ(), 3));
+						project->objects[selection].bbox.GetSizeZ()));
 	}else{
 		m_textCtrlSizeX->SetValue(_T("---"));
 		m_textCtrlSizeY->SetValue(_T("---"));
@@ -124,11 +124,11 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 	m_staticTextUnitAngle->SetLabel(settings->Angle.GetOtherName());
 
 	m_textCtrlScaleUnitX->SetValue(
-			settings->Distance.TextFromSI(scaleUnitX, 3));
+			settings->Distance.TextFromSI(scaleUnitX));
 	m_textCtrlScaleUnitY->SetValue(
-			settings->Distance.TextFromSI(scaleUnitY, 3));
+			settings->Distance.TextFromSI(scaleUnitY));
 	m_textCtrlScaleUnitZ->SetValue(
-			settings->Distance.TextFromSI(scaleUnitZ, 3));
+			settings->Distance.TextFromSI(scaleUnitZ));
 
 	m_textCtrlScalePercent->SetValue(
 			wxString::Format(_T("%.1f"), scalePercent * 100));
@@ -139,8 +139,8 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 	m_textCtrlScalePercentZ->SetValue(
 			wxString::Format(_T("%.1f"), scalePercentZ * 100));
 
-	m_textCtrlMoveStep->SetValue(settings->Distance.TextFromSI(moveStep, 3));
-	m_textCtrlRotateStep->SetValue(settings->Angle.TextFromSI(rotateStep, 2));
+	m_textCtrlMoveStep->SetValue(settings->Distance.TextFromSI(moveStep));
+	m_textCtrlRotateStep->SetValue(settings->Angle.TextFromSI(rotateStep));
 
 	m_checkBoxScaleProportionally->SetValue(scaleProportional);
 

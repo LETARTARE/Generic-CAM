@@ -75,9 +75,9 @@ bool DialogSetupStereo3D::TransferDataToWindow(void)
 			(int) round((settings->focalDistance * 50.0)));
 
 	m_textCtrlEyeDistance->SetValue(
-			settings->Distance.TextFromSI(settings->eyeDistance, 1));
+			settings->Distance.TextFromSI(settings->eyeDistance));
 	m_textCtrlFocalDistance->SetValue(
-			settings->Distance.TextFromSI(settings->focalDistance, 1));
+			settings->Distance.TextFromSI(settings->focalDistance));
 
 	m_staticTextUnitEyeDistance->SetLabel(settings->Distance.GetOtherName());
 	m_staticTextUnitFocalDistance->SetLabel(settings->Distance.GetOtherName());

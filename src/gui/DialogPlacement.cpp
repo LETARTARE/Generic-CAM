@@ -93,13 +93,9 @@ bool DialogPlacement::TransferDataToWindow(void)
 				settings->Distance.TextFromSI(
 						project->workpieces[wpNr].placements[plNr].slotWidth));
 
-		m_radioBtnBox->Enable();
-		m_radioBtnContour->Enable();
-		if(project->workpieces[wpNr].placements[plNr].useContour){
-			m_radioBtnContour->SetValue(true);
-		}else{
-			m_radioBtnBox->SetValue(true);
-		}
+		m_checkBoxContour->Enable();
+		m_checkBoxContour->SetValue(
+				project->workpieces[wpNr].placements[plNr].useContour);
 	}else{
 		m_textCtrlX->SetValue(_T(""));
 		m_textCtrlY->SetValue(_T(""));
@@ -107,9 +103,8 @@ bool DialogPlacement::TransferDataToWindow(void)
 		m_textCtrlAngle->SetValue(_T(""));
 		m_textCtrlDistance->SetValue(_T(""));
 		m_sliderAngle->SetValue(0);
-		m_radioBtnBox->SetValue(true);
-		m_radioBtnBox->Enable(false);
-		m_radioBtnContour->Enable(false);
+		m_checkBoxContour->SetValue(false);
+		m_checkBoxContour->Enable(false);
 	}
 
 	m_staticTextUnitX->SetLabel(settings->Distance.GetOtherName());
@@ -242,13 +237,12 @@ void DialogPlacement::OnChange(wxCommandEvent& event)
 		description = _("Set slotwidth to: ")
 				+ settings->Distance.TextFromSIWithUnit(slotWidth, 2);
 		break;
-	case ID_FORMBOX:
-		useContour = false;
-		description = _("Set form to box");
-		break;
 	case ID_FORMCONTOUR:
-		useContour = true;
-		description = _("Set form to contour");
+		useContour = m_checkBoxContour->GetValue();
+		if(useContour)
+			description = _("Object: Mill contour only");
+		else
+			description = _("Object: Mill everything");
 		break;
 	}
 	commandProcessor->Submit(

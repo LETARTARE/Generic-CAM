@@ -175,18 +175,18 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 	m_staticTextUnitFreeHeight->SetLabel(
 			settings->SmallDistance.GetOtherName());
 
-	m_textCtrlX1->SetValue(settings->Distance.TextFromSI(box.xmin, 3));
-	m_textCtrlY1->SetValue(settings->Distance.TextFromSI(box.ymin, 3));
-	m_textCtrlZ1->SetValue(settings->Distance.TextFromSI(box.zmin, 3));
+	m_textCtrlX1->SetValue(settings->Distance.TextFromSI(box.xmin ));
+	m_textCtrlY1->SetValue(settings->Distance.TextFromSI(box.ymin ));
+	m_textCtrlZ1->SetValue(settings->Distance.TextFromSI(box.zmin ));
 
-	m_textCtrlX2->SetValue(settings->Distance.TextFromSI(box.xmax, 3));
-	m_textCtrlY2->SetValue(settings->Distance.TextFromSI(box.ymax, 3));
-	m_textCtrlZ2->SetValue(settings->Distance.TextFromSI(box.zmax, 3));
+	m_textCtrlX2->SetValue(settings->Distance.TextFromSI(box.xmax));
+	m_textCtrlY2->SetValue(settings->Distance.TextFromSI(box.ymax));
+	m_textCtrlZ2->SetValue(settings->Distance.TextFromSI(box.zmax));
 
 	m_textCtrlMarginBelow->SetValue(
-			settings->Distance.TextFromSI(marginBelow, 3));
+			settings->Distance.TextFromSI(marginBelow));
 	m_textCtrlMarginSide->SetValue(
-			settings->Distance.TextFromSI(marginSides, 3));
+			settings->Distance.TextFromSI(marginSides));
 
 	m_textCtrlFreeHeight->SetValue(
 			settings->SmallDistance.TextFromSI(freeHeight));
@@ -470,6 +470,8 @@ void DialogToolpathGenerator::OnChangeText(wxCommandEvent& event)
 
 void DialogToolpathGenerator::OnPageChanged(wxChoicebookEvent& event)
 {
+	int pageNr = m_choicebookGenerator->GetSelection();
+	gc.generators[pageNr]->TransferDataToPanel();
 }
 
 void DialogToolpathGenerator::OnResetChanges(wxCommandEvent& event)

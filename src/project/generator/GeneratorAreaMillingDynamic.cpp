@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GeneratorFast.cpp
+// Name               : GeneratorAreaMillingDynamic.cpp
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,13 +24,14 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "GeneratorFast.h"
+#include "GeneratorAreaMillingDynamic.h"
+
 #include <math.h>
 
 #include "../Project.h"
 #include "../machine/CNCPosition.h"
 
-GeneratorFast::GeneratorFast()
+GeneratorAreaMillingDynamic::GeneratorAreaMillingDynamic()
 {
 	freeHeightAboveMaterial = 0.002;
 	maxSingleStep = 0.020;
@@ -40,12 +41,126 @@ GeneratorFast::GeneratorFast()
 	toolDiameter = 0.0;
 }
 
-GeneratorFast::~GeneratorFast()
+GeneratorAreaMillingDynamic::~GeneratorAreaMillingDynamic()
 {
 }
 
-ToolPath GeneratorFast::GenerateDrill(double x, double y, double diameter,
-		double depth)
+void GeneratorAreaMillingDynamic::CopyParameterFrom(const Generator* other)
+{
+	GeneratorDexel::CopyParameterFrom(other);
+
+	const GeneratorAreaMillingDynamic * temp =
+			dynamic_cast <const GeneratorAreaMillingDynamic*>(other);
+
+	maxSingleStep = temp->maxSingleStep;
+	raiseStep = temp->raiseStep;
+	dropStep = temp->dropStep;
+}
+
+wxString GeneratorAreaMillingDynamic::GetName(void) const
+{
+	return _T("Area Milling - Dynamic (using Dexel)");
+}
+
+void GeneratorAreaMillingDynamic::AddToPanel(wxPanel* panel,
+		DisplaySettings* settings)
+{
+	Generator::AddToPanel(panel, settings);
+
+	wxBoxSizer* bSizer;
+	bSizer = new wxBoxSizer(wxVERTICAL);
+
+	wxBoxSizer* bSizer11;
+	bSizer11 = new wxBoxSizer(wxVERTICAL);
+
+	wxFlexGridSizer* fgSizer;
+	fgSizer = new wxFlexGridSizer(3, 3, 0, 0);
+	fgSizer->SetFlexibleDirection(wxBOTH);
+	fgSizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+	m_staticText10 = new wxStaticText(panel, wxID_ANY, wxT("Max. single step:"),
+			wxDefaultPosition, wxDefaultSize, 0);
+	m_staticText10->Wrap(-1);
+	fgSizer->Add(m_staticText10, 0,
+			wxALL | wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL, 5);
+
+	m_textCtrlMaxSingleStep = new wxTextCtrl(panel, wxID_ANY, wxEmptyString,
+			wxDefaultPosition, wxDefaultSize, 0);
+	fgSizer->Add(m_textCtrlMaxSingleStep, 0,
+			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL, 5);
+
+	m_staticTextUnit1 = new wxStaticText(panel, wxID_ANY, wxT("mm"),
+			wxDefaultPosition, wxDefaultSize, 0);
+	m_staticTextUnit1->Wrap(-1);
+	fgSizer->Add(m_staticTextUnit1, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+
+	m_staticText12 = new wxStaticText(panel, wxID_ANY, wxT("Raise step:"),
+			wxDefaultPosition, wxDefaultSize, 0);
+	m_staticText12->Wrap(-1);
+	fgSizer->Add(m_staticText12, 0,
+			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT, 5);
+
+	m_textCtrlRaiseStep = new wxTextCtrl(panel, wxID_ANY, wxEmptyString,
+			wxDefaultPosition, wxDefaultSize, 0);
+	fgSizer->Add(m_textCtrlRaiseStep, 0,
+			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL, 5);
+
+	m_staticTextUnit2 = new wxStaticText(panel, wxID_ANY, wxT("mm"),
+			wxDefaultPosition, wxDefaultSize, 0);
+	m_staticTextUnit2->Wrap(-1);
+	fgSizer->Add(m_staticTextUnit2, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+
+	m_staticText14 = new wxStaticText(panel, wxID_ANY, wxT("Drop step:"),
+			wxDefaultPosition, wxDefaultSize, 0);
+	m_staticText14->Wrap(-1);
+	fgSizer->Add(m_staticText14, 0,
+			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT, 5);
+
+	m_textCtrlDropStep = new wxTextCtrl(panel, wxID_ANY, wxEmptyString,
+			wxDefaultPosition, wxDefaultSize, 0);
+	fgSizer->Add(m_textCtrlDropStep, 0,
+			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL, 5);
+
+	m_staticTextUnit3 = new wxStaticText(panel, wxID_ANY, wxT("mm"),
+			wxDefaultPosition, wxDefaultSize, 0);
+	m_staticTextUnit3->Wrap(-1);
+	fgSizer->Add(m_staticTextUnit3, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+
+	bSizer11->Add(fgSizer, 0, 0, 5);
+
+	bSizer->Add(bSizer11, 0, wxALIGN_CENTER_HORIZONTAL, 5);
+
+	panel->SetSizer(bSizer);
+	panel->Layout();
+	bSizer->Fit(panel);
+
+}
+
+void GeneratorAreaMillingDynamic::TransferDataToPanel(void) const
+{
+	m_staticTextUnit1->SetLabel(settings->SmallDistance.GetOtherName());
+	m_staticTextUnit2->SetLabel(settings->SmallDistance.GetOtherName());
+	m_staticTextUnit3->SetLabel(settings->SmallDistance.GetOtherName());
+
+	m_textCtrlMaxSingleStep->SetValue(
+			settings->SmallDistance.TextFromSI(maxSingleStep));
+	m_textCtrlRaiseStep->SetValue(
+			settings->SmallDistance.TextFromSI(raiseStep));
+	m_textCtrlDropStep->SetValue(settings->SmallDistance.TextFromSI(dropStep));
+}
+
+void GeneratorAreaMillingDynamic::TransferDataFromPanel(void)
+{
+	maxSingleStep = settings->SmallDistance.SIFromString(
+			m_textCtrlMaxSingleStep->GetValue());
+	raiseStep = settings->SmallDistance.SIFromString(
+			m_textCtrlRaiseStep->GetValue());
+	dropStep = settings->SmallDistance.SIFromString(
+			m_textCtrlDropStep->GetValue());
+}
+
+ToolPath GeneratorAreaMillingDynamic::GenerateDrill(double x, double y,
+		double diameter, double depth)
 {
 	ToolPath temp;
 	GCodeBlock mp;
@@ -96,7 +211,8 @@ ToolPath GeneratorFast::GenerateDrill(double x, double y, double diameter,
 	return temp;
 }
 
-ToolPath GeneratorFast::GenerateSpiral(double x, double y, double radius)
+ToolPath GeneratorAreaMillingDynamic::GenerateSpiral(double x, double y,
+		double radius)
 {
 	ToolPath temp;
 	GCodeBlock mp;
@@ -126,8 +242,8 @@ ToolPath GeneratorFast::GenerateSpiral(double x, double y, double radius)
 	return temp;
 }
 
-bool GeneratorFast::IsDirectlyReachable(DexelTarget &target, double sx,
-		double sy, double sz, double x, double y, double z)
+bool GeneratorAreaMillingDynamic::IsDirectlyReachable(DexelTarget &target,
+		double sx, double sy, double sz, double x, double y, double z)
 {
 	double dx = x - sx;
 	double dy = y - sy;
@@ -148,40 +264,8 @@ bool GeneratorFast::IsDirectlyReachable(DexelTarget &target, double sx,
 	return true;
 }
 
-void GeneratorFast::CopyParameterFrom(const Generator* other)
-{
-	GeneratorDexel::CopyParameterFrom(other);
-}
-
-wxString GeneratorFast::GetName(void) const
-{
-	return _T("Fast Generator (using Dexel)");
-}
-
-void GeneratorFast::AddToPanel(wxPanel* panel, DisplaySettings* settings)
-{
-	Generator::AddToPanel(panel, settings);
-}
-
-void GeneratorFast::TransferDataToPanel(void) const
-{
-}
-
-void GeneratorFast::TransferDataFromPanel(void)
-{
-}
-
-wxString GeneratorFast::ToString(void) const
-{
-	return _T("");
-}
-
-void GeneratorFast::FromString(const wxString& text)
-{
-}
-
-ToolPath GeneratorFast::MoveSafely(DexelTarget &target, double sx, double sy,
-		double sz, double x, double y, double z)
+ToolPath GeneratorAreaMillingDynamic::MoveSafely(DexelTarget &target, double sx,
+		double sy, double sz, double x, double y, double z)
 {
 	ToolPath tp;
 	GCodeBlock mp;
@@ -265,7 +349,7 @@ ToolPath GeneratorFast::MoveSafely(DexelTarget &target, double sx, double sy,
 	return tp;
 }
 
-void GeneratorFast::GenerateToolpath(void)
+void GeneratorAreaMillingDynamic::GenerateToolpath(void)
 {
 	output.Empty();
 

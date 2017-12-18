@@ -26,14 +26,14 @@
 
 #include "GeneratorCollection.h"
 
-#include "../generator/GeneratorNone.h"
-#include "../generator/GeneratorPositioningDrills.h"
-#include "../generator/GeneratorLoadFromFile.h"
-#include "../generator/GeneratorAreaGridDexel.h"
-#include "../generator/GeneratorFast.h"
-#include "../generator/GeneratorTest.h"
+#include "GeneratorNone.h"
+#include "GeneratorPositioningDrills.h"
+#include "GeneratorLoadFromFile.h"
+#include "GeneratorAreaGridDexel.h"
+#include "GeneratorTest.h"
 
 #include <typeinfo>
+#include "GeneratorAreaMillingDynamic.h"
 
 const size_t N_GENERATORS = 6;
 
@@ -54,7 +54,7 @@ Generator* GeneratorCollection::NewGenerator(size_t generatorNr)
 		return new GeneratorAreaGridDexel();
 		break;
 	case 4:
-		return new GeneratorFast();
+		return new GeneratorAreaMillingDynamic();
 		break;
 	case 5:
 		return new GeneratorTest();

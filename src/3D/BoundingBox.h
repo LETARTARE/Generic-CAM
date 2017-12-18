@@ -123,6 +123,9 @@ public:
 		return zmax - zmin;
 	}
 
+	bool Overlaps(const BoundingBox &other) const;
+	bool IsInside(const Vector3 &v) const;
+
 	//! Put the box into a textstream.
 	void ToStream(wxTextOutputStream & stream) const;
 

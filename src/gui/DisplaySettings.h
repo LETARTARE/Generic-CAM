@@ -52,6 +52,7 @@ public:
 	Unit LinearSpeed;
 	Unit RotationalSpeed;
 	Unit Angle;
+	Unit Percentage;
 
 	wxString lastProjectDirectory;
 	wxString lastObjectDirectory;

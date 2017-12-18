@@ -143,9 +143,9 @@ void GeneratorPositioningDrills::TransferDataToPanel(void) const
 	m_staticTextUnitDepth->SetLabel(settings->SmallDistance.GetOtherName());
 	m_staticTextUnitDiameter->SetLabel(settings->SmallDistance.GetOtherName());
 
-	m_textCtrlHoleDepth->SetValue(settings->SmallDistance.TextFromSI(depth, 3));
+	m_textCtrlHoleDepth->SetValue(settings->SmallDistance.TextFromSI(depth));
 	m_textCtrlHoleDiameter->SetValue(
-			settings->SmallDistance.TextFromSI(diameter, 3));
+			settings->SmallDistance.TextFromSI(diameter));
 
 	m_choiceSetups->Clear();
 	m_choiceSetups->Append(_T(""));

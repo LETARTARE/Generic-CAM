@@ -84,17 +84,17 @@ bool DialogStockMaterial::TransferDataToWindow(void)
 			m_listCtrl->SetItem(i, 0, temp->Item(i).name);
 		}
 		m_listCtrl->SetItem(i, 1,
-				settings->Distance.TextFromSIWithUnit(temp->Item(i).sx, 1));
+				settings->Distance.TextFromSIWithUnit(temp->Item(i).sx));
 		m_listCtrl->SetItem(i, 2,
-				settings->Distance.TextFromSIWithUnit(temp->Item(i).sy, 1));
+				settings->Distance.TextFromSIWithUnit(temp->Item(i).sy));
 		m_listCtrl->SetItem(i, 3,
-				settings->Distance.TextFromSIWithUnit(temp->Item(i).sz, 1));
+				settings->Distance.TextFromSIWithUnit(temp->Item(i).sz));
 		m_listCtrl->SetItem(i, 4,
 				settings->RotationalSpeed.TextFromSIWithUnit(
-						temp->Item(i).maxToolSpeed, 0));
+						temp->Item(i).maxToolSpeed));
 		m_listCtrl->SetItem(i, 5,
 				settings->LinearSpeed.TextFromSIWithUnit(
-						temp->Item(i).maxFeedrate, 1));
+						temp->Item(i).maxFeedrate));
 		if(temp->Item(i).available)
 			m_listCtrl->SetItem(i, 6, _T("x"));
 		else
@@ -116,9 +116,9 @@ bool DialogStockMaterial::TransferDataToWindow(void)
 	m_textCtrlY->SetValue(settings->Distance.TextFromSI(sy));
 	m_textCtrlZ->SetValue(settings->Distance.TextFromSI(sz));
 	m_textCtrlMaxSpeed->SetValue(
-			settings->RotationalSpeed.TextFromSI(toolSpeed, 0));
+			settings->RotationalSpeed.TextFromSI(toolSpeed));
 	m_textCtrlMaxFeedrate->SetValue(
-			settings->LinearSpeed.TextFromSI(feedrate, 1));
+			settings->LinearSpeed.TextFromSI(feedrate));
 	m_checkBoxAvailable->SetValue(available);
 
 	return true;

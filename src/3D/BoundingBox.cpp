@@ -366,3 +366,25 @@ bool BoundingBox::FromStream(wxTextInputStream& stream)
 	stream >> alpha;
 	return true;
 }
+
+bool BoundingBox::Overlaps(const BoundingBox& other) const
+{
+	if(other.xmin > xmax) return false;
+	if(other.xmax < xmin) return false;
+	if(other.ymin > ymax) return false;
+	if(other.ymax < ymin) return false;
+	if(other.zmin > zmax) return false;
+	if(other.zmax < zmin) return false;
+	return true;
+}
+
+bool BoundingBox::IsInside(const Vector3& v) const
+{
+	if(v.x < xmin) return false;
+	if(v.x > xmax) return false;
+	if(v.y < ymin) return false;
+	if(v.y > ymax) return false;
+	if(v.z < zmin) return false;
+	if(v.z > zmax) return false;
+	return true;
+}

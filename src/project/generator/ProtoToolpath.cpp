@@ -23,14 +23,16 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 ///////////////////////////////////////////////////////////////////////////////
+
 #include "ProtoToolpath.h"
+
+#include <wx/arrimpl.cpp>
+WX_DEFINE_OBJARRAY(ArrayOfProtoToolpath)
 
 ProtoToolpath::ProtoToolpath()
 {
-	level = -1;
+	inserted = false;
 	parent = -1;
-	next = -1;
-	child = -1;
 }
 
 ProtoToolpath::~ProtoToolpath()

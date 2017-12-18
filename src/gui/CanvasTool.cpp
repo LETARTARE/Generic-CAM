@@ -93,6 +93,7 @@ void CanvasTool::Render()
 
 	if(tool != NULL){
 		tool->Paint();
+#ifdef _DEBUGMODE
 		if(debug.displayField){
 			glPushMatrix();
 			glTranslatef(0.01 + tool->GetMaxDiameter(), -debug.GetSizeY() / 2,
@@ -100,6 +101,7 @@ void CanvasTool::Render()
 			debug.Paint();
 			glPopMatrix();
 		}
+#endif
 	}
 
 //#if defined (__WIN32__)

@@ -37,6 +37,7 @@ DisplaySettings::DisplaySettings()
 	SmallDistance.Setup(_T("m"), _T("mm"), (double) 1e-3);
 	Tolerance.Setup(_T("m"), _T("um"), (double) 1e-6);
 	Angle.Setup(_T("rad"), _T("deg"), (double) M_PI / 180.0);
+	Percentage.Setup(_T("-"), _T("%"), (double) 0.01);
 
 	// Setup available units
 	factorofLength = new double[7];

@@ -40,7 +40,6 @@
 #include <wx/listctrl.h>
 #include <wx/grid.h>
 #include <wx/slider.h>
-#include <wx/radiobut.h>
 #include "PanelTopView.h"
 #include <wx/listbox.h>
 #include <wx/spinctrl.h>
@@ -53,6 +52,7 @@
 #include <wx/dialog.h>
 #include <wx/choicebk.h>
 #include <wx/richtext/richtextctrl.h>
+#include <wx/radiobut.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -131,41 +131,40 @@
 #define ID_POSY 1072
 #define ID_POSZ 1073
 #define ID_ANGLE 1074
-#define ID_FORMBOX 1075
-#define ID_FORMCONTOUR 1076
-#define ID_DISTANCE 1077
-#define ID_WORKPIECEROTATEX 1078
-#define ID_WORKPIECEROTATEY 1079
-#define ID_WORKPIECEROTATEZ 1080
-#define wxID_LOAD 1081
-#define ID_CONTROLLERSHOW 1082
-#define ID_AXISX 1083
-#define ID_AXISY 1084
-#define ID_AXISZ 1085
-#define ID_TEXTX 1086
-#define ID_TEXTY 1087
-#define ID_TEXTZ 1088
-#define ID_AXISA 1089
-#define ID_AXISB 1090
-#define ID_AXISC 1091
-#define ID_TEXTA 1092
-#define ID_TEXTB 1093
-#define ID_TEXTC 1094
-#define ID_AXISU 1095
-#define ID_AXISV 1096
-#define ID_AXISW 1097
-#define ID_TEXTU 1098
-#define ID_TEXTV 1099
-#define ID_TEXTW 1100
-#define ID_XSTART 1101
-#define ID_XEND 1102
-#define ID_YSTART 1103
-#define ID_YEND 1104
-#define ID_ZSTART 1105
-#define ID_ZEND 1106
-#define ID_SELECTAREAOBJECT 1107
-#define ID_MARGINSIDE 1108
-#define ID_MARGINBELOW 1109
+#define ID_FORMCONTOUR 1075
+#define ID_DISTANCE 1076
+#define ID_WORKPIECEROTATEX 1077
+#define ID_WORKPIECEROTATEY 1078
+#define ID_WORKPIECEROTATEZ 1079
+#define wxID_LOAD 1080
+#define ID_CONTROLLERSHOW 1081
+#define ID_AXISX 1082
+#define ID_AXISY 1083
+#define ID_AXISZ 1084
+#define ID_TEXTX 1085
+#define ID_TEXTY 1086
+#define ID_TEXTZ 1087
+#define ID_AXISA 1088
+#define ID_AXISB 1089
+#define ID_AXISC 1090
+#define ID_TEXTA 1091
+#define ID_TEXTB 1092
+#define ID_TEXTC 1093
+#define ID_AXISU 1094
+#define ID_AXISV 1095
+#define ID_AXISW 1096
+#define ID_TEXTU 1097
+#define ID_TEXTV 1098
+#define ID_TEXTW 1099
+#define ID_XSTART 1100
+#define ID_XEND 1101
+#define ID_YSTART 1102
+#define ID_YEND 1103
+#define ID_ZSTART 1104
+#define ID_ZEND 1105
+#define ID_SELECTAREAOBJECT 1106
+#define ID_MARGINSIDE 1107
+#define ID_MARGINBELOW 1108
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIMain
@@ -490,8 +489,7 @@ class GUIPlacement : public wxFrame
 		wxTextCtrl* m_textCtrlAngle;
 		wxStaticText* m_staticTextunitAngle;
 		wxSlider* m_sliderAngle;
-		wxRadioButton* m_radioBtnBox;
-		wxRadioButton* m_radioBtnContour;
+		wxCheckBox* m_checkBoxContour;
 		wxStaticText* m_staticText108;
 		wxTextCtrl* m_textCtrlDistance;
 		wxStaticText* m_staticTextUnitDistance;
@@ -517,7 +515,7 @@ class GUIPlacement : public wxFrame
 	
 	public:
 		
-		GUIPlacement( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Objects in Workpiece Placement"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 773,726 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxFULL_REPAINT_ON_RESIZE|wxTAB_TRAVERSAL );
+		GUIPlacement( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Objects in Workpiece Placement"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 840,712 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxFULL_REPAINT_ON_RESIZE|wxTAB_TRAVERSAL );
 		
 		~GUIPlacement();
 	

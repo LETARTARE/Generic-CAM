@@ -52,8 +52,22 @@ public:
 	virtual void TransferDataFromPanel(void);
 	virtual void GenerateToolpath(void);
 
+
+	double overlap;
+	int type;
+	bool generateA;
+	bool generateB;
+
 private:
-	wxRadioBox* m_radioBoxDirection;
+	wxRadioButton* m_radioBtnXthenY;
+	wxStaticBitmap* m_bitmapXthenY;
+	wxRadioButton* m_radioBtnYthenX;
+	wxStaticBitmap* m_bitmapYthenX;
+	wxStaticText* m_staticTextOverlap;
+	wxTextCtrl* m_textCtrlOverlap;
+	wxStaticText* m_staticTextUnitOverlap;
+	wxCheckBox* m_checkBoxA;
+	wxCheckBox* m_checkBoxB;
 };
 
 #endif /* GENERATORAREAGRIDDEXEL_H_ */

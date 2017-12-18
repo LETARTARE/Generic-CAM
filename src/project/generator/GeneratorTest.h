@@ -55,7 +55,11 @@ public:
 
 	//Member variables:
 public:
+	double twiddleFactor;
 
+	wxStaticText* m_staticTextTwiddleFactor;
+	wxTextCtrl* m_textCtrlTwiddleFactor;
+	wxStaticText* m_staticTextUnit;
 };
 
 #endif /* GENERATORTEST_H_ */

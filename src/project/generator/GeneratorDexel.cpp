@@ -29,6 +29,7 @@
 #include "../Project.h"
 #include "../Run.h"
 #include "../Tool.h"
+#include "../../Config.h"
 
 GeneratorDexel::GeneratorDexel()
 {
@@ -36,9 +37,13 @@ GeneratorDexel::GeneratorDexel()
 	area.displaySides = false;
 	area.displayBox = true;
 
+#ifdef _DEBUGMODE
+	target.displayField = true;
+	debug.displayField = true;
+#else
 	target.displayField = false;
-
 	debug.displayField = false;
+#endif
 }
 
 void GeneratorDexel::CopyParameterFrom(const Generator * other)
@@ -66,7 +71,7 @@ void GeneratorDexel::Paint(void) const
 {
 	Generator::Paint();
 	area.Paint();
-
+#ifdef _DEBUGMODE
 	glPushMatrix();
 	glTranslatef(0, -target.GetSizeY(), 0);
 	target.Paint();
@@ -75,7 +80,7 @@ void GeneratorDexel::Paint(void) const
 	glTranslatef(0, -2 * target.GetSizeY(), 0);
 	debug.Paint();
 	glPopMatrix();
-
+#endif
 }
 
 void GeneratorDexel::GenerateToolpath(void)
@@ -118,6 +123,20 @@ void GeneratorDexel::GenerateToolpath(void)
 	target = start;
 	target.InitImprinting();
 
+	bool useContours = false;
+
+	for(size_t i = 0; i < workpiece->placements.GetCount(); i++){
+		const ObjectPlacement* const opl = &(workpiece->placements[i]);
+		const size_t refObject = opl->refObject;
+		Object* object = &(project->objects[refObject]);
+		object->Update();
+		AffineTransformMatrix tempMatrix;
+		tempMatrix *= run->workpiecePlacement;
+		tempMatrix *= opl->matrix;
+		object->bbox.Transform(tempMatrix);
+		if(area.Overlaps(object->bbox) && opl->useContour) useContours = true;
+	}
+
 	for(size_t i = 0; i < workpiece->placements.GetCount(); i++){
 		const ObjectPlacement* const opl = &(workpiece->placements[i]);
 		const size_t refObject = opl->refObject;
@@ -128,7 +147,7 @@ void GeneratorDexel::GenerateToolpath(void)
 		target.InsertObject(*object, tempMatrix);
 
 		DexelTarget temp(mask);
-		if(opl->useContour){
+		if(useContours){
 			temp.InitImprinting();
 			temp.InsertObject(*object, tempMatrix);
 			temp.FinishImprint();
@@ -147,12 +166,10 @@ void GeneratorDexel::GenerateToolpath(void)
 		//TODO: Insert supports into target.
 	}
 
+	// TODO Check why in a direct c = a & b; the overloaded & does not return a DexelTarget.
 	temp = start;
 	temp &= mask;
 	target |= temp;
-
-//	debug.displayField = true;
-//	target.displayField = true;
 
 //	target.CleanOutlier();
 	target.Refresh();

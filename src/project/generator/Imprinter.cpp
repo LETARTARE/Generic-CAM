@@ -1227,6 +1227,10 @@ void Imprinter::FoldRaise(const Imprinter &b)
 	for(size_t i = 0; i < N; i++){
 		field[i].aboveDown = field[i].up;
 		field[i].belowUp = field[i].down;
+
+		field[i].aboveUp = field[i].normalx;
+		field[i].belowDown = field[i].normaly;
+
 	}
 
 	size_t p = 0;
@@ -1245,8 +1249,11 @@ void Imprinter::FoldRaise(const Imprinter &b)
 
 								float h = field[p].up + b.field[pb].up;
 
-								if(h > field[ph].aboveDown) field[ph].aboveDown =
-										h;
+								if(h > field[ph].aboveDown){
+									field[ph].aboveDown = h;
+									field[ph].normalx = field[p].aboveUp;
+									field[ph].normaly = field[p].belowDown;
+								}
 
 								h = field[p].down + b.field[pb].down;
 

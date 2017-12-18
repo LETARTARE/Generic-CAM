@@ -40,6 +40,7 @@
 
 GeneratorTest::GeneratorTest()
 {
+	twiddleFactor = 0.008;
 }
 
 GeneratorTest::~GeneratorTest()
@@ -50,6 +51,10 @@ GeneratorTest::~GeneratorTest()
 void GeneratorTest::CopyParameterFrom(const Generator* other)
 {
 	GeneratorDexel::CopyParameterFrom(other);
+
+	const GeneratorTest * temp = dynamic_cast <const GeneratorTest*>(other);
+
+	twiddleFactor = temp->twiddleFactor;
 }
 
 wxString GeneratorTest::GetName(void) const
@@ -60,14 +65,51 @@ wxString GeneratorTest::GetName(void) const
 void GeneratorTest::AddToPanel(wxPanel* panel, DisplaySettings* settings)
 {
 	Generator::AddToPanel(panel, settings);
+
+	wxBoxSizer* bSizer;
+	bSizer = new wxBoxSizer(wxVERTICAL);
+
+	wxFlexGridSizer* fgSizer;
+	fgSizer = new wxFlexGridSizer(1, 3, 0, 0);
+	fgSizer->SetFlexibleDirection(wxBOTH);
+	fgSizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+	m_staticTextTwiddleFactor = new wxStaticText(panel, wxID_ANY,
+			wxT("Twiddle factor:"), wxDefaultPosition, wxDefaultSize, 0);
+	m_staticTextTwiddleFactor->Wrap(-1);
+	fgSizer->Add(m_staticTextTwiddleFactor, 0,
+			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT, 5);
+
+	m_textCtrlTwiddleFactor = new wxTextCtrl(panel, wxID_ANY, wxEmptyString,
+			wxDefaultPosition, wxDefaultSize, 0);
+	fgSizer->Add(m_textCtrlTwiddleFactor, 0,
+			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL, 5);
+
+	m_staticTextUnit = new wxStaticText(panel, wxID_ANY, wxT("mm"),
+			wxDefaultPosition, wxDefaultSize, 0);
+	m_staticTextUnit->Wrap(-1);
+	fgSizer->Add(m_staticTextUnit, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+
+	bSizer->Add(fgSizer, 0, wxALIGN_CENTER_HORIZONTAL, 5);
+
+	panel->SetSizer(bSizer);
+	panel->Layout();
+	bSizer->Fit(panel);
+
 }
 
 void GeneratorTest::TransferDataToPanel(void) const
 {
+	m_staticTextUnit->SetLabel(settings->SmallDistance.GetOtherName());
+	m_textCtrlTwiddleFactor->SetValue(
+			settings->SmallDistance.TextFromSI(twiddleFactor));
+
 }
 
 void GeneratorTest::TransferDataFromPanel(void)
 {
+	twiddleFactor = settings->SmallDistance.SIFromString(
+			m_textCtrlTwiddleFactor->GetValue());
 }
 
 void GeneratorTest::GenerateToolpath(void)
@@ -164,7 +206,7 @@ void GeneratorTest::GenerateToolpath(void)
 						* (m.X - pgs[i - 1].elements[0].x)
 						+ (m.Y - pgs[i - 1].elements[0].y)
 								* (m.Y - pgs[i - 1].elements[0].y);
-				if(d2 > (0.008 * 0.008)){
+				if(d2 > (twiddleFactor * twiddleFactor)){
 					// Move tool out of material to travel to next polygon.
 					m.Rapid();
 					m.Z = temp.GetSizeZ() + freeHeight;
@@ -209,15 +251,13 @@ void GeneratorTest::GenerateToolpath(void)
 		isMillUp = true;
 		tp.positions.Add(m);
 #ifdef _DEBUGMODE
-		wxLogMessage(wxString::Format(_T("Next Level: %.3f m"), level));
+		wxLogMessage
+		(wxString::Format(_T("Next Level: %.3f m"), level));
 //		level = -1;
 #endif
 	}
 //	debug = temp;
 	tp.FlagAll(true);
 
-//	AffineTransformMatrix shiftback;
-//	shiftback.TranslateGlobal(area.xmin, area.ymin, area.zmin);
-//	tp.ApplyTransformation(shiftback);
 	toolpath = tp;
 }

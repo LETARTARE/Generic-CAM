@@ -107,8 +107,7 @@ bool DialogRun::TransferDataToWindow(void)
 					project->run[selected].machine.tools[i].toolName);
 			m_listCtrlTools->SetItem(i, 2,
 					settings->SmallDistance.TextFromSIWithUnit(
-							project->run[selected].machine.tools[i].GetMaxDiameter(),
-							1));
+							project->run[selected].machine.tools[i].GetMaxDiameter()));
 		}
 	}else{
 		m_listCtrlTools->ClearAll();
