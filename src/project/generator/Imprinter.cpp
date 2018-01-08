@@ -36,7 +36,7 @@ ImprinterElement::ImprinterElement()
 ImprinterElement::~ImprinterElement()
 {
 }
-bool ImprinterElement::IsVisible(void)
+bool ImprinterElement::IsVisible(void) const
 {
 	return (up > down);
 }
@@ -983,6 +983,7 @@ bool Imprinter::IsSurrounded(size_t p) const
 
 bool Imprinter::IsStandAlone(size_t p, double height) const
 {
+	//FIXME A position on the outer border can be stand-alone.
 	if(IsOnOuterBorder(p)) return false;
 	size_t i = p - nx - 1;
 	if(IsFilledAbove(i++, height)) return false;
@@ -1024,6 +1025,15 @@ double Imprinter::GetLevel(double x, double y) const
 	return field[p].up;
 }
 
+void Imprinter::SetLevel(double x, double y, double level)
+{
+	const int px = round((x - rx / 2) / rx);
+	const int py = round((y - ry / 2) / ry);
+	if(px < 0 || py < 0 || px >= (int) nx || py >= (int) ny) return;
+	const size_t p = px + py * nx;
+	field[p].up = level;
+}
+
 const ImprinterElement Imprinter::GetElement(double x, double y) const
 {
 	const int px = round((x - rx / 2) / rx);
@@ -1035,12 +1045,12 @@ const ImprinterElement Imprinter::GetElement(double x, double y) const
 		return temp;
 	}
 	const size_t p = px + py * nx;
-	if(!field[p].IsVisible()){
-		ImprinterElement temp;
-		temp.up = 0.0;
-		temp.down = sz;
-		return temp;
-	}
+//	if(!field[p].IsVisible()){
+//		ImprinterElement temp;
+//		temp.up = 0.0;
+//		temp.down = sz;
+//		return temp;
+//	}
 	return field[p];
 }
 
@@ -1223,14 +1233,12 @@ void Imprinter::FoldRaise(const Imprinter &b)
 	const size_t cx = b.nx / 2;
 	const size_t cy = b.ny / 2;
 
-// Init
+	// Init
 	for(size_t i = 0; i < N; i++){
-		field[i].aboveDown = field[i].up;
 		field[i].belowUp = field[i].down;
-
+		field[i].aboveDown = field[i].up;
 		field[i].aboveUp = field[i].normalx;
 		field[i].belowDown = field[i].normaly;
-
 	}
 
 	size_t p = 0;
@@ -1247,7 +1255,7 @@ void Imprinter::FoldRaise(const Imprinter &b)
 								const size_t ph = i + ib - cx
 										+ (j + jb - cy) * nx;
 
-								float h = field[p].up + b.field[pb].up;
+								const float h = field[p].up + b.field[pb].up;
 
 								if(h > field[ph].aboveDown){
 									field[ph].aboveDown = h;
@@ -1255,9 +1263,10 @@ void Imprinter::FoldRaise(const Imprinter &b)
 									field[ph].normaly = field[p].belowDown;
 								}
 
-								h = field[p].down + b.field[pb].down;
+								const double g = field[p].down
+										+ b.field[pb].down;
 
-								if(h < field[ph].belowUp) field[ph].belowUp = h;
+								if(g < field[ph].belowUp) field[ph].belowUp = g;
 							}
 						}
 						pb++;
@@ -1273,6 +1282,75 @@ void Imprinter::FoldRaise(const Imprinter &b)
 		field[i].up = field[i].aboveDown;
 		field[i].down = field[i].belowUp;
 	}
+	refresh = true;
+}
+
+void Imprinter::MarkHeightDelta(const Imprinter &b, Imprinter &ref,
+		bool processFull)
+{
+	const size_t cx = b.nx / 2;
+	const size_t cy = b.ny / 2;
+
+	// Init
+	if(processFull){
+		for(size_t i = 0; i < N; i++){
+//			field[i].belowUp = field[i].up;
+//			field[i].belowDown = field[i].down;
+//			field[i].up = 0;
+//			field[i].down = sz;
+			field[i].aboveDown = -1;
+			field[i].normalx = ref.field[i].normalx;
+			field[i].normaly = ref.field[i].normaly;
+		}
+	}
+//	else{
+//		for(size_t i = 0; i < N; i++){
+//			if(field[i].aboveDown < -0.5){
+//				field[i].belowUp = field[i].up;
+//				field[i].belowDown = field[i].down;
+//			}
+//		}
+//	}
+	for(size_t i = 0; i < N; i++){
+		field[i].aboveUp = field[i].aboveDown;
+	}
+	size_t p = 0;
+	for(size_t j = 0; j < ny; j++){
+		for(size_t i = 0; i < nx; i++){
+			if(field[p].aboveUp < -0.5){
+				size_t pb = 0;
+				double h = -FLT_MAX;
+				for(size_t jb = 0; jb < b.ny; jb++){
+					for(size_t ib = 0; ib < b.nx; ib++){
+						if(b.field[pb].IsVisible()){
+							if(ib + i >= cx && ib + i < nx + cx && jb + j >= cy
+									&& jb + j < ny + cy){
+								const size_t ph = i + ib - cx
+										+ (j + jb - cy) * nx;
+								h = fmax(h, field[ph].up + b.field[pb].up);
+							}
+						}
+						pb++;
+					}
+				}
+				field[p].aboveDown = fmax(field[p].aboveDown,
+						h - ref.field[p].up);
+			}
+			p++;
+		}
+	}
+
+// Finish
+//	for(size_t i = 0; i < N; i++){
+//		if(sqrt(
+//				field[i].normalx * field[i].normalx
+//						+ field[i].normaly * field[i].normaly) > FLT_EPSILON){
+//			field[i].aboveDown = field[i].up - ref.field[i].up;
+//		}else{
+//			field[i].aboveDown = 0.0;
+//		}
+//	}
+
 	refresh = true;
 }
 
@@ -1368,7 +1446,7 @@ void Imprinter::TouchErase(int x, int y, double z, double level,
 						field[ph].down = sz;
 						field[ph].up = 0.0;
 					}
-
+					field[ph].aboveDown = -1.0;
 				}
 			}
 			pb++;

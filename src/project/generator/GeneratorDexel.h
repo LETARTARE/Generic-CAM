@@ -33,10 +33,21 @@
  *
  * The Dexel approach may not be the best one in respect to precisision, but it is
  * the fastest one (and the easiest one to programm).
+ *
+ * The workflow for Dexel generators is:
+ *  -# Set up the target and start representations. The target-representation
+ *     has an additional operation to mark areas the are not to be milled (yet)
+ *     or that cannot be milled, because the machine would collide with the
+ *     workpiece. It also considers the form of the tool used so that control
+ *     can follow the surface of the target workpiece.
+ *  -# Use some algorithms to generate toolpath segments
+ *  -# Fuse the segments into a full toolpath
+ *
  */
 
 #include "Generator.h"
 #include "DexelTarget.h"
+#include "ProtoToolpath.h"
 
 #include <stddef.h>
 
@@ -60,6 +71,9 @@ protected:
 	DexelTarget result;
 
 	DexelTarget debug;
+
+	void QuickCollectToolpaths(ArrayOfProtoToolpath &ptp, const double pathDistance);
+
 };
 
 #endif /* GENERATORDEXEL_H_ */

@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GeneratorTest.h
+// Name               : Direction.h
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 13.07.2011
+// Created            : 19.12.2017
 // Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,42 +24,51 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef GENERATORTEST_H_
-#define GENERATORTEST_H_
+#ifndef DIRECTION_H_
+#define DIRECTION_H_
 
-/*!\class GeneratorTest
- * \ingroup Generator
- * \brief ...
+/*!\class Direction
+ * \brief Stores a direction and provides manipulation thereon
  *
- * ...
+ *
  */
 
-#include "GeneratorDexel.h"
-#include "../Tool.h"
+#include "../../3D/Vector3.h"
+#include <stdint.h>
 
-#include <wx/string.h>
-#include <stddef.h>
-
-class GeneratorTest:public GeneratorDexel {
-	// Constructor/ Destructor
+class Direction {
 public:
-	GeneratorTest();
-	virtual ~GeneratorTest();
+	Direction();
+	virtual ~Direction();
+	int X;
+	int Y;
+	double offsetX;
+	double offsetY;
+	double resolutionX;
+	double resolutionY;
+	int_fast8_t direction;
 
-	virtual void CopyParameterFrom(const Generator * other);
-	virtual wxString GetName(void) const;
-	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
-	virtual void TransferDataToPanel(void) const;
-	virtual void TransferDataFromPanel(void);
-	virtual void GenerateToolpath(void);
+//	Direction& operator =(const Direction &other);
+	Direction& operator =(const Vector3 &other);
+	Direction& operator =(const int &other);
+	Direction& operator++();
+	Direction operator++(int);
+	Direction& operator--();
+	Direction operator--(int);
 
-	//Member variables:
-public:
-	double twiddleFactor;
+	void SetResolution(double rx, double ry = -1);
 
-	wxStaticText* m_staticTextTwiddleFactor;
-	wxTextCtrl* m_textCtrlTwiddleFactor;
-	wxStaticText* m_staticTextUnit;
+	void TurnRight();
+	void TurnLeft();
+	void Reverse();
+	void Move();
+
+	double Xfl(void) const;
+	double Yfl(void) const;
+
+	int OnKey(void) const;
+	Vector3 GetNormal(void) const;
+	Vector3 GetPosition(void) const;
 };
 
-#endif /* GENERATORTEST_H_ */
+#endif /* DIRECTION_H_ */

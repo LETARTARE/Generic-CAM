@@ -34,10 +34,16 @@
 #include "../../icon/ythenx.xpm"
 
 #include <wx/sizer.h>
+#include <float.h>
+#include <cmath>
 
 GeneratorAreaGridDexel::GeneratorAreaGridDexel()
 {
 	overlap = 0.1;
+	maxStepUp = 0.01;
+	type = 0;
+	generateA = false;
+	generateB = false;
 }
 
 GeneratorAreaGridDexel::~GeneratorAreaGridDexel()
@@ -179,8 +185,8 @@ void GeneratorAreaGridDexel::TransferDataToPanel(void) const
 {
 	m_staticTextUnitOverlap->SetLabel(settings->Percentage.GetOtherName());
 	m_textCtrlOverlap->SetValue(settings->Percentage.TextFromSI(overlap));
-	m_radioBtnXthenY->SetValue(type == 0);
-	m_radioBtnYthenX->SetValue(type == 1);
+	m_radioBtnXthenY->SetValue(type.direction == 0);
+	m_radioBtnYthenX->SetValue(type.direction == 1);
 	m_checkBoxA->SetValue(generateA);
 	m_checkBoxB->SetValue(generateB);
 }
@@ -188,8 +194,8 @@ void GeneratorAreaGridDexel::TransferDataToPanel(void) const
 void GeneratorAreaGridDexel::TransferDataFromPanel(void)
 {
 	overlap = settings->Percentage.SIFromString(m_textCtrlOverlap->GetValue());
-	if(m_radioBtnXthenY->GetValue()) type = 0;
-	if(m_radioBtnYthenX->GetValue()) type = 1;
+	if(m_radioBtnXthenY->GetValue()) type.direction = 0;
+	if(m_radioBtnYthenX->GetValue()) type.direction = 1;
 	generateA = m_checkBoxA->GetValue();
 	generateB = m_checkBoxB->GetValue();
 }
@@ -207,30 +213,38 @@ void GeneratorAreaGridDexel::GenerateToolpath(void)
 		return;
 	}
 	GeneratorDexel::GenerateToolpath();
-	const Tool* const tool = &(run->machine.tools[refTool]);
 
-//	DexelTarget surface = target;
+	const Tool* const tool = &(run->machine.tools[refTool]);
 	DexelTarget toolShape;
-	toolShape.SetupTool(*tool, target.GetResolutionX(),
-			target.GetResolutionY());
+	toolShape.SetupTool(*tool, target.GetResolutionX(), target.GetResolutionY(),
+			false);
 	toolShape.NegateZ();
+
+	start.FoldRaise(toolShape);
+	start.Limit();
 	target.FoldRaise(toolShape);
 	target.Limit();
-
 //	debug = target;
+	type.resolutionX = target.GetResolutionX();
+	type.resolutionY = target.GetResolutionY();
+	type.offsetX = target.GetResolutionX() / 2;
+	type.offsetY = target.GetResolutionY() / 2;
 
 	toolpath.Clear();
 
 	const double tooldiameter = tool->GetMaxDiameter();
-	ProtoToolpath tp;
-	GCodeBlock m;
-	m.X = 0;
-	m.Y = 0;
-	m.Z = target.GetSizeZ() + freeHeight;
-	m.Rapid();
-	toolpath.positions.Add(m);
+	ArrayOfProtoToolpath aptp;
+	ProtoToolpath ptp;
+	const double cutdepth = tool->GetCuttingDepth();
 
-	{
+	const int N = ceil((area.zmax - area.zmin) / cutdepth);
+
+//	debug = start;
+
+	for(int n = 1; n <= N; n++){
+		const double level = fmax(area.zmax - n * cutdepth, area.zmin);
+
+		aptp.Clear();
 		for(double x = area.xmin + tooldiameter / 2;
 				x < area.xmax - tooldiameter / 2;
 				x += tooldiameter * (1 - overlap)){
@@ -249,36 +263,235 @@ void GeneratorAreaGridDexel::GenerateToolpath(void)
 			if(py1 >= target.GetCountY()) py1 = target.GetCountY() - 1;
 			if(py1 < py0) continue;
 
-			m.X = ix * target.GetResolutionX() + target.GetResolutionX() / 2;
-			m.Y = py0 * target.GetResolutionY() + target.GetResolutionY() / 2;
-			m.Rapid();
-			toolpath.positions.Add(m);
-
+			ptp.Clear();
+			GCodeBlock m;
 			for(int iy = py0; iy <= py1; iy++){
+
 				m.X = ix * target.GetResolutionX()
 						+ target.GetResolutionX() / 2;
 				m.Y = iy * target.GetResolutionY()
 						+ target.GetResolutionY() / 2;
 				const ImprinterElement e = target.GetElement(m.X, m.Y);
-
-				m.Z = e.up;
+				const ImprinterElement s = start.GetElement(m.X, m.Y);
 
 				if(generateA && !generateB) m.A = asin(-e.normaly);
 				if(!generateA && generateB) m.B = asin(e.normalx);
 				if(generateA && generateB){
 					m.A = asin(-e.normaly);
-					//TODO Checks needed
+					//TODO Check needed for e.normaly <= 1.0
 					m.B = asin(e.normalx / sqrt(1.0 - e.normaly * e.normaly));
 				}
-
 				m.FeedSpeed();
-				toolpath.positions.Add(m);
+
+				m.Z = fmax(e.up, level);
+
+				if(m.Z < s.up - FLT_EPSILON){
+					start.SetLevel(m.X, m.Y, m.Z);
+					if(!ptp.IsEmpty()
+							&& fabs(ptp.positions.Last().Z - m.Z) > maxStepUp){
+						aptp.Add(ptp);
+						ptp.Clear();
+					}
+					ptp.positions.Add(m);
+				}else{
+					aptp.Add(ptp);
+					ptp.Clear();
+				}
 			}
+			if(!ptp.IsEmpty()) aptp.Add(ptp);
+		}
+		CollectToolpaths(aptp, 3 * tooldiameter);
+	}
+	if(!toolpath.IsEmpty()){
+		{
+			GCodeBlock m = toolpath.positions[0];
+			m.Z = target.GetSizeZ() + freeHeight;
+			m.Rapid();
+			toolpath.positions.Insert(m, 0);
+		}
+		{
+			GCodeBlock m = toolpath.positions.Last();
 			m.Z = target.GetSizeZ() + freeHeight;
 			m.Rapid();
 			toolpath.positions.Add(m);
 		}
-
+		toolpath.FlagAll(true, false, false, generateA | generateB);
 	}
-	toolpath.FlagAll(true, false, false, generateA | generateB);
+}
+
+void GeneratorAreaGridDexel::CollectToolpaths(ArrayOfProtoToolpath &ptp,
+		const double pathDistance)
+{
+	if(ptp.GetCount() == 0) return;
+
+	GCodeBlock m;
+	if(!toolpath.IsEmpty()){
+		m.X = toolpath.positions.Last().X;
+		m.Y = toolpath.positions.Last().Y;
+		m.Z = fmax(toolpath.positions.Last().Z, target.GetSizeZ() + freeHeight);
+	}else{
+		m.Z = target.GetSizeZ() + freeHeight;
+	}
+//toolpath.positions.Add(m);
+
+	const Vector3 dirmain = type.GetNormal();
+	const Vector3 dirextra(-dirmain.y, dirmain.x, 0);
+
+	// Assign parents
+	ptp[0].inserted = false;
+	for(size_t q = 0; q < ptp.GetCount(); q++){
+		if(ptp[q].IsEmpty()){
+			ptp[q].inserted = true;
+			continue;
+		}
+		ptp[q].inserted = false;
+		const Vector3 a0(ptp[q].positions[0].X, ptp[q].positions[0].Y, 0);
+		const Vector3 a1(ptp[q].positions.Last().X, ptp[q].positions.Last().Y,
+				0);
+		const double width = (a1 - a0).Dot(dirextra);
+		for(size_t r = q; r-- > 0;){
+			if(ptp[r].IsEmpty()) continue;
+			const Vector3 b0(ptp[r].positions[0].X, ptp[r].positions[0].Y, 0);
+			const Vector3 b1(ptp[r].positions.Last().X,
+					ptp[r].positions.Last().Y, 0);
+			const double v0 = (b0 - a0).Dot(dirmain);
+			const double v1 = (b1 - a0).Dot(dirmain);
+			const double v = (v0 + v1) / 2.0;
+			if(v < -pathDistance || v > -FLT_EPSILON) continue;
+			const double w0 = (b0 - a0).Dot(dirextra);
+			const double w1 = (b1 - a0).Dot(dirextra);
+			if(w1 < 0 || w0 > width) continue;
+			ptp[q].parents.Add(r);
+		}
+	}
+
+	bool allowReversing = true;
+	// Connect the path segments
+	do{
+		double dopt = FLT_MAX;
+		int nopt = -1;
+		bool forward = true;
+		for(size_t n = 0; n < ptp.GetCount(); n++){
+			if(ptp[n].inserted) continue;
+			bool ok = true;
+			for(size_t u = 0; u < ptp[n].parents.GetCount(); u++){
+				if(!ptp[ptp[n].parents[u]].inserted) ok = false;
+			}
+			if(!ok) continue;
+			const double d = (m.X - ptp[n].positions[0].X)
+					* (m.X - ptp[n].positions[0].X)
+					+ (m.Y - ptp[n].positions[0].Y)
+							* (m.Y - ptp[n].positions[0].Y)
+					+ (m.Z - ptp[n].positions[0].Z)
+							* (m.Z - ptp[n].positions[0].Z);
+			if(d < dopt){
+				forward = true;
+				dopt = d;
+				nopt = n;
+			}
+			if(allowReversing){
+				const double d = (m.X - ptp[n].positions.Last().X)
+						* (m.X - ptp[n].positions.Last().X)
+						+ (m.Y - ptp[n].positions.Last().Y)
+								* (m.Y - ptp[n].positions.Last().Y)
+						+ (m.Z - ptp[n].positions.Last().Z)
+								* (m.Z - ptp[n].positions.Last().Z);
+				if(d < dopt){
+					forward = false;
+					dopt = d;
+					nopt = n;
+				}
+			}
+		}
+		if(nopt < 0) break;
+		GCodeBlock mlast = m;
+		if(forward)
+			m = ptp[nopt].positions[0];
+		else
+			m = ptp[nopt].positions.Last();
+
+		{
+			double px0 = round(
+					(mlast.X - target.GetResolutionX() / 2)
+							/ target.GetResolutionX());
+			double py0 = round(
+					(mlast.Y - target.GetResolutionY() / 2)
+							/ target.GetResolutionY());
+			double px1 = round(
+					(m.X - target.GetResolutionX() / 2)
+							/ target.GetResolutionX());
+			double py1 = round(
+					(m.Y - target.GetResolutionY() / 2)
+							/ target.GetResolutionY());
+
+			const double d = fmax(fabs(px0 - px1), fabs(py0 - py1));
+			const int N = round(d);
+			GCodeBlock delta = (m - mlast) / fmax(1.0, d);
+			GCodeBlock p = mlast;
+
+			const double dd = fmax(fabs(px0 - px1) * target.GetResolutionX(),
+					fabs(py0 - py1) * target.GetResolutionY());
+
+			if(fabs(m.Z - mlast.Z) <= maxStepUp && dd < pathDistance){
+				ToolPath tp1;
+				double cost = 0.0;
+				for(size_t u = 0; u <= N; u++){
+					const double h = target.GetLevel(p.X, p.Y);
+					if(h > -FLT_EPSILON){
+						cost += fmax(h - p.Z, 0);
+						GCodeBlock temp = p;
+						temp.Z = fmax(temp.Z, h); //TODO This is following the surface exactly, but should skip gaps.
+						tp1.positions.Add(temp);
+					}
+					p += delta;
+				}
+				toolpath += tp1;
+
+			}else{
+				if(mlast.Z < target.GetSizeZ() + freeHeight - FLT_EPSILON){
+					mlast.Z = target.GetSizeZ() + freeHeight;
+					mlast.Rapid();
+					toolpath.positions.Add(mlast);
+				}
+				mlast = m;
+				mlast.Z = target.GetSizeZ() + freeHeight;
+				mlast.Rapid();
+				toolpath.positions.Add(mlast);
+			}
+		}
+
+//		m.Z = fmax(m.Z, target.GetSizeZ() + freeHeight);
+//		m.Rapid();
+//		toolpath.positions.Add(m);
+
+		if(forward){
+			for(size_t m = 0; m < ptp[nopt].positions.GetCount(); m++){
+				toolpath.positions.Add(ptp[nopt].positions[m]);
+			}
+		}else{
+			for(size_t m = ptp[nopt].positions.GetCount(); m-- > 0;){
+				toolpath.positions.Add(ptp[nopt].positions[m]);
+			}
+		}
+		m = toolpath.positions.Last();
+//		m.Z = fmax(m.Z, target.GetSizeZ() + freeHeight);
+//		m.Rapid();
+//		toolpath.positions.Add(m);
+
+		ptp[nopt].inserted = true;
+	}while(true);
+
+// Move out of workpiece
+	if((toolpath.GetCount() > 0)
+			&& (toolpath.positions.Last().Z
+					< (target.GetSizeZ() + freeHeight - FLT_EPSILON))){
+		GCodeBlock m;
+		//Note: Rotations are kept at zero for the starting position
+		m.X = toolpath.positions.Last().X;
+		m.Y = toolpath.positions.Last().Y;
+		m.Z = target.GetSizeZ() + freeHeight;
+		m.Rapid();
+		toolpath.positions.Add(m);
+	}
+
 }

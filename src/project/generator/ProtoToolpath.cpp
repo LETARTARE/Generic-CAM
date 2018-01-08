@@ -32,7 +32,6 @@ WX_DEFINE_OBJARRAY(ArrayOfProtoToolpath)
 ProtoToolpath::ProtoToolpath()
 {
 	inserted = false;
-	parent = -1;
 }
 
 ProtoToolpath::~ProtoToolpath()

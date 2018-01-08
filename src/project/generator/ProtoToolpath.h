@@ -28,27 +28,25 @@
 #define PROTOTOOLPATH_H_
 
 /*!\class ProtoToolpath
- * \brief Polygon-loop with additional information
+ * \brief Toolpath with additional information for sorting
  *
  * Toolpaths are generated in the wrong order. This class contains the
  * sections of a toolpath for later sorting and joining.
  */
 
-#include "../../3D/Polygon25.h"
-
+#include "../ToolPath.h"
 #include <wx/dynarray.h>
 
-class ProtoToolpath:public Polygon25 {
+class ProtoToolpath:public ToolPath {
 public:
 	ProtoToolpath();
 	virtual ~ProtoToolpath();
 
 public:
 	bool inserted;
-	int parent;
+	wxArrayInt parents;
 };
 
 WX_DECLARE_OBJARRAY(ProtoToolpath, ArrayOfProtoToolpath);
-
 
 #endif /* PROTOTOOLPATH_H_ */

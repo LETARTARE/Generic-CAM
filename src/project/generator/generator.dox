@@ -34,7 +34,7 @@
 \dot
   digraph classes {
 	node [shape=record, fontname=Helvetica, fontsize=10];
-		
+	rankdir = LR
     imp [ label="Imprinter" URL="\ref Imprinter"];
     dta [ label="DexelTarget" URL="\ref DexelTarget"];
     tpg [ label="ToolpathGeneratorThread" URL="\ref ToolpathGeneratorThread"];
@@ -45,9 +45,12 @@
     glff [ label="GeneratorLoadFromFile" URL="\ref GeneratorLoadFromFile"];
     gpdr [ label="GeneratorPositioningDrills" URL="\ref GeneratorPositioningDrills"];
     gagd [ label="GeneratorAreaGridDexel" URL="\ref GeneratorAreaGridDexel"];
-    gfas [ label="GeneratorFast" URL="\ref GeneratorFast"];
+    gdyn [ label="GeneratorAreaMillingDynamic" URL="\ref GeneratorAreaMillingDynamic"];
     gtes [ label="GeneratorTest" URL="\ref GeneratorTest"];
-
+    gdri [ label="GeneratorDrillDexel" URL="\ref GeneratorDrillDexel"];
+    gout [ label="GeneratorOutlineDexel" URL="\ref GeneratorOutlineDexel"];
+    gsur [ label="GeneratorSurfaceDexel" URL="\ref GeneratorSurfaceDexel"];
+    
 	dta -> imp [style=dotted];
 	gdex -> gen [style=dotted];		          
 	gdex -> dta;
@@ -57,14 +60,20 @@
     gco -> glff;
     gco -> gpdr;
     gco -> gagd;
-    gco -> gfas;
+    gco -> gdyn;
+    gco -> gout;
+    gco -> gsur;
+    gco -> gdri;   
     gco -> gtes;
     
     gnon -> gen [style=dotted];
     glff -> gen [style=dotted];
     gpdr -> gen [style=dotted];
     gagd -> gdex [style=dotted];
-    gfas -> gdex [style=dotted];
+    gdyn -> gdex [style=dotted];
+    gdri -> gdex [style=dotted];
+    gout -> gdex [style=dotted];
+    gsur -> gdex [style=dotted];
     gtes -> gdex [style=dotted];
 
   }

@@ -31,11 +31,14 @@
 #include "GeneratorLoadFromFile.h"
 #include "GeneratorAreaGridDexel.h"
 #include "GeneratorTest.h"
+#include "GeneratorDrillDexel.h"
+#include "GeneratorSurfaceDexel.h"
+#include "GeneratorAreaMillingDynamic.h"
+#include "GeneratorOutlineDexel.h"
 
 #include <typeinfo>
-#include "GeneratorAreaMillingDynamic.h"
 
-const size_t N_GENERATORS = 6;
+const size_t N_GENERATORS = 9;
 
 Generator* GeneratorCollection::NewGenerator(size_t generatorNr)
 {
@@ -59,7 +62,15 @@ Generator* GeneratorCollection::NewGenerator(size_t generatorNr)
 	case 5:
 		return new GeneratorTest();
 		break;
-	}
+	case 6:
+		return new GeneratorDrillDexel();
+		break;
+	case 7:
+		return new GeneratorOutlineDexel();
+		break;
+	case 8:
+		return new GeneratorSurfaceDexel();
+		break;	}
 	return NULL;
 }
 

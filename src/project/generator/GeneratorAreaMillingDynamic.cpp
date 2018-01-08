@@ -26,6 +26,8 @@
 
 #include "GeneratorAreaMillingDynamic.h"
 
+#include <float.h>
+
 #include <math.h>
 
 #include "../Project.h"
@@ -371,13 +373,14 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(void)
 
 	toolDiameter = tool->GetMaxDiameter();
 
-	DexelTarget discTool;
-	discTool.SetupTool(*tool, target.GetResolutionX(), target.GetResolutionY());
-	discTool.NegateZ();
+	DexelTarget toolShape;
+	toolShape.SetupTool(*tool, target.GetResolutionX(),
+			target.GetResolutionY());
+	toolShape.NegateZ();
 	DexelTarget temp = target;
 	DexelTarget temptop;
 
-	temp.FoldRaise(discTool);
+	temp.FoldRaise(toolShape);
 	temp.Limit();
 
 	temptop = temp;
@@ -388,21 +391,18 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(void)
 	const double rx2 = rx / 2;
 	const double ry2 = ry / 2;
 
-	int cx, cy;
-	double d;
-
 	Polygon25 poly;
 
 	// Begin drop&raise cycle
 
-	double dmin = temptop.GetMinLevel();
-	double level = dmin + raiseStep;
+	double dmin = temptop.GetMinLevelD();
+	double level = dmin + FLT_EPSILON;
 
 	temptop.GenerateDistanceMap(level, true);
 
 	double px, py, pz;
 
-//TODO: Removed other side from flipped designs?
+//TODO Removed other side from flipped designs?
 //	ArrayOfMachinePosition mpa = target.toolpathFlipped.positions;
 //	if(!mpa.IsEmpty()){
 //		for(size_t i = 0; i < mpa.GetCount(); i++){
@@ -410,11 +410,12 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(void)
 //			py = target.GetSizeY() - mpa[i].Y;
 //			pz = target.GetSizeZ() - mpa[i].Z;
 //			if(pz > level) temptop.FoldLowerDistance(round((px - rx2) / rx),
-//					round((py - ry2) / ry), discTool);
+//					round((py - ry2) / ry), toolShape);
 //		}
 //	}
 
-	d = temptop.GetMaxUpsideLevel(cx, cy);
+	int cx, cy;
+	double d = temptop.GetMaxLevelAD(cx, cy);
 
 	if(tp.IsEmpty()){ // New toolpath starting position
 		mp.X = rx * cx + rx2;
@@ -425,18 +426,18 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(void)
 	}
 
 	// Remove material at drillhole
-	//temptop.FoldLowerDistance(cx, cy, discTool);
+	//temptop.FoldLowerDistance(cx, cy, toolShape);
 
 	do{
 		// Scrubb area
-		while(temptop.FindNextDistance(cx, cy)){
+		while(temptop.FindNextDistanceBDAU(cx, cy)){
 			temptop.FindStartCutting(cx, cy);
 
 			//		if(!IsDirectlyReachable(temp, mp.X, mp.Y, mp.Z, cx * rx
 			//				+ rx2, cy * ry + ry2, level)) break;
 
 			poly = temptop.FindCut(cx, cy);
-			temp.PolygonDropOntoTarget(poly, level); // + raiseStep);
+			temp.PolygonDropOntoTarget(poly, level);
 
 			if(mp.Z > level){
 				// Drill down
@@ -458,7 +459,7 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(void)
 
 				temptop.FoldLowerDistance(
 						round((poly.elements[i].x - rx2) / rx),
-						round((poly.elements[i].y - ry2) / ry), discTool);
+						round((poly.elements[i].y - ry2) / ry), toolShape);
 
 				if(i == 0){
 					tp += MoveSafely(temp, mp.X, mp.Y, mp.Z, poly.elements[i].x,

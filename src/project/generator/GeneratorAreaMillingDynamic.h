@@ -32,7 +32,7 @@
 #include "../../3D/Polygon3.h"
 #include "../Tool.h"
 
-/*!\class GeneratorFast
+/*!\class GeneratorAreaMillingDynamic
  * \ingroup Generator
  * \brief ...
  *

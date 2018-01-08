@@ -31,6 +31,8 @@
 #include "../Tool.h"
 #include "../../Config.h"
 
+#include <float.h>
+
 GeneratorDexel::GeneratorDexel()
 {
 	area.alpha = 1.0;
@@ -38,6 +40,7 @@ GeneratorDexel::GeneratorDexel()
 	area.displayBox = true;
 
 #ifdef _DEBUGMODE
+	start.displayField = true;
 	target.displayField = true;
 	debug.displayField = true;
 #else
@@ -72,14 +75,22 @@ void GeneratorDexel::Paint(void) const
 	Generator::Paint();
 	area.Paint();
 #ifdef _DEBUGMODE
+
+	glPushMatrix();
+	glTranslatef(0, target.GetSizeY(), 0);
+	start.Paint();
+	glPopMatrix();
+
 	glPushMatrix();
 	glTranslatef(0, -target.GetSizeY(), 0);
 	target.Paint();
 	glPopMatrix();
+
 	glPushMatrix();
 	glTranslatef(0, -2 * target.GetSizeY(), 0);
 	debug.Paint();
 	glPopMatrix();
+
 #endif
 }
 
@@ -102,23 +113,6 @@ void GeneratorDexel::GenerateToolpath(void)
 	DexelTarget mask;
 	mask = start;
 	mask.Fill();
-	DexelTarget temp;
-	temp = mask;
-	temp.InitImprinting();
-	temp.InsertTriangle(Vector3(area.xmin, area.ymin, area.zmax),
-			Vector3(area.xmax, area.ymin, area.zmax),
-			Vector3(area.xmax, area.ymax, area.zmax), Imprinter::facing_up);
-	temp.InsertTriangle(Vector3(area.xmin, area.ymin, area.zmax),
-			Vector3(area.xmin, area.ymax, area.zmax),
-			Vector3(area.xmax, area.ymax, area.zmax), Imprinter::facing_up);
-	temp.InsertTriangle(Vector3(area.xmin, area.ymin, area.zmin),
-			Vector3(area.xmax, area.ymin, area.zmin),
-			Vector3(area.xmax, area.ymax, area.zmin), Imprinter::facing_down);
-	temp.InsertTriangle(Vector3(area.xmin, area.ymin, area.zmin),
-			Vector3(area.xmin, area.ymax, area.zmin),
-			Vector3(area.xmax, area.ymax, area.zmin), Imprinter::facing_down);
-	temp.FinishImprint();
-	mask -= temp;
 
 	target = start;
 	target.InitImprinting();
@@ -148,6 +142,7 @@ void GeneratorDexel::GenerateToolpath(void)
 
 		DexelTarget temp(mask);
 		if(useContours){
+			//TODO More differentiated contour processing
 			temp.InitImprinting();
 			temp.InsertObject(*object, tempMatrix);
 			temp.FinishImprint();
@@ -159,17 +154,39 @@ void GeneratorDexel::GenerateToolpath(void)
 		}else{
 			temp.Empty();
 		}
-		mask |= temp;
+		mask &= temp;
 	}
 	target.FinishImprint();
+
 	for(size_t i = 0; i < workpiece->supports.GetCount(); i++){
 		//TODO: Insert supports into target.
 	}
 
-	// TODO Check why in a direct c = a & b; the overloaded & does not return a DexelTarget.
+	DexelTarget temp;
+	temp = mask;
+	temp.InitImprinting();
+	temp.InsertTriangle(Vector3(area.xmin, area.ymin, area.zmax),
+			Vector3(area.xmax, area.ymin, area.zmax),
+			Vector3(area.xmax, area.ymax, area.zmax), Imprinter::facing_up);
+	temp.InsertTriangle(Vector3(area.xmin, area.ymin, area.zmax),
+			Vector3(area.xmin, area.ymax, area.zmax),
+			Vector3(area.xmax, area.ymax, area.zmax), Imprinter::facing_up);
+	temp.InsertTriangle(Vector3(area.xmin, area.ymin, area.zmin),
+			Vector3(area.xmax, area.ymin, area.zmin),
+			Vector3(area.xmax, area.ymax, area.zmin), Imprinter::facing_down);
+	temp.InsertTriangle(Vector3(area.xmin, area.ymin, area.zmin),
+			Vector3(area.xmin, area.ymax, area.zmin),
+			Vector3(area.xmax, area.ymax, area.zmin), Imprinter::facing_down);
+	temp.FinishImprint();
+	temp.HardInvert();
+	mask |= temp;
+
 	temp = start;
+	// TODO Check why in a direct c = a & b; the overloaded & does not return a DexelTarget.
 	temp &= mask;
+	debug = temp;
 	target |= temp;
+//	debug = target;
 
 //	target.CleanOutlier();
 	target.Refresh();
@@ -373,4 +390,155 @@ void GeneratorDexel::GenerateToolpath(void)
 //		tempPlace.matrix.TranslateGlobal(temp.GetSizeX(), 0.0, 0.0);
 //		run[0].placements.Add(tempPlace);
 //	}
+
+void GeneratorDexel::QuickCollectToolpaths(ArrayOfProtoToolpath &ptp,
+		const double pathDistance)
+{
+	if(ptp.GetCount() == 0) return;
+
+	GCodeBlock m;
+	if(!toolpath.IsEmpty()){
+		m.X = toolpath.positions.Last().X;
+		m.Y = toolpath.positions.Last().Y;
+		m.Z = fmax(toolpath.positions.Last().Z, target.GetSizeZ() + freeHeight);
+	}else{
+		m.Z = target.GetSizeZ() + freeHeight;
+	}
+	// Assign parents
+	for(size_t q = 0; q < ptp.GetCount(); q++){
+		if(ptp[q].IsEmpty()){
+			ptp[q].inserted = true;
+			continue;
+		}
+		ptp[q].inserted = false;
+	}
+
+	bool allowReversing = true;
+	double maxStepUp = 0.01;
+
+	// Connect the path segments
+	do{
+		double dopt = FLT_MAX;
+		int nopt = -1;
+		bool forward = true;
+		for(size_t n = 0; n < ptp.GetCount(); n++){
+			if(ptp[n].inserted) continue;
+
+			const double d = (m.X - ptp[n].positions[0].X)
+					* (m.X - ptp[n].positions[0].X)
+					+ (m.Y - ptp[n].positions[0].Y)
+							* (m.Y - ptp[n].positions[0].Y)
+					+ (m.Z - ptp[n].positions[0].Z)
+							* (m.Z - ptp[n].positions[0].Z);
+			if(d < dopt){
+				forward = true;
+				dopt = d;
+				nopt = n;
+			}
+			if(allowReversing){
+				const double d = (m.X - ptp[n].positions.Last().X)
+						* (m.X - ptp[n].positions.Last().X)
+						+ (m.Y - ptp[n].positions.Last().Y)
+								* (m.Y - ptp[n].positions.Last().Y)
+						+ (m.Z - ptp[n].positions.Last().Z)
+								* (m.Z - ptp[n].positions.Last().Z);
+				if(d < dopt){
+					forward = false;
+					dopt = d;
+					nopt = n;
+				}
+			}
+		}
+		if(nopt < 0) break;
+		GCodeBlock mlast = m;
+		if(forward)
+			m = ptp[nopt].positions[0];
+		else
+			m = ptp[nopt].positions.Last();
+
+		{
+			double px0 = round(
+					(mlast.X - target.GetResolutionX() / 2)
+							/ target.GetResolutionX());
+			double py0 = round(
+					(mlast.Y - target.GetResolutionY() / 2)
+							/ target.GetResolutionY());
+			double px1 = round(
+					(m.X - target.GetResolutionX() / 2)
+							/ target.GetResolutionX());
+			double py1 = round(
+					(m.Y - target.GetResolutionY() / 2)
+							/ target.GetResolutionY());
+
+			const double d = fmax(fabs(px0 - px1), fabs(py0 - py1));
+			const int N = round(d);
+			GCodeBlock delta = (m - mlast) / fmax(1.0, d);
+			GCodeBlock p = mlast;
+
+			const double dd = fmax(fabs(px0 - px1) * target.GetResolutionX(),
+					fabs(py0 - py1) * target.GetResolutionY());
+
+			if(fabs(m.Z - mlast.Z) <= maxStepUp && dd < pathDistance){
+				ToolPath tp1;
+				double cost = 0.0;
+				for(size_t u = 0; u <= N; u++){
+					const double h = target.GetLevel(p.X, p.Y);
+					if(h > -FLT_EPSILON){
+						cost += fmax(h - p.Z, 0);
+						GCodeBlock temp = p;
+						temp.Z = fmax(temp.Z, h); //TODO This is following the surface exactly, but should skip gaps.
+						tp1.positions.Add(temp);
+					}
+					p += delta;
+				}
+				toolpath += tp1;
+
+			}else{
+				if(mlast.Z < target.GetSizeZ() + freeHeight - FLT_EPSILON){
+					mlast.Z = target.GetSizeZ() + freeHeight;
+					mlast.Rapid();
+					toolpath.positions.Add(mlast);
+				}
+				mlast = m;
+				mlast.Z = target.GetSizeZ() + freeHeight;
+				mlast.Rapid();
+				toolpath.positions.Add(mlast);
+			}
+		}
+
+//		m.Z = fmax(m.Z, target.GetSizeZ() + freeHeight);
+//		m.Rapid();
+//		toolpath.positions.Add(m);
+
+		if(forward){
+			for(size_t m = 0; m < ptp[nopt].positions.GetCount(); m++){
+				toolpath.positions.Add(ptp[nopt].positions[m]);
+			}
+		}else{
+			for(size_t m = ptp[nopt].positions.GetCount(); m-- > 0;){
+				toolpath.positions.Add(ptp[nopt].positions[m]);
+			}
+		}
+		m = toolpath.positions.Last();
+//		m.Z = fmax(m.Z, target.GetSizeZ() + freeHeight);
+//		m.Rapid();
+//		toolpath.positions.Add(m);
+
+		ptp[nopt].inserted = true;
+	}while(true);
+
+// Move out of workpiece
+	if((toolpath.GetCount() > 0)
+			&& (toolpath.positions.Last().Z
+					< (target.GetSizeZ() + freeHeight - FLT_EPSILON))){
+		GCodeBlock m;
+		//Note: Rotations are kept at zero for the starting position
+		m.X = toolpath.positions.Last().X;
+		m.Y = toolpath.positions.Last().Y;
+		m.Z = target.GetSizeZ() + freeHeight;
+		m.Rapid();
+		toolpath.positions.Add(m);
+	}
+
+}
 

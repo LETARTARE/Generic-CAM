@@ -68,12 +68,12 @@ public:
 	virtual ~ImprinterElement();
 	// Member variables
 public:
+
+	float aboveUp;
+	float aboveDown;
 	float up;
 	float down;
-
-	float aboveDown;
 	float belowUp;
-	float aboveUp;
 	float belowDown;
 
 	// TODO: Add a surface orientation to the dexel cells.
@@ -83,7 +83,7 @@ public:
 
 	// Methods
 public:
-	bool IsVisible(void); ///< A cell is visible, if the upper level is above the lower one.
+	bool IsVisible(void) const; ///< A cell is visible, if the upper level is above the lower one.
 	void Swap(ImprinterElement& b);
 };
 
@@ -174,15 +174,16 @@ public:
 	bool IsFilled(size_t p) const; ///< Test, if cell(p) has a particle somewhere.
 	bool IsVisible(int x, int y) const; ///< Synonymous with IsFilled
 	bool IsVisible(size_t p) const; ///< Synonymous with IsFilled
-	bool IsOnOuterBorder(size_t p) const; ///< Test, if cell belongs to the outermost row.
+	bool IsOnOuterBorder(size_t p) const; ///< Test, if cell belongs to the outermost row/column.
 	bool IsSurrounded(size_t p) const; ///< Test, if cell is not on outer border and surrounded by filled cells. Does not check cell itself.
 	bool IsStandAlone(size_t p, double height) const; ///< Test, if cell is not on outer border and surrounded by filled cells at a certain height. Does not check cell itself.
 
 	double GetMeanLevel(int x, int y) const; ///< Get the middle of the cell[x,y], otherwise return -1;
 	double GetMeanLevel(size_t p) const; ///< Get the middle of the cell[p], otherwise return -1;
-	double GetLevel(double x, double y) const; ///< Get the up-height at cell closest to point(x,y). Otherwise -1;
+	double GetLevel(double x, double y) const; ///< Get the up-height at cell closest to point(x,y). Otherwise -1.
 	double GetMaxLevel(void) const; ///< Returns the max value of the visible elements in the field.
 	const ImprinterElement GetElement(double x, double y) const;
+	void SetLevel(double x, double y, double level); ///< Set the up-height at cell closest to point(x,y).
 
 // ***** Manipulation *****
 
@@ -201,7 +202,7 @@ public:
 	 *
 	 * Adds two Imprinter%s, if they have the same size.
 	 * If they are diffrently sized, nothing happens.
-	 * Additions is equivalent to a "or" (or union) operation on the volume.
+	 * An addition on volumes is equivalent to a "or" (or union) operation.
 	 */
 	const Imprinter operator|(const Imprinter& other) const;
 
@@ -217,7 +218,6 @@ public:
 	 *
 	 * Adds two Imprinter%s, if they have the same size.
 	 * If they are diffrently sized, nothing happens.
-	 * Additions is equivalent to a "or" (or union) operation on the volume.
 	 */
 	const Imprinter operator-(const Imprinter& other) const;
 
@@ -274,6 +274,8 @@ public:
 	void ShiftDown(int x, int y, double z, const Imprinter &b);
 	void TouchErase(int x, int y, double z, double level, const Imprinter &b);
 	void FoldRaise(const Imprinter &b); ///< Folding operation of two Imprinters. Surface is only raised.
+	void MarkHeightDelta(const Imprinter &b, Imprinter &ref,
+			bool processFull = true); ///< FoldRaise() marking the residual error as well
 	void FoldReplace(const Imprinter &b); ///< Folding operation. Model is replaced.
 
 private:
@@ -281,8 +283,19 @@ private:
 			double p3) const;
 
 	// Member variables
-public:
+protected:
+	double sx; ///< Size in x
+	double sy; ///< Size in y
+	double sz; ///< Size in z
+	double rx; ///< Resolution in x
+	double ry; ///< Resolution in y
 
+	ImprinterElement *field;
+	size_t nx; ///< Number of cells in x
+	size_t ny; ///< Number of cells in y
+	size_t N;  ///< = nx * ny
+
+public:
 	bool displayBox; ///< Display the up surface as a continuous plane.
 	bool displayField; ///< Display the up and down surface as planar squares.
 	bool displayAboveDown; ///< Display the above down surface as a grid.
@@ -295,17 +308,6 @@ public:
 	Vector3 colorTodo;
 
 protected:
-	ImprinterElement *field;
-	size_t nx; ///< Number of cells in x
-	size_t ny; ///< Number of cells in y
-	size_t N; ///< = nx * ny
-
-	double sx; ///< Size in x
-	double sy; ///< Size in y
-	double sz; ///< Size in z
-	double rx; ///< Resolution in x
-	double ry; ///< Resolution in y
-
 	mutable bool refresh; ///< Initialize an update of the OpenGL display-list.
 
 private:

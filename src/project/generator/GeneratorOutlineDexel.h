@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GeneratorNone.h
-// Purpose            : 
+// Name               : GeneratorOutlineDexel.h
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 11.02.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 23.12.2017
+// Copyright          : (C) 2017 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,32 +24,37 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef GENERATORNONE_H_
-#define GENERATORNONE_H_
+#ifndef GENERATOROUTLINEDEXEL_H_
+#define GENERATOROUTLINEDEXEL_H_
 
-/*!\class GeneratorNone
+/*!\class GeneratorOutlineDexel
  * \ingroup Generator
- * \brief Empty generator
+ * \brief ...
+ *
+ * ...
  */
 
-#include "Generator.h"
+#include "GeneratorDexel.h"
 
-#include <wx/panel.h>
-#include <wx/string.h>
-#include <wx/thread.h>
-
-class GeneratorNone:public Generator {
+class GeneratorOutlineDexel:public GeneratorDexel {
 public:
-	GeneratorNone();
-	virtual ~GeneratorNone();
+	GeneratorOutlineDexel();
+	virtual ~GeneratorOutlineDexel();
 
-	virtual wxString GetName(void) const;
 	virtual void CopyParameterFrom(const Generator * other);
+	virtual wxString GetName(void) const;
 	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
 	virtual void TransferDataToPanel(void) const;
 	virtual void TransferDataFromPanel(void);
-
 	virtual void GenerateToolpath(void);
+
+public:
+
+private:
+	wxStaticText* m_staticTextTwiddleFactor;
+	wxTextCtrl* m_textCtrlTwiddleFactor;
+	wxStaticText* m_staticTextUnit;
+
 };
 
-#endif /* GENERATORNONE_H_ */
+#endif /* GENERATOROUTLINEDEXEL_H_ */

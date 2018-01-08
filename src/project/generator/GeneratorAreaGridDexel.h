@@ -35,6 +35,8 @@
  */
 
 #include "GeneratorDexel.h"
+#include "ProtoToolpath.h"
+#include "Direction.h"
 
 #include <wx/panel.h>
 #include <wx/radiobox.h>
@@ -51,10 +53,14 @@ public:
 	virtual void TransferDataToPanel(void) const;
 	virtual void TransferDataFromPanel(void);
 	virtual void GenerateToolpath(void);
+private:
+	void CollectToolpaths(ArrayOfProtoToolpath &ptp, const double pathDistance);
 
-
+public:
 	double overlap;
-	int type;
+	double maxStepUp;
+
+	Direction type;
 	bool generateA;
 	bool generateB;
 

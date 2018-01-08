@@ -134,8 +134,8 @@ void GeneratorTest::GenerateToolpath(void)
 	ToolPath tp;
 
 	DexelTarget toolShape;
-	toolShape.SetupTool(*tool, target.GetResolutionX(),
-			target.GetResolutionY());
+	toolShape.SetupTool(*tool, target.GetResolutionX(), target.GetResolutionY(),
+			false);
 
 	toolShape.NegateZ();
 	DexelTarget temp = target;
@@ -164,8 +164,7 @@ void GeneratorTest::GenerateToolpath(void)
 //	tm.TranslateGlobal(0.0, 0.0, -0.0001);
 
 	while(level > -tolerance){
-		double dropLevel = level - maxCutDepth;
-		if(dropLevel < 0.0) dropLevel = 0.0;
+		const double dropLevel = fmax(level - maxCutDepth, 0.0);
 
 		// Find all polygons on one level
 		pg = temp.GeneratePolygon(-1, -1, level - tolerance);
@@ -251,8 +250,7 @@ void GeneratorTest::GenerateToolpath(void)
 		isMillUp = true;
 		tp.positions.Add(m);
 #ifdef _DEBUGMODE
-		wxLogMessage
-		(wxString::Format(_T("Next Level: %.3f m"), level));
+		wxLogMessage(wxString::Format(_T("Next Level: %.3f m"), level));
 //		level = -1;
 #endif
 	}
