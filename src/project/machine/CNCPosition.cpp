@@ -116,13 +116,6 @@ CNCPosition::~CNCPosition()
 {
 }
 
-//void MachinePosition::Zero(void)
-//{
-//	X = Y = Z = 0.0;
-//	A = B = C = 0.0;
-//	U = V = W = 0.0;
-//}
-
 double CNCPosition::AbsXYZ() const
 {
 	return sqrt(X * X + Y * Y + Z * Z);
@@ -290,7 +283,7 @@ AffineTransformMatrix CNCPosition::GetMatrix(void) const
 	// Rz := matrix[[coz,-siz,0,0],[siz,coz,0,0],[0,0,1,0],[0,0,0,1]]
 	// G := matrix[[1,0,0,X],[0,1,0,Y],[0,0,1,Z],[0,0,0,1]]
 
-	// Only considering only XYZABC:
+	// Only considering XYZABC:
 	// G*Rz*Ry*Rx
 
 	AffineTransformMatrix temp;

@@ -107,8 +107,8 @@ void Run::GenerateToolpaths(void)
 				generators[i]->toolpath.positions.Insert(temp, 0);
 			}
 			{
-				GCodeBlock temp(_T("(Set feed-speed mm/min)"));
-				temp.F = 0.02;
+				GCodeBlock temp(_T("(Set feed-speed mm/s)"));
+				temp.F = 0.025; // m/s
 				generators[i]->toolpath.positions.Insert(temp, 1);
 			}
 			{
@@ -145,13 +145,16 @@ bool Run::SaveToolpaths(wxFileName fileName, ToolPath::Dialect dialect)
 	// Move toolpath down by the touchoff height.
 	AffineTransformMatrix matrix;
 	matrix.TranslateGlobal(0, 0, -touchoffHeight);
+	bool flipZ = false;
+	if(flipZ) matrix.ScaleGlobal(1, 1, -1);
 	generated.ApplyTransformation(matrix);
 
 	generated.CleanPath(0.0003);
 	generated.DiffPath(0.0003);
 
 	ToolPath startup;
-	startup.positions.Add(GCodeBlock(_T("S1000 (Spindle speed rpm)")));
+	startup.positions.Add(GCodeBlock(_T("G64 P2 (Cut corners)")));
+	startup.positions.Add(GCodeBlock(_T("S10000 (Spindle speed rpm)")));
 	startup.positions.Add(GCodeBlock(_T("M3 (Start spindel)")));
 	startup.positions.Add(
 			GCodeBlock(

@@ -34,7 +34,6 @@
  * simulation cycle. It also coordinates the setup and processing of the
  * Workpieces in the machine.
  *
- * \todo Remove the quick simulator from the Machine. Everything should be simulated with the same code.
  */
 
 #include "Machine.h"

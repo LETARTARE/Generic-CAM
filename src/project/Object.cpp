@@ -160,6 +160,7 @@ bool Object::ReloadObject(void)
 			geometries.Clear();
 			for(size_t i = 0; i < temp.geometry.GetCount(); i++){
 				temp.geometry[i].ApplyTransformation();
+				temp.geometry[i].matrix = AffineTransformMatrix();
 				Geometry g;
 				g.InsertTrianglesFrom(temp.geometry[i]);
 				g.name = fileName.GetName();
@@ -185,6 +186,7 @@ bool Object::ReloadObject(void)
 			for(size_t i = 0; i < temp.geometry.GetCount(); i++){
 				temp.geometry[i].ApplyTransformation();
 				temp.geometry[i].ApplyTransformation(scaledown);
+				temp.geometry[i].matrix = AffineTransformMatrix();
 				Geometry g;
 				g.InsertTrianglesFrom(temp.geometry[i]);
 				if(g.name.IsEmpty()){
@@ -212,6 +214,7 @@ bool Object::ReloadObject(void)
 			geometries.Clear();
 			for(size_t i = 0; i < temp.geometry.GetCount(); i++){
 				temp.geometry[i].ApplyTransformation();
+				temp.geometry[i].matrix = AffineTransformMatrix();
 				Geometry g;
 				g.InsertTrianglesFrom(temp.geometry[i]);
 				g.name = temp.geometry[i].name;

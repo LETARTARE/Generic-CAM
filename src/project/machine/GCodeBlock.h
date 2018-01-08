@@ -62,7 +62,6 @@ public:
 	GCodeBlock(wxString block = _T(""), double conversionFactor = 0.001);
 	wxString GetCode(void) const;
 
-
 	/*!\brief Copy only the changed values
 	 *
 	 * A G-Code block can have values that are marked as "not changed". These values are not copied.
@@ -80,6 +79,16 @@ public:
 
 	int Motion(void) const;
 
+	GCodeBlock& operator+=(const GCodeBlock& rhs);
+	GCodeBlock& operator-=(const GCodeBlock& rhs);
+	GCodeBlock& operator*=(const double& rhs);
+	GCodeBlock& operator/=(const double& rhs);
+
+	friend GCodeBlock operator+(GCodeBlock lhs, const GCodeBlock& rhs);
+	friend GCodeBlock operator-(GCodeBlock lhs, const GCodeBlock& rhs);
+	friend GCodeBlock operator*(GCodeBlock lhs, const double& rhs);
+	friend GCodeBlock operator/(GCodeBlock lhs, const double& rhs);
+
 	bool IsStateChange(void) const;
 	bool IsMotion(void) const;
 	bool IsLinearMotion(void) const;
@@ -93,51 +102,56 @@ public:
 
 	bool block_delete; //!< Enable block-delete-switch sensitivity for this block
 	bool message; //!< is the comment a message (displayed to the user on the machine)?
-	double A; //!< Rotation around X axis in rad
+	double A; //!< Rotation around X axis (rad)
 	bool AFlag;
-	double B; //!< Rotation around Y axis in rad
+	double B; //!< Rotation around Y axis (rad)
 	bool BFlag;
-	double C; //!< Rotation around Z axis in rad
+	double C; //!< Rotation around Z axis (rad)
 	bool CFlag;
 	wxString Comment;
-	int D;
+	int D; //!< Tool radius compensation number
 	wxString error;
-	double F;
+	double F; //!< Feedrate (m/s)
 	int G[maxGModes];
-	int H;
-	double I; //!< Center of rotation in X direction in meter
+	int H; //!< Tool length offset index
+	double I; //!< Center of rotation in X direction (m)
 	bool IFlag;
-	double J; //!< Center of rotation in Y direction in meter
+	double J; //!< Center of rotation in Y direction (m)
 	bool JFlag;
-	double K; //!< Center of rotation in Z direction in meter
+	double K; //!< Center of rotation in Z direction (m)
 	bool KFlag;
-	int L;
-	int MCount;
+	int L; //!< Number of repetitions in canned cycles
+	int MCount; //!< ?
 	int M[maxMModes];
-	int N;
-	double P;
-	double Q;
-	double R;
+	int N; //!< Line number
+	double P; //!< Dwell time (s)
+	double Q; //!< Feed increment in canned cycles (m)
+	double R; //!< Arc radius (m)
 	bool RFlag;
-	double S; //!< Spindle speed in Hertz
-	int T;
-	double U; //!< Extra axis in X direction in meter
+	double S; //!< Spindle speed (1/s)
+	int T; //!< Tool selection
+	double U; //!< Extra axis in X direction (m)
 	bool UFlag;
-	double V; //!< Extra axis in Y direction in meter
+	double V; //!< Extra axis in Y direction (m)
 	bool VFlag;
-	double W; //!< Extra axis in Z direction in meter
+	double W; //!< Extra axis in Z direction (m)
 	bool WFlag;
-	double X; //!< X position in meter
+	double X; //!< X position (m)
 	bool XFlag;
-	double Y; //!< Y position in meter
+	double Y; //!< Y position (m)
 	bool YFlag;
-	double Z; //!< Z position in meter
+	double Z; //!< Z position (m)
 	bool ZFlag;
 
 private:
 	void Update(char key, bool negative, int numberI, double numberD);
-
+	void UpdateFlags(const GCodeBlock& rhs);
 };
 WX_DECLARE_OBJARRAY(GCodeBlock, ArrayOfGCodeBlock);
+
+GCodeBlock operator+(GCodeBlock lhs, const GCodeBlock& rhs);
+GCodeBlock operator-(GCodeBlock lhs, const GCodeBlock& rhs);
+GCodeBlock operator*(GCodeBlock lhs, const double& rhs);
+GCodeBlock operator/(GCodeBlock lhs, const double& rhs);
 
 #endif /* GCODEBLOCK_H_ */

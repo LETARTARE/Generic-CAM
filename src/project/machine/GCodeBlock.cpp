@@ -482,7 +482,7 @@ wxString GCodeBlock::GetCode(void) const
 			Q / conversionFactor);
 
 	if(F >= -FLT_EPSILON) temp += wxString::Format(_T(" F%g"),
-			F * 60.0 / conversionFactor);
+			F / conversionFactor);
 
 	if(XFlag){
 		temp += wxString::Format(_T(" X%g"), X / conversionFactor);
@@ -1008,3 +1008,134 @@ void GCodeBlock::ArcCCW(void)
 	SetG(3);
 }
 
+void GCodeBlock::UpdateFlags(const GCodeBlock& rhs)
+{
+	AFlag |= rhs.AFlag;
+	BFlag |= rhs.BFlag;
+	CFlag |= rhs.CFlag;
+	IFlag |= rhs.IFlag;
+	JFlag |= rhs.JFlag;
+	KFlag |= rhs.KFlag;
+	RFlag |= rhs.RFlag;
+	UFlag |= rhs.UFlag;
+	VFlag |= rhs.VFlag;
+	WFlag |= rhs.WFlag;
+	XFlag |= rhs.XFlag;
+	YFlag |= rhs.YFlag;
+	ZFlag |= rhs.ZFlag;
+}
+GCodeBlock& GCodeBlock::operator +=(const GCodeBlock& rhs)
+{
+	UpdateFlags(rhs);
+	A += rhs.A;
+	B += rhs.B;
+	C += rhs.C;
+	U += rhs.U;
+	V += rhs.V;
+	W += rhs.W;
+	X += rhs.X;
+	Y += rhs.Y;
+	Z += rhs.Z;
+	I += rhs.I;
+	J += rhs.J;
+	K += rhs.K;
+	F += rhs.F;
+	L += rhs.L;
+	N += rhs.N;
+	P += rhs.P;
+	Q += rhs.Q;
+	R += rhs.R;
+	S += rhs.S;
+	return *this;
+}
+GCodeBlock& GCodeBlock::operator -=(const GCodeBlock& rhs)
+{
+	UpdateFlags(rhs);
+	A -= rhs.A;
+	B -= rhs.B;
+	C -= rhs.C;
+	U -= rhs.U;
+	V -= rhs.V;
+	W -= rhs.W;
+	X -= rhs.X;
+	Y -= rhs.Y;
+	Z -= rhs.Z;
+	I -= rhs.I;
+	J -= rhs.J;
+	K -= rhs.K;
+	F -= rhs.F;
+	L -= rhs.L;
+	N -= rhs.N;
+	P -= rhs.P;
+	Q -= rhs.Q;
+	R -= rhs.R;
+	S -= rhs.S;
+	return *this;
+}
+GCodeBlock& GCodeBlock::operator *=(const double& rhs)
+{
+	A *= rhs;
+	B *= rhs;
+	C *= rhs;
+	U *= rhs;
+	V *= rhs;
+	W *= rhs;
+	X *= rhs;
+	Y *= rhs;
+	Z *= rhs;
+	I *= rhs;
+	J *= rhs;
+	K *= rhs;
+	F *= rhs;
+	L *= rhs;
+	N *= rhs;
+	P *= rhs;
+	Q *= rhs;
+	R *= rhs;
+	S *= rhs;
+	return *this;
+}
+GCodeBlock& GCodeBlock::operator /=(const double& rhs)
+{
+	A /= rhs;
+	B /= rhs;
+	C /= rhs;
+	U /= rhs;
+	V /= rhs;
+	W /= rhs;
+	X /= rhs;
+	Y /= rhs;
+	Z /= rhs;
+	I /= rhs;
+	J /= rhs;
+	K /= rhs;
+	F /= rhs;
+	L /= rhs;
+	N /= rhs;
+	P /= rhs;
+	Q /= rhs;
+	R /= rhs;
+	S /= rhs;
+	return *this;
+}
+
+GCodeBlock operator+(GCodeBlock lhs, const GCodeBlock& rhs)
+{
+	lhs += rhs;
+	return lhs;
+}
+GCodeBlock operator-(GCodeBlock lhs, const GCodeBlock& rhs)
+{
+	lhs -= rhs;
+	return lhs;
+}
+GCodeBlock operator*(GCodeBlock lhs, const double& rhs)
+{
+	lhs *= rhs;
+	return lhs;
+}
+GCodeBlock operator/(GCodeBlock lhs, const double& rhs)
+{
+	lhs /= rhs;
+	return lhs;
+}

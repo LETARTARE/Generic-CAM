@@ -60,7 +60,7 @@ public:
 
 	void InsertObject(const Object &object, const AffineTransformMatrix &shift);
 	void SetupTool(const Tool &tool, const double resolutionX,
-			const double resolutionY);
+			const double resolutionY, bool addMachineSafety = true);
 	void MarkOutline(void);
 
 	void DocumentField(int x, int y, double height);
@@ -70,11 +70,11 @@ public:
 
 // ***** Traversing data *****
 
-	double GetMinLevel(void);
-	double GetMaxUpsideLevel(int &x, int &y);
-	bool IsInsideWorkingArea(int x, int y);
-	bool HasToBeCut(int x, int y);
-	bool HadBeenCut(int x, int y);
+	double GetMinLevelD(void);
+	double GetMaxLevelAD(int &x, int &y);
+	bool IsInsideWorkingAreaAU(int x, int y);
+	bool HasToBeCutBDAU(int x, int y);
+	bool HadBeenCutBDAU(int x, int y);
 	int NextDir(int sx, int sy, double height, int olddir);
 	int NextDir(int sx, int sy, int olddir);
 	int NextDirReverseDistance(int sx, int sy, int olddir);
@@ -88,17 +88,23 @@ public:
 	const Polygon25 GenerateConvexOutline(void);
 
 	void GenerateDistanceMap(double height, bool invert = false);
+
 	void RaiseDistanceMap(double height, bool invert);
 	void FoldLowerDistance(int x, int y, const DexelTarget &b);
-	bool FindNextDistance(int &x, int&y);
+	bool FindNextDistanceBDAU(int &x, int&y);
 
 	bool FindStartCutting(int &x, int &y);
 	Polygon25 FindCut(int &x, int &y);
 
 	void FillBlock(double maxLevel, double minLevel = 0.0);
 
-	// Polygon3 Methods
+	double FindLevelAbove(double startLevel, double normalDeviation);
+	void GenerateDistanceMap(double minLevel, double maxLevel);
+	double FindPeak(int &x, int &y);
+	double FindCircle(double x, double y, double radius);
+	ArrayOfPolygon25 GeneratePolygonAtDistance(double level);
 
+	// Polygon3 Methods
 	void PolygonCutInTarget(Polygon3 &polygon, DexelTarget &tool);
 	void PolygonPunchThroughTarget(Polygon3 &polygon, double level,
 			DexelTarget &tool);
@@ -118,6 +124,11 @@ public:
 
 	void AddSupport(Polygon3 &polygon, double distance, double height,
 			double width, double slotWidth);
+
+	void FilterAD(void);
+
+	void CopyNormal(const DexelTarget& other);
+	void CopyToUp(int f, double factor = 1.0);
 
 	//Member variables:
 public:

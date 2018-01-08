@@ -125,7 +125,8 @@ void MachineSimulator::Step(float tTarget)
 	if(machine->selectedToolSlot > 0){
 		const Tool* tool = &(machine->tools[machine->selectedToolSlot - 1]);
 		DexelTarget dex;
-		dex.SetupTool(*tool, target.GetResolutionX(), target.GetResolutionY());
+		dex.SetupTool(*tool, target.GetResolutionX(), target.GetResolutionY(),
+				false);
 //		dex.MirrorZ();
 //		dex.NegateZ();
 		target.PolygonCutInTarget(temp, dex);

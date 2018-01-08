@@ -41,7 +41,7 @@ ToolPath::ToolPath()
 ToolPath::ToolPath(const ToolPath& other)
 {
 	// Performance issues if called.
-	printf("Copy constructor on ToolPath called.\n");
+//	printf("Copy constructor on ToolPath called.\n");
 	selected = false;
 	colorMoving = other.colorMoving;
 	colorCutting = other.colorCutting;

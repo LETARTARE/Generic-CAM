@@ -76,6 +76,7 @@ void Geometry::ApplyTransformation(void)
 	size_t i;
 	for(i = 0; i < triangles.Count(); i++)
 		triangles[i].ApplyTransformation(this->matrix);
+	//TODO Reset this->matrix to Identity();
 }
 
 void Geometry::Paint(GeometryColorStyle style) const

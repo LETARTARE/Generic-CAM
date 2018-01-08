@@ -130,8 +130,20 @@ void Triangle::ApplyTransformation(const AffineTransformMatrix &matrix)
 	p[0] = matrix.Transform(p[0]);
 	p[1] = matrix.Transform(p[1]);
 	p[2] = matrix.Transform(p[2]);
-	n[0] = matrix.TransformNoShift(n[0]);
-	n[1] = matrix.TransformNoShift(n[1]);
-	n[2] = matrix.TransformNoShift(n[2]);
+
+	const double sx = sqrt(
+			matrix.a[0] * matrix.a[0] + matrix.a[4] * matrix.a[4]
+					+ matrix.a[8] * matrix.a[8]);
+	const double sy = sqrt(
+			matrix.a[1] * matrix.a[1] + matrix.a[5] * matrix.a[5]
+					+ matrix.a[9] * matrix.a[9]);
+	const double sz = sqrt(
+			matrix.a[2] * matrix.a[2] + matrix.a[6] * matrix.a[6]
+					+ matrix.a[10] * matrix.a[10]);
+	AffineTransformMatrix temp = matrix;
+	temp.ScaleGlobal(1 / sx, 1 / sy, 1 / sz);
+	n[0] = temp.TransformNoShift(n[0]);
+	n[1] = temp.TransformNoShift(n[1]);
+	n[2] = temp.TransformNoShift(n[2]);
 }
 

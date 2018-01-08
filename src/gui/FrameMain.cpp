@@ -1050,8 +1050,10 @@ void FrameMain::OnGeneratorSetup(wxCommandEvent& event)
 
 void FrameMain::OnGeneratorStart(wxCommandEvent& event)
 {
+#ifndef _DEBUGMODE
 	wxWindowDisabler disableAll;
 	wxBusyInfo wait(_("Generating Toolpaths..."),this);
+#endif
 	project.GenerateToolpaths();
 
 //	project.PropagateChanges();

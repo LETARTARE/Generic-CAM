@@ -92,12 +92,15 @@ void DexelTarget::InsertObject(const Object &object,
 }
 
 void DexelTarget::SetupTool(const Tool &tool, const double resolutionX,
-		const double resolutionY)
+		const double resolutionY, bool addMachineSafety)
 {
 	//TODO: Integrate the hack for the chuck protection in a more organized way.
-
-//	const double radius = fmax(tool.GetMaxDiameter() / 2.0, 50e-3 / 2.0);
-	const double radius = tool.GetMaxDiameter() / 2.0;
+	double radius;
+	if(addMachineSafety){
+		radius = fmax(tool.GetMaxDiameter() / 2.0, 60e-3 / 2.0);
+	}else{
+		radius = tool.GetMaxDiameter() / 2.0;
+	}
 	const double depth = tool.GetToolLength();
 
 	// Calculate the size to be odd, so there always a cell in the center.
@@ -143,24 +146,28 @@ void DexelTarget::SetupTool(const Tool &tool, const double resolutionX,
 			d = depth - d;
 			if(d < field[j].down) field[j].down = d;
 
-
 		}
 	}
+	if(addMachineSafety){
+		// Insert an approximation to prevent the generator from moving the chuck into the
+		// workpiece.
+		for(size_t j = 0; j < this->N; j++){
+			if(field[j].up < ((25e-3) / 2) && field[j].down > depth) field[j].down =
+					(depth);
+			if(field[j].up < ((45e-3) / 2) && field[j].down > (depth + 20e-3)) field[j].down =
+					(depth + 20e-3);
+			if(field[j].down > (depth + 25e-3)) field[j].down = (depth + 25e-3);
+		}
 
-	// Insert an approximation to prevent the generator from moving the chuck into the
-	// workpiece.
-//	for(size_t j = 0; j < this->N; j++){
-//		if(field[j].up < ((25e-3) / 2) && field[j].down > depth) field[j].down =
-//				(depth);
-//		if(field[j].up < ((45e-3) / 2) && field[j].down > (depth + 20e-3)) field[j].down =
-//				(depth + 20e-3);
-//		if(field[j].down > (depth + 25e-3)) field[j].down = (depth + 25e-3);
-//	}
+		// Put a square cap on top of the tool.
+		for(size_t j = 0; j < this->N; j++)
+			field[j].up = depth + 35e-3;
+	}else{
+		// Put a square cap on top of the tool.
+		for(size_t j = 0; j < this->N; j++)
+			field[j].up = depth;
 
-	// Put a square cap on top of the tool.
-	for(size_t j = 0; j < this->N; j++)
-		field[j].up = depth;//+35e-3;
-
+	}
 	refresh = true;
 }
 
@@ -185,10 +192,10 @@ void DexelTarget::DocumentField(int x, int y)
 	for(int_fast8_t j = -3; j <= 3; j++){
 		tp = wxString::Format(_T("x:%3i y%3i:"), x, y - j);
 		for(int_fast8_t i = -3; i <= 3; i++){
-			if(HasToBeCut(x + i, y - j))
+			if(HasToBeCutBDAU(x + i, y - j))
 				tp += _T("X ");
 			else
-				if(IsInsideWorkingArea(x + i, y - j))
+				if(IsInsideWorkingAreaAU(x + i, y - j))
 					tp += _T("_ ");
 				else
 					tp += _T("0 ");
@@ -222,7 +229,7 @@ void DexelTarget::Simulate(const ToolPath &toolpath, const Tool &tool)
 	this->PolygonCutInTarget(temp, toolShape);
 }
 
-double DexelTarget::GetMinLevel(void)
+double DexelTarget::GetMinLevelD(void)
 {
 	double d = FLT_MAX;
 	for(size_t i = 0; i < N; i++)
@@ -230,7 +237,7 @@ double DexelTarget::GetMinLevel(void)
 	return d;
 }
 
-double DexelTarget::GetMaxUpsideLevel(int &x, int &y)
+double DexelTarget::GetMaxLevelAD(int &x, int &y)
 {
 	double d = -FLT_MAX;
 	x = -1;
@@ -244,7 +251,7 @@ double DexelTarget::GetMaxUpsideLevel(int &x, int &y)
 	return d;
 }
 
-bool DexelTarget::IsInsideWorkingArea(int x, int y)
+bool DexelTarget::IsInsideWorkingAreaAU(int x, int y)
 {
 	if(x < 0 || x >= (int) nx) return false;
 	if(y < 0 || y >= (int) ny) return false;
@@ -255,7 +262,7 @@ bool DexelTarget::IsInsideWorkingArea(int x, int y)
 
 }
 
-bool DexelTarget::HadBeenCut(int x, int y)
+bool DexelTarget::HadBeenCutBDAU(int x, int y)
 {
 	if(x < 0 || x >= (int) nx) return false;
 	if(y < 0 || y >= (int) ny) return false;
@@ -273,7 +280,7 @@ bool DexelTarget::HadBeenCut(int x, int y)
 	return true;
 }
 
-bool DexelTarget::HasToBeCut(int x, int y)
+bool DexelTarget::HasToBeCutBDAU(int x, int y)
 {
 	if(x < 0 || x >= (int) nx) return false;
 	if(y < 0 || y >= (int) ny) return false;
@@ -358,55 +365,54 @@ int DexelTarget::NextDir(int sx, int sy, double height, int olddir)
 	return -1;
 }
 
-// On the outside
 int DexelTarget::NextDirReverseDistance(int sx, int sy, int olddir)
 {
 	int d = (olddir + 5) % 8;
 
-	char c;
-	bool isOutOfMaterial = HadBeenCut(sx, sy);
-	for(c = 0; c < 16; c++){
+	bool isOutOfMaterial = HadBeenCutBDAU(sx, sy);
+
+	for(uint_fast8_t c = 0; c < 16; c++){
 		switch(d){
 		case 0:
-			if(HadBeenCut(sx + 1, sy + 0)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 0)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 0)) return d;
+			if(HadBeenCutBDAU(sx + 1, sy + 0)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx + 1, sy + 0)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx + 1, sy + 0)) return d;
 
 			break;
 		case 1:
-			if(HadBeenCut(sx + 1, sy + 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 1)) return d;
+			if(HadBeenCutBDAU(sx + 1, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx + 1, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx + 1, sy + 1)) return d;
 			break;
 		case 2:
-			if(HadBeenCut(sx + 0, sy + 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 0, sy + 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy + 1)) return d;
+			if(HadBeenCutBDAU(sx + 0, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx + 0, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx + 0, sy + 1)) return d;
 			break;
 		case 3:
-			if(HadBeenCut(sx - 1, sy + 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 1)) return d;
+			if(HadBeenCutBDAU(sx - 1, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx - 1, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx - 1, sy + 1)) return d;
 			break;
 		case 4:
-			if(HadBeenCut(sx - 1, sy + 0)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 0)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 0)) return d;
+			if(HadBeenCutBDAU(sx - 1, sy + 0)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx - 1, sy + 0)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx - 1, sy + 0)) return d;
 			break;
 		case 5:
-			if(HadBeenCut(sx - 1, sy - 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx - 1, sy - 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy - 1)) return d;
+			if(HadBeenCutBDAU(sx - 1, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx - 1, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx - 1, sy - 1)) return d;
 			break;
 		case 6:
-			if(HadBeenCut(sx + 0, sy - 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 0, sy - 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy - 1)) return d;
+			if(HadBeenCutBDAU(sx + 0, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx + 0, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx + 0, sy - 1)) return d;
 			break;
 		case 7:
-			if(HadBeenCut(sx + 1, sy - 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 1, sy - 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy - 1)) return d;
+			if(HadBeenCutBDAU(sx + 1, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx + 1, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx + 1, sy - 1)) return d;
 			break;
 		}
 
@@ -419,51 +425,51 @@ int DexelTarget::NextDirForwardDistance(int sx, int sy, int olddir)
 {
 	int d = (olddir + 3) % 8;
 
-	bool isOutOfMaterial = HadBeenCut(sx, sy);
+	bool isOutOfMaterial = HadBeenCutBDAU(sx, sy);
 
 	char c;
 	for(c = 0; c < 16; c++){
 		switch(d){
 		case 0:
-			if(HadBeenCut(sx + 1, sy + 0)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 0)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 0)) return d;
+			if(HadBeenCutBDAU(sx + 1, sy + 0)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx + 1, sy + 0)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx + 1, sy + 0)) return d;
 
 			break;
 		case 1:
-			if(HadBeenCut(sx + 1, sy + 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 1, sy + 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy + 1)) return d;
+			if(HadBeenCutBDAU(sx + 1, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx + 1, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx + 1, sy + 1)) return d;
 			break;
 		case 2:
-			if(HadBeenCut(sx + 0, sy + 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 0, sy + 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy + 1)) return d;
+			if(HadBeenCutBDAU(sx + 0, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx + 0, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx + 0, sy + 1)) return d;
 			break;
 		case 3:
-			if(HadBeenCut(sx - 1, sy + 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 1)) return d;
+			if(HadBeenCutBDAU(sx - 1, sy + 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx - 1, sy + 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx - 1, sy + 1)) return d;
 			break;
 		case 4:
-			if(HadBeenCut(sx - 1, sy + 0)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx - 1, sy + 0)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy + 0)) return d;
+			if(HadBeenCutBDAU(sx - 1, sy + 0)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx - 1, sy + 0)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx - 1, sy + 0)) return d;
 			break;
 		case 5:
-			if(HadBeenCut(sx - 1, sy - 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx - 1, sy - 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx - 1, sy - 1)) return d;
+			if(HadBeenCutBDAU(sx - 1, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx - 1, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx - 1, sy - 1)) return d;
 			break;
 		case 6:
-			if(HadBeenCut(sx + 0, sy - 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 0, sy - 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 0, sy - 1)) return d;
+			if(HadBeenCutBDAU(sx + 0, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx + 0, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx + 0, sy - 1)) return d;
 			break;
 		case 7:
-			if(HadBeenCut(sx + 1, sy - 1)) isOutOfMaterial = true;
-			if(isOutOfMaterial && HasToBeCut(sx + 1, sy - 1)) return d;
-			if(isOutOfMaterial && !IsInsideWorkingArea(sx + 1, sy - 1)) return d;
+			if(HadBeenCutBDAU(sx + 1, sy - 1)) isOutOfMaterial = true;
+			if(isOutOfMaterial && HasToBeCutBDAU(sx + 1, sy - 1)) return d;
+			if(isOutOfMaterial && !IsInsideWorkingAreaAU(sx + 1, sy - 1)) return d;
 			break;
 		}
 
@@ -934,19 +940,19 @@ void DexelTarget::RaiseDistanceMap(double height, bool invert)
 	}
 }
 
-bool DexelTarget::FindNextDistance(int &x, int&y)
+bool DexelTarget::FindNextDistanceBDAU(int &x, int&y)
 {
 	size_t i, j, p;
 	double d = FLT_MAX;
-	double dc;
-	int cx, cy;
+	int cx = x;
+	int cy = y;
 	bool foundSomething = false;
-
 	p = 0;
 	for(j = 0; j < ny; j++)
 		for(i = 0; i < nx; i++){
 			if(field[p].belowDown > 0.0001 || field[p].aboveUp > 0.0001){
-				dc = ((double) i - (double) x) * ((double) i - (double) x)
+				const double dc = ((double) i - (double) x)
+						* ((double) i - (double) x)
 						+ ((double) j - (double) y) * ((double) j - (double) y);
 				if(dc < d){
 					cx = i;
@@ -972,22 +978,22 @@ bool DexelTarget::FindStartCutting(int &x, int &y)
 	int dx = x;
 	int dy = y;
 
-	size_t N = 1000 * 4;
+	size_t N = 1000 * 4; // Error counter
 
-	if(dx == 54 && dy == 49){
-		DocumentField(dx, dy);
-		//return false;
-	}
+//	if(dx == 54 && dy == 49){
+//		DocumentField(dx, dy);
+//		//return false;
+//	}
 
 	int hx, hy;
 
-	if(!HasToBeCut(x, y)){
-		wxLogMessage(
-				_T("FindStartCutting::Test started in a place not to be cut!"));
+	if(!HasToBeCutBDAU(x, y)){
+		wxLogMessage(_T(
+		"FindStartCutting::Test started in a place that is not to be cut!"));
 		return false;
 	}
-	char dir = 0;
 
+	char dir = 0;
 	while(true){
 
 		dir = NextDirReverseDistance(sx, sy, dir);
@@ -1014,7 +1020,7 @@ bool DexelTarget::FindStartCutting(int &x, int &y)
 			return true;
 		}
 
-		if(!IsInsideWorkingArea(hx, hy)) // Start of cut found
+		if(!IsInsideWorkingAreaAU(hx, hy)) // Start of cut found
 				{
 			x = sx;
 			y = sy;
@@ -1043,7 +1049,7 @@ Polygon25 DexelTarget::FindCut(int &x, int &y)
 
 	temp.InsertPoint((double) x * rx + rx2, (double) y * ry + ry2, 0.002);
 
-	if(!HasToBeCut(x, y)){
+	if(!HasToBeCutBDAU(x, y)){
 		wxLogMessage(_T("FindCut::Test started in a place not to be cut!"));
 		return temp;
 	}
@@ -1079,7 +1085,7 @@ Polygon25 DexelTarget::FindCut(int &x, int &y)
 			return temp;
 		}
 
-		if(!IsInsideWorkingArea(hx, hy)) // End of cut found
+		if(!IsInsideWorkingAreaAU(hx, hy)) // End of cut found
 				{
 			x = sx;
 			y = sy;
@@ -1162,11 +1168,7 @@ void DexelTarget::PolygonDropOntoTarget(Polygon3 &polygon, double level)
 	for(size_t i = 0; i < polygon.elements.GetCount(); i++){
 		const double d = this->GetLevel(polygon.elements[i].x,
 				polygon.elements[i].y);
-		if(d < level){
-			polygon.elements[i].z = level;
-		}else{
-			polygon.elements[i].z = d;
-		}
+		polygon.elements[i].z = fmax(level, d);
 	}
 }
 
@@ -1311,5 +1313,219 @@ void DexelTarget::FillBlock(double maxLevel, double minLevel)
 	}
 }
 
+void DexelTarget::FilterAD(void)
+{
+	for(size_t n = 0; n < N; n++)
+		field[n].belowDown = field[n].aboveDown;
+
+	for(size_t n = 0; n < N; n++){
+		if(IsOnOuterBorder(n)) continue;
+		const double r = field[n].belowDown;
+		size_t m = n - nx - 1;
+		if(field[m].aboveDown < r) field[m].aboveDown = r;
+		m++;
+		if(field[m].aboveDown < r) field[m].aboveDown = r;
+		m++;
+		if(field[m].aboveDown < r) field[m].aboveDown = r;
+		m += nx - 2;
+		if(field[m].aboveDown < r) field[m].aboveDown = r;
+		m += 2;
+		if(field[m].aboveDown < r) field[m].aboveDown = r;
+		m += nx - 2;
+		if(field[m].aboveDown < r) field[m].aboveDown = r;
+		m++;
+		if(field[m].aboveDown < r) field[m].aboveDown = r;
+		m++;
+		if(field[m].aboveDown < r) field[m].aboveDown = r;
+	}
+}
+
+void DexelTarget::CopyNormal(const DexelTarget& other)
+{
+	for(size_t i = 0; i < N; i++){
+		field[i].normalx = other.field[i].normalx;
+		field[i].normaly = other.field[i].normaly;
+	}
+}
+
+double DexelTarget::FindLevelAbove(double startLevel, double normalDeviation)
+{
+	const double dev2 = normalDeviation * normalDeviation;
+	double level = FLT_MAX;
+	for(size_t n = 0; n < N; n++){
+		const double d = field[n].normalx * field[n].normalx
+				+ field[n].normaly * field[n].normaly;
+		if(d < dev2 && field[n].up > startLevel){
+			level = fmin(level, field[n].up);
+		}
+	}
+	return level;
+}
+
+void DexelTarget::GenerateDistanceMap(double minLevel, double maxLevel)
+{
+	for(size_t i = 0; i < N; i++){
+		if(field[i].up > maxLevel || field[i].up < minLevel){ //|| field[i].up-field[i].down <-FLT_EPSILON){
+			field[i].aboveDown = -1.0;
+		}else{
+			field[i].aboveDown = 0.0;
+		}
+	}
+
+	const double r2 = sqrt(rx * rx + ry * ry);
+
+	bool flag = true;
+//	bool firstRound = true;
+	while(flag){
+		flag = false;
+
+		for(size_t i = 0; i < N; i++)
+			field[i].belowDown = field[i].aboveDown;
+
+		for(size_t i = 0; i < N; i++){
+			if(IsOnOuterBorder(i)) continue;
+
+			if(field[i].belowDown < -0.5){
+				double d = FLT_MAX;
+
+				if(field[i + 1].belowDown > -0.5
+						&& field[i + 1].belowDown + rx < d) d =
+						field[i + 1].belowDown + rx;
+				if(field[i - 1].belowDown > -0.5
+						&& field[i - 1].belowDown + rx < d) d =
+						field[i - 1].belowDown + rx;
+				if(field[i + nx].belowDown > -0.5
+						&& field[i + nx].belowDown + ry < d) d =
+						field[i + nx].belowDown + ry;
+				if(field[i - nx].belowDown > -0.5
+						&& field[i - nx].belowDown + ry < d) d =
+						field[i - nx].belowDown + ry;
+
+				//					if(field[i + nx + 1].belowDown > -0.5 && field[i
+				//							+ nx + 1].belowDown + r2 < d) d = field[i
+				//							+ nx + 1].belowDown + r2;
+				//					if(field[i + nx - 1].belowDown > -0.5 && field[i
+				//							+ nx - 1].belowDown + r2 < d) d = field[i
+				//							+ nx - 1].belowDown + r2;
+				//					if(field[i - nx + 1].belowDown > -0.5 && field[i
+				//							- nx + 1].belowDown + r2 < d) d = field[i
+				//							- nx + 1].belowDown + r2;
+				//					if(field[i - nx - 1].belowDown > -0.5 && field[i
+				//							- nx - 1].belowDown + r2 < d) d = field[i
+				//							- nx - 1].belowDown + r2;
+
+				if(d < 1000.0){
+					field[i].aboveDown = d;
+					flag = true;
+				}
+
+				// Mark outline in aboveUp
+//				if(firstRound){
+//					if(d < 1000.0){
+//						field[i].aboveUp = height;
+//					}
+//				}
+
+			}
+		}
+//		firstRound = false;
+
+	}
+
+}
+
+double DexelTarget::FindPeak(int& x, int& y)
+{
+	size_t p = 0;
+	if(x >= 0 && y >= 0) p = y * nx + x;
+	while(p < N){
+		x = p % nx;
+		y = p / nx;
+		if(x > 1 && y > 1 && x < nx - 2 && y < ny - 2){
+			const double r0 = field[p - nx - 1].aboveDown;
+			const double r1 = field[p - nx].aboveDown;
+			const double r2 = field[p - nx + 1].aboveDown;
+			const double r3 = field[p - nx + 2].aboveDown;
+			const double r4 = field[p - 1].aboveDown;
+			const double r5 = field[p].aboveDown;
+			const double r6 = field[p + 1].aboveDown;
+			const double r7 = field[p + 2].aboveDown;
+			const double r8 = field[p + nx - 1].aboveDown;
+			const double r9 = field[p + nx].aboveDown;
+			const double r10 = field[p + nx + 1].aboveDown;
+			const double r11 = field[p + nx + 2].aboveDown;
+			const double r12 = field[p + 2 * nx - 1].aboveDown;
+			const double r13 = field[p + 2 * nx].aboveDown;
+			const double r14 = field[p + 2 * nx + 1].aboveDown;
+			const double r15 = field[p + 2 * nx + 2].aboveDown;
+			if(r0 < r5 && r1 < r5 && r4 < r5 && r2 < r6 && r3 < r6 && r7 < r6
+					&& r8 < r9 && r12 < r9 && r13 < r9 && r11 < r10 && r14 < r10
+					&& r15 < r10){
+				return r5;
+			}
+		}
+		p++;
+	}
+	x = -1;
+	y = -1;
+	return -1.0;
+}
+
+double DexelTarget::FindCircle(double x, double y, double radius)
+{
+	const double r2 = sqrt(rx * rx + ry * ry);
+	const double da = atan(r2 / radius);
+
+	const double r = radius + r2;
+	const size_t C = (size_t) floor(M_PI / da);
+	size_t c = 0;
+	for(double a = 0; a < M_PI; a += da){
+		const double tx = x + r * cos(a);
+		const double ty = y + r * sin(a);
+		const ImprinterElement e = GetElement(tx, ty);
+		if(e.aboveDown < FLT_EPSILON) c++;
+	}
+	return (double) c / (double) C;
+}
+
+ArrayOfPolygon25 DexelTarget::GeneratePolygonAtDistance(double level)
+{
+	ArrayOfPolygon25 ap;
+
+	return ap;
+}
+
+void DexelTarget::CopyToUp(int f, double factor)
+{
+	for(size_t i = 0; i < N; i++)
+		field[i].down = -2;
+
+	switch(f){
+	case 0:
+		for(size_t i = 0; i < N; i++)
+			field[i].up = field[i].belowDown * factor;
+		break;
+	case 1:
+		for(size_t i = 0; i < N; i++)
+			field[i].up = field[i].belowUp * factor;
+		break;
+	case 2:
+		for(size_t i = 0; i < N; i++)
+			field[i].up = field[i].down * factor;
+		break;
+	case 3:
+		for(size_t i = 0; i < N; i++)
+			field[i].up = field[i].up * factor;
+		break;
+	case 4:
+		for(size_t i = 0; i < N; i++)
+			field[i].up = field[i].aboveDown * factor;
+		break;
+	case 5:
+		for(size_t i = 0; i < N; i++)
+			field[i].up = field[i].aboveUp * factor;
+		break;
+	}
+}
 //Moves inside the matrial clockwise
 //Moves inside the material to be cut counter-clockwise

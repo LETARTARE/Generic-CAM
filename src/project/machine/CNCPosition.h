@@ -29,16 +29,16 @@
 /*!\class CNCPosition
  * \ingroup Machine
  * \ingroup CoordinateSystems
- * \brief State of the CNC Machine
+ * \brief 9-dimensional CNC coordinate system
  *
- * The state of the CNC machine contains a set of all parameters, registers and
- * switches, that define the machine state at a certain point in time.
- * The machine state reads G-Code to change.
+ * The state of the CNC machine are stored in the Machine itself. This class manages only
+ * a coordinate system for a CNC machine.
  *
  * The animation of the transition between two states is done by the MachineSimulator.
  *
- * This contains a statemachine with all parameters of the machine. A sequence of
- * these states can be generated into G-code and vice versa.
+ * The transformations in this class especially the functions GetMatrix(), GetNormal() and
+ * GetPosition() are the central points describing the transformations of tool and
+ * workpiece.
  */
 
 // C++ Operator Overloading Guidelines
@@ -70,8 +70,8 @@ public:
 	double V; //!< axis parallel rotated Y coordinate
 	double W; //!< axis parallel rotated Z coordinate
 
-	double dt; //!< Time taken to move to this position (optional, used by some functions)
-	double t; //!< Absolute time this position is reached (optional, used by some functions)
+	double dt; //!< Time taken to move to this position (optional, not directly manipulated by the functions of this class)
+	double t; //!< Absolute time this position is reached (optional, not directly manipulated by the functions of this class)
 
 	/*! \brief Overloaded operator to a positions to another
 	 *
@@ -99,13 +99,12 @@ public:
 	CNCPosition & operator/=(const double &b); //!< Divide all components of the position by a factor
 	const CNCPosition operator/(const double &b) const; //!< Divide all components of the position by a factor
 
-//	void Zero(void);
 	double AbsXYZ() const; //!< Return the length of the XYZ components
 	double AbsABC() const; //!< Return the length of the ABC components
 	double AbsUVW() const; //!< Return the length of the UVW components
 	double AbsXYZUVW() const; //!< Return the length of the XYZUVW components
 
-	Vector3 GetPosition(void) const; //!< Return the XYZ komponent of this position
+	Vector3 GetPosition(void) const; //!< Return the XYZ component of this position
 	Vector3 GetNormal(void) const; //!< Return the normal vector for this position
 	AffineTransformMatrix GetMatrix(void) const; //!< Return a transformation matrix for this position
 

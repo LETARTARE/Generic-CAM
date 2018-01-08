@@ -35,7 +35,7 @@
  *
  * The linking of all parts of the project is describes in the \ref document document.
  *
- * \todo Rewrite to XML load/store for future backward compatibility.
+ * \todo Rewrite to XML load/store for future backwards compatibility.
  */
 
 #include "../Config.h"
