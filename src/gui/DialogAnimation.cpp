@@ -117,7 +117,7 @@ bool DialogAnimation::TransferDataToWindow(void)
 
 	if(simulator != NULL){
 		m_textCtrlMaxTime->SetValue(SecondsToTC(simulator->GetMaxTime()));
-		m_textCtrlTime->SetValue(SecondsToTC(simulator->GetCurrentTime()));
+		m_textCtrlTime->SetValue(SecondsToTC(simulator->GetTime()));
 
 		m_textCtrl0->SetValue(simulator->GetCurrentGCode(-2));
 		m_textCtrl1->SetValue(simulator->GetCurrentGCode(-1));
@@ -255,7 +255,7 @@ void DialogAnimation::PositionSlider(void)
 	if(simulator != NULL){
 		m_sliderTime->SetValue(
 				((double) (m_sliderTime->GetMax() - m_sliderTime->GetMin())
-						/ simulator->GetMaxTime() * simulator->GetCurrentTime())
+						/ simulator->GetMaxTime() * simulator->GetTime())
 						+ m_sliderTime->GetMin());
 		m_sliderTime->Enable(true);
 	}else{
@@ -270,7 +270,7 @@ void DialogAnimation::OnTimer(wxTimerEvent& event)
 	if(!this->IsShown()) timer.Stop();
 	if(loopGuard) return;
 	if(simulator == NULL) return;
-	double target = simulator->GetCurrentTime() + 0.5;
+	double target = simulator->GetTime() + 0.5;
 	if(target >= simulator->GetMaxTime()){
 		timer.Stop();
 		target = simulator->GetMaxTime();

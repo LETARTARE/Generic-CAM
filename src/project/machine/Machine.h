@@ -178,7 +178,6 @@ public:
 private:
 	void Interpolate(CNCPosition *a, CNCPosition *b, bool generateMicroSteps);
 
-	void Copy(double* res, double* A);
 	double GetE(void) const;
 
 	bool initialized;

@@ -30,6 +30,10 @@
 								</option>
 								<option id="gnu.cpp.compiler.option.other.other.1889254600" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="`wx-config --cxxflags` -c -fmessage-length=0 -Wno-write-strings" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.dialect.std.302782331" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1283718695" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="__WXGTK__"/>
+									<listOptionValue builtIn="false" value="WXUSINGDLL"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.575471476" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1283442708" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
@@ -58,7 +62,6 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.1074777317.1625270251" name="temp.h" rcbsApplicability="disable" resourcePath="src/project/generator/temp.h" toolsToInvoke=""/>
 					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1074777317.1817404178" name="/" resourcePath="src/theAttic">
 						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.exe.debug.1637956653" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.exe.debug" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.exe.debug"/>

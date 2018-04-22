@@ -30,6 +30,7 @@
 #include <wx/log.h>
 #include <GL/gl.h>
 #include <float.h>
+#include <stdint.h>
 
 ToolPath::ToolPath()
 {

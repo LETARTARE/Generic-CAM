@@ -71,6 +71,11 @@ public:
 			const wxString& name = _T("OpenGLCanvas"));
 	virtual ~OpenGLCanvas();
 
+	class Context:public wxGLContext {
+	public:
+		Context(wxGLCanvas *canvas);
+	};
+
 	// Member Variables
 public:
 	Stereo3DType stereoMode;
@@ -87,48 +92,46 @@ public:
 	RotationType rotationMode;
 	AffineTransformMatrix rotmat;
 	AffineTransformMatrix transmat;
+	float scale;
 
 protected:
-	float scale;
+	int x; //!< Startpoint for mouse dragging
+	int y; //!< Startpoint for mouse dragging
+	int w; //!< Width of viewport
+	int h; //!< Height of viewport
 	float turntableX;
 	float turntableY;
 	float unitAtOrigin;
+	GLuint m_gllist;
 
 private:
-	bool isInitialized;
-	GLuint m_gllist;
+	Context *context;
 
 #ifdef _USE_6DOFCONTROLLER
 	Control3D* control; //!< Link to 6DOF-controller
 	wxTimer timer; //!< Timer for polling the controller
 #endif
 
-	int x; //!< Startpoint for mouse dragging
-	int y; //!< Startpoint for mouse dragging
-	int w; //!< Width of viewport
-	int h; //!< Height of viewport
-
 	// Methods
 public:
 #ifdef _USE_6DOFCONTROLLER
 	void SetController(Control3D& control);
 #endif
-
-	virtual void Render();
-	virtual void InitGL();
-	virtual void SetupLighting();
-
 #ifdef _USE_3DPICKING
 	bool OnPick(OpenGLPick &result, int x, int y);
 	bool OnPick(OpenGLPick &result, wxPoint pos);
 #endif
+
 protected:
+	virtual void Render(void);
+	virtual void RenderPick(void);
 
 	void OnPaint(wxPaintEvent& WXUNUSED(event));
-	void OnSize(wxSizeEvent& event);
-	void OnEraseBackground(wxEraseEvent& WXUNUSED(event));
 	void OnEnterWindow(wxMouseEvent& WXUNUSED(event));
-	void OnMouseEvent(wxMouseEvent& event);
+
+	virtual void OnMouseEvent(wxMouseEvent& event);
+
+private:
 #ifdef _USE_6DOFCONTROLLER
 	void OnTimer(wxTimerEvent& event);
 #endif

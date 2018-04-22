@@ -66,8 +66,8 @@ public:
 	 * \return wxString with the G-code block
 	 */
 	wxString GetCurrentGCode(int pos = 0) const;
+	double GetTime(void) const;
 	double GetMaxTime(void) const;
-	double GetCurrentTime(void) const;
 
 	/*! \brief Return to the first G-code block
 	 *

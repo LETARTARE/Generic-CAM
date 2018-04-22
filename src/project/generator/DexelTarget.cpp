@@ -33,6 +33,7 @@
 #include <GL/gl.h>
 #include <math.h>
 #include <float.h>
+#include <stdint.h>
 
 DexelTarget::DexelTarget()
 {

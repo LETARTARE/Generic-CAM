@@ -43,8 +43,8 @@ set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -Wno-write-strings")
 add_subdirectory(src)
 
 if(MINGW)
-	add_executable(genericcam.exe src/genericcam.cpp)
-	target_link_libraries(genericcam.exe
+	add_executable(genericcam src/genericcam.cpp)
+	target_link_libraries(genericcam
 		gui
 		controller
 		project
@@ -53,7 +53,7 @@ if(MINGW)
 		opengl32
 		glu32
 		lua53
-		portmidi
+#		portmidi
 	)
 else(MINGW)
 	add_executable(genericcam src/genericcam.cpp)

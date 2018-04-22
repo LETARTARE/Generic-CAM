@@ -1,2 +1,2 @@
-aux_source_directory(. files)
+file(GLOB files "./*.cpp")
 add_library(3D ${files})

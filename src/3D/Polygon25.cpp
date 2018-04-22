@@ -30,6 +30,8 @@
 #include <wx/arrimpl.cpp>
 #include <GL/gl.h>
 #include <float.h>
+#include <stdint.h>
+
 
 WX_DEFINE_OBJARRAY(ArrayOfPolygon25)
 

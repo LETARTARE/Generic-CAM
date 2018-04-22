@@ -26,6 +26,8 @@
 
 #include "Machine.h"
 
+#include "NelderMeadOptimizer.h"
+
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
@@ -153,13 +155,13 @@ void Machine::ToXml(wxXmlNode* parentNode)
 	temp = parentNode->GetChildren();
 	while(temp != NULL && nodeObject == NULL){
 		if(temp->GetName() == _T("machine")
-				&& temp->GetPropVal(_T("name"), _T(""))
+				&& temp->GetAttribute(_T("name"), _T(""))
 						== fileName.GetFullName()) nodeObject = temp;
 		temp = temp->GetNext();
 	}
 	if(nodeObject == NULL){
 		nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("machine"));
-		nodeObject->AddProperty(_T("name"), fileName.GetFullName());
+		nodeObject->AddAttribute(_T("name"), fileName.GetFullName());
 		parentNode->InsertChild(nodeObject, NULL);
 	}
 
@@ -192,7 +194,7 @@ void Machine::ToXml(wxXmlNode* parentNode)
 
 bool Machine::FromXml(wxXmlNode* node)
 {
-	//	objectName = node->GetPropVal(_T("name"), _T(""));
+	//	objectName = node->GetAttribute(_T("name"), _T(""));
 	if(node->GetName() != _T("machine")) return false;
 
 	wxXmlNode *temp = node->GetChildren();
@@ -216,7 +218,6 @@ void Machine::EvaluateDescription(void)
 
 		// Initialize IK
 		calculateIK = false;
-		double A0[NR_IKAXIS];
 		AffineTransformMatrix P0;
 		const double magicnumber = M_PI_4 / M_E;
 		for(size_t n = 0; n < NR_IKAXIS; n++)
@@ -246,12 +247,6 @@ void Machine::EvaluateDescription(void)
 	}
 
 	textOut = evaluator.GetOutput();
-}
-
-void Machine::Copy(double* res, double* A)
-{
-	for(size_t n = 0; n < NR_IKAXIS; n++)
-		res[n] = A[n];
 }
 
 double Machine::GetE(void) const
@@ -286,119 +281,23 @@ void Machine::Assemble()
 		return;
 	}
 
-	// Nelder-Mead Solver
-	// https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method
-
-	const double alpha = 1;
-	const double gamma = 2;
-	const double rho = 0.5;
-	const double sigma = 0.5;
-
-	const double Elimit = 0.01;
-	const double eps = 0.5;
-
-	size_t N = 0;
-	double E[NR_IKAXIS + 1];
-	double C[(NR_IKAXIS + 1) * NR_IKAXIS];
-	for(size_t n = 0; n < (NR_IKAXIS + 1); n++){
-		Copy(C + n * NR_IKAXIS, IKaxis);
-		if(n < NR_IKAXIS){
-			C[n * (1 + NR_IKAXIS)] += eps;
-			if(IKaxisused[n]) N++;
-		}
+	NelderMeadOptimizer optim;
+	for(size_t n = 0; n < NR_IKAXIS; n++){
+		if(IKaxisused[n]) optim.param.push_back(IKaxis[n]);
 	}
-	for(size_t n = 0; n < (NR_IKAXIS + 1); n++){
-		if(IKaxisused[n]){
-			Copy(IKaxis, C + n * NR_IKAXIS);
-			evaluator.EvaluateAssembly();
-			E[n] = GetE();
-		}else{
-			E[n] = FLT_MAX;
+	optim.reevalBest = true;
+	optim.errorLimit = 0.01;
+	optim.evalLimit = 500;
+
+	optim.Start();
+	while(optim.IsRunning()){
+		size_t m = 0;
+		for(size_t n = 0; n < NR_IKAXIS; n++){
+			if(IKaxisused[n]) IKaxis[n] = optim.param[m++];
 		}
-	}
-	for(size_t m = 0; m < 100; m++){
-
-		// 1.) Sort
-		bool flag = true;
-		while(flag){
-			flag = false;
-			for(size_t n = 0; n < NR_IKAXIS; n++){
-				if(E[n] > E[n + 1]){
-					std::swap_ranges(C + n * NR_IKAXIS, C + (n + 1) * NR_IKAXIS,
-							C + (n + 1) * NR_IKAXIS);
-					std::swap(E[n], E[n + 1]);
-					flag = true;
-				}
-			}
-		}
-
-		if(E[0] < Elimit) break;
-
-		// 2.) Calculate centroid
-		double cent[NR_IKAXIS];
-		for(size_t n = 0; n < NR_IKAXIS; n++)
-			cent[n] = 0;
-		for(size_t n = 0; n < (NR_IKAXIS * N); n++)
-			cent[n % NR_IKAXIS] += C[n];
-		for(size_t n = 0; n < NR_IKAXIS; n++)
-			cent[n] /= (double) N;
-
-		// 3.) Reflection
-		double refl[NR_IKAXIS];
-		for(size_t n = 0; n < NR_IKAXIS; n++)
-			refl[n] = cent[n] + alpha * (cent[n] - C[n + NR_IKAXIS * N]);
-		Copy(IKaxis, refl);
 		evaluator.EvaluateAssembly();
-		double Erefl = GetE();
-		if(E[0] <= Erefl && Erefl < E[N - 1]){
-			Copy(C + NR_IKAXIS * N, refl);
-			E[N] = Erefl;
-			continue;
-		}
-
-		// 4.) Expansion
-		if(Erefl < E[0]){
-			double expa[NR_IKAXIS];
-			for(size_t n = 0; n < NR_IKAXIS; n++)
-				expa[n] = cent[n] + gamma * (refl[n] - cent[n]);
-			Copy(IKaxis, expa);
-			evaluator.EvaluateAssembly();
-			double Eexpa = GetE();
-			if(Eexpa < Erefl){
-				Copy(C + NR_IKAXIS * N, expa);
-				E[N] = Eexpa;
-				continue;
-			}else{
-				Copy(C + NR_IKAXIS * N, refl);
-				E[N] = Erefl;
-				continue;
-			}
-		}
-
-		// 5.) Contraction
-		double cont[NR_IKAXIS];
-		for(size_t n = 0; n < NR_IKAXIS; n++)
-			cont[n] = cent[n] + rho * (C[n + NR_IKAXIS * N] - cent[n]);
-		Copy(IKaxis, cont);
-		evaluator.EvaluateAssembly();
-		double Econt = GetE();
-		if(Econt < E[N]){
-			Copy(C + NR_IKAXIS * N, cont);
-			E[N] = Econt;
-			continue;
-		}
-
-		// 6.) Shrink
-		for(size_t n = NR_IKAXIS; n < (NR_IKAXIS * (N + 1)); n++)
-			C[n] = C[n % NR_IKAXIS] + sigma * (C[n] - C[n % NR_IKAXIS]);
-		for(size_t n = 1; n < (NR_IKAXIS + 1); n++){
-			Copy(IKaxis, C + n * NR_IKAXIS);
-			evaluator.EvaluateAssembly();
-			E[n] = GetE();
-		}
+		optim.SetError(GetE());
 	}
-	Copy(IKaxis, C);
-	evaluator.EvaluateAssembly();
 }
 
 bool Machine::IsInitialized(void) const

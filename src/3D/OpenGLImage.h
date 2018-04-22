@@ -40,6 +40,7 @@
  */
 
 #include <wx/image.h>
+#include <wx/string.h>
 #include <GL/gl.h>
 #include <stdint.h>
 
@@ -52,11 +53,11 @@ public:
 	OpenGLImage& operator =(const OpenGLImage& other);
 	OpenGLImage& operator =(const wxImage& other);
 
-	bool LoadFile(const wxString& name, long type = wxBITMAP_TYPE_ANY,
+	bool LoadFile(const wxString& name, wxBitmapType type = wxBITMAP_TYPE_ANY,
 			int index = -1);
 	bool LoadFile(const wxString& name, const wxString& mimetype,
 			int index = -1);
-	bool LoadFile(wxInputStream& stream, long type, int index = -1);
+	bool LoadFile(wxInputStream& stream, wxBitmapType type, int index = -1);
 	bool LoadFile(wxInputStream& stream, const wxString& mimetype, int index =
 			-1);
 

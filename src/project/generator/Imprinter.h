@@ -47,10 +47,6 @@
  *
  * The really fancy functions are found in DexelTarget.
  *
- *
- *
- *
- *
  */
 
 #include "../../3D/Geometry.h"
@@ -58,8 +54,6 @@
 #include "../../3D/Vector3.h"
 
 #include <GL/gl.h>
-
-//TODO: Change in concept (together with Dexeltarget) there should be only be an up, down and normal vectors for up and down.
 
 class ImprinterElement {
 	// Constructor / Destructor

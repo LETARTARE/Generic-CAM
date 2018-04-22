@@ -43,12 +43,11 @@ static int wx_gl_attribs[] =
 
 OpenGLCanvas::OpenGLCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 		const wxSize& size, long style, const wxString& name) :
-		wxGLCanvas(parent, (wxGLCanvas*) NULL, id, pos, size,
-				style | wxFULL_REPAINT_ON_RESIZE, name, wx_gl_attribs)
+		wxGLCanvas(parent, id, wx_gl_attribs, pos, size,
+				style | wxFULL_REPAINT_ON_RESIZE, name)
 {
-	// int args[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
 
-	isInitialized = false;
+	context = NULL;
 	m_gllist = 0;
 	w = h = 500;
 	x = y = 250;
@@ -70,12 +69,8 @@ OpenGLCanvas::OpenGLCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 
 	rotationMode = rotateInterwoven;
 
-	this->Connect(wxEVT_SIZE, wxSizeEventHandler(OpenGLCanvas::OnSize), NULL,
-			this);
 	this->Connect(wxEVT_PAINT, wxPaintEventHandler(OpenGLCanvas::OnPaint), NULL,
 			this);
-	this->Connect(wxEVT_ERASE_BACKGROUND,
-			wxEraseEventHandler(OpenGLCanvas::OnEraseBackground), NULL, this);
 	this->Connect(wxEVT_ENTER_WINDOW,
 			wxMouseEventHandler(OpenGLCanvas::OnEnterWindow), NULL, this);
 	this->Connect(wxEVT_MOTION, wxMouseEventHandler(OpenGLCanvas::OnMouseEvent),
@@ -102,7 +97,7 @@ OpenGLCanvas::~OpenGLCanvas()
 {
 #ifdef _USE_6DOFCONTROLLER
 	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(OpenGLCanvas::OnTimer),
-			NULL, this);
+	NULL, this);
 #endif
 	this->Disconnect(wxEVT_RIGHT_DCLICK,
 			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
@@ -116,12 +111,10 @@ OpenGLCanvas::~OpenGLCanvas()
 			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
 	this->Disconnect(wxEVT_ENTER_WINDOW,
 			wxMouseEventHandler(OpenGLCanvas::OnEnterWindow), NULL, this);
-	this->Disconnect(wxEVT_ERASE_BACKGROUND,
-			wxEraseEventHandler(OpenGLCanvas::OnEraseBackground), NULL, this);
 	this->Disconnect(wxEVT_PAINT, wxPaintEventHandler(OpenGLCanvas::OnPaint),
 	NULL, this);
-	this->Disconnect(wxEVT_SIZE, wxSizeEventHandler(OpenGLCanvas::OnSize), NULL,
-			this);
+
+	if(context != NULL) delete context;
 }
 
 #ifdef _USE_6DOFCONTROLLER
@@ -131,60 +124,10 @@ void OpenGLCanvas::SetController(Control3D& control)
 }
 #endif
 
-void OpenGLCanvas::OnEnterWindow(wxMouseEvent& WXUNUSED(event))
+OpenGLCanvas::Context::Context(wxGLCanvas* canvas)
+		: wxGLContext(canvas)
 {
-	SetFocus();
-}
-
-void OpenGLCanvas::OnSize(wxSizeEvent& event)
-{
-	// This is also necessary to update the context on some platforms
-	wxGLCanvas::OnSize(event);
-	this->Refresh();
-}
-
-void OpenGLCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
-{
-	// Do nothing, to avoid flashing. OpenGL Repaint the entire drawing area on every frame.
-	// There are not leftovers that need to be removed first.
-}
-
-void OpenGLCanvas::SetupLighting()
-{
-	GLfloat ambient0[] =
-		{0.5f, 0.5f, 0.5f};
-	GLfloat diffuse0[] =
-		{0.6f, 0.6f, 0.6f};
-	GLfloat specular0[] =
-		{0.9f, 0.9f, 0.9f};
-	GLfloat position0[] =
-		{-20, 20, 50, 0};
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient0);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse0);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specular0);
-	glLightfv(GL_LIGHT0, GL_POSITION, position0);
-	glEnable(GL_LIGHT0);
-
-	glEnable(GL_LIGHTING);
-}
-
-void OpenGLCanvas::InitGL()
-{
-	/* set viewing projection */
-	//	glMatrixMode(GL_PROJECTION);
-	//	glFrustum( -0.5f, 0.5f, -0.5f, 0.5f, 1.0f, 3.0f);
-	// Is done in OnSize(...)
-	//	GLfloat attenuation[] =
-	//		{1.0f, -0.01f, -.000001f};
-	//glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, attenuation, 0);
-	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-	glEnable(GL_COLOR_MATERIAL);
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//	glBlendFunc(GL_ONE, GL_ZERO); // disable alpha blending
-
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClearDepth(1.0f);
+	SetCurrent(*canvas);
 
 	glEnable(GL_BLEND);
 	glEnable(GL_POINT_SMOOTH);
@@ -198,84 +141,159 @@ void OpenGLCanvas::InitGL()
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
 
-	SetupLighting();
+	/* set viewing projection */
+	//	glMatrixMode(GL_PROJECTION);
+	//	glFrustum( -0.5f, 0.5f, -0.5f, 0.5f, 1.0f, 3.0f);
+	// Is done in OnSize(...)
+	//	GLfloat attenuation[] =
+	//		{1.0f, -0.01f, -.000001f};
+	//glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, attenuation, 0);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	glEnable(GL_COLOR_MATERIAL);
 
-//  Refreshing is done anyway or else OnPaint would not have been called.
-//	this->Refresh();
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_ONE, GL_ZERO); // disable alpha blending
+
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearDepth(1.0f);
+
+	GLfloat ambient0[] = {0.5f, 0.5f, 0.5f};
+	GLfloat diffuse0[] = {0.6f, 0.6f, 0.6f};
+	GLfloat specular0[] = {0.9f, 0.9f, 0.9f};
+	GLfloat position0[] = {-20, 20, 50, 0};
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient0);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse0);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specular0);
+	glLightfv(GL_LIGHT0, GL_POSITION, position0);
+	glEnable(GL_LIGHT0);
+
+	glEnable(GL_LIGHTING);
+
+	printf("GL_VERSION: ");
+	printf((char*) glGetString(GL_VERSION));
+	printf("\n");
 }
 
-#ifdef _USE_3DPICKING
-
-bool OpenGLCanvas::OnPick(OpenGLPick &result, int x, int y)
+void OpenGLCanvas::OnEnterWindow(wxMouseEvent& WXUNUSED(event))
 {
-	return this->OnPick(result, wxPoint(x, y));
+	SetFocus();
 }
 
-bool OpenGLCanvas::OnPick(OpenGLPick &result, wxPoint pos)
+#ifdef _USE_6DOFCONTROLLER
+void OpenGLCanvas::OnTimer(wxTimerEvent& event)
 {
-	if(!IsShown()) return false;
-#ifndef __WXMOTIF__
-	if(!GetContext()) return false;
-#endif
-	wxGLCanvas::SetCurrent(); // Link OpenGL to this area
-	wxPaintDC(this); // Set the clipping for this area
-	if(!isInitialized){
-		InitGL(); // Init OpenGL once, but after SetCurrent
-		isInitialized = true;
+	if(control == NULL) return;
+
+	control->Pump();
+	if(control->IsIdle()) return;
+
+	float resRot = 2000;
+	float resMov = 5 * unitAtOrigin;
+
+	rotmat = AffineTransformMatrix::RotateInterwoven(
+			(float) control->GetAxis(3) / resRot,
+			(float) control->GetAxis(4) / resRot,
+			(float) control->GetAxis(5) / resRot) * rotmat;
+	rotmat.TranslateGlobal((float) control->GetAxis(0) / resMov,
+			(float) control->GetAxis(1) / resMov,
+			(float) control->GetAxis(2) / resMov);
+
+	//rotmat.RotateXY(1,0,1);
+	if(control->GetButton(0)){
+		rotmat.SetIdentity();
+		transmat.SetIdentity();
 	}
-	int w, h;
-	GetClientSize(&w, &h);
-	glViewport(0, 0, (GLint) w, (GLint) h);
-
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	glSelectBuffer(result.GetBufferSize(), result.GetBuffer());
-	glRenderMode(GL_SELECT);
-	glInitNames();
-	glPushName(0); // This value ends up as the label for the background.
-
-	glMatrixMode(GL_PROJECTION);
-	glCullFace(GL_BACK);
-	glLoadIdentity();
-
-	GLint viewport[4];
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	gluPickMatrix(pos.x, viewport[3] - pos.y, 1, 1, viewport);
-
-	GLdouble ar = (GLdouble) w / (GLdouble) h; // Calculate perspective
-	gluPerspective(45, ar, 0.01, 10);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glTranslatef(0.0, 0.0, -focalDistance);
-	glScalef(scale, scale, scale);
-	glMultMatrixd(rotmat.a);
-	glMultMatrixd(transmat.a);
-
-	Render();
-	glFlush();
-	GLuint hits = glRenderMode(GL_RENDER);
-	result.SetHits(hits);
-	return (hits > 0);
+	this->Refresh();
 }
 #endif
+
+void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
+{
+	if(event.ButtonDown(wxMOUSE_BTN_RIGHT)
+			|| event.ButtonDown(wxMOUSE_BTN_MIDDLE)){
+		x = event.m_x;
+		y = event.m_y;
+	}
+	if(event.ButtonDClick(wxMOUSE_BTN_RIGHT)){
+		rotmat = AffineTransformMatrix::Identity();
+		transmat = AffineTransformMatrix::Identity();
+		turntableX = 0;
+		turntableY = M_PI / 2;
+		x = event.m_x;
+		y = event.m_y;
+		this->Refresh();
+	}
+
+	if(event.Dragging() && event.RightIsDown()){
+		switch(rotationMode){
+		case rotateTrackball:
+			{
+				const double r = (double) ((w < h)? w : h) / 2.2;
+				rotmat = AffineTransformMatrix::RotateTrackball(
+						(double) (x - w / 2), (double) (h / 2 - y),
+						(double) (event.m_x - w / 2),
+						(double) (h / 2 - event.m_y), r) * rotmat;
+				break;
+			}
+		case rotateInterwoven:
+			{
+				rotmat = AffineTransformMatrix::RotateXY(event.m_x - x,
+						event.m_y - y, 0.5) * rotmat;
+				break;
+			}
+		case rotateTurntable:
+			{
+				rotmat = AffineTransformMatrix::RotateAroundVector(
+						Vector3(1, 0, 0), -M_PI / 2);
+				turntableX += (double) (event.m_x - x) / 100;
+				turntableY += (double) (event.m_y - y) / 100;
+				rotmat = AffineTransformMatrix::RotateAroundVector(
+						Vector3(1, 0, 0), turntableY) * rotmat;
+				rotmat = rotmat
+						* AffineTransformMatrix::RotateAroundVector(
+								Vector3(0, 0, 1), turntableX);
+				break;
+			}
+		}
+		x = event.m_x;
+		y = event.m_y;
+
+		this->Refresh();
+	}
+
+	if(event.Dragging() && event.MiddleIsDown()){
+		float movement = 1.0;
+		if(unitAtOrigin > 1.0) movement = unitAtOrigin;
+		float dx = (float) (event.m_x - x) / movement;
+		float dy = (float) (event.m_y - y) / movement;
+		rotmat.TranslateGlobal(dx, -dy, 0);
+		x = event.m_x;
+		y = event.m_y;
+
+		this->Refresh();
+	}
+
+	int x = event.GetWheelRotation();
+	if(x != 0){
+		scale = exp(log(scale) - ((float) x) / 1000.0);
+//		rotmat.TranslateGlobal(0, 0, (float) -x / 1000.0);
+		this->Refresh();
+	}
+
+	if(event.Moving() || event.Dragging()) event.Skip();
+}
 
 void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
 	if(!IsShown()) return;
-#ifndef __WXMOTIF__
-	if(!GetContext()) return;
-#endif
-
-	//TODO: Rewrite the Context handling for wxWidgets >= 3.0
-	wxGLCanvas::SetCurrent(); // Link OpenGL to this area
 	wxPaintDC(this); // Set the clipping for this area
 
-	// Init OpenGL once for each Canvas. Has to be done after SetCurrent.
-	if(!isInitialized){
-		InitGL();
-		isInitialized = true;
-	}
+//#ifndef __WXMOTIF__
+//	if(!GetContext()) return;
+//#endif
+
+	if(context == NULL) context = new Context(this);
+	context->SetCurrent(*this); // Link OpenGL to this area
 
 	// set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
 
@@ -380,7 +398,7 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	if(stereoMode != stereoOff){
 		glCullFace(GL_BACK);
 		glLoadIdentity();
-        }
+	}
 
 	if(stereoMode == stereoAnaglyph){
 		glColorMask((rightEyeR == 0)? GL_FALSE : GL_TRUE,
@@ -412,6 +430,68 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	glFlush();
 	SwapBuffers();
 
+}
+#ifdef _USE_3DPICKING
+bool OpenGLCanvas::OnPick(OpenGLPick &result, int x, int y)
+{
+	return this->OnPick(result, wxPoint(x, y));
+}
+
+bool OpenGLCanvas::OnPick(OpenGLPick &result, wxPoint pos)
+{
+	if(!IsShown()) return false;
+	wxPaintDC(this); // Set the clipping for this area
+
+//#ifndef __WXMOTIF__
+//	if(!GetContext()) return false;
+//#endif
+
+	if(context == NULL) context = new Context(this);
+	context->SetCurrent(*this); // Link OpenGL to this area
+//	if(!isInitialized){
+//		InitGL(); // Init OpenGL once, but after SetCurrent
+//		isInitialized = true;
+//	}
+	int w, h;
+	GetClientSize(&w, &h);
+	glViewport(0, 0, (GLint) w, (GLint) h);
+
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	glSelectBuffer(result.GetBufferSize(), result.GetBuffer());
+	glRenderMode(GL_SELECT);
+	glInitNames();
+	glPushName(0); // This value ends up as the label for the background.
+
+	glMatrixMode(GL_PROJECTION);
+	glCullFace(GL_BACK);
+	glLoadIdentity();
+
+	GLint viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	gluPickMatrix(pos.x, viewport[3] - pos.y, 1, 1, viewport);
+
+	GLdouble ar = (GLdouble) w / (GLdouble) h; // Calculate perspective
+	gluPerspective(45, ar, 0.01, 10);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glTranslatef(0.0, 0.0, -focalDistance);
+	glScalef(scale, scale, scale);
+	glMultMatrixd(rotmat.a);
+	glMultMatrixd(transmat.a);
+
+	RenderPick();
+	glFlush();
+	GLuint hits = glRenderMode(GL_RENDER);
+	result.SetHits(hits);
+	return (hits > 0);
+}
+#endif
+
+void OpenGLCanvas::RenderPick(void)
+{
+	this->Render();
 }
 
 void OpenGLCanvas::Render()
@@ -487,106 +567,3 @@ void OpenGLCanvas::Render()
 	glPopMatrix();
 }
 
-void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
-{
-	if(event.ButtonDown(wxMOUSE_BTN_RIGHT)
-			|| event.ButtonDown(wxMOUSE_BTN_MIDDLE)){
-		x = event.m_x;
-		y = event.m_y;
-	}
-	if(event.ButtonDClick(wxMOUSE_BTN_RIGHT)){
-		rotmat = AffineTransformMatrix::Identity();
-		transmat = AffineTransformMatrix::Identity();
-		turntableX = 0;
-		turntableY = M_PI / 2;
-		x = event.m_x;
-		y = event.m_y;
-		this->Refresh();
-	}
-
-	if(event.Dragging() && event.RightIsDown()){
-		switch(rotationMode){
-		case rotateTrackball:
-		{
-			const double r = (double) ((w < h)? w : h) / 2.2;
-			rotmat = AffineTransformMatrix::RotateTrackball(
-					(double) (x - w / 2), (double) (h / 2 - y),
-					(double) (event.m_x - w / 2), (double) (h / 2 - event.m_y),
-					r) * rotmat;
-			break;
-		}
-		case rotateInterwoven:
-		{
-			rotmat = AffineTransformMatrix::RotateXY(event.m_x - x,
-					event.m_y - y, 0.5) * rotmat;
-			break;
-		}
-		case rotateTurntable:
-		{
-			rotmat = AffineTransformMatrix::RotateAroundVector(Vector3(1, 0, 0),
-					-M_PI / 2);
-			turntableX += (double) (event.m_x - x) / 100;
-			turntableY += (double) (event.m_y - y) / 100;
-			rotmat = AffineTransformMatrix::RotateAroundVector(Vector3(1, 0, 0),
-					turntableY) * rotmat;
-			rotmat = rotmat
-					* AffineTransformMatrix::RotateAroundVector(
-							Vector3(0, 0, 1), turntableX);
-			break;
-		}
-		}
-		x = event.m_x;
-		y = event.m_y;
-
-		this->Refresh();
-	}
-
-	if(event.Dragging() && event.MiddleIsDown()){
-		float movement = 1.0;
-		if(unitAtOrigin > 1.0) movement = unitAtOrigin;
-		float dx = (float) (event.m_x - x) / movement;
-		float dy = (float) (event.m_y - y) / movement;
-		rotmat.TranslateGlobal(dx, -dy, 0);
-		x = event.m_x;
-		y = event.m_y;
-
-		this->Refresh();
-	}
-
-	int x = event.GetWheelRotation();
-	if(x != 0){
-		scale = exp(log(scale) - ((float) x) / 1000.0);
-//		rotmat.TranslateGlobal(0, 0, (float) -x / 1000.0);
-		this->Refresh();
-	}
-
-	if(event.Moving() || event.Dragging()) event.Skip();
-}
-
-#ifdef _USE_6DOFCONTROLLER
-void OpenGLCanvas::OnTimer(wxTimerEvent& event)
-{
-	if(control == NULL) return;
-
-	control->Pump();
-	if(control->IsIdle()) return;
-
-	float resRot = 2000;
-	float resMov = 5 * unitAtOrigin;
-
-	rotmat = AffineTransformMatrix::RotateInterwoven(
-			(float) control->GetAxis(3) / resRot,
-			(float) control->GetAxis(4) / resRot,
-			(float) control->GetAxis(5) / resRot) * rotmat;
-	rotmat.TranslateGlobal((float) control->GetAxis(0) / resMov,
-			(float) control->GetAxis(1) / resMov,
-			(float) control->GetAxis(2) / resMov);
-
-	//rotmat.RotateXY(1,0,1);
-	if(control->GetButton(0)){
-		rotmat.SetIdentity();
-		transmat.SetIdentity();
-	}
-	this->Refresh();
-}
-#endif

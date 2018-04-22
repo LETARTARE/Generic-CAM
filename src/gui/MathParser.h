@@ -28,6 +28,7 @@
 #define MATHPARSER_H_
 
 #include <wx/string.h>
+#include <stdint.h>
 
 /*!\class MathParser
  * \brief Simple single-line math parser
@@ -52,7 +53,7 @@ WX_DECLARE_STRING_HASH_MAP(double, Variables);
 
 class MathParser {
 public:
-	MathParser();
+	MathParser(bool autoEvaluate = true);
 
 	// Member functions
 public:

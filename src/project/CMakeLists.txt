@@ -1,5 +1,7 @@
-aux_source_directory(command/. files_command)
-aux_source_directory(generator/. files_generator)
-aux_source_directory(machine/. files_machine)
-aux_source_directory(. files_project)
+file(GLOB files_command "command/*.cpp")
+file(GLOB files_generator "generator/*.cpp")
+file(GLOB files_machine "machine/*.cpp")
+file(GLOB files_project "./*.cpp")
+list(REMOVE_ITEM files_generator "generator/test.cpp")
+
 add_library(project ${files_command} ${files_generator} ${files_machine} ${files_project})

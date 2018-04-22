@@ -166,7 +166,7 @@ double MachineSimulator::GetMaxTime(void) const
 	return toolpath->MaxTime();
 }
 
-double MachineSimulator::GetCurrentTime(void) const
+double MachineSimulator::GetTime(void) const
 {
 	return tStep;
 }

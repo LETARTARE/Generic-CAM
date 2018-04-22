@@ -120,7 +120,7 @@ unsigned int OpenGLPick::GetCount(void)
 	return results;
 }
 
-int OpenGLPick::Get(unsigned int hit, unsigned int level)
+int OpenGLPick::Get(unsigned int level,unsigned int hit)
 {
 	if(hit >= results) return -1;
 	MoveBufferPos(hit);

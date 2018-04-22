@@ -90,6 +90,15 @@ public:
 
 	// Methods
 public:
+	/*! \brief Setup a unit
+	 *
+	 *	The factor is set so that 1 otherName = factor SIName
+	 *	e.g.
+	 *
+	 *	 - 1 mm = 1e-6 m  --> factor = 1e-6
+	 *	 - 1 g  = 1e-3 kg --> factor = 1e-3
+	 *	 - 1 deg = M_PI/180 rad --> factor = M_PI/180
+	 */
 	void Setup(const wxString SIName, const wxString otherName,
 			const double factor);
 	void SetUnit(unit predefinedUnit, wxString extra = _T("*"));
@@ -102,8 +111,7 @@ public:
 	double ToSI(const double value);
 
 	wxString TextFromSI(const double value, int digitsAfterComma = -1);
-	wxString TextFromSIWithUnit(const double value,
-			 int digitsAfterComma = -1);
+	wxString TextFromSIWithUnit(const double value, int digitsAfterComma = -1);
 
 	double SIFromString(const wxString &text, bool useEvaluator = true);
 

@@ -34,11 +34,19 @@
  * Latency compensation is not used.
  */
 
+#if defined(linux) || defined(__linux)
+#define __LINUX
+#endif
+
+#ifdef __LINUX
 #include "portmidi.h"
+#endif
 #include <cstddef>
 #include <string>
+#include <stdint.h>
 
 #include <vector>
+
 
 class MidiPort {
 public:
@@ -76,12 +84,14 @@ public:
 	bool IsLastInstance(void) const;
 
 private:
+#ifdef __LINUX
 	PortMidiStream *midi;
 	const PmDeviceInfo* info;
 	int opendevice;
 	PmError status;
 	PmError length;
 	PmEvent buffer[1];
+#endif
 
 private:
 	// The instance counter is needed, because the Pm_Initialize() and Pm_Terminate() functions are global.

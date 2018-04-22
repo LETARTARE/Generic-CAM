@@ -79,7 +79,7 @@ public:
 	void SortByNear(void); //!< Sort the results by the Near value
 	int NearestWithLevel0(unsigned int L0); //!< Find the nearest result with level0 == L0. Returns -1, if there is nothing found.
 	int NearestWithLevel01(unsigned int L0, unsigned int L1); //!< Find the nearest result with Name0 == L0 and Name1 = L1. Returns -1, if there is nothing found.
-	int Get(unsigned int hit, unsigned int level); //!< Return the levels of the namestack. Returns -1, if nothing is at this level.
+	int Get(unsigned int level, unsigned int hit = 0); //!< Return the levels of the namestack. Returns -1, if nothing is at this level.
 	unsigned int Near(unsigned int hit); //!< Return the Near value of the hit
 	unsigned int Far(unsigned int hit); //!< Return the Far value of the hit
 

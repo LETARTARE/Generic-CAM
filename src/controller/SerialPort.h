@@ -47,8 +47,8 @@
 #ifdef __LINUX
 #include <termios.h>
 #include <stdlib.h>
-#include <string>
 #endif
+#include <string>
 
 class SerialPort {
 

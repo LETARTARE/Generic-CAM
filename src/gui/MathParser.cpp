@@ -29,11 +29,11 @@
 #include <wx/debug.h>
 #include <math.h>
 
-MathParser::MathParser()
+MathParser::MathParser(bool autoEvaluate)
 {
 	wxASSERT(maxStackDepth > 5);
 
-	autoEvaluate = true;
+	this->autoEvaluate = autoEvaluate;
 	addUnit = false;
 	number = 0.0;
 	ResetVariables(true);
@@ -163,8 +163,8 @@ bool MathParser::GetNextToken(void)
 		if(c == ')') newType = expressionBracketClose;
 		if((c >= '0' && c <= '9') || c == '.' || c == ',') newType =
 				expressionNumber;
-		if((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_') newType =
-				expressionText;
+		if((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
+				|| c == '%') newType = expressionText;
 		if(c == '+' || c == '-' || c == '*' || c == '/' || c == '^') newType =
 				expressionOperation;
 

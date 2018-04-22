@@ -336,7 +336,7 @@ GUIMain::GUIMain( wxWindow* parent, wxWindowID id, const wxString& title, const 
 	wxBoxSizer* bSizerTree;
 	bSizerTree = new wxBoxSizer( wxVERTICAL );
 	
-	m_tree = new wxTreeCtrl( m_panelTree, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_EDIT_LABELS|wxTR_EXTENDED|wxTR_FULL_ROW_HIGHLIGHT|wxTR_HAS_BUTTONS|wxTR_MULTIPLE|wxTR_NO_LINES|wxTR_SINGLE );
+	m_tree = new wxTreeCtrl( m_panelTree, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_EDIT_LABELS|wxTR_FULL_ROW_HIGHLIGHT|wxTR_HAS_BUTTONS|wxTR_MULTIPLE|wxTR_NO_LINES|wxTR_SINGLE );
 	bSizerTree->Add( m_tree, 1, wxALL|wxEXPAND, 5 );
 	
 	

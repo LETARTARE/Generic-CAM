@@ -90,7 +90,7 @@ OpenGLImage& OpenGLImage::operator=(const wxImage& other)
 	return *this;
 }
 
-bool OpenGLImage::LoadFile(const wxString& name, long type, int index)
+bool OpenGLImage::LoadFile(const wxString& name, wxBitmapType type, int index)
 {
 	bool temp = wxImage::LoadFile(name, type, index);
 	refresh = true;
@@ -105,7 +105,7 @@ bool OpenGLImage::LoadFile(const wxString& name, const wxString& mimetype,
 	return temp;
 }
 
-bool OpenGLImage::LoadFile(wxInputStream& stream, long type, int index)
+bool OpenGLImage::LoadFile(wxInputStream& stream, wxBitmapType type, int index)
 {
 	bool temp = wxImage::LoadFile(stream, type, index);
 	refresh = true;
@@ -231,7 +231,10 @@ void OpenGLImage::Paint(void) const
 
 	glColor3f(1, 1, 1);
 	glEnable(GL_TEXTURE_2D);
+#ifdef __LINUX
+	//TODO: Check if mingw32 can compile for anything higher than OPENGL_1_1
 	glActiveTexture(GL_TEXTURE0);
+#endif
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glBegin(GL_QUADS);
 	glNormal3f(0, 0, 1);

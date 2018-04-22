@@ -271,7 +271,7 @@ bool SerialPort::Open(const char *Port, int nBaud)
 int SerialPort::GetHandle(void) const
 {
 #ifdef __WIN
-	return m_hIDComDev;
+	return (int)m_hIDComDev;
 #endif
 #ifdef __LINUX
 	return fd;
@@ -351,7 +351,7 @@ int SerialPort::SendData(std::string data)
 #ifdef __WIN
 	if(m_hIDComDev == NULL) return (0);
 	DWORD dwBytesWritten = 0;
-	for(size_t i = 0; i < size; i++){
+	for(size_t i = 0; i < data.size(); i++){
 		WriteCommByte(data[i]);
 		dwBytesWritten++;
 	}
