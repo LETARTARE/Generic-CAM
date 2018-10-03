@@ -6,7 +6,7 @@ find_package(wxWidgets COMPONENTS richtext gl core base html xml adv REQUIRED)
 include( "${wxWidgets_USE_FILE}" )
 
 if(MINGW)
-	include_directories( "/usr/local/i586-mingw32/include/lua5.3" )
+#	include_directories( "/usr/local/i586-mingw32/include/lua5.3" )
 #	set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -I/usr/local/i586-mingw32/include")
 else(MINGW)
 	include_directories( "/usr/include/lua5.3" )

@@ -75,106 +75,84 @@ void GeneratorAreaGridDexel::AddToPanel(wxPanel* panel,
 	Generator::AddToPanel(panel, settings);
 
 	wxBoxSizer* bSizer;
-	bSizer = new wxBoxSizer(wxVERTICAL);
+	bSizer = new wxBoxSizer( wxVERTICAL );
 
 	wxBoxSizer* bSizerBorder;
-	bSizerBorder = new wxBoxSizer(wxVERTICAL);
+	bSizerBorder = new wxBoxSizer( wxVERTICAL );
 
 	wxStaticBoxSizer* sbSizerDirection;
-	sbSizerDirection = new wxStaticBoxSizer(
-			new wxStaticBox(panel, wxID_ANY, wxT("Direction")), wxVERTICAL);
+	sbSizerDirection = new wxStaticBoxSizer( new wxStaticBox( panel, wxID_ANY, wxT("Direction") ), wxVERTICAL );
 
 	wxFlexGridSizer* fgSizerDirection;
-	fgSizerDirection = new wxFlexGridSizer(2, 2, 0, 0);
-	fgSizerDirection->SetFlexibleDirection(wxBOTH);
-	fgSizerDirection->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+	fgSizerDirection = new wxFlexGridSizer( 2, 2, 0, 0 );
+	fgSizerDirection->SetFlexibleDirection( wxBOTH );
+	fgSizerDirection->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	m_radioBtnXthenY = new wxRadioButton(sbSizerDirection->GetStaticBox(),
-			wxID_ANY, wxT("X first then Y"), wxDefaultPosition, wxDefaultSize,
-			0);
-	fgSizerDirection->Add(m_radioBtnXthenY, 0, wxALL | wxALIGN_CENTER_VERTICAL,
-			5);
+	m_radioBtnXthenY = new wxRadioButton( sbSizerDirection->GetStaticBox(), wxID_ANY, wxT("X first then Y"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizerDirection->Add( m_radioBtnXthenY, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
-	m_bitmapXthenY = new wxStaticBitmap(sbSizerDirection->GetStaticBox(),
-			wxID_ANY, wxBitmap(xtheny_xpm), wxDefaultPosition, wxDefaultSize,
-			0);
-	fgSizerDirection->Add(m_bitmapXthenY, 0,
-			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL, 5);
+	m_bitmapXthenY = new wxStaticBitmap( sbSizerDirection->GetStaticBox(), wxID_ANY, wxBitmap( xtheny_xpm ), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizerDirection->Add( m_bitmapXthenY, 0, wxALL, 5 );
 
-	m_radioBtnYthenX = new wxRadioButton(sbSizerDirection->GetStaticBox(),
-			wxID_ANY, wxT("Y first then X"), wxDefaultPosition, wxDefaultSize,
-			0);
-	fgSizerDirection->Add(m_radioBtnYthenX, 0, wxALL | wxALIGN_CENTER_VERTICAL,
-			5);
+	m_radioBtnYthenX = new wxRadioButton( sbSizerDirection->GetStaticBox(), wxID_ANY, wxT("Y first then X"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizerDirection->Add( m_radioBtnYthenX, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
-	m_bitmapYthenX = new wxStaticBitmap(sbSizerDirection->GetStaticBox(),
-			wxID_ANY, wxBitmap(ythenx_xpm), wxDefaultPosition, wxDefaultSize,
-			0);
-	fgSizerDirection->Add(m_bitmapYthenX, 0, wxALL, 5);
+	m_bitmapYthenX = new wxStaticBitmap( sbSizerDirection->GetStaticBox(), wxID_ANY, wxBitmap( ythenx_xpm ), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizerDirection->Add( m_bitmapYthenX, 0, wxALL, 5 );
 
-	sbSizerDirection->Add(fgSizerDirection, 1, wxEXPAND, 5);
 
-	bSizerBorder->Add(sbSizerDirection, 1, wxEXPAND | wxBOTTOM, 5);
+	sbSizerDirection->Add( fgSizerDirection, 0, 0, 5 );
+
+
+	bSizerBorder->Add( sbSizerDirection, 0, wxEXPAND|wxBOTTOM, 5 );
 
 	wxBoxSizer* bSizerDistance;
-	bSizerDistance = new wxBoxSizer(wxHORIZONTAL);
+	bSizerDistance = new wxBoxSizer( wxHORIZONTAL );
 
 	wxFlexGridSizer* fgSizerDistance;
-	fgSizerDistance = new wxFlexGridSizer(1, 3, 0, 0);
-	fgSizerDistance->AddGrowableCol(1);
-	fgSizerDistance->SetFlexibleDirection(wxBOTH);
-	fgSizerDistance->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+	fgSizerDistance = new wxFlexGridSizer( 1, 3, 0, 0 );
+	fgSizerDistance->AddGrowableCol( 1 );
+	fgSizerDistance->SetFlexibleDirection( wxBOTH );
+	fgSizerDistance->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	m_staticTextOverlap = new wxStaticText(panel, wxID_ANY, wxT("Overlap:"),
-			wxDefaultPosition, wxDefaultSize, 0);
-	m_staticTextOverlap->Wrap(-1);
-	fgSizerDistance->Add(m_staticTextOverlap, 0,
-			wxALL | wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL, 5);
+	m_staticTextOverlap = new wxStaticText( panel, wxID_ANY, wxT("Overlap:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextOverlap->Wrap( -1 );
+	fgSizerDistance->Add( m_staticTextOverlap, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 
-	m_textCtrlOverlap = new wxTextCtrl(panel, wxID_ANY, wxEmptyString,
-			wxDefaultPosition, wxDefaultSize, 0);
-	m_textCtrlOverlap->SetToolTip(wxT("Distance between two rows."));
+	m_textCtrlOverlap = new wxTextCtrl( panel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlOverlap->SetToolTip( wxT("Distance between two rows.") );
 
-	fgSizerDistance->Add(m_textCtrlOverlap, 0,
-			wxALL | wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL
-					| wxEXPAND, 5);
+	fgSizerDistance->Add( m_textCtrlOverlap, 0, wxALL|wxEXPAND, 5 );
 
-	m_staticTextUnitOverlap = new wxStaticText(panel, wxID_ANY, wxT("%"),
-			wxDefaultPosition, wxDefaultSize, 0);
-	m_staticTextUnitOverlap->Wrap(-1);
-	fgSizerDistance->Add(m_staticTextUnitOverlap, 0,
-			wxALL | wxALIGN_CENTER_VERTICAL, 5);
+	m_staticTextUnitOverlap = new wxStaticText( panel, wxID_ANY, wxT("%"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitOverlap->Wrap( -1 );
+	fgSizerDistance->Add( m_staticTextUnitOverlap, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
-	bSizerDistance->Add(fgSizerDistance, 1,
-			wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, 5);
 
-	bSizerBorder->Add(bSizerDistance, 0, wxEXPAND | wxALIGN_CENTER_HORIZONTAL,
-			5);
+	bSizerDistance->Add( fgSizerDistance, 1, 0, 5 );
+
+
+	bSizerBorder->Add( bSizerDistance, 0, wxEXPAND, 5 );
 
 	wxStaticBoxSizer* sbSizerRotations;
-	sbSizerRotations = new wxStaticBoxSizer(
-			new wxStaticBox(panel, wxID_ANY, wxT("Rotations")), wxVERTICAL);
+	sbSizerRotations = new wxStaticBoxSizer( new wxStaticBox( panel, wxID_ANY, wxT("Rotations") ), wxVERTICAL );
 
-	m_checkBoxA = new wxCheckBox(sbSizerRotations->GetStaticBox(), wxID_ANY,
-			wxT("Generate A rotations"), wxDefaultPosition, wxDefaultSize, 0);
-	m_checkBoxA->SetToolTip(
-			wxT(
-					"5-axis milling: Generate rotations around X axis (= A axis)."));
+	m_checkBoxA = new wxCheckBox( sbSizerRotations->GetStaticBox(), wxID_ANY, wxT("Generate A rotations"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxA->SetToolTip( wxT("5-axis milling: Generate rotations around X axis (= A axis).") );
 
-	sbSizerRotations->Add(m_checkBoxA, 0, wxALL, 5);
+	sbSizerRotations->Add( m_checkBoxA, 0, wxALL, 5 );
 
-	m_checkBoxB = new wxCheckBox(sbSizerRotations->GetStaticBox(), wxID_ANY,
-			wxT("Generate B rotations"), wxDefaultPosition, wxDefaultSize, 0);
-	m_checkBoxB->SetToolTip(
-			wxT(
-					"5-axis milling: Generate rotations around the Y axis (= B axis)."));
+	m_checkBoxB = new wxCheckBox( sbSizerRotations->GetStaticBox(), wxID_ANY, wxT("Generate B rotations"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxB->SetToolTip( wxT("5-axis milling: Generate rotations around the Y axis (= B axis).") );
 
-	sbSizerRotations->Add(m_checkBoxB, 0, wxBOTTOM | wxRIGHT | wxLEFT, 5);
+	sbSizerRotations->Add( m_checkBoxB, 0, wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 
-	bSizerBorder->Add(sbSizerRotations, 0,
-			wxALIGN_CENTER_HORIZONTAL | wxEXPAND | wxTOP, 5);
 
-	bSizer->Add(bSizerBorder, 0, wxALIGN_CENTER_HORIZONTAL, 5);
+	bSizerBorder->Add( sbSizerRotations, 0, wxEXPAND|wxTOP, 5 );
+
+
+	bSizer->Add( bSizerBorder, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+
 
 	panel->SetSizer(bSizer);
 	panel->Layout();

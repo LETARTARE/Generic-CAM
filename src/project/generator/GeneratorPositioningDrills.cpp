@@ -74,63 +74,60 @@ void GeneratorPositioningDrills::AddToPanel(wxPanel* panel,
 {
 	Generator::AddToPanel(panel, settings);
 	wxBoxSizer* bSizer;
-	bSizer = new wxBoxSizer(wxVERTICAL);
+	bSizer = new wxBoxSizer( wxVERTICAL );
+
 	wxArrayString m_choiceSetupsChoices;
-	m_choiceSetups = new wxChoice(panel, wxID_ANY, wxDefaultPosition,
-			wxDefaultSize, m_choiceSetupsChoices, 0);
-	m_choiceSetups->SetSelection(0);
-	bSizer->Add(m_choiceSetups, 0, wxALL | wxEXPAND, 5);
-	wxString m_radioBoxChoices[] =
-		{wxT("Mirrored along X-axis"), wxT("Mirrored along Y-axis (default)"),
-				wxT("Normal (for Machinebed preparation)")};
-	int m_radioBoxNChoices = sizeof(m_radioBoxChoices) / sizeof(wxString);
-	m_radioBox = new wxRadioBox(panel, wxID_ANY, wxT("Drill positioning"),
-			wxDefaultPosition, wxDefaultSize, m_radioBoxNChoices,
-			m_radioBoxChoices, 1, wxRA_SPECIFY_COLS);
-	m_radioBox->SetSelection(2);
-	bSizer->Add(m_radioBox, 0, wxALL | wxALIGN_CENTER_HORIZONTAL | wxEXPAND, 5);
+	m_choiceSetups = new wxChoice( panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceSetupsChoices, 0 );
+	m_choiceSetups->SetSelection( 0 );
+	bSizer->Add( m_choiceSetups, 0, wxALL|wxEXPAND, 5 );
+
+	wxString m_radioBoxChoices[] = { wxT("Mirrored along X-axis"), wxT("Mirrored along Y-axis (default)"), wxT("Normal (for Machinebed preparation)") };
+	int m_radioBoxNChoices = sizeof( m_radioBoxChoices ) / sizeof( wxString );
+	m_radioBox = new wxRadioBox( panel, wxID_ANY, wxT("Change drill positioning"), wxDefaultPosition, wxDefaultSize, m_radioBoxNChoices, m_radioBoxChoices, 1, wxRA_SPECIFY_COLS );
+	m_radioBox->SetSelection( 0 );
+	bSizer->Add( m_radioBox, 0, wxALL|wxEXPAND, 5 );
+
 	wxFlexGridSizer* fgSizer;
-	fgSizer = new wxFlexGridSizer(2, 3, 0, 0);
-	fgSizer->AddGrowableCol(1);
-	fgSizer->SetFlexibleDirection(wxBOTH);
-	fgSizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
-	m_staticTextHoleDiameter = new wxStaticText(panel, wxID_ANY,
-			wxT("Hole diameter:"), wxDefaultPosition, wxDefaultSize, 0);
-	m_staticTextHoleDiameter->Wrap(-1);
-	fgSizer->Add(m_staticTextHoleDiameter, 0, wxALL | wxALIGN_CENTER_VERTICAL,
-			5);
-	m_textCtrlHoleDiameter = new wxTextCtrl(panel, wxID_ANY, wxEmptyString,
-			wxDefaultPosition, wxDefaultSize, 0);
-	fgSizer->Add(m_textCtrlHoleDiameter, 0,
-			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT, 5);
-	m_staticTextUnitDiameter = new wxStaticText(panel, wxID_ANY, wxT("mm"),
-			wxDefaultPosition, wxDefaultSize, 0);
-	m_staticTextUnitDiameter->Wrap(-1);
-	fgSizer->Add(m_staticTextUnitDiameter, 0, wxALL | wxALIGN_CENTER_VERTICAL,
-			5);
-	m_staticTextHoleDepth = new wxStaticText(panel, wxID_ANY, wxT("Depth:"),
-			wxDefaultPosition, wxDefaultSize, 0);
-	m_staticTextHoleDepth->Wrap(-1);
-	fgSizer->Add(m_staticTextHoleDepth, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
-	m_textCtrlHoleDepth = new wxTextCtrl(panel, wxID_ANY, wxEmptyString,
-			wxDefaultPosition, wxDefaultSize, 0);
-	fgSizer->Add(m_textCtrlHoleDepth, 0,
-			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT, 5);
-	m_staticTextUnitDepth = new wxStaticText(panel, wxID_ANY, wxT("mm"),
-			wxDefaultPosition, wxDefaultSize, 0);
-	m_staticTextUnitDepth->Wrap(-1);
-	fgSizer->Add(m_staticTextUnitDepth, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
-	bSizer->Add(fgSizer, 0, wxALIGN_CENTER_HORIZONTAL, 5);
-	bSizer->Add(0, 0, 1, wxEXPAND, 5);
-	m_staticTextInfo =
-			new wxStaticText(panel, wxID_ANY,
-					wxT(
-							"Please note, that the measurements of the workpiece have to be exact for this to work correctly. (At least in the direction You are flipping the workpiece in. The height has to be correct as well.)"),
-					wxDefaultPosition, wxDefaultSize, 0);
-	m_staticTextInfo->Wrap(400);
-	bSizer->Add(m_staticTextInfo, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, 5);
-	bSizer->Add(0, 0, 1, wxEXPAND, 5);
-	panel->SetSizer(bSizer);
+	fgSizer = new wxFlexGridSizer( 2, 3, 0, 0 );
+	fgSizer->AddGrowableCol( 1 );
+	fgSizer->SetFlexibleDirection( wxBOTH );
+	fgSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+
+	m_staticTextHoleDiameter = new wxStaticText( panel, wxID_ANY, wxT("Hole diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextHoleDiameter->Wrap( -1 );
+	fgSizer->Add( m_staticTextHoleDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+
+	m_textCtrlHoleDiameter = new wxTextCtrl( panel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer->Add( m_textCtrlHoleDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+
+	m_staticTextUnitDiameter = new wxStaticText( panel, wxID_ANY, wxT("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitDiameter->Wrap( -1 );
+	fgSizer->Add( m_staticTextUnitDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+
+	m_staticTextHoleDepth = new wxStaticText( panel, wxID_ANY, wxT("Depth:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextHoleDepth->Wrap( -1 );
+	fgSizer->Add( m_staticTextHoleDepth, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+
+	m_textCtrlHoleDepth = new wxTextCtrl( panel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer->Add( m_textCtrlHoleDepth, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+
+	m_staticTextUnitDepth = new wxStaticText( panel, wxID_ANY, wxT("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitDepth->Wrap( -1 );
+	fgSizer->Add( m_staticTextUnitDepth, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+
+
+	bSizer->Add( fgSizer, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+
+
+	bSizer->Add( 0, 0, 1, 0, 5 );
+
+	m_staticTextInfo = new wxStaticText( panel, wxID_ANY, wxT("Please note, that the measurements of the workpiece have to be exact for this to work correctly. (At least in the direction You are flipping the workpiece in. The height has to be correct as well.)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextInfo->Wrap( 400 );
+	bSizer->Add( m_staticTextInfo, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+
+
+	bSizer->Add( 0, 0, 1, 0, 5 );
+
 	panel->Layout();
 	bSizer->Fit(panel);
 

@@ -69,6 +69,8 @@ OpenGLCanvas::OpenGLCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 
 	rotationMode = rotateInterwoven;
 
+	SetBackgroundStyle(wxBG_STYLE_CUSTOM);
+
 	this->Connect(wxEVT_PAINT, wxPaintEventHandler(OpenGLCanvas::OnPaint), NULL,
 			this);
 	this->Connect(wxEVT_ENTER_WINDOW,
@@ -124,8 +126,8 @@ void OpenGLCanvas::SetController(Control3D& control)
 }
 #endif
 
-OpenGLCanvas::Context::Context(wxGLCanvas* canvas)
-		: wxGLContext(canvas)
+OpenGLCanvas::Context::Context(wxGLCanvas* canvas) :
+		wxGLContext(canvas)
 {
 	SetCurrent(*canvas);
 
@@ -157,10 +159,14 @@ OpenGLCanvas::Context::Context(wxGLCanvas* canvas)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClearDepth(1.0f);
 
-	GLfloat ambient0[] = {0.5f, 0.5f, 0.5f};
-	GLfloat diffuse0[] = {0.6f, 0.6f, 0.6f};
-	GLfloat specular0[] = {0.9f, 0.9f, 0.9f};
-	GLfloat position0[] = {-20, 20, 50, 0};
+	GLfloat ambient0[] =
+		{0.5f, 0.5f, 0.5f};
+	GLfloat diffuse0[] =
+		{0.6f, 0.6f, 0.6f};
+	GLfloat specular0[] =
+		{0.9f, 0.9f, 0.9f};
+	GLfloat position0[] =
+		{-20, 20, 50, 0};
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient0);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse0);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specular0);
@@ -170,7 +176,7 @@ OpenGLCanvas::Context::Context(wxGLCanvas* canvas)
 	glEnable(GL_LIGHTING);
 
 	printf("GL_VERSION: ");
-	printf((char*) glGetString(GL_VERSION));
+	printf("%s", (char*) glGetString(GL_VERSION));
 	printf("\n");
 }
 
@@ -227,33 +233,33 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 	if(event.Dragging() && event.RightIsDown()){
 		switch(rotationMode){
 		case rotateTrackball:
-			{
-				const double r = (double) ((w < h)? w : h) / 2.2;
-				rotmat = AffineTransformMatrix::RotateTrackball(
-						(double) (x - w / 2), (double) (h / 2 - y),
-						(double) (event.m_x - w / 2),
-						(double) (h / 2 - event.m_y), r) * rotmat;
-				break;
-			}
+		{
+			const double r = (double) ((w < h)? w : h) / 2.2;
+			rotmat = AffineTransformMatrix::RotateTrackball(
+					(double) (x - w / 2), (double) (h / 2 - y),
+					(double) (event.m_x - w / 2), (double) (h / 2 - event.m_y),
+					r) * rotmat;
+			break;
+		}
 		case rotateInterwoven:
-			{
-				rotmat = AffineTransformMatrix::RotateXY(event.m_x - x,
-						event.m_y - y, 0.5) * rotmat;
-				break;
-			}
+		{
+			rotmat = AffineTransformMatrix::RotateXY(event.m_x - x,
+					event.m_y - y, 0.5) * rotmat;
+			break;
+		}
 		case rotateTurntable:
-			{
-				rotmat = AffineTransformMatrix::RotateAroundVector(
-						Vector3(1, 0, 0), -M_PI / 2);
-				turntableX += (double) (event.m_x - x) / 100;
-				turntableY += (double) (event.m_y - y) / 100;
-				rotmat = AffineTransformMatrix::RotateAroundVector(
-						Vector3(1, 0, 0), turntableY) * rotmat;
-				rotmat = rotmat
-						* AffineTransformMatrix::RotateAroundVector(
-								Vector3(0, 0, 1), turntableX);
-				break;
-			}
+		{
+			rotmat = AffineTransformMatrix::RotateAroundVector(Vector3(1, 0, 0),
+					-M_PI / 2);
+			turntableX += (double) (event.m_x - x) / 100;
+			turntableY += (double) (event.m_y - y) / 100;
+			rotmat = AffineTransformMatrix::RotateAroundVector(Vector3(1, 0, 0),
+					turntableY) * rotmat;
+			rotmat = rotmat
+					* AffineTransformMatrix::RotateAroundVector(
+							Vector3(0, 0, 1), turntableX);
+			break;
+		}
 		}
 		x = event.m_x;
 		y = event.m_y;
@@ -277,7 +283,7 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 	if(x != 0){
 		scale = exp(log(scale) - ((float) x) / 1000.0);
 //		rotmat.TranslateGlobal(0, 0, (float) -x / 1000.0);
-		this->Refresh();
+		GetParent()->Refresh();
 	}
 
 	if(event.Moving() || event.Dragging()) event.Skip();
@@ -440,7 +446,8 @@ bool OpenGLCanvas::OnPick(OpenGLPick &result, int x, int y)
 bool OpenGLCanvas::OnPick(OpenGLPick &result, wxPoint pos)
 {
 	if(!IsShown()) return false;
-	wxPaintDC(this); // Set the clipping for this area
+	//TODO: Test if needed:
+	//wxClientDC(this); // Set the clipping for this area
 
 //#ifndef __WXMOTIF__
 //	if(!GetContext()) return false;

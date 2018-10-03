@@ -102,6 +102,9 @@ private:
 	struct termios oldtio, newtio;
 #endif
 
+#ifdef __WIN
+//#include <wx/msw/winundef.h>
+#endif
 };
 
 #endif // __SERIALPORT_H__

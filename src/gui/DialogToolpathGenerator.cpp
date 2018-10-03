@@ -49,7 +49,6 @@ DialogToolpathGenerator::DialogToolpathGenerator(wxWindow* parent,
 	box.Clear();
 	slotNr = 0;
 	freeHeight = 0.001;
-
 	// Assign pages to the choicebook for every generator
 	wxString generatorName;
 	for(size_t i = 0; i < gc.GetCount(); i++){

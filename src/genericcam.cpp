@@ -38,6 +38,7 @@ IMPLEMENT_APP(GenericCAMApp)
 
 GenericCAMApp::GenericCAMApp()
 {
+
 	frame = NULL;
 	config = new wxConfig(_T("genericcam"));
 

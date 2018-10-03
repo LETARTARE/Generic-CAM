@@ -377,8 +377,8 @@ void FrameMain::On3DSelect(wxMouseEvent& event)
 	size_t n;
 	if(result.HasHits()){
 		result.SortByNear();
-		if(result.Get(0, 0) == 1 && result.Get(0, 1) > 0){
-			size_t id = result.Get(0, 1) - 1;
+		if(result.Get(0) == 1 && result.Get(1) > 0){
+			size_t id = result.Get(1) - 1;
 			for(n = 0; n < project.objects.GetCount(); n++)
 				project.objects[n].selected = (n == id);
 			tree->UpdateSelection();
@@ -395,7 +395,7 @@ void FrameMain::On3DDClick(wxMouseEvent& event)
 	m_canvas->OnPick(result, x, y);
 	if(result.HasHits()){
 		result.SortByNear();
-		if(result.Get(0, 0) == 1){
+		if(result.Get(0) == 1){
 //	       <...>
 		}
 	}

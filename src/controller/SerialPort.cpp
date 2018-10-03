@@ -26,6 +26,10 @@
 
 #include "SerialPort.h"
 
+#ifdef __WIN
+//#include <windows.h>
+#endif
+
 #ifdef __LINUX
 #define _POSIX_SOURCE 1
 #include <stdio.h>

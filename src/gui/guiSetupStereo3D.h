@@ -1,15 +1,16 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Dec 21 2009)
+// C++ code generated with wxFormBuilder (version Aug 20 2017)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __guiSetupStereo3D__
-#define __guiSetupStereo3D__
+#ifndef __GUISETUPSTEREO3D_H__
+#define __GUISETUPSTEREO3D_H__
 
+#include <wx/artprov.h>
+#include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
-
 #include <wx/string.h>
 #include <wx/stattext.h>
 #include <wx/gdicmn.h>
@@ -97,8 +98,9 @@ class GUISetupStereo3D : public wxFrame
 	public:
 		
 		GUISetupStereo3D( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup Stereo "), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 771,691 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		
 		~GUISetupStereo3D();
 	
 };
 
-#endif //__guiSetupStereo3D__
+#endif //__GUISETUPSTEREO3D_H__

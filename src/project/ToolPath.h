@@ -66,7 +66,7 @@
 
 #include <wx/filename.h>
 #include <wx/textfile.h>
-#include <wx/thread.h>
+//#include <wx/thread.h>
 #include <vector>
 
 //class Generator;

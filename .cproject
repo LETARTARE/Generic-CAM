@@ -85,7 +85,7 @@
 					</folderInfo>
 					<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.1074777317.1021935980" name="OctreeInt64.h" rcbsApplicability="disable" resourcePath="src/theAttic/OctreeInt64.h" toolsToInvoke=""/>
 					<sourceEntries>
-						<entry excluding="src/project/generator/temp.h|src/project/generator/temp.cpp|bin_release|bin_debug|bin_win|src/generator/temp.cpp|src/generator/temp.h|src/3D/OctreeInt64.h|src/3D/OctreeInt64.cpp|bin_linux|src/theAttic" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="bin_release|bin_debug|bin_win|src/generator/temp.cpp|src/generator/temp.h|src/3D/OctreeInt64.h|src/3D/OctreeInt64.cpp|bin_linux|src/theAttic" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
