@@ -39,8 +39,6 @@
 static int wx_gl_attribs[] =
 	{WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24, 0};
 
-//wxGLCanvas(parent, wxID_ANY ,wxDefaultPosition, wxDefaultSize, 0, wxT("GLCanvas"));
-
 OpenGLCanvas::OpenGLCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 		const wxSize& size, long style, const wxString& name) :
 		wxGLCanvas(parent, id, wx_gl_attribs, pos, size,
@@ -68,8 +66,6 @@ OpenGLCanvas::OpenGLCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 	leftEyeB = 0;
 
 	rotationMode = rotateInterwoven;
-
-	SetBackgroundStyle(wxBG_STYLE_CUSTOM);
 
 	this->Connect(wxEVT_PAINT, wxPaintEventHandler(OpenGLCanvas::OnPaint), NULL,
 			this);
@@ -126,8 +122,8 @@ void OpenGLCanvas::SetController(Control3D& control)
 }
 #endif
 
-OpenGLCanvas::Context::Context(wxGLCanvas* canvas) :
-		wxGLContext(canvas)
+OpenGLCanvas::Context::Context(wxGLCanvas* canvas)
+		: wxGLContext(canvas)
 {
 	SetCurrent(*canvas);
 
@@ -159,14 +155,10 @@ OpenGLCanvas::Context::Context(wxGLCanvas* canvas) :
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClearDepth(1.0f);
 
-	GLfloat ambient0[] =
-		{0.5f, 0.5f, 0.5f};
-	GLfloat diffuse0[] =
-		{0.6f, 0.6f, 0.6f};
-	GLfloat specular0[] =
-		{0.9f, 0.9f, 0.9f};
-	GLfloat position0[] =
-		{-20, 20, 50, 0};
+	GLfloat ambient0[] = {0.5f, 0.5f, 0.5f};
+	GLfloat diffuse0[] = {0.6f, 0.6f, 0.6f};
+	GLfloat specular0[] = {0.9f, 0.9f, 0.9f};
+	GLfloat position0[] = {-20, 20, 50, 0};
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient0);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse0);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specular0);
@@ -193,8 +185,8 @@ void OpenGLCanvas::OnTimer(wxTimerEvent& event)
 	control->Pump();
 	if(control->IsIdle()) return;
 
-	float resRot = 2000;
-	float resMov = 5 * unitAtOrigin;
+	const float resRot = 2000;
+	const float resMov = 5 * unitAtOrigin;
 
 	rotmat = AffineTransformMatrix::RotateInterwoven(
 			(float) control->GetAxis(3) / resRot,
@@ -233,33 +225,33 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 	if(event.Dragging() && event.RightIsDown()){
 		switch(rotationMode){
 		case rotateTrackball:
-		{
-			const double r = (double) ((w < h)? w : h) / 2.2;
-			rotmat = AffineTransformMatrix::RotateTrackball(
-					(double) (x - w / 2), (double) (h / 2 - y),
-					(double) (event.m_x - w / 2), (double) (h / 2 - event.m_y),
-					r) * rotmat;
-			break;
-		}
+			{
+				const double r = (double) ((w < h)? w : h) / 2.2;
+				rotmat = AffineTransformMatrix::RotateTrackball(
+						(double) (x - w / 2), (double) (h / 2 - y),
+						(double) (event.m_x - w / 2),
+						(double) (h / 2 - event.m_y), r) * rotmat;
+				break;
+			}
 		case rotateInterwoven:
-		{
-			rotmat = AffineTransformMatrix::RotateXY(event.m_x - x,
-					event.m_y - y, 0.5) * rotmat;
-			break;
-		}
+			{
+				rotmat = AffineTransformMatrix::RotateXY(event.m_x - x,
+						event.m_y - y, 0.5) * rotmat;
+				break;
+			}
 		case rotateTurntable:
-		{
-			rotmat = AffineTransformMatrix::RotateAroundVector(Vector3(1, 0, 0),
-					-M_PI / 2);
-			turntableX += (double) (event.m_x - x) / 100;
-			turntableY += (double) (event.m_y - y) / 100;
-			rotmat = AffineTransformMatrix::RotateAroundVector(Vector3(1, 0, 0),
-					turntableY) * rotmat;
-			rotmat = rotmat
-					* AffineTransformMatrix::RotateAroundVector(
-							Vector3(0, 0, 1), turntableX);
-			break;
-		}
+			{
+				rotmat = AffineTransformMatrix::RotateAroundVector(
+						Vector3(1, 0, 0), -M_PI / 2);
+				turntableX += (double) (event.m_x - x) / 100;
+				turntableY += (double) (event.m_y - y) / 100;
+				rotmat = AffineTransformMatrix::RotateAroundVector(
+						Vector3(1, 0, 0), turntableY) * rotmat;
+				rotmat = rotmat
+						* AffineTransformMatrix::RotateAroundVector(
+								Vector3(0, 0, 1), turntableX);
+				break;
+			}
 		}
 		x = event.m_x;
 		y = event.m_y;
@@ -270,20 +262,20 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 	if(event.Dragging() && event.MiddleIsDown()){
 		float movement = 1.0;
 		if(unitAtOrigin > 1.0) movement = unitAtOrigin;
-		float dx = (float) (event.m_x - x) / movement;
-		float dy = (float) (event.m_y - y) / movement;
+		const float dx = (float) (event.m_x - x) / movement;
+		const float dy = (float) (event.m_y - y) / movement;
 		rotmat.TranslateGlobal(dx, -dy, 0);
 		x = event.m_x;
 		y = event.m_y;
 
 		this->Refresh();
-	}
-
-	int x = event.GetWheelRotation();
-	if(x != 0){
-		scale = exp(log(scale) - ((float) x) / 1000.0);
-//		rotmat.TranslateGlobal(0, 0, (float) -x / 1000.0);
-		GetParent()->Refresh();
+	}else{
+		const int x = event.GetWheelRotation();
+		if(x != 0){
+			scale *= exp(-((float) x) / 1000.0);
+			// rotmat.TranslateGlobal(0, 0, (float) -x / 1000.0);
+			this->Refresh();
+		}
 	}
 
 	if(event.Moving() || event.Dragging()) event.Skip();

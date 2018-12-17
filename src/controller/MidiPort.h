@@ -34,11 +34,11 @@
  * Latency compensation is not used.
  */
 
-#if defined(linux) || defined(__linux)
-#define __LINUX
+#if !(defined(linux) || defined(__linux))
+#undef _USE_MIDI
 #endif
 
-#ifdef __LINUX
+#ifdef _USE_MIDI
 #include "portmidi.h"
 #endif
 #include <cstddef>
@@ -46,7 +46,6 @@
 #include <stdint.h>
 
 #include <vector>
-
 
 class MidiPort {
 public:
@@ -84,7 +83,7 @@ public:
 	bool IsLastInstance(void) const;
 
 private:
-#ifdef __LINUX
+#ifdef _USE_MIDI
 	PortMidiStream *midi;
 	const PmDeviceInfo* info;
 	int opendevice;

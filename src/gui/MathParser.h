@@ -97,8 +97,10 @@ private:
 
 	// Member variables
 public:
-	bool autoEvaluate; ///< Evaluate string whenever a new one is passed?
-	bool addUnit; ///< Add unit to generated string?
+	bool autoEvaluate; ///< Boolean: Evaluate the string instantly when it is passed into a MathParser object.
+	bool addUnit; ///< Boolean: Add a unit to generated string?
+	bool ignorecase; ///< Boolean: Ignore the case for variables.
+
 
 	Variables globals;
 	Variables allowedUnits;

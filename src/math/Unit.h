@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : Unit.h
 // Purpose            : Converts from SI to other measures
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 03.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 07.06.2014
+// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -66,7 +66,10 @@
  * HINT: The available types for the units are maintained in the DialogSetupUnits.
  */
 
+#include "../Config.h"
+#ifdef _USE_MATHPARSER
 #include "MathParser.h"
+#endif
 #include <wx/string.h>
 
 class Unit {
@@ -166,9 +169,9 @@ private:
 	double power; ///<
 	wxString SIName; ///< The name in SI: m, m/s, 1/s, ...
 	wxString otherName; ///< The name in the "other" system: h, cm, dm, rpm, inch, mil, mm, ...
-
+#ifdef _USE_MATHPARSER
 	MathParser parser;
-
+#endif
 	int m; ///< Power of Length
 	int kg; ///< Power of Mass
 	int s; ///< Power of Time

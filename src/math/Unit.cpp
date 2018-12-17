@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : Unit.cpp
 // Purpose            : Value with unit
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 03.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 07.06.2014
+// Copyright          : (C) 2014 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -168,6 +168,12 @@ wxString Unit::GetOtherName(void)
 
 double Unit::SIFromString(const wxString& text, bool useEvaluator)
 {
+#ifdef _USE_MATHPARSER
 	parser.SetString(text);
 	return ToSI(parser.GetNumber());
+#else
+	double temp;
+	text.ToDouble(&temp);
+	return ToSI(temp);
+#endif
 }

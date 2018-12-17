@@ -1,0 +1,118 @@
+# Compiling and Cross-compiling projects
+
+All these instructions assume a native build on linux or for the cross
+compilation of a build on linux for windows.
+
+The Linux distribution, this document was written for:
+	uname -a
+	Linux 4.13.0-39-generic #44~16.04.1-Ubuntu
+
+## Compiling on Linux for Linux
+
+sudo apt-get install cmake
+
+Setup a working directory for compiling the project. cd into that directory and
+
+	cmake [path to base directory of project]
+	
+E.g. inside the project directory:
+
+	mkdir bin
+	cd bin 
+	cmake ../.
+	make
+
+If everything went well, You should find an executable in this very directory.
+
+## Cross Compiling on Linux for Windows
+
+Install the cross compiling toolchain with everything it pulls along:
+
+	sudo apt-get install g++-mingw-w64-i686
+
+### Cross compiling wxWidgets
+
+Setup a working directory and copy the sources for the latest stable codebase from
+
+	https://wxwidgets.org/downloads/
+
+Unpack it into some working directory for compiling and installing
+
+I choose the local directory /home/[username]/usr/src/
+
+Unpack the downloaded packet in there. cd into the directory
+
+	~/usr/src/wxWidgets-3.0.4$
+
+wxWidgets uses autotools for building. (configure -> make -> make install)
+
+Configure sets up the makefiles. It is told that we want to comile for a different OS:
+
+	./configure --prefix=/home/[username]/usr/local --build=i686-linux --host=i686-w64-mingw32 --enable-monolithic --disable-debug --enable-opengl --enable-docview --enable-help --enable-optimise
+
+	--prefix: Where everything ends up. Here the directory /home/[username]/usr/local is used.
+	--build: Where we are: This is actualy expanded to i686-pc-linux-gnu (cpu-vendor-os)
+	--host: Where we are aiming for: i686-w64-mingw32 for 32bit-Windows, x86_64-w64-mingw32 for 64bit-Windows
+ 
+The options for configure can be viewed by invoking ./configure --help
+ 
+If configure complains about missing header or something of that ilk, keep on installing packages until
+configure comes back to You with something similar to
+ 
+	Configured wxWidgets 3.0.4 for `i686-w64-mingw32'
+ 
+(It it complains about missing 'magic.h' it does not want 'imagemagic', but 'libmagic-dev': Magic numbers for file types)
+
+	make
+
+If successful followed by
+
+	make install
+	
+('sudo' not needed, because it is installed locally.)
+This will setup the include, bin and lib directories for the cross compiler directory
+
+To rip it back out:
+	make uninstall
+
+#### Testing wxWidgets
+
+In the checked out source-code there is a samples folder. The configure script set up the Makefiles in this directory to use
+the cross compiler as well.
+
+	cd samples
+	
+By setting the WINEPATH variable DLLs do not have to be copied around to get the project to work. For shipping 
+only some DLLS from /usr/bin/i686-w64-mingw32/lib and /usr/lib/gcc/i686-w64-mingw32/5.3-win32 have to be copied
+alongside the program.
+
+	cd minimal
+	make
+	WINEPATH="/home/[username]/usr/local/lib;/usr/lib/gcc/i686-w64-mingw32/5.3-win32;/usr/i686-w64-mingw32/lib/"
+	wine minimal.exe
+	
+### Cross compiling Lua from Linux to Windows
+
+Download and unpack the Lua sourcecode into /home/[username]/usr/src/
+cd into the directory.
+The Lua Makefile is not really intended for cross compiling. A lot of variables have to be set manually:
+
+	make mingw install INSTALL_TOP="/home/[username]/usr/local" CC="i686-w64-mingw32-gcc -std=gnu99" AR="i686-w64-mingw32-ar rcu" RANLIB="i686-w64-mingw32-ranlib" INSTALL_EXEC="cp -p" INSTALL_DATA="cp -p" TO_BIN="lua.exe luac.exe" TO_LIB="lua53.dll"
+
+### Cross-Compiling the project itself
+
+Get the source-code. Unpack it into a directory.
+cd to the source directory and into a bin subdirectory. Invoke CMAKE with:
+	
+	cmake -DwxWidgets_ROOT_DIR=/home/[username]/usr/local -DCMAKE_TOOLCHAIN_FILE=../Toolchain_Win32.cmake ../.
+	make
+	
+If everything went well, You should find an executable in this very directory.
+
+#### Testing
+	
+
+
+
+
+

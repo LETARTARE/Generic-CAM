@@ -37,6 +37,8 @@ NelderMeadOptimizer::NelderMeadOptimizer()
 	sigma = 0.5;
 
 	simplexSpread = 0.1;
+	keepSimplex = false;
+	simplexIsSetup = false;
 
 	errorLimit = 1e-3;
 	evalLimit = 1000;
@@ -61,27 +63,31 @@ NelderMeadOptimizer::~NelderMeadOptimizer()
 
 void NelderMeadOptimizer::Start(void)
 {
-	N = param.size();
-	if(N == 0){
-		state = 0;
-		return;
-	}
-	M = N + 1;
-
-	// Setup the simplex
-	simplex.resize(N * M);
-	size_t c = 0;
-	for(size_t m = 0; m < M; m++)
-		for(size_t n = 0; n < N; n++){
-			simplex[c] = param[n] + (((n + 1) == m)? simplexSpread : 0.0);
-			c++;
+	if(!keepSimplex) simplexIsSetup = false;
+	if(!simplexIsSetup){
+		N = param.size();
+		if(N == 0){
+			state = 0;
+			return;
 		}
+		M = N + 1;
 
-	f.resize(M);
-	xo.resize(N);
-	xr.resize(N);
-	xe.resize(N);
-	xc.resize(N);
+		// Setup the simplex
+		simplex.resize(N * M);
+		size_t c = 0;
+		for(size_t m = 0; m < M; m++)
+			for(size_t n = 0; n < N; n++){
+				simplex[c] = param[n] + (((n + 1) == m)? simplexSpread : 0.0);
+				c++;
+			}
+
+		f.resize(M);
+		xo.resize(N);
+		xr.resize(N);
+		xe.resize(N);
+		xc.resize(N);
+	}
+
 	index = 0;
 	evaluationCount = 0;
 	state = 1;

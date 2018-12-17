@@ -35,6 +35,7 @@ MathParser::MathParser(bool autoEvaluate)
 
 	this->autoEvaluate = autoEvaluate;
 	addUnit = false;
+	ignorecase = false;
 	number = 0.0;
 	ResetVariables(true);
 }
@@ -102,12 +103,19 @@ void MathParser::ResetVariables(bool setStandard)
 
 void MathParser::SetVariable(const wxString& variable, double value)
 {
-	globals[variable] = value;
+	if(ignorecase)
+		globals[variable.Lower()] = value;
+	else
+		globals[variable] = value;
 }
 
 double MathParser::GetVariable(const wxString& variable)
 {
-	double x = globals[variable];
+	double x;
+	if(ignorecase)
+		x = globals[variable.Lower()];
+	else
+		x = globals[variable];
 	return x;
 }
 
@@ -262,6 +270,7 @@ bool MathParser::Evaluate(void)
 	strLength = text.Length();
 	posText = 0;
 	posStack = 0;
+	number = 0;
 	bool flag;
 
 	while(GetNextToken()){
@@ -273,10 +282,18 @@ bool MathParser::Evaluate(void)
 			if(posStack >= 2 && stackType[posStack - 2] == expressionText){
 				wxString variable = text.Mid(stackStartPos[posStack - 2],
 						stackCharCount[posStack - 2]);
-				if(globals.count(variable) == 1){
-					stackNumber[posStack - 2] = globals[variable];
-					stackType[posStack - 2] = expressionNumber;
-					flag = true;
+				if(ignorecase){
+					if(globals.count(variable.Lower()) == 1){
+						stackNumber[posStack - 2] = globals[variable.Lower()];
+						stackType[posStack - 2] = expressionNumber;
+						flag = true;
+					}
+				}else{
+					if(globals.count(variable) == 1){
+						stackNumber[posStack - 2] = globals[variable];
+						stackType[posStack - 2] = expressionNumber;
+						flag = true;
+					}
 				}
 			}
 

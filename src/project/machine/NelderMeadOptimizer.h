@@ -76,19 +76,20 @@ public:
 
 	std::vector <double> param; //!< Parameter of the system
 
-	double alpha; //!< Reflection coefficient (alpha > 0 ) Default: 1
-	double gamma; //!< Expansion coefficient (gamma > 1) Default: 2
-	double rho; //!< Contraction coefficient (rho > 0 and rho <= 0.5) Default: 0.5
-	double sigma; //!< Shrink coefficient (sigma > 0 and sigma < 1) Default: 0.5
+	double alpha; //!< Reflection coefficient (alpha > 0 ), default: 1
+	double gamma; //!< Expansion coefficient (gamma > 1), default: 2
+	double rho; //!< Contraction coefficient (rho > 0 and rho <= 0.5), default: 0.5
+	double sigma; //!< Shrink coefficient (sigma > 0 and sigma < 1), default: 0.5
 
 	double errorLimit; //!< Stop optimization if error is less than errorLimit. Default: 1e-3
-	size_t evalLimit; //!< Stop optimization if the loop has run more than evalLimit times Default: 1000
+	size_t evalLimit; //!< Stop optimization if the loop has run more than evalLimit times. Default: 1000
 
 	double simplexSpread; //!< Spread for setting up the simplex. Default: 0.1
 
+	bool keepSimplex; //!< Speed up continued optimisations, if the system changes only a little. Default: false
 	bool reevalBest; //!< After the optimization has finished, do an evaluation on the best result. Default: false
 
-	void Start(void); //!< Setup the internal variables and start an optimizsation
+	void Start(void); //!< Setup the internal variables and start an optimisation
 	bool IsRunning(void); //!< Loop control function for the main loop
 	void SetError(double error); //!< Insert the error back into the solver
 	void Stop(void); //!< Optional: Stops the optimization prematurely and copies the best result so far into 'param'.
@@ -97,6 +98,7 @@ public:
 	double ResidualError(void) const; //!< Error of the returned result
 
 private:
+	bool simplexIsSetup; //!< Internal variable to indicate that the simplex has been set up.
 	size_t N; //!< Number of parameter
 	size_t M; //!< Size of corners in simplex
 	std::vector <double> simplex;

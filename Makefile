@@ -20,9 +20,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
-##$LastChangedDate: $
-##$Revision: $
-##$LastChangedBy: $
 ###############################################################################
 
 ## macro definitions:
@@ -33,7 +30,8 @@ PROJECT := genericcam
 SOURCES = src/genericcam.cpp
 
 # 3D object files:
-SOURCES += src/3D/AffineTransformMatrix.cpp \
+SOURCES += \
+	src/3D/AffineTransformMatrix.cpp \
 	src/3D/BoundingBox.cpp \
 	src/3D/BooleanBox.cpp \
 	src/3D/FileDXF.cpp \
@@ -47,12 +45,13 @@ SOURCES += src/3D/AffineTransformMatrix.cpp \
 	src/3D/OpenGLPick.cpp \
 	src/3D/Polygon3.cpp \
 	src/3D/Polygon25.cpp \
-	src/3D/Surface.cpp \
 	src/3D/Triangle.cpp \
 	src/3D/Vector3.cpp \
 
+
 # 3D controller object files:
-SOURCES += src/controller/Control3D.cpp \
+SOURCES += \
+	src/controller/Control3D.cpp \
 	src/controller/Control3DAbstract.cpp \
 	src/controller/ControlSpaceBall.cpp \
 	src/controller/ControlSpaceMouse.cpp \
@@ -60,55 +59,126 @@ SOURCES += src/controller/Control3D.cpp \
 	src/controller/DialogSetup6DOFController.cpp \
 	src/controller/guiSetup6DOFController.cpp \
 	src/controller/SerialPort.cpp \
-	
-# Generator object files:
-SOURCES += src/generator/Imprinter.cpp \
-	src/generator/Octree.cpp \
-	src/generator/Polygon25.cpp \
-	src/generator/TPGenerator.cpp \
-	src/generator/TPGeneratorFast.cpp \
-	src/generator/TPGeneratorTest.cpp \
+	src/controller/MidiPort.cpp \
+
 	
 # GUI object files:
-SOURCES += src/gui/AboutDialog.cpp \
-	src/gui/AnimationFrame.cpp \
-	src/gui/Control6DOFDialog.cpp \
-	src/gui/ErrorFrame.cpp \
-	src/gui/gui.cpp \
-	src/gui/MainCanvas.cpp \
-	src/gui/MainFrame.cpp \
-	src/gui/ObjectFrame.cpp \
-	src/gui/StockFrame.cpp \
-	src/gui/TargetDialog.cpp \
-	src/gui/ToolboxFrame.cpp \
-	src/gui/ToolCanvas.cpp \
-	src/gui/ToolPanel.cpp \
-	src/gui/UnitDialog.cpp \
+SOURCES += \
+src/gui/DialogAbout.cpp \
+src/gui/DialogSetupStereo3D.cpp \
+src/gui/FrameMain.cpp \
+src/gui/DialogToolpathGenerator.cpp \
+src/gui/guiSetupStereo3D.cpp \
+src/gui/gui.cpp \
+src/gui/DialogAnimation.cpp \
+src/gui/MathParser.cpp \
+src/gui/CanvasTool.cpp \
+src/gui/DialogToolbox.cpp \
+src/gui/DialogStockMaterial.cpp \
+src/gui/DialogRun.cpp \
+src/gui/DialogObjectTransformation.cpp \
+src/gui/DisplaySettings.cpp \
+src/gui/DialogPlacement.cpp \
+src/gui/DialogMachineDebugger.cpp \
+src/gui/PanelTool.cpp \
+src/gui/CanvasMachine.cpp \
+src/gui/CanvasMain.cpp \
+src/gui/CanvasStereoTest.cpp \
+src/gui/DialogMachineControl.cpp \
+src/gui/DialogSetupMidi.cpp \
+src/gui/DialogSetupUnits.cpp \
+src/gui/DialogTestGCode.cpp \
+src/gui/DialogToolWizard.cpp \
+src/gui/DialogWorkpiece.cpp \
+src/gui/DnDFile.cpp \
+src/gui/PanelTopView.cpp \
+src/gui/TreeItem.cpp \
+src/gui/TreeSetup.cpp \
+
+
+# math functions
+SOURCES += \
+	src/math/Unit.cpp \
+
+
+# Project manipultion commands:
+SOURCES += \
+src/project/command/CommandObjectDelete.cpp \
+src/project/command/CommandObjectLoad.cpp \
+src/project/command/CommandObjectRename.cpp \
+src/project/command/CommandObjectSetColor.cpp \
+src/project/command/CommandObjectTransform.cpp \
+src/project/command/CommandProjectRename.cpp \
+src/project/command/CommandRunAdd.cpp \
+src/project/command/CommandRunGeneratorAdd.cpp \
+src/project/command/CommandRunGeneratorDelete.cpp \
+src/project/command/CommandRunGeneratorUpdate.cpp \
+src/project/command/CommandRunMachineLoad.cpp \
+src/project/command/CommandRunRemove.cpp \
+src/project/command/CommandRunRename.cpp \
+src/project/command/CommandRunToolAdd.cpp \
+src/project/command/CommandRunToolRemove.cpp \
+src/project/command/CommandRunWorkpieceAssign.cpp \
+src/project/command/CommandRunWorkpieceTransform.cpp \
+src/project/command/CommandWorkpieceAdd.cpp \
+src/project/command/CommandWorkpieceDelete.cpp \
+src/project/command/CommandWorkpieceObjectAssign.cpp \
+src/project/command/CommandWorkpieceObjectRemove.cpp \
+src/project/command/CommandWorkpieceObjectTransform.cpp \
+src/project/command/CommandWorkpieceRename.cpp \
+
+
+# Generator object files:
+SOURCES += \
+	src/project/generator/GeneratorPositioningDrills.cpp \
+	src/project/generator/GeneratorLoadFromFile.cpp \
+	src/project/generator/GeneratorAreaGridDexel.cpp \
+	src/project/generator/DexelTarget.cpp \
+	src/project/generator/Field.cpp \
+	src/project/generator/GeneratorTest.cpp \
+	src/project/generator/GeneratorAreaMillingDynamic.cpp \
+	src/project/generator/GeneratorCollection.cpp \
+	src/project/generator/GeneratorDexel.cpp \
+	src/project/generator/GeneratorDrillDexel.cpp \
+	src/project/generator/GeneratorNone.cpp \
+	src/project/generator/GeneratorOutlineDexel.cpp \
+	src/project/generator/GeneratorSurfaceDexel.cpp \
+	src/project/generator/Imprinter.cpp \
+	src/project/generator/ProtoToolpath.cpp \
+	src/project/generator/ToolpathGeneratorThread.cpp \
+	src/project/generator/VoxelVolume.cpp \
+	src/project/generator/Direction.cpp \
+	src/project/generator/Generator.cpp \
+
 
 # machine object files:
-SOURCES += src/machine/LUACodeEvaluator.cpp \
-	src/machine/Machine.cpp \
-	src/machine/MachineComponent.cpp \
-	src/machine/MachinePosition.cpp \
-	src/machine/Tool.cpp \
-	src/machine/ToolElement.cpp \
+SOURCES += \
+src/project/machine/Machine.cpp \
+src/project/machine/MachineSimulator.cpp \
+src/project/machine/NelderMeadOptimizer.cpp \
+src/project/machine/CNCPosition.cpp \
+src/project/machine/GCodeBlock.cpp \
+src/project/machine/LUACodeEvaluator.cpp \
+src/project/machine/MachineComponent.cpp \
+src/project/machine/CNCInterpreter.cpp \
+
 	
 # project object files:
-SOURCES += src/project/Object.cpp \
+SOURCES += \
+	src/project/Workpiece.cpp \
+	src/project/ToolPath.cpp \
+	src/project/Object.cpp \
+	src/project/ObjectPlacement.cpp \
 	src/project/Project.cpp \
 	src/project/Run.cpp \
-	src/project/Stock.cpp \
+	src/project/StockFile.cpp \
 	src/project/StockMaterial.cpp \
-	src/project/Target.cpp \
-	src/project/TargetPlacement.cpp \
-	src/project/Toolbox.cpp \
-	src/project/ToolPath.cpp \
-	src/project/Unit.cpp \
-	src/project/Workpiece.cpp \
+	src/project/Support.cpp \
+	src/project/Tool.cpp \
+	src/project/ToolBox.cpp \
+	src/project/FlipDrillPattern.cpp \
 
-# simulator object files:
-SOURCES += src/simulator/MachineSimulator.cpp \
-	
+
 	
 	
 
@@ -121,9 +191,9 @@ DEPS := $(patsubst %.cpp, ${OBJDIR}/%.d, ${SOURCES})
 
 # gcc flags:
 INCFLAGS := -I./src
-CXXFLAGS := `wx-config --cxxflags` -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/lua5.1 -O0 -g3 -Wall 
-LDFLAGS  := `wx-config --libs gl,core,base,xml` -L/usr/local/lib -L/usr/lib
-LDLIBS   := -llua5.1 -lGLU
+CXXFLAGS := `wx-config --cxxflags` -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/lua5.3 -O0 -g3 -Wall 
+LDFLAGS  := `wx-config --libs richtext,gl,core,base,html,xml,adv` -L/usr/local/lib -L/usr/lib
+LDLIBS   := -llua5.3 -lGL -lGLU
 #REZFLAGS := `wx-config --rez-flags`
 
 ifdef FINAL
@@ -180,9 +250,10 @@ $(OBJDIR) :
 		mkdir $(OBJDIR)/src
 		mkdir $(OBJDIR)/src/3D
 		mkdir $(OBJDIR)/src/controller
-		mkdir $(OBJDIR)/src/generator
 		mkdir $(OBJDIR)/src/gui
-		mkdir $(OBJDIR)/src/machine
+		mkdir $(OBJDIR)/src/math
 		mkdir $(OBJDIR)/src/project
-		mkdir $(OBJDIR)/src/simulator
+		mkdir $(OBJDIR)/src/project/command
+		mkdir $(OBJDIR)/src/project/generator
+		mkdir $(OBJDIR)/src/project/machine
 		

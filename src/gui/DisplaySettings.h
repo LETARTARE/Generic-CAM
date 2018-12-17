@@ -35,7 +35,7 @@
 
 #include "../StdInclude.h"
 #include "../3D/OpenGLCanvas.h"
-#include "Unit.h"
+#include "../math/Unit.h"
 #include <wx/config.h>
 
 class DisplaySettings {

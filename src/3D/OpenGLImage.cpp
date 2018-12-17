@@ -198,7 +198,7 @@ void OpenGLImage::Update(void) const
 void OpenGLImage::SetAlphaColor(unsigned char red, unsigned char green,
 		unsigned char blue)
 {
-	if(~HasAlpha()) InitAlpha();
+	if(!HasAlpha()) InitAlpha();
 	for(size_t i = 0; i < GetWidth(); i++){
 		for(size_t j = 0; j < GetHeight(); j++){
 			if(GetRed(i, j) == red && GetGreen(i, j) == green

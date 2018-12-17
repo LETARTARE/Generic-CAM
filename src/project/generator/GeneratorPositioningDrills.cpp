@@ -33,7 +33,7 @@
 #include <wx/sizer.h>
 
 #include "../../gui/DisplaySettings.h"
-#include "../../gui/Unit.h"
+#include "../../math/Unit.h"
 #include "../FlipDrillPattern.h"
 #include "../Project.h"
 
