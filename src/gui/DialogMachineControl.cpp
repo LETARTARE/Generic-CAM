@@ -29,20 +29,22 @@
 
 #include <math.h>
 
-DialogMachineControl::DialogMachineControl(wxWindow* parent,
-		DisplaySettings * settings, MidiPort * midi) :
+#include "FrameMain.h"
+#include "FrameParent.h"
+
+DialogMachineControl::DialogMachineControl(wxWindow* parent, MidiPort &midi) :
 		GUIMachineControl(parent)
 {
-	this->settings = settings;
-	this->midi = midi;
+	m_menuSettings->Append(ID_SETUPMIDI, _("Setup &MIDI"));
+	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+
+	this->midi = &midi;
 	X = Y = Z = 0.0;
 	A = B = C = 0.0;
 	U = V = W = 0.0;
 
-	if(midi != NULL){
-		for(uint8_t n = 0; n < 10; n++)
-			midi->cc[n] = 64;
-	}
+	for(uint8_t n = 0; n < 10; n++)
+		this->midi->cc[n] = 64;
 
 	groupXYZLimit = 1.0;
 	groupABCLimit = M_PI;
@@ -168,6 +170,10 @@ bool DialogMachineControl::TransferDataFromWindowSliders(void)
 
 bool DialogMachineControl::TransferDataToWindowTextbox(void)
 {
+	FrameParent * frame =
+			wxStaticCast(GetParent(), FrameMain)->GetParentFrame();
+	DisplaySettings * settings = &(frame->settings);
+
 	m_staticTextUnitX->SetLabel(settings->Distance.GetOtherName());
 	m_staticTextUnitY->SetLabel(settings->Distance.GetOtherName());
 	m_staticTextUnitZ->SetLabel(settings->Distance.GetOtherName());
@@ -229,6 +235,8 @@ void DialogMachineControl::OnZero(wxMouseEvent& event)
 
 void DialogMachineControl::OnTextChanged(wxCommandEvent& event)
 {
+	FrameParent * frame = wxStaticCast(GetParent()->GetParent(), FrameParent);
+	DisplaySettings * settings = &(frame->settings);
 	switch(event.GetId()){
 	case ID_TEXTX:
 		m_textCtrlX->GetValue().ToDouble(&X);
@@ -272,6 +280,13 @@ void DialogMachineControl::OnTextChanged(wxCommandEvent& event)
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
 	ID_UPDATEMACHINESIMULATION);
 	ProcessEvent(selectEvent);
+}
+
+Project* DialogMachineControl::GetProject(void)
+{
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project * project = wxStaticCast(frame->GetDocument(), Project);
+	return project;
 }
 
 void DialogMachineControl::OnTimer(wxTimerEvent& event)

@@ -42,11 +42,8 @@
 
 class DialogMachineControl:public GUIMachineControl {
 public:
-	DialogMachineControl(wxWindow * parent, DisplaySettings * settings, MidiPort * midi);
+	DialogMachineControl(wxWindow * parent, MidiPort &midi);
 	virtual ~DialogMachineControl();
-
-
-	DisplaySettings * settings;
 
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
@@ -71,8 +68,9 @@ private:
 	bool TransferDataFromWindowSliders(void);
 	bool TransferDataToWindowTextbox(void);
 
+	Project* GetProject(void);
+
 protected:
-	
 	void OnXClose(wxCloseEvent& event);
 	void OnClose(wxCommandEvent& event);
 	void OnScroll(wxScrollEvent& event);
@@ -81,7 +79,6 @@ protected:
 	void OnTextChanged(wxCommandEvent& event);
 
 	void OnTimer(wxTimerEvent& event);
-
 };
 
 #endif /* DIALOGMACHINECONTROL_H_ */

@@ -33,7 +33,6 @@
  * ...
  */
 
-#include "../StdInclude.h"
 #include "../controller/MidiPort.h"
 #include "../project/Project.h"
 #include "../project/machine/Machine.h"
@@ -43,9 +42,8 @@
 
 class DialogMachineDebugger:public GUIMachineDebugger {
 public:
-	DialogMachineDebugger(wxWindow * parent, DisplaySettings * settings, MidiPort * midi);
+	DialogMachineDebugger(wxWindow * parent,  MidiPort &midi);
 	virtual ~DialogMachineDebugger();
-	DisplaySettings * settings;
 
 	MidiPort * midi;
 
@@ -53,9 +51,7 @@ public:
 	bool TransferDataFromWindow(void);
 
 private:
-
 	DialogMachineControl * machineControl;
-
 	Machine machine;
 
 protected:
@@ -68,7 +64,6 @@ protected:
 	void OnScriptEvaluate(wxCommandEvent& event);
 	void OnShowController(wxCommandEvent& event);
 	void OnChangeStereo3D(wxCommandEvent& event);
-
 };
 
 #endif /* DIALOGMACHINEDEBUGGER_H_ */

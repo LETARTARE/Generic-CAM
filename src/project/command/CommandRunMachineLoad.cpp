@@ -38,7 +38,7 @@ CommandRunMachineLoad::CommandRunMachineLoad(const wxString& name,
 bool CommandRunMachineLoad::Do(void)
 {
 	bool flag = project->run[runNr].machine.Load(wxFileName(fileName));
-	if(flag) project->Update();
+	project->Update();
 	return flag;
 }
 

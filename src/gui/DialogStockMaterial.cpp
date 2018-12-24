@@ -26,15 +26,15 @@
 
 #include "DialogStockMaterial.h"
 
+#include "../project/ProjectView.h"
+#include "FrameMain.h"
+#include "FrameParent.h"
 #include "IDs.h"
 
-DialogStockMaterial::DialogStockMaterial(wxWindow* parent, Project * project,
-		StockFile* stock, DisplaySettings * settings) :
+DialogStockMaterial::DialogStockMaterial(wxWindow* parent) :
 		GUIStockMaterial(parent)
 {
-	this->project = project;
-	this->settings = settings;
-	this->stock = stock;
+	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
 
 	selectedLine = -1;
 	isInitialized = false;
@@ -70,11 +70,15 @@ void DialogStockMaterial::Initialize(void)
 bool DialogStockMaterial::TransferDataToWindow(void)
 {
 	if(!this->IsShown()) return false;
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
+	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
 	if(project == NULL) return false;
 
 	if(!isInitialized) Initialize();
 
-	ArrayOfStockMaterial* temp = &(stock->stockMaterials);
+	ArrayOfStockMaterial* temp = &(view->stock.stockMaterials);
 	size_t N = m_listCtrl->GetItemCount();
 	size_t i;
 	for(i = 0; i < temp->GetCount(); i++){
@@ -117,14 +121,16 @@ bool DialogStockMaterial::TransferDataToWindow(void)
 	m_textCtrlZ->SetValue(settings->Distance.TextFromSI(sz));
 	m_textCtrlMaxSpeed->SetValue(
 			settings->RotationalSpeed.TextFromSI(toolSpeed));
-	m_textCtrlMaxFeedrate->SetValue(
-			settings->LinearSpeed.TextFromSI(feedrate));
+	m_textCtrlMaxFeedrate->SetValue(settings->LinearSpeed.TextFromSI(feedrate));
 	m_checkBoxAvailable->SetValue(available);
 
 	return true;
 }
+
 bool DialogStockMaterial::TransferDataFromWindow(void)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
 	name = m_textCtrlName->GetValue();
 
 	m_textCtrlX->GetValue().ToDouble(&sx);
@@ -159,6 +165,9 @@ void DialogStockMaterial::OnXClose(wxCloseEvent& event)
 
 void DialogStockMaterial::OnAddUpdate(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
+	StockFile* stock = &(view->stock);
 	TransferDataFromWindow();
 
 	size_t i;
@@ -181,12 +190,15 @@ void DialogStockMaterial::OnAddUpdate(wxCommandEvent& event)
 	TransferDataToWindow();
 
 	//TODO: Does the above operation require a refresh of the FrameMain?
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHMAINGUI);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 	ProcessEvent(selectEvent);
 }
 
 void DialogStockMaterial::OnDelete(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
+	StockFile* stock = &(view->stock);
 	TransferDataFromWindow();
 	size_t i;
 	for(i = 0; i < stock->stockMaterials.GetCount(); i++){
@@ -200,6 +212,9 @@ void DialogStockMaterial::OnDelete(wxCommandEvent& event)
 
 void DialogStockMaterial::OnActivate(wxListEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
+	StockFile* stock = &(view->stock);
 	TransferDataFromWindow();
 	int i = event.GetIndex();
 	stock->stockMaterials[i].available ^= true;
@@ -217,6 +232,9 @@ void DialogStockMaterial::OnSize(wxSizeEvent& event)
 
 void DialogStockMaterial::OnSelected(wxListEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
+	StockFile* stock = &(view->stock);
 	int i = event.GetIndex();
 
 	sx = stock->stockMaterials[i].sx;
@@ -230,3 +248,9 @@ void DialogStockMaterial::OnSelected(wxListEvent& event)
 	TransferDataToWindow();
 }
 
+Project* DialogStockMaterial::GetProject(void)
+{
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project * project = wxStaticCast(frame->GetDocument(), Project);
+	return project;
+}

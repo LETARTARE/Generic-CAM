@@ -31,12 +31,15 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#define _GENERICCAM_VERSION "0.2"
-#define _GENERICCAM_AUTHORS "Tobias Schaefer"
-//#define _GENERICCAM_USEMULTITHREADING
+#define _GENERICCAM_VERSION_MAJOR 0
+#define _GENERICCAM_VERSION_MINOR 2
+#define _GENERICCAM_VERSION_PATCH 0
 
 //#define _DEBUGMODE
+#define _USE_3DVIEWS
 #define _USE_3DPICKING
+//#define _USE_MIDI
 #define _USE_6DOFCONTROLLER
+//#define _USE_MULTITHREADING
 
 #endif /* CONFIG_H_ */

@@ -41,7 +41,7 @@
 
 class DialogSetupMidi:public GUISetupMidi {
 public:
-	DialogSetupMidi(wxWindow* parent, MidiPort* midi);
+	DialogSetupMidi(wxWindow* parent, MidiPort &midi);
 	virtual ~DialogSetupMidi();
 
 private:

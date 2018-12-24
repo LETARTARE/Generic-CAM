@@ -27,15 +27,16 @@
 #include "DialogPlacement.h"
 
 #include "../project/command/CommandWorkpieceObjectTransform.h"
+#include "FrameMain.h"
+#include "FrameParent.h"
 #include "IDs.h"
 
-DialogPlacement::DialogPlacement(wxWindow* parent, Project* project,
-		wxCommandProcessor* commandProcessor, DisplaySettings* settings) :
+DialogPlacement::DialogPlacement(wxWindow* parent) :
 		GUIPlacement(parent)
 {
-	this->project = project;
-	this->commandProcessor = commandProcessor;
-	this->settings = settings;
+	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	FrameMain * frame = wxStaticCast(parent, FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	m_topview->InsertProject(project);
 }
 
@@ -45,6 +46,9 @@ DialogPlacement::~DialogPlacement()
 
 bool DialogPlacement::TransferDataToWindow(void)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
 	int wpNr = GetSelectedWorkpiece();
 	int plNr = GetSelectedPlacement(wpNr);
 
@@ -138,6 +142,8 @@ void DialogPlacement::OnExtraAdd(wxCommandEvent& event)
 
 int DialogPlacement::GetSelectedWorkpiece(void)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	size_t N = project->workpieces.GetCount();
 	if(N == 0) return -1;
 	size_t n;
@@ -149,6 +155,8 @@ int DialogPlacement::GetSelectedWorkpiece(void)
 
 int DialogPlacement::GetSelectedPlacement(int workpieceNr)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	if(workpieceNr < 0) return -1;
 	size_t N = project->workpieces[workpieceNr].placements.GetCount();
 	if(N == 0) return -1;
@@ -161,18 +169,22 @@ int DialogPlacement::GetSelectedPlacement(int workpieceNr)
 
 void DialogPlacement::OnSelectWorkpiece(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	int id = m_choiceWorkpiece->GetSelection() - 1;
 	size_t n;
 	for(n = 0; n < project->workpieces.GetCount(); n++)
 		project->workpieces[n].selected = (n == id);
 
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHMAINGUI);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 	ProcessEvent(selectEvent);
 	TransferDataToWindow();
 }
 
 void DialogPlacement::OnSelectObject(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	int wpNr = m_choiceWorkpiece->GetSelection() - 1;
 	if(wpNr < 0) return;
 	int plNr = m_choicePlacement->GetSelection() - 1;
@@ -181,7 +193,7 @@ void DialogPlacement::OnSelectObject(wxCommandEvent& event)
 	for(size_t n = 0; n < project->workpieces[wpNr].placements.GetCount(); n++)
 		project->workpieces[wpNr].placements[n].selected = (n == plNr);
 
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHMAINGUI);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 	ProcessEvent(selectEvent);
 	TransferDataToWindow();
 
@@ -189,6 +201,10 @@ void DialogPlacement::OnSelectObject(wxCommandEvent& event)
 
 void DialogPlacement::OnChange(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
+	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
 	int wpNr = m_choiceWorkpiece->GetSelection() - 1;
 	if(wpNr < 0) return;
 	int plNr = m_choicePlacement->GetSelection() - 1;
@@ -245,7 +261,7 @@ void DialogPlacement::OnChange(wxCommandEvent& event)
 			description = _("Object: Mill everything");
 		break;
 	}
-	commandProcessor->Submit(
+	cmdProc->Submit(
 			new CommandWorkpieceObjectTransform(description, project, wpNr,
 					plNr, temp, newX, newY, useContour, slotWidth));
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
@@ -256,7 +272,10 @@ void DialogPlacement::OnChange(wxCommandEvent& event)
 
 void DialogPlacement::OnChangeSlider(wxScrollEvent& event)
 {
-
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
+	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
 	int wpNr = m_choiceWorkpiece->GetSelection() - 1;
 	if(wpNr < 0) return;
 	int plNr = m_choicePlacement->GetSelection() - 1;
@@ -279,7 +298,7 @@ void DialogPlacement::OnChangeSlider(wxScrollEvent& event)
 	temp *= AffineTransformMatrix::RotateAroundVector(Vector3(0, 0, 1), d);
 	description = _("Rotate around Z: ")
 			+ settings->Angle.TextFromSIWithUnit(d, 2);
-	commandProcessor->Submit(
+	cmdProc->Submit(
 			new CommandWorkpieceObjectTransform(description, project, wpNr,
 					plNr, temp, newX, newY, useContour, slotWidth));
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
@@ -288,8 +307,19 @@ void DialogPlacement::OnChangeSlider(wxScrollEvent& event)
 	TransferDataToWindow();
 }
 
+Project* DialogPlacement::GetProject(void)
+{
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project * project = wxStaticCast(frame->GetDocument(), Project);
+	return project;
+}
+
 void DialogPlacement::OnTransform(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
+	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
 	int wpNr = m_choiceWorkpiece->GetSelection() - 1;
 	if(wpNr < 0) return;
 	int plNr = m_choicePlacement->GetSelection() - 1;
@@ -347,7 +377,7 @@ void DialogPlacement::OnTransform(wxCommandEvent& event)
 		break;
 	}
 
-	commandProcessor->Submit(
+	cmdProc->Submit(
 			new CommandWorkpieceObjectTransform(description, project, wpNr,
 					plNr, temp, newX, newY, useContour, slotWidth));
 

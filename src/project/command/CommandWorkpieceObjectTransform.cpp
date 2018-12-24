@@ -65,6 +65,7 @@ bool CommandWorkpieceObjectTransform::Do(void)
 	project->workpieces[workpieceNr].placements[placementNr].slotWidth =
 			newSlotWidth;
 	project->workpieces[workpieceNr].Update();
+	project->Update();
 	return true;
 }
 
@@ -80,5 +81,6 @@ bool CommandWorkpieceObjectTransform::Undo(void)
 	project->workpieces[workpieceNr].placements[placementNr].slotWidth =
 			oldSlotWidth;
 	project->workpieces[workpieceNr].Update();
+	project->Update();
 	return true;
 }

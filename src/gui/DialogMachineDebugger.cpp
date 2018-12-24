@@ -24,30 +24,37 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "../StdInclude.h"
+
 #include "DialogMachineDebugger.h"
 
 #include "IDs.h"
 #include <wx/textfile.h>
 #include <wx/dir.h>
 
-DialogMachineDebugger::DialogMachineDebugger(wxWindow * parent,
-		DisplaySettings * settings, MidiPort * midi) :
+#include "FrameMain.h"
+#include "FrameParent.h"
+
+DialogMachineDebugger::DialogMachineDebugger(wxWindow * parent, MidiPort &midi) :
 		GUIMachineDebugger(parent)
 {
+	m_menuSettings->Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
+	m_menuSettings->Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
+	m_menuSettings->Append(ID_SETUPMIDI, _("Setup &MIDI"));
+	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
 
 	this->Connect(ID_UPDATEMACHINESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(DialogMachineDebugger::Update));
 
-	this->midi = midi;
-	this->settings = settings;
-	machineControl = new DialogMachineControl(this, settings, midi);
+	this->midi = &midi;
+	machineControl = new DialogMachineControl(this, midi);
 
 	m_canvas->InsertMachine(&machine);
 //	machine.Load(wxFileName(_T("machines/testmachine.lua")));
 	machine.EvaluateDescription();
 	m_textCtrlScript->SetValue(machine.machineDescription);
 
-	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
+	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
 	TransferDataToWindow();
 }
 
@@ -75,6 +82,8 @@ void DialogMachineDebugger::Update(wxCommandEvent& event)
 
 bool DialogMachineDebugger::TransferDataToWindow(void)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	DisplaySettings * settings = &(frame->GetParentFrame()->settings);
 	settings->WriteToCanvas(m_canvas);
 	if(!this->IsShown()){
 		if(machineControl->IsShown()) machineControl->Show(false);
@@ -126,6 +135,8 @@ void DialogMachineDebugger::OnScriptEvaluate(wxCommandEvent& event)
 
 void DialogMachineDebugger::OnMachineLoad(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	DisplaySettings * settings = &(frame->GetParentFrame()->settings);
 	wxFileDialog dialog(this, _("Open machine description..."), _T(""), _T(""),
 			_(
 					"All machine descriptions  (*.lua;*.zip)|*.lua;*.zip|Machine descriptions (LUA Files)  (*.lua)|*.lua|Packed Machine descriptions  (*.zip)|*.zip|Text files  (*.txt)|*.txt|All files|*.*"),
@@ -189,7 +200,9 @@ void DialogMachineDebugger::OnChangeStereo3D(wxCommandEvent& event)
 	}else{
 		m_canvas->stereoMode = stereoAnaglyph;
 	}
-	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
+	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	DisplaySettings * settings = &(frame->GetParentFrame()->settings);
 	settings->WriteToCanvas(m_canvas);
 	m_canvas->Refresh();
 }

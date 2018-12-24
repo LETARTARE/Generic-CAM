@@ -42,13 +42,8 @@
 
 class DialogWorkpiece:public GUIWorkpiece {
 public:
-	DialogWorkpiece(wxWindow* parent, Project * project, StockFile * stock,
-			wxCommandProcessor * commandProcessor);
-
-	Project* project;
-	StockFile* stock;
-	wxCommandProcessor * commandProcessor;
-
+	DialogWorkpiece(wxWindow* parent);
+	Project* GetProject(void);
 	void OnXClose(wxCloseEvent& event);
 	void OnClose(wxCommandEvent& event);
 	void OnManageStock(wxCommandEvent& event);
@@ -56,7 +51,6 @@ public:
 	void OnDBLClick(wxGridEvent& event);
 	void OnSize(wxSizeEvent& event);
 	bool TransferDataToWindow(void);
-
 };
 
 #endif /* DIALOGWORKPIECE_H_ */

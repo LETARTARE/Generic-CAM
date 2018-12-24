@@ -37,17 +37,11 @@ class DialogToolbox:public GUIToolbox {
 	// Constructor/ Destructor
 
 public:
-	DialogToolbox(wxWindow* parent, Project * project, ToolBox * toolbox,
-			DisplaySettings * settings);
+	DialogToolbox(wxWindow* parent);
 	virtual ~DialogToolbox();
 
 	// Member Variables
 protected:
-
-	ToolBox* toolbox;
-	Project* project;
-	DisplaySettings * settings;
-
 	int selectedTool;
 	int selectedElement;
 

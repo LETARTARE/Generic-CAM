@@ -24,9 +24,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "../StdInclude.h"
 #include "DialogSetupUnits.h"
 #include "IDs.h"
-#include "../StdInclude.h"
 
 DialogSetupUnits::DialogSetupUnits(wxWindow* parent, DisplaySettings * settings) :
 		GUISetupUnits(parent)

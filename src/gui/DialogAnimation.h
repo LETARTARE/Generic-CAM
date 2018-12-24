@@ -36,7 +36,7 @@
 class DialogAnimation:public GUIAnimation {
 	// Constructor/ Destructor
 public:
-	DialogAnimation(wxWindow *parent, Project *project);
+	DialogAnimation(wxWindow *parent);
 	virtual ~DialogAnimation();
 
 	bool TransferDataToWindow(void);
@@ -58,20 +58,20 @@ public:
 private:
 	void PositionSlider(void);
 	int GetSelectedRun(void);
+	Project* GetProject(void);
 	void InitSimulation(void);
 	wxString SecondsToTC(const double t);
 
 	// Member Variables
 public:
-	Project* project;
-	Run* run;
+
+private:
+	int runNr;
 	MachineSimulator* simulator;
 
 	DexelTarget model;
 
 	bool simulateWorkpiece;
-
-private:
 	bool loopGuard;
 	wxTimer timer;
 };

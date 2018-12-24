@@ -32,14 +32,13 @@
 #include <wx/event.h>
 #include <math.h>
 
-DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent,
-		Project * project, wxCommandProcessor * commandProcessor,
-		DisplaySettings * settings) :
+#include "FrameMain.h"
+#include "FrameParent.h"
+
+DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent) :
 		GUIObjectTransformation(parent)
 {
-	this->project = project;
-	this->commandProcessor = commandProcessor;
-	this->settings = settings;
+	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
 
 	scaleProportional = true;
 	scalePercent = 1;
@@ -62,6 +61,8 @@ DialogObjectTransformation::~DialogObjectTransformation()
 bool DialogObjectTransformation::TransferDataToWindow(void)
 {
 	if(!this->IsShown()) return false;
+	Project* project = GetProject();
+	DisplaySettings* settings = &(wxStaticCast(GetParent()->GetParent(),FrameParent)->settings);
 	if(project == NULL) return false;
 
 	// Update Selection box
@@ -123,12 +124,9 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 	m_staticTextUnitMove->SetLabel(settings->Distance.GetOtherName());
 	m_staticTextUnitAngle->SetLabel(settings->Angle.GetOtherName());
 
-	m_textCtrlScaleUnitX->SetValue(
-			settings->Distance.TextFromSI(scaleUnitX));
-	m_textCtrlScaleUnitY->SetValue(
-			settings->Distance.TextFromSI(scaleUnitY));
-	m_textCtrlScaleUnitZ->SetValue(
-			settings->Distance.TextFromSI(scaleUnitZ));
+	m_textCtrlScaleUnitX->SetValue(settings->Distance.TextFromSI(scaleUnitX));
+	m_textCtrlScaleUnitY->SetValue(settings->Distance.TextFromSI(scaleUnitY));
+	m_textCtrlScaleUnitZ->SetValue(settings->Distance.TextFromSI(scaleUnitZ));
 
 	m_textCtrlScalePercent->SetValue(
 			wxString::Format(_T("%.1f"), scalePercent * 100));
@@ -153,6 +151,8 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 }
 bool DialogObjectTransformation::TransferDataFromWindow(void)
 {
+	DisplaySettings* settings = &(wxStaticCast(GetParent(),FrameMain)->GetParentFrame()->settings);
+
 	m_textCtrlScalePercent->GetValue().ToDouble(&scalePercent);
 	m_textCtrlScalePercentX->GetValue().ToDouble(&scalePercentX);
 	m_textCtrlScalePercentY->GetValue().ToDouble(&scalePercentY);
@@ -193,6 +193,7 @@ void DialogObjectTransformation::OnXClose(wxCloseEvent& event)
 
 void DialogObjectTransformation::OnSelectObject(wxCommandEvent& event)
 {
+	Project* project = GetProject();
 	int id = m_choiceObjectSelection->GetSelection();
 	// Return if "Multiple objects selected." was selected again.
 	if(id >= project->objects.GetCount()) return;
@@ -202,12 +203,16 @@ void DialogObjectTransformation::OnSelectObject(wxCommandEvent& event)
 		project->objects[n].selected = (n == id);
 
 	// Tell the main frame to update the selection in the treeview via custom command.
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHMAINGUI);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 	ProcessEvent(selectEvent);
 }
 
 void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 {
+	Project* project = GetProject();
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
 	if(project == NULL) return;
 	TransferDataFromWindow();
 
@@ -415,9 +420,10 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 
 			command = new CommandObjectTransform(description, project, n, flipX,
 					flipY, flipZ, flipNormals, newMatrix);
-			commandProcessor->Submit(command);
+			cmdProc->Submit(command);
 		}else{
-			wxLogMessage(
+			wxLogMessage
+			(
 					wxString::Format(
 							_T(
 									"Unknown ID_... (=%i) in DialogObjectTransformation::OnTransform(...)"),
@@ -425,12 +431,13 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 		}
 	}
 
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 	ProcessEvent(selectEvent);
 }
 
 void DialogObjectTransformation::OnSetFactors(wxCommandEvent& event)
 {
+	Project* project = GetProject();
 	TransferDataFromWindow();
 
 	// Calculate a common bounding box of all selected objects.
@@ -498,6 +505,9 @@ void DialogObjectTransformation::OnFlipNormals(wxCommandEvent& event)
 
 void DialogObjectTransformation::OnChangeObjectColor(wxColourPickerEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(),Project);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
 	Vector3 color;
 	wxColor temp = m_colourPickerObject->GetColour();
 	color.x = (float) temp.Red() / 255.0;
@@ -507,8 +517,15 @@ void DialogObjectTransformation::OnChangeObjectColor(wxColourPickerEvent& event)
 		if(!project->objects[n].selected) continue;
 		CommandObjectSetColor* command = new CommandObjectSetColor(
 				_("Set object color"), project, n, color);
-		commandProcessor->Submit(command);
+		cmdProc->Submit(command);
 	}
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 	ProcessEvent(selectEvent);
+}
+
+Project* DialogObjectTransformation::GetProject(void)
+{
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project * project = wxStaticCast(frame->GetDocument(), Project);
+	return project;
 }

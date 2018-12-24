@@ -30,6 +30,7 @@
 #include "generator/ToolpathGeneratorThread.h"
 
 #include "../3D/FileSTL.h"
+#include "../gui/IDs.h"
 
 #include <wx/zipstrm.h>
 #include <wx/txtstrm.h>
@@ -39,7 +40,10 @@
 #include <math.h>
 #include <float.h>
 
-Project::Project()
+IMPLEMENT_DYNAMIC_CLASS(Project, wxDocument)
+
+Project::Project() :
+		wxDocument()
 {
 	Clear();
 }
@@ -200,6 +204,17 @@ void Project::Update(void)
 		}
 		run[i].Update();
 	}
+	UpdateAllViews();
+}
+
+bool Project::DoSaveDocument(const wxString& file)
+{
+	return Save(wxFileName(file));
+}
+
+bool Project::DoOpenDocument(const wxString& file)
+{
+	return Load(wxFileName(file));
 }
 
 bool Project::Save(wxFileName fileName)
@@ -252,6 +267,14 @@ bool Project::Load(wxFileName fileName)
 	if(!fileName.IsOk()) return false;
 	setlocale(LC_ALL, "C");
 	wxFFileInputStream in(fileName.GetFullPath());
+
+	if(!in.IsOk()){
+		printf("File is not OK: ");
+		printf(fileName.GetFullPath().ToAscii());
+		printf("\n");
+		return false;
+	}
+
 	wxZipInputStream zip(in);
 	wxTextInputStream txt(zip);
 
@@ -641,6 +664,7 @@ void Project::RenderCoordinateSystem(void) const
 
 	::glEnd();
 }
+
 
 //void Project::PaintDepthField(unsigned int runNr,
 //		unsigned int objectReferenceNr)

@@ -38,17 +38,13 @@
 #include "gui.h"
 
 class DialogStockMaterial:public GUIStockMaterial {
-public:
 	// Constructor/ Destructor
-	DialogStockMaterial(wxWindow* parent, Project * project, StockFile* stock,
-			DisplaySettings * settings);
+public:
+	DialogStockMaterial(wxWindow* parent);
 	virtual ~DialogStockMaterial();
+
 	// Member Variables
 private:
-	Project* project;
-	StockFile* stock;
-	DisplaySettings * settings;
-
 	int selectedLine;
 	bool isInitialized;
 
@@ -57,6 +53,7 @@ private:
 	double feedrate;
 	double toolSpeed;
 	bool available;
+
 	// Methods
 public:
 	bool TransferDataToWindow(void);
@@ -64,6 +61,7 @@ public:
 	void Initialize(void);
 
 protected:
+	Project* GetProject(void);
 
 	void OnXClose(wxCloseEvent& event);
 	void OnClose(wxCommandEvent& event);
@@ -72,7 +70,6 @@ protected:
 	void OnDelete(wxCommandEvent& event);
 	void OnActivate(wxListEvent& event);
 	void OnSelected(wxListEvent& event);
-
 };
 
 #endif /* DIALOGSTOCKMATERIAL_H_ */

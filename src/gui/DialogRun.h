@@ -42,16 +42,10 @@
 
 class DialogRun:public GUIRun {
 public:
-	DialogRun(wxWindow* parent, Project * project, ToolBox * toolbox,
-			wxCommandProcessor * commandProcessor, DisplaySettings * settings);
+	DialogRun(wxWindow* parent);
 	virtual ~DialogRun();
 
 private:
-	Project* project;
-	ToolBox* toolbox;
-	DisplaySettings * settings;
-	wxCommandProcessor * commandProcessor;
-
 	bool loopGuard;
 
 	// Methods
@@ -59,6 +53,8 @@ public:
 
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
+private:
+	Project* GetProject(void);
 	int GetSelected(void);
 
 	void OnXClose(wxCloseEvent& event);
@@ -69,7 +65,6 @@ public:
 	void OnMachineLoad(wxCommandEvent& event);
 	void OnToolRemove(wxCommandEvent& event);
 	void OnToolAdd(wxCommandEvent& event);
-
 };
 
 #endif /* DIALOGRUN_H_ */

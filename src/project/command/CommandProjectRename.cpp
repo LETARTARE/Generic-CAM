@@ -38,11 +38,13 @@ bool CommandProjectRename::Do(void)
 {
 	this->oldName = project->name;
 	project->name = this->newName;
+	project->Update();
 	return true;
 }
 
 bool CommandProjectRename::Undo(void)
 {
 	project->name = this->oldName;
+	project->Update();
 	return true;
 }

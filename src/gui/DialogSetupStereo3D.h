@@ -41,7 +41,7 @@ class DisplaySettings;
 
 class DialogSetupStereo3D:public GUISetupStereo3D {
 public:
-	DialogSetupStereo3D(wxWindow* parent, DisplaySettings * settings);
+	DialogSetupStereo3D(wxWindow* parent, DisplaySettings &settings);
 
 private:
 	DisplaySettings * settings;

@@ -54,6 +54,7 @@ bool CommandRunToolRemove::Do(void)
 		run->machine.tools.Insert(temp, index);
 	}
 	run->Update();
+	project->Update();
 	return true;
 }
 
@@ -69,5 +70,6 @@ bool CommandRunToolRemove::Undo(void)
 	}
 	oldTool = NULL;
 	run->Update();
+	project->Update();
 	return true;
 }

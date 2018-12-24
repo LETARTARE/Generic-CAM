@@ -64,14 +64,13 @@ SOURCES += \
 	
 # GUI object files:
 SOURCES += \
-src/gui/DialogAbout.cpp \
 src/gui/DialogSetupStereo3D.cpp \
 src/gui/FrameMain.cpp \
+src/gui/FrameParent.cpp \
 src/gui/DialogToolpathGenerator.cpp \
 src/gui/guiSetupStereo3D.cpp \
 src/gui/gui.cpp \
 src/gui/DialogAnimation.cpp \
-src/gui/MathParser.cpp \
 src/gui/CanvasTool.cpp \
 src/gui/DialogToolbox.cpp \
 src/gui/DialogStockMaterial.cpp \
@@ -99,6 +98,7 @@ src/gui/TreeSetup.cpp \
 # math functions
 SOURCES += \
 	src/math/Unit.cpp \
+	src/math/MathParser.cpp \
 
 
 # Project manipultion commands:
@@ -170,6 +170,7 @@ SOURCES += \
 	src/project/Object.cpp \
 	src/project/ObjectPlacement.cpp \
 	src/project/Project.cpp \
+	src/project/ProjectView.cpp \
 	src/project/Run.cpp \
 	src/project/StockFile.cpp \
 	src/project/StockMaterial.cpp \

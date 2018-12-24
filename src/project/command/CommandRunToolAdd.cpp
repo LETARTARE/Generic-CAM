@@ -53,12 +53,14 @@ bool CommandRunToolAdd::Do(void)
 				onlyUpdating = true;
 				oldTool = run->machine.tools[n];
 				run->machine.tools[n] = newTool;
+				project->Update();
 				return true;
 			}
 		}
 	}
 	run->machine.tools.Add(newTool);
 	run->Update();
+	project->Update();
 	return true;
 }
 
@@ -72,6 +74,7 @@ bool CommandRunToolAdd::Undo(void)
 		for(size_t n = 0; n < maxTools; n++){
 			if(run->machine.tools[n].slotNr == slotNr){
 				run->machine.tools[n] = oldTool;
+				project->Update();
 				return true;
 			}
 		}
@@ -79,5 +82,6 @@ bool CommandRunToolAdd::Undo(void)
 	}
 	run->machine.tools.RemoveAt(run->machine.tools.GetCount() - 1, 1);
 	run->Update();
+	project->Update();
 	return true;
 }

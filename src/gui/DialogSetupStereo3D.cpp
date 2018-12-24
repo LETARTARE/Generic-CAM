@@ -34,10 +34,10 @@
 #include "../StdInclude.h"
 
 DialogSetupStereo3D::DialogSetupStereo3D(wxWindow* parent,
-		DisplaySettings * settings) :
+		DisplaySettings &settings) :
 		GUISetupStereo3D(parent)
 {
-	this->settings = settings;
+	this->settings = &settings;
 	
 	m_canvas->stereoMode = stereoAnaglyph;
 	TransferDataToWindow();

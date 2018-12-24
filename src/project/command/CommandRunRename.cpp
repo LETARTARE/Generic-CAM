@@ -39,11 +39,13 @@ bool CommandRunRename::Do(void)
 {
 	this->oldName = project->run[runNr].name;
 	project->run[runNr].name = this->newName;
+	project->Update();
 	return true;
 }
 
 bool CommandRunRename::Undo(void)
 {
 	project->run[runNr].name = this->oldName;
+	project->Update();
 	return true;
 }

@@ -41,6 +41,7 @@ bool CommandRunWorkpieceTransform::Do(void)
 	matrixOld = project->run[runNr].workpiecePlacement;
 	project->run[runNr].workpiecePlacement = matrixNew;
 	project->run[runNr].Update();
+	project->Update();
 	return true;
 }
 
@@ -49,5 +50,6 @@ bool CommandRunWorkpieceTransform::Undo(void)
 	if(runNr >= project->run.GetCount()) return false;
 	project->run[runNr].workpiecePlacement = matrixOld;
 	project->run[runNr].Update();
+	project->Update();
 	return true;
 }

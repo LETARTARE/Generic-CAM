@@ -44,14 +44,40 @@
  *  - \b ID_UPDATEMACHINESIMULATION - Refresh the Machine Simulator in the DialogMachineDebugger
  */
 
-#define ID_REFRESH3DVIEW				(wxID_HIGHEST+1)
-#define ID_REFRESHMAINGUI				(wxID_HIGHEST+2)
-#define ID_REFRESHALL					(wxID_HIGHEST+3)
+// Refresh every view of every document:
+#define ID_REFRESHALL					(wxID_HIGHEST+1)
 
-#define ID_UPDATESIMULATION				(wxID_HIGHEST+11)
-#define ID_UPDATEMACHINESIMULATION		(wxID_HIGHEST+12)
+// Refresh every 3D view of every document:
+#define ID_REFRESHALL3DVIEW				(wxID_HIGHEST+2)
+
+// Refresh all views of current document:
+#define ID_REFRESHVIEW					(wxID_HIGHEST+3)
+
+// Refresh all 3D views of the current document:
+#define ID_REFRESH3DVIEW				(wxID_HIGHEST+4)
+
+// Refresh the treeview of the current document:
+#define ID_REFRESHTREEVIEW				(wxID_HIGHEST+5)
+
+// Start the recalculation of the current project state:
+#define ID_UPDATEPROJECT				(wxID_HIGHEST+21)
+//
+#define ID_UPDATESIMULATION				(wxID_HIGHEST+22)
+//
+#define ID_UPDATEMACHINESIMULATION		(wxID_HIGHEST+23)
+
+// Setup calls to common hardware setup
+#define ID_SETUPLANGUAGE				(wxID_HIGHEST+41)
+#define ID_SETUPUNITS					(wxID_HIGHEST+42)
+#define ID_SETUPSTEREO3D				(wxID_HIGHEST+43)
+#define ID_SETUPMIDI					(wxID_HIGHEST+44)
+#define ID_SETUPCONTROLLER				(wxID_HIGHEST+45)
+
+
+#define ID_PROJECTRENAME				(wxID_HIGHEST+61)
+
 
 //! \def ID_THREADLASTDONE Worker thread to main thread: Processing of volume ready.
-#define ID_THREADLASTDONE				(wxID_HIGHEST+21)
+#define ID_THREADLASTDONE				(wxID_HIGHEST+101)
 
 #endif /* IDS_H_ */

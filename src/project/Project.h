@@ -49,8 +49,18 @@
 #include <wx/defs.h>
 
 #include <stddef.h>
+#include <wx/docview.h>
 
-class Project {
+//
+//#if wxUSE_STD_IOSTREAM
+//typedef wxSTD istream DocumentIstream;
+//typedef wxSTD ostream DocumentOstream;
+//#else // !wxUSE_STD_IOSTREAM
+//typedef wxInputStream DocumentIstream;
+//typedef wxOutputStream DocumentOstream;
+//#endif // wxUSE_STD_IOSTREAM/!wxUSE_STD_IOSTREAM
+
+class Project:public wxDocument {
 public:
 	Project();
 	virtual ~Project();
@@ -76,6 +86,9 @@ public:
 public:
 	void Clear(void);
 
+	bool DoSaveDocument(const wxString& file);
+	bool DoOpenDocument(const wxString& file);
+	//TODO Remove the functions below and join them into the functions above
 	bool Load(wxFileName fileName);
 	bool Save(wxFileName fileName);
 
@@ -114,7 +127,8 @@ private:
 	wxMutex mtx_project;
 	wxMutex mtx_generator;
 #endif
-
+DECLARE_DYNAMIC_CLASS(Project)
+	;
 };
 
 #endif /* PROJECT_H_ */

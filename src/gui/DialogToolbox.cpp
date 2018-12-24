@@ -25,25 +25,32 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "DialogToolbox.h"
-
+#include "IDs.h"
+#include "../project/ProjectView.h"
 #include "DialogToolWizard.h"
+#include "FrameMain.h"
+#include "FrameParent.h"
 
-DialogToolbox::DialogToolbox(wxWindow* parent, Project * project,
-		ToolBox * toolbox, DisplaySettings * settings) :
+DialogToolbox::DialogToolbox(wxWindow* parent) :
 		GUIToolbox(parent)
+
 {
-	this->project = project;
-	this->toolbox = toolbox;
-	this->settings = settings;
+	m_menuSettings->Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
+	m_menuSettings->Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
+	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+
+	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
 
 	selectedTool = 0;
 	selectedElement = 0;
-	if(selectedTool < toolbox->GetToolCount()){
-		tempTool = *(toolbox->ToolIndex(selectedTool));
+	if(selectedTool < view->toolbox.GetToolCount()){
+		tempTool = *(view->toolbox.ToolIndex(selectedTool));
 		if(selectedElement < tempTool.elements.GetCount()) tempElement =
 				tempTool.elements[selectedElement];
 	}
-	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
+	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
 	TransferDataToWindow();
 }
 
@@ -53,17 +60,21 @@ DialogToolbox::~DialogToolbox()
 
 bool DialogToolbox::TransferDataToWindow(void)
 {
-	if(toolbox == NULL) return false;
-
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
+	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
 	size_t i, j;
 
 	m_comboBoxToolSelector->Clear();
-	if(toolbox->GetToolCount() == 0){
+	if(view->toolbox.GetToolCount() == 0){
 		m_comboBoxToolSelector->Append(_("No tools in toolbox!"));
 		m_comboBoxToolSelector->Enable(false);
 	}else{
-		for(i = 0; i < toolbox->GetToolCount(); i++){
-			m_comboBoxToolSelector->Append(toolbox->ToolIndex(i)->toolName);
+		for(i = 0; i < view->toolbox.GetToolCount(); i++){
+			m_comboBoxToolSelector->Append(
+					view->toolbox.ToolIndex(i)->toolName);
 		}
 		m_comboBoxToolSelector->SetValue(tempTool.toolName);
 		m_comboBoxToolSelector->Enable(true);
@@ -170,6 +181,10 @@ bool DialogToolbox::TransferDataToWindow(void)
 
 bool DialogToolbox::TransferDataFromWindow(void)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
+	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
 	tempTool.toolName = m_comboBoxToolSelector->GetValue();
 	tempTool.shaftDiameter = settings->SmallDistance.SIFromString(
 			m_textCtrlShaftDiameter->GetValue());
@@ -219,12 +234,16 @@ void DialogToolbox::SetController(Control3D& control)
 
 void DialogToolbox::OnChangeStereo3D(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
+	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
 	if(m_canvas->stereoMode != stereoOff){
 		m_canvas->stereoMode = stereoOff;
 	}else{
 		m_canvas->stereoMode = stereoAnaglyph;
 	}
-	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
+	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
 	settings->WriteToCanvas(m_canvas);
 	m_canvas->Refresh();
 }
@@ -232,10 +251,13 @@ void DialogToolbox::OnChangeStereo3D(wxCommandEvent& event)
 void DialogToolbox::OnToolSelect(wxCommandEvent& event)
 {
 //	if(selectedTool == event.GetSelection()) return;
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
 	TransferDataFromWindow();
 	selectedTool = event.GetSelection();
-	if(selectedTool < toolbox->GetToolCount()){
-		tempTool = *(toolbox->ToolIndex(selectedTool));
+	if(selectedTool < view->toolbox.GetToolCount()){
+		tempTool = *(view->toolbox.ToolIndex(selectedTool));
 		selectedElement = 0;
 		if(tempTool.elements.GetCount() > 0) tempElement = tempTool.elements[0];
 	}
@@ -251,31 +273,40 @@ void DialogToolbox::OnToolRename(wxCommandEvent& event)
 
 void DialogToolbox::OnToolNew(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
 	TransferDataFromWindow();
 	if(!tempTool.toolName.IsEmpty()){
 		tempTool.toolName = _("Copy of ") + tempTool.toolName;
 	}
-	selectedTool = toolbox->AddTool(tempTool);
+	selectedTool = view->toolbox.AddTool(tempTool);
 	TransferDataToWindow();
 }
 
 void DialogToolbox::OnToolUpdate(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
 	TransferDataFromWindow();
-	if(selectedTool >= toolbox->GetToolCount()) return;
-	*(toolbox->ToolIndex(selectedTool)) = tempTool;
+	if(selectedTool >= view->toolbox.GetToolCount()) return;
+	*(view->toolbox.ToolIndex(selectedTool)) = tempTool;
 	TransferDataToWindow();
 }
 
 void DialogToolbox::OnToolDelete(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
 	if(selectedTool < 0) return;
-	if(selectedTool >= toolbox->GetToolCount()) return;
-	toolbox->RemoveToolIndex(selectedTool);
+	if(selectedTool >= view->toolbox.GetToolCount()) return;
+	view->toolbox.RemoveToolIndex(selectedTool);
 	selectedTool--;
 	if(selectedTool < 0) selectedTool = 0;
-	if(selectedTool < toolbox->GetToolCount()){
-		tempTool = *(toolbox->ToolIndex(selectedTool));
+	if(selectedTool < view->toolbox.GetToolCount()){
+		tempTool = *(view->toolbox.ToolIndex(selectedTool));
 		selectedElement = 0;
 		if(tempTool.elements.GetCount() > 0) tempElement = tempTool.elements[0];
 	}

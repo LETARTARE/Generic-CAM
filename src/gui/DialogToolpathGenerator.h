@@ -43,13 +43,8 @@
 
 class DialogToolpathGenerator:public GUIToolpathGenerator {
 public:
-	DialogToolpathGenerator(wxWindow* parent, Project * project,
-			wxCommandProcessor * commandProcessor, DisplaySettings * settings);
+	DialogToolpathGenerator(wxWindow* parent);
 	virtual ~DialogToolpathGenerator();
-
-	Project* project;
-	wxCommandProcessor * commandProcessor;
-	DisplaySettings * settings;
 
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
@@ -70,7 +65,7 @@ public:
 	void OnClose(wxCommandEvent& event);
 
 private:
-
+	Project* GetProject(void);
 	GeneratorCollection gc;
 	int GetGeneratorNr(int runNr, int toolpathNr);
 
@@ -82,8 +77,7 @@ private:
 	size_t slotNr;
 	float freeHeight;
 
-	bool lockUpdate;
-
+	bool loopGuard;
 };
 
 #endif /* DIALOGTOOLPATHGENERATOR_H_ */

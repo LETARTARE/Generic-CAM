@@ -29,6 +29,8 @@
 
 #include "wx/richtext/richtextxml.h"
 
+#include "gui/FrameParent.h"
+#include "project/ProjectView.h"
 #if wxUSE_DEBUG_CONTEXT == 1
 #include  <wx/memory.h>
 #endif
@@ -38,8 +40,6 @@ IMPLEMENT_APP(GenericCAMApp)
 
 GenericCAMApp::GenericCAMApp()
 {
-
-	frame = NULL;
 	config = new wxConfig(_T("genericcam"));
 
 	unsigned int selectedLanguage = wxLocale::GetSystemLanguage();
@@ -57,7 +57,8 @@ GenericCAMApp::GenericCAMApp()
 	}
 
 	if(!locale.Init(selectedLanguage, wxLOCALE_DONT_LOAD_DEFAULT)){
-		wxLogWarning(_T("This language is not supported by the system."));
+		wxLogWarning
+		(_T("This language is not supported by the system."));
 		return;
 	}
 
@@ -73,7 +74,8 @@ GenericCAMApp::GenericCAMApp()
 		temp =
 		_T("The translation catalog for ") + locale.GetCanonicalName() +
 		_T(" was not loaded !");
-		wxLogWarning(temp);
+		wxLogWarning
+		(temp);
 	}
 	locale.AddCatalog("wxstd");
 }
@@ -83,6 +85,7 @@ GenericCAMApp::~GenericCAMApp(void)
 #if wxUSE_DEBUG_CONTEXT == 1
 	wxDebugContext::PrintStatistics(true);
 #endif
+	delete config; // config is written back on deletion of object
 }
 
 // The Commandline is parsed before OnInit is called.
@@ -110,21 +113,58 @@ bool GenericCAMApp::OnInit()
 {
 	if(!wxApp::OnInit()) return false;
 
-	frame = new FrameMain(NULL, &locale, config);
+	SetAppName("genericcam");
+	SetAppDisplayName("Generic CAM");
 
-	if(!loadOnStartup.IsEmpty()){
-		frame->ProjectLoad(loadOnStartup);
+	wxDocManager *docManager = new wxDocManager;
+
+	new wxDocTemplate(docManager, "Generic CAM Project", "*.zip", "", "zip",
+			"Project", "Project View", CLASSINFO(Project),
+			CLASSINFO(ProjectView));
+
+#if defined( __WXMAC__ )  && wxOSX_USE_CARBON
+	wxFileName::MacRegisterDefaultTypeAndCreator("zip" , 'WXMB' , 'WXMA'); // ?
+#endif
+
+	docManager->FileHistoryLoad(*config);
+
+	wxFrame* parent;
+	parent = new FrameParent(docManager, config, NULL, wxID_ANY,
+			GetAppDisplayName());
+
+	SetTopWindow(parent);
+	parent->Show(true);
+
+	Project* project;
+	if(loadOnStartup.IsEmpty()){
+		project = (Project*) docManager->CreateDocument(wxEmptyString,
+				wxDOC_NEW);
+	}else{
+		project = (Project*) docManager->CreateDocument(loadOnStartup,
+				wxDOC_SILENT);
 	}
 
-	frame->Show(true);
-	SetTopWindow(frame);
-
 	// Show release notes
-	wxRichTextBuffer::AddHandler(new wxRichTextXMLHandler);
-	StartupText * temp = new StartupText(frame);
-	temp->m_richText->LoadFile(_T("releasenote.xml"), wxRICHTEXT_TYPE_XML);
-//	temp->Show();
+//	wxRichTextBuffer::AddHandler(new wxRichTextXMLHandler);
+//	StartupText * temp = new StartupText(frame);
+//	temp->m_richText->LoadFile(_T("releasenote.xml"), wxRICHTEXT_TYPE_XML);
+	//	temp->Show();
 
 	return true;
 }
 
+int GenericCAMApp::OnExit()
+{
+	wxDocManager* const docManager = wxDocManager::GetDocumentManager();
+	docManager->FileHistorySave(*config);
+	delete docManager;
+	return wxApp::OnExit();
+}
+
+wxFrame* GenericCAMApp::CreateChildFrame(wxView* view)
+{
+	wxDocument *doc = view->GetDocument();
+	wxFrame *subframe = new FrameMain(doc, view, config,
+			wxStaticCast(GetTopWindow(), wxDocParentFrame));
+	return subframe;
+}

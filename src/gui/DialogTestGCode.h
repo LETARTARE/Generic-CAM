@@ -33,15 +33,13 @@
 
 class DialogTestGCode:public GUITestGCode {
 public:
-	DialogTestGCode(wxWindow* parent, DisplaySettings* settings);
+	DialogTestGCode(wxWindow* parent);
 	virtual ~DialogTestGCode();
 
 	bool TransferDataToWindow(void);
 
 	void OnText(wxCommandEvent& event);
 	void OnClear(wxCommandEvent& event);
-
-	DisplaySettings* settings;
 };
 
 #endif /* DIALOGTESTGCODE_H_ */

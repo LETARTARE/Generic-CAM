@@ -29,18 +29,16 @@
 #include "../project/command/CommandRunGeneratorAdd.h"
 #include "../project/command/CommandRunGeneratorDelete.h"
 #include "../project/command/CommandRunGeneratorUpdate.h"
+#include "FrameMain.h"
+#include "FrameParent.h"
 #include "IDs.h"
 
-DialogToolpathGenerator::DialogToolpathGenerator(wxWindow* parent,
-		Project* project, wxCommandProcessor* commandProcessor,
-		DisplaySettings * settings) :
+DialogToolpathGenerator::DialogToolpathGenerator(wxWindow* parent) :
 		GUIToolpathGenerator(parent)
 {
-	this->project = project;
-	this->commandProcessor = commandProcessor;
-	this->settings = settings;
-
-	lockUpdate = false;
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	loopGuard = false;
 
 	currentRun = -1;
 	currentToolpath = -1;
@@ -63,13 +61,14 @@ DialogToolpathGenerator::DialogToolpathGenerator(wxWindow* parent,
 
 DialogToolpathGenerator::~DialogToolpathGenerator()
 {
-
 }
 
 bool DialogToolpathGenerator::TransferDataToWindow(void)
 {
-	if(lockUpdate) return false;
-
+	if(loopGuard) return false;
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
 	int selectedRun = -1;
 	for(size_t i = 0; i < project->run.GetCount(); i++){
 		if(selectedRun == -1 && project->run[i].selected) selectedRun = i;
@@ -89,7 +88,7 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 	}
 
 	if(selectedRun != currentRun){
-		lockUpdate = true;
+		loopGuard = true;
 
 		m_choiceRun->Clear();
 		m_choiceRun->Append(_T(""));
@@ -110,11 +109,11 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 			}
 		}
 
-		lockUpdate = false;
+		loopGuard = false;
 	}
 
 	if(selectedRun != currentRun || selectedToolpath != currentToolpath){
-		lockUpdate = true;
+		loopGuard = true;
 		m_choiceToolpath->Clear();
 		m_choiceToolpath->Append(_T(""));
 		if(selectedRun >= 0){
@@ -157,7 +156,7 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 		currentRun = selectedRun;
 		currentToolpath = selectedToolpath;
 
-		lockUpdate = false;
+		loopGuard = false;
 	}
 
 	m_staticTextUnitX1->SetLabel(settings->Distance.GetOtherName());
@@ -174,23 +173,21 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 	m_staticTextUnitFreeHeight->SetLabel(
 			settings->SmallDistance.GetOtherName());
 
-	m_textCtrlX1->SetValue(settings->Distance.TextFromSI(box.xmin ));
-	m_textCtrlY1->SetValue(settings->Distance.TextFromSI(box.ymin ));
-	m_textCtrlZ1->SetValue(settings->Distance.TextFromSI(box.zmin ));
+	m_textCtrlX1->SetValue(settings->Distance.TextFromSI(box.xmin));
+	m_textCtrlY1->SetValue(settings->Distance.TextFromSI(box.ymin));
+	m_textCtrlZ1->SetValue(settings->Distance.TextFromSI(box.zmin));
 
 	m_textCtrlX2->SetValue(settings->Distance.TextFromSI(box.xmax));
 	m_textCtrlY2->SetValue(settings->Distance.TextFromSI(box.ymax));
 	m_textCtrlZ2->SetValue(settings->Distance.TextFromSI(box.zmax));
 
-	m_textCtrlMarginBelow->SetValue(
-			settings->Distance.TextFromSI(marginBelow));
-	m_textCtrlMarginSide->SetValue(
-			settings->Distance.TextFromSI(marginSides));
+	m_textCtrlMarginBelow->SetValue(settings->Distance.TextFromSI(marginBelow));
+	m_textCtrlMarginSide->SetValue(settings->Distance.TextFromSI(marginSides));
 
 	m_textCtrlFreeHeight->SetValue(
 			settings->SmallDistance.TextFromSI(freeHeight));
 
-	lockUpdate = true;
+	loopGuard = true;
 	if(selectedRun >= 0 && selectedToolpath >= 0){
 
 		Generator * temp =
@@ -232,13 +229,15 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 		m_textCtrlInfo->SetValue(_T(""));
 		m_choicebookGenerator->SetSelection(0);
 	}
-	lockUpdate = false;
+	loopGuard = false;
 
 	return true;
 }
 
 bool DialogToolpathGenerator::TransferDataFromWindow(void)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
 	const int pageNr = m_choicebookGenerator->GetSelection();
 	gc.generators[pageNr]->TransferDataFromPanel();
 	box.xmin = settings->Distance.SIFromString(m_textCtrlX1->GetValue());
@@ -291,9 +290,18 @@ void DialogToolpathGenerator::UndoChanges(void)
 	currentToolpath = -2;
 }
 
+Project* DialogToolpathGenerator::GetProject(void)
+{
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project * project = wxStaticCast(frame->GetDocument(), Project);
+	return project;
+}
+
 int DialogToolpathGenerator::GetGeneratorNr(int runNr, int toolpathNr)
 {
 	if(runNr < 0) return -1;
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	if(runNr >= project->run.GetCount()) return -1;
 	if(toolpathNr < 0) return -1;
 	if(toolpathNr >= project->run[runNr].generators.GetCount()) return -1;
@@ -308,6 +316,8 @@ int DialogToolpathGenerator::GetGeneratorNr(int runNr, int toolpathNr)
 
 void DialogToolpathGenerator::OnSelectRun(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	TransferDataFromWindow();
 	int runNr = m_choiceRun->GetSelection() - 1;
 
@@ -324,12 +334,14 @@ void DialogToolpathGenerator::OnSelectRun(wxCommandEvent& event)
 
 // Tell the main frame to update the selection in the treeview via custom command.
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-	ID_REFRESHMAINGUI);
+	ID_REFRESHVIEW);
 	ProcessEvent(selectEvent);
 }
 
 void DialogToolpathGenerator::OnSelectToolpath(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	TransferDataFromWindow();
 	int runNr = m_choiceRun->GetSelection() - 1;
 	int toolpathNr = m_choiceToolpath->GetSelection() - 1;
@@ -342,12 +354,15 @@ void DialogToolpathGenerator::OnSelectToolpath(wxCommandEvent& event)
 
 // Tell the main frame to update the selection in the treeview via custom command.
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-	ID_REFRESHMAINGUI);
+	ID_REFRESHVIEW);
 	ProcessEvent(selectEvent);
 }
 
 void DialogToolpathGenerator::OnAdd(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
 	TransferDataFromWindow();
 	int runNr = m_choiceRun->GetSelection() - 1;
 	int toolpathNr = m_choiceToolpath->GetSelection() - 1;
@@ -355,7 +370,7 @@ void DialogToolpathGenerator::OnAdd(wxCommandEvent& event)
 
 	// The new generator/toolpath is placed behind the selected one.
 	// That is the reason for the toolpathNr + 1.
-	commandProcessor->Submit(
+	cmdProc->Submit(
 			new CommandRunGeneratorAdd(
 			_("Add generator to run ") + project->run[runNr].name,
 					project, runNr, toolpathNr + 1, gc.NewGenerator(0)));
@@ -367,19 +382,22 @@ void DialogToolpathGenerator::OnAdd(wxCommandEvent& event)
 
 	TransferDataToWindow();
 
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 	ProcessEvent(selectEvent);
 }
 
 void DialogToolpathGenerator::OnDelete(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
 	TransferDataFromWindow();
 	int runNr = m_choiceRun->GetSelection() - 1;
 	int toolpathNr = m_choiceToolpath->GetSelection() - 1;
 	if(runNr < 0) return;
 	if(toolpathNr < 0) return;
 
-	commandProcessor->Submit(
+	cmdProc->Submit(
 			new CommandRunGeneratorDelete(
 			_("Deleted generator from run ") + project->run[runNr].name,
 					project, runNr, toolpathNr));
@@ -394,12 +412,15 @@ void DialogToolpathGenerator::OnDelete(wxCommandEvent& event)
 
 	TransferDataToWindow();
 
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 	ProcessEvent(selectEvent);
 }
 
 void DialogToolpathGenerator::OnUpdate(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
 	TransferDataFromWindow();
 	int runNr = m_choiceRun->GetSelection() - 1;
 	int toolpathNr = m_choiceToolpath->GetSelection() - 1;
@@ -414,7 +435,7 @@ void DialogToolpathGenerator::OnUpdate(wxCommandEvent& event)
 	temp->refTool = slotNr;
 	temp->freeHeight = freeHeight;
 
-	commandProcessor->Submit(
+	cmdProc->Submit(
 			new CommandRunGeneratorUpdate(
 			_("Update generator on run ") + project->run[runNr].name,
 					project, runNr, toolpathNr, temp));
@@ -425,13 +446,15 @@ void DialogToolpathGenerator::OnUpdate(wxCommandEvent& event)
 
 	TransferDataToWindow();
 
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 	ProcessEvent(selectEvent);
 }
 
 void DialogToolpathGenerator::OnSelectArea(wxCommandEvent& event)
 {
 
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	int runNr = m_choiceRun->GetSelection() - 1;
 	if(runNr < 0) return;
 	int workpieceNr = project->run[runNr].refWorkpiece;
@@ -459,7 +482,7 @@ void DialogToolpathGenerator::OnSelectArea(wxCommandEvent& event)
 		}
 		TransferDataToWindow();
 		wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-		ID_REFRESH3DVIEW);
+				ID_REFRESHVIEW);
 	}
 }
 

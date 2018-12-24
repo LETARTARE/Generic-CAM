@@ -32,13 +32,13 @@
 #include "IDs.h"
 #include <wx/grid.h>
 
-DialogWorkpiece::DialogWorkpiece(wxWindow* parent, Project* project,
-		StockFile * stock, wxCommandProcessor* commandProcessor) :
+#include "../project/ProjectView.h"
+#include "FrameMain.h"
+#include "FrameParent.h"
+
+DialogWorkpiece::DialogWorkpiece(wxWindow* parent) :
 		GUIWorkpiece(parent)
 {
-	this->project = project;
-	this->stock = stock;
-	this->commandProcessor = commandProcessor;
 }
 
 void DialogWorkpiece::OnXClose(wxCloseEvent& event)
@@ -60,26 +60,31 @@ void DialogWorkpiece::OnManageStock(wxCommandEvent& event)
 
 void DialogWorkpiece::OnAddStock(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
 	int selected = m_choiceStock->GetSelection();
-	if(selected >= 0 && selected < stock->stockMaterials.GetCount()){
+	if(selected >= 0 && selected < view->stock.stockMaterials.GetCount()){
 
-		wxString name = stock->stockMaterials[selected].name;
+		wxString name = view->stock.stockMaterials[selected].name;
 		CommandWorkpieceAdd * command = new CommandWorkpieceAdd(
 		_("Add Workpiece ") + name, project,
-				stock->stockMaterials[selected]);
-		commandProcessor->Submit(command);
-		wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
+				view->stock.stockMaterials[selected]);
+		cmdProc->Submit(command);
+		wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 		ProcessEvent(selectEvent);
 	}
 
 	if(project == NULL) return;
 
-	if(selected > stock->stockMaterials.GetCount()
+	if(selected > view->stock.stockMaterials.GetCount()
 			&& selected
-					<= stock->stockMaterials.GetCount()
+					<= view->stock.stockMaterials.GetCount()
 							+ project->objects.GetCount()){
 
-		const size_t objectNr = selected - stock->stockMaterials.GetCount() - 1;
+		const size_t objectNr = selected - view->stock.stockMaterials.GetCount()
+				- 1;
 		StockMaterial tempStock;
 		project->objects[objectNr].Update();
 		tempStock.sx = project->objects[objectNr].bbox.GetSizeX();
@@ -90,14 +95,17 @@ void DialogWorkpiece::OnAddStock(wxCommandEvent& event)
 		CommandWorkpieceAdd * command = new CommandWorkpieceAdd(
 		_("Add Object as Workpiece ") + name, project, tempStock,
 				objectNr);
-		commandProcessor->Submit(command);
-		wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
+		cmdProc->Submit(command);
+		wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 		ProcessEvent(selectEvent);
 	}
 }
 
 void DialogWorkpiece::OnDBLClick(wxGridEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
 	int objectNr = event.GetRow();
 	int workpieceNr = event.GetCol();
 	unsigned int placementNr;
@@ -106,20 +114,20 @@ void DialogWorkpiece::OnDBLClick(wxGridEvent& event)
 			placementNr++){
 		if(project->workpieces[workpieceNr].placements[placementNr].refObject
 				== objectNr){
-			commandProcessor->Submit(
+			cmdProc->Submit(
 					new CommandWorkpieceObjectRemove(
 							_("Remove Object from Workpiece"), project,
 							workpieceNr, placementNr));
 			wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-			ID_REFRESHALL);
+					ID_REFRESHVIEW);
 			ProcessEvent(selectEvent);
 			return;
 		}
 	}
-	commandProcessor->Submit(
+	cmdProc->Submit(
 			new CommandWorkpieceObjectAssign(_("Assign Object to Workpiece"),
 					project, workpieceNr, objectNr));
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 	ProcessEvent(selectEvent);
 }
 
@@ -131,9 +139,19 @@ void DialogWorkpiece::OnSize(wxSizeEvent& event)
 	TransferDataToWindow();
 }
 
+Project* DialogWorkpiece::GetProject(void)
+{
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project * project = wxStaticCast(frame->GetDocument(), Project);
+	return project;
+}
+
 bool DialogWorkpiece::TransferDataToWindow(void)
 {
 	if(!this->IsShown()) return false;
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
 	if(project == NULL) return false;
 
 	wxSize sz = m_grid->GetClientSize();
@@ -180,15 +198,15 @@ bool DialogWorkpiece::TransferDataToWindow(void)
 	}
 
 	// Update available stock material
-	size_t nrMaterials = stock->stockMaterials.GetCount() + 1
+	size_t nrMaterials = view->stock.stockMaterials.GetCount() + 1
 			+ project->objects.GetCount();
 
 	size_t c = 0;
-	for(size_t i = 0; i < stock->stockMaterials.GetCount(); i++){
+	for(size_t i = 0; i < view->stock.stockMaterials.GetCount(); i++){
 		if(c >= m_choiceStock->GetCount()){
-			m_choiceStock->Append(stock->stockMaterials[i].name);
+			m_choiceStock->Append(view->stock.stockMaterials[i].name);
 		}else{
-			m_choiceStock->SetString(c, stock->stockMaterials[i].name);
+			m_choiceStock->SetString(c, view->stock.stockMaterials[i].name);
 		}
 		c++;
 	}

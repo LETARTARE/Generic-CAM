@@ -33,7 +33,6 @@
  * ...
  */
 
-#include "../StdInclude.h"
 #include "DisplaySettings.h"
 #include "gui.h"
 
@@ -44,8 +43,8 @@ public:
 	DialogSetupUnits(wxWindow* parent, DisplaySettings * settings);
 	virtual ~DialogSetupUnits();
 	// Member variables
-private:
 
+private:
 	DisplaySettings * settings;
 
 	// Methods

@@ -39,11 +39,13 @@ bool CommandWorkpieceRename::Do(void)
 {
 	this->oldName = project->workpieces[workpieceNr].name;
 	project->workpieces[workpieceNr].name = this->newName;
+	project->Update();
 	return true;
 }
 
 bool CommandWorkpieceRename::Undo(void)
 {
 	project->workpieces[workpieceNr].name = this->oldName;
+	project->Update();
 	return true;
 }

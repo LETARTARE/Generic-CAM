@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Aug 20 2017)
+// C++ code generated with wxFormBuilder (version Dec 20 2018)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO "NOT" EDIT THIS FILE!
+// PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
 #ifndef __GUI_H__
@@ -12,10 +12,10 @@
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
 #include <wx/string.h>
+#include <wx/menu.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
-#include <wx/menu.h>
 #include <wx/gdicmn.h>
 #include <wx/font.h>
 #include <wx/colour.h>
@@ -26,7 +26,6 @@
 #include "CanvasMain.h"
 #include <wx/splitter.h>
 #include <wx/statusbr.h>
-#include <wx/toolbar.h>
 #include <wx/frame.h>
 #include <wx/clrpicker.h>
 #include <wx/choice.h>
@@ -56,127 +55,120 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
-#define ID_PROJECTRENAME 1000
-#define ID_OBJECTMODIFY 1001
-#define ID_OBJECTFLIPNORMALS 1002
-#define ID_OBJECTLOAD 1003
-#define ID_OBJECTRENAME 1004
-#define ID_OBJECTDELETE 1005
-#define ID_STOCKORGANIZE 1006
-#define ID_WORKPIECEADD 1007
-#define ID_STOCKLOAD 1008
-#define ID_STOCKSAVE 1009
-#define ID_WORKPIECESETUP 1010
-#define ID_WORKPIECEDELETE 1011
-#define ID_WORKPIECEDELETEUNUSED 1012
-#define ID_MACHINELOAD 1013
-#define ID_MACHINERELOAD 1014
-#define ID_MACHINEDEBUGGER 1015
-#define ID_TOOLBOXEDIT 1016
-#define ID_TOOLBOXLOAD 1017
-#define ID_TOOLBOXSAVE 1018
-#define ID_RUNEDIT 1019
-#define ID_RUNADD 1020
-#define ID_RUNDELETE 1021
-#define ID_GENERATORSETUP 1022
-#define ID_GENERATORSTART 1023
-#define ID_GENERATORAUTOMATIC 1024
-#define ID_GENERATORRESTART 1025
-#define ID_DIALECT_RS274NGC 1026
-#define ID_DIALECT_FANUCM 1027
-#define ID_TOOLPATHSAVE 1028
-#define ID_VIEWSTEREO3D 1029
-#define ID_SETUPCONTROLLER 1030
-#define ID_SETUPUNITS 1031
-#define ID_CLOSEEXTRAWINDOWS 1032
-#define ID_LOGSHOW 1033
-#define ID_VIEWTOP 1034
-#define ID_VIEWBOTTOM 1035
-#define ID_VIEWFRONT 1036
-#define ID_VIEWBACK 1037
-#define ID_VIEWRIGHT 1038
-#define ID_VIEWLEFT 1039
-#define ID_TESTGCODE 1040
-#define ID_DISPLAYMACHINE 1041
-#define ID_DISPLAYMATERIAL 1042
-#define ID_MULTTEN 1043
-#define ID_DIVTEN 1044
-#define ID_SCALEUNITX 1045
-#define ID_SCALEUNITY 1046
-#define ID_SCALEUNITZ 1047
-#define ID_SCALEPERCENTX 1048
-#define ID_SCALEPERCENTY 1049
-#define ID_SCALEPERCENTZ 1050
-#define ID_SCALEPERCENT 1051
-#define ID_MOVEZP 1052
-#define ID_MOVEYP 1053
-#define ID_MOVEXN 1054
-#define ID_MOVEXP 1055
-#define ID_MOVEYN 1056
-#define ID_MOVEZN 1057
-#define ID_ALIGNTOP 1058
-#define ID_ALIGNMIDDLE 1059
-#define ID_ALIGNBOTTOM 1060
-#define ID_ALIGNCENTER 1061
-#define ID_ROTATEYN 1062
-#define ID_ROTATEXN 1063
-#define ID_ROTATEYP 1064
-#define ID_ROTATEZN 1065
-#define ID_ROTATEZP 1066
-#define ID_ROTATEXP 1067
-#define ID_FLIPX 1068
-#define ID_FLIPY 1069
-#define ID_FLIPZ 1070
-#define ID_POSX 1071
-#define ID_POSY 1072
-#define ID_POSZ 1073
-#define ID_ANGLE 1074
-#define ID_FORMCONTOUR 1075
-#define ID_DISTANCE 1076
-#define ID_WORKPIECEROTATEX 1077
-#define ID_WORKPIECEROTATEY 1078
-#define ID_WORKPIECEROTATEZ 1079
-#define wxID_LOAD 1080
-#define ID_CONTROLLERSHOW 1081
-#define ID_AXISX 1082
-#define ID_AXISY 1083
-#define ID_AXISZ 1084
-#define ID_TEXTX 1085
-#define ID_TEXTY 1086
-#define ID_TEXTZ 1087
-#define ID_AXISA 1088
-#define ID_AXISB 1089
-#define ID_AXISC 1090
-#define ID_TEXTA 1091
-#define ID_TEXTB 1092
-#define ID_TEXTC 1093
-#define ID_AXISU 1094
-#define ID_AXISV 1095
-#define ID_AXISW 1096
-#define ID_TEXTU 1097
-#define ID_TEXTV 1098
-#define ID_TEXTW 1099
-#define ID_XSTART 1100
-#define ID_XEND 1101
-#define ID_YSTART 1102
-#define ID_YEND 1103
-#define ID_ZSTART 1104
-#define ID_ZEND 1105
-#define ID_SELECTAREAOBJECT 1106
-#define ID_MARGINSIDE 1107
-#define ID_MARGINBELOW 1108
+#define ID_OBJECTMODIFY 1000
+#define ID_OBJECTFLIPNORMALS 1001
+#define ID_OBJECTLOAD 1002
+#define ID_OBJECTRENAME 1003
+#define ID_OBJECTDELETE 1004
+#define ID_STOCKORGANIZE 1005
+#define ID_WORKPIECEADD 1006
+#define ID_STOCKLOAD 1007
+#define ID_STOCKSAVE 1008
+#define ID_WORKPIECESETUP 1009
+#define ID_WORKPIECEDELETE 1010
+#define ID_WORKPIECEDELETEUNUSED 1011
+#define ID_MACHINELOAD 1012
+#define ID_MACHINERELOAD 1013
+#define ID_MACHINEDEBUGGER 1014
+#define ID_TOOLBOXEDIT 1015
+#define ID_TOOLBOXLOAD 1016
+#define ID_TOOLBOXSAVE 1017
+#define ID_RUNEDIT 1018
+#define ID_RUNADD 1019
+#define ID_RUNDELETE 1020
+#define ID_GENERATORSETUP 1021
+#define ID_GENERATORSTART 1022
+#define ID_GENERATORAUTOMATIC 1023
+#define ID_GENERATORRESTART 1024
+#define ID_DIALECT_RS274NGC 1025
+#define ID_DIALECT_FANUCM 1026
+#define ID_TOOLPATHSAVE 1027
+#define ID_VIEWSTEREO3D 1028
+#define ID_CLOSEEXTRAWINDOWS 1029
+#define ID_LOGSHOW 1030
+#define ID_VIEWTOP 1031
+#define ID_VIEWBOTTOM 1032
+#define ID_VIEWFRONT 1033
+#define ID_VIEWBACK 1034
+#define ID_VIEWRIGHT 1035
+#define ID_VIEWLEFT 1036
+#define ID_TESTGCODE 1037
+#define ID_MULTTEN 1038
+#define ID_DIVTEN 1039
+#define ID_SCALEUNITX 1040
+#define ID_SCALEUNITY 1041
+#define ID_SCALEUNITZ 1042
+#define ID_SCALEPERCENTX 1043
+#define ID_SCALEPERCENTY 1044
+#define ID_SCALEPERCENTZ 1045
+#define ID_SCALEPERCENT 1046
+#define ID_MOVEZP 1047
+#define ID_MOVEYP 1048
+#define ID_MOVEXN 1049
+#define ID_MOVEXP 1050
+#define ID_MOVEYN 1051
+#define ID_MOVEZN 1052
+#define ID_ALIGNTOP 1053
+#define ID_ALIGNMIDDLE 1054
+#define ID_ALIGNBOTTOM 1055
+#define ID_ALIGNCENTER 1056
+#define ID_ROTATEYN 1057
+#define ID_ROTATEXN 1058
+#define ID_ROTATEYP 1059
+#define ID_ROTATEZN 1060
+#define ID_ROTATEZP 1061
+#define ID_ROTATEXP 1062
+#define ID_FLIPX 1063
+#define ID_FLIPY 1064
+#define ID_FLIPZ 1065
+#define ID_POSX 1066
+#define ID_POSY 1067
+#define ID_POSZ 1068
+#define ID_ANGLE 1069
+#define ID_FORMCONTOUR 1070
+#define ID_DISTANCE 1071
+#define ID_WORKPIECEROTATEX 1072
+#define ID_WORKPIECEROTATEY 1073
+#define ID_WORKPIECEROTATEZ 1074
+#define ID_CONTROLLERSHOW 1075
+#define ID_AXISX 1076
+#define ID_AXISY 1077
+#define ID_AXISZ 1078
+#define ID_TEXTX 1079
+#define ID_TEXTY 1080
+#define ID_TEXTZ 1081
+#define ID_AXISA 1082
+#define ID_AXISB 1083
+#define ID_AXISC 1084
+#define ID_TEXTA 1085
+#define ID_TEXTB 1086
+#define ID_TEXTC 1087
+#define ID_AXISU 1088
+#define ID_AXISV 1089
+#define ID_AXISW 1090
+#define ID_TEXTU 1091
+#define ID_TEXTV 1092
+#define ID_TEXTW 1093
+#define ID_XSTART 1094
+#define ID_XEND 1095
+#define ID_YSTART 1096
+#define ID_YEND 1097
+#define ID_ZSTART 1098
+#define ID_ZEND 1099
+#define ID_SELECTAREAOBJECT 1100
+#define ID_MARGINSIDE 1101
+#define ID_MARGINBELOW 1102
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class GUIMain
+/// Class GUIFrameMain
 ///////////////////////////////////////////////////////////////////////////////
-class GUIMain : public wxFrame 
+class GUIFrameMain : public wxDocChildFrame
 {
 	private:
 	
 	protected:
 		wxMenuBar* m_menubar;
-		wxMenu* m_menuProject;
-		wxMenu* m_menuProjectRecent;
+		wxMenu* m_menuFile;
 		wxMenu* m_menuEdit;
 		wxMenu* m_menuObject;
 		wxMenu* m_menuStock;
@@ -195,23 +187,9 @@ class GUIMain : public wxFrame
 		wxPanel* m_panelCanvasMain;
 		CanvasMain* m_canvas;
 		wxStatusBar* m_statusBar;
-		wxToolBar* m_toolBar;
-		wxToolBarToolBase* m_toolUndo; 
-		wxToolBarToolBase* m_toolRedo; 
-		wxToolBarToolBase* m_toolDisplayMachine; 
-		wxToolBarToolBase* m_toolDisplayMaterial; 
-		wxToolBarToolBase* m_toolGeneratorSetup; 
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnIdle( wxIdleEvent& event ) = 0;
-		virtual void OnProjectNew( wxCommandEvent& event ) = 0;
-		virtual void OnProjectRename( wxCommandEvent& event ) = 0;
-		virtual void OnProjectLoad( wxCommandEvent& event ) = 0;
-		virtual void OnProjectSave( wxCommandEvent& event ) = 0;
-		virtual void OnProjectSaveAs( wxCommandEvent& event ) = 0;
-		virtual void OnQuit( wxCommandEvent& event ) = 0;
-		virtual void OnUndo( wxCommandEvent& event ) = 0;
-		virtual void OnRedo( wxCommandEvent& event ) = 0;
+		virtual void OnClose( wxCloseEvent& event ) = 0;
 		virtual void OnObjectModify( wxCommandEvent& event ) = 0;
 		virtual void OnObjectFlipNormals( wxCommandEvent& event ) = 0;
 		virtual void OnObjectLoad( wxCommandEvent& event ) = 0;
@@ -238,18 +216,11 @@ class GUIMain : public wxFrame
 		virtual void OnGeneratorRestart( wxCommandEvent& event ) = 0;
 		virtual void OnGeneratorSaveToolpath( wxCommandEvent& event ) = 0;
 		virtual void OnShowAnimationControl( wxCommandEvent& event ) = 0;
-		virtual void OnChangeLanguage( wxCommandEvent& event ) = 0;
 		virtual void OnActivateStereo3D( wxCommandEvent& event ) = 0;
-		virtual void OnSetupController( wxCommandEvent& event ) = 0;
-		virtual void OnSetupStereo3D( wxCommandEvent& event ) = 0;
-		virtual void OnSetupMidi( wxCommandEvent& event ) = 0;
-		virtual void OnSetupUnits( wxCommandEvent& event ) = 0;
 		virtual void OnExtraWindowClose( wxCommandEvent& event ) = 0;
 		virtual void OnShowLogWindow( wxCommandEvent& event ) = 0;
 		virtual void OnViewSet( wxCommandEvent& event ) = 0;
-		virtual void OnHelp( wxCommandEvent& event ) = 0;
 		virtual void OnTestGCode( wxCommandEvent& event ) = 0;
-		virtual void OnAbout( wxCommandEvent& event ) = 0;
 		virtual void OnBeginLabelEdit( wxTreeEvent& event ) = 0;
 		virtual void OnEndLabelEdit( wxTreeEvent& event ) = 0;
 		virtual void OnActivate( wxTreeEvent& event ) = 0;
@@ -258,19 +229,18 @@ class GUIMain : public wxFrame
 		virtual void OnSelectionChanging( wxTreeEvent& event ) = 0;
 		virtual void On3DDClick( wxMouseEvent& event ) = 0;
 		virtual void On3DSelect( wxMouseEvent& event ) = 0;
-		virtual void OnToolbarButton( wxCommandEvent& event ) = 0;
 		
 	
 	public:
 		
-		GUIMain( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxPoint( -1,-1 ), const wxSize& size = wxSize( 803,627 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		GUIFrameMain(wxDocument* doc, wxView* view, wxDocParentFrame* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxPoint( -1,-1 ), const wxSize& size = wxSize( 803,627 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		
-		~GUIMain();
+		~GUIFrameMain();
 		
 		void m_splitterOnIdle( wxIdleEvent& )
 		{
 			m_splitter->SetSashPosition( 250 );
-			m_splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIMain::m_splitterOnIdle ), NULL, this );
+			m_splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIFrameMain::m_splitterOnIdle ), NULL, this );
 		}
 	
 };
@@ -579,7 +549,8 @@ class GUIMachineDebugger : public wxFrame
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuMachine;
 		wxMenu* m_menuSettings;
-		wxSplitterWindow* m_splitter2;
+		wxMenu* m_menuView;
+		wxSplitterWindow* m_splitter;
 		wxPanel* m_panel;
 		wxSplitterWindow* m_splitter3;
 		wxPanel* m_panelEditor;
@@ -607,10 +578,10 @@ class GUIMachineDebugger : public wxFrame
 		
 		~GUIMachineDebugger();
 		
-		void m_splitter2OnIdle( wxIdleEvent& )
+		void m_splitterOnIdle( wxIdleEvent& )
 		{
-			m_splitter2->SetSashPosition( 326 );
-			m_splitter2->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIMachineDebugger::m_splitter2OnIdle ), NULL, this );
+			m_splitter->SetSashPosition( 326 );
+			m_splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( GUIMachineDebugger::m_splitterOnIdle ), NULL, this );
 		}
 		
 		void m_splitter3OnIdle( wxIdleEvent& )
@@ -629,8 +600,9 @@ class GUIMachineControl : public wxFrame
 	private:
 	
 	protected:
-		wxMenuBar* m_menubar9;
-		wxMenu* m_menuDialog;
+		wxMenuBar* m_menubar;
+		wxMenu* m_menuController;
+		wxMenu* m_menuSettings;
 		wxStaticText* m_staticText69;
 		wxSlider* m_sliderX;
 		wxStaticText* m_staticText70;
@@ -704,6 +676,7 @@ class GUIToolbox : public wxFrame
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuTools;
 		wxMenu* m_menuSettings;
+		wxMenu* m_menuView;
 		wxComboBox* m_comboBoxToolSelector;
 		wxButton* m_buttonToolNew;
 		wxButton* m_buttonToolUpdate;
@@ -978,24 +951,20 @@ class GUISetupUnits : public wxFrame
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class GUIAbout
+/// Class GUIDialogAbout
 ///////////////////////////////////////////////////////////////////////////////
-class GUIAbout : public wxDialog 
+class GUIDialogAbout : public wxDialog 
 {
 	private:
 	
 	protected:
-		wxTextCtrl* m_textCtrl12;
-		wxButton* m_button1;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCommandEvent& event ) = 0;
-		
+		wxTextCtrl* m_textCtrl;
+		wxButton* m_buttonClose;
 	
 	public:
 		
-		GUIAbout( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 504,373 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP ); 
-		~GUIAbout();
+		GUIDialogAbout( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 504,373 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP ); 
+		~GUIDialogAbout();
 	
 };
 

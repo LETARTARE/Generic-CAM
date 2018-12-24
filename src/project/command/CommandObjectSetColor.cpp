@@ -40,11 +40,13 @@ bool CommandObjectSetColor::Do(void)
 {
 	this->oldColor = project->objects[objectNr].geometries[0].color;
 	project->objects[objectNr].geometries[0].color = this->newColor;
+	project->Update();
 	return true;
 }
 
 bool CommandObjectSetColor::Undo(void)
 {
 	project->objects[objectNr].geometries[0].color = this->oldColor;
+	project->Update();
 	return true;
 }

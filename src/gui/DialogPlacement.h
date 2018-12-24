@@ -43,14 +43,8 @@
 
 class DialogPlacement:public GUIPlacement {
 public:
-	DialogPlacement(wxWindow* parent, Project * project,
-			wxCommandProcessor * commandProcessor, DisplaySettings * settings);
+	DialogPlacement(wxWindow* parent);
 	virtual ~DialogPlacement();
-
-private:
-	Project* project;
-	DisplaySettings * settings;
-	wxCommandProcessor * commandProcessor;
 
 	// Methods
 public:
@@ -59,6 +53,7 @@ public:
 	bool TransferDataFromWindow(void);
 
 protected:
+	Project* GetProject(void);
 	int GetSelectedWorkpiece(void);
 	int GetSelectedPlacement(int workpieceNr);
 
@@ -71,7 +66,6 @@ protected:
 	void OnChange(wxCommandEvent& event);
 	void OnChangeSlider(wxScrollEvent& event);
 	void OnTransform(wxCommandEvent& event);
-
 };
 
 #endif /* DIALOGPLACEMENT_H_ */

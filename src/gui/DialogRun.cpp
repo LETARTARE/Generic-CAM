@@ -34,14 +34,14 @@
 #include "../3D/AffineTransformMatrix.h"
 #include <wx/event.h>
 
-DialogRun::DialogRun(wxWindow* parent, Project* project, ToolBox * toolbox,
-		wxCommandProcessor* commandProcessor, DisplaySettings* settings) :
+#include "../project/ProjectView.h"
+#include "FrameMain.h"
+#include "FrameParent.h"
+
+DialogRun::DialogRun(wxWindow* parent) :
 		GUIRun(parent)
 {
-	this->project = project;
-	this->toolbox = toolbox;
-	this->commandProcessor = commandProcessor;
-	this->settings = settings;
+	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
 	loopGuard = false;
 }
 
@@ -52,6 +52,11 @@ DialogRun::~DialogRun()
 bool DialogRun::TransferDataToWindow(void)
 {
 	if(loopGuard) return false;
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
+
+	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
 	size_t i;
 	int selected = -1;
 	m_choiceRun->Clear();
@@ -69,14 +74,14 @@ bool DialogRun::TransferDataToWindow(void)
 	for(i = 0; i < project->workpieces.GetCount(); i++)
 		m_choiceWorkpiece->Append(project->workpieces[i].name);
 
-	for(i = 0; i < toolbox->GetToolCount(); i++){
+	for(i = 0; i < view->toolbox.GetToolCount(); i++){
 		if(i >= m_listBoxTool->GetCount()){
-			m_listBoxTool->Append(toolbox->ToolIndex(i)->toolName);
+			m_listBoxTool->Append(view->toolbox.ToolIndex(i)->toolName);
 		}else{
-			m_listBoxTool->SetString(i, toolbox->ToolIndex(i)->toolName);
+			m_listBoxTool->SetString(i, view->toolbox.ToolIndex(i)->toolName);
 		}
 	}
-	for(i = m_listBoxTool->GetCount(); i > toolbox->GetToolCount(); i--)
+	for(i = m_listBoxTool->GetCount(); i > view->toolbox.GetToolCount(); i--)
 		m_listBoxTool->Delete(i - 1);
 	loopGuard = true;
 	if(m_listBoxTool->GetSelection() < 0) m_listBoxTool->SetSelection(0);
@@ -140,6 +145,8 @@ void DialogRun::OnClose(wxCommandEvent& event)
 void DialogRun::OnRunSelect(wxCommandEvent& event)
 {
 	if(loopGuard) return;
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	int id = m_choiceRun->GetSelection() - 1;
 
 	size_t n;
@@ -147,38 +154,43 @@ void DialogRun::OnRunSelect(wxCommandEvent& event)
 		project->run[n].Select(n == id);
 
 	// Tell the main frame to update the selection in the treeview via custom command.
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHMAINGUI);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 	ProcessEvent(selectEvent);
 }
 
 void DialogRun::OnWorkpieceSelect(wxCommandEvent& event)
 {
 	if(loopGuard) return;
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
 	const int selected = GetSelected();
 	if(selected < 0) return;
 	int temp = m_choiceWorkpiece->GetSelection() - 1;
 	if(project->run[selected].refWorkpiece != temp){
 		if(temp >= 0){
-			commandProcessor->Submit(
+			cmdProc->Submit(
 					new CommandRunWorkpieceAssign(
 							_("Set Workpiece to ")
 									+ m_choiceWorkpiece->GetString(temp + 1),
 							project, selected, temp));
 		}else{
-			commandProcessor->Submit(
+			cmdProc->Submit(
 					new CommandRunWorkpieceAssign(_("Removed Workpiece."),
 							project, selected, temp));
-
 		}
 
-		wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-		ID_REFRESHMAINGUI);
-		ProcessEvent(selectEvent);
+//		wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
+//		ID_REFRESHMAINGUI);
+//		ProcessEvent(selectEvent);
 	}
 }
 
 void DialogRun::OnRotate(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
 	int runNr = GetSelected();
 	if(runNr < 0) return;
 	int workpieceNr = project->run[runNr].refWorkpiece;
@@ -214,12 +226,12 @@ void DialogRun::OnRotate(wxCommandEvent& event)
 	if(temp.y < 0.0) matrix.TranslateGlobal(0, -temp.y, 0);
 	if(temp.z < 0.0) matrix.TranslateGlobal(0, 0, -temp.z);
 
-	commandProcessor->Submit(
+	cmdProc->Submit(
 			new CommandRunWorkpieceTransform(description, project, runNr,
 					matrix));
-	TransferDataToWindow();
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESH3DVIEW);
-	ProcessEvent(selectEvent);
+//	TransferDataToWindow();
+//	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESH3DVIEW);
+//	ProcessEvent(selectEvent);
 }
 
 void DialogRun::OnMachineLoad(wxCommandEvent& event)
@@ -227,28 +239,33 @@ void DialogRun::OnMachineLoad(wxCommandEvent& event)
 	// Select Machine load... from the main menu.
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_MACHINELOAD);
 	ProcessEvent(selectEvent);
-	TransferDataToWindow();
+//	TransferDataToWindow();
 }
 
 void DialogRun::OnToolRemove(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
 	int runNr = GetSelected();
 	if(runNr < 0) return;
 	int index = m_listCtrlTools->GetNextItem(-1, wxLIST_NEXT_ALL,
 	wxLIST_STATE_SELECTED);
 	if(index < 0) return;
-	commandProcessor->Submit(
+	cmdProc->Submit(
 			new CommandRunToolRemove(
 					_(
 							"Removed tool ") + project->run[runNr].machine.tools[index].toolName+_(" from run"),
 					project, runNr, index));
-	TransferDataToWindow();
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESH3DVIEW);
-	ProcessEvent(selectEvent);
+//	TransferDataToWindow();
+//	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESH3DVIEW);
+//	ProcessEvent(selectEvent);
 }
 
 int DialogRun::GetSelected(void)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	int selected = -1;
 	size_t n;
 	for(n = 0; n < project->run.GetCount(); n++){
@@ -262,19 +279,31 @@ int DialogRun::GetSelected(void)
 
 void DialogRun::OnToolAdd(wxCommandEvent& event)
 {
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project* project = wxStaticCast(frame->GetDocument(), Project);
+	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
+	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
 	int selected = GetSelected();
 	if(selected < 0) return;
 	int toolNr = m_listBoxTool->GetSelection();
 	if(toolNr < 0) return;
 	int slotNr = m_spinCtrlToolSlot->GetValue();
-	commandProcessor->Submit(
+	cmdProc->Submit(
 			new CommandRunToolAdd(
 					_("Added tool to run ")
-							+ toolbox->ToolIndex(toolNr)->toolName, project,
-					selected, *(toolbox->ToolIndex(toolNr)), slotNr));
+							+ view->toolbox.ToolIndex(toolNr)->toolName,
+					project, selected, *(view->toolbox.ToolIndex(toolNr)),
+					slotNr));
 
 	m_spinCtrlToolSlot->SetValue(slotNr + 1);
-	TransferDataToWindow();
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESH3DVIEW);
-	ProcessEvent(selectEvent);
+//	TransferDataToWindow();
+//	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESH3DVIEW);
+//	ProcessEvent(selectEvent);
+}
+
+Project* DialogRun::GetProject(void)
+{
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project * project = wxStaticCast(frame->GetDocument(), Project);
+	return project;
 }

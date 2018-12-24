@@ -37,37 +37,40 @@ DnDFile::DnDFile(Project* project, FrameMain* parent)
 
 bool DnDFile::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 {
+	wxCommandProcessor* cmdProc = parent->GetDocument()->GetCommandProcessor();
 	for(size_t n = 0; n < filenames.GetCount(); n++){
 		wxFileName filename(filenames[n]);
 		if(!filename.IsOk()){
-			wxLogMessage(_("File is invalid: ") + filename.GetFullPath());
+			wxLogMessage
+			(_("File is invalid: ") + filename.GetFullPath());
 			return false;
 		}
 
 		if(filename.GetExt().CmpNoCase(_T("stl")) == 0
 				|| filename.GetExt().CmpNoCase(_T("dxf")) == 0
 				|| filename.GetExt().CmpNoCase(_T("gts")) == 0){
-			parent->commandProcessor.Submit(
+			cmdProc->Submit(
 					new CommandObjectLoad(
 							(_("Load Object: ") + filename.GetName()),
 							project, filename.GetFullPath()));
 			parent->TransferDataToWindow();
 		}else{
-
 			if(filename.GetExt().CmpNoCase(_T("zip")) == 0
 					|| filename.GetExt().CmpNoCase(_T("prj")) == 0){
 				if(!project->Load(filename)){
-					wxLogMessage(
+					wxLogMessage
+					(
 							_("Not a valid project file: ")
 									+ filename.GetFullPath());
 					return false;
 				}
-				parent->commandProcessor.ClearCommands();
-				parent->commandProcessor.MarkAsSaved();
+				cmdProc->ClearCommands();
+				cmdProc->MarkAsSaved();
 				parent->TransferDataToWindow();
 
 			}else{
-				wxLogMessage(
+				wxLogMessage
+				(
 				_("Unknown file extension: ") + filename.GetFullPath());
 				return false;
 			}

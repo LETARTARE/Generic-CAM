@@ -45,16 +45,10 @@
 class DialogObjectTransformation:public GUIObjectTransformation {
 	// Constructor/ Destructor
 public:
-	DialogObjectTransformation(wxWindow* parent, Project * project,
-			wxCommandProcessor * commandProcessor, DisplaySettings * settings);
+	DialogObjectTransformation(wxWindow* parent);
 	virtual ~DialogObjectTransformation();
 
 	// Member Variables
-
-	Project* project;
-	DisplaySettings * settings;
-	wxCommandProcessor * commandProcessor;
-
 private:
 	unsigned int c;
 
@@ -73,12 +67,10 @@ private:
 
 	// Methods
 public:
-
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 
 private:
-
 	void OnXClose(wxCloseEvent& event);
 	void OnClose(wxCommandEvent& event);
 	void OnChangeObjectColor(wxColourPickerEvent& event);
@@ -86,6 +78,7 @@ private:
 	void OnTransform(wxCommandEvent& event);
 	void OnSetFactors(wxCommandEvent& event);
 	void OnFlipNormals(wxCommandEvent& event);
+	Project* GetProject(void);
 };
 
 #endif /* DIALOGOBJECTTRANSFORMATION_H_ */

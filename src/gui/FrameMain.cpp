@@ -24,11 +24,12 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "FrameMain.h"
+#include "../StdInclude.h"
+#include "../Config.h"
 
-#include "../controller/DialogSetup6DOFController.h"
-#include "DialogAbout.h"
-#include "DialogSetupUnits.h"
+#include "FrameMain.h"
+#include "FrameParent.h"
+
 #include "DialogTestGCode.h"
 
 #include "../project/generator/ToolpathGeneratorThread.h"
@@ -45,8 +46,8 @@
 
 #include "DnDFile.h"
 
-#include "MathParser.h"
-#include "../languages.h"
+#include "../math/MathParser.h"
+#include "../project/ProjectView.h"
 #include "IDs.h"
 
 #ifndef __WIN32__
@@ -66,14 +67,16 @@
 #include <wx/dir.h>
 #include <unistd.h>
 
-FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
-		GUIMain(parent)
+FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
+		wxDocParentFrame* parent) :
+		GUIFrameMain(doc, view, parent)
 {
-
-//	MathParser x;
-//	x.SetString(_T("1,000 * 15 mA"));
+	this->config = config;
 
 	selectedTargetPosition = 0;
+
+	FrameParent* parentframe = wxStaticCast(parent, FrameParent);
+	Project* project = wxStaticCast(GetDocument(), Project);
 
 #ifndef __WIN32__
 	//TODO: Check, why the icon is not working under Windows / Code::Blocks.
@@ -85,72 +88,68 @@ FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	SetIcons(logo);
 #endif
 
-	logWindow = new wxLogWindow(this, _("Generic CAM - log window"), false,
-			false);
-
-// Setup configuration
-	this->config = config;
-	this->locale = locale;
-
-	settings.GetConfigFrom(config);
 	// Set the window size according to the config file
 	int w, h;
 	w = config->Read(_T("MainFrameWidth"), 600);
 	h = config->Read(_T("MainFrameHeight"), 400);
 	SetClientSize(w, h);
-	control.GetConfigFrom(config);
 
-	m_fileHistory = new wxFileHistory();
-	m_fileHistory->UseMenu(m_menuProjectRecent);
-	m_fileHistory->AddFilesToMenu(m_menuProjectRecent);
-	m_fileHistory->Load(*config);
+	m_menuFile->Append(wxID_NEW);
+	m_menuFile->Append(wxID_OPEN);
+	m_menuFile->Append(wxID_REVERT_TO_SAVED);
+	wxMenu* m_menuRecent = new wxMenu();
+	m_menuFile->Append(
+			new wxMenuItem(m_menuFile, wxID_ANY, _("&Recently opened"),
+					wxEmptyString, wxITEM_NORMAL, m_menuRecent));
+	doc->GetDocumentManager()->FileHistoryAddFilesToMenu(m_menuRecent);
+	m_menuFile->Append(wxID_SAVE);
+	m_menuFile->Append(wxID_SAVEAS);
+	m_menuFile->AppendSeparator();
+	m_menuFile->Append(ID_PROJECTRENAME, _("&Rename project"));
+	m_menuFile->AppendSeparator();
+	m_menuFile->Append(wxID_PRINT);
+	m_menuFile->Append(wxID_PREVIEW);
+	m_menuFile->Append(wxID_PRINT_SETUP, _("Print Setup..."));
+	m_menuFile->AppendSeparator();
+	m_menuFile->Append(wxID_CLOSE);
+	m_menuFile->Append(wxID_EXIT);
 
-	m_canvas->SetDropTarget(new DnDFile(&project, this));
-	m_tree->SetDropTarget(new DnDFile(&project, this));
+	m_menuEdit->Append(wxID_UNDO);
+	m_menuEdit->Append(wxID_REDO);
+	doc->GetCommandProcessor()->SetEditMenu(m_menuEdit);
+	doc->GetCommandProcessor()->Initialize();
 
-	m_canvas->SetController(control);
+	m_menuSettings->Append(ID_SETUPLANGUAGE, _T("Change Language"));
+	m_menuSettings->Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
+	m_menuSettings->Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
+	m_menuSettings->Append(ID_SETUPMIDI, _("Setup &MIDI"));
+	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
 
-	this->Connect(ID_UPDATESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(FrameMain::UpdateSimulation));
+	m_menuHelp->AppendSeparator();
+	m_menuHelp->Append(wxID_HELP, _("&Help") + wxT("\tF1"));
+	m_menuHelp->Append(wxID_ABOUT);
 
-	this->Connect(ID_REFRESHALL, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(FrameMain::RefreshAll));
-	this->Connect(ID_REFRESHMAINGUI, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(FrameMain::RefreshMainGUI));
-	this->Connect(ID_REFRESH3DVIEW, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(FrameMain::Refresh3DView));
+	tree = new TreeSetup(m_tree, project);
 
-	this->Connect(wxID_FILE1, wxID_FILE9, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(FrameMain::OnProjectLoadRecent));
+	m_canvas->SetDropTarget(new DnDFile(project, this));
+	m_tree->SetDropTarget(new DnDFile(project, this));
 
-	//TODO: Why is the KeyDown event connected to the canvas?
-	m_canvas->Connect(wxID_ANY, wxEVT_KEY_DOWN,
-			wxKeyEventHandler(FrameMain::OnKeyDown), NULL, this);
+	m_canvas->SetController(parentframe->control);
+	m_canvas->InsertProject(project); // Connect the project to the 3D canvas
+	parentframe->settings.WriteToCanvas(m_canvas);
 
-	commandProcessor.SetEditMenu(m_menuEdit);
-	commandProcessor.Initialize();
-	commandProcessor.MarkAsSaved();
+	logWindow = new wxLogWindow(this, _("Generic CAM - log window"), false,
+			false);
 
-	m_helpController = new wxHelpController;
-	m_helpController->Initialize(_T("./doc/help/genericcam.hhp"));
-
-	dialogObjectTransformation = new DialogObjectTransformation(this, &project,
-			&commandProcessor, &settings);
-	dialogStockMaterial = new DialogStockMaterial(this, &project, &stock,
-			&settings);
-	dialogWorkpiece = new DialogWorkpiece(this, &project, &stock,
-			&commandProcessor);
-	dialogPlacement = new DialogPlacement(this, &project, &commandProcessor,
-			&settings);
-	dialogRun = new DialogRun(this, &project, &toolbox, &commandProcessor,
-			&settings);
-	dialogDebugger = new DialogMachineDebugger(this, &settings, &midi);
-	dialogSetupStereo3D = new DialogSetupStereo3D(this, &settings);
-	dialogSetupMidi = new DialogSetupMidi(this, &midi);
-	dialogToolbox = new DialogToolbox(this, &project, &toolbox, &settings);
-	dialogToolpathGenerator = new DialogToolpathGenerator(this, &project,
-			&commandProcessor, &settings);
-	dialogAnimation = new DialogAnimation(this, &project);
+	dialogObjectTransformation = new DialogObjectTransformation(this);
+	dialogStockMaterial = new DialogStockMaterial(this);
+	dialogWorkpiece = new DialogWorkpiece(this);
+	dialogPlacement = new DialogPlacement(this);
+	dialogRun = new DialogRun(this);
+	dialogDebugger = new DialogMachineDebugger(this, parentframe->midi);
+	dialogToolbox = new DialogToolbox(this);
+	dialogToolpathGenerator = new DialogToolpathGenerator(this);
+	dialogAnimation = new DialogAnimation(this);
 
 	wxString dialect;
 	config->Read(_T("GCodeDialect"), &dialect, _T("RS274NGC"));
@@ -159,44 +158,29 @@ FrameMain::FrameMain(wxWindow* parent, wxLocale* locale, wxConfig* config) :
 	m_menuDialect->Check(ID_DIALECT_FANUCM,
 			dialect.CmpNoCase(_T("FanucM")) == 0);
 
-	// Connect the project to the 3D canvas
-	m_canvas->InsertProject(&project);
-	settings.WriteToCanvas(m_canvas);
-	tree = new TreeSetup(m_tree, &project);
-
-	timer.SetOwner(this);
-	this->Connect(wxEVT_TIMER, wxTimerEventHandler(FrameMain::OnTimer), NULL,
-			this);
-
-	dt = 50e-3; // s
-	timer.Start(round(dt * 1000.0)); // ms
-
 	m_canvas->display = CanvasMain::displayObjects;
+
+	this->Connect(ID_PROJECTRENAME, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(FrameMain::OnProjectRename));
+
+	this->Connect(ID_UPDATESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(FrameMain::UpdateSimulation));
+
+
 
 	TransferDataToWindow();
 }
 
 FrameMain::~FrameMain()
 {
+	printf("FrameMain: Destructor called\n");
 	// Disconnect events
-	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(FrameMain::OnTimer), NULL,
-			this);
-	m_canvas->Disconnect(wxID_ANY, wxEVT_KEY_DOWN,
-			wxKeyEventHandler(FrameMain::OnKeyDown), NULL, this);
-	this->Disconnect(wxID_FILE1, wxID_FILE9, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(FrameMain::OnProjectLoadRecent));
-	this->Disconnect(ID_REFRESH3DVIEW, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(FrameMain::Refresh3DView));
-	this->Disconnect(ID_REFRESHMAINGUI, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(FrameMain::RefreshMainGUI));
-	this->Disconnect(ID_REFRESHALL, wxEVT_COMMAND_MENU_SELECTED,
-			wxCommandEventHandler(FrameMain::RefreshAll));
 
 	this->Disconnect(ID_UPDATESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(FrameMain::UpdateSimulation));
 
-	// Save the configuration of the 6DOF controller
-	control.WriteConfigTo(config);
+	this->Disconnect(ID_PROJECTRENAME, wxEVT_COMMAND_MENU_SELECTED,
+			wxCommandEventHandler(FrameMain::OnProjectRename));
 
 	// Save the size of the mainframe
 	int w, h;
@@ -207,12 +191,11 @@ FrameMain::~FrameMain()
 	wxString dialect = _T("RS274NGC");
 	if(m_menuDialect->IsChecked(ID_DIALECT_FANUCM)) dialect = _T("FanucM");
 	config->Write(_T("GCodeDialect"), dialect);
+}
 
-	delete m_helpController;
-	settings.WriteConfigTo(config);
-	m_fileHistory->Save(*config);
-	delete m_fileHistory;
-	delete config; // config is written back on deletion of object
+FrameParent* FrameMain::GetParentFrame(void)
+{
+	return wxStaticCast(GetParent(), FrameParent);
 }
 
 bool FrameMain::TransferDataToWindow(void)
@@ -221,15 +204,15 @@ bool FrameMain::TransferDataToWindow(void)
 	tree->Update();
 
 //	m_menuToolpath->Check(ID_GENERATORAUTOMATIC, project.processToolpath);
-	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
+	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
 	//TODO: Reactivate
 //	m_toolBar->ToggleTool(ID_DISPLAYMACHINE, project.displayMachine);
 //	m_toolBar->ToggleTool(ID_DISPLAYMATERIAL, project.displayGeometry);
 
-	wxString temp = _T("Generic CAM - ");
-	if(commandProcessor.IsDirty()) temp += _T("* ");
-	temp += project.name;
-	this->SetTitle(temp);
+//	wxString temp = _T("Generic CAM - ");
+//	if(commandProcessor.IsDirty()) temp += _T("* ");
+//	temp += project.name;
+//	this->SetTitle(temp);
 
 //	m_canvas->displayAnimation = dialogAnimation->IsShown();
 
@@ -242,7 +225,6 @@ bool FrameMain::TransferDataToWindow(void)
 	dialogDebugger->TransferDataToWindow();
 	dialogToolpathGenerator->TransferDataToWindow();
 	dialogAnimation->TransferDataToWindow();
-	dialogSetupStereo3D->TransferDataToWindow();
 
 	Refresh();
 	return true;
@@ -258,23 +240,6 @@ bool FrameMain::TransferDataFromWindow(void)
 	return true;
 }
 
-void FrameMain::RefreshAll(wxCommandEvent& event)
-{
-	settings.WriteToCanvas(m_canvas);
-	TransferDataToWindow();
-}
-
-void FrameMain::RefreshMainGUI(wxCommandEvent& event)
-{
-	tree->UpdateSelection();
-	Refresh();
-}
-
-void FrameMain::Refresh3DView(wxCommandEvent& event)
-{
-	settings.WriteToCanvas(m_canvas);
-	m_canvas->Refresh();
-}
 
 void FrameMain::UpdateSimulation(wxCommandEvent& event)
 {
@@ -297,80 +262,35 @@ size_t FrameMain::GetFreeSystemMemory()
 #endif
 }
 
-void FrameMain::OnIdle(wxIdleEvent& event)
+void FrameMain::OnClose(wxCloseEvent& event)
 {
-	event.Skip();
-}
+	wxDocument* doc = this->GetDocument();
+	wxList tempDocs = doc->GetDocumentManager()->GetDocuments();
+	wxList tempViews = doc->GetViews();
+//	Project* project = wxStaticCast(doc, Project);
+//	project->StopAllThreads();
 
-void FrameMain::OnTimer(wxTimerEvent& event)
-{
-	t += dt;
+	printf("FrameMain: %lu docs, %lu views\n", tempDocs.GetCount(),
+			tempViews.GetCount());
 
-	wxString temp;
-//	temp = wxString::Format(_T("Free RAM: %lu MB"),
-//			GetFreeSystemMemory() / 1024 / 1024);
-//
-//	m_statusBar->SetStatusText(temp, 1);
-
-//	if(project.processToolpath){
-//		if(project.GenerateToolpaths()) TransferDataToWindow();
-//	}
-}
-
-void FrameMain::OnKeyDown(wxKeyEvent& event)
-{
-	int k = event.GetKeyCode();
-
-//	if(k == WXK_ESCAPE){
-//		this->Close();
-//	}
-
-// Select placement
-//	if(k == WXK_NUMPAD_ADD
-//			&& selectedTargetPosition
-//					< project.run[0].placements.GetCount() - 1) selectedTargetPosition++;
-//	if(k == WXK_NUMPAD_SUBTRACT && selectedTargetPosition > 0) selectedTargetPosition--;
-
-//	if(selectedTargetPosition
-//			< project.run[0].placements.GetCount()
-//			&& project.run[0].placements[selectedTargetPosition].isMovable){
-//
-//		if(k == WXK_UP) project.run[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
-//				0.0, 0.001, 0.0);
-//		if(k == WXK_DOWN) project.run[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
-//				0.0, -0.001, 0.0);
-//		if(k == WXK_RIGHT) project.run[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
-//				0.001, 0.0, 0.0);
-//		if(k == WXK_LEFT) project.run[0].placements[selectedTargetPosition].matrix.TranslateGlobal(
-//				-0.001, 0.0, 0.0);
-//
-//		if(k == WXK_PAGEUP){
-//			AffineTransformMatrix temp;
-//			temp = AffineTransformMatrix::RotateXYZ(0.0, 0.0, M_PI / 16);
-//			project.run[0].placements[selectedTargetPosition].matrix =
-//					project.run[0].placements[selectedTargetPosition].matrix
-//							* temp;
-//		}
-//		if(k == WXK_PAGEDOWN){
-//			AffineTransformMatrix temp;
-//			temp = AffineTransformMatrix::RotateXYZ(0.0, 0.0, -M_PI / 16);
-//			project.run[0].placements[selectedTargetPosition].matrix =
-//					project.run[0].placements[selectedTargetPosition].matrix
-//							* temp;
-//		}
-//
-//		m_statusBar->SetStatusText(_T("Dummy text..."));
-//
-//		this->Refresh();
-//	}
-
-	event.Skip();
+	if(tempDocs.GetCount() > 1){
+		event.Skip(); // Only close this window, by passing the event to the default handler.
+		return;
+	}
+	if(tempViews.GetCount() > 1){
+		event.Skip(); // Only close this window, by passing the event to the default handler.
+		return;
+	}
+	wxWindow* main = this->GetParent();
+	printf("FrameMain: parent->Close()\n");
+	main->Close(); // Exit app by closing main window, this will close this window as well.
 }
 
 void FrameMain::On3DSelect(wxMouseEvent& event)
 {
 	int x = event.GetX();
 	int y = event.GetY();
+	Project* project = wxStaticCast(GetDocument(), Project);
 	OpenGLPick result;
 	m_canvas->OnPick(result, x, y);
 
@@ -379,8 +299,8 @@ void FrameMain::On3DSelect(wxMouseEvent& event)
 		result.SortByNear();
 		if(result.Get(0) == 1 && result.Get(1) > 0){
 			size_t id = result.Get(1) - 1;
-			for(n = 0; n < project.objects.GetCount(); n++)
-				project.objects[n].selected = (n == id);
+			for(n = 0; n < project->objects.GetCount(); n++)
+				project->objects[n].selected = (n == id);
 			tree->UpdateSelection();
 			Refresh();
 		}
@@ -418,6 +338,8 @@ void FrameMain::OnBeginLabelEdit(wxTreeEvent& event)
 
 void FrameMain::OnEndLabelEdit(wxTreeEvent& event)
 {
+	Project* project = wxStaticCast(GetDocument(), Project);
+	wxCommandProcessor* cmdProc = project->GetCommandProcessor();
 	wxTreeItemId id = event.GetItem();
 	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
 	wxString newName = event.GetLabel();
@@ -427,38 +349,34 @@ void FrameMain::OnEndLabelEdit(wxTreeEvent& event)
 	}
 
 	if(data->dataType == itemProject){
-		if(newName == project.name) return;
-		commandProcessor.Submit(
+		if(newName == project->name) return;
+		cmdProc->Submit(
 				new CommandProjectRename(_("Project renamed to ") + newName,
-						&project, newName));
-		TransferDataToWindow();
+						project, newName));
 		return;
 	};
 
 	if(data->dataType == itemObject){
-		if(newName == project.objects[data->nr].name) return;
-		commandProcessor.Submit(
+		if(newName == project->objects[data->nr].name) return;
+		cmdProc->Submit(
 				new CommandObjectRename(_("Object renamed to ") + newName,
-						&project, data->nr, newName));
-		TransferDataToWindow();
+						project, data->nr, newName));
 		return;
 	};
 
 	if(data->dataType == itemWorkpiece){
-		if(newName == project.workpieces[data->nr].name) return;
-		commandProcessor.Submit(
+		if(newName == project->workpieces[data->nr].name) return;
+		cmdProc->Submit(
 				new CommandWorkpieceRename(_("Workpiece renamed to ") + newName,
-						&project, data->nr, newName));
-		TransferDataToWindow();
+						project, data->nr, newName));
 		return;
 	};
 
 	if(data->dataType == itemRun){
-		if(newName == project.run[data->nr].name) return;
-		commandProcessor.Submit(
-				new CommandRunRename(_("Run renamed to ") + newName, &project,
+		if(newName == project->run[data->nr].name) return;
+		cmdProc->Submit(
+				new CommandRunRename(_("Run renamed to ") + newName, project,
 						data->nr, newName));
-		TransferDataToWindow();
 		return;
 	};
 
@@ -587,6 +505,7 @@ void FrameMain::OnSelectionChanged(wxTreeEvent& event)
 {
 	wxTreeItemId id = event.GetItem();
 	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
+	Project* project = wxStaticCast(GetDocument(), Project);
 
 	tree->UpdateVariables();
 
@@ -594,8 +513,8 @@ void FrameMain::OnSelectionChanged(wxTreeEvent& event)
 		if(m_tree->IsSelected(id)){
 			// Only allow one item selected at a time
 			size_t n;
-			for(n = 0; n < project.run.GetCount(); n++)
-				project.run[n].Select(n == data->nr);
+			for(n = 0; n < project->run.GetCount(); n++)
+				project->run[n].Select(n == data->nr);
 			tree->UpdateSelection();
 		}
 	}
@@ -639,148 +558,39 @@ void FrameMain::OnSelectionChanging(wxTreeEvent& event)
 	event.Veto();
 }
 
-void FrameMain::OnToolbarButton(wxCommandEvent& event)
-{
-	TransferDataFromWindow();
-	TransferDataToWindow();
-}
-
-void FrameMain::OnProjectNew(wxCommandEvent& event)
-{
-	// TODO: Multiple Project%s in one session
-//	Project temp;
-//	project.Add(temp);
-	commandProcessor.ClearCommands();
-	project.Clear();
-	commandProcessor.MarkAsSaved();
-	commandProcessor.SetMenuStrings();
-	TransferDataToWindow();
-	tree->UpdateSelection();
-}
-
 void FrameMain::OnProjectRename(wxCommandEvent& event)
 {
+	Project* project = wxStaticCast(GetDocument(), Project);
 	wxTextEntryDialog dialog(this, _("Enter new project name:"),
-			_T("Rename Project"), project.name);
+			_T("Rename Project"), project->name);
 	if(dialog.ShowModal() == wxID_OK){
 		if(dialog.GetValue().IsEmpty()) return;
-		if(dialog.GetValue() == project.name) return;
+		if(dialog.GetValue() == project->name) return;
 
 		CommandProjectRename * command = new CommandProjectRename(
-		_("Project renamed to ") + dialog.GetValue(), &project,
+		_("Project renamed to ") + dialog.GetValue(), project,
 				dialog.GetValue());
-		commandProcessor.Submit(command);
+		project->GetCommandProcessor()->Submit(command);
 		TransferDataToWindow();
 	}
-}
-
-void FrameMain::ProjectLoad(wxString fileName)
-{
-	project.Load(fileName);
-
-	commandProcessor.ClearCommands();
-	commandProcessor.MarkAsSaved();
-	TransferDataToWindow();
-}
-
-void FrameMain::OnProjectLoad(wxCommandEvent& event)
-{
-	wxFileName fileName;
-	wxFileDialog dialog(this, _("Open Project..."), _T(""), _T(""),
-			_("Generic CAM Project (*.zip)|*.zip;*.ZIP|All Files|*.*"),
-			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
-
-	if(wxDir::Exists(settings.lastProjectDirectory)){
-		dialog.SetDirectory(settings.lastProjectDirectory);
-	}
-
-	if(dialog.ShowModal() == wxID_OK){
-		fileName = dialog.GetPath();
-		m_fileHistory->AddFileToHistory(fileName.GetFullPath());
-		if(project.Load(fileName)){
-			settings.lastProjectDirectory = fileName.GetPath();
-			TransferDataToWindow();
-			tree->UpdateSelection();
-		}
-	}
-}
-
-void FrameMain::OnProjectLoadRecent(wxCommandEvent& event)
-{
-	wxString fileName(
-			m_fileHistory->GetHistoryFile(event.GetId() - wxID_FILE1));
-	if(!fileName.empty() && project.Load(fileName)){
-		TransferDataToWindow();
-		tree->UpdateSelection();
-	}
-}
-
-void FrameMain::OnProjectSave(wxCommandEvent& event)
-{
-	if(!project.fileName.IsOk()) OnProjectSaveAs(event);
-	if(project.Save(project.fileName)){
-		commandProcessor.MarkAsSaved();
-	}
-	TransferDataToWindow();
-}
-
-void FrameMain::OnProjectSaveAs(wxCommandEvent &event)
-{
-	wxFileName fileName;
-	wxFileDialog dialog(this, _("Save Project As..."), _T(""), _T(""),
-			_("Generic CAM Project (*.zip)|*.zip|All Files|*.*"),
-			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-
-	if(wxDir::Exists(settings.lastProjectDirectory)){
-		dialog.SetDirectory(settings.lastProjectDirectory);
-	}
-
-	if(project.fileName.IsOk()) dialog.SetPath(project.fileName.GetFullPath());
-
-	if(dialog.ShowModal() == wxID_OK){
-		fileName = dialog.GetPath();
-		if(fileName.GetExt().IsEmpty()) fileName.SetExt(_T("zip"));
-		m_fileHistory->AddFileToHistory(fileName.GetFullPath());
-		if(project.Save(fileName)){
-			commandProcessor.MarkAsSaved();
-			settings.lastProjectDirectory = project.fileName.GetPath();
-		}
-	}
-	TransferDataToWindow();
-}
-
-void FrameMain::OnQuit(wxCommandEvent& event)
-{
-	Close();
-}
-
-void FrameMain::OnUndo(wxCommandEvent& event)
-{
-	commandProcessor.Undo();
-	dialogToolpathGenerator->UndoChanges();
-	TransferDataToWindow();
-}
-
-void FrameMain::OnRedo(wxCommandEvent& event)
-{
-	commandProcessor.Redo();
-	dialogToolpathGenerator->UndoChanges();
-	TransferDataToWindow();
 }
 
 void FrameMain::OnObjectLoad(wxCommandEvent& event)
 {
+	FrameParent* parentframe = wxStaticCast(GetParent(), FrameParent);
+	Project* project = wxStaticCast(GetDocument(), Project);
+	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 	wxFileName fileName;
 	wxFileDialog dialog(this, _("Open Object..."), _T(""), _T(""),
 			_(
 					"All supported files (*.dxf; *.stl; *.gts)|*.dxf;*DXF;*.stl;*.STL;*.gts;*.GTS|DXF Files (*.dxf)|*.dxf;*.DXF|Stereolithography files (STL files) (*.stl)|*.stl;*.STL|GTS files (*.gts)|*.gts;*.GTS|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_MULTIPLE);
 
-	if(wxDir::Exists(settings.lastObjectDirectory)){
-		dialog.SetDirectory(settings.lastObjectDirectory);
+	if(wxDir::Exists(parentframe->settings.lastObjectDirectory)){
+		dialog.SetDirectory(parentframe->settings.lastObjectDirectory);
 	}else{
-		if(wxDir::Exists(settings.lastProjectDirectory)){
-			dialog.SetDirectory(settings.lastProjectDirectory);
+		if(wxDir::Exists(parentframe->settings.lastProjectDirectory)){
+			dialog.SetDirectory(parentframe->settings.lastProjectDirectory);
 		}
 	}
 
@@ -791,11 +601,12 @@ void FrameMain::OnObjectLoad(wxCommandEvent& event)
 		size_t n;
 		for(n = 0; n < paths.GetCount(); n++){
 			fileName = paths[n];
-			commandProcessor.Submit(
+			cmdProc->Submit(
 					new CommandObjectLoad(
 							(_("Load Object: ") + fileName.GetName()),
-							&project, paths[n]));
-			if(n == 0) settings.lastObjectDirectory = fileName.GetPath();
+							project, paths[n]));
+			if(n == 0) parentframe->settings.lastObjectDirectory =
+					fileName.GetPath();
 		}
 		TransferDataToWindow();
 	}
@@ -810,18 +621,20 @@ void FrameMain::OnObjectModify(wxCommandEvent& event)
 
 void FrameMain::OnObjectRename(wxCommandEvent& event)
 {
+	Project* project = wxStaticCast(GetDocument(), Project);
+	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 	TransferDataFromWindow();
 	int i = tree->GetFirstSelectedObject();
-	if(i < 0 || i >= project.objects.GetCount()) return;
+	if(i < 0 || i >= project->objects.GetCount()) return;
 	wxTextEntryDialog dialog(this, _("Enter new name:"),
-	_T("Rename Object ") + project.objects[i].name,
-			project.objects[i].name);
+	_T("Rename Object ") + project->objects[i].name,
+			project->objects[i].name);
 	if(dialog.ShowModal() == wxID_OK){
 		if(dialog.GetValue().IsEmpty()) return;
-		if(dialog.GetValue() == project.objects[i].name) return;
-		commandProcessor.Submit(
+		if(dialog.GetValue() == project->objects[i].name) return;
+		cmdProc->Submit(
 				new CommandObjectRename(
-				_("Object renamed to ") + dialog.GetValue(), &project, i,
+				_("Object renamed to ") + dialog.GetValue(), project, i,
 						dialog.GetValue()));
 		TransferDataToWindow();
 	}
@@ -829,28 +642,32 @@ void FrameMain::OnObjectRename(wxCommandEvent& event)
 
 void FrameMain::OnObjectDelete(wxCommandEvent& event)
 {
+	Project* project = wxStaticCast(GetDocument(), Project);
+	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 	TransferDataFromWindow();
 	tree->UpdateVariables();
 	int i = tree->GetFirstSelectedObject();
-	if(i < 0 || i >= project.objects.GetCount()) return;
-	commandProcessor.Submit(
+	if(i < 0 || i >= project->objects.GetCount()) return;
+	cmdProc->Submit(
 			new CommandObjectDelete(
-			_("Object ") + project.objects[i].name + _(" deleted."),
-					&project, i));
+			_("Object ") + project->objects[i].name + _(" deleted."),
+					project, i));
 	TransferDataToWindow();
 }
 
 void FrameMain::OnObjectFlipNormals(wxCommandEvent& event)
 {
+	Project* project = wxStaticCast(GetDocument(), Project);
+	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 	size_t n;
-	for(n = 0; n < project.objects.GetCount(); n++){
-		if(project.objects[n].selected){
-			AffineTransformMatrix matrix = project.objects[n].displayTransform
-					* project.objects[n].matrix;
+	for(n = 0; n < project->objects.GetCount(); n++){
+		if(project->objects[n].selected){
+			AffineTransformMatrix matrix = project->objects[n].displayTransform
+					* project->objects[n].matrix;
 			CommandObjectTransform * command = new CommandObjectTransform(
-					project.objects[n].name + _(": Flipped normal vectors"),
-					&project, n, false, false, false, true, matrix);
-			commandProcessor.Submit(command);
+					project->objects[n].name + _(": Flipped normal vectors"),
+					project, n, false, false, false, true, matrix);
+			cmdProc->Submit(command);
 		}
 	}
 	TransferDataToWindow();
@@ -880,15 +697,17 @@ void FrameMain::OnWorkpieceAdd(wxCommandEvent& event)
 
 void FrameMain::OnWorkpieceDelete(wxCommandEvent& event)
 {
+	Project* project = wxStaticCast(GetDocument(), Project);
+	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 	TransferDataFromWindow();
 	tree->UpdateVariables();
 	size_t i;
-	for(i = project.workpieces.GetCount(); i > 0; i--){
-		if(project.workpieces[i - 1].selected){
-			commandProcessor.Submit(
+	for(i = project->workpieces.GetCount(); i > 0; i--){
+		if(project->workpieces[i - 1].selected){
+			cmdProc->Submit(
 					new CommandWorkpieceDelete(
 							_("Remove workpiece ")
-									+ project.workpieces[i - 1].name, &project,
+									+ project->workpieces[i - 1].name, project,
 							i - 1));
 		}
 	}
@@ -897,14 +716,15 @@ void FrameMain::OnWorkpieceDelete(wxCommandEvent& event)
 
 void FrameMain::OnWorkpieceDeleteUnused(wxCommandEvent& event)
 {
+	Project* project = wxStaticCast(GetDocument(), Project);
+	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 	TransferDataFromWindow();
-	size_t i;
-	for(i = project.workpieces.GetCount(); i > 0; i--){
-		if(project.workpieces[i - 1].placements.GetCount() == 0){
-			commandProcessor.Submit(
+	for(size_t i = project->workpieces.GetCount(); i > 0; i--){
+		if(project->workpieces[i - 1].placements.GetCount() == 0){
+			cmdProc->Submit(
 					new CommandWorkpieceDelete(
 							_("Remove workpiece ")
-									+ project.workpieces[i - 1].name, &project,
+									+ project->workpieces[i - 1].name, project,
 							i - 1));
 		}
 	}
@@ -913,9 +733,11 @@ void FrameMain::OnWorkpieceDeleteUnused(wxCommandEvent& event)
 
 void FrameMain::OnRunAdd(wxCommandEvent& event)
 {
-	unsigned int i = project.run.GetCount() + 1;
-	commandProcessor.Submit(
-			new CommandRunAdd(_("Add run"), &project,
+	Project* project = wxStaticCast(GetDocument(), Project);
+	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
+	unsigned int i = project->run.GetCount() + 1;
+	cmdProc->Submit(
+			new CommandRunAdd(_("Add run"), project,
 					wxString::Format(_("Run #%u"), i)));
 	TransferDataToWindow();
 }
@@ -929,19 +751,21 @@ void FrameMain::OnRunEdit(wxCommandEvent& event)
 
 void FrameMain::OnRunDelete(wxCommandEvent& event)
 {
+	Project* project = wxStaticCast(GetDocument(), Project);
+	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 	TransferDataFromWindow();
 	tree->UpdateVariables();
-	size_t i;
-	for(i = project.run.GetCount(); i > 0; i--){
-		if(project.run[i - 1].selected){
-			commandProcessor.Submit(new CommandRunRemove(
-			_("Remove run ") + project.run[i - 1].name, &project, i - 1));
+	for(size_t i = project->run.GetCount(); i > 0; i--){
+		if(project->run[i - 1].selected){
+			cmdProc->Submit(new CommandRunRemove(
+			_("Remove run ") + project->run[i - 1].name, project, i - 1));
 		}
 	}
 	TransferDataToWindow();
 }
 void FrameMain::OnMachineLoad(wxCommandEvent& event)
 {
+	FrameParent* parentframe = wxStaticCast(GetParent(), FrameParent);
 	int selected = tree->GetFirstSelectedRun();
 	if(selected < 0) return;
 
@@ -950,20 +774,22 @@ void FrameMain::OnMachineLoad(wxCommandEvent& event)
 					"All machine descriptions  (*.lua;*.zip)|*.lua;*.zip|Machine descriptions (LUA Files)  (*.lua)|*.lua|Packed Machine descriptions  (*.zip)|*.zip|Text files  (*.txt)|*.txt|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
-	if(wxDir::Exists(settings.lastMachineDirectory)){
-		dialog.SetDirectory(settings.lastMachineDirectory);
+	if(wxDir::Exists(parentframe->settings.lastMachineDirectory)){
+		dialog.SetDirectory(parentframe->settings.lastMachineDirectory);
 	}else{
-		if(wxDir::Exists(settings.lastProjectDirectory)){
-			dialog.SetDirectory(settings.lastProjectDirectory);
+		if(wxDir::Exists(parentframe->settings.lastProjectDirectory)){
+			dialog.SetDirectory(parentframe->settings.lastProjectDirectory);
 		}
 	}
+	Project* project = wxStaticCast(GetDocument(), Project);
 
 	if(dialog.ShowModal() == wxID_OK){
 		wxFileName fileName(dialog.GetPath());
-		if(project.run[selected].machine.Load(fileName)){
-			settings.lastMachineDirectory = fileName.GetPath();
+		if(project->run[selected].machine.Load(fileName)){
+			parentframe->settings.lastMachineDirectory = fileName.GetPath();
 		}else{
-			wxLogError(project.run[selected].machine.textOut);
+			wxLogError
+			(project->run[selected].machine.textOut);
 		}
 		TransferDataToWindow();
 	}
@@ -971,12 +797,12 @@ void FrameMain::OnMachineLoad(wxCommandEvent& event)
 
 void FrameMain::OnMachineReload(wxCommandEvent& event)
 {
+	Project* project = wxStaticCast(GetDocument(), Project);
 	int selected = tree->GetFirstSelectedRun();
 	if(selected < 0) return;
-
-	if(!project.run[selected].machine.ReLoad()){
-
-		wxLogError(project.run[selected].machine.textOut);
+	if(!project->run[selected].machine.ReLoad()){
+		wxLogError
+		(project->run[selected].machine.textOut);
 	}
 	TransferDataToWindow();
 }
@@ -1000,20 +826,22 @@ void FrameMain::OnToolboxEdit(wxCommandEvent& event)
 
 void FrameMain::OnToolboxLoad(wxCommandEvent& event)
 {
+	FrameParent* parentframe = wxStaticCast(GetParent(), FrameParent);
+	ProjectView* view = wxStaticCast(GetView(), ProjectView);
 	wxFileDialog dialog(this, _("Open toolbox..."), _T(""), _T(""),
 			_("Toolbox (*.xml)|*.xml|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
-	if(wxDir::Exists(settings.lastToolboxDirectory)){
-		dialog.SetDirectory(settings.lastToolboxDirectory);
+	if(wxDir::Exists(parentframe->settings.lastToolboxDirectory)){
+		dialog.SetDirectory(parentframe->settings.lastToolboxDirectory);
 	}else{
-		if(wxDir::Exists(settings.lastProjectDirectory)){
-			dialog.SetDirectory(settings.lastProjectDirectory);
+		if(wxDir::Exists(parentframe->settings.lastProjectDirectory)){
+			dialog.SetDirectory(parentframe->settings.lastProjectDirectory);
 		}
 	}
 	if(dialog.ShowModal() == wxID_OK){
 		wxFileName fileName(dialog.GetPath());
-		if(toolbox.LoadToolBox(fileName)){
-			settings.lastToolboxDirectory = fileName.GetPath();
+		if(view->toolbox.LoadToolBox(fileName)){
+			parentframe->settings.lastToolboxDirectory = fileName.GetPath();
 			TransferDataToWindow();
 		}
 	}
@@ -1021,20 +849,22 @@ void FrameMain::OnToolboxLoad(wxCommandEvent& event)
 
 void FrameMain::OnToolboxSave(wxCommandEvent &event)
 {
+	FrameParent* parentframe = wxStaticCast(GetParent(), FrameParent);
+	ProjectView* view = wxStaticCast(GetView(), ProjectView);
 	wxFileDialog dialog(this, _("Save toolbox..."), _T(""), _T(""),
 			_("Toolbox (*.xml)|*.xml|All files|*.*"),
 			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-	if(toolbox.fileName.IsOk()){
-		dialog.SetPath(toolbox.fileName.GetFullPath());
+	if(view->toolbox.fileName.IsOk()){
+		dialog.SetPath(view->toolbox.fileName.GetFullPath());
 	}else{
-		if(wxDir::Exists(settings.lastToolboxDirectory)){
-			dialog.SetDirectory(settings.lastToolboxDirectory);
+		if(wxDir::Exists(parentframe->settings.lastToolboxDirectory)){
+			dialog.SetDirectory(parentframe->settings.lastToolboxDirectory);
 		}
 	}
 	if(dialog.ShowModal() == wxID_OK){
 		wxFileName fileName;
 		fileName = dialog.GetPath();
-		if(toolbox.SaveToolBox(fileName)){
+		if(view->toolbox.SaveToolBox(fileName)){
 			TransferDataToWindow();
 		}
 	}
@@ -1045,16 +875,16 @@ void FrameMain::OnGeneratorSetup(wxCommandEvent& event)
 	dialogToolpathGenerator->Show();
 	dialogToolpathGenerator->Raise();
 	TransferDataToWindow();
-
 }
 
 void FrameMain::OnGeneratorStart(wxCommandEvent& event)
 {
 #ifndef _DEBUGMODE
 	wxWindowDisabler disableAll;
-	wxBusyInfo wait(_("Generating Toolpaths..."),this);
+	wxBusyInfo wait(_("Generating Toolpaths..."), this);
 #endif
-	project.GenerateToolpaths();
+	Project* project = wxStaticCast(GetDocument(), Project);
+	project->GenerateToolpaths();
 
 //	project.PropagateChanges();
 //
@@ -1084,36 +914,27 @@ void FrameMain::OnGeneratorRestart(wxCommandEvent& event)
 
 void FrameMain::OnGeneratorSaveToolpath(wxCommandEvent& event)
 {
+	FrameParent* parentframe = wxStaticCast(GetParent(), FrameParent);
+	Project* project = wxStaticCast(GetDocument(), Project);
 	const int runNr = tree->GetFirstSelectedRun();
-	if(runNr < 0 || runNr >= project.run.GetCount()) return;
+	if(runNr < 0 || runNr >= project->run.GetCount()) return;
 
 	wxFileDialog dialog(this, _("Save toolpath..."), _T(""), _T(""),
 			_("G-Code file (*.nc)|*.nc|All files|*.*"),
 			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
-	if(wxDir::Exists(settings.lastToolpathDirectory)){
-		dialog.SetDirectory(settings.lastToolpathDirectory);
+	if(wxDir::Exists(parentframe->settings.lastToolpathDirectory)){
+		dialog.SetDirectory(parentframe->settings.lastToolpathDirectory);
 	}
 	if(dialog.ShowModal() == wxID_OK){
 		wxFileName fileName;
 		fileName = dialog.GetPath();
-		settings.lastToolpathDirectory = fileName.GetPath();
+		parentframe->settings.lastToolpathDirectory = fileName.GetPath();
 		ToolPath::Dialect dialect = ToolPath::RS274NGC;
 		if(m_menuDialect->IsChecked(ID_DIALECT_FANUCM)) dialect =
 				ToolPath::FanucM;
-		project.SaveToolpath(fileName, runNr, dialect);
+		project->SaveToolpath(fileName, runNr, dialect);
 	}
-}
-
-void FrameMain::OnChangeLanguage(wxCommandEvent& event)
-{
-	long lng =
-			wxGetSingleChoiceIndex(
-					_T(
-							"Please choose language:\nChanges will take place after restart!"),
-					_T("Language"), WXSIZEOF(langNames), langNames);
-	if(lng >= 0) config->Write(_T("Language"), langNames[lng]);
-	TransferDataToWindow();
 }
 
 void FrameMain::OnActivateStereo3D(wxCommandEvent& event)
@@ -1123,34 +944,8 @@ void FrameMain::OnActivateStereo3D(wxCommandEvent& event)
 	}else{
 		m_canvas->stereoMode = stereoOff;
 	}
-	m_menuSettings->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
+	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
 	TransferDataToWindow();
-}
-
-void FrameMain::OnSetupController(wxCommandEvent& event)
-{
-	DialogSetup6DOFController temp(this);
-	temp.InsertController(control);
-	temp.ShowModal();
-}
-
-void FrameMain::OnSetupStereo3D(wxCommandEvent& event)
-{
-	dialogSetupStereo3D->Show(true);
-	dialogSetupStereo3D->Raise();
-}
-
-void FrameMain::OnSetupMidi(wxCommandEvent& event)
-{
-	dialogSetupMidi->Show(true);
-	dialogSetupMidi->Raise();
-}
-
-void FrameMain::OnSetupUnits(wxCommandEvent& event)
-{
-	DialogSetupUnits * temp = new DialogSetupUnits(this, &settings);
-	temp->Show();
-	temp->Raise();
 }
 
 void FrameMain::OnShowAnimationControl(wxCommandEvent& event)
@@ -1171,7 +966,6 @@ void FrameMain::OnExtraWindowClose(wxCommandEvent& event)
 	dialogToolbox->Show(false);
 	dialogToolpathGenerator->Show(false);
 	dialogAnimation->Show(false);
-	dialogSetupStereo3D->Show(false);
 
 	TransferDataToWindow();
 }
@@ -1219,23 +1013,10 @@ void FrameMain::OnViewSet(wxCommandEvent& event)
 	TransferDataToWindow();
 }
 
-void FrameMain::OnHelp(wxCommandEvent& event)
-{
-	m_helpController->DisplayContents();
-}
-
 void FrameMain::OnTestGCode(wxCommandEvent& event)
 {
 	//TODO: When the units change the change is not immediately propagated into the TestGCode dialog.
-	DialogTestGCode * dialog = new DialogTestGCode(this, &settings);
+	DialogTestGCode * dialog = new DialogTestGCode(this);
 	dialog->Show();
 	dialog->Raise();
 }
-
-void FrameMain::OnAbout(wxCommandEvent& event)
-{
-	DialogAbout * dialog = new DialogAbout(this);
-	dialog->Show();
-	dialog->Raise();
-}
-

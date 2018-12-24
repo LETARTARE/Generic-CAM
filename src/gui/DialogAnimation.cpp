@@ -29,14 +29,14 @@
 #include <math.h>
 #include "../icon/play.xpm"
 #include "../icon/stop.xpm"
+#include "FrameMain.h"
 #include "IDs.h"
 
-DialogAnimation::DialogAnimation(wxWindow* parent, Project *project) :
+DialogAnimation::DialogAnimation(wxWindow* parent) :
 		GUIAnimation(parent)
 {
-	this->project = project;
-	this->run = NULL;
-	this->simulator = NULL;
+	runNr = -1;
+	simulator = NULL;
 	loopGuard = false;
 	simulateWorkpiece = true;
 	timer.SetOwner(this);
@@ -50,18 +50,27 @@ DialogAnimation::~DialogAnimation()
 	NULL, this);
 }
 
+Project* DialogAnimation::GetProject(void)
+{
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project * project = wxStaticCast(frame->GetDocument(), Project);
+	return project;
+}
+
 int DialogAnimation::GetSelectedRun(void)
 {
+	Project* project = GetProject();
 	if(project == NULL) return -1;
 	return project->GetFirstSelectedRun();
 }
 
 void DialogAnimation::InitSimulation(void)
 {
-	int runNr = GetSelectedRun();
+	runNr = GetSelectedRun();
 	if(runNr >= 0){
-		run = &(project->run[runNr]);
-		Workpiece * workpiece = run->GetWorkpiece();
+		Project* project = GetProject();
+		Run* run = &(project->run[runNr]);
+		Workpiece* workpiece = run->GetWorkpiece();
 		simulator = &(run->simulator);
 		simulator->InsertMachine(&(run->machine));
 		simulator->InsertToolPath(run->GetFirstSelectedToolpath());
@@ -71,7 +80,6 @@ void DialogAnimation::InitSimulation(void)
 		}
 		simulator->InsertTarget(&model);
 	}else{
-		run = NULL;
 		if(simulator != NULL){
 			simulator->InsertMachine(NULL);
 			simulator->InsertToolPath(NULL);
@@ -79,6 +87,7 @@ void DialogAnimation::InitSimulation(void)
 		simulator = NULL;
 	}
 }
+
 bool DialogAnimation::TransferDataToWindow(void)
 {
 	if(loopGuard) return false;
@@ -89,6 +98,7 @@ bool DialogAnimation::TransferDataToWindow(void)
 	m_choiceToolpath->Append(_T(""));
 
 	int selected = -1;
+	Project* project = GetProject();
 	if(project != NULL){
 		for(size_t i = 0; i < project->run.GetCount(); i++){
 			m_choiceToolpath->Append(project->run[i].name);
@@ -151,10 +161,11 @@ void DialogAnimation::OnXClose(wxCloseEvent &event)
 		TransferDataToWindow();
 	}
 	int selectedRun = GetSelectedRun();
+	Project* project = GetProject();
 	if(project != NULL && selectedRun >= 0) project->run[selectedRun].showSimulation =
 			false;
 	this->Show(false);
-	wxCommandEvent refreshEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
+	wxCommandEvent refreshEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 	ProcessEvent(refreshEvent);
 }
 
@@ -165,10 +176,11 @@ void DialogAnimation::OnClose(wxCommandEvent& event)
 		TransferDataToWindow();
 	}
 	int selectedRun = GetSelectedRun();
+	Project* project = GetProject();
 	if(project != NULL && selectedRun >= 0) project->run[selectedRun].showSimulation =
 			false;
 	this->Show(false);
-	wxCommandEvent refreshEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHALL);
+	wxCommandEvent refreshEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 	ProcessEvent(refreshEvent);
 }
 
@@ -291,3 +303,4 @@ wxString DialogAnimation::SecondsToTC(const double t)
 	return wxString::Format(_T("%02i:%02i:%02i"), (int) floor(t / 3600.0),
 			((int) floor(t / 60.0)) % 60, ((int) floor(t)) % 60);
 }
+

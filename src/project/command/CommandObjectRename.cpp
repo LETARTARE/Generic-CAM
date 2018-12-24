@@ -39,11 +39,13 @@ bool CommandObjectRename::Do(void)
 {
 	this->oldName = project->objects[objectNr].name;
 	project->objects[objectNr].name = this->newName;
+	project->Update();
 	return true;
 }
 
 bool CommandObjectRename::Undo(void)
 {
 	project->objects[objectNr].name = this->oldName;
+	project->Update();
 	return true;
 }

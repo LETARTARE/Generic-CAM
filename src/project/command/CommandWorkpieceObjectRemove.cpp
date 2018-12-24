@@ -45,6 +45,7 @@ bool CommandWorkpieceObjectRemove::Do(void)
 {
 	placement = project->workpieces[workpieceNr].placements.Detach(placementNr);
 	project->workpieces[workpieceNr].Update();
+	project->Update();
 	return true;
 }
 
@@ -60,5 +61,6 @@ bool CommandWorkpieceObjectRemove::Undo(void)
 	// If the the placement was inserted back into the project,
 	// this function must not delete the placement in the destructor.
 	placement = NULL;
+	project->Update();
 	return true;
 }

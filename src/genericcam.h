@@ -45,7 +45,7 @@ public:
 
 	// Member variables
 public:
-	FrameMain* frame;
+//	FrameMain* frame;
 	wxString loadOnStartup;
 
 protected:
@@ -54,10 +54,13 @@ protected:
 
 	// Methods
 public:
-	virtual bool OnInit();
 	virtual void OnInitCmdLine(wxCmdLineParser& parser);
 	virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
-
+	virtual bool OnInit();
+	virtual int OnExit();
+	wxFrame* CreateChildFrame(wxView* view);
+	wxDECLARE_NO_COPY_CLASS(GenericCAMApp);
 };
 DECLARE_APP(GenericCAMApp)
+
 #endif /* GENERICCAM_H_ */
