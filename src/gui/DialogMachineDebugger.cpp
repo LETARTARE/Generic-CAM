@@ -38,10 +38,10 @@
 DialogMachineDebugger::DialogMachineDebugger(wxWindow * parent, MidiPort &midi) :
 		GUIMachineDebugger(parent)
 {
-	m_menuSettings->Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
-	m_menuSettings->Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
-	m_menuSettings->Append(ID_SETUPMIDI, _("Setup &MIDI"));
-	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	m_menuPreferences->Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
+	m_menuPreferences->Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
+	m_menuPreferences->Append(ID_SETUPMIDI, _("Setup &MIDI"));
+	m_menuPreferences->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
 
 	this->Connect(ID_UPDATEMACHINESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(DialogMachineDebugger::Update));

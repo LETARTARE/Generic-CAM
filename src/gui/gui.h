@@ -178,7 +178,7 @@ class GUIFrameMain : public wxDocChildFrame
 		wxMenu* m_menuRun;
 		wxMenu* m_menuToolpath;
 		wxMenu* m_menuDialect;
-		wxMenu* m_menuSettings;
+		wxMenu* m_menuPreferences;
 		wxMenu* m_menuView;
 		wxMenu* m_menuHelp;
 		wxSplitterWindow* m_splitter;
@@ -256,7 +256,7 @@ class GUIObjectTransformation : public wxFrame
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuObject;
 		wxMenu* m_menuEdit;
-		wxMenu* m_menuSettings;
+		wxMenu* m_menuPreferences;
 		wxColourPickerCtrl* m_colourPickerObject;
 		wxChoice* m_choiceObjectSelection;
 		wxStaticText* m_staticText37;
@@ -359,7 +359,7 @@ class GUIStockMaterial : public wxFrame
 	protected:
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuStock;
-		wxMenu* m_menuSettings;
+		wxMenu* m_menuPreferences;
 		wxStaticText* m_staticText96;
 		wxTextCtrl* m_textCtrlName;
 		wxStaticText* m_staticText27;
@@ -443,7 +443,7 @@ class GUIPlacement : public wxFrame
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuPlacement;
 		wxMenu* m_menuEdit;
-		wxMenu* m_menuSettings;
+		wxMenu* m_menuPreferences;
 		wxChoice* m_choiceWorkpiece;
 		wxChoice* m_choicePlacement;
 		wxStaticText* m_staticText100;
@@ -502,7 +502,7 @@ class GUIRun : public wxFrame
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuToolbox;
 		wxMenu* m_menuEdit;
-		wxMenu* m_menuSettings;
+		wxMenu* m_menuPreferences;
 		wxChoice* m_choiceRun;
 		wxChoice* m_choiceWorkpiece;
 		wxButton* m_buttonRotX90;
@@ -548,7 +548,7 @@ class GUIMachineDebugger : public wxFrame
 	protected:
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuMachine;
-		wxMenu* m_menuSettings;
+		wxMenu* m_menuPreferences;
 		wxMenu* m_menuView;
 		wxSplitterWindow* m_splitter;
 		wxPanel* m_panel;
@@ -602,7 +602,7 @@ class GUIMachineControl : public wxFrame
 	protected:
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuController;
-		wxMenu* m_menuSettings;
+		wxMenu* m_menuPreferences;
 		wxStaticText* m_staticText69;
 		wxSlider* m_sliderX;
 		wxStaticText* m_staticText70;
@@ -675,7 +675,7 @@ class GUIToolbox : public wxFrame
 	protected:
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuTools;
-		wxMenu* m_menuSettings;
+		wxMenu* m_menuPreferences;
 		wxMenu* m_menuView;
 		wxComboBox* m_comboBoxToolSelector;
 		wxButton* m_buttonToolNew;
@@ -870,16 +870,16 @@ class GUIAnimation : public wxFrame
 	private:
 	
 	protected:
-		wxStaticText* m_staticText70;
+		wxStaticText* m_staticTextRun;
 		wxChoice* m_choiceToolpath;
 		wxTextCtrl* m_textCtrl0;
 		wxTextCtrl* m_textCtrl1;
 		wxTextCtrl* m_textCtrl2;
 		wxTextCtrl* m_textCtrl3;
 		wxTextCtrl* m_textCtrl4;
-		wxStaticText* m_staticText71;
+		wxStaticText* m_staticTextTime;
 		wxTextCtrl* m_textCtrlTime;
-		wxStaticText* m_staticText72;
+		wxStaticText* m_staticTextSlash;
 		wxTextCtrl* m_textCtrlMaxTime;
 		wxSlider* m_sliderTime;
 		wxCheckBox* m_checkBoxSimulateWorkpiece;
@@ -963,7 +963,7 @@ class GUIDialogAbout : public wxDialog
 	
 	public:
 		
-		GUIDialogAbout( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 504,373 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP ); 
+		GUIDialogAbout( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 504,373 ), long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP ); 
 		~GUIDialogAbout();
 	
 };

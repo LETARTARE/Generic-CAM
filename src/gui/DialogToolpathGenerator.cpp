@@ -87,30 +87,33 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 		currentRun = -2;
 	}
 
-	if(selectedRun != currentRun){
-		loopGuard = true;
+	loopGuard = true;
 
-		m_choiceRun->Clear();
-		m_choiceRun->Append(_T(""));
-		for(size_t i = 0; i < project->run.GetCount(); i++){
-			m_choiceRun->Append(project->run[i].name);
+	wxArrayString newRuns;
+	newRuns.Add(_T(""));
+	for(size_t i = 0; i < project->run.GetCount(); i++)
+		newRuns.Add(project->run[i].name);
+	wxArrayString oldRuns = m_choiceRun->GetStrings();
+	if(oldRuns != newRuns) m_choiceRun->Set(newRuns);
+
+	if(selectedRun != currentRun) m_choiceRun->SetSelection(selectedRun + 1);
+
+	wxArrayString newTools;
+	newTools.Add(_T(""));
+	if(selectedRun >= 0){
+
+		for(int n = 0; n < project->run[selectedRun].machine.tools.GetCount();
+				n++){
+			newTools.Add(
+					wxString::Format(_T("T%i - "), n + 1)
+							+ project->run[selectedRun].machine.tools[n].toolName);
 		}
-		m_choiceRun->SetSelection(selectedRun + 1);
-
-		m_choiceTool->Clear();
-		m_choiceTool->Append(_T(""));
-		if(selectedRun >= 0){
-			for(int n = 0;
-					n < project->run[selectedRun].machine.tools.GetCount();
-					n++){
-				m_choiceTool->Append(
-						wxString::Format(_T("T%i - "), n + 1)
-								+ project->run[selectedRun].machine.tools[n].toolName);
-			}
-		}
-
-		loopGuard = false;
 	}
+
+	wxArrayString oldTools = m_choiceTool->GetStrings();
+	if(oldTools != newTools) m_choiceTool->Set(newTools);
+
+	loopGuard = false;
 
 	if(selectedRun != currentRun || selectedToolpath != currentToolpath){
 		loopGuard = true;
@@ -482,7 +485,7 @@ void DialogToolpathGenerator::OnSelectArea(wxCommandEvent& event)
 		}
 		TransferDataToWindow();
 		wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-				ID_REFRESHVIEW);
+		ID_REFRESHVIEW);
 	}
 }
 

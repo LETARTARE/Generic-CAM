@@ -128,12 +128,11 @@ bool GenericCAMApp::OnInit()
 
 	docManager->FileHistoryLoad(*config);
 
-	wxFrame* parent;
-	parent = new FrameParent(docManager, config, NULL, wxID_ANY,
+	wxFrame* parent = new FrameParent(docManager, config, NULL, wxID_ANY,
 			GetAppDisplayName());
 
 	SetTopWindow(parent);
-	parent->Show(true);
+	parent->Show(false);
 
 	Project* project;
 	if(loadOnStartup.IsEmpty()){

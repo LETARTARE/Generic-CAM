@@ -35,9 +35,9 @@ DialogToolbox::DialogToolbox(wxWindow* parent) :
 		GUIToolbox(parent)
 
 {
-	m_menuSettings->Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
-	m_menuSettings->Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
-	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	m_menuPreferences->Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
+	m_menuPreferences->Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
+	m_menuPreferences->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
 
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 

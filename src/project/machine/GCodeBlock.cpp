@@ -482,7 +482,7 @@ wxString GCodeBlock::GetCode(void) const
 			Q / conversionFactor);
 
 	if(F >= -FLT_EPSILON) temp += wxString::Format(_T(" F%g"),
-			F / conversionFactor);
+			F / conversionFactor * 60);
 
 	if(XFlag){
 		temp += wxString::Format(_T(" X%g"), X / conversionFactor);

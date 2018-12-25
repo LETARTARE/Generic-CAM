@@ -38,7 +38,7 @@
 DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent) :
 		GUIObjectTransformation(parent)
 {
-	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	m_menuPreferences->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
 
 	scaleProportional = true;
 	scalePercent = 1;

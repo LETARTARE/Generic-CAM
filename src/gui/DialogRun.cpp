@@ -41,7 +41,7 @@
 DialogRun::DialogRun(wxWindow* parent) :
 		GUIRun(parent)
 {
-	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	m_menuPreferences->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
 	loopGuard = false;
 }
 

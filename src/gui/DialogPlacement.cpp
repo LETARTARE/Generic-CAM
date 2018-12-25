@@ -34,7 +34,7 @@
 DialogPlacement::DialogPlacement(wxWindow* parent) :
 		GUIPlacement(parent)
 {
-	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	m_menuPreferences->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
 	FrameMain * frame = wxStaticCast(parent, FrameMain);
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	m_topview->InsertProject(project);

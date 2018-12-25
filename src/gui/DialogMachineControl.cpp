@@ -35,8 +35,9 @@
 DialogMachineControl::DialogMachineControl(wxWindow* parent, MidiPort &midi) :
 		GUIMachineControl(parent)
 {
-	m_menuSettings->Append(ID_SETUPMIDI, _("Setup &MIDI"));
-	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	m_menuPreferences->Append(ID_SETUPMIDI, _("Setup &MIDI"));
+	m_menuPreferences->Append(ID_SETUPUNITS,
+	_("Setup &Units") + wxT("\tCtrl+U"));
 
 	this->midi = &midi;
 	X = Y = Z = 0.0;
@@ -170,8 +171,10 @@ bool DialogMachineControl::TransferDataFromWindowSliders(void)
 
 bool DialogMachineControl::TransferDataToWindowTextbox(void)
 {
+	DialogMachineDebugger * framemd = wxStaticCast(GetParent(),
+			DialogMachineDebugger);
 	FrameParent * frame =
-			wxStaticCast(GetParent(), FrameMain)->GetParentFrame();
+	wxStaticCast(framemd->GetParent(), FrameMain)->GetParentFrame();
 	DisplaySettings * settings = &(frame->settings);
 
 	m_staticTextUnitX->SetLabel(settings->Distance.GetOtherName());
@@ -235,7 +238,10 @@ void DialogMachineControl::OnZero(wxMouseEvent& event)
 
 void DialogMachineControl::OnTextChanged(wxCommandEvent& event)
 {
-	FrameParent * frame = wxStaticCast(GetParent()->GetParent(), FrameParent);
+	DialogMachineDebugger * framemd = wxStaticCast(GetParent(),
+			DialogMachineDebugger);
+	FrameParent * frame = wxStaticCast(framemd->GetParent()->GetParent(),
+			FrameParent);
 	DisplaySettings * settings = &(frame->settings);
 	switch(event.GetId()){
 	case ID_TEXTX:
@@ -284,7 +290,9 @@ void DialogMachineControl::OnTextChanged(wxCommandEvent& event)
 
 Project* DialogMachineControl::GetProject(void)
 {
-	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	DialogMachineDebugger * framemd = wxStaticCast(GetParent(),
+			DialogMachineDebugger);
+	FrameMain * frame = wxStaticCast(framemd->GetParent(), FrameMain);
 	Project * project = wxStaticCast(frame->GetDocument(), Project);
 	return project;
 }

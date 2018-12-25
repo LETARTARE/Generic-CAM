@@ -192,7 +192,7 @@ DEPS := $(patsubst %.cpp, ${OBJDIR}/%.d, ${SOURCES})
 
 # gcc flags:
 INCFLAGS := -I./src
-CXXFLAGS := `wx-config --cxxflags` -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/lua5.3 -O0 -g3 -Wall 
+CXXFLAGS := `wx-config --cxxflags` -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/lua5.3 -O3 -Wall -Wno-write-strings
 LDFLAGS  := `wx-config --libs richtext,gl,core,base,html,xml,adv` -L/usr/local/lib -L/usr/lib
 LDLIBS   := -llua5.3 -lGL -lGLU
 #REZFLAGS := `wx-config --rez-flags`

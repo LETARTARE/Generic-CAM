@@ -37,10 +37,8 @@ DialogTestGCode::DialogTestGCode(wxWindow* parent) :
 {
 	m_textCtrlInput->SetFocus();
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
-	Project* project = wxStaticCast(frame->GetDocument(), Project);
-	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
 	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
-	wxString temp = settings->Distance.GetOtherName();
+		wxString temp = settings->Distance.GetOtherName();
 	if(temp.Cmp(_T("in")) == 0 || temp.Cmp(_T("ft")) == 0){
 		m_radioBtnG20->SetValue(true);
 		m_radioBtnG21->SetValue(false);
@@ -62,8 +60,8 @@ void DialogTestGCode::OnText(wxCommandEvent& event)
 bool DialogTestGCode::TransferDataToWindow(void)
 {
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
-	Project* project = wxStaticCast(frame->GetDocument(), Project);
-	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
+//	Project* project = wxStaticCast(frame->GetDocument(), Project);
+//	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
 	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
 	double cf = 0.0;
 	if(m_radioBtnG20->GetValue()) cf = 0.0254;

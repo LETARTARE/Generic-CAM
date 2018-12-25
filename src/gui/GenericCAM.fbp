@@ -26,7 +26,7 @@
         <property name="ui_table">UI</property>
         <property name="use_enum">0</property>
         <property name="use_microsoft_bom">0</property>
-        <object class="Frame" expanded="1">
+        <object class="Frame" expanded="0">
             <property name="aui_managed">0</property>
             <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
@@ -88,7 +88,7 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxMenuBar" expanded="1">
+            <object class="wxMenuBar" expanded="0">
                 <property name="bg"></property>
                 <property name="context_help"></property>
                 <property name="context_menu">1</property>
@@ -143,7 +143,7 @@
                     <property name="name">m_menuEdit</property>
                     <property name="permission">protected</property>
                 </object>
-                <object class="wxMenu" expanded="1">
+                <object class="wxMenu" expanded="0">
                     <property name="label">&amp;Object</property>
                     <property name="name">m_menuObject</property>
                     <property name="permission">protected</property>
@@ -659,8 +659,8 @@
                     </object>
                 </object>
                 <object class="wxMenu" expanded="0">
-                    <property name="label">S&amp;ettings</property>
-                    <property name="name">m_menuSettings</property>
+                    <property name="label">&amp;Preferences</property>
+                    <property name="name">m_menuPreferences</property>
                     <property name="permission">protected</property>
                 </object>
                 <object class="wxMenu" expanded="0">
@@ -681,6 +681,10 @@
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">OnActivateStereo3D</event>
                         <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="separator" expanded="0">
+                        <property name="name">m_separator161</property>
+                        <property name="permission">none</property>
                     </object>
                     <object class="wxMenuItem" expanded="0">
                         <property name="bitmap"></property>
@@ -1536,8 +1540,8 @@
                     </object>
                 </object>
                 <object class="wxMenu" expanded="0">
-                    <property name="label">&amp;Settings</property>
-                    <property name="name">m_menuSettings</property>
+                    <property name="label">&amp;Preferences</property>
+                    <property name="name">m_menuPreferences</property>
                     <property name="permission">protected</property>
                 </object>
             </object>
@@ -8443,8 +8447,8 @@
                     </object>
                 </object>
                 <object class="wxMenu" expanded="0">
-                    <property name="label">S&amp;ettings</property>
-                    <property name="name">m_menuSettings</property>
+                    <property name="label">&amp;Preferences</property>
+                    <property name="name">m_menuPreferences</property>
                     <property name="permission">protected</property>
                 </object>
             </object>
@@ -11148,8 +11152,8 @@
                     </object>
                 </object>
                 <object class="wxMenu" expanded="0">
-                    <property name="label">&amp;Settings</property>
-                    <property name="name">m_menuSettings</property>
+                    <property name="label">&amp;Preferences</property>
+                    <property name="name">m_menuPreferences</property>
                     <property name="permission">protected</property>
                 </object>
             </object>
@@ -13870,8 +13874,8 @@
                     </object>
                 </object>
                 <object class="wxMenu" expanded="0">
-                    <property name="label">&amp;Settings</property>
-                    <property name="name">m_menuSettings</property>
+                    <property name="label">&amp;Preferences</property>
+                    <property name="name">m_menuPreferences</property>
                     <property name="permission">protected</property>
                 </object>
             </object>
@@ -15499,8 +15503,8 @@
                     </object>
                 </object>
                 <object class="wxMenu" expanded="0">
-                    <property name="label">&amp;Settings</property>
-                    <property name="name">m_menuSettings</property>
+                    <property name="label">&amp;Preferences</property>
+                    <property name="name">m_menuPreferences</property>
                     <property name="permission">protected</property>
                 </object>
                 <object class="wxMenu" expanded="0">
@@ -16572,8 +16576,8 @@
                     </object>
                 </object>
                 <object class="wxMenu" expanded="0">
-                    <property name="label">&amp;Settings</property>
-                    <property name="name">m_menuSettings</property>
+                    <property name="label">&amp;Preferences</property>
+                    <property name="name">m_menuPreferences</property>
                     <property name="permission">protected</property>
                 </object>
             </object>
@@ -20867,7 +20871,7 @@
                 </object>
             </object>
         </object>
-        <object class="Frame" expanded="1">
+        <object class="Frame" expanded="0">
             <property name="aui_managed">0</property>
             <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
@@ -20929,7 +20933,7 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxMenuBar" expanded="1">
+            <object class="wxMenuBar" expanded="0">
                 <property name="bg"></property>
                 <property name="context_help"></property>
                 <property name="context_menu">1</property>
@@ -21048,11 +21052,11 @@
                     </object>
                 </object>
                 <object class="wxMenu" expanded="0">
-                    <property name="label">&amp;Settings</property>
-                    <property name="name">m_menuSettings</property>
+                    <property name="label">&amp;Preferences</property>
+                    <property name="name">m_menuPreferences</property>
                     <property name="permission">protected</property>
                 </object>
-                <object class="wxMenu" expanded="1">
+                <object class="wxMenu" expanded="0">
                     <property name="label">&amp;View</property>
                     <property name="name">m_menuView</property>
                     <property name="permission">protected</property>
@@ -30765,7 +30769,7 @@
             <event name="OnUpdateUI"></event>
             <object class="wxBoxSizer" expanded="0">
                 <property name="minimum_size"></property>
-                <property name="name">bSizer29</property>
+                <property name="name">bSizer</property>
                 <property name="orient">wxVERTICAL</property>
                 <property name="permission">none</property>
                 <object class="sizeritem" expanded="0">
@@ -30774,7 +30778,7 @@
                     <property name="proportion">0</property>
                     <object class="wxBoxSizer" expanded="0">
                         <property name="minimum_size"></property>
-                        <property name="name">bSizer30</property>
+                        <property name="name">bSizerRunSelect</property>
                         <property name="orient">wxHORIZONTAL</property>
                         <property name="permission">none</property>
                         <object class="sizeritem" expanded="0">
@@ -30817,7 +30821,7 @@
                                 <property name="minimize_button">0</property>
                                 <property name="minimum_size"></property>
                                 <property name="moveable">1</property>
-                                <property name="name">m_staticText70</property>
+                                <property name="name">m_staticTextRun</property>
                                 <property name="pane_border">1</property>
                                 <property name="pane_position"></property>
                                 <property name="pane_size"></property>
@@ -30958,7 +30962,7 @@
                         <property name="id">wxID_ANY</property>
                         <property name="label">G-Codes</property>
                         <property name="minimum_size"></property>
-                        <property name="name">sbSizer22</property>
+                        <property name="name">sbSizerGCode</property>
                         <property name="orient">wxVERTICAL</property>
                         <property name="parent">1</property>
                         <property name="permission">none</property>
@@ -31426,7 +31430,7 @@
                     <property name="proportion">0</property>
                     <object class="wxBoxSizer" expanded="0">
                         <property name="minimum_size"></property>
-                        <property name="name">bSizer31</property>
+                        <property name="name">bSizerTime</property>
                         <property name="orient">wxHORIZONTAL</property>
                         <property name="permission">none</property>
                         <object class="sizeritem" expanded="0">
@@ -31469,7 +31473,7 @@
                                 <property name="minimize_button">0</property>
                                 <property name="minimum_size"></property>
                                 <property name="moveable">1</property>
-                                <property name="name">m_staticText71</property>
+                                <property name="name">m_staticTextTime</property>
                                 <property name="pane_border">1</property>
                                 <property name="pane_position"></property>
                                 <property name="pane_size"></property>
@@ -31643,7 +31647,7 @@
                                 <property name="minimize_button">0</property>
                                 <property name="minimum_size"></property>
                                 <property name="moveable">1</property>
-                                <property name="name">m_staticText72</property>
+                                <property name="name">m_staticTextSlash</property>
                                 <property name="pane_border">1</property>
                                 <property name="pane_position"></property>
                                 <property name="pane_size"></property>
@@ -31981,7 +31985,7 @@
                     <property name="proportion">0</property>
                     <object class="wxBoxSizer" expanded="0">
                         <property name="minimum_size"></property>
-                        <property name="name">bSizer32</property>
+                        <property name="name">bSizerButtons</property>
                         <property name="orient">wxHORIZONTAL</property>
                         <property name="permission">none</property>
                         <object class="sizeritem" expanded="0">
@@ -34025,7 +34029,7 @@
             <property name="aui_managed">0</property>
             <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
-            <property name="center"></property>
+            <property name="center">wxBOTH</property>
             <property name="context_help"></property>
             <property name="context_menu">1</property>
             <property name="enabled">1</property>
@@ -34040,7 +34044,7 @@
             <property name="name">GUIDialogAbout</property>
             <property name="pos"></property>
             <property name="size">504,373</property>
-            <property name="style">wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP</property>
+            <property name="style">wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP</property>
             <property name="subclass"></property>
             <property name="title">About</property>
             <property name="tooltip"></property>
@@ -34211,7 +34215,7 @@
                         <property name="font"></property>
                         <property name="gripper">0</property>
                         <property name="hidden">0</property>
-                        <property name="id">wxID_CLOSE</property>
+                        <property name="id">wxID_OK</property>
                         <property name="label">Close</property>
                         <property name="max_size"></property>
                         <property name="maximize_button">0</property>
@@ -34500,7 +34504,7 @@
             <event name="OnUpdateUI"></event>
             <object class="wxBoxSizer" expanded="0">
                 <property name="minimum_size"></property>
-                <property name="name">bSizerV</property>
+                <property name="name">bSizer</property>
                 <property name="orient">wxVERTICAL</property>
                 <property name="permission">none</property>
                 <object class="sizeritem" expanded="0">
@@ -34509,7 +34513,7 @@
                     <property name="proportion">0</property>
                     <object class="wxBoxSizer" expanded="0">
                         <property name="minimum_size"></property>
-                        <property name="name">bSizerB</property>
+                        <property name="name">bSizerPrevious</property>
                         <property name="orient">wxHORIZONTAL</property>
                         <property name="permission">none</property>
                         <object class="sizeritem" expanded="0">
@@ -34570,7 +34574,7 @@
                                 <property name="validator_style">wxFILTER_NONE</property>
                                 <property name="validator_type">wxDefaultValidator</property>
                                 <property name="validator_variable"></property>
-                                <property name="value">0</property>
+                                <property name="value">1</property>
                                 <property name="window_extra_style"></property>
                                 <property name="window_name"></property>
                                 <property name="window_style"></property>
@@ -34696,7 +34700,7 @@
                     <property name="proportion">0</property>
                     <object class="wxBoxSizer" expanded="0">
                         <property name="minimum_size"></property>
-                        <property name="name">bSizerH</property>
+                        <property name="name">bSizerInput</property>
                         <property name="orient">wxHORIZONTAL</property>
                         <property name="permission">none</property>
                         <object class="sizeritem" expanded="0">
@@ -34933,7 +34937,7 @@
                         <property name="style">wxTE_MULTILINE|wxTE_READONLY</property>
                         <property name="subclass"></property>
                         <property name="toolbar_pane">0</property>
-                        <property name="tooltip">Meaning of the G-Code.</property>
+                        <property name="tooltip">Interpretation of the G-Code.</property>
                         <property name="validator_data_type"></property>
                         <property name="validator_style">wxFILTER_NONE</property>
                         <property name="validator_type">wxDefaultValidator</property>

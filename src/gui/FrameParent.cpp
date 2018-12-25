@@ -65,12 +65,12 @@ FrameParent::FrameParent(wxDocManager *manager, wxConfig* config,
 	m_menuFile->AppendSeparator();
 	m_menuFile->Append(wxID_EXIT);
 
-	wxMenu *m_menuSettings = new wxMenu;
-	m_menuSettings->Append(ID_SETUPLANGUAGE, _T("Change Language"));
-	m_menuSettings->Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
-	m_menuSettings->Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
-	m_menuSettings->Append(ID_SETUPMIDI, _("Setup &MIDI"));
-	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	wxMenu *m_menuPreferences = new wxMenu;
+	m_menuPreferences->Append(ID_SETUPLANGUAGE, _T("Change Language"));
+	m_menuPreferences->Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
+	m_menuPreferences->Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
+	m_menuPreferences->Append(ID_SETUPMIDI, _("Setup &MIDI"));
+	m_menuPreferences->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
 
 	wxMenu *m_menuHelp = new wxMenu;
 	m_menuHelp->Append(wxID_HELP, _("&Help") + wxT("\tF1"));
@@ -78,7 +78,7 @@ FrameParent::FrameParent(wxDocManager *manager, wxConfig* config,
 
 	wxMenuBar *menubar = new wxMenuBar;
 	menubar->Append(m_menuFile, wxGetStockLabel(wxID_FILE));
-	menubar->Append(m_menuSettings, wxGetStockLabel(wxID_PREFERENCES));
+	menubar->Append(m_menuPreferences, wxGetStockLabel(wxID_PREFERENCES));
 	menubar->Append(m_menuHelp, wxGetStockLabel(wxID_HELP));
 
 	SetMenuBar(menubar);

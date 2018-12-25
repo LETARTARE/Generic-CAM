@@ -46,6 +46,7 @@ bool CommandRunToolAdd::Do(void)
 {
 	if(project == NULL) return false;
 	Run* const run = &(project->run[runNr]);
+
 	const size_t maxTools = run->machine.tools.GetCount();
 	if(maxTools > 0){
 		for(size_t n = 0; n < maxTools; n++){

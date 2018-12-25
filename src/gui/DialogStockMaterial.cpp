@@ -34,7 +34,7 @@
 DialogStockMaterial::DialogStockMaterial(wxWindow* parent) :
 		GUIStockMaterial(parent)
 {
-	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	m_menuPreferences->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
 
 	selectedLine = -1;
 	isInitialized = false;

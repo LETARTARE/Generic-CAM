@@ -119,11 +119,11 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 	doc->GetCommandProcessor()->SetEditMenu(m_menuEdit);
 	doc->GetCommandProcessor()->Initialize();
 
-	m_menuSettings->Append(ID_SETUPLANGUAGE, _T("Change Language"));
-	m_menuSettings->Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
-	m_menuSettings->Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
-	m_menuSettings->Append(ID_SETUPMIDI, _("Setup &MIDI"));
-	m_menuSettings->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	m_menuPreferences->Append(ID_SETUPLANGUAGE, _T("Change Language"));
+	m_menuPreferences->Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
+	m_menuPreferences->Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
+	m_menuPreferences->Append(ID_SETUPMIDI, _("Setup &MIDI"));
+	m_menuPreferences->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
 
 	m_menuHelp->AppendSeparator();
 	m_menuHelp->Append(wxID_HELP, _("&Help") + wxT("\tF1"));
