@@ -64,35 +64,35 @@ SOURCES += \
 	
 # GUI object files:
 SOURCES += \
-src/gui/DialogSetupStereo3D.cpp \
-src/gui/FrameMain.cpp \
-src/gui/FrameParent.cpp \
-src/gui/DialogToolpathGenerator.cpp \
-src/gui/guiSetupStereo3D.cpp \
-src/gui/gui.cpp \
-src/gui/DialogAnimation.cpp \
-src/gui/CanvasTool.cpp \
-src/gui/DialogToolbox.cpp \
-src/gui/DialogStockMaterial.cpp \
-src/gui/DialogRun.cpp \
-src/gui/DialogObjectTransformation.cpp \
-src/gui/DisplaySettings.cpp \
-src/gui/DialogPlacement.cpp \
-src/gui/DialogMachineDebugger.cpp \
-src/gui/PanelTool.cpp \
-src/gui/CanvasMachine.cpp \
-src/gui/CanvasMain.cpp \
-src/gui/CanvasStereoTest.cpp \
-src/gui/DialogMachineControl.cpp \
-src/gui/DialogSetupMidi.cpp \
-src/gui/DialogSetupUnits.cpp \
-src/gui/DialogTestGCode.cpp \
-src/gui/DialogToolWizard.cpp \
-src/gui/DialogWorkpiece.cpp \
-src/gui/DnDFile.cpp \
-src/gui/PanelTopView.cpp \
-src/gui/TreeItem.cpp \
-src/gui/TreeSetup.cpp \
+	src/gui/DialogSetupStereo3D.cpp \
+	src/gui/FrameMain.cpp \
+	src/gui/FrameParent.cpp \
+	src/gui/DialogToolpathGenerator.cpp \
+	src/gui/guiSetupStereo3D.cpp \
+	src/gui/gui.cpp \
+	src/gui/DialogAnimation.cpp \
+	src/gui/CanvasTool.cpp \
+	src/gui/DialogToolbox.cpp \
+	src/gui/DialogStockMaterial.cpp \
+	src/gui/DialogRun.cpp \
+	src/gui/DialogObjectTransformation.cpp \
+	src/gui/DisplaySettings.cpp \
+	src/gui/DialogPlacement.cpp \
+	src/gui/DialogMachineDebugger.cpp \
+	src/gui/PanelTool.cpp \
+	src/gui/CanvasMachine.cpp \
+	src/gui/CanvasMain.cpp \
+	src/gui/CanvasStereoTest.cpp \
+	src/gui/DialogMachineControl.cpp \
+	src/gui/DialogSetupMidi.cpp \
+	src/gui/DialogSetupUnits.cpp \
+	src/gui/DialogTestGCode.cpp \
+	src/gui/DialogToolWizard.cpp \
+	src/gui/DialogWorkpiece.cpp \
+	src/gui/DnDFile.cpp \
+	src/gui/PanelTopView.cpp \
+	src/gui/TreeItem.cpp \
+	src/gui/TreeSetup.cpp \
 
 
 # math functions
@@ -103,29 +103,29 @@ SOURCES += \
 
 # Project manipultion commands:
 SOURCES += \
-src/project/command/CommandObjectDelete.cpp \
-src/project/command/CommandObjectLoad.cpp \
-src/project/command/CommandObjectRename.cpp \
-src/project/command/CommandObjectSetColor.cpp \
-src/project/command/CommandObjectTransform.cpp \
-src/project/command/CommandProjectRename.cpp \
-src/project/command/CommandRunAdd.cpp \
-src/project/command/CommandRunGeneratorAdd.cpp \
-src/project/command/CommandRunGeneratorDelete.cpp \
-src/project/command/CommandRunGeneratorUpdate.cpp \
-src/project/command/CommandRunMachineLoad.cpp \
-src/project/command/CommandRunRemove.cpp \
-src/project/command/CommandRunRename.cpp \
-src/project/command/CommandRunToolAdd.cpp \
-src/project/command/CommandRunToolRemove.cpp \
-src/project/command/CommandRunWorkpieceAssign.cpp \
-src/project/command/CommandRunWorkpieceTransform.cpp \
-src/project/command/CommandWorkpieceAdd.cpp \
-src/project/command/CommandWorkpieceDelete.cpp \
-src/project/command/CommandWorkpieceObjectAssign.cpp \
-src/project/command/CommandWorkpieceObjectRemove.cpp \
-src/project/command/CommandWorkpieceObjectTransform.cpp \
-src/project/command/CommandWorkpieceRename.cpp \
+	src/project/command/CommandObjectDelete.cpp \
+	src/project/command/CommandObjectLoad.cpp \
+	src/project/command/CommandObjectRename.cpp \
+	src/project/command/CommandObjectSetColor.cpp \
+	src/project/command/CommandObjectTransform.cpp \
+	src/project/command/CommandProjectRename.cpp \
+	src/project/command/CommandRunAdd.cpp \
+	src/project/command/CommandRunGeneratorAdd.cpp \
+	src/project/command/CommandRunGeneratorDelete.cpp \
+	src/project/command/CommandRunGeneratorUpdate.cpp \
+	src/project/command/CommandRunMachineLoad.cpp \
+	src/project/command/CommandRunRemove.cpp \
+	src/project/command/CommandRunRename.cpp \
+	src/project/command/CommandRunToolAdd.cpp \
+	src/project/command/CommandRunToolRemove.cpp \
+	src/project/command/CommandRunWorkpieceAssign.cpp \
+	src/project/command/CommandRunWorkpieceTransform.cpp \
+	src/project/command/CommandWorkpieceAdd.cpp \
+	src/project/command/CommandWorkpieceDelete.cpp \
+	src/project/command/CommandWorkpieceObjectAssign.cpp \
+	src/project/command/CommandWorkpieceObjectRemove.cpp \
+	src/project/command/CommandWorkpieceObjectTransform.cpp \
+	src/project/command/CommandWorkpieceRename.cpp \
 
 
 # Generator object files:
@@ -153,14 +153,14 @@ SOURCES += \
 
 # machine object files:
 SOURCES += \
-src/project/machine/Machine.cpp \
-src/project/machine/MachineSimulator.cpp \
-src/project/machine/NelderMeadOptimizer.cpp \
-src/project/machine/CNCPosition.cpp \
-src/project/machine/GCodeBlock.cpp \
-src/project/machine/LUACodeEvaluator.cpp \
-src/project/machine/MachineComponent.cpp \
-src/project/machine/CNCInterpreter.cpp \
+	src/project/machine/Machine.cpp \
+	src/project/machine/MachineSimulator.cpp \
+	src/project/machine/NelderMeadOptimizer.cpp \
+	src/project/machine/CNCPosition.cpp \
+	src/project/machine/GCodeBlock.cpp \
+	src/project/machine/LUACodeEvaluator.cpp \
+	src/project/machine/MachineComponent.cpp \
+	src/project/machine/CNCInterpreter.cpp \
 
 	
 # project object files:

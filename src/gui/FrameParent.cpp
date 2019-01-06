@@ -108,6 +108,7 @@ FrameParent::FrameParent(wxDocManager *manager, wxConfig* config,
 FrameParent::~FrameParent()
 {
 	printf("FrameParent: Destructor called\n");
+
 	// Save the configuration of the 6DOF controller
 	control.WriteConfigTo(config);
 	settings.WriteConfigTo(config);

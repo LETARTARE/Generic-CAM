@@ -45,6 +45,7 @@ bool ProjectView::OnClose(bool deleteWindow)
 {
 	printf("ProjectView::OnClose(%s) called...\n",
 			deleteWindow? "true" : "false");
+
 	wxDocument* doc = GetDocument();
 	wxDocManager* manager = doc->GetDocumentManager();
 	wxList tempDocs = manager->GetDocuments();

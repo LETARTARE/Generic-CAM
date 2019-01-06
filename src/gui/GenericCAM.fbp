@@ -26,7 +26,7 @@
         <property name="ui_table">UI</property>
         <property name="use_enum">0</property>
         <property name="use_microsoft_bom">0</property>
-        <object class="Frame" expanded="0">
+        <object class="Frame" expanded="1">
             <property name="aui_managed">0</property>
             <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
@@ -88,7 +88,7 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxMenuBar" expanded="0">
+            <object class="wxMenuBar" expanded="1">
                 <property name="bg"></property>
                 <property name="context_help"></property>
                 <property name="context_menu">1</property>
@@ -346,6 +346,56 @@
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
+                <object class="wxMenu" expanded="1">
+                    <property name="label">&amp;Toolbox</property>
+                    <property name="name">m_menuToolbox</property>
+                    <property name="permission">protected</property>
+                    <object class="wxMenuItem" expanded="0">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">ID_TOOLBOXEDIT</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">&amp;Edit Toolbox</property>
+                        <property name="name">m_menuItemToolboxEdit</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut">Ctrl+T</property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">OnToolboxEdit</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="0">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">ID_TOOLBOXLOAD</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">&amp;Load Toolbox...</property>
+                        <property name="name">m_menuItemToolboxLoad</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">OnToolboxLoad</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="0">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">ID_TOOLBOXSAVE</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">&amp;Save Toolbox...</property>
+                        <property name="name">m_menuItemToolboxSave</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">OnToolboxSave</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                </object>
                 <object class="wxMenu" expanded="0">
                     <property name="label">&amp;Machine</property>
                     <property name="name">m_menuMachine</property>
@@ -415,107 +465,7 @@
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
-                <object class="wxMenu" expanded="0">
-                    <property name="label">&amp;Toolbox</property>
-                    <property name="name">m_menuToolbox</property>
-                    <property name="permission">protected</property>
-                    <object class="wxMenuItem" expanded="0">
-                        <property name="bitmap"></property>
-                        <property name="checked">0</property>
-                        <property name="enabled">1</property>
-                        <property name="help"></property>
-                        <property name="id">ID_TOOLBOXEDIT</property>
-                        <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">&amp;Edit Toolbox</property>
-                        <property name="name">m_menuItemToolboxEdit</property>
-                        <property name="permission">none</property>
-                        <property name="shortcut">Ctrl+T</property>
-                        <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection">OnToolboxEdit</event>
-                        <event name="OnUpdateUI"></event>
-                    </object>
-                    <object class="wxMenuItem" expanded="0">
-                        <property name="bitmap"></property>
-                        <property name="checked">0</property>
-                        <property name="enabled">1</property>
-                        <property name="help"></property>
-                        <property name="id">ID_TOOLBOXLOAD</property>
-                        <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">&amp;Load Toolbox...</property>
-                        <property name="name">m_menuItemToolboxLoad</property>
-                        <property name="permission">none</property>
-                        <property name="shortcut"></property>
-                        <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection">OnToolboxLoad</event>
-                        <event name="OnUpdateUI"></event>
-                    </object>
-                    <object class="wxMenuItem" expanded="0">
-                        <property name="bitmap"></property>
-                        <property name="checked">0</property>
-                        <property name="enabled">1</property>
-                        <property name="help"></property>
-                        <property name="id">ID_TOOLBOXSAVE</property>
-                        <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">&amp;Save Toolbox...</property>
-                        <property name="name">m_menuItemToolboxSave</property>
-                        <property name="permission">none</property>
-                        <property name="shortcut"></property>
-                        <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection">OnToolboxSave</event>
-                        <event name="OnUpdateUI"></event>
-                    </object>
-                </object>
-                <object class="wxMenu" expanded="0">
-                    <property name="label">&amp;Run</property>
-                    <property name="name">m_menuRun</property>
-                    <property name="permission">protected</property>
-                    <object class="wxMenuItem" expanded="0">
-                        <property name="bitmap"></property>
-                        <property name="checked">0</property>
-                        <property name="enabled">1</property>
-                        <property name="help"></property>
-                        <property name="id">ID_RUNEDIT</property>
-                        <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">&amp;Setup Run</property>
-                        <property name="name">m_menuItemRunSetup</property>
-                        <property name="permission">none</property>
-                        <property name="shortcut">CTRL+R</property>
-                        <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection">OnRunEdit</event>
-                        <event name="OnUpdateUI"></event>
-                    </object>
-                    <object class="wxMenuItem" expanded="0">
-                        <property name="bitmap"></property>
-                        <property name="checked">0</property>
-                        <property name="enabled">1</property>
-                        <property name="help"></property>
-                        <property name="id">ID_RUNADD</property>
-                        <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">&amp;Add Run</property>
-                        <property name="name">m_menuItemRunAdd</property>
-                        <property name="permission">none</property>
-                        <property name="shortcut"></property>
-                        <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection">OnRunAdd</event>
-                        <event name="OnUpdateUI"></event>
-                    </object>
-                    <object class="wxMenuItem" expanded="0">
-                        <property name="bitmap"></property>
-                        <property name="checked">0</property>
-                        <property name="enabled">1</property>
-                        <property name="help"></property>
-                        <property name="id">ID_RUNDELETE</property>
-                        <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">&amp;Delete Run</property>
-                        <property name="name">m_menuItemRunDelete</property>
-                        <property name="permission">none</property>
-                        <property name="shortcut"></property>
-                        <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection">OnRunDelete</event>
-                        <event name="OnUpdateUI"></event>
-                    </object>
-                </object>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">Tool&amp;path</property>
                     <property name="name">m_menuToolpath</property>
                     <property name="permission">protected</property>
@@ -655,6 +605,56 @@
                         <property name="shortcut">Ctrl+A</property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">OnShowAnimationControl</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                </object>
+                <object class="wxMenu" expanded="1">
+                    <property name="label">&amp;Run</property>
+                    <property name="name">m_menuRun</property>
+                    <property name="permission">protected</property>
+                    <object class="wxMenuItem" expanded="0">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">ID_RUNEDIT</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">&amp;Setup Run</property>
+                        <property name="name">m_menuItemRunSetup</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut">CTRL+R</property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">OnRunEdit</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="0">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">ID_RUNADD</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">&amp;Add Run</property>
+                        <property name="name">m_menuItemRunAdd</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">OnRunAdd</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="0">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">ID_RUNDELETE</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">&amp;Delete Run</property>
+                        <property name="name">m_menuItemRunDelete</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">OnRunDelete</event>
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>

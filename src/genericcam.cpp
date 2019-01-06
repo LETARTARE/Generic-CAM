@@ -86,6 +86,7 @@ GenericCAMApp::~GenericCAMApp(void)
 	wxDebugContext::PrintStatistics(true);
 #endif
 	delete config; // config is written back on deletion of object
+	printf("GenericCAMApp: Destructor called\n");
 }
 
 // The Commandline is parsed before OnInit is called.

@@ -39,18 +39,18 @@
 
 Machine::Machine()
 {
-	ClearComponents();
-	Reset();
 	initialized = false;
 	microstepMode = distanceBased;
 	microstepDistance = 0.001; // = 1mm;
 	microstepPosition = 0;
-
 	for(size_t n = 0; n < NR_IKAXIS; n++){
 		IKaxis[n] = 0.0;
 		IKaxisused[n] = false;
 	}
 	calculateIK = false;
+
+	ClearComponents();
+	Reset();
 
 //	CNCPosition x(0, 0, 0, 0.3, -0.4, 0.1);
 //	AffineTransformMatrix m = x.GetMatrix();

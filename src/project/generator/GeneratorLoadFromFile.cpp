@@ -47,7 +47,8 @@ void GeneratorLoadFromFile::CopyParameterFrom(const Generator * other)
 			dynamic_cast <const GeneratorLoadFromFile*>(other);
 
 	filename = temp->filename;
-	wxLogMessage(_T("CopyFrom: ") + filename.GetFullName());
+	wxLogMessage
+	(_T("CopyFrom: ") + filename.GetFullName());
 }
 
 GeneratorLoadFromFile::~GeneratorLoadFromFile()
@@ -76,13 +77,12 @@ void GeneratorLoadFromFile::AddToPanel(wxPanel* panel,
 	wxBoxSizer* bSizer2;
 	bSizer2 = new wxBoxSizer(wxHORIZONTAL);
 
-	m_filePicker = new wxFilePickerCtrl(panel, wxID_ANY, wxEmptyString,
-			wxT("Select a file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize,
-			wxFLP_DEFAULT_STYLE);
-	bSizer2->Add(m_filePicker, 1, wxALL, 5);
+	m_filePicker = new wxFilePickerCtrl( panel, wxID_ANY, wxEmptyString, wxT("Select a file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL );
+	bSizer2->Add( m_filePicker, 1, wxALL, 5 );
 
 	bSizer1->Add(bSizer2, 0, wxEXPAND, 5);
 
+	panel->SetSizer(bSizer1);
 	panel->Layout();
 	bSizer1->Fit(panel);
 
@@ -97,7 +97,8 @@ void GeneratorLoadFromFile::TransferDataToPanel(void) const
 void GeneratorLoadFromFile::TransferDataFromPanel(void)
 {
 	filename = m_filePicker->GetPath();
-	wxLogMessage(_T("Filename: ") + filename.GetFullPath());
+	wxLogMessage
+	(_T("Filename: ") + filename.GetFullPath());
 }
 
 void GeneratorLoadFromFile::GenerateToolpath(void)
