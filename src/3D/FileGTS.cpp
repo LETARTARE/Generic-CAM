@@ -31,6 +31,7 @@
 #include <wx/log.h>
 #include <wx/string.h>
 #include <wx/tokenzr.h>
+#include <vector>
 
 FileGTS::FileGTS()
 {
@@ -84,7 +85,7 @@ bool FileGTS::ReadFile(wxString fileName)
 
 	long i;
 	double x, y, z;
-	ArrayOfVector3 vectors;
+	std::vector <Vector3> vectors;
 	Vector3* vec;
 	Triangle* tri;
 
@@ -105,12 +106,12 @@ bool FileGTS::ReadFile(wxString fileName)
 		tokenizer.GetNextToken().ToDouble(&x);
 		tokenizer.GetNextToken().ToDouble(&y);
 		tokenizer.GetNextToken().ToDouble(&z);
-		vec = new Vector3(x, y, z);
-		*vec = matrix.Transform(*vec);
+		Vector3 vec(x, y, z);
+		vec = matrix.Transform(vec);
 		//		vec->x = x;
 		//		vec->y = y;
 		//		vec->z = z;
-		vectors.Add(vec);
+		vectors.push_back(vec);
 	}
 
 	wxArrayLong e1, e2;
@@ -135,7 +136,7 @@ bool FileGTS::ReadFile(wxString fileName)
 
 	unsigned long v1, v2, v3;
 
-	wxLogMessage(wxString::Format(_T("vectors.GetCount() = %lu"), vectors.GetCount()));
+	wxLogMessage(wxString::Format(_T("vectors.size() = %lu"), vectors.size()));
 
 	unsigned long u[6];
 	unsigned long t;
@@ -147,8 +148,7 @@ bool FileGTS::ReadFile(wxString fileName)
 		temp = file.GetNextLine();
 		tokenizer.SetString(temp);
 		if(tokenizer.CountTokens() < 3){
-			wxLogError(
-					_T("File is not a valid GTS file (too little triangles)!"));
+			wxLogError(_T("File is not a valid GTS file (too little triangles)!"));
 			return false;
 		}
 		tri = new Triangle;

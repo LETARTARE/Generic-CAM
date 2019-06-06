@@ -26,10 +26,10 @@
 
 #include "DialogSetupMidi.h"
 
-DialogSetupMidi::DialogSetupMidi(wxWindow* parent, MidiPort &midi) :
+DialogSetupMidi::DialogSetupMidi(wxWindow* parent, MidiPort* midi) :
 		GUISetupMidi(parent)
 {
-	this->midi = &midi;
+	this->midi = midi;
 	TransferDataToWindow();
 
 	timer.SetOwner(this);

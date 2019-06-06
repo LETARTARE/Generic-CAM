@@ -97,7 +97,7 @@ bool Project::GenerateToolpaths(void)
 	Update();
 
 	const AffineTransformMatrix rotx0 = AffineTransformMatrix::Identity();
-	const AffineTransformMatrix rotx180 = AffineTransformMatrix::RotateXYZ(M_PI,
+	const AffineTransformMatrix rotx180 = AffineTransformMatrix::RotationXYZ(M_PI,
 			0, 0);
 
 	for(size_t n = 0; n < workpieces.GetCount(); n++)

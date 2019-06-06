@@ -35,33 +35,37 @@
  * This class stores and manages a 4x4 matrix. This matrix is organized the same way,
  * the transformation matrices of OpenGL are:
  *
- *  R11 R12 R13 Tx\n
- *  R21 R22 R23 Ty\n
- *  R31 R32 R33 Tz\n
- *   0   0   0   1\n
+ * <table>
+ * <tr><td>R11</td><td>R12</td><td>R13</td><td>Tx</td></tr>
+ * <tr><td>R21</td><td>R22</td><td>R23</td><td>Ty</td></tr>
+ * <tr><td>R31</td><td>R32</td><td>R33</td><td>Tz</td></tr>
+ * <tr><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+ * </table>
  *
  * Where R is responsible for rotation and scaling
  * and T for translation.
  * The vector \c a is organized as follows:
  *
- *   0   4   8  12\n
- *   1   5   9  13\n
- *   2   6  10  14\n
- *   3   7  11  15\n
+ * <table>
+ * <tr><td>0</td><td>4</td><td>8</td><td>12</td></tr>
+ * <tr><td>1</td><td>5</td><td>9</td><td>13</td></tr>
+ * <tr><td>2</td><td>6</td><td>10</td><td>14</td></tr>
+ * <tr><td>3</td><td>7</td><td>11</td><td>15</td></tr>
+ * </table>
  *
- * Right handed coordinate system:\n
- * X to the right of the screen\n
- * Y to the top of the screen\n
- * Z towards the viewer\n
+ * Right handed coordinate system:
+ *  * X to the right of the screen
+ *  * Y to the top of the screen
+ *  * Z towards the viewer
  *
  */
 
 // http://www.parashift.com/c++-faq-lite/operator-overloading.html
-#include <wx/dynarray.h>
-#include <wx/string.h>
-#include <wx/txtstrm.h>
+class Vector3;
 
-#include "Vector3.h"
+class wxString;
+class wxTextOutputStream;
+class wxTextInputStream;
 
 class AffineTransformMatrix {
 	// Constructor / Destructor
@@ -75,8 +79,6 @@ public:
 	double rx, ry, rz; //!< Rotation after taking the matrix apart.
 	double tx, ty, tz; //!< Translation after taking the matrix apart.
 	double sx, sy, sz; //!< Scaling after taking the matrix apart.
-
-	bool linkScaling; //!< Force uniform scaling.
 
 	// Methods
 public:
@@ -98,22 +100,20 @@ public:
 	AffineTransformMatrix& operator/=(const AffineTransformMatrix &b);
 	const AffineTransformMatrix operator/(const AffineTransformMatrix& b) const;
 
-	Vector3 GetCenter(void) const;
-
 	void SetIdentity();
-	static AffineTransformMatrix Identity();
 
 	const AffineTransformMatrix Inverse() const;
 
-	static AffineTransformMatrix RotateAroundVector(Vector3 const& vector,
+	static AffineTransformMatrix Identity();
+	static AffineTransformMatrix RotationAroundVector(Vector3 const& vector,
 			double const& phi);
-	static AffineTransformMatrix RotateInterwoven(double const& x,
+	static AffineTransformMatrix RotationInterwoven(double const& x,
 			double const& y, double const& z);
-	static AffineTransformMatrix RotateXY(int const& x, int const& y,
+	static AffineTransformMatrix RotationXY(int const& x, int const& y,
 			double const& scale);
-	static AffineTransformMatrix RotateXYZ(double const& x, double const& y,
+	static AffineTransformMatrix RotationXYZ(double const& x, double const& y,
 			double const& z);
-	static AffineTransformMatrix RotateTrackball(double const& x1,
+	static AffineTransformMatrix RotationTrackball(double const& x1,
 			double const& y1, double const& x2, double const& y2,
 			double const& r);
 
@@ -124,12 +124,12 @@ public:
 	void ScaleLocal(double const& x, double const& y, double const& z);
 
 	Vector3 Transform(Vector3 const& v) const;
+	Vector3 operator()(const Vector3 &v) const;
 	Vector3 TransformNoShift(Vector3 const& v) const;
 
+	Vector3 GetCenter(void) const;
 	double Distance(const AffineTransformMatrix &other) const;
 
 };
-
-WX_DECLARE_OBJARRAY(AffineTransformMatrix, ArrayOfAffineTransformMatrix);
 
 #endif /* AFFINETRANSFORMMATRIX_H_ */

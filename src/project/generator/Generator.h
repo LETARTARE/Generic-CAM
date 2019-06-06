@@ -37,7 +37,6 @@
 
 #include "../Tool.h"
 #include "../ToolPath.h"
-#include "../../gui/DisplaySettings.h"
 #include "../../3D/BoundingBox.h"
 //#include "../../3D/AffineTransformMatrix.h"
 
@@ -48,6 +47,7 @@
 #include <wx/dynarray.h>
 #include <stddef.h>
 
+#include "../../gui/CollectionUnits.h"
 class Run;
 class Workpiece;
 
@@ -81,13 +81,13 @@ public:
 	bool selected;
 
 protected:
-	DisplaySettings * settings;
+	CollectionUnits * settings;
 
 //Methods:
 public:
 	virtual wxString GetName(void) const;
 	virtual void CopyParameterFrom(const Generator * other);
-	virtual void AddToPanel(wxPanel * panel, DisplaySettings * settings);
+	virtual void AddToPanel(wxPanel * panel, CollectionUnits * settings);
 	virtual void TransferDataToPanel(void) const = 0;
 	virtual void TransferDataFromPanel(void) = 0;
 	virtual void ToStream(wxTextOutputStream & stream);

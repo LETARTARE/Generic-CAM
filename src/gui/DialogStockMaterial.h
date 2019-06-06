@@ -31,10 +31,13 @@
  * \brief Manages the heap of stock material in the workshop
  */
 
-#include "../StdInclude.h"
-#include "../project/Project.h"
-#include "../project/StockFile.h"
-#include "DisplaySettings.h"
+#include <wx/event.h>
+#include <wx/string.h>
+
+//#include "../project/Project.h"
+//#include "../project/StockFile.h"
+//#include "../StdInclude.h"
+//#include "CollectionUnits.h"
 #include "gui.h"
 
 class DialogStockMaterial:public GUIStockMaterial {

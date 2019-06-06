@@ -38,7 +38,7 @@
 //#define _DEBUGMODE
 #define _USE_3DVIEWS
 #define _USE_3DPICKING
-//#define _USE_MIDI
+#define _USE_MIDI
 #define _USE_6DOFCONTROLLER
 //#define _USE_MULTITHREADING
 

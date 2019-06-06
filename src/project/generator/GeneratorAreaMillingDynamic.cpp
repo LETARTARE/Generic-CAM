@@ -65,7 +65,7 @@ wxString GeneratorAreaMillingDynamic::GetName(void) const
 }
 
 void GeneratorAreaMillingDynamic::AddToPanel(wxPanel* panel,
-		DisplaySettings* settings)
+		CollectionUnits* settings)
 {
 	Generator::AddToPanel(panel, settings);
 
@@ -455,19 +455,18 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(void)
 				tp.positions.Add(mp);
 			}
 			//if(poly.elements.GetCount() > 3){
-			for(size_t i = 0; i < poly.elements.GetCount(); i++){
+			for(size_t i = 0; i < poly.Size(); i++){
 
-				temptop.FoldLowerDistance(
-						round((poly.elements[i].x - rx2) / rx),
-						round((poly.elements[i].y - ry2) / ry), toolShape);
+				temptop.FoldLowerDistance(round((poly[i].x - rx2) / rx),
+						round((poly[i].y - ry2) / ry), toolShape);
 
 				if(i == 0){
-					tp += MoveSafely(temp, mp.X, mp.Y, mp.Z, poly.elements[i].x,
-							poly.elements[i].y, poly.elements[i].z);
+					tp += MoveSafely(temp, mp.X, mp.Y, mp.Z, poly[i].x,
+							poly[i].y, poly[i].z);
 				}
-				mp.X = poly.elements[i].x;
-				mp.Y = poly.elements[i].y;
-				mp.Z = poly.elements[i].z;
+				mp.X = poly[i].x;
+				mp.Y = poly[i].y;
+				mp.Z = poly[i].z;
 				mp.FeedSpeed();
 				tp.positions.Add(mp);
 				//}

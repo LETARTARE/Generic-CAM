@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : FileDXF.h
-// Purpose            : Reads a DXF File.
+// Name               : CollectionFilepaths.h
+// Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 07.08.2010
-// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 18.02.2019
+// Copyright          : (C) 2019 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,52 +24,32 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef FILEDXF_H_
-#define FILEDXF_H_
+#ifndef _COLLECTIONFILEPATHS_H_
+#define _COLLECTIONFILEPATHS_H_
 
-/*!\class FileDXF
- * \ingroup File3D
- * \brief DXF file
+/*!\class CollectionFilepaths
+ * \brief ...
  *
- * Class for reading in DXF files
+ * ...
  */
 
 #include <wx/string.h>
-#include <vector>
+#include <wx/config.h>
 
-#include "GeometryFileAbstract.h"
-#include "Vector3.h"
-
-class FileDXF:public GeometryFileAbstract {
-	// Constructor/ Destructor
+class CollectionFilepaths {
 public:
-	FileDXF();
-	virtual ~FileDXF();
+	CollectionFilepaths();
+	virtual ~CollectionFilepaths();
 
-	// Member variables
-public:
+	wxString lastProjectDirectory;
+	wxString lastObjectDirectory;
+	wxString lastStockDirectory;
+	wxString lastMachineDirectory;
+	wxString lastToolboxDirectory;
+	wxString lastToolpathDirectory;
 
-private:
-	enum StateType {
-		idle = 0, inSection, inBlock, inEntities
-	};
-	StateType state;
-
-	wxString blockName;
-	wxString objectName;
-	wxString objectType;
-	long objectFlag;
-	double x, y, z;
-	double sx, sy, sz;
-	long v0, v1, v2, v3;
-	long lastGeometry;
-	std::vector <Vector3> v;
-
-	//Methods:
-public:
-	bool ReadFile(wxString fileName);
-private:
-	void ProcessCode(long codeNr, wxString code);
+	bool Load(wxConfig * config);
+	bool Save(wxConfig * config);
 };
 
-#endif /* FILEDXF_H_ */
+#endif /* _COLLECTIONFILEPATHS_H_ */

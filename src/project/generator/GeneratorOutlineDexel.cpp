@@ -53,7 +53,7 @@ wxString GeneratorOutlineDexel::GetName(void) const
 }
 
 void GeneratorOutlineDexel::AddToPanel(wxPanel* panel,
-		DisplaySettings* settings)
+		CollectionUnits* settings)
 {
 	Generator::AddToPanel(panel, settings);
 
@@ -128,8 +128,8 @@ void GeneratorOutlineDexel::GenerateToolpath(void)
 	GCodeBlock m;
 	if(pg.GetCount() > 0){
 		m.Rapid();
-		m.X = pg.elements[0].x;
-		m.Y = pg.elements[0].y;
+		m.X = pg[0].x;
+		m.Y = pg[0].y;
 		m.Z = target.GetSizeZ() + freeHeight;
 		toolpath.positions.Add(m);
 
@@ -139,14 +139,14 @@ void GeneratorOutlineDexel::GenerateToolpath(void)
 			const double level = fmax(area.zmax - n * cutdepth, area.zmin);
 
 			for(size_t n = 0; n < pg.GetCount(); n++){
-				m.X = pg.elements[n].x;
-				m.Y = pg.elements[n].y;
+				m.X = pg[n].x;
+				m.Y = pg[n].y;
 				m.Z = level;
 				m.FeedSpeed();
 				toolpath.positions.Add(m);
 			}
-			m.X = pg.elements[0].x;
-			m.Y = pg.elements[0].y;
+			m.X = pg[0].x;
+			m.Y = pg[0].y;
 			toolpath.positions.Add(m);
 		}
 		m.Z = target.GetSizeZ() + freeHeight;

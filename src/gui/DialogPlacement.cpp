@@ -34,7 +34,8 @@
 DialogPlacement::DialogPlacement(wxWindow* parent) :
 		GUIPlacement(parent)
 {
-	m_menuPreferences->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	m_menuPreferences->Append(ID_SETUPUNITS,
+	_("Setup &Units") + wxT("\tCtrl+U"));
 	FrameMain * frame = wxStaticCast(parent, FrameMain);
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	m_topview->InsertProject(project);
@@ -48,7 +49,7 @@ bool DialogPlacement::TransferDataToWindow(void)
 {
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
-	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	CollectionUnits* settings = &(frame->GetParentFrame()->units);
 	int wpNr = GetSelectedWorkpiece();
 	int plNr = GetSelectedPlacement(wpNr);
 
@@ -204,7 +205,7 @@ void DialogPlacement::OnChange(wxCommandEvent& event)
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
-	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	CollectionUnits* settings = &(frame->GetParentFrame()->units);
 	int wpNr = m_choiceWorkpiece->GetSelection() - 1;
 	if(wpNr < 0) return;
 	int plNr = m_choicePlacement->GetSelection() - 1;
@@ -243,7 +244,8 @@ void DialogPlacement::OnChange(wxCommandEvent& event)
 	case ID_ANGLE:
 		d = settings->Angle.SIFromString(m_textCtrlAngle->GetValue());
 		d -= temp.rz;
-		temp *= AffineTransformMatrix::RotateAroundVector(Vector3(0, 0, 1), d);
+		temp *= AffineTransformMatrix::RotationAroundVector(Vector3(0, 0, 1),
+				d);
 		description = _("Rotate around Z: ")
 				+ settings->Angle.TextFromSIWithUnit(d, 2);
 		break;
@@ -275,7 +277,7 @@ void DialogPlacement::OnChangeSlider(wxScrollEvent& event)
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
-	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	CollectionUnits* settings = &(frame->GetParentFrame()->units);
 	int wpNr = m_choiceWorkpiece->GetSelection() - 1;
 	if(wpNr < 0) return;
 	int plNr = m_choicePlacement->GetSelection() - 1;
@@ -295,7 +297,7 @@ void DialogPlacement::OnChangeSlider(wxScrollEvent& event)
 	d = (float) m_sliderAngle->GetValue();
 	d = d * M_PI / 180.0;
 	d -= temp.rz;
-	temp *= AffineTransformMatrix::RotateAroundVector(Vector3(0, 0, 1), d);
+	temp *= AffineTransformMatrix::RotationAroundVector(Vector3(0, 0, 1), d);
 	description = _("Rotate around Z: ")
 			+ settings->Angle.TextFromSIWithUnit(d, 2);
 	cmdProc->Submit(
@@ -319,7 +321,7 @@ void DialogPlacement::OnTransform(wxCommandEvent& event)
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
-	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	CollectionUnits* settings = &(frame->GetParentFrame()->units);
 	int wpNr = m_choiceWorkpiece->GetSelection() - 1;
 	if(wpNr < 0) return;
 	int plNr = m_choicePlacement->GetSelection() - 1;

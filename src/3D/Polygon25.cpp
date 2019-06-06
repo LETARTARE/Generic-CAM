@@ -27,13 +27,9 @@
 #include "Polygon25.h"
 
 #include <wx/log.h>
-#include <wx/arrimpl.cpp>
 #include <GL/gl.h>
 #include <float.h>
 #include <stdint.h>
-
-
-WX_DEFINE_OBJARRAY(ArrayOfPolygon25)
 
 Polygon25::Polygon25()
 {
@@ -45,13 +41,13 @@ Polygon25::~Polygon25()
 
 double Polygon25::GetLengthXY(void) const
 {
-	if(elements.GetCount() <= 1) return 0.0;
+	if(elements.size() <= 1) return 0.0;
 	double d = 0.0;
 	size_t i;
 	Vector3 temp, temp2;
 
 	temp = elements[0];
-	for(i = 1; i < elements.GetCount(); i++){
+	for(i = 1; i < elements.size(); i++){
 		temp2 = temp - elements[i];
 		temp2.z = 0;
 		d += temp2.Abs();
@@ -73,7 +69,7 @@ void Polygon25::PolygonFillHoles(void)
 	double m;
 	m = 0.0;
 	nrp = 0;
-	for(i = 0; i < elements.GetCount(); i++){
+	for(i = 0; i < elements.size(); i++){
 		if(elements[i].z > -0.5){
 			nrp++;
 			m += elements[i].z;
@@ -81,7 +77,7 @@ void Polygon25::PolygonFillHoles(void)
 	}
 	if(nrp == 0) return;
 	m /= (double) nrp;
-	for(i = 0; i < elements.GetCount(); i++){
+	for(i = 0; i < elements.size(); i++){
 		if(elements[i].z < -0.5){
 			elements[i].z = m;
 		}
@@ -90,16 +86,16 @@ void Polygon25::PolygonFillHoles(void)
 
 void Polygon25::PolygonSmooth(void)
 {
-	ArrayOfVector3 temp = elements;
+	std::vector <Vector3> temp = elements;
 
-	for(size_t i = 0; i < elements.GetCount(); i++){
+	for(size_t i = 0; i < elements.size(); i++){
 		Vector3 d;
 		if(i == 0)
-			d = elements[elements.GetCount() - 1];
+			d = elements[elements.size() - 1];
 		else
 			d = elements[i - 1];
 		d += elements[i];
-		if(i + 1 < elements.GetCount())
+		if(i + 1 < elements.size())
 			d += elements[i + 1];
 		else
 			d += elements[0];
@@ -110,11 +106,11 @@ void Polygon25::PolygonSmooth(void)
 
 void Polygon25::PolygonExpand(double r)
 {
-	if(elements.GetCount() < 2) return;
+	if(elements.size() < 2) return;
 	size_t i;
 	Vector3 o, n, d;
 	o = elements[0];
-	for(i = 1; i < elements.GetCount(); i++){
+	for(i = 1; i < elements.size(); i++){
 		n = elements[i];
 		o = n - o;
 		o.Normalize();
@@ -136,7 +132,7 @@ bool Polygon25::IsElementInside(const Vector3 &v) const
 	// Using the Jordan Polygon Theorem
 
 	int_fast8_t c = 1;
-	size_t E = elements.GetCount();
+	size_t E = elements.size();
 	for(size_t i = 0; i < E; i++){
 		Vector3 p0 = elements[i];
 		Vector3 p1;
@@ -180,7 +176,7 @@ bool Polygon25::IsElementInside(const Vector3 &v) const
 
 bool Polygon25::IsPolygonInside(const Polygon25& other) const
 {
-	for(size_t i = 0; i < other.elements.GetCount(); i++){
+	for(size_t i = 0; i < other.elements.size(); i++){
 		if(!IsElementInside(other.elements[i])){
 			return false;
 		}
@@ -188,24 +184,25 @@ bool Polygon25::IsPolygonInside(const Polygon25& other) const
 	return true;
 }
 
-void Polygon25::SortPolygonsFromOutside(ArrayOfPolygon25 *array)
+void Polygon25::SortPolygonsFromOutside(std::vector <Polygon25> *array)
 {
-	const int N = array->GetCount();
+	const int N = array->size();
 	if(N == 0) return;
-	ArrayOfPolygon25 temp;
-	temp.Add(array->operator [](0));
+	std::vector <Polygon25> temp;
+	temp.push_back(array->operator [](0));
 	for(int i = 1; i < N; i++){
 		int pos = -1;
-		const int M = temp.GetCount();
+		const int M = temp.size();
 		for(int j = M; j > 0; j--){
 			if(temp[j - 1].IsPolygonInside(array->operator [](i))){
 				pos = j - 1;
 				break;
 			}
 		}
-		if(pos == -1) temp.Insert(array->operator [](i), 0);
-		if(pos >= 0 && pos < M - 1) temp.Insert(array->operator [](i), pos + 1);
-		if(pos >= M - 1) temp.Add(array->operator [](i));
+		if(pos == -1) temp.insert(temp.begin(), array->operator [](i));
+		if(pos >= 0 && pos < M - 1) temp.insert(temp.begin() + pos + 1,
+				array->operator [](i));
+		if(pos >= M - 1) temp.push_back(array->operator [](i));
 	}
 	*array = temp;
 }
@@ -216,7 +213,7 @@ double Polygon25::DistanceToElement(const size_t elementInPolygon,
 	double qx, qy, px, py;
 	px = elements[elementInPolygon].x;
 	py = elements[elementInPolygon].y;
-	if(elementInPolygon + 1 == elements.GetCount()){
+	if(elementInPolygon + 1 == elements.size()){
 		qx = elements[0].x;
 		qy = elements[0].y;
 	}else{
@@ -247,11 +244,11 @@ double Polygon25::DistanceToPolygon(const Polygon25 &polygon, double vx,
 	size_t i, j;
 	double dmin = DBL_MAX;
 	double d;
-	size_t n = polygon.elements.GetCount();
+	size_t n = polygon.elements.size();
 	if(!polygon.isClosed && (n > 0)) n--;
 	for(i = 0; i < n; i++){
 		//		wxLogMessage(wxString::Format(_T("to element %u."),i));
-		for(j = 0; j < this->elements.GetCount(); j++){
+		for(j = 0; j < this->elements.size(); j++){
 			d = polygon.DistanceToElement(i, elements[j].x, elements[j].y, vx,
 					vy);
 			if(d < dmin) dmin = d;
@@ -263,13 +260,13 @@ double Polygon25::DistanceToPolygon(const Polygon25 &polygon, double vx,
 void Polygon25::RotatePolygonStart(double x, double y)
 {
 
-	if(elements.GetCount() == 0) return;
+	if(elements.size() == 0) return;
 
 	size_t i;
 	Vector3 t;
 	double d;
 	double dmin = DBL_MAX;
-	size_t n = elements.GetCount();
+	size_t n = elements.size();
 
 	// Find element with minimal distance to (x,y)
 	size_t nshift = 0;
@@ -285,10 +282,10 @@ void Polygon25::RotatePolygonStart(double x, double y)
 	// Shift by -nshift (so nshift becomes 0)
 	//	nshift = n - nshift;
 	size_t j;
-	ArrayOfVector3 temp;
+	std::vector <Vector3> temp;
 	for(i = 0; i < n; i++){
 		j = (i + nshift) % n;
-		temp.Add(elements[j]);
+		temp.push_back(elements[j]);
 	}
 	elements = temp;
 }

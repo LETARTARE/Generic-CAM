@@ -30,7 +30,6 @@
 #include "../StdInclude.h"
 #include "../project/ToolBox.h"
 #include "../project/Project.h"
-#include "DisplaySettings.h"
 #include "gui.h"
 
 class DialogToolbox:public GUIToolbox {

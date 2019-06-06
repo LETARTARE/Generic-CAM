@@ -33,19 +33,19 @@
  * ...
  */
 
-#include "DisplaySettings.h"
+#include "CollectionUnits.h"
 #include "gui.h"
 
 class DialogSetupUnits:public GUISetupUnits {
 	// Constructor/ Destructor
 
 public:
-	DialogSetupUnits(wxWindow* parent, DisplaySettings * settings);
+	DialogSetupUnits(wxWindow* parent, CollectionUnits * settings);
 	virtual ~DialogSetupUnits();
 	// Member variables
 
 private:
-	DisplaySettings * settings;
+	CollectionUnits * settings;
 
 	// Methods
 private:

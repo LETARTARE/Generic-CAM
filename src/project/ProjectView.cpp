@@ -97,6 +97,6 @@ void ProjectView::OnUpdate3D(void)
 {
 	FrameMain* frame = wxStaticCast(GetFrame(), FrameMain);
 	FrameParent* parentframe = wxStaticCast(frame->GetParent(), FrameParent);
-	parentframe->settings.WriteToCanvas(frame->m_canvas);
+	parentframe->settingsStereo3D.WriteToCanvas(frame->m_canvas);
 	frame->m_canvas->Refresh();
 }

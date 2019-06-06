@@ -53,11 +53,12 @@
  *
  */
 
-#include "../3D/AffineTransformMatrix.h"
-#include "../3D/Vector3.h"
+#include <wx/dynarray.h>
 
 #include <wx/string.h>
-#include <wx/dynarray.h>
+#include <wx/txtstrm.h>
+
+#include "../3D/Vector3.h"
 
 class StockMaterial {
 	// Constructor / Destructor

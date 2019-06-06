@@ -37,12 +37,12 @@
 #include "../controller/MidiPort.h"
 #include "../StdInclude.h"
 #include "../project/Project.h"
-#include "DisplaySettings.h"
+#include "CollectionUnits.h"
 #include "gui.h"
 
 class DialogMachineControl:public GUIMachineControl {
 public:
-	DialogMachineControl(wxWindow * parent, MidiPort &midi);
+	DialogMachineControl(wxWindow * parent);
 	virtual ~DialogMachineControl();
 
 	bool TransferDataToWindow(void);
@@ -60,7 +60,11 @@ public:
 	unsigned int pageSize;
 	unsigned int lineSize;
 
+#ifdef _USE_MIDI
 	MidiPort * midi;
+	void SetMidiPort(MidiPort &midi);
+#endif
+
 	wxTimer timer;
 
 private:

@@ -32,7 +32,6 @@
 #include <wx/stattext.h>
 #include <wx/sizer.h>
 
-#include "../../gui/DisplaySettings.h"
 #include "../../math/Unit.h"
 #include "../FlipDrillPattern.h"
 #include "../Project.h"
@@ -71,7 +70,7 @@ wxString GeneratorPositioningDrills::GetName(void) const
 }
 
 void GeneratorPositioningDrills::AddToPanel(wxPanel* panel,
-		DisplaySettings* settings)
+		CollectionUnits* settings)
 {
 	Generator::AddToPanel(panel, settings);
 

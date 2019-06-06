@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : DisplaySettings.h
+// Name               : SettingsStereo3D.h
 // Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 07.01.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 18.02.2019
+// Copyright          : (C) 2019 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,42 +24,22 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef DISPLAYSETTINGS_H_
-#define DISPLAYSETTINGS_H_
+#ifndef _SETTINGSSTEREO3D_H_
+#define _SETTINGSSTEREO3D_H_
 
-/*!\class DisplaySettings
+/*!\class SettingsStereo3D
  * \brief ...
  *
  * ...
  */
 
-#include "../StdInclude.h"
-#include "../3D/OpenGLCanvas.h"
-#include "../math/Unit.h"
 #include <wx/config.h>
+#include "../3D/OpenGLCanvas.h"
 
-class DisplaySettings {
-	friend class DialogSetupUnits;
-
+class SettingsStereo3D {
 public:
-	DisplaySettings();
-	virtual ~DisplaySettings();
-
-	Unit Time;
-	Unit Distance;
-	Unit SmallDistance;
-	Unit Tolerance;
-	Unit LinearSpeed;
-	Unit RotationalSpeed;
-	Unit Angle;
-	Unit Percentage;
-
-	wxString lastProjectDirectory;
-	wxString lastObjectDirectory;
-	wxString lastStockDirectory;
-	wxString lastMachineDirectory;
-	wxString lastToolboxDirectory;
-	wxString lastToolpathDirectory;
+	SettingsStereo3D();
+	virtual ~SettingsStereo3D();
 
 	float eyeDistance;
 	float focalDistance;
@@ -71,24 +51,11 @@ public:
 	unsigned char leftEyeG;
 	unsigned char leftEyeB;
 
-	bool GetConfigFrom(wxConfig * config);
-	bool WriteConfigTo(wxConfig * config);
+	bool Load(wxConfig * config);
+	bool Save(wxConfig * config);
 
 	void WriteToCanvas(OpenGLCanvas * canvas);
 
-protected:
-	wxArrayString unitsOfLength;
-	wxArrayString unitsOfTime;
-	wxArrayString unitsOfSpeedLinear;
-	wxArrayString unitsOfSpeedRotational;
-	wxArrayString unitsOfAngle;
-
-	double * factorofLength;
-	double * factorofTime;
-	double * factorofSpeedLinear;
-	double * factorofSpeedRotational;
-	double * factorofAngle;
-
 };
 
-#endif /* DISPLAYSETTINGS_H_ */
+#endif /* _SETTINGSSTEREO3D_H_ */

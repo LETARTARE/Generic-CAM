@@ -39,6 +39,7 @@ Unit::Unit()
 	mol = 0;
 	cd = 0;
 	cur = 0;
+	power = 0.0;
 //	this->extra = _T("*");
 }
 
@@ -60,19 +61,22 @@ Unit::Unit(const wxString SIName, const wxString otherName, const double factor)
 		this->factor = factor;
 	else
 		this->factor = 1.0;
+	m = 0;
+	kg = 0;
+	s = 0;
+	A = 0;
+	K = 0;
+	mol = 0;
+	cd = 0;
+	cur = 0;
+	power = 0.0;
 }
 
 Unit::Unit(int m, int kg, int s, int A, int K, int mol, int cd, int cur)
+		: m(m), kg(kg), s(s), A(A), K(K), mol(mol), cd(cd), cur(cur)
 {
-	this->m = m;
-	this->s = s;
-	this->kg = kg;
-	this->A = A;
-	this->K = K;
-	this->mol = mol;
-	this->cd = cd;
-	this->cur = cur;
-//	this->extra = _T("*");
+	power = 0.0;
+	factor = 1.0;
 }
 
 void Unit::Setup(const wxString SIName, const wxString otherName,

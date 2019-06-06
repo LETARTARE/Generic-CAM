@@ -30,7 +30,6 @@
 #include <wx/button.h>
 #include <wx/log.h>
 
-#include "../../gui/DisplaySettings.h"
 #include "../ToolPath.h"
 
 GeneratorLoadFromFile::GeneratorLoadFromFile()
@@ -61,7 +60,7 @@ wxString GeneratorLoadFromFile::GetName(void) const
 }
 
 void GeneratorLoadFromFile::AddToPanel(wxPanel* panel,
-		DisplaySettings* settings)
+		CollectionUnits* settings)
 {
 	Generator::AddToPanel(panel, settings);
 
@@ -77,8 +76,10 @@ void GeneratorLoadFromFile::AddToPanel(wxPanel* panel,
 	wxBoxSizer* bSizer2;
 	bSizer2 = new wxBoxSizer(wxHORIZONTAL);
 
-	m_filePicker = new wxFilePickerCtrl( panel, wxID_ANY, wxEmptyString, wxT("Select a file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL );
-	bSizer2->Add( m_filePicker, 1, wxALL, 5 );
+	m_filePicker = new wxFilePickerCtrl(panel, wxID_ANY, wxEmptyString,
+			wxT("Select a file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize,
+			wxFLP_DEFAULT_STYLE | wxFLP_USE_TEXTCTRL);
+	bSizer2->Add(m_filePicker, 1, wxALL, 5);
 
 	bSizer1->Add(bSizer2, 0, wxEXPAND, 5);
 
@@ -86,7 +87,7 @@ void GeneratorLoadFromFile::AddToPanel(wxPanel* panel,
 	panel->Layout();
 	bSizer1->Fit(panel);
 
-	m_filePicker->SetPath(settings->lastProjectDirectory);
+	m_filePicker->SetPath(_T(""));
 }
 
 void GeneratorLoadFromFile::TransferDataToPanel(void) const

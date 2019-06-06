@@ -62,7 +62,7 @@ wxString GeneratorTest::GetName(void) const
 	return _T("Test Generator (using Dexel)");
 }
 
-void GeneratorTest::AddToPanel(wxPanel* panel, DisplaySettings* settings)
+void GeneratorTest::AddToPanel(wxPanel* panel, CollectionUnits* settings)
 {
 	Generator::AddToPanel(panel, settings);
 
@@ -157,7 +157,7 @@ void GeneratorTest::GenerateToolpath(void)
 	m.Z = temp.GetSizeZ() + freeHeight;
 	m.Rapid();
 
-	ArrayOfPolygon25 pgs;
+	std::vector <Polygon25> pgs;
 	Polygon25 pg;
 
 //	AffineTransformMatrix tm;
@@ -168,11 +168,11 @@ void GeneratorTest::GenerateToolpath(void)
 
 		// Find all polygons on one level
 		pg = temp.GeneratePolygon(-1, -1, level - tolerance);
-		while(pg.elements.GetCount() > 0){
+		while(pg.Size() > 0){
 			temptop.PolygonDropOntoTarget(pg, dropLevel);
 			temp.PolygonPunchThroughTarget(pg, dropLevel, toolShape);
 			pg.PolygonSmooth();
-			pgs.Add(pg);
+			pgs.push_back(pg);
 			pg = temp.GeneratePolygon(-1, -1, level - tolerance);
 		}
 
@@ -195,16 +195,15 @@ void GeneratorTest::GenerateToolpath(void)
 
 		bool isMillUp = true;
 		// Generate a toolpath from the polygon collection
-		for(size_t i = pgs.GetCount(); i > 0; i--){
-			if(pgs[i - 1].elements.GetCount() == 0) continue;
+		for(size_t i = pgs.size(); i > 0; i--){
+			if(pgs[i - 1].Size() == 0) continue;
 
 			pgs[i - 1].RotatePolygonStart(m.X, m.Y);
 
 			if(!isMillUp){
-				const double d2 = (m.X - pgs[i - 1].elements[0].x)
-						* (m.X - pgs[i - 1].elements[0].x)
-						+ (m.Y - pgs[i - 1].elements[0].y)
-								* (m.Y - pgs[i - 1].elements[0].y);
+				const double d2 = (m.X - pgs[i - 1][0].x)
+						* (m.X - pgs[i - 1][0].x)
+						+ (m.Y - pgs[i - 1][0].y) * (m.Y - pgs[i - 1][0].y);
 				if(d2 > (twiddleFactor * twiddleFactor)){
 					// Move tool out of material to travel to next polygon.
 					m.Rapid();
@@ -216,8 +215,8 @@ void GeneratorTest::GenerateToolpath(void)
 
 			if(isMillUp){
 				// Move tool to next position
-				m.X = pgs[i - 1].elements[0].x;
-				m.Y = pgs[i - 1].elements[0].y;
+				m.X = pgs[i - 1][0].x;
+				m.Y = pgs[i - 1][0].y;
 				m.Z = temp.GetSizeZ() + freeHeight;
 				m.Rapid();
 				tp.positions.Add(m);
@@ -226,14 +225,14 @@ void GeneratorTest::GenerateToolpath(void)
 			m.FeedSpeed();
 			isMillUp = false;
 
-			for(size_t j = 0; j < pgs[i - 1].elements.GetCount(); j++){
-				m.X = pgs[i - 1].elements[j].x;
-				m.Y = pgs[i - 1].elements[j].y;
-				m.Z = pgs[i - 1].elements[j].z;
+			for(size_t j = 0; j < pgs[i - 1].Size(); j++){
+				m.X = pgs[i - 1][j].x;
+				m.Y = pgs[i - 1][j].y;
+				m.Z = pgs[i - 1][j].z;
 				tp.positions.Add(m);
 			}
 		}
-		pgs.Clear();
+		pgs.clear();
 
 		if(level >= 0.0 && level < 3 * tolerance){
 			level = -1.0;

@@ -35,7 +35,7 @@
 
 #include "../StdInclude.h"
 #include "../project/Project.h"
-#include "DisplaySettings.h"
+#include "CollectionUnits.h"
 #include "gui.h"
 
 //#include <wx/wx.h>

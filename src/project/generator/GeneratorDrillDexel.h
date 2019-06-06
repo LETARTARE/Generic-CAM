@@ -43,7 +43,7 @@ public:
 
 	virtual void CopyParameterFrom(const Generator * other);
 	virtual wxString GetName(void) const;
-	virtual void AddToPanel(wxPanel * panel, DisplaySettings* settings);
+	virtual void AddToPanel(wxPanel * panel, CollectionUnits* settings);
 	virtual void TransferDataToPanel(void) const;
 	virtual void TransferDataFromPanel(void);
 	virtual void GenerateToolpath(void);

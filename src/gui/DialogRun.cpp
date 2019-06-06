@@ -41,7 +41,8 @@
 DialogRun::DialogRun(wxWindow* parent) :
 		GUIRun(parent)
 {
-	m_menuPreferences->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	m_menuPreferences->Append(ID_SETUPUNITS,
+			_("Setup &Units") + wxT("\tCtrl+U"));
 	loopGuard = false;
 }
 
@@ -56,7 +57,7 @@ bool DialogRun::TransferDataToWindow(void)
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
 
-	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	CollectionUnits* settings = &(frame->GetParentFrame()->units);
 	size_t i;
 	int selected = -1;
 	m_choiceRun->Clear();
@@ -205,15 +206,15 @@ void DialogRun::OnRotate(wxCommandEvent& event)
 
 	switch(event.GetId()){
 	case ID_WORKPIECEROTATEX:
-		matrix *= AffineTransformMatrix::RotateXYZ(M_PI_2, 0, 0);
+		matrix *= AffineTransformMatrix::RotationXYZ(M_PI_2, 0, 0);
 		description = _("Rotate workpiece around X axis");
 		break;
 	case ID_WORKPIECEROTATEY:
-		matrix *= AffineTransformMatrix::RotateXYZ(0, M_PI_2, 0);
+		matrix *= AffineTransformMatrix::RotationXYZ(0, M_PI_2, 0);
 		description = _("Rotate workpiece around Y axis");
 		break;
 	case ID_WORKPIECEROTATEZ:
-		matrix *= AffineTransformMatrix::RotateXYZ(0, 0, M_PI_2);
+		matrix *= AffineTransformMatrix::RotationXYZ(0, 0, M_PI_2);
 		description = _("Rotate workpiece around Z axis");
 		break;
 	}

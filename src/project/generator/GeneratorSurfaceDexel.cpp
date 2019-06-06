@@ -53,7 +53,7 @@ wxString GeneratorSurfaceDexel::GetName(void) const
 }
 
 void GeneratorSurfaceDexel::AddToPanel(wxPanel* panel,
-		DisplaySettings* settings)
+		CollectionUnits* settings)
 {
 	Generator::AddToPanel(panel, settings);
 

@@ -37,7 +37,6 @@
 #include "../StdInclude.h"
 #include "../project/Project.h"
 #include "../project/generator/GeneratorCollection.h"
-#include "DisplaySettings.h"
 #include "gui.h"
 #include <wx/cmdproc.h>
 

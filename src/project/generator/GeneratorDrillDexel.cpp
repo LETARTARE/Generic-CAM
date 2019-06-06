@@ -51,7 +51,7 @@ wxString GeneratorDrillDexel::GetName(void) const
 	return _T("Drilling Holes (using Dexel)");
 }
 
-void GeneratorDrillDexel::AddToPanel(wxPanel* panel, DisplaySettings* settings)
+void GeneratorDrillDexel::AddToPanel(wxPanel* panel, CollectionUnits* settings)
 {
 	Generator::AddToPanel(panel, settings);
 

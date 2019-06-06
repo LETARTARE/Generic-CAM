@@ -35,7 +35,6 @@
 
 #include "../StdInclude.h"
 #include "../project/Project.h"
-#include "DisplaySettings.h"
 #include "../math/Unit.h"
 
 #include "gui.h"
@@ -79,6 +78,8 @@ private:
 	void OnSetFactors(wxCommandEvent& event);
 	void OnFlipNormals(wxCommandEvent& event);
 	Project* GetProject(void);
+
+
 };
 
 #endif /* DIALOGOBJECTTRANSFORMATION_H_ */

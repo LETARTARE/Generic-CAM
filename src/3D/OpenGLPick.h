@@ -28,8 +28,8 @@
 #define OPENGLPICK_H_
 
 /*!\class OpenGLPick
- * \ingroup View3D
  * \brief Storage for the result of an OpenGL picking operation
+ * \ingroup View3D
  *
  * The result is stored as it is delivered from the OpenGL call.
  * Functions are provided to interpret the results.

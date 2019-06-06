@@ -62,7 +62,7 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 {
 	if(!this->IsShown()) return false;
 	Project* project = GetProject();
-	DisplaySettings* settings = &(wxStaticCast(GetParent()->GetParent(),FrameParent)->settings);
+	CollectionUnits* settings = &(wxStaticCast(GetParent()->GetParent(),FrameParent)->units);
 	if(project == NULL) return false;
 
 	// Update Selection box
@@ -151,7 +151,7 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 }
 bool DialogObjectTransformation::TransferDataFromWindow(void)
 {
-	DisplaySettings* settings = &(wxStaticCast(GetParent(),FrameMain)->GetParentFrame()->settings);
+	CollectionUnits* settings = &(wxStaticCast(GetParent(),FrameMain)->GetParentFrame()->units);
 
 	m_textCtrlScalePercent->GetValue().ToDouble(&scalePercent);
 	m_textCtrlScalePercentX->GetValue().ToDouble(&scalePercentX);
@@ -211,7 +211,7 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 {
 	Project* project = GetProject();
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
-	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	CollectionUnits* settings = &(frame->GetParentFrame()->units);
 	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
 	if(project == NULL) return;
 	TransferDataFromWindow();
@@ -376,42 +376,42 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around X by %.0f degree"),
 							rotateStep);
-			newMatrix = AffineTransformMatrix::RotateXYZ(rotateStep, 0, 0)
+			newMatrix = AffineTransformMatrix::RotationXYZ(rotateStep, 0, 0)
 					* newMatrix;
 			break;
 		case ID_ROTATEXN:
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around X by %.0f degree"),
 							-rotateStep);
-			newMatrix = AffineTransformMatrix::RotateXYZ(-rotateStep, 0, 0)
+			newMatrix = AffineTransformMatrix::RotationXYZ(-rotateStep, 0, 0)
 					* newMatrix;
 			break;
 		case ID_ROTATEYP:
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around Y by %.0f degree"),
 							rotateStep);
-			newMatrix = AffineTransformMatrix::RotateXYZ(0, rotateStep, 0)
+			newMatrix = AffineTransformMatrix::RotationXYZ(0, rotateStep, 0)
 					* newMatrix;
 			break;
 		case ID_ROTATEYN:
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around Y by %.0f degree"),
 							-rotateStep);
-			newMatrix = AffineTransformMatrix::RotateXYZ(0, -rotateStep, 0)
+			newMatrix = AffineTransformMatrix::RotationXYZ(0, -rotateStep, 0)
 					* newMatrix;
 			break;
 		case ID_ROTATEZP:
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around Z by %.0f degree"),
 							rotateStep);
-			newMatrix = AffineTransformMatrix::RotateXYZ(0, 0, rotateStep)
+			newMatrix = AffineTransformMatrix::RotationXYZ(0, 0, rotateStep)
 					* newMatrix;
 			break;
 		case ID_ROTATEZN:
 			description = project->objects[n].name
 					+ wxString::Format(_T(": rotate around Z by %.0f degree"),
 							-rotateStep);
-			newMatrix = AffineTransformMatrix::RotateXYZ(0, 0, -rotateStep)
+			newMatrix = AffineTransformMatrix::RotationXYZ(0, 0, -rotateStep)
 					* newMatrix;
 			break;
 		}

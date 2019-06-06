@@ -37,14 +37,16 @@
 
 #include <wx/event.h>
 
-class DisplaySettings;
-
+class SettingsStereo3D;
+class CollectionUnits;
 class DialogSetupStereo3D:public GUISetupStereo3D {
 public:
-	DialogSetupStereo3D(wxWindow* parent, DisplaySettings &settings);
+	DialogSetupStereo3D(wxWindow* parent, SettingsStereo3D * settings,
+			CollectionUnits * units);
 
 private:
-	DisplaySettings * settings;
+	SettingsStereo3D * settings;
+	CollectionUnits * units;
 
 	// Methods
 public:

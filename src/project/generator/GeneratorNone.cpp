@@ -50,7 +50,7 @@ wxString GeneratorNone::GetName(void) const
 	return _("None");
 }
 
-void GeneratorNone::AddToPanel(wxPanel* panel, DisplaySettings* settings)
+void GeneratorNone::AddToPanel(wxPanel* panel, CollectionUnits* settings)
 {
 	Generator::AddToPanel(panel, settings);
 	wxStaticBitmap* m_bitmap;

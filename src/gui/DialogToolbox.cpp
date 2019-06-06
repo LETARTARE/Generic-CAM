@@ -37,7 +37,8 @@ DialogToolbox::DialogToolbox(wxWindow* parent) :
 {
 	m_menuPreferences->Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
 	m_menuPreferences->Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
-	m_menuPreferences->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	m_menuPreferences->Append(ID_SETUPUNITS,
+	_("Setup &Units") + wxT("\tCtrl+U"));
 
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 
@@ -64,7 +65,8 @@ bool DialogToolbox::TransferDataToWindow(void)
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
 	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
-	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	SettingsStereo3D* settings = &(frame->GetParentFrame()->settingsStereo3D);
+	CollectionUnits* units = &(frame->GetParentFrame()->units);
 	size_t i, j;
 
 	m_comboBoxToolSelector->Clear();
@@ -87,25 +89,23 @@ bool DialogToolbox::TransferDataToWindow(void)
 	m_canvas->Refresh();
 
 	m_textCtrlShaftDiameter->SetValue(
-			settings->SmallDistance.TextFromSI(tempTool.shaftDiameter));
+			units->SmallDistance.TextFromSI(tempTool.shaftDiameter));
 	m_textCtrlShaftLength->SetValue(
-			settings->SmallDistance.TextFromSI(tempTool.shaftLength));
+			units->SmallDistance.TextFromSI(tempTool.shaftLength));
 	m_textCtrlMaxSpeed->SetValue(
-			settings->RotationalSpeed.TextFromSI(tempTool.maxSpeed));
+			units->RotationalSpeed.TextFromSI(tempTool.maxSpeed));
 	m_textCtrlFeedCoefficient->SetValue(
-			settings->SmallDistance.TextFromSI(tempTool.feedCoefficient));
+			units->SmallDistance.TextFromSI(tempTool.feedCoefficient));
 	m_textCtrlNrOfTeeth->SetValue(
 			wxString::Format(_T("%u"), tempTool.nrOfTeeth));
 	m_textCtrlComment->SetValue(tempTool.comment);
 
 	m_staticTextUnitShaftDiameter->SetLabel(
-			settings->SmallDistance.GetOtherName());
-	m_staticTextUnitShaftLength->SetLabel(
-			settings->SmallDistance.GetOtherName());
-	m_staticTextUnitMaxSpeed->SetLabel(
-			settings->RotationalSpeed.GetOtherName());
+			units->SmallDistance.GetOtherName());
+	m_staticTextUnitShaftLength->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitMaxSpeed->SetLabel(units->RotationalSpeed.GetOtherName());
 	m_staticTextUnitFeedCoefficient->SetLabel(
-			settings->SmallDistance.GetOtherName());
+			units->SmallDistance.GetOtherName());
 
 	wxSize sz = m_listCtrl->GetClientSize();
 	unsigned int w = sz.x / 14;
@@ -141,11 +141,11 @@ bool DialogToolbox::TransferDataToWindow(void)
 		}
 
 		m_listCtrl->SetItem(j, 1,
-				settings->SmallDistance.TextFromSI(tempTool.elements[j].d));
+				units->SmallDistance.TextFromSI(tempTool.elements[j].d));
 		m_listCtrl->SetItem(j, 2,
-				settings->SmallDistance.TextFromSI(tempTool.elements[j].h));
+				units->SmallDistance.TextFromSI(tempTool.elements[j].h));
 		m_listCtrl->SetItem(j, 3,
-				settings->SmallDistance.TextFromSI(tempTool.elements[j].r));
+				units->SmallDistance.TextFromSI(tempTool.elements[j].r));
 
 		if(tempTool.elements[j].cutting){
 			m_listCtrl->SetItem(j, 4, _("Yes"));
@@ -164,15 +164,13 @@ bool DialogToolbox::TransferDataToWindow(void)
 	m_choiceType->Select(tempElement.t);
 
 	m_textCtrlDiameter->SetValue(
-			settings->SmallDistance.TextFromSI(tempElement.d));
-	m_textCtrlHeight->SetValue(
-			settings->SmallDistance.TextFromSI(tempElement.h));
-	m_textCtrlRadius->SetValue(
-			settings->SmallDistance.TextFromSI(tempElement.r));
+			units->SmallDistance.TextFromSI(tempElement.d));
+	m_textCtrlHeight->SetValue(units->SmallDistance.TextFromSI(tempElement.h));
+	m_textCtrlRadius->SetValue(units->SmallDistance.TextFromSI(tempElement.r));
 
-	m_staticTextUnitDiameter->SetLabel(settings->SmallDistance.GetOtherName());
-	m_staticTextUnitHeight->SetLabel(settings->SmallDistance.GetOtherName());
-	m_staticTextUnitRadius->SetLabel(settings->SmallDistance.GetOtherName());
+	m_staticTextUnitDiameter->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitHeight->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitRadius->SetLabel(units->SmallDistance.GetOtherName());
 
 	m_checkBoxCutting->SetValue(tempElement.cutting);
 
@@ -184,26 +182,26 @@ bool DialogToolbox::TransferDataFromWindow(void)
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
-	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	CollectionUnits* units = &(frame->GetParentFrame()->units);
 	tempTool.toolName = m_comboBoxToolSelector->GetValue();
-	tempTool.shaftDiameter = settings->SmallDistance.SIFromString(
+	tempTool.shaftDiameter = units->SmallDistance.SIFromString(
 			m_textCtrlShaftDiameter->GetValue());
-	tempTool.shaftLength = settings->SmallDistance.SIFromString(
+	tempTool.shaftLength = units->SmallDistance.SIFromString(
 			m_textCtrlShaftLength->GetValue());
-	tempTool.maxSpeed = settings->RotationalSpeed.SIFromString(
+	tempTool.maxSpeed = units->RotationalSpeed.SIFromString(
 			m_textCtrlMaxSpeed->GetValue());
-	tempTool.feedCoefficient = settings->SmallDistance.SIFromString(
+	tempTool.feedCoefficient = units->SmallDistance.SIFromString(
 			m_textCtrlFeedCoefficient->GetValue());
-	tempTool.nrOfTeeth = settings->SmallDistance.SIFromString(
+	tempTool.nrOfTeeth = units->SmallDistance.SIFromString(
 			m_textCtrlNrOfTeeth->GetValue());
 	tempTool.comment = m_textCtrlComment->GetValue();
 
 	tempElement.t = m_choiceType->GetSelection();
-	tempElement.d = settings->SmallDistance.SIFromString(
+	tempElement.d = units->SmallDistance.SIFromString(
 			m_textCtrlDiameter->GetValue());
-	tempElement.h = settings->SmallDistance.SIFromString(
+	tempElement.h = units->SmallDistance.SIFromString(
 			m_textCtrlHeight->GetValue());
-	tempElement.r = settings->SmallDistance.SIFromString(
+	tempElement.r = units->SmallDistance.SIFromString(
 			m_textCtrlRadius->GetValue());
 
 	tempElement.cutting = m_checkBoxCutting->GetValue();
@@ -237,7 +235,7 @@ void DialogToolbox::OnChangeStereo3D(wxCommandEvent& event)
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
-	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	SettingsStereo3D* settings = &(frame->GetParentFrame()->settingsStereo3D);
 	if(m_canvas->stereoMode != stereoOff){
 		m_canvas->stereoMode = stereoOff;
 	}else{

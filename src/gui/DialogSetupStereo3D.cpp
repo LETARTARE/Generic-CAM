@@ -26,19 +26,21 @@
 
 #include "DialogSetupStereo3D.h"
 
-#include "../gui/DisplaySettings.h"
 #include "../gui/CanvasStereoTest.h"
 #include "../math/Unit.h"
 #include "../gui/IDs.h"
 
 #include "../StdInclude.h"
+#include "CollectionUnits.h"
+#include "SettingsStereo3D.h"
 
 DialogSetupStereo3D::DialogSetupStereo3D(wxWindow* parent,
-		DisplaySettings &settings) :
-		GUISetupStereo3D(parent)
+		SettingsStereo3D * settings, CollectionUnits * units)
+		: GUISetupStereo3D(parent)
 {
-	this->settings = &settings;
-	
+	this->settings = settings;
+	this->units = units;
+
 	m_canvas->stereoMode = stereoAnaglyph;
 	TransferDataToWindow();
 }
@@ -75,12 +77,12 @@ bool DialogSetupStereo3D::TransferDataToWindow(void)
 			(int) round((settings->focalDistance * 50.0)));
 
 	m_textCtrlEyeDistance->SetValue(
-			settings->Distance.TextFromSI(settings->eyeDistance));
+			units->Distance.TextFromSI(settings->eyeDistance));
 	m_textCtrlFocalDistance->SetValue(
-			settings->Distance.TextFromSI(settings->focalDistance));
+			units->Distance.TextFromSI(settings->focalDistance));
 
-	m_staticTextUnitEyeDistance->SetLabel(settings->Distance.GetOtherName());
-	m_staticTextUnitFocalDistance->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitEyeDistance->SetLabel(units->Distance.GetOtherName());
+	m_staticTextUnitFocalDistance->SetLabel(units->Distance.GetOtherName());
 
 	settings->WriteToCanvas(m_canvas);
 	m_canvas->Refresh();
@@ -219,11 +221,11 @@ void DialogSetupStereo3D::OnTextChange(wxCommandEvent& event)
 		if(settings->rightEyeB > 0) settings->leftEyeB = 0;
 		break;
 	case ID_EYEDISTANCE:
-		settings->eyeDistance = settings->Distance.SIFromString(
+		settings->eyeDistance = units->Distance.SIFromString(
 				event.GetString());
 		break;
 	case ID_FOCALDISTANCE:
-		settings->focalDistance = settings->Distance.SIFromString(
+		settings->focalDistance = units->Distance.SIFromString(
 				event.GetString());
 		break;
 	}

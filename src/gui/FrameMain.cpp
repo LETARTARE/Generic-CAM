@@ -123,7 +123,8 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 	m_menuPreferences->Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
 	m_menuPreferences->Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
 	m_menuPreferences->Append(ID_SETUPMIDI, _("Setup &MIDI"));
-	m_menuPreferences->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	m_menuPreferences->Append(ID_SETUPUNITS,
+	_("Setup &Units") + wxT("\tCtrl+U"));
 
 	m_menuHelp->AppendSeparator();
 	m_menuHelp->Append(wxID_HELP, _("&Help") + wxT("\tF1"));
@@ -136,7 +137,7 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 
 	m_canvas->SetController(parentframe->control);
 	m_canvas->InsertProject(project); // Connect the project to the 3D canvas
-	parentframe->settings.WriteToCanvas(m_canvas);
+	parentframe->settingsStereo3D.WriteToCanvas(m_canvas);
 
 	logWindow = new wxLogWindow(this, _("Generic CAM - log window"), false,
 			false);
@@ -146,7 +147,11 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 	dialogWorkpiece = new DialogWorkpiece(this);
 	dialogPlacement = new DialogPlacement(this);
 	dialogRun = new DialogRun(this);
-	dialogDebugger = new DialogMachineDebugger(this, parentframe->midi);
+	dialogDebugger = new DialogMachineDebugger(this);
+#ifdef _USE_MIDI
+	dialogDebugger->SetMidiPort(parentframe->midi);
+#endif
+
 	dialogToolbox = new DialogToolbox(this);
 	dialogToolpathGenerator = new DialogToolpathGenerator(this);
 	dialogAnimation = new DialogAnimation(this);
@@ -165,8 +170,6 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 
 	this->Connect(ID_UPDATESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(FrameMain::UpdateSimulation));
-
-
 
 	TransferDataToWindow();
 }
@@ -239,7 +242,6 @@ bool FrameMain::TransferDataFromWindow(void)
 
 	return true;
 }
-
 
 void FrameMain::UpdateSimulation(wxCommandEvent& event)
 {
@@ -577,7 +579,6 @@ void FrameMain::OnProjectRename(wxCommandEvent& event)
 
 void FrameMain::OnObjectLoad(wxCommandEvent& event)
 {
-	FrameParent* parentframe = wxStaticCast(GetParent(), FrameParent);
 	Project* project = wxStaticCast(GetDocument(), Project);
 	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 	wxFileName fileName;
@@ -586,11 +587,11 @@ void FrameMain::OnObjectLoad(wxCommandEvent& event)
 					"All supported files (*.dxf; *.stl; *.gts)|*.dxf;*DXF;*.stl;*.STL;*.gts;*.GTS|DXF Files (*.dxf)|*.dxf;*.DXF|Stereolithography files (STL files) (*.stl)|*.stl;*.STL|GTS files (*.gts)|*.gts;*.GTS|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_MULTIPLE);
 
-	if(wxDir::Exists(parentframe->settings.lastObjectDirectory)){
-		dialog.SetDirectory(parentframe->settings.lastObjectDirectory);
+	if(wxDir::Exists(filepaths.lastObjectDirectory)){
+		dialog.SetDirectory(filepaths.lastObjectDirectory);
 	}else{
-		if(wxDir::Exists(parentframe->settings.lastProjectDirectory)){
-			dialog.SetDirectory(parentframe->settings.lastProjectDirectory);
+		if(wxDir::Exists(filepaths.lastProjectDirectory)){
+			dialog.SetDirectory(filepaths.lastProjectDirectory);
 		}
 	}
 
@@ -605,8 +606,7 @@ void FrameMain::OnObjectLoad(wxCommandEvent& event)
 					new CommandObjectLoad(
 							(_("Load Object: ") + fileName.GetName()),
 							project, paths[n]));
-			if(n == 0) parentframe->settings.lastObjectDirectory =
-					fileName.GetPath();
+			if(n == 0) filepaths.lastObjectDirectory = fileName.GetPath();
 		}
 		TransferDataToWindow();
 	}
@@ -774,11 +774,11 @@ void FrameMain::OnMachineLoad(wxCommandEvent& event)
 					"All machine descriptions  (*.lua;*.zip)|*.lua;*.zip|Machine descriptions (LUA Files)  (*.lua)|*.lua|Packed Machine descriptions  (*.zip)|*.zip|Text files  (*.txt)|*.txt|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
-	if(wxDir::Exists(parentframe->settings.lastMachineDirectory)){
-		dialog.SetDirectory(parentframe->settings.lastMachineDirectory);
+	if(wxDir::Exists(filepaths.lastMachineDirectory)){
+		dialog.SetDirectory(filepaths.lastMachineDirectory);
 	}else{
-		if(wxDir::Exists(parentframe->settings.lastProjectDirectory)){
-			dialog.SetDirectory(parentframe->settings.lastProjectDirectory);
+		if(wxDir::Exists(filepaths.lastProjectDirectory)){
+			dialog.SetDirectory(filepaths.lastProjectDirectory);
 		}
 	}
 	Project* project = wxStaticCast(GetDocument(), Project);
@@ -786,7 +786,7 @@ void FrameMain::OnMachineLoad(wxCommandEvent& event)
 	if(dialog.ShowModal() == wxID_OK){
 		wxFileName fileName(dialog.GetPath());
 		if(project->run[selected].machine.Load(fileName)){
-			parentframe->settings.lastMachineDirectory = fileName.GetPath();
+			filepaths.lastMachineDirectory = fileName.GetPath();
 		}else{
 			wxLogError
 			(project->run[selected].machine.textOut);
@@ -831,17 +831,17 @@ void FrameMain::OnToolboxLoad(wxCommandEvent& event)
 	wxFileDialog dialog(this, _("Open toolbox..."), _T(""), _T(""),
 			_("Toolbox (*.xml)|*.xml|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
-	if(wxDir::Exists(parentframe->settings.lastToolboxDirectory)){
-		dialog.SetDirectory(parentframe->settings.lastToolboxDirectory);
+	if(wxDir::Exists(filepaths.lastToolboxDirectory)){
+		dialog.SetDirectory(filepaths.lastToolboxDirectory);
 	}else{
-		if(wxDir::Exists(parentframe->settings.lastProjectDirectory)){
-			dialog.SetDirectory(parentframe->settings.lastProjectDirectory);
+		if(wxDir::Exists(filepaths.lastProjectDirectory)){
+			dialog.SetDirectory(filepaths.lastProjectDirectory);
 		}
 	}
 	if(dialog.ShowModal() == wxID_OK){
 		wxFileName fileName(dialog.GetPath());
 		if(view->toolbox.LoadToolBox(fileName)){
-			parentframe->settings.lastToolboxDirectory = fileName.GetPath();
+			filepaths.lastToolboxDirectory = fileName.GetPath();
 			TransferDataToWindow();
 		}
 	}
@@ -857,8 +857,8 @@ void FrameMain::OnToolboxSave(wxCommandEvent &event)
 	if(view->toolbox.fileName.IsOk()){
 		dialog.SetPath(view->toolbox.fileName.GetFullPath());
 	}else{
-		if(wxDir::Exists(parentframe->settings.lastToolboxDirectory)){
-			dialog.SetDirectory(parentframe->settings.lastToolboxDirectory);
+		if(wxDir::Exists(filepaths.lastToolboxDirectory)){
+			dialog.SetDirectory(filepaths.lastToolboxDirectory);
 		}
 	}
 	if(dialog.ShowModal() == wxID_OK){
@@ -923,13 +923,13 @@ void FrameMain::OnGeneratorSaveToolpath(wxCommandEvent& event)
 			_("G-Code file (*.nc)|*.nc|All files|*.*"),
 			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
-	if(wxDir::Exists(parentframe->settings.lastToolpathDirectory)){
-		dialog.SetDirectory(parentframe->settings.lastToolpathDirectory);
+	if(wxDir::Exists(filepaths.lastToolpathDirectory)){
+		dialog.SetDirectory(filepaths.lastToolpathDirectory);
 	}
 	if(dialog.ShowModal() == wxID_OK){
 		wxFileName fileName;
 		fileName = dialog.GetPath();
-		parentframe->settings.lastToolpathDirectory = fileName.GetPath();
+		filepaths.lastToolpathDirectory = fileName.GetPath();
 		ToolPath::Dialect dialect = ToolPath::RS274NGC;
 		if(m_menuDialect->IsChecked(ID_DIALECT_FANUCM)) dialect =
 				ToolPath::FanucM;
@@ -982,22 +982,22 @@ void FrameMain::OnViewSet(wxCommandEvent& event)
 	switch(event.GetId()){
 	case ID_VIEWFRONT:
 		m_canvas->rotmat = AffineTransformMatrix::Identity();
-		m_canvas->rotmat *= AffineTransformMatrix::RotateXYZ(-M_PI_2, 0, 0);
+		m_canvas->rotmat *= AffineTransformMatrix::RotationXYZ(-M_PI_2, 0, 0);
 		m_statusBar->SetStatusText(_T("ID_VIEWFRONT"), 1);
 		break;
 	case ID_VIEWBACK:
 		m_canvas->rotmat = AffineTransformMatrix::Identity();
-		m_canvas->rotmat *= AffineTransformMatrix::RotateXYZ(M_PI_2, 0, 0);
+		m_canvas->rotmat *= AffineTransformMatrix::RotationXYZ(M_PI_2, 0, 0);
 		m_statusBar->SetStatusText(_T("ID_VIEWBACK"), 1);
 		break;
 	case ID_VIEWLEFT:
 		m_canvas->rotmat = AffineTransformMatrix::Identity();
-		m_canvas->rotmat *= AffineTransformMatrix::RotateXYZ(0, M_PI_2, 0);
+		m_canvas->rotmat *= AffineTransformMatrix::RotationXYZ(0, M_PI_2, 0);
 		m_statusBar->SetStatusText(_T("ID_VIEWLEFT"), 1);
 		break;
 	case ID_VIEWRIGHT:
 		m_canvas->rotmat = AffineTransformMatrix::Identity();
-		m_canvas->rotmat *= AffineTransformMatrix::RotateXYZ(0, -M_PI_2, 0);
+		m_canvas->rotmat *= AffineTransformMatrix::RotationXYZ(0, -M_PI_2, 0);
 		m_statusBar->SetStatusText(_T("ID_VIEWRIGHT"), 1);
 		break;
 	case ID_VIEWTOP:
@@ -1006,7 +1006,7 @@ void FrameMain::OnViewSet(wxCommandEvent& event)
 		break;
 	case ID_VIEWBOTTOM:
 		m_canvas->rotmat = AffineTransformMatrix::Identity();
-		m_canvas->rotmat *= AffineTransformMatrix::RotateXYZ(0, M_PI, 0);
+		m_canvas->rotmat *= AffineTransformMatrix::RotationXYZ(0, M_PI, 0);
 		m_statusBar->SetStatusText(_T("ID_VIEWBOTTOM"), 1);
 		break;
 	}

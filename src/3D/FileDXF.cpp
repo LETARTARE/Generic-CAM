@@ -26,11 +26,16 @@
 
 #include "FileDXF.h"
 
-#include <wx/file.h>
-#include <wx/textfile.h>
-#include <wx/log.h>
-
+#include <stddef.h>
 #include <string.h>
+#include <wx/chartype.h>
+//#include <wx/file.h>
+#include <wx/log.h>
+#include <wx/textbuf.h>
+#include <wx/textfile.h>
+
+#include "AffineTransformMatrix.h"
+#include "Geometry.h"
 
 FileDXF::FileDXF()
 {
@@ -117,7 +122,7 @@ void FileDXF::ProcessCode(long codeNr, wxString code)
 		// Generate Objects and such
 
 		if(objectType.Cmp(_T("BLOCK")) == 0){
-			v.Empty();
+			v.clear();
 			Geometry* g = new Geometry();
 			g->matrix.TranslateGlobal(x, y, z);
 			g->name = blockName;
@@ -127,7 +132,7 @@ void FileDXF::ProcessCode(long codeNr, wxString code)
 		if(objectType.Cmp(_T("VERTEX")) == 0){
 			if(objectFlag == 192){
 				Vector3 vector(x, y, z);
-				v.Add(vector);
+				v.push_back(vector);
 			}
 			if(objectFlag == 128){
 				if(lastGeometry >= 0){

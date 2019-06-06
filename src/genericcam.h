@@ -28,21 +28,19 @@
 #define GENERICCAM_H_
 
 #include "StdInclude.h"
-#include "Config.h"
 
 #include "gui/FrameMain.h"
 
 #include <wx/cmdline.h>
 #include <wx/string.h>
+#include <wx/app.h>
 #include <wx/intl.h>
 #include <wx/config.h>
 
 class GenericCAMApp:public wxApp {
-	// Constructor
 public:
 	GenericCAMApp(void);
 	virtual ~GenericCAMApp(void);
-
 	// Member variables
 public:
 //	FrameMain* frame;

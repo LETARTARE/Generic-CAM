@@ -47,23 +47,26 @@
  *
  * The main loop can be stopped by calling .Stop() inside the loop.
  *
- * \code{.cpp}
- NelderMeadOptimizer optim;
-
- // Insert the startup parameter-set
- optim.param.push_back(0.123);
-
- optim.Start();
- while(optim.IsRunning()){
-
-   double x = optim.param[0];
-   double f = x * x;
-
-   optim.SetError(f);
- }
-
- printf("Optimum: x = %g\n", optim.param[0]);
- \endcode
+ * ~~~~~~~~~~~~~~~{.cpp}
+ * NelderMeadOptimizer optim;
+ *
+ * // Insert the startup parameter-set
+ * optim.param.push_back(0.123);
+ *
+ * optim.Start();
+ * while(optim.IsRunning()){
+ *
+ *    double x = optim.param[0];
+ *    double f = x * x;
+ *
+ *    optim.SetError(f);
+ * }
+ *
+ * printf("Optimum: x = %g\n", optim.param[0]);
+ * ~~~~~~~~~~~~~~~
+ *
+ * The main loop hidden in IsRunning and SetError is a really complicated state machine. This Orchestrates all
+ * needed evaluations to form the simplex and move the simplex around the search-space.
  */
 
 #include <cstddef>

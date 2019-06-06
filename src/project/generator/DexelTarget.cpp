@@ -183,7 +183,8 @@ void DexelTarget::DocumentField(int x, int y, double height)
 			else
 				tp += _T("_ ");
 		}
-		wxLogMessage(tp);
+		wxLogMessage
+		(tp);
 	}
 }
 
@@ -201,7 +202,8 @@ void DexelTarget::DocumentField(int x, int y)
 				else
 					tp += _T("0 ");
 		}
-		wxLogMessage(tp);
+		wxLogMessage
+		(tp);
 	}
 }
 
@@ -541,7 +543,8 @@ const Polygon25 DexelTarget::GeneratePolygon(int stx, int sty)
 		dir = NextDir(x, y, dir);
 
 		if(dir == -1){
-			wxLogError(_T("DexelTarget::GeneratePolygon: Lost wall contact!"));
+			wxLogError
+			(_T("DexelTarget::GeneratePolygon: Lost wall contact!"));
 			return temp;
 		}
 
@@ -626,7 +629,8 @@ const Polygon25 DexelTarget::GeneratePolygon(int stx, int sty, double height)
 		dir = NextDir(x, y, height, dir);
 
 		if(dir == -1){
-			wxLogError(_T("DexelTarget::GeneratePolygon: Lost wall contact!"));
+			wxLogError
+			(_T("DexelTarget::GeneratePolygon: Lost wall contact!"));
 			DocumentField(x, y, height);
 			this->field[x + y * nx].up = -0.0001;
 			return temp;
@@ -989,7 +993,8 @@ bool DexelTarget::FindStartCutting(int &x, int &y)
 	int hx, hy;
 
 	if(!HasToBeCutBDAU(x, y)){
-		wxLogMessage(_T(
+		wxLogMessage
+		(_T(
 		"FindStartCutting::Test started in a place that is not to be cut!"));
 		return false;
 	}
@@ -1001,14 +1006,16 @@ bool DexelTarget::FindStartCutting(int &x, int &y)
 
 		if(dir == -1) // Wall contact lost
 				{
-			wxLogMessage(_T("FindStartCutting::Wall contact lost!"));
+			wxLogMessage
+			(_T("FindStartCutting::Wall contact lost!"));
 			return false;
 		}
 
 		N--;
 		if(N == 0) // Wall contact lost
 				{
-			wxLogMessage(_T("FindStartCutting:: Timeout!"));
+			wxLogMessage
+			(_T("FindStartCutting:: Timeout!"));
 			return false;
 		}
 
@@ -1051,7 +1058,8 @@ Polygon25 DexelTarget::FindCut(int &x, int &y)
 	temp.InsertPoint((double) x * rx + rx2, (double) y * ry + ry2, 0.002);
 
 	if(!HasToBeCutBDAU(x, y)){
-		wxLogMessage(_T("FindCut::Test started in a place not to be cut!"));
+		wxLogMessage
+		(_T("FindCut::Test started in a place not to be cut!"));
 		return temp;
 	}
 
@@ -1061,18 +1069,20 @@ Polygon25 DexelTarget::FindCut(int &x, int &y)
 
 		if(dir == -1) // Wall contact lost
 				{
-			wxLogMessage(_T("FindCut::Wall contact lost!"));
+			wxLogMessage
+			(_T("FindCut::Wall contact lost!"));
 			return temp;
 		}
 
 		N--;
 		if(N == 0) // Wall contact lost
 				{
-			wxLogMessage(_T("FindCut:: Timeout!"));
+			wxLogMessage
+			(_T("FindCut:: Timeout!"));
 
 			size_t i;
 			for(i = 0; i < 5; i++){
-				temp2.elements.Add(temp.elements[i]);
+				temp2 += temp[i];
 			}
 			return temp2;
 		}
@@ -1105,23 +1115,23 @@ Polygon25 DexelTarget::FindCut(int &x, int &y)
 void DexelTarget::PolygonCutInTarget(Polygon3 &polygon, DexelTarget &tool)
 {
 	if(polygon.GetCount() == 0) return;
-	int px = floor(polygon.elements[0].x / rx);
-	int py = floor(polygon.elements[0].y / ry);
-	double pz = polygon.elements[0].z;
+	int px = floor(polygon[0].x / rx);
+	int py = floor(polygon[0].y / ry);
+	double pz = polygon[0].z;
 	this->ShiftDown(px, py, pz, tool);
-	if(polygon.GetCount() == 1) return;
-	for(size_t i = 1; i < polygon.elements.GetCount(); i++){
-		const double dx = polygon.elements[i].x - polygon.elements[i - 1].x;
-		const double dy = polygon.elements[i].y - polygon.elements[i - 1].y;
-		const double dz = polygon.elements[i].z - polygon.elements[i - 1].z;
-		const int nx = abs(floor(polygon.elements[i].x / rx) - px);
-		const int ny = abs(floor(polygon.elements[i].y / ry) - py);
+	if(polygon.Size() == 1) return;
+	for(size_t i = 1; i < polygon.Size(); ++i){
+		const double dx = polygon[i].x - polygon[i - 1].x;
+		const double dy = polygon[i].y - polygon[i - 1].y;
+		const double dz = polygon[i].z - polygon[i - 1].z;
+		const int nx = abs(floor(polygon[i].x / rx) - px);
+		const int ny = abs(floor(polygon[i].y / ry) - py);
 		if(nx > ny){
 			const double rz = dz / (double) nx;
 			const int cx = dx >= 0? 1 : -1;
 			const int cy = dy >= 0? 1 : -1;
 			int b = 0;
-			for(size_t n = 0; n < nx; n++){
+			for(size_t n = 0; n < nx; ++n){
 				px += cx;
 				b += ny;
 				if(b > nx){
@@ -1137,7 +1147,7 @@ void DexelTarget::PolygonCutInTarget(Polygon3 &polygon, DexelTarget &tool)
 			const int cx = dx >= 0? 1 : -1;
 			const int cy = dy >= 0? 1 : -1;
 			int b = 0;
-			for(size_t n = 0; n < ny; n++){
+			for(size_t n = 0; n < ny; ++n){
 				py += cy;
 				b += nx;
 				if(b > ny){
@@ -1148,28 +1158,26 @@ void DexelTarget::PolygonCutInTarget(Polygon3 &polygon, DexelTarget &tool)
 				this->ShiftDown(px, py, pz, tool);
 			}
 		}
-		px = floor(polygon.elements[i].x / rx);
-		py = floor(polygon.elements[i].y / ry);
-		pz = polygon.elements[i].z;
+		px = floor(polygon[i].x / rx);
+		py = floor(polygon[i].y / ry);
+		pz = polygon[i].z;
 	}
 }
 
 void DexelTarget::PolygonPunchThroughTarget(Polygon3& polygon, double level,
 		DexelTarget& tool)
 {
-	for(size_t i = 0; i < polygon.elements.GetCount(); i++){
-		this->TouchErase(round(polygon.elements[i].x / rx - 0.5),
-				round(polygon.elements[i].y / ry - 0.5), polygon.elements[i].z,
-				level, tool);
+	for(size_t i = 0; i < polygon.Size(); i++){
+		this->TouchErase(round(polygon[i].x / rx - 0.5),
+				round(polygon[i].y / ry - 0.5), polygon[i].z, level, tool);
 	}
 }
 
 void DexelTarget::PolygonDropOntoTarget(Polygon3 &polygon, double level)
 {
-	for(size_t i = 0; i < polygon.elements.GetCount(); i++){
-		const double d = this->GetLevel(polygon.elements[i].x,
-				polygon.elements[i].y);
-		polygon.elements[i].z = fmax(level, d);
+	for(size_t i = 0; i < polygon.Size(); i++){
+		const double d = this->GetLevel(polygon[i].x, polygon[i].y);
+		polygon[i].z = fmax(level, d);
 	}
 }
 
@@ -1201,10 +1209,10 @@ void DexelTarget::FillOutsidePolygon(Polygon3 &polygon)
 	}
 
 	int px, py;
-	for(i = 0; i < polygon.elements.GetCount(); i++){
+	for(i = 0; i < polygon.Size(); ++i){
 		//TODO: Change this to a Bresenham algorithm.
-		px = round(polygon.elements[i].x / this->rx);
-		py = round(polygon.elements[i].y / this->ry);
+		px = round(polygon[i].x / this->rx);
+		py = round(polygon[i].y / this->ry);
 		if(py >= 0 && py < this->ny){
 			if(px < this->nx && px > right[py]) right[py] = px;
 			if(px < left[py] && px >= 0) left[py] = px;
@@ -1242,7 +1250,7 @@ void DexelTarget::AddSupport(Polygon3 &polygon, double distance, double height,
 		double width, double slotWidth)
 {
 
-	if(polygon.elements.GetCount() < 2) return;
+	if(polygon.Size() < 2) return;
 
 	double dc = -distance / 2;
 	size_t i;
@@ -1250,16 +1258,15 @@ void DexelTarget::AddSupport(Polygon3 &polygon, double distance, double height,
 	Vector3 a, b, c, d;
 
 	// Limit polygon range
-	for(i = 0; i < polygon.elements.GetCount(); i++){
-		if(polygon.elements[i].z >= sz - (height / 2)) polygon.elements[i].z =
-				sz - (height / 2) - 0.0001;
-		if(polygon.elements[i].z <= (height / 2)) polygon.elements[i].z =
-				(height / 2) + 0.0001;
+	for(i = 0; i < polygon.Size(); ++i){
+		if(polygon[i].z >= sz - (height / 2)) polygon[i].z = sz - (height / 2)
+				- 0.0001;
+		if(polygon[i].z <= (height / 2)) polygon[i].z = (height / 2) + 0.0001;
 	}
 
-	o = polygon.elements[0];
-	for(i = 1; i < polygon.elements.GetCount(); i++){
-		p = polygon.elements[i];
+	o = polygon[0];
+	for(i = 1; i < polygon.Size(); i++){
+		p = polygon[i];
 		h = o - p;
 		o = p;
 		h.z = 0.0;
@@ -1489,10 +1496,11 @@ double DexelTarget::FindCircle(double x, double y, double radius)
 	return (double) c / (double) C;
 }
 
-ArrayOfPolygon25 DexelTarget::GeneratePolygonAtDistance(double level)
+std::vector <Vector3> DexelTarget::GeneratePolygonAtDistance(double level)
 {
-	ArrayOfPolygon25 ap;
-
+	std::vector <Vector3> ap;
+	throw(std::logic_error(
+			"DexelTarget::GeneratePolygonAtDistance: Missing code."));
 	return ap;
 }
 

@@ -34,6 +34,7 @@
  * Latency compensation is not used.
  */
 
+#include "../Config.h"
 #if !(defined(linux) || defined(__linux))
 #undef _USE_MIDI
 #endif

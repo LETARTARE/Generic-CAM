@@ -26,67 +26,26 @@
 
 #ifndef HULL_H_
 #define HULL_H_
-
-#include "Vector3.h"
-#include "Triangle.h"
-#include "AffineTransformMatrix.h"
-#include "Geometry.h"
-#include <wx/string.h>
-#include <wx/dynarray.h>
-
-/*!\class HullEdge
- * \ingroup 3DObject
- * \brief Closed Hull
- *
- * Calculates a closed Hull from a TriangleSoup.
- */
-
-class HullEdge {
-	// Constructor/ Destructor
-public:
-	HullEdge();
-	virtual ~HullEdge();
-
-	// Member variables
-public:
-	size_t va, vb;
-	size_t ta, tb;
-
-	Vector3 n;
-
-	// Methods
-public:
-};
-WX_DECLARE_OBJARRAY(HullEdge, ArrayOfHullEdge);
-
-/*!\class HullTriangle
- * \brief ...
- *
- * ...
- */
-
-class HullTriangle {
-	// Constructor/ Destructor
-public:
-	HullTriangle();
-	virtual ~HullTriangle();
-
-	// Member variables
-public:
-	size_t va, vb, vc;
-	size_t ea, eb, ec;
-	Vector3 n;
-
-	// Methods
-public:
-};
-WX_DECLARE_OBJARRAY(HullTriangle, ArrayOfHullTriangle);
-
 /*!\class Hull
- * \brief ...
+ * \brief A (possibly closed) hull made from trinagles
  *
- * ...
+ * This class stores and operates on a hull made from a triangle soup.
+ * Triangles are connected with each other to form a hull. This hull can
+ * be intersected by a plane to return closed polygons.
  */
+
+#include <stddef.h>
+#include <stdint.h>
+#include <set>
+#include <string>
+#include <vector>
+
+#include "AffineTransformMatrix.h"
+#include "BoundingBox.h"
+#include "Vector3.h"
+
+class Geometry;
+class Polygon3;
 
 class Hull {
 	// Constructor/ Destructor
@@ -94,32 +53,67 @@ public:
 	Hull();
 	virtual ~Hull();
 
+	class Edge {
+	public:
+		Edge();
+		size_t va, vb;
+		size_t ta, tb;
+		uint_least8_t trianglecount;
+		Vector3 n;
+		size_t OtherTriangle(size_t n);
+	};
+	class Triangle {
+	public:
+		Triangle();
+		size_t va, vb, vc;
+		size_t ea, eb, ec;
+		Vector3 n;
+		int Direction(size_t i1, size_t i2); //!< Test the direction of rotation of two indices respective to a triangle.
+	};
+
 	// Member variables
 public:
-	wxString objectName;
-	Vector3 color;
-	bool visible;
+	bool smooth;
 	bool paintEdges;
 	bool paintTriangles;
 	bool paintVertices;
+	bool paintNormals;
+	bool paintSelected;
 
 	AffineTransformMatrix matrix; //!< Transformation of the data.
 
 private:
-	ArrayOfVector3 v;
-	ArrayOfHullEdge e;
-	ArrayOfHullTriangle t;
+	std::set <size_t> selected; // Selected Vertices
+	std::vector <Vector3> v; // Vertices
+	std::vector <Vector3> vn; // Normal for vertices
+	std::vector <Hull::Edge> e; // Edges
+	std::vector <Hull::Triangle> t; // Triangles
 
 	// Methods
 public:
-	void Paint(void) const;
-
 	void Clear(void);
-	void CopyFrom(const Geometry &geometry);
-	void CopyTrianglesFrom(const Geometry &geometry);
+	void SetEpsilon(double newEpsilon);
+	void Paint(void) const;
+	bool IsClosed(void) const; //!< Test, if the hull is perfectly closed.
+
+	void CalcNormals(void);
+	void FlipNormals(void);
+
+	size_t SelectAll(void);
+	size_t UnselectAll(void);
+	size_t SelectByPlane(Vector3 n, double d);
+	size_t UnselectByPlane(Vector3 n, double d);
+	size_t SelectByNormal(Vector3 n, double limit = 0.0);
+	size_t UnselectByNormal(Vector3 n, double limit = 0.0);
+	size_t CountSelected(void) const;
 
 	void ApplyTransformation(const AffineTransformMatrix &matrix);
 	void ApplyTransformation(void);
+
+	void CopyFrom(const Geometry &geometry);
+	void CopyTrianglesFrom(const Geometry &geometry);
+
+	bool LoadObj(std::string filename); //!< Load Wavefront OBJ file.
 
 	size_t AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c);
 	size_t AddTriangleTransform(const Vector3 &a, const Vector3 &b,
@@ -135,22 +129,28 @@ public:
 	void AddQuadTransform(const Vector3 &a, const Vector3 &b, const Vector3 &c,
 			const Vector3 &d, const AffineTransformMatrix &transformMatrix);
 
-	void CalcNormals(void);
+	Polygon3 IntersectPlane(Vector3 n, double d);
+	Vector3 GetCenter(void) const;
 
 	size_t GetVertexCount(void) const
 	{
-		return v.GetCount();
+		return v.size();
 	}
-
 	Vector3 GetVertex(const size_t i) const
 	{
 		return v[i];
 	}
 
 private:
-	double DiffSquareAndAdd(const Vector3 &a, const Vector3 &b);
+	double epsilon;
+	double epsilon2;
+	std::set <size_t> openedges;
+	std::set <size_t> openvertices;
 
+	size_t FindVertex(const Vector3& x);
+	size_t FindEdge(const size_t indexa, const size_t indexb);
+	Vector3 PlaneProjection(const Vector3 &a, const Vector3 &b, Vector3 n,
+			double d) const;
 };
-WX_DECLARE_OBJARRAY(Hull, ArrayOfHull);
 
 #endif /* HULL_H_ */

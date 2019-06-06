@@ -24,14 +24,16 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+
 #include "BoundingBox.h"
+
+#include "Geometry.h"
+#include "AffineTransformMatrix.h"
+#include "Triangle.h"
 
 #include <GL/gl.h>
 #include <float.h>
 #include <stdint.h>
-
-#include <wx/arrimpl.cpp>
-WX_DEFINE_OBJARRAY(ArrayOfBoundingBox)
 
 BoundingBox::BoundingBox()
 {

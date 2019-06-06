@@ -102,7 +102,7 @@ public:
 	void GenerateDistanceMap(double minLevel, double maxLevel);
 	double FindPeak(int &x, int &y);
 	double FindCircle(double x, double y, double radius);
-	ArrayOfPolygon25 GeneratePolygonAtDistance(double level);
+	std::vector<Vector3> GeneratePolygonAtDistance(double level);
 
 	// Polygon3 Methods
 	void PolygonCutInTarget(Polygon3 &polygon, DexelTarget &tool);

@@ -28,8 +28,8 @@
 #define OPENGLCANVAS_H_
 
 /*!\class OpenGLCanvas
- * \ingroup View3D
  * \brief Extended wxGLCanvas
+ * \ingroup View3D
  *
  * Provides features like:
  *  * Mouse movement
@@ -47,6 +47,8 @@
 #include "OpenGLPick.h"
 #endif
 #include "AffineTransformMatrix.h"
+#include "OpenGLLight.h"
+//#include "OpenGLShader.h"
 #include <wx/glcanvas.h>
 #include <GL/gl.h>
 
@@ -94,6 +96,8 @@ public:
 	AffineTransformMatrix transmat;
 	float scale;
 
+	OpenGLLight Light0;
+
 protected:
 	int x; //!< Startpoint for mouse dragging
 	int y; //!< Startpoint for mouse dragging
@@ -103,6 +107,10 @@ protected:
 	float turntableY;
 	float unitAtOrigin;
 	GLuint m_gllist;
+
+//	OpenGLShader shadows;
+//	GLuint depthBuffer;
+//	GLuint depthMap;
 
 private:
 	Context *context;
@@ -123,6 +131,7 @@ public:
 #endif
 
 protected:
+	virtual void Init(void);
 	virtual void Render(void);
 	virtual void RenderPick(void);
 

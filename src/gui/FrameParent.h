@@ -24,14 +24,16 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef SRC_GUI_FRAMEPARENT_H_
-#define SRC_GUI_FRAMEPARENT_H_
+#ifndef _FRAMEPARENT_H_
+#define _FRAMEPARENT_H_
 
 /*!\class FrameParent
  * \brief Parentframe for the application
  *
  * Parent frame for the SDI application.
  */
+
+#include "../Config.h"
 
 #include <wx/config.h>
 #include <wx/docview.h>
@@ -40,13 +42,16 @@
 #include <wx/string.h>
 #include <wx/timer.h>
 
+#ifdef _USE_6DOFCONTROLLER
 #include "../controller/Control3D.h"
+#endif
+#ifdef _USE_MIDI
 #include "../controller/MidiPort.h"
-#include "DisplaySettings.h"
-
-#include "../controller/DialogSetup6DOFController.h"
 #include "DialogSetupMidi.h"
+#endif
+#include "SettingsStereo3D.h"
 #include "DialogSetupStereo3D.h"
+#include "CollectionUnits.h"
 #include "DialogSetupUnits.h"
 
 class FrameParent:public wxDocParentFrame {
@@ -57,9 +62,14 @@ public:
 
 public:
 	void OnChangeLanguage(wxCommandEvent& event);
-	void OnSetupController(wxCommandEvent& event);
 	void OnSetupStereo3D(wxCommandEvent& event);
+
+#ifdef _USE_6DOFCONTROLLER
+	void OnSetupController(wxCommandEvent& event);
+#endif
+#ifdef _USE_MIDI
 	void OnSetupMidi(wxCommandEvent& event);
+#endif
 	void OnSetupUnits(wxCommandEvent& event);
 
 	void OnRefreshAll(wxCommandEvent& event);
@@ -77,11 +87,16 @@ public:
 
 	wxHelpController* m_helpController;
 	DialogSetupStereo3D * dialogSetupStereo3D;
-	DialogSetupMidi * dialogSetupMidi;
-	DisplaySettings settings;
+	SettingsStereo3D settingsStereo3D;
+	CollectionUnits units;
 
+#ifdef _USE_6DOFCONTROLLER
 	Control3D control;
+#endif
+#ifdef _USE_MIDI
+	DialogSetupMidi* dialogSetupMidi;
 	MidiPort midi;
+#endif
 
 	wxTimer timer; ///> Animation timer
 	float t;
@@ -90,4 +105,4 @@ public:
 wxDECLARE_EVENT_TABLE();
 };
 
-#endif /* SRC_GUI_FRAMEPARENT_H_ */
+#endif /* _FRAMEPARENT_H_ */

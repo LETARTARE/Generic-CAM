@@ -32,20 +32,17 @@
 #include "FrameMain.h"
 #include "FrameParent.h"
 
-DialogMachineControl::DialogMachineControl(wxWindow* parent, MidiPort &midi) :
+DialogMachineControl::DialogMachineControl(wxWindow* parent) :
 		GUIMachineControl(parent)
 {
 	m_menuPreferences->Append(ID_SETUPMIDI, _("Setup &MIDI"));
 	m_menuPreferences->Append(ID_SETUPUNITS,
 	_("Setup &Units") + wxT("\tCtrl+U"));
 
-	this->midi = &midi;
+	this->midi = NULL;
 	X = Y = Z = 0.0;
 	A = B = C = 0.0;
 	U = V = W = 0.0;
-
-	for(uint8_t n = 0; n < 10; n++)
-		this->midi->cc[n] = 64;
 
 	groupXYZLimit = 1.0;
 	groupABCLimit = M_PI;
@@ -68,6 +65,13 @@ DialogMachineControl::~DialogMachineControl()
 	this->Disconnect(wxEVT_TIMER,
 			wxTimerEventHandler(DialogMachineControl::OnTimer),
 			NULL, this);
+}
+
+void DialogMachineControl::SetMidiPort(MidiPort& midi)
+{
+	this->midi = &midi;
+	for(uint8_t n = 0; n < 10; n++)
+		this->midi->cc[n] = 64;
 }
 
 void DialogMachineControl::OnXClose(wxCloseEvent& event)
@@ -175,7 +179,7 @@ bool DialogMachineControl::TransferDataToWindowTextbox(void)
 			DialogMachineDebugger);
 	FrameParent * frame =
 	wxStaticCast(framemd->GetParent(), FrameMain)->GetParentFrame();
-	DisplaySettings * settings = &(frame->settings);
+	CollectionUnits * settings = &(frame->units);
 
 	m_staticTextUnitX->SetLabel(settings->Distance.GetOtherName());
 	m_staticTextUnitY->SetLabel(settings->Distance.GetOtherName());
@@ -242,7 +246,7 @@ void DialogMachineControl::OnTextChanged(wxCommandEvent& event)
 			DialogMachineDebugger);
 	FrameParent * frame = wxStaticCast(framemd->GetParent()->GetParent(),
 			FrameParent);
-	DisplaySettings * settings = &(frame->settings);
+	CollectionUnits * settings = &(frame->units);
 	switch(event.GetId()){
 	case ID_TEXTX:
 		m_textCtrlX->GetValue().ToDouble(&X);
@@ -299,6 +303,7 @@ Project* DialogMachineControl::GetProject(void)
 
 void DialogMachineControl::OnTimer(wxTimerEvent& event)
 {
+	if(midi == NULL) return;
 	if(!IsShown()) return;
 	if(!midi->Poll()) return;
 

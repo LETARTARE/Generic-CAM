@@ -320,7 +320,7 @@ int LUACodeEvaluator::rotate_glue(lua_State * L)
 		const float x = luaL_checknumber(L, 1) / 180 * M_PI;
 		const float y = luaL_checknumber(L, 2) / 180 * M_PI;
 		const float z = luaL_checknumber(L, 3) / 180 * M_PI;
-		CC->matrix = CC->matrix * AffineTransformMatrix::RotateXYZ(x, y, z);
+		CC->matrix = CC->matrix * AffineTransformMatrix::RotationXYZ(x, y, z);
 		break;
 	}
 	case 6:
@@ -332,7 +332,7 @@ int LUACodeEvaluator::rotate_glue(lua_State * L)
 		const float ty = luaL_checknumber(L, 5);
 		const float tz = luaL_checknumber(L, 6);
 		CC->matrix.TranslateLocal(tx, ty, tz);
-		CC->matrix = CC->matrix * AffineTransformMatrix::RotateXYZ(x, y, z);
+		CC->matrix = CC->matrix * AffineTransformMatrix::RotationXYZ(x, y, z);
 		CC->matrix.TranslateLocal(-tx, -ty, -tz);
 		break;
 	}

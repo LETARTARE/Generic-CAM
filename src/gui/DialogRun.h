@@ -36,7 +36,7 @@
 #include "../StdInclude.h"
 #include "../project/Project.h"
 #include "../project/ToolBox.h"
-#include "DisplaySettings.h"
+#include "CollectionUnits.h"
 #include "gui.h"
 #include <wx/cmdproc.h>
 

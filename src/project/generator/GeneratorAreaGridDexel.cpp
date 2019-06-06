@@ -70,7 +70,7 @@ wxString GeneratorAreaGridDexel::GetName(void) const
 }
 
 void GeneratorAreaGridDexel::AddToPanel(wxPanel* panel,
-		DisplaySettings* settings)
+		CollectionUnits* settings)
 {
 	Generator::AddToPanel(panel, settings);
 

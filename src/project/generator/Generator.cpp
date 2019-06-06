@@ -69,7 +69,7 @@ wxString Generator::GetName(void) const
 	return _T("Base Class");
 }
 
-void Generator::AddToPanel(wxPanel* panel, DisplaySettings* settings)
+void Generator::AddToPanel(wxPanel* panel, CollectionUnits* settings)
 {
 	this->settings = settings;
 }

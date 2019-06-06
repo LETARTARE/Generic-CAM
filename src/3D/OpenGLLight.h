@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : FileDXF.h
-// Purpose            : Reads a DXF File.
+// Name               : OpenGLLight.h
+// Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 07.08.2010
-// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 26.03.2019
+// Copyright          : (C) 2019 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,52 +24,38 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef FILEDXF_H_
-#define FILEDXF_H_
+#ifndef SRC_3D_OPENGLLIGHT_H_
+#define SRC_3D_OPENGLLIGHT_H_
 
-/*!\class FileDXF
- * \ingroup File3D
- * \brief DXF file
+/*!\class OpenGLLight
+ * \brief ...
+ * \ingroup View3D
  *
- * Class for reading in DXF files
+ * ...
  */
 
-#include <wx/string.h>
-#include <vector>
-
-#include "GeometryFileAbstract.h"
 #include "Vector3.h"
+#include <GL/gl.h>
 
-class FileDXF:public GeometryFileAbstract {
-	// Constructor/ Destructor
+class OpenGLLight {
 public:
-	FileDXF();
-	virtual ~FileDXF();
+	OpenGLLight(GLenum lightsource);
+	void SetAmbient(GLfloat r, GLfloat g, GLfloat b);
+	void SetAmbient(Vector3 c);
+	void SetDiffuse(GLfloat r, GLfloat g, GLfloat b);
+	void SetDiffuse(Vector3 c);
+	void SetSpecular(GLfloat r, GLfloat g, GLfloat b);
+	void SetSpecular(Vector3 c);
+	void SetPosition(GLfloat x, GLfloat y, GLfloat z);
+	void SetPosition(Vector3 p);
+	void Enable(bool on = true);
+	void Update(bool preRender = false);
 
-	// Member variables
-public:
-
+	bool moveWithCamera;
 private:
-	enum StateType {
-		idle = 0, inSection, inBlock, inEntities
-	};
-	StateType state;
-
-	wxString blockName;
-	wxString objectName;
-	wxString objectType;
-	long objectFlag;
-	double x, y, z;
-	double sx, sy, sz;
-	long v0, v1, v2, v3;
-	long lastGeometry;
-	std::vector <Vector3> v;
-
-	//Methods:
-public:
-	bool ReadFile(wxString fileName);
-private:
-	void ProcessCode(long codeNr, wxString code);
+	GLenum lightsource;
+	GLfloat buffer[4];
+	Vector3 position;
 };
 
-#endif /* FILEDXF_H_ */
+#endif /* SRC_3D_OPENGLLIGHT_H_ */

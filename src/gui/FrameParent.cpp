@@ -32,14 +32,21 @@
 #include "../languages.h"
 #include "../project/ProjectView.h"
 #include "IDs.h"
+#ifdef _USE_6DOFCONTROLLER
+#include "../controller/DialogSetup6DOFController.h"
+#endif
 
 wxBEGIN_EVENT_TABLE(FrameParent, wxDocParentFrame)
 
 EVT_MENU(ID_SETUPLANGUAGE , FrameParent::OnChangeLanguage)
 EVT_MENU(ID_SETUPUNITS , FrameParent::OnSetupUnits)
 EVT_MENU(ID_SETUPSTEREO3D , FrameParent::OnSetupStereo3D)
-EVT_MENU(ID_SETUPMIDI , FrameParent::OnSetupMidi)
+#ifdef _USE_6DOFCONTROLLER
 EVT_MENU(ID_SETUPCONTROLLER , FrameParent::OnSetupController)
+#endif
+#ifdef _USE_MIDI
+EVT_MENU(ID_SETUPMIDI , FrameParent::OnSetupMidi)
+#endif
 EVT_MENU(wxID_ABOUT, FrameParent::OnAbout)
 EVT_MENU(wxID_HELP, FrameParent::OnHelp)
 
@@ -54,9 +61,11 @@ FrameParent::FrameParent(wxDocManager *manager, wxConfig* config,
 		wxDocParentFrame(manager, parent, id, title)
 {
 	this->config = config;
-	settings.GetConfigFrom(config);
+	settingsStereo3D.Load(config);
+	units.Load(config);
+#ifdef _USE_6DOFCONTROLLER
 	control.GetConfigFrom(config);
-
+#endif
 	wxMenu *m_menuFile = new wxMenu;
 	m_menuFile->Append(wxID_NEW);
 	m_menuFile->Append(wxID_OPEN);
@@ -67,10 +76,15 @@ FrameParent::FrameParent(wxDocManager *manager, wxConfig* config,
 
 	wxMenu *m_menuPreferences = new wxMenu;
 	m_menuPreferences->Append(ID_SETUPLANGUAGE, _T("Change Language"));
+#ifdef _USE_6DOFCONTROLLER
 	m_menuPreferences->Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
+#endif
 	m_menuPreferences->Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
+#ifdef _USE_MIDI
 	m_menuPreferences->Append(ID_SETUPMIDI, _("Setup &MIDI"));
-	m_menuPreferences->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+#endif
+	m_menuPreferences->Append(ID_SETUPUNITS,
+	_("Setup &Units") + wxT("\tCtrl+U"));
 
 	wxMenu *m_menuHelp = new wxMenu;
 	m_menuHelp->Append(wxID_HELP, _("&Help") + wxT("\tF1"));
@@ -85,14 +99,16 @@ FrameParent::FrameParent(wxDocManager *manager, wxConfig* config,
 
 	m_helpController = new wxHelpController();
 
-	dialogSetupStereo3D = new DialogSetupStereo3D(this, settings);
-	dialogSetupMidi = new DialogSetupMidi(this, midi);
-
+	dialogSetupStereo3D = new DialogSetupStereo3D(this, &settingsStereo3D,
+			&units);
+#ifdef _USE_MIDI
+	dialogSetupMidi = new DialogSetupMidi(this, &midi);
+#endif
 	//TODO Logging is disable here, because the SESSION_MANAGER variable is not defined since Ubuntu 16.04.
 	// The initialisation of the help controller will always lead to the message:
 	// 	Debug: Failed to connect to session manager: SESSION_MANAGER environment variable not defined
 	wxLog::EnableLogging(false);
-	m_helpController->Initialize(_T("doc/help/genericcam.hhp"));
+	m_helpController->Initialize(_T("doc/help/help.hhp"));
 	wxLog::EnableLogging(true);
 
 	timer.SetOwner(this);
@@ -109,18 +125,18 @@ FrameParent::~FrameParent()
 {
 	printf("FrameParent: Destructor called\n");
 
+#ifdef _USE_6DOFCONTROLLER
 	// Save the configuration of the 6DOF controller
 	control.WriteConfigTo(config);
-	settings.WriteConfigTo(config);
+#endif
+	settingsStereo3D.Save(config);
+	units.Save(config);
 
 	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(FrameParent::OnTimer),
 	NULL, this);
 
 	delete m_helpController;
 }
-
-//OnUpdate
-// dialogSetupStereo3D->TransferDataToWindow();
 
 void FrameParent::OnAbout(wxCommandEvent&)
 {
@@ -157,29 +173,29 @@ void FrameParent::OnChangeLanguage(wxCommandEvent& event)
 					_T("Language"), WXSIZEOF(langNames), langNames);
 	if(lng >= 0) config->Write(_T("Language"), langNames[lng]);
 }
-
+#ifdef _USE_6DOFCONTROLLER
 void FrameParent::OnSetupController(wxCommandEvent& event)
 {
 	DialogSetup6DOFController temp(this);
 	temp.InsertController(control);
 	temp.ShowModal();
 }
-
+#endif
 void FrameParent::OnSetupStereo3D(wxCommandEvent& event)
 {
 	dialogSetupStereo3D->Show(true);
 	dialogSetupStereo3D->Raise();
 }
-
+#ifdef _USE_MIDI
 void FrameParent::OnSetupMidi(wxCommandEvent& event)
 {
 	dialogSetupMidi->Show(true);
 	dialogSetupMidi->Raise();
 }
-
+#endif
 void FrameParent::OnSetupUnits(wxCommandEvent& event)
 {
-	DialogSetupUnits * temp = new DialogSetupUnits(this, &settings);
+	DialogSetupUnits * temp = new DialogSetupUnits(this, &units);
 	temp->Show();
 	temp->Raise();
 }

@@ -29,6 +29,7 @@
 #include "../project/command/CommandRunGeneratorAdd.h"
 #include "../project/command/CommandRunGeneratorDelete.h"
 #include "../project/command/CommandRunGeneratorUpdate.h"
+#include "CollectionUnits.h"
 #include "FrameMain.h"
 #include "FrameParent.h"
 #include "IDs.h"
@@ -37,7 +38,7 @@ DialogToolpathGenerator::DialogToolpathGenerator(wxWindow* parent) :
 		GUIToolpathGenerator(parent)
 {
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
-	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	CollectionUnits* settings = &(frame->GetParentFrame()->units);
 	loopGuard = false;
 
 	currentRun = -1;
@@ -68,7 +69,7 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 	if(loopGuard) return false;
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
-	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	CollectionUnits* settings = &(frame->GetParentFrame()->units);
 	int selectedRun = -1;
 	for(size_t i = 0; i < project->run.GetCount(); i++){
 		if(selectedRun == -1 && project->run[i].selected) selectedRun = i;
@@ -240,7 +241,7 @@ bool DialogToolpathGenerator::TransferDataToWindow(void)
 bool DialogToolpathGenerator::TransferDataFromWindow(void)
 {
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
-	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	CollectionUnits* settings = &(frame->GetParentFrame()->units);
 	const int pageNr = m_choicebookGenerator->GetSelection();
 	gc.generators[pageNr]->TransferDataFromPanel();
 	box.xmin = settings->Distance.SIFromString(m_textCtrlX1->GetValue());

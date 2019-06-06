@@ -145,7 +145,7 @@ bool Run::SaveToolpaths(wxFileName fileName, ToolPath::Dialect dialect)
 	// Move toolpath down by the touchoff height.
 	AffineTransformMatrix matrix;
 	matrix.TranslateGlobal(0, 0, -touchoffHeight);
-	bool flipZ = false;
+	const bool flipZ = true;
 	if(flipZ) matrix.ScaleGlobal(1, 1, -1);
 	generated.ApplyTransformation(matrix);
 

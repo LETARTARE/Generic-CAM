@@ -28,7 +28,7 @@
 #include "DialogSetupUnits.h"
 #include "IDs.h"
 
-DialogSetupUnits::DialogSetupUnits(wxWindow* parent, DisplaySettings * settings) :
+DialogSetupUnits::DialogSetupUnits(wxWindow* parent, CollectionUnits * settings) :
 		GUISetupUnits(parent)
 {
 	this->settings = settings;

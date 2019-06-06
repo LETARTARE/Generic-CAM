@@ -37,7 +37,6 @@
 
 #include "gui.h"
 
-#include "DisplaySettings.h"
 #include "DialogObjectTransformation.h"
 #include "DialogStockMaterial.h"
 #include "DialogWorkpiece.h"
@@ -49,6 +48,7 @@
 #include "DialogToolpathGenerator.h"
 
 #include "TreeSetup.h"
+#include "CollectionFilepaths.h"
 
 #include "../project/Project.h"
 #include "../project/ToolBox.h"
@@ -73,6 +73,7 @@ public:
 
 	// Member variables
 public:
+	CollectionFilepaths filepaths;
 
 protected:
 	TreeSetup* tree;

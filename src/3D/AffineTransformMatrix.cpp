@@ -26,19 +26,19 @@
 
 #include "AffineTransformMatrix.h"
 
+#include "Vector3.h"
+
 #include <wx/tokenzr.h>
+#include <wx/string.h>
+#include <wx/txtstrm.h>
 
 #include <math.h>
 #include <stdint.h>
 #include <assert.h>
 
-#include <wx/arrimpl.cpp>
-WX_DEFINE_OBJARRAY(ArrayOfAffineTransformMatrix);
-
 AffineTransformMatrix::AffineTransformMatrix()
 {
 	SetIdentity();
-	linkScaling = true;
 }
 
 /*!\brief Copies a matrix by inserting a given matrix into \a a.
@@ -402,6 +402,16 @@ Vector3 AffineTransformMatrix::Transform(Vector3 const& v) const
 	return temp;
 }
 
+//! Operator reference for Vector3 transformations.
+Vector3 AffineTransformMatrix::operator ()(const Vector3 &v) const
+{
+	Vector3 temp;
+		temp.x = a[0] * v.x + a[4] * v.y + a[8] * v.z + a[12];
+		temp.y = a[1] * v.x + a[5] * v.y + a[9] * v.z + a[13];
+		temp.z = a[2] * v.x + a[6] * v.y + a[10] * v.z + a[14];
+		return temp;
+}
+
 //! Apply the transformation matrix on a given vector without shifting the vector.
 Vector3 AffineTransformMatrix::TransformNoShift(Vector3 const& v) const
 {
@@ -500,7 +510,7 @@ void AffineTransformMatrix::ScaleLocal(const double& x, const double& y,
  * \param phi Angle of rotation.
  * \return Rotation matrix.
  */
-AffineTransformMatrix AffineTransformMatrix::RotateAroundVector(
+AffineTransformMatrix AffineTransformMatrix::RotationAroundVector(
 		Vector3 const& vector, double const& phi)
 {
 	const double c = cos(phi);
@@ -536,7 +546,7 @@ AffineTransformMatrix AffineTransformMatrix::RotateAroundVector(
  * \param scale Scaling of the movement.
  * \return Rotation matrix.
  */
-AffineTransformMatrix AffineTransformMatrix::RotateXY(int const& x,
+AffineTransformMatrix AffineTransformMatrix::RotationXY(int const& x,
 		int const& y, double const& scale)
 {
 
@@ -569,7 +579,7 @@ AffineTransformMatrix AffineTransformMatrix::RotateXY(int const& x,
 }
 
 //! Rotation by the Z,Y,X rule.
-AffineTransformMatrix AffineTransformMatrix::RotateXYZ(double const& x,
+AffineTransformMatrix AffineTransformMatrix::RotationXYZ(double const& x,
 		double const& y, double const& z)
 {
 	AffineTransformMatrix a;
@@ -612,13 +622,13 @@ AffineTransformMatrix AffineTransformMatrix::RotateXYZ(double const& x,
  *
  * This results in a rotation as expected from a 6 DOF controller.
  */
-AffineTransformMatrix AffineTransformMatrix::RotateInterwoven(double const& x,
+AffineTransformMatrix AffineTransformMatrix::RotationInterwoven(double const& x,
 		double const& y, double const& z)
 {
 	const double alpha = sqrt(x * x + y * y + z * z);
 	if(alpha == 0) return AffineTransformMatrix::Identity();
 	const Vector3 R(x / alpha, y / alpha, z / alpha);
-	return AffineTransformMatrix::RotateAroundVector(R, alpha);
+	return AffineTransformMatrix::RotationAroundVector(R, alpha);
 }
 
 /*!\brief Rotate around a virtual trackball.
@@ -630,7 +640,7 @@ AffineTransformMatrix AffineTransformMatrix::RotateInterwoven(double const& x,
  * @param r Radius of a sphere in screen units.
  * @return Rotational Matrix
  */
-AffineTransformMatrix AffineTransformMatrix::RotateTrackball(const double& x1,
+AffineTransformMatrix AffineTransformMatrix::RotationTrackball(const double& x1,
 		const double& y1, const double& x2, const double& y2, const double& r)
 {
 	Vector3 r1(x1, y1, 0);
@@ -651,13 +661,403 @@ AffineTransformMatrix AffineTransformMatrix::RotateTrackball(const double& x1,
 	}
 	const Vector3 A = r1 * r2;
 	const double alpha = asin(A.Abs());
-	return AffineTransformMatrix::RotateAroundVector(A, alpha);
+	return AffineTransformMatrix::RotationAroundVector(A, alpha);
 }
 
 double AffineTransformMatrix::Distance(const AffineTransformMatrix& other) const
 {
-	double temp = 0.0;
-	for(uint_fast8_t n = 0; n < 16; n++)
-		temp += (a[n] - other.a[n]) * (a[n] - other.a[n]);
-	return sqrt(temp);
+	const bool useNaiveDistance = true;
+
+	if(useNaiveDistance){
+		double temp = 0.0;
+		for(uint_fast8_t n = 0; n < 16; ++n)
+			temp += (a[n] - other.a[n]) * (a[n] - other.a[n]);
+		return sqrt(temp);
+	}
+
+
+	// If two matrices are identical, the matrix times the inverse of the other
+	// should be the identity matrix.
+
+	// A:=matrix([[a[0],a[4],a[8],a[12]],[a[1],a[5],a[9],a[13]],[a[2],a[6],a[10],a[14]],[0,0,0,1]])
+	// B:=matrix([[b[0],b[4],b[8],b[12]],[b[1],b[5],b[9],b[13]],[b[2],b[6],b[10],b[14]],[0,0,0,1]])
+	// I:=matrix([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
+	// R:=A*inverse(B)-I
+	// trace(R*transpose(R))
+
+	const double T2 = a[2];
+	const double T3 = a[1];
+	const double T4 = a[0];
+	const double T5 = other.a[4];
+	const double T6 = a[6];
+	const double T7 = a[5];
+	const double T8 = a[4];
+	const double T9 = other.a[0];
+	const double T10 = T2 * T2;
+	const double T11 = T3 * T3;
+	const double T12 = T4 * T4;
+	const double T13 = 2 * T2 * T6;
+	const double T14 = 2 * T3 * T7;
+	const double T15 = 2 * T4 * T8;
+	const double T16 = T13 + T14 + T15;
+	const double T17 = T6 * T6;
+	const double T18 = T7 * T7;
+	const double T19 = T8 * T8;
+	const double T20 = other.a[1];
+	const double T21 = a[10];
+	const double T22 = a[9];
+	const double T23 = a[8];
+	const double T24 = T9 * T9;
+	const double T25 = other.a[5];
+	const double T26 = 2 * T2 * T21;
+	const double T27 = 2 * T3 * T22;
+	const double T28 = 2 * T4 * T23;
+	const double T29 = T5 * T5;
+	const double T30 = 2 * T6 * T21;
+	const double T31 = 2 * T7 * T22;
+	const double T32 = 2 * T8 * T23;
+	const double T33 = other.a[9];
+	const double T34 = T10 + T11 + T12;
+	const double T35 = -T13 - T14 - T15;
+	const double T36 = T17 + T18 + T19;
+	const double T37 = other.a[8];
+	const double T38 = -T26 - T27 - T28;
+	const double T39 = T25 * T25;
+	const double T40 = T26 + T27 + T28;
+	const double T41 = T30 + T31 + T32;
+	const double T42 = -T30 - T31 - T32;
+	const double T43 = T20 * T20;
+	const double T44 = T21 * T21;
+	const double T45 = T22 * T22;
+	const double T46 = T23 * T23;
+	const double T47 = T44 + T45 + T46;
+	const double T48 = (-2 * T10) + (-2 * T11) + (-2 * T12);
+	const double T49 = (-2 * T17) + (-2 * T18) + (-2 * T19);
+	const double T50 = 2 * T10;
+	const double T51 = 2 * T11;
+	const double T52 = 2 * T12;
+	const double T53 = 2 * T17;
+	const double T54 = 2 * T18;
+	const double T55 = 2 * T19;
+	const double T56 = (T50 + T51 + T52) * T5 + T35 * T9;
+	const double T57 = T53 + T54 + T55;
+	const double T58 = other.a[2];
+	const double T59 = T38 * T9 * T5 + T41 * T24;
+	const double T60 = other.a[6];
+	const double T61 = T37 * T37;
+	const double T62 = (-2 * T44) + (-2 * T45) + (-2 * T46);
+	const double T63 = 2 * T44;
+	const double T64 = 2 * T45;
+	const double T65 = 2 * T46;
+	const double T66 = T63 + T64 + T65;
+	const double T67 = T56 * T25 + T35 * T20 * T5 + T57 * T9 * T20;
+	const double T68 = 4 * T2 * T6 + 4 * T3 * T7 + 4 * T4 * T8;
+	const double T69 = T38 * T20 * T5;
+	const double T70 = T42 * T9 * T20;
+	const double T71 = other.a[10];
+	const double T72 = T48 * T5 + T16 * T9;
+	const double T73 = T33 * T33;
+	const double T74 = T50 + T51 + T52;
+	const double T75 = 4 * T2 * T21 + 4 * T3 * T22 + 4 * T4 * T23;
+	const double T76 = T38 * T58 * T5;
+	const double T77 = 4 * T6 * T21 + 4 * T7 * T22 + 4 * T8 * T23;
+	const double T78 = a[14];
+	const double T79 = a[13];
+	const double T80 = a[12];
+	const double T81 = 2 * T2 * T78;
+	const double T82 = 2 * T3 * T79;
+	const double T83 = 2 * T4 * T80;
+	const double T84 = 2 * T6 * T78;
+	const double T85 = 2 * T7 * T79;
+	const double T86 = 2 * T8 * T80;
+	const double T87 = T81 + T82 + T83;
+	const double T88 = -T81 - T82 - T83;
+	const double T89 = -T84 - T85 - T86;
+	const double T90 = T84 + T85 + T86;
+	const double T91 = (-2 * T21 * T78) + (-2 * T22 * T79) + (-2 * T23 * T80);
+	const double T92 = T88 * T20 * T5;
+	const double T93 = 2 * T21 * T78;
+	const double T94 = 2 * T22 * T79;
+	const double T95 = 2 * T23 * T80;
+	const double T96 = T93 + T94 + T95;
+	const double T97 = other.a[14];
+	const double T98 = T34 * T29 + T35 * T9 * T5 + T36 * T24;
+	const double T99 = T72 * T60 + T16 * T58 * T5 + T49 * T9 * T58;
+	const double T100 = T40 * T9 * T5 + T42 * T24;
+	const double T101 = T60 * T60;
+	const double T102 = T58 * T58;
+	const double T103 = other.a[13];
+	const double T104 = T72 * T25 + T16 * T20 * T5 + T49 * T9 * T20;
+	const double T105 = T71 * T71;
+	const double T106 = T56 * T60 + T35 * T58 * T5 + T57 * T9 * T58;
+	const double T107 = ((T74 * T25 + T35 * T20) * T60 + T35 * T58 * T25
+			+ T57 * T20 * T58) * T37;
+	const double T108 = T38 * T9 * T25;
+	const double T109 = T42 * T9 * T58;
+	const double T110 = T42 * T20 * T58 * T5;
+	const double T111 = T76 + T109;
+	const double T112 = other.a[12];
+	const double T113 = T87 * T9 * T5 + T89 * T24;
+	const double T114 = T88 * T9 * T5 + T90 * T24;
+	const double T115 = T88 * T9 * T25;
+	const double T116 = 4 * T2 * T78 + 4 * T3 * T79 + 4 * T4 * T80;
+	const double T117 = T89 * T9 * T20;
+	const double T118 = 4 * T6 * T78 + 4 * T7 * T79 + 4 * T8 * T80;
+	const double T119 = T89 * T20 * T58 * T5;
+	const double T120 = (T96 * T24 * T25 + T91 * T9 * T20 * T5) * T60;
+	const double T121 = T91 * T9 * T58 * T5 * T25;
+	const double T122 = T96 * T20 * T58 * T29;
+	const double T123 = T88 * T58 * T5;
+	const double T124 = T89 * T9 * T58;
+	const double T125 = 4 * T21 * T78 + 4 * T22 * T79 + 4 * T23 * T80;
+	const double T126 = T34 * T39 + T35 * T20 * T25 + T36 * T43;
+	const double T127 = (T48 * T25 + T16 * T20) * T60 + T16 * T58 * T25
+			+ T49 * T20 * T58;
+	const double T128 = T34 * T101 + T35 * T58 * T60 + T36 * T102;
+	const double T129 = T123 + T124;
+	const double T130 = (T91 * T9 * T20 * T25 + T96 * T43 * T5) * T60;
+	const double T131 = T96 * T9 * T58 * T39;
+	const double T132 = T91 * T20 * T58 * T5 * T25;
+	const double T133 = T96 * T9 * T20 * T101;
+	const double T134 = (T91 * T9 * T58 * T25 + T91 * T20 * T58 * T5) * T60;
+	const double T135 = T96 * T102 * T5 * T25;
+	const double T136 = T78 * T78;
+	const double T137 = T79 * T79;
+	const double T138 = T80 * T80;
+	const double T139 = T136 + T137 + T138 + 3;
+	const double T140 = T35 * T9;
+	const double T141 = T36 * T43;
+	const double T142 = T36 * T24;
+	const double T143 = (-2 * T136) + (-2 * T137) + (-2 * T138) - 6;
+	const double T144 = 2 * T136;
+	const double T145 = 2 * T137;
+	const double T146 = 2 * T138;
+	const double T147 = 2 * T4;
+	const double T148 = 2 * T3 * T9;
+	const double T149 = 2 * T8 * T9;
+	const double T150 = 2 * T7 * T24;
+	const double T151 = (T144 + T145 + T146 + 6) * T9 - T147;
+	const double T152 = -T149 + T13 + T14 + T15;
+	const double T153 = T49 * T20 * T58;
+	const double T154 = T151 * T20 - T148;
+	const double T155 = 2 * T8 * T43;
+	const double T156 = 2 * T7 * T9 * T20;
+	const double T157 = T16 * T9;
+	const double T158 = T143 * T9 + T147;
+	const double T159 = 2 * T2 * T9;
+	const double T160 = T144 + T145 + T146 + 6;
+	const double T161 = 2 * T3;
+	const double T162 = 2 * T2 * T20;
+	const double T163 = -2 * T6 * T9 * T20;
+	const double T164 = T49 * T9 * T58;
+	const double T165 = T42 * T43;
+	const double T166 = T42 * T24;
+	const double T167 = 2 * T23 * T9;
+	const double T168 = T41 * T20 * T58;
+	const double T169 = T41 * T9 * T58 * T5;
+	const double T170 = T139 * T24 + (-2 * T4 * T9) + T10 + T11 + T12;
+	const double T171 = T158 * T58 + T159;
+	const double T172 = T149 - T13 - T14 - T15;
+	const double T173 = 2 * T6 * T24;
+	const double T174 = T36 * T102;
+	const double T175 = T158 * T20 + T148;
+	const double T176 = T151 * T58 - T159;
+	const double T177 = ((T160 * T20 - T161) * T58 - T162) * T5;
+	const double T178 = -2 * T8 * T20;
+	const double T179 = -2 * T7 * T9;
+	const double T180 = 2 * T8 * T102;
+	const double T181 = 2 * T6 * T9 * T58;
+	const double T182 = T16 * T20;
+	const double T183 = T49 * T9 * T20;
+	const double T184 = T167 - T26 - T27 - T28;
+	const double T185 = 2 * T22 * T24;
+	const double T186 = -T167 + T26 + T27 + T28;
+	const double T187 = 2 * T21 * T24;
+	const double T188 = -2 * T23 * T20;
+	const double T189 = T40 * T9;
+	const double T190 = T41 * T9 * T20 * T5;
+	const double T191 = T139 * T43 + (-2 * T3 * T20) + T10 + T11 + T12;
+	const double T192 = (T143 * T20 + T161) * T58 + T162;
+	const double T193 = 2 * T7 * T20;
+	const double T194 = 2 * T6 * T43;
+	const double T195 = T139 * T102 + (-2 * T2 * T58) + T10 + T11 + T12;
+	const double T196 = 2 * T7 * T102;
+	const double T197 = 2 * T6 * T20 * T58;
+	const double T198 = T35 * T20;
+	const double T199 = 2 * T23 * T43;
+	const double T200 = 2 * T22 * T9 * T20;
+	const double T201 = -2 * T22 * T9;
+	const double T202 = -2 * T21 * T9 * T20;
+	const double T203 = 2 * T22 * T20;
+	const double T204 = 2 * T21 * T43;
+	const double T205 = T41 * T9 * T58;
+	const double T206 = 2 * T23 * T102;
+	const double T207 = 2 * T21 * T9 * T58;
+	const double T208 = T38 * T9;
+	const double T209 = 2 * T22 * T102;
+	const double T210 = 2 * T21 * T20 * T58;
+	const double T211 = T41 * T9 * T20;
+	const double T212 = T42 * T102;
+	const double T213 = T47 * T24;
+	const double T214 = T62 * T9 * T20 * T5 * T25;
+	const double T215 = T47 * T102;
+	const double T216 = T47 * T43;
+	const double T217 = (T98 * T73
+			+ (T104 * T37 + T100 * T25 + T38 * T20 * T29 + T190) * T33
+			+ T126 * T61
+			+ (T38 * T9 * T39 + (T40 * T20 * T5 + T211) * T25 + T42 * T43 * T5)
+					* T37 + T47 * T24 * T39 + T214 + T47 * T43 * T29) * T97
+			* T97
+			+ ((((T48 * T29 + T68 * T9 * T5 + T49 * T24) * T33 + T67 * T37
+					+ T59 * T25 + T40 * T20 * T29 + T42 * T9 * T20 * T5) * T71
+					+ (T106 * T37 + T59 * T60 + T40 * T58 * T29
+							+ T42 * T9 * T58 * T5) * T33 + T127 * T61
+					+ ((T75 * T9 * T25 + T69 + T70) * T60 + T111 * T25
+							+ T77 * T20 * T58 * T5) * T37
+					+ (T62 * T24 * T25 + T66 * T9 * T20 * T5) * T60
+					+ T66 * T9 * T58 * T5 * T25 + T62 * T20 * T58 * T29) * T103
+					+ ((T67 * T33
+							+ (T48 * T39 + T68 * T20 * T25 + T49 * T43) * T37
+							+ T40 * T9 * T39 + (T69 + T70) * T25
+							+ T41 * T43 * T5) * T71 + T99 * T73
+							+ (T107 + (T108 + T75 * T20 * T5 + T70) * T60
+									+ (T76 + T77 * T9 * T58) * T25 + T110) * T33
+							+ ((T38 * T20 * T25 + T41 * T43) * T60
+									+ T40 * T58 * T39 + T42 * T20 * T58 * T25)
+									* T37
+							+ (T66 * T9 * T20 * T25 + T62 * T43 * T5) * T60
+							+ T62 * T9 * T58 * T39 + T66 * T20 * T58 * T5 * T25)
+							* T112
+					+ ((T114 * T25 + T87 * T20 * T29 + T89 * T9 * T20 * T5)
+							* T33
+							+ (T87 * T9 * T39 + (T92 + T117) * T25
+									+ T90 * T43 * T5) * T37 + T91 * T24 * T39
+							+ T125 * T9 * T20 * T5 * T25 + T91 * T43 * T29)
+							* T71
+					+ (T113 * T60 + T88 * T58 * T29 + T90 * T9 * T58 * T5) * T73
+					+ (((T115 + T92 + T118 * T9 * T20) * T60
+							+ (T116 * T58 * T5 + T124) * T25 + T119) * T37
+							+ T120 + T121 + T122) * T33
+					+ ((T87 * T20 * T25 + T89 * T43) * T60 + T88 * T58 * T39
+							+ T90 * T20 * T58 * T25) * T61
+					+ (T130 + T131 + T132) * T37) * T97
+			+ (T98 * T105
+					+ (T99 * T37 + T100 * T60 + T38 * T58 * T29 + T169) * T71
+					+ T128 * T61
+					+ (T38 * T9 * T101 + (T40 * T58 * T5 + T205) * T60
+							+ T42 * T102 * T5) * T37 + T47 * T24 * T101
+					+ T62 * T9 * T58 * T5 * T60 + T47 * T102 * T29) * T103
+					* T103;
+	const double T218 = T217
+			+ ((T104 * T105
+					+ (T106 * T33 + T107 + (T108 + T69 + T77 * T9 * T20) * T60
+							+ (T75 * T58 * T5 + T109) * T25 + T110) * T71
+					+ ((T48 * T101 + T68 * T58 * T60 + T49 * T102) * T37
+							+ T40 * T9 * T101 + T111 * T60 + T41 * T102 * T5)
+							* T33
+					+ (T40 * T20 * T101
+							+ (T38 * T58 * T25 + T42 * T20 * T58) * T60
+							+ T41 * T102 * T25) * T37 + T62 * T9 * T20 * T101
+					+ (T66 * T9 * T58 * T25 + T66 * T20 * T58 * T5) * T60
+					+ T62 * T102 * T5 * T25) * T112
+					+ (T113 * T25 + T88 * T20 * T29 + T90 * T9 * T20 * T5)
+							* T105
+					+ ((T114 * T60 + T87 * T58 * T29 + T89 * T9 * T58 * T5)
+							* T33
+							+ ((T115 + T116 * T20 * T5 + T117) * T60
+									+ (T123 + T118 * T9 * T58) * T25 + T119)
+									* T37 + T120 + T121 + T122) * T71
+					+ ((T87 * T9 * T101 + T129 * T60 + T90 * T102 * T5) * T37
+							+ T91 * T24 * T101 + T125 * T9 * T58 * T5 * T60
+							+ T91 * T102 * T29) * T33
+					+ (T88 * T20 * T101
+							+ (T87 * T58 * T25 + T90 * T20 * T58) * T60
+							+ T89 * T102 * T25) * T61
+					+ (T133 + T134 + T135) * T37) * T103
+			+ (T126 * T105
+					+ (T127 * T33 + (T40 * T20 * T25 + T165) * T60
+							+ T38 * T58 * T39 + T41 * T20 * T58 * T25) * T71
+					+ T128 * T73
+					+ (T38 * T20 * T101 + (T40 * T58 * T25 + T168) * T60
+							+ T42 * T102 * T25) * T33 + T47 * T43 * T101
+					+ T62 * T20 * T58 * T25 * T60 + T47 * T102 * T39) * T112
+					* T112
+			+ ((T88 * T9 * T39 + (T87 * T20 * T5 + T90 * T9 * T20) * T25
+					+ T89 * T43 * T5) * T105
+					+ (((T116 * T9 * T25 + T92 + T117) * T60 + T129 * T25
+							+ T118 * T20 * T58 * T5) * T33
+							+ ((T88 * T20 * T25 + T90 * T43) * T60
+									+ T87 * T58 * T39 + T89 * T20 * T58 * T25)
+									* T37 + T130 + T131 + T132) * T71
+					+ (T88 * T9 * T101 + (T87 * T58 * T5 + T90 * T9 * T58) * T60
+							+ T89 * T102 * T5) * T73
+					+ ((T87 * T20 * T101
+							+ (T88 * T58 * T25 + T89 * T20 * T58) * T60
+							+ T90 * T102 * T25) * T37 + T133 + T134 + T135)
+							* T33
+					+ (T91 * T43 * T101 + T125 * T20 * T58 * T25 * T60
+							+ T91 * T102 * T39) * T37) * T112;
+	const double T219 = T218
+			+ (T170 * T39 + (T175 * T5 + T172 * T20 - T150) * T25 + T191 * T29
+					+ (-T155 + T156 + T140) * T5 + T141 + T142) * T105
+			+ ((((T143 * T24 + 4 * T4 * T9 - T50 - T51 - T52) * T25 + T154 * T5
+					+ T152 * T20 + T150) * T60
+					+ (T176 * T5 + T152 * T58 + T173) * T25 + T192 * T29
+					+ ((4 * T8 * T20 + T179) * T58 + T163) * T5 + T153) * T33
+					+ ((T154 * T25
+							+ (T143 * T43 + 4 * T3 * T20 - T50 - T51 - T52) * T5
+							+ T155 - T156 + T157) * T60 + T171 * T39
+							+ (T177 + (T178 + 4 * T7 * T9) * T58 + T163) * T25
+							+ ((-T193 + T13 + T14 + T15) * T58 + T194) * T5
+							+ T164) * T37
+					+ ((T186 * T20 + T185) * T25 + (T199 - T200 + T189) * T5
+							+ T165 + T166) * T60 + (T184 * T58 - T187) * T39
+					+ (((T188 + T201) * T58 + 4 * T21 * T9 * T20) * T5 + T168)
+							* T25
+					+ ((T203 - T26 - T27 - T28) * T58 - T204) * T29 + T169)
+					* T71
+			+ (T170 * T101 + (T171 * T5 + T172 * T58 - T173) * T60 + T195 * T29
+					+ (-T180 + T181 + T140) * T5 + T174 + T142) * T73
+			+ ((T175 * T101
+					+ (T176 * T25 + T177 + (T178 + T179) * T58
+							+ 4 * T6 * T9 * T20) * T60
+					+ ((T143 * T102 + 4 * T2 * T58 - T50 - T51 - T52) * T5
+							+ T180 - T181 + T157) * T25
+					+ (T196 - T197 + T182) * T5 + T183) * T37
+					+ (T184 * T20 - T185) * T101
+					+ ((T186 * T58 + T187) * T25
+							+ ((T188 + 4 * T22 * T9) * T58 + T202) * T5 + T168)
+							* T60
+					+ ((T206 - T207 + T189) * T5 + T212 + T166) * T25
+					+ (-T209 + T210 + T38 * T20) * T29 + T190) * T33
+			+ (T191 * T101
+					+ (T192 * T25 + (T193 - T13 - T14 - T15) * T58 - T194) * T60
+					+ T195 * T39 + (-T196 + T197 + T198) * T25 + T174 + T141)
+					* T61
+			+ ((-T199 + T200 + T208) * T101
+					+ (((4 * T23 * T20 + T201) * T58 + T202) * T25
+							+ ((-T203 + T26 + T27 + T28) * T58 + T204) * T5
+							+ T205) * T60 + (-T206 + T207 + T208) * T39
+					+ ((T209 - T210 + T40 * T20) * T5 + T211) * T25
+					+ (T212 + T165) * T5) * T37;
+	const double R22 = (T219 + (T216 + T213) * T101
+			+ (T62 * T20 * T58 * T25 + T62 * T9 * T58 * T5) * T60
+			+ (T215 + T213) * T39 + T214 + (T215 + T216) * T29)
+			/ ((T24 * T39 + (-2 * T9 * T20 * T5 * T25) + T43 * T29) * T105
+					+ ((((-2 * T24 * T25) + 2 * T9 * T20 * T5) * T60
+							+ 2 * T9 * T58 * T5 * T25 + (-2 * T20 * T58 * T29))
+							* T33
+							+ ((2 * T9 * T20 * T25 + (-2 * T43 * T5)) * T60
+									+ (-2 * T9 * T58 * T39)
+									+ 2 * T20 * T58 * T5 * T25) * T37) * T71
+					+ (T24 * T101 + (-2 * T9 * T58 * T5 * T60) + T102 * T29)
+							* T73
+					+ ((-2 * T9 * T20 * T101)
+							+ (2 * T9 * T58 * T25 + 2 * T20 * T58 * T5) * T60
+							+ (-2 * T102 * T5 * T25)) * T37 * T33
+					+ (T43 * T101 + (-2 * T20 * T58 * T25 * T60) + T102 * T39)
+							* T61);
+
+	return sqrt(R22);
 }
+

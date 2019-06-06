@@ -37,15 +37,18 @@
 #include "../project/Project.h"
 #include "../project/machine/Machine.h"
 #include "DialogMachineControl.h"
-#include "DisplaySettings.h"
+#include "CollectionUnits.h"
 #include "gui.h"
 
 class DialogMachineDebugger:public GUIMachineDebugger {
 public:
-	DialogMachineDebugger(wxWindow * parent,  MidiPort &midi);
+	DialogMachineDebugger(wxWindow * parent);
 	virtual ~DialogMachineDebugger();
 
+#ifdef _USE_MIDI
 	MidiPort * midi;
+	void SetMidiPort(MidiPort &midi);
+#endif
 
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);

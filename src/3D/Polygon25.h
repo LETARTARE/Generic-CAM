@@ -32,15 +32,12 @@
  *
  * Expansion of the Polygon3 class with functions for 2.5D polygons.
  *
- * All polygons are used as if they were flat polygons with a height assigned
+ * All polygons are used as if they were flat polygons in the XY plane with a height assigned
  * to each point.
- *
  */
 
 #include "Polygon3.h"
 
-#include <wx/dynarray.h>
-class ArrayOfPolygon25;
 class Polygon25:public Polygon3 {
 public:
 	Polygon25();
@@ -48,20 +45,20 @@ public:
 
 	// Methods
 public:
-	/*! \brief Returns the length, if the polygon was flat in the XY plane
+	/*! \brief Returns the length, as if the polygon was flat in the XY plane
 	 */
 	double GetLengthXY(void) const;
 
 	/*! \brief Searches for points below z -0.5 and replaces them with the average value of the point above -0.5
 	 *
-	 * (Very domain specific function for a very specific problem.)
-	 *
+	 * (Very domain specific function for a very specific problem. Should probably be elsewhere.)
 	 */
 	void PolygonFillHoles(void);
 
 	/*! \brief MA Filter for polygons with the size of 3
 	 *
 	 * Replaces every vertex i with the average of the vertices i-1, i, i+1.
+	 * \todo Move to the more general Polygon3
 	 */
 	void PolygonSmooth(void);
 
@@ -70,7 +67,7 @@ public:
 	 * The function uses the direction of the polygon in the XY plane to
 	 * determine outside / right. It assumes, that the polygon is defined
 	 * mathematically positive.
-	 *
+	 * \todo Revisit, for this may be broken. Also add interpolating / cutting function for sharp corners.
 	 * @param r Distance to move the points of the polygon
 	 */
 	void PolygonExpand(double r);
@@ -78,6 +75,8 @@ public:
 	/*! \brief Move the points of the polygon to the left (inside)
 	 *
 	 * Uses PolygonExpand with negative parameter.
+	 *
+	 * \todo Remove, as it is covered by PolygonExpand
 	 *
 	 * @param r Distance to move the points of the polygon
 	 */
@@ -94,7 +93,7 @@ public:
 
 	bool IsPolygonInside(const Polygon25 &other) const;
 
-	static void SortPolygonsFromOutside(ArrayOfPolygon25 *array);
+	static void SortPolygonsFromOutside(std::vector<Polygon25> *array);
 
 	/*! \brief Find the closest distance of a line to an element on the polygon
 	 *
@@ -131,6 +130,5 @@ public:
 	 */
 	void RotatePolygonStart(double x, double y);
 };
-WX_DECLARE_OBJARRAY(Polygon25, ArrayOfPolygon25);
 
 #endif /* POLYGON25_H_ */

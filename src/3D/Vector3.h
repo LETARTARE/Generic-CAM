@@ -35,15 +35,15 @@
 #ifndef _CVECTOR3_H_
 #define _CVECTOR3_H_
 
-#include <wx/dynarray.h>
-#include <wx/string.h>
 #include <math.h>
+#include <wx/string.h>
+#include <ostream>
 
 class Vector3 {
 	// Constructor / Destructor:
 public:
-	Vector3(float px = 0.0, float py = 0.0, float pz = 0.0) :
-			x(px), y(py), z(pz)
+	Vector3(float px = 0.0, float py = 0.0, float pz = 0.0)
+			: x(px), y(py), z(pz)
 	{
 	}
 	Vector3(wxString string);
@@ -192,6 +192,12 @@ public:
 		return !(*this == b);
 	}
 
+	friend std::ostream &operator<<(std::ostream &output, const Vector3 &v)
+	{
+		output << "[" << v.x << ", " << v.y << ", " << v.z << "]";
+		return output;
+	}
+
 	//! Zeros the vector.
 	void Zero(void);
 
@@ -208,7 +214,12 @@ public:
 
 	//! Normalizes the length of a vector.
 	Vector3 Normalize(void);
+
+	/*! \brief Generate an orthogonal vector
+	 *
+	 * Generates an arbitrary vector that is garanteed orthogonal to this vector.
+	 */
+	Vector3 Orthogonal(void) const;
 };
-WX_DECLARE_OBJARRAY(Vector3, ArrayOfVector3);
 
 #endif // _CVECTOR3_H_

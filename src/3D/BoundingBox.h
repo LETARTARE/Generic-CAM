@@ -26,17 +26,19 @@
 
 #ifndef BOUNDINGBOX_H_
 #define BOUNDINGBOX_H_
-
-#include <wx/dynarray.h>
-#include <wx/txtstrm.h>
-
-#include "Geometry.h"
-
 /*!\class BoundingBox
  * \brief Bounding Box aligned with x,y,z
  *
  * Stores the min and max values of Vector3%s, Triangle%s, other BoundingBox%es and Geometry.
  */
+
+#include <wx/txtstrm.h>
+
+#include "Vector3.h"
+
+class Triangle;
+class AffineTransformMatrix;
+class Geometry;
 
 class BoundingBox {
 	// Constructor / Destructor
@@ -135,6 +137,5 @@ public:
 	//! Paint the box in OpenGL.
 	void Paint(void) const;
 };
-WX_DECLARE_OBJARRAY(BoundingBox, ArrayOfBoundingBox);
 
 #endif /* BOUNDINGBOX_H_ */

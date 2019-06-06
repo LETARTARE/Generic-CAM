@@ -34,7 +34,8 @@
 DialogStockMaterial::DialogStockMaterial(wxWindow* parent) :
 		GUIStockMaterial(parent)
 {
-	m_menuPreferences->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	m_menuPreferences->Append(ID_SETUPUNITS,
+			_("Setup &Units") + wxT("\tCtrl+U"));
 
 	selectedLine = -1;
 	isInitialized = false;
@@ -73,7 +74,7 @@ bool DialogStockMaterial::TransferDataToWindow(void)
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	ProjectView* view = wxStaticCast(frame->GetView(), ProjectView);
-	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	CollectionUnits* settings = &(frame->GetParentFrame()->units);
 	if(project == NULL) return false;
 
 	if(!isInitialized) Initialize();
@@ -130,7 +131,7 @@ bool DialogStockMaterial::TransferDataToWindow(void)
 bool DialogStockMaterial::TransferDataFromWindow(void)
 {
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
-	DisplaySettings* settings = &(frame->GetParentFrame()->settings);
+	CollectionUnits* settings = &(frame->GetParentFrame()->units);
 	name = m_textCtrlName->GetValue();
 
 	m_textCtrlX->GetValue().ToDouble(&sx);

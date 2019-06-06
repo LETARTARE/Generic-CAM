@@ -25,12 +25,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "genericcam.h"
+
+
+#include "gui/FrameParent.h"
+
 #include "languages.h"
 
 #include "wx/richtext/richtextxml.h"
 
-#include "gui/FrameParent.h"
 #include "project/ProjectView.h"
+
 #if wxUSE_DEBUG_CONTEXT == 1
 #include  <wx/memory.h>
 #endif
@@ -67,7 +71,7 @@ GenericCAMApp::GenericCAMApp()
 	//			locale.GetLanguage()));
 	//	wxLogMessage(_T("name language :") + locale.GetCanonicalName());
 
-	locale.AddCatalogLookupPathPrefix(_T("./i18n"));
+	locale.AddCatalogLookupPathPrefix(_T("i18n"));
 	bool catalogLoaded = locale.AddCatalog(_T("GenericCAM"));
 	if(!catalogLoaded){
 		wxString temp;
@@ -85,8 +89,8 @@ GenericCAMApp::~GenericCAMApp(void)
 #if wxUSE_DEBUG_CONTEXT == 1
 	wxDebugContext::PrintStatistics(true);
 #endif
-	delete config; // config is written back on deletion of object
 	printf("GenericCAMApp: Destructor called\n");
+	delete config; // config is written back on deletion of object
 }
 
 // The Commandline is parsed before OnInit is called.
@@ -129,7 +133,8 @@ bool GenericCAMApp::OnInit()
 
 	docManager->FileHistoryLoad(*config);
 
-	wxFrame* parent = new FrameParent(docManager, config, NULL, wxID_ANY,
+	wxFrame* parent;
+	parent  = new FrameParent(docManager, config, NULL, wxID_ANY,
 			GetAppDisplayName());
 
 	SetTopWindow(parent);

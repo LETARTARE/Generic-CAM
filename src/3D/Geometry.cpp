@@ -76,7 +76,6 @@ void Geometry::ApplyTransformation(void)
 	size_t i;
 	for(i = 0; i < triangles.Count(); i++)
 		triangles[i].ApplyTransformation(this->matrix);
-	//TODO Reset this->matrix to Identity();
 }
 
 void Geometry::Paint(GeometryColorStyle style) const
@@ -124,6 +123,18 @@ void Geometry::Paint(GeometryColorStyle style) const
 
 	}
 	::glEnd();
+
+//	for(i = 0; i < triangles.Count(); i++){
+//		::glBegin(GL_LINE_LOOP);
+//		::glVertex3d(triangles[i].p[0].x, triangles[i].p[0].y,
+//				triangles[i].p[0].z);
+//		::glVertex3d(triangles[i].p[1].x, triangles[i].p[1].y,
+//				triangles[i].p[1].z);
+//		::glVertex3d(triangles[i].p[2].x, triangles[i].p[2].y,
+//				triangles[i].p[2].z);
+//		::glEnd();
+//	}
+
 	::glPopMatrix();
 //#if defined (__WIN32__)
 //	::glDisable(GL_NORMALIZE);
