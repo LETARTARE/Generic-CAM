@@ -55,7 +55,7 @@ public:
 	 * Only the translatory components are used.
 	 * @param matrix AffineTransformMatrix
 	 */
-	void Translate(const AffineTransformMatrix matrix);
+	void Translate(const AffineTransformMatrix &matrix);
 
 	/*!\brief Paint box in Open GL*/
 	void Paint(bool flipNormals = false) const;

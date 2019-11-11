@@ -26,7 +26,6 @@
 
 #ifndef AFFINETRANSFORMMATRIX_H_
 #define AFFINETRANSFORMMATRIX_H_
-
 /** \class AffineTransformMatrix
  * 	\code #include "AffineTransformMatrix.h"\endcode
  * 	\ingroup Base3D
@@ -61,75 +60,171 @@
  */
 
 // http://www.parashift.com/c++-faq-lite/operator-overloading.html
+// http://courses.cms.caltech.edu/cs11/material/cpp/donnie/cpp-ops.html
+//
 class Vector3;
-
 class wxString;
 class wxTextOutputStream;
 class wxTextInputStream;
-
 class AffineTransformMatrix {
-	// Constructor / Destructor
 public:
+	enum orientation {
+		rhs, //!< Right-handed system
+		lhs  //!< Left-handed system
+	};
+
 	AffineTransformMatrix();
+	AffineTransformMatrix(const Vector3& ex, const Vector3& ey,
+			const Vector3& ez, const Vector3& center);
 
-	// Member variables
+private:
+	double a[16]; //!< Transformation matrix
+	orientation side; //!< Handedness of the coordinate system
+
 public:
-	double a[16]; //!< The transformation matrix.
+	void SetOrientation(orientation side); //!< Preset the behavior for future Set and Calculate operations
+	orientation GetOrientation(void) const; //!< Return the orientation flag
+	orientation CheckOrientation(void) const; //!< Calculate the orientations of the coordinate system by analysing the matrix
+	void UpdateOrientation(void); //!< Set the orientation flag according the the matrix values
 
-	double rx, ry, rz; //!< Rotation after taking the matrix apart.
-	double tx, ty, tz; //!< Translation after taking the matrix apart.
-	double sx, sy, sz; //!< Scaling after taking the matrix apart.
+	void SetIdentity(void); //!< Resets the matrix to the identity matrix.
+	void ResetRotationAndScale(void); //!< Resets the rotation and scale, but keeps the translation
 
-	// Methods
-public:
+	void Set(AffineTransformMatrix const& b); //!< Copies a matrix by inserting a given matrix into \a a.
+	void SetOrigin(const Vector3& center);
 
-	void TakeMatrixApart(void);
-	void PutMatrixTogether(void);
+	void SetEx(const Vector3& ex);
+	void SetEy(const Vector3& ey);
+	void SetEz(const Vector3& ez);
+	void CalculateEx(void);
+	void CalculateEy(void);
+	void CalculateEz(void);
+	AffineTransformMatrix Normal(void) const;
+	void Normalize(void);
 
-	wxString ToString();
-	void FromString(wxString const& string);
+	Vector3 GetOrigin(void) const; //!< Returns the center point of the matrix.
+	Vector3 GetEx(void) const;
+	Vector3 GetEy(void) const;
+	Vector3 GetEz(void) const;
 
-	void ToStream(wxTextOutputStream & stream);
-	void FromStream(wxTextInputStream & stream);
+	AffineTransformMatrix& operator*=(const AffineTransformMatrix& b); //!< Overloaded operator to allow correct multiplication of two matrices.
+	const AffineTransformMatrix operator*(const AffineTransformMatrix& b) const; //!< Overloaded operator to allow correct multiplication of two matrices.
+	/*!\brief  Overloaded operator to allow correct division of two matrices.
+	 *
+	 * The division is done by inverting the second matrix and the multiplying both.
+	 */
+	AffineTransformMatrix& operator/=(const AffineTransformMatrix& b);
+	const AffineTransformMatrix operator/(const AffineTransformMatrix& b) const; //!< Overloaded operator to allow correct division of two matrices.
 
-	void Set(AffineTransformMatrix const& b);
+	void Invert(void); //!< Inverts the matrix itself
 
-	AffineTransformMatrix& operator*=(const AffineTransformMatrix &b);
-	const AffineTransformMatrix operator*(const AffineTransformMatrix& b) const;
+	/*! \brief Returns an inverted matrix
+	 *
+	 * The transform used in here is optimized for matrices with 0,0,0,1 in the last row.
+	 * It would not give the correct results for other matrices,
+	 *
+	 * \return Inverted matrix.
+	 */
+	const AffineTransformMatrix Inverse(void) const;
 
-	AffineTransformMatrix& operator/=(const AffineTransformMatrix &b);
-	const AffineTransformMatrix operator/(const AffineTransformMatrix& b) const;
+	static AffineTransformMatrix Identity(); //!< Function returning an identity matrix.
 
-	void SetIdentity();
-
-	const AffineTransformMatrix Inverse() const;
-
-	static AffineTransformMatrix Identity();
+	/*!\brief Rotation matrix around a given vector.
+	 *
+	 * Generates a rotation matrix around a given vector.
+	 * \param vector Axis of rotation.
+	 * \param phi Angle of rotation.
+	 * \return Rotation matrix.
+	 */
 	static AffineTransformMatrix RotationAroundVector(Vector3 const& vector,
 			double const& phi);
+
+	/*!\brief An interwoven rotation matrix.
+	 *
+	 * Generates a rotation matrix around x,y,z.
+	 * In this case the rotations are interwoven:
+	 *
+	 * Every rotation (around x, around y and around z) is done
+	 * in infinitesimal small steps. On step around x, one step around y, ...
+	 *
+	 * This results in a rotation as expected from a 6 DOF controller.
+	 */
+
 	static AffineTransformMatrix RotationInterwoven(double const& x,
 			double const& y, double const& z);
+
+	/*! \brief Rotation matrix for rotation by mouse.
+	 *
+	 * This function is only a drop in until the RotateByTrackball function works.
+	 *
+	 * \param x Movement of mouse in x direction (=xnew-xold).
+	 * \param y Movement of mouse in y direction (=ynew-yold).
+	 * \param scale Scaling of the movement.
+	 * \return Rotation matrix.
+	 */
 	static AffineTransformMatrix RotationXY(int const& x, int const& y,
 			double const& scale);
+
+	/*! \brief Rotation matrix composed by the Z,Y,X rule.
+	 */
 	static AffineTransformMatrix RotationXYZ(double const& x, double const& y,
 			double const& z);
+
+	/*!\brief Rotation matrix around a virtual trackball.
+	 *
+	 * @param x1 Old x-mouse position on screen
+	 * @param y1 Old y-mouse position on screen
+	 * @param x2 New x-mouse position on screen
+	 * @param y2 New y-mouse position on screen
+	 * @param r Radius of a sphere in screen units.
+	 * @return Rotational Matrix
+	 */
 	static AffineTransformMatrix RotationTrackball(double const& x1,
 			double const& y1, double const& x2, double const& y2,
 			double const& r);
 
-	void TranslateGlobal(double const& x, double const& y, double const& z);
-	void TranslateLocal(double const& x, double const& y, double const& z);
+	void TranslateGlobal(double const& x, double const& y, double const& z); //!< Translate matrix in the global coordinate system.
+	void TranslateLocal(double const& x, double const& y, double const& z); //!< Translate matrix in the local, rotated coordinate system.
 
-	void ScaleGlobal(double const& x, double const& y, double const& z);
-	void ScaleLocal(double const& x, double const& y, double const& z);
+	void ScaleGlobal(double const& x, double const& y, double const& z); //!< Scale matrix in the global coordinate system.
+	void ScaleLocal(double const& x, double const& y, double const& z); //!< Scale matrix in the local coordinate system.
 
-	Vector3 Transform(Vector3 const& v) const;
-	Vector3 operator()(const Vector3 &v) const;
-	Vector3 TransformNoShift(Vector3 const& v) const;
+	Vector3 Transform(Vector3 const& v) const; //!< Apply the transformation matrix on a given vector.
+	Vector3 Transform(const double x, const double y = 0.0,
+			const double z = 0.0) const;
+	Vector3 TransformNoShift(Vector3 const& v) const; //!< Apply the transformation matrix on a given vector without shifting the vector.
+	Vector3 TransformNoShift(const double x, const double y = 0.0,
+			const double z = 0.0) const;
+	Vector3 operator*(const Vector3& v) const;
+	double &operator[](unsigned char index);
+	const double operator[](unsigned char index) const;
+	Vector3 operator()(const Vector3& v) const; //!< Operator reference for Vector3 transformations.
+	Vector3 operator()(const double x, const double y = 0.0, const double z =
+			0.0) const;
 
-	Vector3 GetCenter(void) const;
+	double LocalX(const Vector3& v) const; ///< Maps a global point onto the local coordinate system, returns the local x.
+	double LocalY(const Vector3& v) const; ///< Maps a global point onto the local coordinate system, returns the local y.
+	double LocalZ(const Vector3& v) const; ///< Maps a global point onto the local coordinate system, returns the local z.
+	double GlobalX(double x = 0.0, double y = 0.0, double z = 0.0) const; ///< Calculates the global x, given a local point.
+	double GlobalY(double x = 0.0, double y = 0.0, double z = 0.0) const; ///< Calculates the global y, given a local point.
+	double GlobalZ(double x = 0.0, double y = 0.0, double z = 0.0) const; ///< Calculates the global z, given a local point.
+
 	double Distance(const AffineTransformMatrix &other) const;
 
+public:
+	void TakeMatrixApart(void); //!< Calculate rx,ry,rz,tx,ty,tz and sx,sy,sz from the matrix.
+	double rx, ry, rz; //!< Rotation after taking the matrix apart.
+	double tx, ty, tz; //!< Translation after taking the matrix apart.
+	double sx, sy, sz; //!< Scaling after taking the matrix apart.
+	void PutMatrixTogether(void); //!< Calculate the matrix from rx,ry,rz,tx,ty,tz and sx,sy,sz.
+
+	wxString ToString(); //!< Generate a string containing the matrix.
+	void FromString(wxString const& string); //!< Setup the matrix from a string.
+	void ToStream(wxTextOutputStream & stream);
+	void FromStream(wxTextInputStream & stream);
+
+	void GLMultMatrix(void) const; //!< Multiply the matrix onto the active OpenGL matrix (right multiply)
+	void Paint(const double scale = 1.0) const; //!< Display the coordinate system in OpenGL
 };
 
 #endif /* AFFINETRANSFORMMATRIX_H_ */

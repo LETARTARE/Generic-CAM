@@ -74,17 +74,11 @@ public:
 	//! Insert another BoungingBox.
 	void Insert(const BoundingBox& bbox);
 
-	BoundingBox& operator+=(const BoundingBox& rhs);
-	const BoundingBox operator+(const BoundingBox& rhs) const;
-
 	//! Insert a single Triangle.
 	void Insert(const Triangle& tri);
 
-	/*!\brief Transform BoundingBox by matrix
-	 *
-	 * @param matrix AffineTransformMatrix
-	 */
-	void Transform(const AffineTransformMatrix matrix);
+	BoundingBox& operator+=(const BoundingBox& rhs);
+	const BoundingBox operator+(const BoundingBox& rhs) const;
 
 	//! Check if the box is empty, i.e. nothing was inserted.
 	bool IsEmpty(void) const;
@@ -100,6 +94,8 @@ public:
 
 	void SetOrigin(float origx = 0.0, float origy = 0.0, float origz = 0.0);
 	void SetOrigin(const Vector3 &orig);
+
+	AffineTransformMatrix GetCoordinateSystem(void) const; ///< Return a (non-normal) coordinate system for mapping points in the box.
 
 	//! Get the volume of the box.
 	double GetVolume(void) const;
@@ -127,6 +123,12 @@ public:
 
 	bool Overlaps(const BoundingBox &other) const;
 	bool IsInside(const Vector3 &v) const;
+
+	/*!\brief Transform BoundingBox by matrix
+	 *
+	 * @param matrix AffineTransformMatrix
+	 */
+	void Transform(const AffineTransformMatrix matrix);
 
 	//! Put the box into a textstream.
 	void ToStream(wxTextOutputStream & stream) const;

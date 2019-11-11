@@ -28,7 +28,7 @@
 #define POLYGON25_H_
 
 /*!\class Polygon25
- * \brief Plane polygon in 3D
+ * \brief Planar polygon in 3D
  *
  * Expansion of the Polygon3 class with functions for 2.5D polygons.
  *

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : Unit.h
-// Purpose            : Converts from SI to other measures
+// Purpose            : Stores a physical unit
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
@@ -24,56 +24,65 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef UNIT_H_
-#define UNIT_H_
+#ifndef _UNIT_H_
+#define _UNIT_H_
 
 /*!\class Unit
- * \brief Converts from SI to whatever and back
+ * \brief Stores a physical unit
  *
- * Simple conversion class.
+ * This class stores an unit and the conversion from SI to that unit and back.
+ *
  * The factor is the multiplier to convert into the other unit.
  * E.g.:
- *    1 cm = 0.01 m, factor = 1/100
- *    1 rpm = 1/60 1/s, factor = 1/60
+ *  -  1 cm = 0.01 m        --> factor = 1/100
+ *  -  1 rpm = 1/60 1/s     --> factor = 1/60
+ *  -  1 mm = 1e-6 m        --> factor = 1e-6
+ *  -  1 g  = 1e-3 kg       --> factor = 1e-3
+ *  -  1 deg = M_PI/180 rad --> factor = M_PI/180
  *
  *
- *    Powers:
- *    'y',-24
- *    'z',-21
- *    'a',-18
- *    'f',-15
- *    'p',-12
- *    'n',-9
- *    'µ',-6
- *    'u',-6
- *    'm',-3
- *    'c',-2
- *    'd',-1
- *    'da',1
- *    'h',2
- *    'k',3
- *    'M',6
- *    'G',9
- *    'T',12
- *    'P',15
- *    'E',18
- *    'Z',21
- *    'Y',24
+ *  Name: | Power:
+ *  ------|--------
+ *    y   | -24
+ *    z   | -21
+ *    a   | -18
+ *    f   | -15
+ *    p   | -12
+ *    n   | -9
+ *    µ   | -6
+ *    u   | -6
+ *    m   | -3
+ *    c   | -2
+ *    d   | -1
+ *    da  | 1
+ *    h   | 2
+ *    k   | 3
+ *    M   | 6
+ *    G   | 9
+ *    T   | 12
+ *    P   | 15
+ *    E   | 18
+ *    Z   | 21
+ *    Y   | 24
  *
+ * The available types for the units are maintained in CollectionUnits.
  *
- *
- *
- * HINT: The available types for the units are maintained in the DialogSetupUnits.
+ * The used types are set in DialogSetupUnits.
  */
 
-#include "../Config.h"
+//#include <wx/chartype.h>
+#include <cmath>
+
+//#include "../Config.h"
+
 #ifdef _USE_MATHPARSER
 #include "MathParser.h"
 #endif
-#include <wx/string.h>
+
+#include <string>
+#include <wx/string.h> //TODO: Remove usage of wx/string.h
 
 class Unit {
-	// Enumerations
 public:
 	/*!\enum unit
 	 * \brief Predefined types of units (SI and otherwise)
@@ -82,7 +91,26 @@ public:
 		Unitless = 0, Second, Volume, Celsius
 	};
 
-	//Constructor / Destructor
+private:
+	wxString SIName; ///< The name in SI: m, m/s, 1/s, ...
+	wxString otherName; ///< The name in the "other" system: h, cm, dm, rpm, inch, mil, mm, ...
+
+	double factor; ///< 1 in SI = factor in non SI units
+	int power; ///< Power for the units (normally a multiple of 3)
+
+	int m; ///< Power of Length
+	int kg; ///< Power of Mass
+	int s; ///< Power of Time
+	int A; ///< Power of Current
+	int K; ///< Power of Temperature (absolut)
+	int mol; ///< Power of Molar Mass
+	int cd; ///< Power of Brightness
+	int cur; ///< Power of Currency
+
+#ifdef _USE_MATHPARSER
+	MathParser parser;
+#endif
+
 public:
 	Unit();
 	Unit(int m, int kg = 0, int s = 0, int A = 0, int K = 0, int mol = 0,
@@ -91,7 +119,6 @@ public:
 	Unit(const wxString SIName, const wxString otherName, const double factor);
 	Unit(unit predefinedUnit, wxString extra = _T("*"));
 
-	// Methods
 public:
 	/*! \brief Setup a unit
 	 *
@@ -117,6 +144,21 @@ public:
 	wxString TextFromSIWithUnit(const double value, int digitsAfterComma = -1);
 
 	double SIFromString(const wxString &text, bool useEvaluator = true);
+	friend inline bool operator==(const Unit &lhs, const Unit &rhs)
+	{
+		return (lhs.m == rhs.m && lhs.s == rhs.s && lhs.kg == rhs.kg
+				&& lhs.A == rhs.A && lhs.K == rhs.K && lhs.mol == rhs.mol
+				&& lhs.cd == rhs.cd && lhs.cur == rhs.cur
+				&& lhs.power == rhs.power
+				&& fabs(lhs.factor - rhs.factor) < 1e-9);
+	}
+	friend inline bool operator!=(const Unit &lhs, const Unit &rhs)
+	{
+		return !(lhs == rhs);
+	}
+
+
+	//TODO: Check if the functions below belong into the Measurement class.
 
 	Unit& operator*=(const Unit &other)
 	{
@@ -152,35 +194,7 @@ public:
 		return lhs /= rhs;
 	}
 
-	friend inline bool operator==(const Unit &lhs, const Unit &rhs)
-	{
-		return (lhs.m == rhs.m && lhs.s == rhs.s && lhs.kg == rhs.kg
-				&& lhs.A == rhs.A && lhs.K == rhs.K && lhs.mol == rhs.mol
-				&& lhs.cd == rhs.cd && lhs.cur == rhs.cur);
-	}
-	friend inline bool operator!=(const Unit &lhs, const Unit &rhs)
-	{
-		return !(lhs == rhs);
-	}
-
-	//Member variables
-private:
-	double factor; ///< 1 in SI = factor in non SI units
-	double power; ///<
-	wxString SIName; ///< The name in SI: m, m/s, 1/s, ...
-	wxString otherName; ///< The name in the "other" system: h, cm, dm, rpm, inch, mil, mm, ...
-#ifdef _USE_MATHPARSER
-	MathParser parser;
-#endif
-	int m; ///< Power of Length
-	int kg; ///< Power of Mass
-	int s; ///< Power of Time
-	int A; ///< Power of Current
-	int K; ///< Power of Temperature (absolut)
-	int mol; ///< Power of Molar Mass
-	int cd; ///< Power of Brightness
-	int cur; ///< Power of Currency
 
 };
 
-#endif /* UNIT_H_ */
+#endif /* _UNIT_H_ */

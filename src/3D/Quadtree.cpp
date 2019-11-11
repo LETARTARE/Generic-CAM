@@ -30,7 +30,7 @@
 #include "Vector3.h"
 #include <wx/defs.h>
 #include <stddef.h>
-#include <cmath>
+//#include <cmath>
 
 
 Quadtree::QuadtreeCell::QuadtreeCell()

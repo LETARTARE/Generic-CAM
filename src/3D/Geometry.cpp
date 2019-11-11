@@ -30,7 +30,7 @@
 #include <wx/log.h>
 #include <wx/arrimpl.cpp>
 
-WX_DEFINE_OBJARRAY(ArrayOfGeometry);
+WX_DEFINE_OBJARRAY(ArrayOfGeometry)
 
 Geometry::Geometry()
 {
@@ -95,7 +95,7 @@ void Geometry::Paint(GeometryColorStyle style) const
 //#endif
 
 	::glPushMatrix();
-	::glMultMatrixd(matrix.a);
+	matrix.GLMultMatrix();
 
 	size_t i;
 	::glBegin(GL_TRIANGLES);

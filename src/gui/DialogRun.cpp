@@ -198,9 +198,9 @@ void DialogRun::OnRotate(wxCommandEvent& event)
 	if(workpieceNr < 0) return;
 
 	AffineTransformMatrix matrix = project->run[runNr].workpiecePlacement;
-	matrix.a[12] = 0.0;
-	matrix.a[13] = 0.0;
-	matrix.a[14] = 0.0;
+	matrix[12] = 0.0;
+	matrix[13] = 0.0;
+	matrix[14] = 0.0;
 
 	wxString description;
 

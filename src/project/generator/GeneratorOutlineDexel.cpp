@@ -126,7 +126,7 @@ void GeneratorOutlineDexel::GenerateToolpath(void)
 	toolpath.Clear();
 
 	GCodeBlock m;
-	if(pg.GetCount() > 0){
+	if(pg.Size() > 0){
 		m.Rapid();
 		m.X = pg[0].x;
 		m.Y = pg[0].y;
@@ -138,7 +138,7 @@ void GeneratorOutlineDexel::GenerateToolpath(void)
 		for(int n = 1; n <= N; n++){
 			const double level = fmax(area.zmax - n * cutdepth, area.zmin);
 
-			for(size_t n = 0; n < pg.GetCount(); n++){
+			for(size_t n = 0; n < pg.Size(); n++){
 				m.X = pg[n].x;
 				m.Y = pg[n].y;
 				m.Z = level;

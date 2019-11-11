@@ -98,7 +98,6 @@ public:
 	double feedCoefficient;
 	unsigned int nrOfTeeth;
 	ArrayOfToolElement elements;
-	static unsigned int resolution;
 
 private:
 	ArrayOfToolContourElement contour;

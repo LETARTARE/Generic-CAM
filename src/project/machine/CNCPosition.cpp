@@ -58,15 +58,15 @@ CNCPosition::CNCPosition(const AffineTransformMatrix& matrix)
 	// Maxima: Rotational matrices combined
 	// [a0=coy*coz,a1=coy*siz,a2=-siy,a4=(-cox*siz)+coz*six*siy,a5=six*siy*siz+cox*coz,a6=coy*six,a8=six*siz+cox*coz*siy,a9=cox*siy*siz+(-coz*six),a10=cox*coy]
 
-	const double a0 = matrix.a[0];
-	const double a1 = matrix.a[1];
-	const double a2 = matrix.a[2];
-	const double a4 = matrix.a[4];
-	const double a5 = matrix.a[5];
-	const double a6 = matrix.a[6];
-	const double a8 = matrix.a[8];
-	const double a9 = matrix.a[9];
-	const double a10 = matrix.a[10];
+	const double a0 = matrix[0];
+	const double a1 = matrix[1];
+	const double a2 = matrix[2];
+	const double a4 = matrix[4];
+	const double a5 = matrix[5];
+	const double a6 = matrix[6];
+	const double a8 = matrix[8];
+	const double a9 = matrix[9];
+	const double a10 = matrix[10];
 
 	const double siy = -a2;
 	const double coy = (sqrt(a0 * a0 + a1 * a1) + sqrt(a6 * a6 + a10 * a10))
@@ -101,9 +101,9 @@ CNCPosition::CNCPosition(const AffineTransformMatrix& matrix)
 		C = atan2(-siz, -coz);
 	}
 
-	X = matrix.a[12];
-	Y = matrix.a[13];
-	Z = matrix.a[14];
+	X = matrix[12];
+	Y = matrix[13];
+	Z = matrix[14];
 	U = 0;
 	V = 0;
 	W = 0;
@@ -308,24 +308,24 @@ AffineTransformMatrix CNCPosition::GetMatrix(void) const
 	// Considering XYZABCUVW
 	// G*Rz*Ry*Rx*L
 
-	temp.a[0] = coy * coz;
-	temp.a[1] = coy * siz;
-	temp.a[2] = -siy;
-	temp.a[3] = 0;
-	temp.a[4] = (-cox * siz) + coz * six * siy;
-	temp.a[5] = six * siy * siz + cox * coz;
-	temp.a[6] = coy * six;
-	temp.a[7] = 0;
-	temp.a[8] = six * siz + cox * coz * siy;
-	temp.a[9] = cox * siy * siz + (-coz * six);
-	temp.a[10] = cox * coy;
-	temp.a[11] = 0;
-	temp.a[12] = (W * six + (-V * cox)) * siz
+	temp[0] = coy * coz;
+	temp[1] = coy * siz;
+	temp[2] = -siy;
+	temp[3] = 0;
+	temp[4] = (-cox * siz) + coz * six * siy;
+	temp[5] = six * siy * siz + cox * coz;
+	temp[6] = coy * six;
+	temp[7] = 0;
+	temp[8] = six * siz + cox * coz * siy;
+	temp[9] = cox * siy * siz + (-coz * six);
+	temp[10] = cox * coy;
+	temp[11] = 0;
+	temp[12] = (W * six + (-V * cox)) * siz
 			+ (V * coz * six + W * cox * coz) * siy + U * coy * coz + X;
-	temp.a[13] = ((V * six + W * cox) * siy + U * coy) * siz + (-W * coz * six)
+	temp[13] = ((V * six + W * cox) * siy + U * coy) * siz + (-W * coz * six)
 			+ V * cox * coz + Y;
-	temp.a[14] = (-U * siy) + V * coy * six + W * cox * coy + Z;
-	temp.a[15] = 1;
+	temp[14] = (-U * siy) + V * coy * six + W * cox * coy + Z;
+	temp[15] = 1;
 
 	return temp;
 }

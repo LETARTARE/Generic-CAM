@@ -28,6 +28,8 @@
 
 #include <GL/gl.h>
 #include <algorithm>
+#include <iostream>
+#include <fstream>
 #include <stdexcept>
 
 #include "Geometry.h"
@@ -43,10 +45,24 @@ Hull::Edge::Edge()
 	trianglecount = 0;
 }
 
-size_t Hull::Edge::OtherTriangle(size_t n)
+size_t Hull::Edge::OtherTriangle(size_t n) const
 {
 	if(ta == n) return tb;
 	return ta;
+}
+
+bool Hull::Edge::AttachTriangle(size_t index)
+{
+	if(trianglecount == 0){
+		ta = index;
+		trianglecount++;
+		return true;
+	}
+	if(trianglecount == 1){
+		tb = index;
+		trianglecount++;
+	}
+	return false;
 }
 
 Hull::Triangle::Triangle()
@@ -59,7 +75,7 @@ Hull::Triangle::Triangle()
 	ec = 0;
 }
 
-int Hull::Triangle::Direction(size_t i1, size_t i2)
+int Hull::Triangle::Direction(size_t i1, size_t i2) const
 {
 	if((i1 == va && i2 == vb) || (i1 == vb && i2 == vc)
 			|| (i1 == vc && i2 == va)) return 1;
@@ -75,7 +91,7 @@ Hull::Hull()
 	paintEdges = true;
 	paintVertices = false;
 	paintNormals = false;
-	smooth = true;
+	smooth = false;
 	paintSelected = true;
 }
 
@@ -86,6 +102,7 @@ Hull::~Hull()
 void Hull::Clear(void)
 {
 	v.clear();
+	vn.clear();
 	e.clear();
 	t.clear();
 	openedges.clear();
@@ -102,7 +119,7 @@ void Hull::SetEpsilon(double newEpsilon)
 void Hull::Paint(void) const
 {
 	::glPushMatrix();
-	::glMultMatrixd(matrix.a);
+	matrix.GLMultMatrix();
 
 	const double normalscale = 0.1;
 
@@ -217,35 +234,338 @@ bool Hull::IsClosed(void) const
 
 bool Hull::LoadObj(std::string filename)
 {
-	return false;
+	// The state machine to parse the input stream of a Wavefront .obj file:
+
+	//	digraph{ rankdir=LR
+	//	0 -> 0 [label="\\r \\n \\s"]
+	//
+	//	0 -> 1 [label="g m o s u #"]
+	//	1 -> 1
+	//	1 -> 0 [label="\\r \\n"]
+	//
+	//	0 -> 2 [label="v"]
+	//	2 -> 3 [label="t n"]
+	//
+	//	{2,3} -> 4 -> 4[label="\\s"]
+	//
+	//	{2,3,4} -> 5 [label="+ -"]
+	//	{2,3,4,5} -> 6 -> 6[label="0-9"]
+	//
+	//	{2,3,4,5,6} -> 7 [label=", ."]
+	//
+	//	7 -> 8 -> 8[label="0-9"]
+	//
+	//	{6,7,8} -> 4 [label="\\s"]
+	//	{4,6,7,8} -> 0 [label="\\r \\n"]
+	//
+	//
+	//	0 -> 9 [label="f"]
+	//	9 -> 10 -> 10 [label="\\s"]
+	//
+	//	{9,10,12,16} -> 11 -> 11 [label="0-9"]
+	//
+	//	11 -> 12 -> 12 [label="\\s"]
+	//	{11,12} -> 13 [label="/"]
+	//	13 -> 14 -> 14 [label="\\s"]
+	//
+	//	{13,14} -> 15 -> 15 [label="0-9"]
+	//
+	//	15 -> 16 -> 16 [label="\\s"]
+	//	{13,14,15,16} -> 17 [label="/"]
+	//	17 -> 18 -> 18 [label="\\s"]
+	//
+	//	{17,18} -> 19 -> 19 [label="0-9"]
+	//
+	//	19 -> 10 [label="\\s"]
+	//	{10,11,12,15,16,19} -> 0 [label="\\r \\n"]
+	//	}
+
+	const size_t buffersize = 1048576;
+
+	char *buffer = new char[buffersize];
+	size_t charsread;
+	std::ifstream in(filename.c_str(), std::ifstream::in | std::ios::binary);
+
+	if(!in.good()) return false;
+
+	this->Clear();
+
+	int_fast8_t state = 0;
+	char command = 0;
+	std::vector <double> value;
+	std::vector <int> index_v;
+	std::vector <int> index_t;
+	std::vector <int> index_n;
+	std::vector <Vector3> tempnormals;
+	double tempvalue;
+	int tempindex;
+	double factor = 1.0;
+	bool negative = false;
+	do{
+		in.read(buffer, buffersize);
+		charsread = in.gcount();
+
+		for(size_t n = 0; n < charsread; ++n){
+			const char c = buffer[n];
+
+			// State changes according to the graph above
+			int_fast8_t nextstate = -1;
+			switch(state){
+			case 0:
+				if(c == '\r' || c == '\n' || c == ' ' || c == '\t') nextstate =
+						0;
+				if(c == 'g' || c == 'm' || c == 'o' || c == 's' || c == 'u'
+						|| c == '#') nextstate = 1;
+				if(c == 'v') nextstate = 2;
+				if(c == 'f') nextstate = 9;
+				break;
+			case 1:
+				if(c == '\r' || c == '\n')
+					nextstate = 0;
+				else
+					nextstate = 1;
+				break;
+			case 2:
+				if(c == 't' || c == 'n') nextstate = 3;
+				if(c == ' ' || c == '\t') nextstate = 4;
+				if(c == '+' || c == '-') nextstate = 5;
+				if(c >= '0' && c <= '9') nextstate = 6;
+				if(c == ',' || c == '.') nextstate = 7;
+				break;
+			case 3:
+				if(c == ' ' || c == '\t') nextstate = 4;
+				if(c == '+' || c == '-') nextstate = 5;
+				if(c >= '0' && c <= '9') nextstate = 6;
+				if(c == ',' || c == '.') nextstate = 7;
+
+				break;
+			case 4:
+				if(c == ' ' || c == '\t') nextstate = 4;
+				if(c == '+' || c == '-') nextstate = 5;
+				if(c >= '0' && c <= '9') nextstate = 6;
+				if(c == ',' || c == '.') nextstate = 7;
+				if(c == '\r' || c == '\n') nextstate = 0;
+				break;
+			case 5:
+				if(c >= '0' && c <= '9') nextstate = 6;
+				if(c == ',' || c == '.') nextstate = 7;
+				break;
+			case 6:
+				if(c >= '0' && c <= '9') nextstate = 6;
+				if(c == ',' || c == '.') nextstate = 7;
+				if(c == ' ' || c == '\t') nextstate = 4;
+				if(c == '\r' || c == '\n') nextstate = 0;
+				break;
+			case 7:
+				if(c >= '0' && c <= '9') nextstate = 8;
+				if(c == ' ' || c == '\t') nextstate = 4;
+				if(c == '\r' || c == '\n') nextstate = 0;
+				break;
+			case 8:
+				if(c >= '0' && c <= '9') nextstate = 8;
+				if(c == ' ' || c == '\t') nextstate = 4;
+				if(c == '\r' || c == '\n') nextstate = 0;
+				break;
+			case 9:
+				if(c == ' ' || c == '\t') nextstate = 10;
+				if(c >= '0' && c <= '9') nextstate = 11;
+				break;
+			case 10:
+				if(c == ' ' || c == '\t') nextstate = 10;
+				if(c == '\r' || c == '\n') nextstate = 0;
+				if(c >= '0' && c <= '9') nextstate = 11;
+				break;
+			case 11:
+				if(c == ' ' || c == '\t') nextstate = 12;
+				if(c == '\r' || c == '\n') nextstate = 0;
+				if(c >= '0' && c <= '9') nextstate = 11;
+				if(c == '/') nextstate = 13;
+				break;
+			case 12:
+				if(c == ' ' || c == '\t') nextstate = 12;
+				if(c == '\r' || c == '\n') nextstate = 0;
+				if(c >= '0' && c <= '9') nextstate = 11;
+				if(c == '/') nextstate = 13;
+				break;
+			case 13:
+				if(c == ' ' || c == '\t') nextstate = 14;
+				if(c >= '0' && c <= '9') nextstate = 15;
+				if(c == '/') nextstate = 17;
+				break;
+			case 14:
+				if(c == ' ' || c == '\t') nextstate = 14;
+				if(c >= '0' && c <= '9') nextstate = 15;
+				if(c == '/') nextstate = 17;
+				break;
+			case 15:
+				if(c == ' ' || c == '\t') nextstate = 16;
+				if(c == '\r' || c == '\n') nextstate = 0;
+				if(c >= '0' && c <= '9') nextstate = 15;
+				if(c == '/') nextstate = 17;
+				break;
+			case 16:
+				if(c == ' ' || c == '\t') nextstate = 16;
+				if(c == '\r' || c == '\n') nextstate = 0;
+				if(c >= '0' && c <= '9') nextstate = 11;
+				if(c == '/') nextstate = 17;
+				break;
+			case 17:
+				if(c == ' ' || c == '\t') nextstate = 18;
+				if(c >= '0' && c <= '9') nextstate = 19;
+				break;
+			case 18:
+				if(c == ' ' || c == '\t') nextstate = 18;
+				if(c >= '0' && c <= '9') nextstate = 19;
+				break;
+			case 19:
+				if(c == ' ' || c == '\t') nextstate = 10;
+				if(c == '\r' || c == '\n') nextstate = 0;
+				if(c >= '0' && c <= '9') nextstate = 19;
+				break;
+			default:
+				delete[] buffer;
+				throw(std::logic_error(
+						"__FILE__ : LoadObj: Statemachine has invalid state."));
+			}
+
+			if(nextstate == -1){
+				// Parsing error in file, maybe broken file or not a Wavefron OBJ file.
+				// Normally at every node in the graph there should be a next node, if the
+				// fileformat is valid.
+				delete[] buffer;
+				return false;
+			}
+
+			// Actions associated with the state changes
+			if(state == 0 && nextstate == 2){
+				command = 'v';
+				tempvalue = 0.0;
+				factor = 1.0;
+				negative = false;
+			}
+			if(state == 2 && nextstate == 3) command = c;
+			if(nextstate == 5) negative = (c == '-');
+			if(nextstate == 6 || nextstate == 8) tempvalue = tempvalue * 10
+					+ (double) (c - '0');
+			if(nextstate == 8) factor /= 10;
+			if((nextstate == 4 || nextstate == 0) && state >= 6 && state <= 8){
+				value.push_back((negative? -tempvalue : tempvalue) * factor);
+				tempvalue = 0.0;
+				factor = 1.0;
+				negative = false;
+			}
+			if(nextstate == 0 && state >= 4 && state <= 8){
+				const double x = (value.size() > 0)? value[0] : 0.0;
+				const double y = (value.size() > 1)? value[1] : 0.0;
+				const double z = (value.size() > 2)? value[2] : 0.0;
+				if(command == 'v') v.push_back(Vector3(x, y, z));
+				if(command == 'n') tempnormals.push_back(Vector3(x, y, z));
+				// Ignore 't' for now. Texturecoordinates are not interpreted yet.
+				value.clear();
+			}
+
+			if(state == 0 && nextstate == 9){
+				command = 'f';
+				tempindex = 0;
+			}
+			if(nextstate == 11 || nextstate == 15 || nextstate == 19) tempindex =
+					tempindex * 10 + (int) (c - '0');
+			if(state == 11 && nextstate != 11){
+				index_v.push_back(tempindex - 1);
+				tempindex = 0;
+			}
+			if(state == 15 && nextstate != 15){
+				index_t.push_back(tempindex - 1);
+				tempindex = 0;
+			}
+			if(state == 19 && nextstate != 19){
+				index_n.push_back(tempindex - 1);
+				tempindex = 0;
+			}
+			if(state >= 9 && nextstate == 0){
+
+				if(index_v.size() >= 3){
+					Hull::Triangle tempt;
+					tempt.va = index_v[0];
+					tempt.vb = index_v[1];
+					tempt.vc = index_v[2];
+					tempt.ea = FindEdge(tempt.va, tempt.vb);
+					tempt.eb = FindEdge(tempt.vb, tempt.vc);
+					tempt.ec = FindEdge(tempt.vc, tempt.va);
+					tempt.n = tempnormals[index_n[0]];
+
+					size_t tindex = t.size();
+					t.push_back(tempt);
+					if(!e[tempt.ea].AttachTriangle(tindex)) openedges.erase(
+							tempt.ea);
+					if(!e[tempt.eb].AttachTriangle(tindex)) openedges.erase(
+							tempt.eb);
+					if(!e[tempt.ec].AttachTriangle(tindex)) openedges.erase(
+							tempt.ec);
+				}
+				index_v.clear();
+				index_t.clear();
+				index_n.clear();
+			}
+
+			state = nextstate;
+		}
+	}while(charsread == buffersize);
+	delete[] buffer;
+
+	// Calculate missing normals
+	vn.assign(v.size(), Vector3(0, 0, 0));
+	for(size_t i = 0; i < e.size(); ++i){
+		if(e[i].trianglecount == 0) continue;
+		Vector3 temp = t[e[i].ta].n;
+		if(e[i].trianglecount > 1) temp += t[e[i].tb].n;
+		temp.Normalize();
+		e[i].n = temp;
+		vn[e[i].va] += temp;
+		vn[e[i].vb] += temp;
+	}
+	for(size_t i = 0; i < vn.size(); ++i)
+		vn[i].Normalize();
+
+	return true;
+}
+
+void Hull::SaveObj(std::string filename) const
+{
+	std::ofstream out(filename.c_str(), std::ofstream::out);
+	for(size_t i = 0; i < v.size(); ++i)
+		out << "v " << v[i].x << " " << v[i].y << " " << v[i].z << "\n";
+	for(size_t i = 0; i < vn.size(); ++i)
+		out << "vn " << vn[i].x << " " << vn[i].y << " " << vn[i].z << "\n";
+	out << "s off\n";
+	for(size_t i = 0; i < t.size(); ++i)
+		out << "f " << t[i].va + 1 << "//" << t[i].va + 1 << " " << t[i].vb + 1
+				<< "//" << t[i].vb + 1 << " " << t[i].vc + 1 << "//"
+				<< t[i].vc + 1 << "\n";
 }
 
 void Hull::ApplyTransformation(const AffineTransformMatrix &matrix)
 {
 	std::transform(v.begin(), v.end(), v.begin(), matrix);
-
-//	for(size_t i = 0; i < v.size(); i++)
-//		v[i] = matrix.Transform(v[i]);
-
 	for(size_t i = 0; i < vn.size(); i++)
 		vn[i] = matrix.TransformNoShift(vn[i]);
 	for(size_t i = 0; i < e.size(); i++)
 		e[i].n = matrix.TransformNoShift(e[i].n);
 	for(size_t i = 0; i < t.size(); i++)
 		t[i].n = matrix.TransformNoShift(t[i].n);
+
+	if(matrix.CheckOrientation() == AffineTransformMatrix::lhs){
+		for(size_t i = 0; i < t.size(); i++){
+			std::swap(t[i].va, t[i].vb);
+			std::swap(t[i].eb, t[i].ec);
+		}
+	}
 }
 
 void Hull::ApplyTransformation(void)
 {
-	std::transform(v.begin(), v.end(), v.begin(), matrix);
-//	for(size_t i = 0; i < v.size(); i++)
-//		v[i] = this->matrix.Transform(v[i]);
-	for(size_t i = 0; i < vn.size(); i++)
-		vn[i] = matrix.TransformNoShift(vn[i]);
-	for(size_t i = 0; i < e.size(); i++)
-		e[i].n = this->matrix.TransformNoShift(e[i].n);
-	for(size_t i = 0; i < t.size(); i++)
-		t[i].n = this->matrix.TransformNoShift(t[i].n);
+	this->ApplyTransformation(this->matrix);
+	this->matrix.SetIdentity();
 }
 
 void Hull::CopyFrom(const Geometry &geometry)
@@ -278,16 +598,18 @@ Vector3 Hull::GetCenter(void) const
 }
 
 Vector3 Hull::PlaneProjection(const Vector3& a, const Vector3& b, Vector3 n,
-		double d) const
+		double d)
 {
 	// Assume, that n is of length 1
+	// Project a onto the normal vector of the plane, distance relative to the center
 	const double sa = n.Dot(a) - d;
 	const double sb = n.Dot(b) - d;
 	if(sa - sb == 0) return (a + b) / 2;
+	// Project the line from a to b onto the plane, return the intersecting point
 	return (b * sa - a * sb) / (sa - sb);
 }
 
-Polygon3 Hull::IntersectPlane(Vector3 n, double d)
+Polygon3 Hull::IntersectPlane(Vector3 n, double d) const
 {
 	n.Normalize();
 
@@ -311,7 +633,17 @@ Polygon3 Hull::IntersectPlane(Vector3 n, double d)
 			"Hull:IntersectPlane - Wrong triangle selected."));
 	if(dir == -1) nt = e[ne].tb;
 	while(!edges.empty()){
-		temp.InsertPoint(PlaneProjection(v[e[ne].va], v[e[ne].vb], n, d));
+
+		const Vector3 a = v[e[ne].va];
+		const Vector3 b = v[e[ne].vb];
+		const double sa = n.Dot(a) - d;
+		const double sb = n.Dot(b) - d;
+		const double f = (sa - sb == 0)? (0.5) : (sa / (sa - sb));
+
+		temp.InsertPoint(a + (b - a) * f,
+				(vn[e[ne].va] + (vn[e[ne].vb] - vn[e[ne].va]) * f).Normal());
+
+//		temp.InsertPoint(PlaneProjection(a, b, n, d));
 		edges.erase(ne);
 
 		if(edges.find(t[nt].ea) != edges.end()){
@@ -332,42 +664,68 @@ Polygon3 Hull::IntersectPlane(Vector3 n, double d)
 		break;
 	}
 
-//	for(std::set <size_t>::iterator it = edges.begin(); it != edges.end();
-//			++it){
-//
-//	}
+	//TODO: If edges is not yet empty, there is more than a single loop in the cutting plane.
+	// for(std::set <size_t>::iterator it = edges.begin(); it != edges.end(); ++it){
+	//   ...
+	// }
 
 	temp.Close();
 	return temp;
 }
 
+Vector3 Hull::IntersectArrow(Vector3 p0, Vector3 dir) const
+{
+	for(size_t i = 0; i < t.size(); ++i){
+		const Vector3 a = v[t[i].va];
+		const Vector3 b = v[t[i].vb];
+		const Vector3 c = v[t[i].vc];
+		// Check if point of (p0 + x*dir) lies inside the triangle
+		if(((b - a) * (p0 - a)).Dot(dir) < 0) continue;
+		if(((c - b) * (p0 - b)).Dot(dir) < 0) continue;
+		if(((a - c) * (p0 - c)).Dot(dir) < 0) continue;
+		// Find intersection point
+		// solve((p0x+x*dirx)*nx + (p0y+x*diry)*ny + (p0z+x*dirz)*nz = ax*nx + ay*ny + az*nz, x);
+		const double den = t[i].n.Dot(dir);
+		const double x = t[i].n.Dot(a - p0) / den;
+		return p0 + dir * x;
+	}
+	return Vector3();
+}
+
 void Hull::CalcNormals(void)
 {
-	Vector3 temp;
+	// Start with triangle normals
 	for(size_t i = 0; i < t.size(); ++i){
-		temp = (v[t[i].vb] - v[t[i].va]) * (v[t[i].vc] - v[t[i].vb]);
+		Vector3 temp = (v[t[i].vb] - v[t[i].va]) * (v[t[i].vc] - v[t[i].vb]);
 		temp.Normalize();
 		t[i].n = temp;
 	}
+	// Zero vertex normals
 	for(size_t i = 0; i < vn.size(); ++i)
 		vn[i].Zero();
 	for(size_t i = 0; i < e.size(); ++i){
+		// For edges connected to triangles:
 		if(e[i].trianglecount == 0) continue;
-		temp = t[e[i].ta].n;
+		// Average triangle normals to edge normals
+		Vector3 temp = t[e[i].ta].n;
 		if(e[i].trianglecount > 1) temp += t[e[i].tb].n;
 		temp.Normalize();
+		e[i].n = temp;
+		// Propagate edge normals to vertex normals
 		const size_t a = e[i].va;
 		const size_t b = e[i].vb;
-		e[i].n = temp;
 		vn[a] += temp;
 		vn[b] += temp;
 	}
+	// Normalize all vertex normals
 	for(size_t i = 0; i < vn.size(); ++i)
 		vn[i].Normalize();
+	// Use vertex normals for edges not belonging to triangles
 	for(size_t i = 0; i < e.size(); ++i){
 		if(e[i].trianglecount != 0) continue;
-		temp = vn[e[i].va] + vn[e[i].vb];
+		Vector3 temp = vn[e[i].va] + vn[e[i].vb];
 		temp.Normalize();
+		e[i].n = temp;
 	}
 }
 
@@ -620,3 +978,4 @@ size_t Hull::CountSelected(void) const
 {
 	return selected.size();
 }
+

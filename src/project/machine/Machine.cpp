@@ -26,7 +26,7 @@
 
 #include "Machine.h"
 
-#include "NelderMeadOptimizer.h"
+#include "../../math/NelderMeadOptimizer.h"
 
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
@@ -256,11 +256,11 @@ double Machine::GetE(void) const
 	AffineTransformMatrix cpos = workpiecePosition.Inverse() * toolPosition;
 
 	// Scalar product of the normal vectors (0,0,1) for both matrices.
-	const double normalaligned = tpos.a[8] * cpos.a[8] + tpos.a[9] * cpos.a[9]
-			+ tpos.a[10] * cpos.a[10];
+	const double normalaligned = tpos[8] * cpos[8] + tpos[9] * cpos[9]
+			+ tpos[10] * cpos[10];
 
-	Vector3 tc = tpos.GetCenter();
-	Vector3 cc = cpos.GetCenter();
+	Vector3 tc = tpos.GetOrigin();
+	Vector3 cc = cpos.GetOrigin();
 
 	// Keep the axes rather straight.
 	double bend = 0.0;
@@ -317,7 +317,7 @@ void Machine::Paint(void) const
 //	::glPopMatrix();
 
 	::glPushMatrix();
-	::glMultMatrixd(workpiecePosition.a);
+	workpiecePosition.GLMultMatrix();
 	PaintCoordinateSystem(0.1);
 //	AffineTransformMatrix temp = workpiecePosition.Inverse() * toolPosition;
 //	::glMultMatrixd(temp.a);
@@ -325,7 +325,7 @@ void Machine::Paint(void) const
 	AffineTransformMatrix temp = (currentpos + offset0).GetMatrix();
 	temp.TranslateLocal(0, 0, toolLengthOffset);
 //	temp = temp.Inverse();
-	::glMultMatrixd(temp.a);
+	temp.GLMultMatrix();
 	if(selectedToolSlot > 0 && selectedToolSlot <= tools.GetCount()){
 		::glColor3f(0.7, 0.7, 0.7);
 		tools[selectedToolSlot - 1].Paint();
@@ -520,7 +520,7 @@ void Machine::Reset()
 
 Vector3 Machine::GetCenter(void) const
 {
-	return workpiecePosition.GetCenter();
+	return workpiecePosition.GetOrigin();
 }
 
 void Machine::TouchoffPoint(const CNCPosition &point)

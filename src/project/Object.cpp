@@ -61,7 +61,7 @@ void Object::Paint(const bool absolutCoordinates,
 	if(!show) return;
 	glPushMatrix();
 	if(absolutCoordinates){
-		glMultMatrixd(displayTransform.a);
+		displayTransform.GLMultMatrix();
 //#ifdef _DEBUGMODE
 //		if(geometries.GetCount() > 0){
 //			glColor3f(geometries[0].color.x, geometries[0].color.y,
@@ -74,7 +74,7 @@ void Object::Paint(const bool absolutCoordinates,
 //		glEnd();
 //#endif
 	}
-	glMultMatrixd(matrix.a);
+	matrix.GLMultMatrix();
 	for(size_t i = 0; i < geometries.GetCount(); i++)
 		geometries[i].Paint(style);
 	glPopMatrix();

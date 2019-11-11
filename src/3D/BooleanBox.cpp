@@ -29,6 +29,8 @@
 #include <GL/gl.h>
 #include <wx/log.h>
 
+#include "Vector3.h"
+
 BooleanBox::BooleanBox()
 {
 	bufferSizeIntersect = 10;
@@ -207,7 +209,7 @@ void BooleanBox::Paint(bool flipNormals) const
 	const unsigned int hz = nx * ny;
 
 	::glPushMatrix();
-	::glMultMatrixd(matrix.a);
+	matrix.GLMultMatrix();
 
 	::glBegin(GL_QUADS);
 
@@ -368,9 +370,9 @@ void BooleanBox::SetSize(float sx, float sy, float sz)
 BooleanBox& BooleanBox::operator -=(const BooleanBox &rhs)
 {
 	// Calculate relative position in x, y and z
-	const float mx = rhs.matrix.a[12] - matrix.a[12];
-	const float my = rhs.matrix.a[13] - matrix.a[13];
-	const float mz = rhs.matrix.a[14] - matrix.a[14];
+	const float mx = rhs.matrix[12] - matrix[12];
+	const float my = rhs.matrix[13] - matrix[13];
+	const float mz = rhs.matrix[14] - matrix[14];
 
 	const float eps = 1e-6; // = 1 um
 
@@ -528,7 +530,8 @@ BooleanBox& BooleanBox::operator -=(const BooleanBox &rhs)
 	return *this;
 }
 
-void BooleanBox::Translate(const AffineTransformMatrix matrix)
+void BooleanBox::Translate(const AffineTransformMatrix &matrix)
 {
-	this->matrix.TranslateGlobal(matrix.a[12], matrix.a[13], matrix.a[14]);
+	Vector3 temp = matrix.GetOrigin();
+	this->matrix.TranslateGlobal(temp.x, temp.y, temp.z);
 }

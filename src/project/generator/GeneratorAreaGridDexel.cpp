@@ -35,7 +35,7 @@
 
 #include <wx/sizer.h>
 #include <float.h>
-#include <cmath>
+//#include <cmath>
 
 GeneratorAreaGridDexel::GeneratorAreaGridDexel()
 {

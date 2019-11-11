@@ -30,7 +30,9 @@
 /*!\class Polygon3
  * \brief Polygon in 3D space.
  *
- * Loop of Vector3 objects that form a polygon.
+ * Vector of Vector3 objects that form a polygon. The polygon may be closed.
+ * The points of the polygon may have optional normal vectors.
+ * Normal vectors can be (re-)calculated.
  */
 
 #include <stddef.h>
@@ -43,49 +45,50 @@ class Polygon3 {
 	// Constructor / Destructor
 public:
 	Polygon3();
-	virtual ~Polygon3();
+
 	// Member variables
 public:
+
 	AffineTransformMatrix matrix; ///< Global Transformation of the polygon points
 
-	bool showDots; ///< Show Dots (GL_POINTS) at the points of the polygon
-	bool calcNormals; ///< Calculate normals when sending to OpenGL
-
+	size_t dotSize; ///< If > 0, dots (GL_POINTS) of this size are shown at the vertices
+	enum normalCalculation {
+		byCenter, ///< Calculate normals with respect to the center of the polygon
+		byBends ///< Calculate normals by examining the bends in the polygon
+	};
 protected:
-	bool isClosed; ///< Boolean: Closed or open polygon
 	std::vector <Vector3> elements; ///< Points that make up the polygon
+	bool isClosed; ///< Boolean: Closed or open polygon
+
+	std::vector <Vector3> normals; ///< One normal per vertex
+	normalCalculation method;
 
 	// Methods
 public:
 
-	/*! \brief Clear all points from the Polygon
-	 */
-	void Clear(void);
+	void Clear(void); ///< Clear all points from the Polygon
 
-	/*! \brief Insert a point at the end of the polygon using the coordinates x,y and z
-	 */
-	void InsertPoint(double x = 0.0, double y = 0.0, double z = 0.0);
+	void InsertPoint(double x = 0.0, double y = 0.0, double z = 0.0); ///< Insert a point at the end of the polygon
+	void InsertPoint(const Vector3 &x); ///< Insert a point at the end of the polygon
+	void InsertPoint(double x, double y, double z, double nx, double ny,
+			double nz); ///< Insert a point with normal at the end of the polygon
+	void InsertPoint(const Vector3 &x, const Vector3 &n); ///< Insert a point with normal at the end of the polygon
 
-	/*! \brief Insert a point at the end of the polygon using a Vector3 point
-	 *
-	 * @param x Vector3 point
-	 */
-	void InsertPoint(const Vector3 &x);
+	Polygon3 & operator+=(const Polygon3 &a); ///< Append another Polygon3 to this one
+	const Polygon3 operator+(const Polygon3 &a) const; ///< Append two Polygon3%s
 
-	/*! \brief Close (or open) the polygon to a cycle
-	 *
+	Polygon3 & operator+=(const Vector3 &a); ///< Add a Vector3 to this Polygon3
+	const Polygon3 operator+(const Vector3 &a) const; ///< Add a Vector3 to a Polygon3
+
+	/*! \brief Close (or open) the polygon to a cyclic polygon
 	 * @param close Boolean: true (default) to close the polygon, false to open it.
 	 */
 	void Close(bool close = true);
 	bool IsClosed(void) const;
 
-	/*! \brief Reverse the direction of the polygon
-	 */
-	void Reverse(void);
+	void Reverse(void); ///< Reverse the direction of the polygon
 
-	/*! \brief Remove all segments from the polygon, that have a length of zero
-	 */
-	void RemoveZeroLength(void);
+	void RemoveZeroLength(void); ///< Remove all segments from the polygon, that have a length of zero
 
 	/*! \brief Apply the transformation matrix to the points in the polygon.
 	 *
@@ -94,32 +97,17 @@ public:
 	 */
 	void ApplyTransformation(void);
 
-	/*! \brief Apply a AffineTransformMatrix to the points in the polygon
+	/*! \brief Apply an AffineTransformMatrix to the points in the polygon
 	 *
 	 * The matrix belonging to the polygon itself stays unchanged.
 	 * @param matrix AffineTransformMatrix with the transform operation
 	 */
 	void ApplyTransformation(const AffineTransformMatrix &matrix);
 
-	/*! \brief Add the points of two Polygon3 together
-	 *
-	 * Both polygons are appended behind each other.
-	 */
-	Polygon3 & operator+=(const Polygon3 &a);
-
-	/*! \brief Add another Polygon3 to this polygon
-	 */
-	const Polygon3 operator+(const Polygon3 &a) const;
-
-	/*! \brief Add a Vector3 to a Polygon3
-	 *
-	 * Both polygons are appended behind each other.
-	 */
-	Polygon3 & operator+=(const Vector3 &a);
-
-	/*! \brief Add a Vector3 to this polygon
-	 */
-	const Polygon3 operator+(const Vector3 &a) const;
+	Polygon3 & operator/=(const double val);
+	const Polygon3 operator/(const double val);
+	Polygon3 & operator*=(const double val);
+	const Polygon3 operator*(const double val);
 
 	/*! \brief Returns the length of the polygon
 	 */
@@ -127,14 +115,12 @@ public:
 
 	/*! \brief Get the number of elements
 	 */
-	size_t GetCount(void) const;
-
-	/*! \brief Get the number of elements
-	 */
 	size_t Size(void) const;
 
 	Vector3& operator[](size_t index);
-	Vector3 operator[](size_t index) const;
+	const Vector3& operator[](size_t index) const;
+	Vector3& Normal(size_t index);
+	const Vector3& Normal(size_t index) const;
 
 	/*! \brief Get the center of the Polygon.
 	 *
@@ -148,6 +134,12 @@ public:
 	 * This function calculates the axis of rotation of the polygon.
 	 */
 	Vector3 GetRotationalAxis(void) const;
+
+	/*! \brief Calculates the area of the polygon
+	 *
+	 * This function assumes the polygon is closed and uses the vectorproduct to calculate the area of the polygon.
+	 */
+	double GetArea(void) const;
 
 	/*! \brief Returns a std::vector with all x values of the polygon.
 	 *
@@ -178,7 +170,7 @@ public:
 	 * The polygon is resampled into a polygon with N points. This can be an over- or undersampling of the original polygon.
 	 * @param N New number of points
 	 */
-	void Resample(unsigned int N);
+	void Resample(unsigned int Nnew);
 
 	/*! \brief Moving-average filter for the points of the polygon
 	 *
@@ -193,9 +185,19 @@ public:
 	 */
 	void Filter(unsigned int N);
 
-	/*! \brief Render the Polygon to OpenGL
+	/*! \brief Init the normal vector
+	 * This function is needed, if the normals will be set externally. If CalculateAndStoreNormals is called,
+	 * the vector is initialized as well.
 	 */
-	void Paint(void) const;
+	void InitNormals(void); ///< Prepare the normal vector for each vertex.
+	void CalculateNormals(void); ///< Calculate normals once and store them. (InitNormals not needed.)
+	void ClearNormals(void); ///< Clear the normal storage.
+
+	void Export(std::string filename) const; ///< Export as a Matlab/Octave .mat file.
+
+	void Paint(bool withNormals = true, double normalLength = -1) const; ///< Render the Polygon to OpenGL
+private:
+	std::vector <Vector3> pCalculateNormals(void) const; ///< Extra private function, because const.
 };
 
 #endif /* POLYGON3_H_ */

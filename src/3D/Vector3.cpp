@@ -83,7 +83,7 @@ void Vector3::Swap(Vector3& b)
 	this->z = temp;
 }
 
-Vector3 Vector3::Normalize(void)
+void Vector3::Normalize(void)
 {
 	float d = Abs();
 	if(d > 0){
@@ -91,9 +91,17 @@ Vector3 Vector3::Normalize(void)
 		y /= d;
 		z /= d;
 	}
-	return Vector3(x, y, z);
 }
 
+Vector3 Vector3::Normal(void) const
+{
+	float d = Abs();
+	if(d > 0){
+		return Vector3(x / d, y / d, z / d);
+	}else{
+		return Vector3(x, y, z);
+	}
+}
 bool Vector3::operator ==(const Vector3& b) const
 {
 	double epsilon = 1e-5;
@@ -113,5 +121,6 @@ Vector3 Vector3::Orthogonal(void) const
 	if(ay < az && ay < ax) temp.Set(z, y, x);
 	if(az < ax && az < ay) temp.Set(y, x, z);
 	temp *= (*this);
-	return temp.Normalize();
+	return temp.Normal();
 }
+

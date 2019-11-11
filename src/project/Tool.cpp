@@ -36,8 +36,6 @@ WX_DEFINE_OBJARRAY(ArrayOfToolContourElement)
 WX_DEFINE_OBJARRAY(ArrayOfToolElement)
 WX_DEFINE_OBJARRAY(ArrayOfTool)
 
-unsigned int Tool::resolution = 32;
-
 ToolContourElement::ToolContourElement(bool cutting, bool partOfShaft)
 {
 	isCutting = cutting;
@@ -311,15 +309,17 @@ void Tool::GenerateContour(void)
 
 void Tool::Paint(void) const
 {
-	float ss[resolution + 1], cc[resolution + 1];
-	for(unsigned int i = 0; i <= resolution; i++){
+	const size_t resolution = 32;
+	float ss[resolution + 1];
+	float cc[resolution + 1];
+	for(size_t i = 0; i <= resolution; i++){
 		ss[i] = sin(-2.0 * M_PI / (float) resolution * (float) i);
 		cc[i] = cos(-2.0 * M_PI / (float) resolution * (float) i);
 	}
-	for(unsigned int i = 0; i < contour.Count(); i++){
+	for(size_t i = 0; i < contour.Count(); i++){
 		::glBegin(GL_QUAD_STRIP);
 		//TODO Note that Z is flipped. this has to be passed into the GenerateContour function.
-		for(unsigned int j = 0; j <= resolution; j++){
+		for(size_t j = 0; j <= resolution; j++){
 			::glNormal3f(cc[j] * contour[i].n2.x, ss[j] * contour[i].n2.x,
 					-contour[i].n2.z);
 			::glVertex3f(cc[j] * contour[i].p2.x, ss[j] * contour[i].p2.x,

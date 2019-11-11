@@ -61,7 +61,7 @@ void Workpiece::Paint(void) const
 	const Project* project = this->parent;
 	if(project == NULL) return;
 	glPushMatrix();
-	glMultMatrixd(this->matrix.a);
+	this->matrix.GLMultMatrix();
 
 	for(size_t j = 0; j < placements.GetCount(); j++){
 //		const float x = placements[j].matrix.a[12];
@@ -78,7 +78,7 @@ void Workpiece::Paint(void) const
 		Object* obj = &(project->objects[obpl->refObject]);
 		if(obj != NULL){
 			glPushMatrix();
-			glMultMatrixd(obpl->matrix.a);
+			obpl->matrix.GLMultMatrix();
 			obj->Paint(false);
 			glPopMatrix();
 		}

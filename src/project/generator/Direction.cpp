@@ -26,7 +26,7 @@
 
 #include "Direction.h"
 
-#include <cmath>
+//#include <cmath>
 
 Direction::Direction()
 {

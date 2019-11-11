@@ -212,8 +212,11 @@ public:
 	//! Swap the vector with a given vector.
 	void Swap(Vector3& b);
 
+	//! Returns a normal length vector (without changing the original vector)
+	Vector3 Normal(void) const;
+
 	//! Normalizes the length of a vector.
-	Vector3 Normalize(void);
+	void Normalize(void);
 
 	/*! \brief Generate an orthogonal vector
 	 *

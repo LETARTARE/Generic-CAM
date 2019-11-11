@@ -99,7 +99,7 @@ OpenGLCanvas::~OpenGLCanvas()
 {
 #ifdef _USE_6DOFCONTROLLER
 	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(OpenGLCanvas::OnTimer),
-	NULL, this);
+			NULL, this);
 #endif
 	this->Disconnect(wxEVT_RIGHT_DCLICK,
 			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
@@ -130,7 +130,6 @@ OpenGLCanvas::Context::Context(wxGLCanvas* canvas)
 		: wxGLContext(canvas)
 {
 	SetCurrent(*canvas);
-
 
 	printf("GL_VERSION: ");
 	printf("%s", (char*) glGetString(GL_VERSION));
@@ -393,8 +392,9 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 			&winZ2);
 	unitAtOrigin = winX2 - winX1;
 
-	glMultMatrixd(rotmat.a);
-	glMultMatrixd(transmat.a);
+	rotmat.GLMultMatrix();
+	transmat.GLMultMatrix();
+
 	//	if(m_gllist == 0){
 	//		m_gllist = glGenLists(1); // Make one (1) empty display list.
 	//		glNewList(m_gllist, GL_COMPILE_AND_EXECUTE);
@@ -431,8 +431,8 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 		glTranslatef(-eyeDistance / 2, 0, 0);
 		glTranslatef(0.0, 0.0, -focalDistance);
 		glScalef(scale, scale, scale);
-		glMultMatrixd(rotmat.a);
-		glMultMatrixd(transmat.a);
+		rotmat.GLMultMatrix();
+		transmat.GLMultMatrix();
 		Light0.Update(true);
 		Render();
 		//glCallList(m_gllist);
@@ -492,8 +492,8 @@ bool OpenGLCanvas::OnPick(OpenGLPick &result, wxPoint pos)
 
 	glTranslatef(0.0, 0.0, -focalDistance);
 	glScalef(scale, scale, scale);
-	glMultMatrixd(rotmat.a);
-	glMultMatrixd(transmat.a);
+	rotmat.GLMultMatrix();
+	transmat.GLMultMatrix();
 
 	RenderPick();
 	glFlush();

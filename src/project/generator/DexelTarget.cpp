@@ -1114,7 +1114,7 @@ Polygon25 DexelTarget::FindCut(int &x, int &y)
 }
 void DexelTarget::PolygonCutInTarget(Polygon3 &polygon, DexelTarget &tool)
 {
-	if(polygon.GetCount() == 0) return;
+	if(polygon.Size() == 0) return;
 	int px = floor(polygon[0].x / rx);
 	int py = floor(polygon[0].y / ry);
 	double pz = polygon[0].z;

@@ -116,7 +116,7 @@ bool Project::GenerateToolpaths(void)
 			}
 			lastPlacement = run[n].workpiecePlacement / lastPlacement;
 			for(uint_fast8_t m = 12; m <= 14; m++)
-				lastPlacement.a[m] = 0;
+				lastPlacement[m] = 0;
 
 			if(lastPlacement.Distance(rotx0) < FLT_EPSILON){
 				// Nothing to do

@@ -225,7 +225,7 @@ void Run::Paint(void) const
 
 	if(refWorkpiece > -1){
 		::glPushMatrix();
-		::glMultMatrixd(machine.workpiecePosition.a);
+		machine.workpiecePosition.GLMultMatrix();
 
 		if(showSimulation){
 			simulator.Paint();
@@ -245,7 +245,7 @@ void Run::Paint(void) const
 			}
 
 			::glPushMatrix();
-			::glMultMatrixd(workpiecePlacement.a);
+			workpiecePlacement.GLMultMatrix();
 			pr->workpieces[refWorkpiece].Paint();
 			::glPopMatrix();
 		}

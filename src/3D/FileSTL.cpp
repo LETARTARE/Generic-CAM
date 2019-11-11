@@ -32,6 +32,10 @@
 #include <wx/string.h>
 #include <stdint.h>
 
+// Verify, that float is 32 bit on this architecture.
+#define __ASSERT(e) typedef char __ASSERT__[(e)?1:-1]
+__ASSERT(sizeof(float) == sizeof(uint32_t));
+
 FileSTL::FileSTL()
 {
 }
@@ -83,6 +87,8 @@ bool FileSTL::ReadStream(wxInputStream & stream)
 
 bool FileSTL::ReadStreamBinary(wxInputStream & stream, bool hasRead5Byte)
 {
+	// NOTE: When changing to std::istream, check https://stackoverflow.com/questions/5605125/why-is-iostreameof-inside-a-loop-condition-i-e-while-stream-eof-cons
+
 //	wxString temp;
 	wxDataInputStream binaryStream(stream);
 
@@ -107,7 +113,7 @@ bool FileSTL::ReadStreamBinary(wxInputStream & stream, bool hasRead5Byte)
 	geometry.Clear(); // Clear the old geometry and
 	geometry.Add(g); //insert the new one.
 	size_t nGeometry = geometry.GetCount() - 1;
-	wxASSERT(nGeometry==0);
+	wxASSERT(nGeometry == 0);
 
 	// Binary STL File
 	uint32_t nrOfTriangles = binaryStream.Read32();
@@ -121,7 +127,7 @@ bool FileSTL::ReadStreamBinary(wxInputStream & stream, bool hasRead5Byte)
 	unsigned char j;
 	float coord[12];
 
-	wxASSERT(sizeof(float)==4);
+	wxASSERT(sizeof(float) == 4);
 
 	uint16_t attribute;
 

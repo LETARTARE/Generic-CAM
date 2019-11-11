@@ -60,7 +60,8 @@ public:
 		size_t ta, tb;
 		uint_least8_t trianglecount;
 		Vector3 n;
-		size_t OtherTriangle(size_t n);
+		size_t OtherTriangle(size_t n) const;
+		bool AttachTriangle(size_t index);
 	};
 	class Triangle {
 	public:
@@ -68,7 +69,7 @@ public:
 		size_t va, vb, vc;
 		size_t ea, eb, ec;
 		Vector3 n;
-		int Direction(size_t i1, size_t i2); //!< Test the direction of rotation of two indices respective to a triangle.
+		int Direction(size_t i1, size_t i2) const; //!< Test the direction of rotation of two indices respective to a triangle.
 	};
 
 	// Member variables
@@ -114,6 +115,7 @@ public:
 	void CopyTrianglesFrom(const Geometry &geometry);
 
 	bool LoadObj(std::string filename); //!< Load Wavefront OBJ file.
+	void SaveObj(std::string filename) const; //!< Write Wavefront OBJ file.
 
 	size_t AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c);
 	size_t AddTriangleTransform(const Vector3 &a, const Vector3 &b,
@@ -129,7 +131,8 @@ public:
 	void AddQuadTransform(const Vector3 &a, const Vector3 &b, const Vector3 &c,
 			const Vector3 &d, const AffineTransformMatrix &transformMatrix);
 
-	Polygon3 IntersectPlane(Vector3 n, double d);
+	Polygon3 IntersectPlane(Vector3 n, double d) const;
+	Vector3 IntersectArrow(Vector3 p0, Vector3 dir) const;
 	Vector3 GetCenter(void) const;
 
 	size_t GetVertexCount(void) const
@@ -149,8 +152,8 @@ private:
 
 	size_t FindVertex(const Vector3& x);
 	size_t FindEdge(const size_t indexa, const size_t indexb);
-	Vector3 PlaneProjection(const Vector3 &a, const Vector3 &b, Vector3 n,
-			double d) const;
+	static Vector3 PlaneProjection(const Vector3 &a, const Vector3 &b,
+			Vector3 n, double d);
 };
 
 #endif /* HULL_H_ */

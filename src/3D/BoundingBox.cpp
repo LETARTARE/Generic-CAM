@@ -24,7 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include "BoundingBox.h"
 
 #include "Geometry.h"
@@ -209,6 +208,16 @@ double BoundingBox::GetVolume(void) const
 	if(ymax <= ymin) return 0.0;
 	if(zmax <= zmin) return 0.0;
 	return (xmax - xmin) * (ymax - ymin) * (zmax - zmin);
+}
+
+AffineTransformMatrix BoundingBox::GetCoordinateSystem(void) const
+{
+	AffineTransformMatrix temp;
+	temp.SetEx(Vector3(xmax - xmin, 0, 0));
+	temp.SetEy(Vector3(0, ymax - ymin, 0));
+	temp.SetEz(Vector3(0, 0, zmax - zmin));
+	temp.SetOrigin(Vector3(xmin, ymin, zmin));
+	return temp;
 }
 
 void BoundingBox::Paint(void) const

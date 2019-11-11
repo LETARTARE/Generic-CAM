@@ -176,7 +176,7 @@ void MachineComponent::SetColor(float r, float g, float b)
 void MachineComponent::Paint(void) const
 {
 	::glPushMatrix();
-	::glMultMatrixd(matrix.a);
+	matrix.GLMultMatrix();
 	geometry.Paint();
 	::glPopMatrix();
 }
