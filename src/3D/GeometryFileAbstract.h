@@ -45,7 +45,7 @@ public:
 public:
 	wxString filename; ///< Last read / written file
 	AffineTransformMatrix matrix;
-	ArrayOfGeometry geometry;
+	Geometry geometry;
 	wxString error; ///> Errorstring, empty if no errors occured
 	Vector3 color; ///> Color of object, if no color is provided by the geometry itself.
 

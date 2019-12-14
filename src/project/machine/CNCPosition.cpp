@@ -26,14 +26,10 @@
 
 #include "CNCPosition.h"
 
-#include <wx/log.h>
-#include <wx/arrimpl.cpp>
 
 #include <math.h>
 #include <locale.h>
 #include <float.h>
-
-WX_DEFINE_OBJARRAY(ArrayOfCNCPosition)
 
 CNCPosition::CNCPosition(double x, double y, double z, double a, double b,
 		double c, double u, double v, double w)

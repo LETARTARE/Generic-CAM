@@ -33,16 +33,15 @@
 #include <wx/string.h>
 #include <wx/log.h>
 #include <GL/gl.h>
+#include <algorithm>
 
+#include "../3D/OpenGLMaterial.h"
 #include "../Config.h"
-
-#include <wx/arrimpl.cpp>
-WX_DEFINE_OBJARRAY(ArrayOfObject)
 
 Object::Object()
 {
 	show = true;
-	selected = false;
+	selectable = true;
 //	modified = false;
 }
 
@@ -52,53 +51,107 @@ Object::~Object()
 
 bool Object::IsEmpty(void) const
 {
-	return (geometries.GetCount() == 0);
+	return geometry.IsEmpty();
 }
 
-void Object::Paint(const bool absolutCoordinates,
-		const GeometryColorStyle style) const
+void Object::Paint(const OpenGLMaterial &face, const OpenGLMaterial &edge,
+		const Selection& sel) const
 {
 	if(!show) return;
-	glPushMatrix();
-	if(absolutCoordinates){
-		displayTransform.GLMultMatrix();
+
 //#ifdef _DEBUGMODE
 //		if(geometries.GetCount() > 0){
 //			glColor3f(geometries[0].color.x, geometries[0].color.y,
 //					geometries[0].color.z);
 //		}
-		// Paint a little dot at the origin of the Object.
+	// Paint a little dot at the origin of the Object.
 //		glPointSize(5);
 //		glBegin(GL_POINTS);
 //		glVertex3i(0, 0, 0);
 //		glEnd();
 //#endif
-	}
+
+	const bool invert = sel.IsInverted();
+	glPushMatrix();
 	matrix.GLMultMatrix();
-	for(size_t i = 0; i < geometries.GetCount(); i++)
-		geometries[i].Paint(style);
+	face.UseMaterial();
+	glPushName(Selection::TriangleGroup);
+	if(sel.IsType(Selection::TriangleGroup)){
+		geometry.PaintTriangles(sel.GetSet(), invert);
+	}else{
+		if(invert) geometry.PaintTriangles(std::set <size_t>(), true);
+	}
+	glPopName();
+
+	if(OpenGLMaterial::ColorsAllowed()){
+		edge.UseMaterial();
+		glLineWidth(3);
+		glPushMatrix();
+
+		GLdouble modelview[16];
+		glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+		modelview[14] = modelview[14] + 0.001; // Move edges a little bit towards the camera
+		glLoadMatrixd(modelview);
+
+		glPushName(Selection::EdgeGroup);
+		if(sel.IsType(Selection::EdgeGroup)){
+			geometry.PaintEdges(sel.GetSet(), invert);
+		}else{
+			if(invert) geometry.PaintEdges(std::set <size_t>(), true);
+		}
+		glPopName();
+
+		glPopMatrix();
+		glLineWidth(1);
+	}
 	glPopMatrix();
 }
 
 void Object::Update(void)
 {
 	bbox.Clear();
-	for(size_t i = 0; i < geometries.GetCount(); i++)
-		bbox.Insert((geometries[i]), matrix);
-	matrix.TranslateGlobal(-bbox.xmin, -bbox.ymin, -bbox.zmin);
-	displayTransform.TranslateGlobal(bbox.xmin, bbox.ymin, bbox.zmin);
-	bbox.xmax -= bbox.xmin;
-	bbox.ymax -= bbox.ymin;
-	bbox.zmax -= bbox.zmin;
-	bbox.xmin = 0;
-	bbox.ymin = 0;
-	bbox.zmin = 0;
+
+	const size_t N = geometry.GetVertexCount();
+	for(size_t n = 0; n < N; ++n)
+		bbox.Insert(geometry.GetVertex(n));
+	bbox.Transform(geometry.matrix);
+
+//	matrix.TranslateGlobal(-bbox.xmin, -bbox.ymin, -bbox.zmin);
+//	bbox.xmax -= bbox.xmin;
+//	bbox.ymax -= bbox.ymin;
+//	bbox.zmax -= bbox.zmin;
+//	bbox.xmin = 0;
+//	bbox.ymin = 0;
+//	bbox.zmin = 0;
 }
 
-void Object::UpdateNormals(void)
+//
+//void Object::UpdateNormals(void)
+//{
+//	geometry.CalculateNormals();
+//}
+
+void Object::PaintPick(void) const
 {
-	for(size_t i = 0; i < geometries.GetCount(); i++)
-		geometries[i].CalculateNormals();
+	if(!show) return;
+	glPushMatrix();
+	matrix.GLMultMatrix();
+	glPushName(Selection::TriangleGroup);
+	geometry.PaintTriangles();
+	glPopName();
+
+	GLdouble modelview[16];
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+	modelview[14] = modelview[14] + 0.001; // Move edges a little bit towards the camera
+	glLoadMatrixd(modelview);
+
+	glPushName(Selection::EdgeGroup);
+	geometry.PaintEdges();
+	glPopName();
+	glPushName(Selection::VertexGroup);
+	geometry.PaintVertices();
+	glPopName();
+	glPopMatrix();
 }
 
 void Object::TransformFromCenter(void)
@@ -106,7 +159,6 @@ void Object::TransformFromCenter(void)
 	const double dx = bbox.xmin + bbox.GetSizeX() / 2;
 	const double dy = bbox.ymin + bbox.GetSizeY() / 2;
 	const double dz = bbox.zmin + bbox.GetSizeZ() / 2;
-	displayTransform.TranslateGlobal(dx, dy, dz);
 	matrix.TranslateGlobal(-dx, -dy, -dz);
 	bbox.xmin -= dx;
 	bbox.ymin -= dy;
@@ -118,23 +170,19 @@ void Object::TransformFromCenter(void)
 
 void Object::FlipNormals(void)
 {
-	for(size_t i = 0; i < geometries.GetCount(); i++)
-		geometries[i].FlipNormals();
+	geometry.FlipNormals();
 }
 void Object::FlipX(void)
 {
-	for(size_t i = 0; i < geometries.GetCount(); i++)
-		geometries[i].FlipX();
+//	geometry.FlipX();
 }
 void Object::FlipY(void)
 {
-	for(size_t i = 0; i < geometries.GetCount(); i++)
-		geometries[i].FlipY();
+//	geometry.FlipY();
 }
 void Object::FlipZ(void)
 {
-	for(size_t i = 0; i < geometries.GetCount(); i++)
-		geometries[i].FlipZ();
+//	geometry.FlipZ();
 }
 
 bool Object::LoadObject(wxFileName fileName)
@@ -145,84 +193,103 @@ bool Object::LoadObject(wxFileName fileName)
 	return ReloadObject();
 }
 
+bool IsLess(Triangle a, Triangle b)
+{
+	return (a.p[0].x < b.p[0].x);
+}
+
 bool Object::ReloadObject(void)
 {
 
 	if(!fileName.IsOk()) return false;
 
-	// Process a GTS-file:
+// Process a GTS-file:
 	if(fileName.GetExt().CmpNoCase(_T("gts")) == 0){
 		FileGTS temp;
 		if(!temp.ReadFile(fileName.GetFullPath())){
-			wxLogMessage(_("GTS file not readable!"));
+			wxLogMessage
+			(_("GTS file not readable!"));
 			return false;
-		}else{
-			geometries.Clear();
-			for(size_t i = 0; i < temp.geometry.GetCount(); i++){
-				temp.geometry[i].ApplyTransformation();
-				temp.geometry[i].matrix = AffineTransformMatrix();
-				Geometry g;
-				g.InsertTrianglesFrom(temp.geometry[i]);
-				g.name = fileName.GetName();
-				geometries.Add(g);
-			}
 		}
-		Update();
-		UpdateNormals();
+		if(temp.geometry.Size() > 0){
+			temp.geometry.ApplyTransformation();
+			temp.geometry.matrix = AffineTransformMatrix();
+			geometry.Clear();
+			geometry.CopyFrom(temp.geometry);
+			this->name = fileName.GetName();
+			geometry.CalcNormals();
+			geometry.CalcGroups();
+			geometry.ApplyTransformation();
+		}
 		return true;
 	}
 
-	// Process a STL-file:
+// Process a STL-file:
 	if(fileName.GetExt().CmpNoCase(_T("stl")) == 0){
 		FileSTL temp;
 		if(!temp.ReadFile(fileName.GetFullPath())){
-			wxLogMessage(_("STL file not readable!"));
-			wxLogMessage(temp.error);
+			wxLogMessage
+			(_("STL file not readable!"));
+			wxLogMessage
+			(temp.error);
 			return false;
-		}else{
-			AffineTransformMatrix scaledown;
-			scaledown.ScaleGlobal(0.001, 0.001, 0.001); // Most programs export .stl with the unit of mm.
-			geometries.Clear();
-			for(size_t i = 0; i < temp.geometry.GetCount(); i++){
-				temp.geometry[i].ApplyTransformation();
-				temp.geometry[i].ApplyTransformation(scaledown);
-				temp.geometry[i].matrix = AffineTransformMatrix();
-				Geometry g;
-				g.InsertTrianglesFrom(temp.geometry[i]);
-				if(g.name.IsEmpty()){
-					g.name = fileName.GetName()
-							+ wxString::Format(_T(" - %lu"), i);
-				}
-				g.color.Set((float) rand() / (float) RAND_MAX / 2.0 + 0.5,
-						(float) rand() / (float) RAND_MAX / 2.0 + 0.5,
-						(float) rand() / (float) RAND_MAX / 2.0 + 0.5);
-				geometries.Add(g);
-			}
-			if(!temp.error.IsEmpty()) wxLogMessage(temp.error);
 		}
-		Update();
-		UpdateNormals();
+		AffineTransformMatrix scaledown;
+		scaledown.ScaleGlobal(1, 1, 1);
+		if(temp.geometry.Size() > 0){
+			temp.geometry.ApplyTransformation();
+			temp.geometry.ApplyTransformation(scaledown);
+			temp.geometry.matrix = AffineTransformMatrix();
+			std::sort(temp.geometry.triangles.begin(),
+					temp.geometry.triangles.end(), IsLess);
+			geometry.Clear();
+			geometry.CopyFrom(temp.geometry);
+			this->name = fileName.GetName();
+			geometry.CalcNormals();
+			geometry.CalcGroups();
+//				geometry.color.Set(
+//						(float) rand() / (float) RAND_MAX / 2.0 + 0.5,
+//						(float) rand() / (float) RAND_MAX / 2.0 + 0.5,
+//						(float) rand() / (float) RAND_MAX / 2.0 + 0.5);
+		}
+		if(!temp.error.IsEmpty()) wxLogMessage
+		(temp.error);
 		return true;
 	}
 
-	// Process a DXF-file:
+// Process a DXF-file:
 	if(fileName.GetExt().CmpNoCase(_T("dxf")) == 0){
 		FileDXF temp;
 		if(!temp.ReadFile(fileName.GetFullPath())){
-			wxLogMessage(_("DXF file not readable!"));
-		}else{
-			geometries.Clear();
-			for(size_t i = 0; i < temp.geometry.GetCount(); i++){
-				temp.geometry[i].ApplyTransformation();
-				temp.geometry[i].matrix = AffineTransformMatrix();
-				Geometry g;
-				g.InsertTrianglesFrom(temp.geometry[i]);
-				g.name = temp.geometry[i].name;
-				geometries.Add(g);
-			}
+			wxLogMessage
+			(_("DXF file not readable!"));
 		}
-		Update();
-		UpdateNormals();
+		geometry.Clear();
+		if(temp.geometry.Size() > 0){
+			temp.geometry.ApplyTransformation();
+			temp.geometry.matrix = AffineTransformMatrix();
+			geometry.CopyFrom(temp.geometry);
+			this->name = temp.geometry.name;
+			geometry.CalcNormals();
+			geometry.CalcGroups();
+			geometry.ApplyTransformation();
+		}
+		return true;
+	}
+
+// Process a Wavefront OBJ-file:
+	if(fileName.GetExt().CmpNoCase(_T("obj")) == 0){
+		Hull temp;
+		if(!temp.LoadObj(std::string(fileName.GetFullPath().mb_str()))){
+			wxLogMessage
+			(_("OBJ file not readable!"));
+			return false;
+		}
+		geometry = temp;
+		this->name = fileName.GetName();
+		geometry.CalcNormals();
+		geometry.CalcGroups();
+		geometry.ApplyTransformation();
 		return true;
 	}
 	return false;
@@ -236,31 +303,29 @@ void Object::ToStream(wxTextOutputStream& stream, size_t n)
 	matrix.ToStream(stream);
 	stream << endl;
 	stream << _T("DisplayMatrix: ");
-	displayTransform.ToStream(stream);
 	stream << endl;
 	stream << _T("Show: ");
 	stream << ((show)? 1 : 0);
 	stream << endl;
 	stream << _T("Geometries: ");
-	stream << wxString::Format(_T("%zu"), geometries.GetCount());
+	stream << wxString::Format(_T("%zu"), 1);
 	stream << endl;
-	for(size_t m = 0; m < geometries.GetCount(); m++){
-		stream << _T("Geometry: ");
-		stream << wxString::Format(_T("%zu"), m);
-		stream << endl;
-		stream << _T("Name:") << endl;
-		stream << geometries[m].name << endl;
-		stream << _T("Filename:") << endl;
-		stream << wxString::Format(_T("object_%zu_geometry_%zu.stl"), n, m)
-				<< endl;
-		stream << _T("Matrix: ");
-		geometries[m].matrix.ToStream(stream);
-		stream << endl;
-		stream << _T("Color: ");
-		stream << geometries[m].color.x << _T(" ");
-		stream << geometries[m].color.y << _T(" ");
-		stream << geometries[m].color.z << endl;
-	}
+
+	stream << _T("Geometry: ");
+	stream << wxString::Format(_T("%zu"), 0);
+	stream << endl;
+	stream << _T("Name:") << endl;
+	stream << this->name << endl;
+	stream << _T("Filename:") << endl;
+	stream << wxString::Format(_T("object_%zu_geometry_%zu.stl"), n, 0) << endl;
+	stream << _T("Matrix: ");
+	geometry.matrix.ToStream(stream);
+	stream << endl;
+//	stream << _T("Color: ");
+//	stream << geometry.color.x << _T(" ");
+//	stream << geometry.color.y << _T(" ");
+//	stream << geometry.color.z << endl;
+
 }
 
 bool Object::FromStream(wxTextInputStream& stream)
@@ -274,34 +339,31 @@ bool Object::FromStream(wxTextInputStream& stream)
 	matrix.FromStream(stream);
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("DisplayMatrix:")) != 0) return false;
-	displayTransform.FromStream(stream);
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Show:")) != 0) return false;
 	show = (stream.Read8() == 1);
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Geometries:")) != 0) return false;
 	const size_t N = stream.Read32();
-	Geometry geometry;
-	geometries.Clear();
-	for(size_t n = 0; n < N; n++){
-		temp = stream.ReadWord();
-		if(temp.Cmp(_T("Geometry:")) != 0) return false;
-		if(n != stream.Read32()) return false;
-		temp = stream.ReadLine();
-		if(temp.Cmp(_T("Name:")) != 0) return false;
-		geometry.name = stream.ReadLine();
-		temp = stream.ReadLine();
-		if(temp.Cmp(_T("Filename:")) != 0) return false;
-		temp = stream.ReadLine();
-		temp = stream.ReadWord();
-		if(temp.Cmp(_T("Matrix:")) != 0) return false;
-		geometry.matrix.FromStream(stream);
-		temp = stream.ReadWord();
-		if(temp.Cmp(_T("Color:")) != 0) return false;
-		geometry.color.x = stream.ReadDouble();
-		geometry.color.y = stream.ReadDouble();
-		geometry.color.z = stream.ReadDouble();
-		geometries.Add(geometry);
-	}
+
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Geometry:")) != 0) return false;
+	if(0 != stream.Read32()) return false;
+	temp = stream.ReadLine();
+	if(temp.Cmp(_T("Name:")) != 0) return false;
+	this->name = stream.ReadLine();
+	temp = stream.ReadLine();
+	if(temp.Cmp(_T("Filename:")) != 0) return false;
+	temp = stream.ReadLine();
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Matrix:")) != 0) return false;
+	geometry.matrix.FromStream(stream);
+	temp = stream.ReadWord();
+//	if(temp.Cmp(_T("Color:")) != 0) return false;
+//	geometry.color.x = stream.ReadDouble();
+//	geometry.color.y = stream.ReadDouble();
+//	geometry.color.z = stream.ReadDouble();
+
 	return true;
 }
+

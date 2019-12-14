@@ -25,7 +25,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "CommandObjectLoad.h"
+
 #include "../../Config.h"
+#include "../Project.h"
 #ifdef _DEBUGMODE
 #include  <wx/stopwatch.h>
 #endif
@@ -36,6 +38,8 @@ CommandObjectLoad::CommandObjectLoad(const wxString& name, Project * project,
 {
 	this->project = project;
 	this->fileName = fileName;
+	project->maxObjectID++;
+	this->ID = project->maxObjectID;
 }
 
 bool CommandObjectLoad::Do(void)
@@ -45,7 +49,7 @@ bool CommandObjectLoad::Do(void)
 	wxStopWatch sw;
 #endif
 	if(temp.LoadObject(fileName)){
-		project->objects.Add(temp);
+		project->objects[ID] = temp;
 #ifdef _DEBUGMODE
 		wxLogMessage(_T("CommandObjectLoad took %ld ms to execute."),
 				sw.Time());
@@ -58,7 +62,7 @@ bool CommandObjectLoad::Do(void)
 
 bool CommandObjectLoad::Undo(void)
 {
-	project->objects.RemoveAt(project->objects.GetCount() - 1, 1);
+	project->objects.erase(ID);
 	project->Update();
 	return true;
 }

@@ -30,14 +30,12 @@
 /*!\class CanvasMain
  * \brief Main 3D display
  *
- * This class is the View part of the Data/View model. The other part is of course the Project.
- *
- * This class displays the Project depending on the selections made in the TreeSetup.
+ * Canvas that calls the ProjectView of a Project to display the data stored therein.
  *
  */
 
 #include "../StdInclude.h"
-#include "../project/Project.h"
+#include "../project/ProjectView.h"
 #include "../3D/OpenGLCanvas.h"
 
 class CanvasMain:public OpenGLCanvas {
@@ -48,43 +46,18 @@ public:
 			0, const wxString& name = _T(""));
 	virtual ~CanvasMain();
 
-	// Member Variables
-public:
-	enum DisplayType {
-		displayObjects, displayWorkpieces, displayRun
-	};
-
-	bool displayCoordinateSystem;
-	DisplayType display;
-
-private:
-	bool displayAnimation;
-	bool displayGeometry;
-	bool displayMachine;
-	bool displayStock;
-	bool displayBoundingBox;
-	bool displayTargets;
-	bool displayToolpath;
-	bool displayOutLines;
-
-	int selectedObject;
-	int selectedWorkpiece;
-	int selectedRun;
-
 	// Experimental stuff:
 	// OctreeGenerator octree;
 	// Quadtree quadtree;
 
 private:
-	Project* project;
-
-public:
-	unsigned int c0; ///< Counter for debugging. Remove on release.
+	ProjectView* projectview;
 
 	// Methods
 public:
-	void InsertProject(Project* project);
+	void InsertProjectView(ProjectView* projectview);
 	void Render();
+	void RenderPick();
 };
 
 #endif /* MAINCANVAS_H_ */

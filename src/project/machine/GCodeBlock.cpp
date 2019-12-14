@@ -30,11 +30,9 @@
 #include <float.h>
 #include <stdint.h>
 #include <stdexcept>
-#include <wx/arrimpl.cpp>
+#include <sstream>
 
-WX_DEFINE_OBJARRAY(ArrayOfGCodeBlock)
-
-GCodeBlock::GCodeBlock(wxString block, double conversionFactor)
+GCodeBlock::GCodeBlock(std::string block, double conversionFactor)
 {
 	t = 0.0;
 	duration = 0.0;
@@ -93,9 +91,9 @@ GCodeBlock::GCodeBlock(wxString block, double conversionFactor)
 	double shift = 1;
 	char key = 0;
 	uint_fast8_t state = 0;
-	const size_t BL = block.Length();
+	const size_t BL = block.size();
 	for(size_t n = 0; n <= BL; ++n){
-		const wxChar c = (n < BL)? block[n] : 0;
+		const char c = (n < BL)? block[n] : 0;
 		bool unexpected = false;
 		switch(state){
 		case 0:
@@ -321,7 +319,7 @@ GCodeBlock::GCodeBlock(wxString block, double conversionFactor)
 			Comment += c;
 			if(c == ' ' || c == 9) break;
 			if(c == ','){
-				Comment.Empty();
+				Comment.clear();
 				message = true;
 				state = 8;
 				break;
@@ -433,111 +431,114 @@ GCodeBlock::GCodeBlock(wxString block, double conversionFactor)
 		}
 
 		if(unexpected && n < BL){
-			error = wxString::Format(_T("Character %c was not expected."), c);
+			std::ostringstream temp;
+			temp << "Character " << c << " was not expected.";
+			error = temp.str();
 		}
 
-		if(n == BL && state != 4 && state != 0) error = _T(
-				"Missing closing character at end of line.");
-		if(!error.IsEmpty()){
-			error = wxString::Format(_T("Column %lu: "), n) + error;
-			error += _T("\nafter ") + block.Left(n) + _T("<");
+		if(n == BL && state != 4 && state != 0) error =
+				"Missing closing character at end of line.";
+		if(!error.empty()){
+			std::ostringstream temp;
+			temp << "Column " << n << ": " << error;
+			temp << "\nafter " << block.substr(0, n);
+			temp << "<";
+			error = temp.str();
 			break;
 		}
 	}
 }
 
-wxString GCodeBlock::GetCode(void) const
+std::string GCodeBlock::GetCode(void) const
 {
-	wxString temp;
+	std::ostringstream temp;
+
+	if(block_delete) temp << "/";
+	if(N >= 0) temp << " N" << N;
 
 	for(uint_fast8_t n = 0; n < maxMModes; ++n){
 		if(M[n] < 0) continue;
-		temp += wxString::Format(_T(" M%i"), M[n]);
+		temp << " M" << M[n];
 	}
 
-	if(T >= 0) temp += wxString::Format(_T(" T%i"), T);
-	if(S >= -FLT_EPSILON) temp += wxString::Format(_T(" S%g"), S * 60);
+	if(T >= 0) temp << " T" << T;
+	if(S >= -FLT_EPSILON) temp << " S" << S * 60;
 
 	for(uint_fast8_t n = 0; n < maxGModes; ++n){
 		if(G[n] < 0) continue;
 		const uint_fast16_t gmaj = (G[n] / 10);
 		const uint_fast8_t gmin = (G[n] % 10);
 		if(gmin == 0){
-			temp += wxString::Format(_T(" G%lu"), gmaj);
+			temp << " G" << gmaj;
 		}else{
-			temp += wxString::Format(_T(" G%lu.%lu"), gmaj, gmin);
+			temp << " G" << gmaj << "." << gmin;
 		}
 	}
 
-	if(D >= 0) temp += wxString::Format(_T(" D%i"), D);
-	if(H >= 0) temp += wxString::Format(_T(" H%i"), H);
-	if(L >= 0) temp += wxString::Format(_T(" L%i"), L);
+	if(D >= 0) temp << " D" << D;
+	if(H >= 0) temp << " H" << H;
+	if(L >= 0) temp << " L" << L;
 
-	if(RFlag){
-		temp += wxString::Format(_T(" R%g"), R / conversionFactor);
-	}
+	if(RFlag) temp << " R" << (R / conversionFactor);
 
-	if(P >= -FLT_EPSILON) temp += wxString::Format(_T(" P%g"), P);
-	if(Q >= -FLT_EPSILON) temp += wxString::Format(_T(" Q%g"),
-			Q / conversionFactor);
+	if(P >= -FLT_EPSILON) temp << " P" << P;
+	if(Q >= -FLT_EPSILON) temp << " Q" << (Q / conversionFactor);
 
-	if(F >= -FLT_EPSILON) temp += wxString::Format(_T(" F%g"),
-			F / conversionFactor * 60);
+	if(F >= -FLT_EPSILON) temp << " F" << (F / conversionFactor * 60);
 
 	if(XFlag){
-		temp += wxString::Format(_T(" X%g"), X / conversionFactor);
+		temp << " X" << (X / conversionFactor);
 	}
 	if(YFlag){
-		temp += wxString::Format(_T(" Y%g"), Y / conversionFactor);
+		temp << " Y" << (Y / conversionFactor);
 	}
 	if(ZFlag){
-		temp += wxString::Format(_T(" Z%g"), Z / conversionFactor);
+		temp << " Z" << (Z / conversionFactor);
 	}
 	if(AFlag){
-		temp += wxString::Format(_T(" A%g"), A * 180.0 * M_1_PI);
+		temp << " A" << (A * 180.0 * M_1_PI);
 	}
 	if(BFlag){
-		temp += wxString::Format(_T(" B%g"), B * 180.0 * M_1_PI);
+		temp << " B" << (B * 180.0 * M_1_PI);
 	}
 	if(CFlag){
-		temp += wxString::Format(_T(" C%g"), C * 180.0 * M_1_PI);
+		temp << " C" << (C * 180.0 * M_1_PI);
 	}
 	if(UFlag){
-		temp += wxString::Format(_T(" U%g"), U / conversionFactor);
+		temp << " U" << (U / conversionFactor);
 	}
 	if(VFlag){
-		temp += wxString::Format(_T(" V%g"), V / conversionFactor);
+		temp << " V" << (V / conversionFactor);
 	}
 	if(WFlag){
-		temp += wxString::Format(_T(" W%g"), W / conversionFactor);
+		temp << " W" << (W / conversionFactor);
 	}
 	if(IFlag){
-		temp += wxString::Format(_T(" I%g"), I / conversionFactor);
+		temp << " I" << (I / conversionFactor);
 	}
 	if(JFlag){
-		temp += wxString::Format(_T(" J%g"), J / conversionFactor);
+		temp << " J" << (J / conversionFactor);
 	}
 	if(KFlag){
-		temp += wxString::Format(_T(" K%g"), K / conversionFactor);
+		temp << " K" << (K / conversionFactor);
 	}
 
 	// Convert , to . on every machine.
-	for(size_t n = 0; n < temp.Length(); n++)
-		if(temp[n] == ',') temp[n] = '.';
 
-	if(N >= 0) temp = wxString::Format(_T(" N%05i"), N) + temp;
-	if(block_delete) temp = _T("/") + temp;
 	if(!Comment.empty()){
 		if(message){
-			temp += _T(" (MSG,") + Comment + _T(")");
+			temp << " (MSG," << Comment << ")";
 		}else{
-			temp += _T(" (") + Comment + _T(")");
+			temp << " (" << Comment << ")";
 		}
 	}
-	if(!temp.IsEmpty() && temp[0] == ' '){
-		temp = temp.Right(temp.Length() - 1);
-	}
-	return temp;
+	std::string temp2 = temp.str();
+
+	if(!temp2.empty() && temp2[0] == ' ') temp2 = temp2.substr(1,
+			temp2.size() - 1);
+	for(size_t n = 0; n < temp2.size(); ++n)
+		if(temp2[n] == ',') temp2[n] = '.';
+	return temp2;
 }
 
 static const int Gindex[1000] =
@@ -612,6 +613,8 @@ static const int Mindex[120] =
 
 void GCodeBlock::Update(char key, bool negative, int numberI, double numberD)
 {
+	std::ostringstream errstr;
+
 	if(negative){
 		numberI = -numberI;
 		numberD = -numberD;
@@ -700,7 +703,7 @@ void GCodeBlock::Update(char key, bool negative, int numberI, double numberD)
 	case 'D':
 	{
 		if(numberI < 0){
-			error = _T("Integer negative for D.");
+			errstr << "Integer negative for D.";
 		}else{
 			D = numberI;
 		}
@@ -709,7 +712,7 @@ void GCodeBlock::Update(char key, bool negative, int numberI, double numberD)
 	case 'F':
 	{
 		if(numberD < 0){
-			error = _T("Integer negative for F.");
+			errstr << "Integer negative for F.";
 		}else{
 			F = numberD * conversionFactor / 60.0;
 		}
@@ -718,7 +721,7 @@ void GCodeBlock::Update(char key, bool negative, int numberI, double numberD)
 	case 'H':
 	{
 		if(numberI < 0){
-			error = _T("Integer negative for H.");
+			errstr << "Integer negative for H.";
 		}else{
 			H = numberI;
 		}
@@ -727,7 +730,7 @@ void GCodeBlock::Update(char key, bool negative, int numberI, double numberD)
 	case 'L':
 	{
 		if(numberI < 0){
-			error = _T("Integer negative for L.");
+			errstr << "Integer negative for L.";
 		}else{
 			L = numberI;
 		}
@@ -736,7 +739,7 @@ void GCodeBlock::Update(char key, bool negative, int numberI, double numberD)
 	case 'P':
 	{
 		if(numberD < 0){
-			error = _T("Integer negative for P.");
+			errstr << "Integer negative for P.";
 		}else{
 			P = numberD;
 		}
@@ -745,7 +748,7 @@ void GCodeBlock::Update(char key, bool negative, int numberI, double numberD)
 	case 'Q':
 	{
 		if(numberD < 0){
-			error = _T("Integer negative for Q.");
+			errstr << "Integer negative for Q.";
 		}else{
 			Q = numberD * conversionFactor;
 		}
@@ -755,7 +758,7 @@ void GCodeBlock::Update(char key, bool negative, int numberI, double numberD)
 	case 'S':
 	{
 		if(numberD < 0){
-			error = _T("Integer negative for S.");
+			errstr << "Integer negative for S.";
 		}else{
 			S = numberD / 60.0;
 		}
@@ -765,7 +768,7 @@ void GCodeBlock::Update(char key, bool negative, int numberI, double numberD)
 	case 'T':
 	{
 		if(numberI < 0){
-			error = _T("Integer negative for T.");
+			errstr << "Integer negative for T.";
 		}else{
 			T = numberI;
 		}
@@ -778,20 +781,20 @@ void GCodeBlock::Update(char key, bool negative, int numberI, double numberD)
 		if(temp >= 0 && temp < 1000){
 			const int index = Gindex[temp];
 			if(index == -1){
-				error = _T("Unknown or unsupported G command.");
+				errstr << "Unknown or unsupported G command.";
 			}else{
 				if(G[index] >= 0){
-					error = wxString::Format(
-							_T("From this modal-group there is already G%g."),
-							(double) G[index] / 10.0);
+					errstr << "From this modal-group there is already G";
+					errstr << ((double) G[index] / 10.0);
+					errstr << ".";
 				}else{
 					G[index] = temp;
 				}
 			}
 		}else{
-			if(temp < 0) error = _T("G command may not be negative.");
-			if(temp >= 1000) error = _T(
-					"G command may not be greater than 99.9.");
+			if(temp < 0) errstr << "G command may not be negative.";
+			if(temp >= 1000) errstr
+					<< "G command may not be greater than 99.9.";
 		}
 		break;
 	}
@@ -801,29 +804,30 @@ void GCodeBlock::Update(char key, bool negative, int numberI, double numberD)
 		if(temp >= 0 && temp < 120){
 			const int index = Mindex[temp];
 			if(index == -1){
-				error = _T("Unknown or unsupported M command.");
+				errstr << "Unknown or unsupported M command.";
 			}else{
 				if(M[index] >= 0){
-					error =
-							wxString::Format(
-									_T(
-											"A command for this M command-group was already found. (M%i)"),
-									M[index]);
+					errstr
+							<< "A command for this M command-group was already found. (M";
+					errstr << M[index];
+					errstr << ")";
 				}else{
 					M[index] = temp;
 				}
 			}
 		}else{
-			if(temp < 0) error = _T("M command may not be negative.");
-			if(temp >= 120) error = _T(
-					"M command may not be greater than 119.");
+			if(temp < 0) errstr << "M command may not be negative.";
+			if(temp >= 120) errstr << "M command may not be greater than 119.";
 		}
 		break;
 	}
 	default:
-		error = wxString::Format(_T("Missing case for %c."), key);
+		errstr << "Missing case for ";
+		errstr << key;
+		errstr << ".";
 		break;
 	}
+	error = errstr.str();
 }
 
 int GCodeBlock::Motion(void) const

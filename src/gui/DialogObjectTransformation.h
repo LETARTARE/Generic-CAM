@@ -33,13 +33,14 @@
  * ...
  */
 
-#include "../StdInclude.h"
-#include "../project/Project.h"
-#include "../math/Unit.h"
+//#include <wx/cmdproc.h>
+#include <wx/event.h>
 
+#include "../3D/BoundingBox.h"
+#include "../project/Selection.h"
 #include "gui.h"
 
-#include <wx/cmdproc.h>
+class Project;
 
 class DialogObjectTransformation:public GUIObjectTransformation {
 	// Constructor/ Destructor
@@ -47,8 +48,14 @@ public:
 	DialogObjectTransformation(wxWindow* parent);
 	virtual ~DialogObjectTransformation();
 
+	void SetSelection(const Selection &selection);
+
 	// Member Variables
 private:
+
+	Selection selected;
+	BoundingBox bbox;
+
 	unsigned int c;
 
 	bool scaleProportional;
@@ -71,15 +78,11 @@ public:
 
 private:
 	void OnXClose(wxCloseEvent& event);
-	void OnClose(wxCommandEvent& event);
-	void OnChangeObjectColor(wxColourPickerEvent& event);
-	void OnSelectObject(wxCommandEvent& event);
 	void OnTransform(wxCommandEvent& event);
 	void OnSetFactors(wxCommandEvent& event);
 	void OnFlipNormals(wxCommandEvent& event);
 	Project* GetProject(void);
-
-
+	ProjectView* GetView(void);
 };
 
 #endif /* DIALOGOBJECTTRANSFORMATION_H_ */

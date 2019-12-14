@@ -26,37 +26,34 @@
 
 #include "CommandRunRemove.h"
 
+#include "../Project.h"
+
 CommandRunRemove::CommandRunRemove(const wxString& name, Project* project,
-		int runNr) :
+		size_t ID) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->runNr = runNr;
-	this->run = NULL;
+	this->ID = ID;
 }
 
 CommandRunRemove::~CommandRunRemove()
 {
-	if(run != NULL) delete run;
 }
 
 bool CommandRunRemove::Do(void)
 {
-	run = project->run.Detach(runNr);
+	if(project == NULL) return false;
+	if(project->run.find(ID) == project->run.end()) return false;
+	this->run = project->run[ID];
+	project->run.erase(ID);
 	project->Update();
 	return true;
 }
 
 bool CommandRunRemove::Undo(void)
 {
-	if(runNr >= project->run.GetCount()){
-		project->run.Add(run);
-	}else{
-		project->run.Insert(run, runNr);
-	}
-	// If the the workpiece was inserted back into the project,
-	// this function must not delete the workpiece in the destructor.
-	run = NULL;
+	if(project == NULL) return false;
+	project->run[ID] = run;
 	project->Update();
 	return true;
 }

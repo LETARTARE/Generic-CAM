@@ -37,7 +37,6 @@
 #include "Vector3.h"
 
 #include <wx/string.h>
-#include <wx/dynarray.h>
 
 class AffineTransformMatrix;
 
@@ -61,6 +60,5 @@ public:
 	void ApplyTransformation(const AffineTransformMatrix &matrix);
 
 };
-WX_DECLARE_OBJARRAY(Triangle, ArrayOfTriangle);
 
 #endif /* TRIANGLE_H_ */

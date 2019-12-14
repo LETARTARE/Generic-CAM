@@ -39,7 +39,6 @@
 #include "../3D/AffineTransformMatrix.h"
 #include "../3D/Geometry.h"
 #include "../machine/Tool.h"
-#include <wx/dynarray.h>
 
 class ToolPath:public Geometry {
 	// Constructor / Destructor
@@ -59,7 +58,5 @@ public:
 			AffineTransformMatrix const& position2);
 
 };
-
-WX_DECLARE_OBJARRAY(Toolpath, ArrayOfToolpath);
 
 #endif /* TOOLPATH_H_ */

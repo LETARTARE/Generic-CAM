@@ -40,9 +40,6 @@
 #include "../3D/Polygon25.h"
 #include "../3D/AffineTransformMatrix.h"
 
-#include <wx/xml/xml.h>
-#include <wx/wfstream.h>
-#include <wx/dynarray.h>
 #include <stddef.h>
 
 class Workpiece;
@@ -85,6 +82,5 @@ public:
 //	void Paint(void) const;
 
 };
-WX_DECLARE_OBJARRAY(ObjectPlacement, ArrayOfObjectPlacement);
 
 #endif /* OBJECTPLACEMENT_H_ */

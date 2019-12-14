@@ -50,8 +50,7 @@
  * \attention All values are stored in SI standard units. They are converted upon read-in.
  */
 
-#include <wx/string.h>
-#include <wx/dynarray.h>
+#include <string>
 
 class GCodeBlock {
 public:
@@ -59,8 +58,8 @@ public:
 	static const size_t maxGModes = 15;
 	static const size_t maxMModes = 11;
 
-	GCodeBlock(wxString block = _T(""), double conversionFactor = 0.001);
-	wxString GetCode(void) const;
+	GCodeBlock(std::string block = "", double conversionFactor = 0.001);
+	std::string GetCode(void) const;
 
 	/*!\brief Copy only the changed values
 	 *
@@ -108,9 +107,9 @@ public:
 	bool BFlag;
 	double C; //!< Rotation around Z axis (rad)
 	bool CFlag;
-	wxString Comment;
+	std::string Comment;
 	int D; //!< Tool radius compensation number
-	wxString error;
+	std::string error;
 	double F; //!< Feedrate (m/s)
 	int G[maxGModes];
 	int H; //!< Tool length offset index
@@ -147,7 +146,6 @@ private:
 	void Update(char key, bool negative, int numberI, double numberD);
 	void UpdateFlags(const GCodeBlock& rhs);
 };
-WX_DECLARE_OBJARRAY(GCodeBlock, ArrayOfGCodeBlock);
 
 GCodeBlock operator+(GCodeBlock lhs, const GCodeBlock& rhs);
 GCodeBlock operator-(GCodeBlock lhs, const GCodeBlock& rhs);

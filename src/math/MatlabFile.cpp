@@ -205,10 +205,10 @@ void MatlabFile::WriteMatrix(const MatlabMatrix& M)
 				char headertext[124];
 				time_t rawtime;
 				struct tm * timeinfo;
-				char bufferTime[80];
+				char bufferTime[76];
 				time(&rawtime);
 				timeinfo = localtime(&rawtime);
-				strftime(bufferTime, 80, "%F %X %Z", timeinfo);
+				strftime(bufferTime, 75, "%F %X %Z", timeinfo);
 				memset(headertext, 32, sizeof(char) * 124);
 				sprintf(headertext,
 						"MATLAB 5.0 MAT-file, written by MatlabFile.cpp, %s",

@@ -36,33 +36,25 @@
  *
  */
 
-
 #include <wx/treectrl.h>
-
-enum ItemDataType {
-	itemUnknown = 0, ///> Default
-	itemProject,       //!< itemProject
-	itemGroupObject,   //!< itemGroupObject
-	itemObject,        //!< itemObject
-	itemSubObject,     //!< itemSubObject
-	itemGroupWorkpiece,//!< itemGroupWorkpiece
-	itemWorkpiece,     //!< itemWorkpiece
-	itemPlacement,     //!< itemPlacement
-	itemObjectLink,    //!< itemObjectLink
-	itemGroupRun,      //!< itemGroupRun
-	itemRun,           //!< itemRun
-	itemRunWorkpiece,  //!< itemRunWorkpiece
-	itemMachine,       //!< itemMachine
-	itemToolpath       //!< itemToolpath
-};
 
 class TreeItem:public wxTreeItemData {
 public:
+	enum itemtype {
+		itemUnknown = 0,
+		itemProject,
+		itemGroupObjects,
+		itemObject,
+		itemSubObject,
+		itemGroupRun,
+		itemRun,
+		itemGenerator
+	};
 
-	TreeItem(ItemDataType dataType = itemUnknown, size_t nr = 0);
+	TreeItem(itemtype type = itemUnknown, size_t ID = 0);
 
-	ItemDataType dataType;
-	size_t nr;
+	itemtype type;
+	size_t ID;
 };
 
 #endif /* TREEITEM_H_ */

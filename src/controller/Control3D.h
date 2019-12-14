@@ -59,8 +59,8 @@ public:
 	int GetAxis(unsigned char i);
 	wxString GetPort(void);
 	bool SetPort(wxString port);
-	bool GetConfigFrom(wxConfig *config);
-	bool WriteConfigTo(wxConfig *config);
+	bool Load(wxConfig *config);
+	bool Save(wxConfig *config);
 
 	bool Pump(void);
 

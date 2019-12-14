@@ -40,12 +40,12 @@
 
 #include "../StdInclude.h"
 
-static int wx_gl_attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE,
-		24, 0};
+static int wx_gl_attribs[] =
+	{WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24, 0};
 
 OpenGLCanvas::OpenGLCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos,
-		const wxSize& size, long style, const wxString& name)
-		: wxGLCanvas(parent, id, wx_gl_attribs, pos, size,
+		const wxSize& size, long style, const wxString& name) :
+		wxGLCanvas(parent, id, wx_gl_attribs, pos, size,
 				style | wxFULL_REPAINT_ON_RESIZE, name), Light0(GL_LIGHT0)
 {
 
@@ -99,7 +99,7 @@ OpenGLCanvas::~OpenGLCanvas()
 {
 #ifdef _USE_6DOFCONTROLLER
 	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(OpenGLCanvas::OnTimer),
-			NULL, this);
+	NULL, this);
 #endif
 	this->Disconnect(wxEVT_RIGHT_DCLICK,
 			wxMouseEventHandler(OpenGLCanvas::OnMouseEvent), NULL, this);
@@ -126,8 +126,8 @@ void OpenGLCanvas::SetController(Control3D& control)
 }
 #endif
 
-OpenGLCanvas::Context::Context(wxGLCanvas* canvas)
-		: wxGLContext(canvas)
+OpenGLCanvas::Context::Context(wxGLCanvas* canvas) :
+		wxGLContext(canvas)
 {
 	SetCurrent(*canvas);
 
@@ -189,33 +189,33 @@ void OpenGLCanvas::OnMouseEvent(wxMouseEvent& event)
 	if(event.Dragging() && event.RightIsDown()){
 		switch(rotationMode){
 		case rotateTrackball:
-			{
-				const double r = (double) ((w < h)? w : h) / 2.2;
-				rotmat = AffineTransformMatrix::RotationTrackball(
-						(double) (x - w / 2), (double) (h / 2 - y),
-						(double) (event.m_x - w / 2),
-						(double) (h / 2 - event.m_y), r) * rotmat;
-				break;
-			}
+		{
+			const double r = (double) ((w < h)? w : h) / 2.2;
+			rotmat = AffineTransformMatrix::RotationTrackball(
+					(double) (x - w / 2), (double) (h / 2 - y),
+					(double) (event.m_x - w / 2), (double) (h / 2 - event.m_y),
+					r) * rotmat;
+			break;
+		}
 		case rotateInterwoven:
-			{
-				rotmat = AffineTransformMatrix::RotationXY(event.m_x - x,
-						event.m_y - y, 0.5) * rotmat;
-				break;
-			}
+		{
+			rotmat = AffineTransformMatrix::RotationXY(event.m_x - x,
+					event.m_y - y, 0.5) * rotmat;
+			break;
+		}
 		case rotateTurntable:
-			{
-				rotmat = AffineTransformMatrix::RotationAroundVector(
-						Vector3(1, 0, 0), -M_PI / 2);
-				turntableX += (double) (event.m_x - x) / 100;
-				turntableY += (double) (event.m_y - y) / 100;
-				rotmat = AffineTransformMatrix::RotationAroundVector(
-						Vector3(1, 0, 0), turntableY) * rotmat;
-				rotmat = rotmat
-						* AffineTransformMatrix::RotationAroundVector(
-								Vector3(0, 0, 1), turntableX);
-				break;
-			}
+		{
+			rotmat = AffineTransformMatrix::RotationAroundVector(
+					Vector3(1, 0, 0), -M_PI / 2);
+			turntableX += (double) (event.m_x - x) / 100;
+			turntableY += (double) (event.m_y - y) / 100;
+			rotmat = AffineTransformMatrix::RotationAroundVector(
+					Vector3(1, 0, 0), turntableY) * rotmat;
+			rotmat = rotmat
+					* AffineTransformMatrix::RotationAroundVector(
+							Vector3(0, 0, 1), turntableX);
+			break;
+		}
 		}
 		x = event.m_x;
 		y = event.m_y;
@@ -475,7 +475,6 @@ bool OpenGLCanvas::OnPick(OpenGLPick &result, wxPoint pos)
 	glSelectBuffer(result.GetBufferSize(), result.GetBuffer());
 	glRenderMode(GL_SELECT);
 	glInitNames();
-	glPushName(0); // This value ends up as the label for the background.
 
 	glMatrixMode(GL_PROJECTION);
 	glCullFace(GL_BACK);
@@ -483,7 +482,7 @@ bool OpenGLCanvas::OnPick(OpenGLPick &result, wxPoint pos)
 
 	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
-	gluPickMatrix(pos.x, viewport[3] - pos.y, 1, 1, viewport);
+	gluPickMatrix(pos.x, viewport[3] - pos.y, 10, 10, viewport);
 
 	GLdouble ar = (GLdouble) w / (GLdouble) h; // Calculate perspective
 	gluPerspective(45, ar, 0.01, 10);
@@ -498,6 +497,23 @@ bool OpenGLCanvas::OnPick(OpenGLPick &result, wxPoint pos)
 	RenderPick();
 	glFlush();
 	GLuint hits = glRenderMode(GL_RENDER);
+	GLenum err = glGetError();
+	if(err){
+		if(err == GL_INVALID_OPERATION){
+			printf("OpenGLCanvas::OnPick - GL_INVALID_OPERATION returned.\n",
+					err);
+		}else{
+			printf("OpenGLCanvas::OnPick - Error %u.\n", err);
+		}
+		result.SetHits(0);
+		return false;
+	}
+	if(hits == 0xFFFFFFFF){
+		printf(
+				"OpenGLCanvas::OnPick - Buffer Overflow (increase buffer size).\n");
+		result.SetHits(0);
+		return false;
+	}
 	result.SetHits(hits);
 	return (hits > 0);
 }

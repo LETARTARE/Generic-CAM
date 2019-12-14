@@ -30,9 +30,6 @@
 
 #include <GL/gl.h>
 
-#include <wx/arrimpl.cpp>
-WX_DEFINE_OBJARRAY(ArrayOfObjectPlacement)
-
 ObjectPlacement::ObjectPlacement()
 {
 	parent = NULL;

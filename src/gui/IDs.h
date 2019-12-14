@@ -33,37 +33,30 @@
  * from the child windows to the main window.
  *
  * \par Difference between Update and Refresh
- *  - \b Refresh - Refresh of the display without changing the Project itself.
- *  - \b Update - Changing the Project or the Simulation and updating the display afterwards.
+ *  - \b Refresh - Issue a request to refresh a window in the next run of the wxWidgets main event loop.
+ *  - \b Update(in the context of wxWidgets) - Repaint the window immediately!
+ *  - \b Update(in the context of Project) - Update the inner workings of the Project or the Simulation and issue a refresh for the next main event loop.
  *
- * \par List of IDs
- *  - \b ID_REFRESH3DVIEW - Refresh the main OpenGL drawing area (e.g after a rotation of scene)
- *  - \b ID_REFRESHMAINGUI - Update and refresh the Treeview, the menu items and the main OpenGL view
- *  - \b ID_REFRESHALL - All of the above, also all subwindows as well (e.g. propagation of Units)
- *  - \b ID_UPDATESIMULATION - Update the Simulation system in the Project. Refresh OpenGL afterwards.
- *  - \b ID_UPDATEMACHINESIMULATION - Refresh the Machine Simulator in the DialogMachineDebugger
  */
 
-// Refresh every view of every document:
+//!> Refresh every view of every document:
 #define ID_REFRESHALL					(wxID_HIGHEST+1)
 
-// Refresh every 3D view of every document:
-#define ID_REFRESHALL3DVIEW				(wxID_HIGHEST+2)
+//!> Refresh every 3D view of every document:
+#define ID_REFRESHALL3D					(wxID_HIGHEST+2)
 
-// Refresh all views of current document:
+//!> Refresh all views of current document:
 #define ID_REFRESHVIEW					(wxID_HIGHEST+3)
 
-// Refresh all 3D views of the current document:
-#define ID_REFRESH3DVIEW				(wxID_HIGHEST+4)
+//!> Refresh all 3D views of the current document:
+#define ID_REFRESHVIEW3D				(wxID_HIGHEST+4)
 
-// Refresh the treeview of the current document:
+//!> Refresh the treeview of the current document:
 #define ID_REFRESHTREEVIEW				(wxID_HIGHEST+5)
 
-// Start the recalculation of the current project state:
+//!> Start the recalculation of the current project state:
 #define ID_UPDATEPROJECT				(wxID_HIGHEST+21)
-//
 #define ID_UPDATESIMULATION				(wxID_HIGHEST+22)
-//
 #define ID_UPDATEMACHINESIMULATION		(wxID_HIGHEST+23)
 
 // Setup calls to common hardware setup
@@ -72,12 +65,23 @@
 #define ID_SETUPSTEREO3D				(wxID_HIGHEST+43)
 #define ID_SETUPMIDI					(wxID_HIGHEST+44)
 #define ID_SETUPCONTROLLER				(wxID_HIGHEST+45)
-
+#define ID_SETUPPATHS					(wxID_HIGHEST+46)
 
 #define ID_PROJECTRENAME				(wxID_HIGHEST+61)
+#define ID_OBJECTRENAME					(wxID_HIGHEST+62)
+#define ID_OBJECTDELETE					(wxID_HIGHEST+63)
+#define ID_RUNRENAME					(wxID_HIGHEST+64)
+#define ID_RUNDELETE					(wxID_HIGHEST+65)
+#define ID_GENERATORADD					(wxID_HIGHEST+66)
+#define ID_GENERATORMODIFY				(wxID_HIGHEST+67)
+#define ID_GENERATORDELETE				(wxID_HIGHEST+68)
 
+#define ID_SELECTIONDONE				(wxID_HIGHEST+80)
+#define ID_SELECTIONOBJECT				(wxID_HIGHEST+81)
+#define ID_SELECTIONFACE				(wxID_HIGHEST+82)
+#define ID_SELECTIONEDGE				(wxID_HIGHEST+83)
 
-//! \def ID_THREADLASTDONE Worker thread to main thread: Processing of volume ready.
-#define ID_THREADLASTDONE				(wxID_HIGHEST+101)
+#define ID_GENERATORADDTYPE				(wxID_HIGHEST+601)
+// ... and the next 100 IDs ...
 
 #endif /* IDS_H_ */

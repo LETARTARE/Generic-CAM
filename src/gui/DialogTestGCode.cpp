@@ -67,19 +67,20 @@ bool DialogTestGCode::TransferDataToWindow(void)
 	if(m_radioBtnG20->GetValue()) cf = 0.0254;
 	if(m_radioBtnG21->GetValue()) cf = 0.001;
 
-	GCodeBlock temp(m_textCtrlInput->GetValue(), cf);
-	if(!temp.error.IsEmpty()){
+	GCodeBlock temp(std::string(m_textCtrlInput->GetValue().mb_str()), cf);
+	if(!temp.error.empty()){
 		m_textCtrlOutput->SetValue(temp.error);
 		return true;
 	}
 	if(temp.G[6] == 200 || temp.G[6] == 210){
 		if(temp.G[6] == 200) cf = 0.0254;
 		if(temp.G[6] == 210) cf = 0.001;
-		temp = GCodeBlock(m_textCtrlInput->GetValue(), cf);
+		temp = GCodeBlock(std::string(m_textCtrlInput->GetValue().mb_str()),
+				cf);
 	}
 
 	wxString out;
-	if(!temp.Comment.IsEmpty()){
+	if(!temp.Comment.empty()){
 		if(temp.message){
 			out = _T("Message: ") + temp.Comment + _T("\n");
 		}else{

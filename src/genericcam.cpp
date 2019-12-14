@@ -26,7 +26,6 @@
 
 #include "genericcam.h"
 
-
 #include "gui/FrameParent.h"
 
 #include "languages.h"
@@ -34,6 +33,7 @@
 #include "wx/richtext/richtextxml.h"
 
 #include "project/ProjectView.h"
+#include "test/test.h"
 
 #if wxUSE_DEBUG_CONTEXT == 1
 #include  <wx/memory.h>
@@ -86,10 +86,10 @@ GenericCAMApp::GenericCAMApp()
 
 GenericCAMApp::~GenericCAMApp(void)
 {
+	printf("GenericCAMApp: Destructor called\n");
 #if wxUSE_DEBUG_CONTEXT == 1
 	wxDebugContext::PrintStatistics(true);
 #endif
-	printf("GenericCAMApp: Destructor called\n");
 	delete config; // config is written back on deletion of object
 }
 
@@ -98,18 +98,21 @@ void GenericCAMApp::OnInitCmdLine(wxCmdLineParser& parser)
 {
 	parser.AddParam(_("<filepath of document to open>"), wxCMD_LINE_VAL_STRING,
 			wxCMD_LINE_PARAM_OPTIONAL);
+	parser.AddSwitch("t", "test", "Runs unit tests on some of the classes.");
 	wxApp::OnInitCmdLine(parser);
 }
 
 bool GenericCAMApp::OnCmdLineParsed(wxCmdLineParser& parser)
 {
-	wxString str;
+	if(parser.FoundSwitch("t") == wxCMD_SWITCH_ON){
+		TestAll();
+		return false;
+	}
 	int count = parser.GetParamCount();
 	if(count == 1){
-		str = parser.GetParam(0);
+		wxString str = parser.GetParam(0);
 		//		if(_DEBUGMODE) wxLogMessage(_T("cmd line param: ") + str);
 		loadOnStartup = str;
-
 	}
 	return true;
 }
@@ -134,7 +137,7 @@ bool GenericCAMApp::OnInit()
 	docManager->FileHistoryLoad(*config);
 
 	wxFrame* parent;
-	parent  = new FrameParent(docManager, config, NULL, wxID_ANY,
+	parent = new FrameParent(docManager, config, NULL, wxID_ANY,
 			GetAppDisplayName());
 
 	SetTopWindow(parent);
@@ -160,6 +163,7 @@ bool GenericCAMApp::OnInit()
 
 int GenericCAMApp::OnExit()
 {
+	printf("GenericCAMApp::OnExit called\n");
 	wxDocManager* const docManager = wxDocManager::GetDocumentManager();
 	docManager->FileHistorySave(*config);
 	delete docManager;

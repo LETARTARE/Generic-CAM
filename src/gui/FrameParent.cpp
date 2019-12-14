@@ -51,9 +51,9 @@ EVT_MENU(wxID_ABOUT, FrameParent::OnAbout)
 EVT_MENU(wxID_HELP, FrameParent::OnHelp)
 
 EVT_MENU(ID_REFRESHALL, FrameParent::OnRefreshAll)
-EVT_MENU(ID_REFRESHALL3DVIEW, FrameParent::OnRefreshAll3D)
+EVT_MENU(ID_REFRESHALL3D, FrameParent::OnRefreshAll3D)
 EVT_MENU(ID_REFRESHVIEW, FrameParent::OnRefreshView)
-EVT_MENU(ID_REFRESH3DVIEW, FrameParent::OnRefreshView3D)
+EVT_MENU(ID_REFRESHVIEW3D, FrameParent::OnRefreshView3D)
 wxEND_EVENT_TABLE()
 
 FrameParent::FrameParent(wxDocManager *manager, wxConfig* config,
@@ -64,7 +64,7 @@ FrameParent::FrameParent(wxDocManager *manager, wxConfig* config,
 	settingsStereo3D.Load(config);
 	units.Load(config);
 #ifdef _USE_6DOFCONTROLLER
-	control.GetConfigFrom(config);
+	control.Load(config);
 #endif
 	wxMenu *m_menuFile = new wxMenu;
 	m_menuFile->Append(wxID_NEW);
@@ -99,6 +99,11 @@ FrameParent::FrameParent(wxDocManager *manager, wxConfig* config,
 
 	m_helpController = new wxHelpController();
 
+	wxAcceleratorEntry entries[1];
+	entries[0].Set(0, WXK_F1, wxID_HELP);
+	wxAcceleratorTable accel(1, entries);
+	this->SetAcceleratorTable(accel);
+
 	dialogSetupStereo3D = new DialogSetupStereo3D(this, &settingsStereo3D,
 			&units);
 #ifdef _USE_MIDI
@@ -111,10 +116,12 @@ FrameParent::FrameParent(wxDocManager *manager, wxConfig* config,
 	m_helpController->Initialize(_T("doc/help/help.hhp"));
 	wxLog::EnableLogging(true);
 
+	logWindow = new wxLogWindow(this, _("Log Window"), false, false);
+
 	timer.SetOwner(this);
 
 	t = 0.0;
-	dt = 50e-3; // s
+	dt = 500e-3; // s
 	timer.Start(round(dt * 1000.0)); // ms
 
 	this->Connect(wxEVT_TIMER, wxTimerEventHandler(FrameParent::OnTimer), NULL,
@@ -124,10 +131,9 @@ FrameParent::FrameParent(wxDocManager *manager, wxConfig* config,
 FrameParent::~FrameParent()
 {
 	printf("FrameParent: Destructor called\n");
-
 #ifdef _USE_6DOFCONTROLLER
 	// Save the configuration of the 6DOF controller
-	control.WriteConfigTo(config);
+	control.Save(config);
 #endif
 	settingsStereo3D.Save(config);
 	units.Save(config);
@@ -152,16 +158,11 @@ void FrameParent::OnHelp(wxCommandEvent&)
 void FrameParent::OnTimer(wxTimerEvent& event)
 {
 	t += dt;
-
 //	wxString temp;
 //	temp = wxString::Format(_T("Free RAM: %lu MB"),
 //			GetFreeSystemMemory() / 1024 / 1024);
 //
 //	m_statusBar->SetStatusText(temp, 1);
-
-//	if(project.processToolpath){
-//		if(project.GenerateToolpaths()) TransferDataToWindow();
-//	}
 }
 
 void FrameParent::OnChangeLanguage(wxCommandEvent& event)

@@ -36,7 +36,7 @@
  */
 
 #include "../Tool.h"
-#include "../ToolPath.h"
+//#include "../ToolPath.h"
 #include "../../3D/BoundingBox.h"
 //#include "../../3D/AffineTransformMatrix.h"
 
@@ -44,7 +44,6 @@
 #include <wx/panel.h>
 #include <wx/string.h>
 #include <wx/txtstrm.h>
-#include <wx/dynarray.h>
 #include <stddef.h>
 
 #include "../../gui/CollectionUnits.h"
@@ -62,10 +61,12 @@ public:
 
 	//Member variables:
 public:
+	wxString name;
+
 	Run * parent; //!< Pointer back to the Run this Generator belongs to.
 	BoundingBox area; //!< Area to work in
 
-	ToolPath toolpath; //!< Generated ToolPath
+//	ToolPath toolpath; //!< Generated ToolPath
 	bool toolpathGenerated; //!< Flag if toolpath was generated
 
 	bool errorOccured;
@@ -77,8 +78,6 @@ public:
 	float freeHeight; //!< Distance from the top of the material for fast travel
 	float marginBelow; //!< Distance to the final shape below the tool
 	float marginSide; //!< Distance to the final shape next to the tool
-
-	bool selected;
 
 protected:
 	CollectionUnits * settings;
@@ -95,6 +94,5 @@ public:
 	virtual void Paint(void) const;
 	virtual void GenerateToolpath(void) = 0;
 };
-WX_DECLARE_OBJARRAY(Generator*, ArrayOfGeneratorPointer);
 
 #endif /* GENERATOR_H_ */

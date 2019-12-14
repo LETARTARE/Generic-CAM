@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : CommandRunAdd.cpp
-// Purpose            : 
+// Purpose            :
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 17.01.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 02.12.2019
+// Copyright          : (C) 2019 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -26,28 +26,31 @@
 
 #include "CommandRunAdd.h"
 
-#include "../Run.h"
+#include "../Project.h"
 
 CommandRunAdd::CommandRunAdd(const wxString& name, Project* project,
-		wxString runName) :
+		wxString runName, size_t objID) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->runName = runName;
+	this->run.name = runName;
+	if(objID > 0) this->run.object.Add(Selection::Object, objID);
+	project->maxRunID++;
+	ID = project->maxRunID;
 }
 
 bool CommandRunAdd::Do(void)
 {
-	Run* temp = new Run();
-	temp->name = runName;
-	project->run.Add(temp);
+	if(project == NULL) return false;
+	project->run[ID] = run;
 	project->Update();
 	return true;
 }
 
 bool CommandRunAdd::Undo(void)
 {
-	project->run.RemoveAt(project->run.GetCount() - 1);
+	if(project == NULL) return false;
+	project->objects.erase(ID);
 	project->Update();
 	return true;
 }

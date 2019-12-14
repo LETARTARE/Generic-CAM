@@ -1,12 +1,32 @@
-/*
- * ProjectView.cpp
- *
- *  Created on: 21.12.2018
- *      Author: toby
- */
+///////////////////////////////////////////////////////////////////////////////
+// Name               : ProjectView.cpp
+// Purpose            : View for a Project
+// Thread Safe        : Yes
+// Platform dependent : No
+// Compiler Options   :
+// Author             : Tobias Schaefer
+// Created            : 21.12.2018
+// Copyright          : (C) 2018 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Licence            : GNU General Public License version 3.0 (GPLv3)
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 #include "ProjectView.h"
 
+#include "../3D/OpenGLMaterial.h"
 #include "../genericcam.h"
 #include "../gui/FrameMain.h"
 #include "../gui/FrameParent.h"
@@ -14,13 +34,24 @@
 
 IMPLEMENT_DYNAMIC_CLASS(ProjectView, wxView)
 
-wxBEGIN_EVENT_TABLE(ProjectView, wxView)
-EVT_MENU(ID_REFRESHTREEVIEW, ProjectView::OnUpdateTree)
+wxBEGIN_EVENT_TABLE(ProjectView, wxView) EVT_MENU(ID_REFRESHTREEVIEW, ProjectView::OnUpdateTree)
 wxEND_EVENT_TABLE()
 
 ProjectView::ProjectView() :
 		wxView()
 {
+
+	displayCoordinateSystem = true;
+
+	display = displayObjects;
+	displayGeometry = true;
+	displayBoundingBox = false;
+	displayMachine = false;
+	displayStock = false;
+	displayTargets = false;
+	displayToolpath = false;
+	displayOutLines = false;
+	displayAnimation = false;
 }
 
 ProjectView::~ProjectView()
@@ -89,7 +120,7 @@ void ProjectView::OnUpdate(wxView* sender, wxObject* hint)
 void ProjectView::OnUpdateTree(wxCommandEvent& event)
 {
 	FrameMain* frame = wxStaticCast(GetFrame(), FrameMain);
-	frame->tree->UpdateSelection();
+	frame->tree->Update();
 	frame->Refresh();
 }
 
@@ -99,4 +130,116 @@ void ProjectView::OnUpdate3D(void)
 	FrameParent* parentframe = wxStaticCast(frame->GetParent(), FrameParent);
 	parentframe->settingsStereo3D.WriteToCanvas(frame->m_canvas);
 	frame->m_canvas->Refresh();
+}
+
+void ProjectView::Render(void) const
+{
+	Project* project = wxStaticCast(GetDocument(), Project);
+
+	if(displayCoordinateSystem){
+		RenderCoordinateSystem();
+	}
+
+	Selection both = selection + hover;
+	both.Invert();
+
+	OpenGLMaterial::EnableColors();
+	project->Paint(OpenGLMaterial(0.3, 0.3, 1.0), OpenGLMaterial(0, 0, 0),
+			both);
+	project->Paint(OpenGLMaterial(0.8, 0.8, 1.0), OpenGLMaterial(0.8, 0.8, 0.8),
+			selection);
+	project->Paint(OpenGLMaterial(0.5, 0.5, 1.0), OpenGLMaterial(0.5, 0.5, 0.5),
+			hover);
+}
+
+void ProjectView::RenderPick(void) const
+{
+	if(displayCoordinateSystem){
+		glPushName(0);
+		RenderCoordinateSystem();
+		glPopName();
+	}
+	Project* project = wxStaticCast(GetDocument(), Project);
+	project->PaintPick();
+}
+
+void ProjectView::RenderCoordinateSystem(void) const
+{
+	GLfloat s = 0.1;
+	GLfloat n = sqrt(2.0);
+	GLfloat d = s / 10;
+
+	OpenGLMaterial::EnableColors();
+	glPushName(Selection::Axis);
+	glPushName(0);
+	glBegin(GL_LINES);
+
+	glColor3f(1.0, 0, 0);
+	glNormal3f(-s, 0, 0);
+	glVertex3f(-s, 0, 0);
+	glNormal3f(s, 0, 0);
+	glVertex3f(s, 0, 0);
+
+	glNormal3f(n, n, 0);
+	glVertex3f(s, 0, 0);
+	glVertex3f(s - d, d, 0);
+	glNormal3f(n, -n, 0);
+	glVertex3f(s, 0, 0);
+	glVertex3f(s - d, -d, 0);
+	glNormal3f(n, 0, n);
+	glVertex3f(s, 0, 0);
+	glVertex3f(s - d, 0, d);
+	glNormal3f(n, 0, -n);
+	glVertex3f(s, 0, 0);
+	glVertex3f(s - d, 0, -d);
+
+	glEnd();
+	glLoadName(1);
+	glBegin(GL_LINES);
+
+	glColor3f(0, 1.0, 0);
+	glNormal3f(0, -s, 0);
+	glVertex3f(0, -s, 0);
+	glNormal3f(0, s, 0);
+	glVertex3f(0, s, 0);
+
+	glNormal3f(n, n, 0);
+	glVertex3f(0, s, 0);
+	glVertex3f(d, s - d, 0);
+	glNormal3f(-n, n, 0);
+	glVertex3f(0, s, 0);
+	glVertex3f(-d, s - d, 0);
+	glNormal3f(0, n, n);
+	glVertex3f(0, s, 0);
+	glVertex3f(0, s - d, d);
+	glNormal3f(0, n, -n);
+	glVertex3f(0, s, 0);
+	glVertex3f(0, s - d, -d);
+
+	glEnd();
+	glLoadName(2);
+	glBegin(GL_LINES);
+
+	glColor3f(0, 0, 1.0);
+	glNormal3f(0, 0, -s);
+	glVertex3f(0, 0, -s);
+	glNormal3f(0, 0, s);
+	glVertex3f(0, 0, s);
+
+	glNormal3f(n, 0, n);
+	glVertex3f(0, 0, s);
+	glVertex3f(d, 0, s - d);
+	glNormal3f(-n, 0, n);
+	glVertex3f(0, 0, s);
+	glVertex3f(-d, 0, s - d);
+	glNormal3f(0, n, n);
+	glVertex3f(0, 0, s);
+	glVertex3f(0, d, s - d);
+	glNormal3f(0, -n, n);
+	glVertex3f(0, 0, s);
+	glVertex3f(0, -d, s - d);
+
+	glEnd();
+	glPopName();
+	glPopName();
 }

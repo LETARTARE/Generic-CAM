@@ -28,9 +28,6 @@
 
 #include <GL/gl.h>
 #include <wx/log.h>
-#include <wx/arrimpl.cpp>
-
-WX_DEFINE_OBJARRAY(ArrayOfGeometry)
 
 Geometry::Geometry()
 {
@@ -46,35 +43,35 @@ Geometry::~Geometry()
 
 void Geometry::Clear(void)
 {
-	triangles.Clear();
+	triangles.clear();
 }
 
 void Geometry::InsertTrianglesFrom(const Geometry& geometry, bool recolor)
 {
 	size_t i;
 	Triangle temp;
-	for(i = 0; i < geometry.triangles.GetCount(); i++){
+	for(i = 0; i < geometry.triangles.size(); i++){
 		temp = geometry.triangles[i];
 		if(recolor){
 			temp.c[0] = colorNewObjects;
 			temp.c[1] = colorNewObjects;
 			temp.c[2] = colorNewObjects;
 		}
-		this->triangles.Add(temp);
+		this->triangles.push_back(temp);
 	}
 }
 
 void Geometry::ApplyTransformation(const AffineTransformMatrix& matrix)
 {
 	size_t i;
-	for(i = 0; i < triangles.Count(); i++)
+	for(i = 0; i < triangles.size(); i++)
 		triangles[i].ApplyTransformation(matrix);
 }
 
 void Geometry::ApplyTransformation(void)
 {
 	size_t i;
-	for(i = 0; i < triangles.Count(); i++)
+	for(i = 0; i < triangles.size(); i++)
 		triangles[i].ApplyTransformation(this->matrix);
 }
 
@@ -101,23 +98,23 @@ void Geometry::Paint(GeometryColorStyle style) const
 	::glBegin(GL_TRIANGLES);
 	switch(style){
 	case geometryColorNone:
-		for(i = 0; i < triangles.Count(); i++)
+		for(i = 0; i < triangles.size(); i++)
 			triangles[i].Paint(true, false);
 		break;
 	case geometryColorGlobal:
 		::glColor3f(color.x, color.y, color.z);
-		for(i = 0; i < triangles.Count(); i++)
+		for(i = 0; i < triangles.size(); i++)
 			triangles[i].Paint(true, false);
 		break;
 	case geometryColorTriangle:
-		for(i = 0; i < triangles.Count(); i++){
+		for(i = 0; i < triangles.size(); i++){
 			::glColor3f(triangles[i].c[0].x, triangles[i].c[0].y,
 					triangles[i].c[0].z);
 			triangles[i].Paint(true, false);
 		}
 		break;
 	case geometryColorVertex:
-		for(i = 0; i < triangles.Count(); i++)
+		for(i = 0; i < triangles.size(); i++)
 			triangles[i].Paint(true, true);
 		break;
 
@@ -145,96 +142,101 @@ void Geometry::Paint(GeometryColorStyle style) const
 
 void Geometry::AddTriangle(const Vector3& a, const Vector3& b, const Vector3& c)
 {
-	Triangle* tri = new Triangle;
-	tri->p[0] = a;
-	tri->p[1] = b;
-	tri->p[2] = c;
-	tri->c[0] = colorNewObjects;
-	tri->CalculateNormal();
-	triangles.Add(tri);
+	Triangle tri;
+	tri.p[0] = a;
+	tri.p[1] = b;
+	tri.p[2] = c;
+	tri.c[0] = colorNewObjects;
+	tri.CalculateNormal();
+	triangles.push_back(tri);
 }
 
 void Geometry::AddTriangleWithNormals(const Vector3& a, const Vector3& b,
 		const Vector3& c, const Vector3& na, const Vector3& nb,
 		const Vector3& nc)
 {
-	Triangle* tri = new Triangle;
-	tri->p[0] = a;
-	tri->p[1] = b;
-	tri->p[2] = c;
-	tri->n[0] = na;
-	tri->n[1] = nb;
-	tri->n[2] = nc;
-	tri->c[0] = colorNewObjects;
-	triangles.Add(tri);
+	Triangle tri;
+	tri.p[0] = a;
+	tri.p[1] = b;
+	tri.p[2] = c;
+	tri.n[0] = na;
+	tri.n[1] = nb;
+	tri.n[2] = nc;
+	tri.c[0] = colorNewObjects;
+	triangles.push_back(tri);
 }
 
 void Geometry::AddTriangleTransform(const Vector3& a, const Vector3& b,
 		const Vector3& c, const AffineTransformMatrix& transformMatrix)
 {
-	Triangle* tri = new Triangle;
-	tri->p[0] = transformMatrix.Transform(a);
-	tri->p[1] = transformMatrix.Transform(b);
-	tri->p[2] = transformMatrix.Transform(c);
-	tri->c[0] = colorNewObjects;
-	tri->CalculateNormal();
-	triangles.Add(tri);
+	Triangle tri;
+	tri.p[0] = transformMatrix.Transform(a);
+	tri.p[1] = transformMatrix.Transform(b);
+	tri.p[2] = transformMatrix.Transform(c);
+	tri.c[0] = colorNewObjects;
+	tri.CalculateNormal();
+	triangles.push_back(tri);
 }
 
 void Geometry::AddTriangle(const Triangle& tri, bool copyNormals)
 {
-	Triangle * temp = new Triangle(tri);
-	if(!copyNormals) temp->CalculateNormal();
-	triangles.Add(temp);
+	Triangle temp = tri;
+	if(!copyNormals) temp.CalculateNormal();
+	triangles.push_back(temp);
 }
 
 void Geometry::AddQuad(const Vector3& a, const Vector3& b, const Vector3& c,
 		const Vector3& d)
 {
-	Triangle* tri0 = new Triangle;
-	Triangle* tri1 = new Triangle;
-	tri0->p[0] = a;
-	tri0->p[1] = b;
-	tri0->p[2] = c;
-	tri1->p[0] = tri0->p[2];
-	tri1->p[1] = d;
-	tri1->p[2] = tri0->p[0];
-	tri0->CalculateNormal();
-	tri1->n[0] = tri0->n[0];
-	tri1->n[1] = tri0->n[1];
-	tri1->n[2] = tri0->n[2];
-	tri0->c[0] = colorNewObjects;
-	tri1->c[0] = colorNewObjects;
-	triangles.Add(tri0);
-	triangles.Add(tri1);
+	Triangle tri0;
+	Triangle tri1;
+	tri0.p[0] = a;
+	tri0.p[1] = b;
+	tri0.p[2] = c;
+	tri1.p[0] = tri0.p[2];
+	tri1.p[1] = d;
+	tri1.p[2] = tri0.p[0];
+	tri0.CalculateNormal();
+	tri1.n[0] = tri0.n[0];
+	tri1.n[1] = tri0.n[1];
+	tri1.n[2] = tri0.n[2];
+	tri0.c[0] = colorNewObjects;
+	tri1.c[0] = colorNewObjects;
+	triangles.push_back(tri0);
+	triangles.push_back(tri1);
+}
+
+size_t Geometry::Size(void) const
+{
+	return triangles.size();
 }
 
 void Geometry::AddQuadTransform(const Vector3& a, const Vector3& b,
 		const Vector3& c, const Vector3& d,
 		const AffineTransformMatrix& transformMatrix)
 {
-	Triangle* tri0 = new Triangle;
-	Triangle* tri1 = new Triangle;
-	tri0->c[0] = colorNewObjects;
-	tri0->p[0] = transformMatrix.Transform(a);
-	tri0->p[1] = transformMatrix.Transform(b);
-	tri0->p[2] = transformMatrix.Transform(c);
-	tri0->CalculateNormal();
-	tri1->c[0] = colorNewObjects;
-	tri1->p[0] = tri0->p[2];
-	tri1->p[1] = transformMatrix.Transform(d);
-	tri1->p[2] = tri0->p[0];
-	tri1->n[0] = tri0->n[0];
-	tri1->n[1] = tri0->n[1];
-	tri1->n[2] = tri0->n[2];
-	triangles.Add(tri0);
-	triangles.Add(tri1);
+	Triangle tri0;
+	Triangle tri1;
+	tri0.c[0] = colorNewObjects;
+	tri0.p[0] = transformMatrix.Transform(a);
+	tri0.p[1] = transformMatrix.Transform(b);
+	tri0.p[2] = transformMatrix.Transform(c);
+	tri0.CalculateNormal();
+	tri1.c[0] = colorNewObjects;
+	tri1.p[0] = tri0.p[2];
+	tri1.p[1] = transformMatrix.Transform(d);
+	tri1.p[2] = tri0.p[0];
+	tri1.n[0] = tri0.n[0];
+	tri1.n[1] = tri0.n[1];
+	tri1.n[2] = tri0.n[2];
+	triangles.push_back(tri0);
+	triangles.push_back(tri1);
 }
 
 void Geometry::CalculateNormals(void)
 {
 	size_t i;
-	for(i = 0; i < triangles.GetCount(); i++){
+	for(i = 0; i < triangles.size(); i++){
 		triangles[i].CalculateNormal();
 	}
 }
@@ -242,7 +244,7 @@ void Geometry::CalculateNormals(void)
 void Geometry::FlipX(void)
 {
 	size_t i;
-	for(i = 0; i < triangles.GetCount(); i++){
+	for(i = 0; i < triangles.size(); i++){
 		triangles[i].p[0].x = -triangles[i].p[0].x;
 		triangles[i].p[1].x = -triangles[i].p[1].x;
 		triangles[i].p[2].x = -triangles[i].p[2].x;
@@ -252,7 +254,7 @@ void Geometry::FlipX(void)
 void Geometry::FlipY(void)
 {
 	size_t i;
-	for(i = 0; i < triangles.GetCount(); i++){
+	for(i = 0; i < triangles.size(); i++){
 		triangles[i].p[0].y = -triangles[i].p[0].y;
 		triangles[i].p[1].y = -triangles[i].p[1].y;
 		triangles[i].p[2].y = -triangles[i].p[2].y;
@@ -262,7 +264,7 @@ void Geometry::FlipY(void)
 void Geometry::FlipZ(void)
 {
 	size_t i;
-	for(i = 0; i < triangles.GetCount(); i++){
+	for(i = 0; i < triangles.size(); i++){
 		triangles[i].p[0].z = -triangles[i].p[0].z;
 		triangles[i].p[1].z = -triangles[i].p[1].z;
 		triangles[i].p[2].z = -triangles[i].p[2].z;
@@ -271,7 +273,7 @@ void Geometry::FlipZ(void)
 void Geometry::FlipNormals(void)
 {
 	size_t i;
-	for(i = 0; i < triangles.GetCount(); i++){
+	for(i = 0; i < triangles.size(); i++){
 		triangles[i].n[0] = -triangles[i].n[0];
 		triangles[i].n[1] = -triangles[i].n[1];
 		triangles[i].n[2] = -triangles[i].n[2];
@@ -322,7 +324,7 @@ void Geometry::ToXml(wxXmlNode* parentNode)
 
 	// Insert new triangles
 	size_t i;
-	for(i = 0; i < triangles.GetCount(); i++){
+	for(i = 0; i < triangles.size(); i++){
 		temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("tri"));
 		nodeObject->InsertChild(temp, NULL);
 		temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
@@ -337,17 +339,17 @@ bool Geometry::FromXml(wxXmlNode* parentNode)
 	name = parentNode->GetAttribute(_T("name"), _T(""));
 	wxXmlNode *temp = parentNode->GetChildren();
 
-	triangles.Empty();
-	Triangle* tri;
+	triangles.clear();
+	Triangle tri;
 
 	while(temp != NULL){
 		if(temp->GetName() == _T("tri")){
-			tri = new Triangle(temp->GetNodeContent());
+			tri.FromString(temp->GetNodeContent());
 			//			if(triangles.GetCount() < 20) wxLogMessage(
 			//					_T("Geometry::FromXml: Tri from >")
 			//							+ temp->GetNodeContent() + _T("<."));
 
-			triangles.Add(tri);
+			triangles.push_back(tri);
 		}
 		if(temp->GetName() == _T("matrix")){
 			matrix.FromString(temp->GetNodeContent());
@@ -358,4 +360,3 @@ bool Geometry::FromXml(wxXmlNode* parentNode)
 	}
 	return true;
 }
-

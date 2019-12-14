@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandObjectDelete.h
-// Purpose            : 
+// Name               : ProtoToolpath.h
+// Purpose            :
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
-// Author             : Tobias Schaefer
-// Created            : 08.01.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Author             : tobiassch
+// Created            : 03.01.2017
+// Copyright          : (C) 2017 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,25 +24,14 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDOBJECTDELETE_H_
-#define COMMANDOBJECTDELETE_H_
+#include "ProtoToolpath.h"
 
-#include "../Project.h"
 
-#include <wx/cmdproc.h>
-#include <wx/string.h>
+ProtoToolpath::ProtoToolpath()
+{
+	inserted = false;
+}
 
-class CommandObjectDelete:public wxCommand {
-public:
-	CommandObjectDelete(const wxString& name, Project * project, int objectNr);
-	virtual ~CommandObjectDelete();
-	bool Do(void);
-	bool Undo(void);
-
-protected:
-	Project * project;
-	int objectNr;
-	Object * object;
-};
-
-#endif /* COMMANDOBJECTDELETE_H_ */
+ProtoToolpath::~ProtoToolpath()
+{
+}

@@ -44,14 +44,15 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.499271279" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
 							<tool command="g++  " commandLinePattern="${COMMAND} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} ${FLAGS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.376884687" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
-								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.cpp.link.option.libs.960362737" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.cpp.link.option.libs.960362737" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value="GL"/>
+									<listOptionValue builtIn="false" value="cppunit"/>
 									<listOptionValue builtIn="false" value="GLU"/>
 									<listOptionValue builtIn="false" value="lua5.3"/>
 									<listOptionValue builtIn="false" value="portmidi"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1318683508" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths"/>
-								<option id="gnu.cpp.link.option.flags.284247766" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="`wx-config --libs richtext,gl,core,base,html,xml,adv`" valueType="string"/>
+								<option id="gnu.cpp.link.option.flags.284247766" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="`wx-config --libs richtext,gl,core,base,html,xml,adv,ribbon,propgrid`" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1271724444" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -84,18 +85,8 @@
 						</toolChain>
 					</folderInfo>
 					<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.1074777317.1021935980" name="OctreeInt64.h" rcbsApplicability="disable" resourcePath="src/theAttic/OctreeInt64.h" toolsToInvoke=""/>
-					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1074777317.343943262" name="/" resourcePath="Video">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.1432520426" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1271378774" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.2138686872"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.928950381" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1358257702"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1195607928" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1283442708"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1576864177" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug.499271279"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1214612622" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.376884687"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1907633854" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug.585771149"/>
-						</toolChain>
-					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Video|bin_release|bin_debug|bin_win|src/generator/temp.cpp|src/generator/temp.h|src/3D/OctreeInt64.h|src/3D/OctreeInt64.cpp|bin_linux|src/theAttic" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="doc|examples|FANUCM|machines|pdf|rawWWW|toolpath|WWW|src/project/machine/temp|src/project/generator/temp|src/gui/temp|src/project/command/temp|src/project/temp|Video|bin_release|bin_debug|bin_win|src/generator/temp.cpp|src/generator/temp.h|src/3D/OctreeInt64.h|src/3D/OctreeInt64.cpp|bin_linux|src/theAttic" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -127,7 +118,7 @@
 								<option id="gnu.cpp.compiler.exe.release.option.debugging.level.2068411328" name="Debug Level" superClass="gnu.cpp.compiler.exe.release.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.other.other.1615716021" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="`wx-config --cxxflags` -c -fmessage-length=0 -Wno-write-strings" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.dialect.std.1487574611" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.include.paths.804349737" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.cpp.compiler.option.include.paths.804349737" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="/usr/lib/x86_64-linux-gnu/wx/include/gtk2-unicode-release-3.0"/>
 									<listOptionValue builtIn="false" value="/usr/include/wx-3.0"/>
 									<listOptionValue builtIn="false" value="/usr/include/lua5.3"/>
@@ -144,7 +135,7 @@
 							<tool commandLinePattern="${COMMAND} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} ${FLAGS}" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.1823166464" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release">
 								<option id="gnu.cpp.link.option.flags.1743787553" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="`wx-config --libs richtext,gl,core,base,xml,adv`" valueType="string"/>
 								<option id="gnu.cpp.link.option.paths.1676840372" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths"/>
-								<option id="gnu.cpp.link.option.libs.1450076741" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.cpp.link.option.libs.1450076741" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="GL"/>
 									<listOptionValue builtIn="false" value="GLU"/>
 									<listOptionValue builtIn="false" value="lua5.3"/>

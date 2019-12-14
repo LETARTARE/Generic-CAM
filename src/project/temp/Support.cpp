@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ProtoToolpath.h
-// Purpose            :
-// Thread Safe        : No
+// Name               : Support.cpp
+// Purpose            : 
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
-// Author             : tobiassch
-// Created            : 03.01.2017
-// Copyright          : (C) 2017 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Author             : Tobias Schaefer
+// Created            : 09.02.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,29 +24,15 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef PROTOTOOLPATH_H_
-#define PROTOTOOLPATH_H_
+#include "Support.h"
 
-/*!\class ProtoToolpath
- * \brief Toolpath with additional information for sorting
- *
- * Toolpaths are generated in the wrong order. This class contains the
- * sections of a toolpath for later sorting and joining.
- */
+Support::Support()
+{
+	// TODO Auto-generated constructor stub
+}
 
-#include "../ToolPath.h"
-#include <wx/dynarray.h>
+Support::~Support()
+{
+	// TODO Auto-generated destructor stub
+}
 
-class ProtoToolpath:public ToolPath {
-public:
-	ProtoToolpath();
-	virtual ~ProtoToolpath();
-
-public:
-	bool inserted;
-	wxArrayInt parents;
-};
-
-WX_DECLARE_OBJARRAY(ProtoToolpath, ArrayOfProtoToolpath);
-
-#endif /* PROTOTOOLPATH_H_ */

@@ -60,19 +60,16 @@
  */
 
 #include "generator/Generator.h"
-#include "FlipDrillPattern.h"
-#include "Workpiece.h"
-#include "machine/Machine.h"
-#include "machine/MachineSimulator.h"
 
 #include "../3D/Geometry.h"
 #include "../3D/OpenGLImage.h"
 #include "../3D/AffineTransformMatrix.h"
 
-#include <wx/filename.h>
-#include <wx/txtstrm.h>
-#include <wx/string.h>
-#include <wx/dynarray.h>
+#include <map>
+#include <string>
+
+#include "Selection.h"
+#include "Workpiece.h"
 
 class Project;
 class Run {
@@ -81,59 +78,50 @@ class Run {
 	// Constructor / Destructor
 public:
 	Run();
-	Run(const Run& other); //!< Copy constructor
-	Run& operator=(const Run& other); ///< Assignment operator
 	virtual ~Run();
 
 	// Member variables
 public:
-	wxString name;
 	Project * parent; ///< Pointer back to the Project this Run belongs to.
-	int prevRun; ///< Link to the previous Run
 
-	Machine machine; ///< Machine used in this run
-	ArrayOfGeneratorPointer generators; ///< List of Generator%s applied to the workpiece in this run
-	MachineSimulator simulator; ///< Simulator
+	wxString name;
 
-	int refWorkpiece; ///< Workpiece reference
-	AffineTransformMatrix workpiecePlacement; //!< For flipping the workpiece to machine the other sides.
+	Selection object;
 
+	enum StockType {
+		Object, BoxTop, BoxCenter, BoxBottom
+	} type;
+	size_t stockobject;
+	Vector3 stocksize;
 
-	FlipDrillPattern pattern; //!< Experimental: FlipDrillPattern
+	AffineTransformMatrix origin; //!< Origin and coordinate-system
 
-	float touchoffHeight; ///< Level of the touchoff. This can be below the workpiece or at the top of it. Not to be neglected or the machine-bed will get a scar.
-
-	bool selected; ///< Flag if this run is selected.
-	bool showSimulation;
-private:
-//	int selectedTool;
-	OpenGLImage touchpoint;
-
-private:
-	mutable GLuint textureID;
-	mutable bool isOGLInit; ///< Controls the setup of OpenGL elements on the first evaluation of the Paint function.
+	std::map <size_t, Generator*> generators; ///< List of Generator%s applied to the workpiece in this run
 
 	// Methods
 public:
 	void Update(void);
-	void Select(bool select = true);
 
-	void GenerateToolpaths(void);
-	bool SaveToolpaths(wxFileName fileName, ToolPath::Dialect dialect);
+//	void GenerateToolpaths(void);
+//	bool SaveToolpaths(wxFileName fileName);
 
-	Vector3 GetCenter(void) const;
 	void Paint(void) const;
 
-	void ToStream(wxTextOutputStream & stream);
-	bool FromStream(wxTextInputStream & stream, int runNr, Project * project);
+//	void ToStream(wxTextOutputStream & stream);
+//	bool FromStream(wxTextInputStream & stream, int runNr, Project * project);
 
-	void ToolpathToStream(wxTextOutputStream & stream);
+//	void ToolpathToStream(wxTextOutputStream & stream);
 
-	Workpiece* GetWorkpiece(void);
-	const Workpiece* GetWorkpiece(void) const;
-	ToolPath* GetFirstSelectedToolpath(void);
-	const ToolPath* GetFirstSelectedToolpath(void) const;
+//	Workpiece* GetWorkpiece(void);
+//	const Workpiece* GetWorkpiece(void) const;
+//	ToolPath* GetFirstSelectedToolpath(void);
+//	const ToolPath* GetFirstSelectedToolpath(void) const;
+
+	friend bool operator<(const Run& a, const Run& b)
+	{
+		return a.name.Cmp(b.name) < 0;
+	}
+
 };
-WX_DECLARE_OBJARRAY(Run, ArrayOfRun);
 
 #endif /* RUN_H_ */

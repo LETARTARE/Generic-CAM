@@ -53,11 +53,6 @@
  *
  */
 
-#include <wx/dynarray.h>
-
-#include <wx/string.h>
-#include <wx/txtstrm.h>
-
 #include "../3D/Vector3.h"
 
 class StockMaterial {
@@ -68,7 +63,7 @@ public:
 
 	// Member variables
 public:
-	wxString name;
+	std::string name;
 	float sx, sy, sz;
 
 	bool available; ///< Available in workshop
@@ -84,8 +79,8 @@ public:
 public:
 	void Paint(float alpha, bool flipNormals = false) const;
 	void PaintWireBox(void) const;
-	void ToStream(wxTextOutputStream & stream);
-	bool FromStream(wxTextInputStream & stream);
+//	void ToStream(wxTextOutputStream & stream);
+//	bool FromStream(wxTextInputStream & stream);
 };
-WX_DECLARE_OBJARRAY(StockMaterial, ArrayOfStockMaterial);
+
 #endif /* STOCKMATERIAL_H_ */

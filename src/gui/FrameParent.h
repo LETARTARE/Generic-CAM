@@ -41,6 +41,7 @@
 #include <wx/help.h>
 #include <wx/string.h>
 #include <wx/timer.h>
+#include <wx/log.h>
 
 #ifdef _USE_6DOFCONTROLLER
 #include "../controller/Control3D.h"
@@ -85,6 +86,7 @@ public:
 public:
 	wxConfig* config;
 
+	wxLogWindow* logWindow;
 	wxHelpController* m_helpController;
 	DialogSetupStereo3D * dialogSetupStereo3D;
 	SettingsStereo3D settingsStereo3D;

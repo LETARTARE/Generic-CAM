@@ -113,7 +113,7 @@ void BoundingBox::Insert(const Triangle &tri)
 void BoundingBox::Insert(const Geometry &geometry,
 		const AffineTransformMatrix &matrix)
 {
-	for(size_t i = 0; i < geometry.triangles.GetCount(); i++){
+	for(size_t i = 0; i < geometry.triangles.size(); i++){
 		Triangle temp = geometry.triangles[i];
 		temp.ApplyTransformation(matrix * geometry.matrix);
 		for(uint_fast8_t j = 0; j < 3; j++){

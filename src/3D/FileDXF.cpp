@@ -126,8 +126,8 @@ void FileDXF::ProcessCode(long codeNr, wxString code)
 			Geometry* g = new Geometry();
 			g->matrix.TranslateGlobal(x, y, z);
 			g->name = blockName;
-			geometry.Add(g);
-			lastGeometry = geometry.Count() - 1;
+//			geometry.Add(g);
+//			lastGeometry = geometry.Count() - 1;
 		}
 		if(objectType.Cmp(_T("VERTEX")) == 0){
 			if(objectFlag == 192){
@@ -137,14 +137,14 @@ void FileDXF::ProcessCode(long codeNr, wxString code)
 			if(objectFlag == 128){
 				if(lastGeometry >= 0){
 					if(v0 > 0 && v1 > 0 && v2 > 0 && v3 < 0){
-						geometry[lastGeometry].AddTriangle(v[v0 - 1], v[v1 - 1],
-								v[v2 - 1]);
+//						geometry[lastGeometry].AddTriangle(v[v0 - 1], v[v1 - 1],
+//								v[v2 - 1]);
 					}
 					if(v0 > 0 && v1 > 0 && v2 > 0 && v3 > 0)
 
 					{
-						geometry[lastGeometry].AddQuad(v[v0 - 1], v[v1 - 1],
-								v[v2 - 1], v[v3 - 1]);
+//						geometry[lastGeometry].AddQuad(v[v0 - 1], v[v1 - 1],
+//								v[v2 - 1], v[v3 - 1]);
 					}
 				}
 			}
@@ -152,12 +152,12 @@ void FileDXF::ProcessCode(long codeNr, wxString code)
 
 		if(objectType.Cmp(_T("INSERT")) == 0){
 			size_t i;
-			for(i = 0; i < geometry.GetCount(); i++){
-				if(geometry[i].name.Cmp(blockName) == 0){
-					geometry[i].matrix.ScaleGlobal(sx, sy, sz);
-					geometry[i].matrix.TranslateGlobal(x, y, z);
-				}
-			}
+//			for(i = 0; i < geometry.GetCount(); i++){
+//				if(geometry[i].name.Cmp(blockName) == 0){
+//					geometry[i].matrix.ScaleGlobal(sx, sy, sz);
+//					geometry[i].matrix.TranslateGlobal(x, y, z);
+//				}
+//			}
 		}
 
 		objectName.Empty();
@@ -230,8 +230,8 @@ bool FileDXF::ReadFile(wxString fileName)
 
 	// Calculate normals to get the lighting right.
 	size_t i;
-	for(i = 0; i < geometry.GetCount(); i++){
-		geometry[i].CalculateNormals();
-	}
+//	for(i = 0; i < geometry.GetCount(); i++){
+//		geometry[i].CalculateNormals();
+//	}
 	return true;
 }

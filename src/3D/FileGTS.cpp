@@ -71,10 +71,11 @@ bool FileGTS::ReadFile(wxString fileName)
 	Geometry* g = new Geometry();
 	g->name = fileName;
 
-	geometry.Clear(); // Clear the old geometry and
-	geometry.Add(g); //insert the new one.
-	size_t nGeometry = geometry.GetCount() - 1;
-	wxASSERT(nGeometry==0);
+	geometry = *g;
+//	geometry.Clear(); // Clear the old geometry and
+//	geometry.Add(g); //insert the new one.
+//	size_t nGeometry = geometry.GetCount() - 1;
+//	wxASSERT(nGeometry==0);
 
 	long nv;
 	long ne;
@@ -98,8 +99,7 @@ bool FileGTS::ReadFile(wxString fileName)
 		temp.Replace(_T("."), _T(","));
 		tokenizer.SetString(temp);
 		if(tokenizer.CountTokens() < 3){
-			wxLogError(
-					_T("File is not a valid GTS file (too little vertices)!"));
+			wxLogError(_T("File is not a valid GTS file (too little vertices)!"));
 			return false;
 		}
 
@@ -180,8 +180,7 @@ bool FileGTS::ReadFile(wxString fileName)
 			u[5] = t;
 		}
 
-		geometry[nGeometry].AddTriangle(vectors[u[0]], vectors[u[2]],
-				vectors[u[4]]);
+		geometry.AddTriangle(vectors[u[0]], vectors[u[2]], vectors[u[4]]);
 
 
 		//      unsigned char j;

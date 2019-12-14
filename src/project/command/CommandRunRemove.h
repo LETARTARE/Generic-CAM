@@ -27,14 +27,15 @@
 #ifndef COMMANDRUNREMOVE_H_
 #define COMMANDRUNREMOVE_H_
 
-#include "../Project.h"
-#include "../Workpiece.h"
-
+#include <stddef.h>
 #include <wx/cmdproc.h>
+#include <wx/string.h>
+
+#include "../Run.h"
 
 class CommandRunRemove:public wxCommand {
 public:
-	CommandRunRemove(const wxString& name, Project * project, int runNr);
+	CommandRunRemove(const wxString& name, Project * project, size_t ID);
 	virtual ~CommandRunRemove();
 
 	bool Do(void);
@@ -42,8 +43,8 @@ public:
 
 protected:
 	Project * project;
-	int runNr;
-	Run * run;
+	size_t ID;
+	Run run;
 };
 
 #endif /* COMMANDRUNREMOVE_H_ */

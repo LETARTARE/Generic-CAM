@@ -83,7 +83,7 @@ public:
 public:
 	char Error[200];
 
-protected:
+private:
 	bool Opened;
 	char szPort[256]; ///< Name of the open port. //TODO: Use std::string ASAP.
 

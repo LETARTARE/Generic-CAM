@@ -42,52 +42,58 @@
  * in the depth of these private functions.
  */
 
-#include "../project/Project.h"
+#include <stddef.h>
+#include <wx/string.h>
+#include <wx/thread.h>
+//#include <wx/treebase.h>
+#include <wx/treectrl.h>
+
+#include "../project/Selection.h"
 #include "TreeItem.h"
 
-#include <wx/treectrl.h>
+class FrameMain;
 
 class TreeSetup {
 public:
-	TreeSetup(wxTreeCtrl * tree, Project * project);
+	TreeSetup(FrameMain * parent, wxTreeCtrl * tree);
 	virtual ~TreeSetup();
 
 	void Update(void); ///< Populate the wxTreeView with all items from the Project. Also update the view.
-	void UpdateSelection(void); ///< Set the selection in the tree to the selection marked in the Project.
-	void UpdateVariables(void); ///< Update the "selected" variables in the Project from the selection in the tree.
+	void SelectonToTree(const Selection &sel); ///< Set the selection in the tree to the selection marked in the Project.
+	Selection TreeToSelection(void); ///< Update the "selected" variables in the Project from the selection in the tree.
 
-	int GetFirstSelectedObject(void);
-	int GetFirstSelectedWorkpiece(void);
-	int GetFirstSelectedRun(void);
-	int GetFirstSelectedToolpath(void);
-
-	int GetWorkpieceFromLink(int linkNr);
-	int GetObjectFromLink(int linkNr);
+//	int GetFirstSelectedObject(void);
+//	int GetFirstSelectedWorkpiece(void);
+//	int GetFirstSelectedRun(void);
+//	int GetFirstSelectedToolpath(void);
+//
+//	int GetWorkpieceFromLink(int linkNr);
+//	int GetObjectFromLink(int linkNr);
 
 private:
 	void Reset(void);
-	void SetAtLevel(int level, const wxString& name, ItemDataType type, int nr);
+	void SetAtLevel(int level, const wxString& name, TreeItem::itemtype type,
+			size_t ID);
 	void FinishLevel(int level, bool autoExpand = false);
 
 	bool GetSelection(void);
 	void SetSelection(bool selection = true);
 
-	bool loopGuard; ///< Cancel update loops. Tree updates variable updates tree updates variable updates ...
+	wxMutex loopGuard; ///< Breaks update loops. Tree updates variable updates tree updates variable updates ...
 
 	bool levelModified;
 	wxTreeItemIdValue cookie;
 	wxTreeItemId * id;
 
 	wxTreeItemId groupObjects;
-	wxTreeItemId groupWorkpieces;
 	wxTreeItemId groupRun;
+	wxTreeItemId groupGenerator;
 
 	size_t maxId;
 	int currentLevel;
 
-	Project * project;
+	FrameMain * parent;
 	wxTreeCtrl * tree;
-
 };
 
 #endif /* TREESETUP_H_ */

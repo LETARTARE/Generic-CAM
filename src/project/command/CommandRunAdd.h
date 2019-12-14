@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : CommandRunAdd.h
-// Purpose            : 
+// Purpose            :
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 17.01.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 02.12.2019
+// Copyright          : (C) 2019 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,23 +24,28 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDRUNADD_H_
-#define COMMANDRUNADD_H_
+#ifndef __COMMANDRUNADD_H__
+#define __COMMANDRUNADD_H__
 
-#include "../Project.h"
-
+#include <stddef.h>
 #include <wx/cmdproc.h>
+#include <wx/string.h>
+
+#include "../Run.h"
 
 class CommandRunAdd:public wxCommand {
 public:
-	CommandRunAdd(const wxString& name, Project * project, wxString runName);
+	CommandRunAdd(const wxString& name, Project * project, wxString runName,
+			size_t objID = 0);
 
 	bool Do(void);
 	bool Undo(void);
 
 protected:
+	Run run;
 	Project * project;
-	wxString runName;
+	size_t ID;
 };
 
-#endif /* COMMANDRUNADD_H_ */
+#endif /* __COMMANDRUNADD_H__ */
+

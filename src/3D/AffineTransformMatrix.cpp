@@ -524,6 +524,46 @@ AffineTransformMatrix AffineTransformMatrix::RotationTrackball(const double& x1,
 	return AffineTransformMatrix::RotationAroundVector(A, alpha);
 }
 
+AffineTransformMatrix AffineTransformMatrix::RotationQuarternion(
+		const double& w, const double& x, const double& y, const double& z)
+{
+	// Conversion formula from
+	// https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion
+
+	const double n = w * w + x * x + y * y + z * z;
+	const double s = (fabs(n) < 1e-9)? (0) : (2.0 / n);
+	const double wx = s * w * x;
+	const double wy = s * w * y;
+	const double wz = s * w * z;
+	const double xx = s * x * x;
+	const double xy = s * x * y;
+	const double xz = s * x * z;
+	const double yy = s * y * y;
+	const double yz = s * y * z;
+	const double zz = s * z * z;
+
+	AffineTransformMatrix m;
+
+	m.a[0] = 1.0 - (yy + zz);
+	m.a[1] = xy + wz;
+	m.a[2] = xz - wy;
+	m.a[3] = 0;
+	m.a[4] = xy - wz;
+	m.a[5] = 1.0 - (xx + zz);
+	m.a[6] = yz + wx;
+	m.a[7] = 0;
+	m.a[8] = xz + wy;
+	m.a[9] = yz - wx;
+	m.a[10] = 1.0 - (xx + yy);
+	m.a[11] = 0;
+	m.a[12] = 0;
+	m.a[13] = 0;
+	m.a[14] = 0;
+	m.a[15] = 1.0;
+
+	return m;
+}
+
 void AffineTransformMatrix::TranslateGlobal(double const& x, double const& y,
 		double const& z)
 {

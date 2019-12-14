@@ -305,7 +305,6 @@ bool SerialPort::Close(void)
 #endif
 
 	Opened = false;
-	//	printf("Port wurde geschlossen!\n");
 	return (true);
 }
 

@@ -27,8 +27,6 @@
 #ifndef OCTREE_H_
 #define OCTREE_H_
 
-#include <wx/defs.h>
-#include <wx/dynarray.h>
 #include <GL/gl.h>
 #include <stdint.h>
 
@@ -113,6 +111,5 @@ public:
 	void Paint(void); ///< Paints the octree and creates the OpenGL display list.
 
 };
-WX_DECLARE_OBJARRAY(Octree, ArrayOfOctree);
 
 #endif /* OCTREE_H_ */

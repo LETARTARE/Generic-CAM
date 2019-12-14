@@ -26,9 +26,9 @@
 
 #include "TreeItem.h"
 
-TreeItem::TreeItem(ItemDataType dataType, size_t nr)
+TreeItem::TreeItem(itemtype type, size_t ID)
 {
-	this->nr = nr;
-	this->dataType = dataType;
+	this->ID = ID;
+	this->type = type;
 }
 

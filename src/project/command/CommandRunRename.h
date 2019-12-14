@@ -27,14 +27,15 @@
 #ifndef COMMANDRUNRENAME_H_
 #define COMMANDRUNRENAME_H_
 
-#include "../Project.h"
-
+#include <stddef.h>
 #include <wx/cmdproc.h>
 #include <wx/string.h>
 
+class Project;
+
 class CommandRunRename:public wxCommand {
 public:
-	CommandRunRename(const wxString& name, Project * project, int runNr,
+	CommandRunRename(const wxString& name, Project * project, size_t ID,
 			const wxString newName);
 
 	bool Do(void);
@@ -42,7 +43,7 @@ public:
 
 protected:
 	Project * project;
-	int runNr;
+	size_t ID;
 	wxString newName;
 	wxString oldName;
 };

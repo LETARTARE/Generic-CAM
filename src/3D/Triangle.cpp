@@ -30,9 +30,7 @@
 
 #include <GL/gl.h>
 #include <wx/tokenzr.h>
-#include <wx/arrimpl.cpp>
-
-WX_DEFINE_OBJARRAY(ArrayOfTriangle)
+#include <cmath>
 
 Triangle::Triangle()
 {

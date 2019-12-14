@@ -26,13 +26,15 @@
 
 #include "CommandObjectTransform.h"
 
+#include "../Project.h"
+
 CommandObjectTransform::CommandObjectTransform(const wxString& name,
-		Project* project, size_t objectNr, bool flipX, bool flipY, bool flipZ,
+		Project* project, size_t ID, bool flipX, bool flipY, bool flipZ,
 		bool flipNormals, const AffineTransformMatrix& matrixNew) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->objectNr = objectNr;
+	this->ID = ID;
 	this->flipX = flipX;
 	this->flipY = flipY;
 	this->flipZ = flipZ;
@@ -42,30 +44,29 @@ CommandObjectTransform::CommandObjectTransform(const wxString& name,
 
 bool CommandObjectTransform::Do(void)
 {
-	if(objectNr >= project->objects.GetCount()) return false;
-	matrixOld = project->objects[objectNr].displayTransform
-			* project->objects[objectNr].matrix;
-	project->objects[objectNr].matrix = matrixNew;
-	project->objects[objectNr].displayTransform.SetIdentity();
-	if(flipX) project->objects[objectNr].FlipX();
-	if(flipY) project->objects[objectNr].FlipY();
-	if(flipZ) project->objects[objectNr].FlipZ();
-	if(flipNormals) project->objects[objectNr].FlipNormals();
-	project->objects[objectNr].Update();
+	if(project == NULL) return false;
+	if(project->objects.find(ID) == project->objects.end()) return false;
+	matrixOld = project->objects[ID].matrix;
+	project->objects[ID].matrix = matrixNew;
+	if(flipX) project->objects[ID].FlipX();
+	if(flipY) project->objects[ID].FlipY();
+	if(flipZ) project->objects[ID].FlipZ();
+	if(flipNormals) project->objects[ID].FlipNormals();
+//	project->objects[objectNr].Update();
 	project->Update();
 	return true;
 }
 
 bool CommandObjectTransform::Undo(void)
 {
-	if(objectNr >= project->objects.GetCount()) return false;
-	project->objects[objectNr].matrix = matrixOld;
-	project->objects[objectNr].displayTransform.SetIdentity();
-	if(flipX) project->objects[objectNr].FlipX();
-	if(flipY) project->objects[objectNr].FlipY();
-	if(flipZ) project->objects[objectNr].FlipZ();
-	if(flipNormals) project->objects[objectNr].FlipNormals();
-	project->objects[objectNr].Update();
+	if(project == NULL) return false;
+	if(project->objects.find(ID) == project->objects.end()) return false;
+	project->objects[ID].matrix = matrixOld;
+	if(flipX) project->objects[ID].FlipX();
+	if(flipY) project->objects[ID].FlipY();
+	if(flipZ) project->objects[ID].FlipZ();
+	if(flipNormals) project->objects[ID].FlipNormals();
+//	project->objects[objectNr].Update();
 	project->Update();
 	return true;
 }

@@ -28,11 +28,13 @@
 
 #include <GL/gl.h>
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
 
 #include "Geometry.h"
+#include "OpenGLMaterial.h"
 #include "Polygon3.h"
 #include "Triangle.h"
 
@@ -43,6 +45,14 @@ Hull::Edge::Edge()
 	ta = 0;
 	tb = 0;
 	trianglecount = 0;
+	group = 0;
+	sharp = false;
+}
+
+size_t Hull::Edge::OtherVertex(size_t n) const
+{
+	if(va == n) return vb;
+	return va;
 }
 
 size_t Hull::Edge::OtherTriangle(size_t n) const
@@ -61,7 +71,9 @@ bool Hull::Edge::AttachTriangle(size_t index)
 	if(trianglecount == 1){
 		tb = index;
 		trianglecount++;
+		return false;
 	}
+	if(trianglecount < 255) trianglecount++;
 	return false;
 }
 
@@ -73,6 +85,7 @@ Hull::Triangle::Triangle()
 	ea = 0;
 	eb = 0;
 	ec = 0;
+	group = 0;
 }
 
 int Hull::Triangle::Direction(size_t i1, size_t i2) const
@@ -87,12 +100,12 @@ int Hull::Triangle::Direction(size_t i1, size_t i2) const
 Hull::Hull()
 {
 	SetEpsilon(1e-6); // 1 um
-	paintTriangles = false;
+	paintTriangles = true;
 	paintEdges = true;
 	paintVertices = false;
 	paintNormals = false;
 	smooth = false;
-	paintSelected = true;
+	paintSelected = false;
 }
 
 Hull::~Hull()
@@ -108,6 +121,7 @@ void Hull::Clear(void)
 	openedges.clear();
 	openvertices.clear();
 	selected.clear();
+	matrix.SetIdentity();
 }
 
 void Hull::SetEpsilon(double newEpsilon)
@@ -118,118 +132,228 @@ void Hull::SetEpsilon(double newEpsilon)
 
 void Hull::Paint(void) const
 {
-	::glPushMatrix();
-	matrix.GLMultMatrix();
-
-	const double normalscale = 0.1;
 
 	if(paintTriangles){
-		::glBegin(GL_TRIANGLES);
-		if(smooth){
-			for(size_t i = 0; i < t.size(); ++i){
-				glNormal3f(vn[t[i].va].x, vn[t[i].va].y, vn[t[i].va].z);
-				glVertex3f(v[t[i].va].x, v[t[i].va].y, v[t[i].va].z);
-				glNormal3f(vn[t[i].vb].x, vn[t[i].vb].y, vn[t[i].vb].z);
-				glVertex3f(v[t[i].vb].x, v[t[i].vb].y, v[t[i].vb].z);
-				glNormal3f(vn[t[i].vc].x, vn[t[i].vc].y, vn[t[i].vc].z);
-				glVertex3f(v[t[i].vc].x, v[t[i].vc].y, v[t[i].vc].z);
-			}
-		}else{
-			for(size_t i = 0; i < t.size(); ++i){
-				glNormal3f(t[i].n.x, t[i].n.y, t[i].n.z);
-				glVertex3f(v[t[i].va].x, v[t[i].va].y, v[t[i].va].z);
-				glVertex3f(v[t[i].vb].x, v[t[i].vb].y, v[t[i].vb].z);
-				glVertex3f(v[t[i].vc].x, v[t[i].vc].y, v[t[i].vc].z);
-			}
-		}
-		::glEnd();
-		if(paintNormals){
-
-			glBegin(GL_LINES);
-			for(size_t i = 0; i < t.size(); ++i){
-				glNormal3f(t[i].n.x, t[i].n.y, t[i].n.z);
-				const Vector3 center = (v[t[i].va] + v[t[i].vb] + v[t[i].vc])
-						/ 3;
-				glVertex3f(center.x, center.y, center.z);
-				glVertex3f(center.x + t[i].n.x * normalscale,
-						center.y + t[i].n.y * normalscale,
-						center.z + t[i].n.z * normalscale);
-			}
-			glEnd();
-		}
+		PaintTriangles();
 	}
 	if(paintEdges){
-		::glBegin(GL_LINES);
-		if(smooth){
-			for(size_t i = 0; i < e.size(); ++i){
-				glNormal3f(vn[e[i].va].x, vn[e[i].va].y, vn[e[i].va].z);
-				glVertex3f(v[e[i].va].x, v[e[i].va].y, v[e[i].va].z);
-				glNormal3f(vn[e[i].vb].x, vn[e[i].vb].y, vn[e[i].vb].z);
-				glVertex3f(v[e[i].vb].x, v[e[i].vb].y, v[e[i].vb].z);
-			}
-		}else{
-			for(size_t i = 0; i < e.size(); ++i){
-				glNormal3f(e[i].n.x, e[i].n.y, e[i].n.z);
-				glVertex3f(v[e[i].va].x, v[e[i].va].y, v[e[i].va].z);
-				glVertex3f(v[e[i].vb].x, v[e[i].vb].y, v[e[i].vb].z);
-			}
-		}
-		::glEnd();
+		PaintEdges();
+	}
+	if(paintVertices){
+		PaintVertices();
+	}
+	if(paintSelected){
+		PaintSelected();
+	}
+}
 
-		if(paintNormals){
-			glBegin(GL_LINES);
-			for(size_t i = 0; i < e.size(); ++i){
-				glNormal3f(e[i].n.x, e[i].n.y, e[i].n.z);
-				const Vector3 center = (v[e[i].va] + v[e[i].vb]) / 2;
-				glVertex3f(center.x, center.y, center.z);
-				glVertex3f(center.x + e[i].n.x * normalscale,
-						center.y + e[i].n.y * normalscale,
-						center.z + e[i].n.z * normalscale);
+void Hull::PaintTriangles(const std::set <size_t>&sel, bool invert) const
+{
+	const double normalscale = 0.1;
+	::glPushMatrix();
+	matrix.GLMultMatrix();
+//	OpenGLMaterial::EnableColors();
+	GLuint group = 0;
+	bool skip = false;
+	glPushName(group);
+	glBegin(GL_TRIANGLES);
+	if(smooth){
+		for(size_t i = 0; i < t.size(); ++i){
+
+			if(t[i].group != group){
+				group = (GLuint) (t[i].group % 4294967295);
+				skip = ((!invert && sel.find(group) == sel.end())
+						|| (invert && sel.find(group) != sel.end()));
+				if(skip) continue;
+
+				glEnd();
+				glLoadName(group);
+				glBegin(GL_TRIANGLES);
 			}
-			glEnd();
+			if(skip) continue;
+			glNormal3f(vn[t[i].va].x, vn[t[i].va].y, vn[t[i].va].z);
+			glVertex3f(v[t[i].va].x, v[t[i].va].y, v[t[i].va].z);
+			glNormal3f(vn[t[i].vb].x, vn[t[i].vb].y, vn[t[i].vb].z);
+			glVertex3f(v[t[i].vb].x, v[t[i].vb].y, v[t[i].vb].z);
+			glNormal3f(vn[t[i].vc].x, vn[t[i].vc].y, vn[t[i].vc].z);
+			glVertex3f(v[t[i].vc].x, v[t[i].vc].y, v[t[i].vc].z);
+		}
+
+	}else{
+		for(size_t i = 0; i < t.size(); ++i){
+			if(t[i].group != group){
+				group = (GLuint) (t[i].group % 4294967295);
+				skip = ((!invert && sel.find(t[i].group) == sel.end())
+						|| (invert && sel.find(t[i].group) != sel.end()));
+				if(skip) continue;
+				glEnd();
+				glLoadName(group);
+				glBegin(GL_TRIANGLES);
+			}
+			if(skip) continue;
+
+//			glColor3f(0.5 + cos(2 * M_PI / 20.0 * t[i].group) * 0.5,
+//					0.5
+//							+ cos(
+//									2 * M_PI / 20.0 * t[i].group
+//											+ M_PI * 2.0 / 3.0) * 0.5,
+//					0.5
+//							+ cos(
+//									2 * M_PI / 20.0 * t[i].group
+//											+ M_PI * 4.0 / 3.0) * 0.5);
+			glNormal3f(t[i].n.x, t[i].n.y, t[i].n.z);
+			glVertex3f(v[t[i].va].x, v[t[i].va].y, v[t[i].va].z);
+			glVertex3f(v[t[i].vb].x, v[t[i].vb].y, v[t[i].vb].z);
+			glVertex3f(v[t[i].vc].x, v[t[i].vc].y, v[t[i].vc].z);
 		}
 	}
+	glEnd();
+	glPopName();
 
-	if(paintVertices){
-		::glBegin(GL_POINTS);
+	if(paintNormals){
+
+		glBegin(GL_LINES);
+		for(size_t i = 0; i < t.size(); ++i){
+			glNormal3f(t[i].n.x, t[i].n.y, t[i].n.z);
+			const Vector3 center = (v[t[i].va] + v[t[i].vb] + v[t[i].vc]) / 3;
+			glVertex3f(center.x, center.y, center.z);
+			glVertex3f(center.x + t[i].n.x * normalscale,
+					center.y + t[i].n.y * normalscale,
+					center.z + t[i].n.z * normalscale);
+		}
+		glEnd();
+	}
+	glPopMatrix();
+}
+
+void Hull::PaintEdges(const std::set <size_t>&sel, bool invert) const
+{
+	const double normalscale = 0.1;
+	glPushMatrix();
+	matrix.GLMultMatrix();
+	GLuint group = 0;
+	bool skip = false;
+	glPushName(group);
+	glBegin(GL_LINES);
+	if(smooth){
+		for(size_t i = 0; i < e.size(); ++i){
+			if(e[i].group != group){
+				group = (GLuint) (e[i].group % 4294967295);
+				skip = ((!invert && sel.find(group) == sel.end())
+						|| (invert && sel.find(group) != sel.end()));
+				if(skip) continue;
+				glEnd();
+				glLoadName(group);
+				glBegin(GL_LINES);
+			}
+			if(skip) continue;
+			if(!e[i].sharp) continue;
+			glNormal3f(vn[e[i].va].x, vn[e[i].va].y, vn[e[i].va].z);
+			glVertex3f(v[e[i].va].x, v[e[i].va].y, v[e[i].va].z);
+			glNormal3f(vn[e[i].vb].x, vn[e[i].vb].y, vn[e[i].vb].z);
+			glVertex3f(v[e[i].vb].x, v[e[i].vb].y, v[e[i].vb].z);
+		}
+	}else{
+		for(size_t i = 0; i < e.size(); ++i){
+			if(e[i].group != group){
+				group = (GLuint) (e[i].group % 4294967295);
+				skip = ((!invert && sel.find(group) == sel.end())
+						|| (invert && sel.find(group) != sel.end()));
+				if(skip) continue;
+				glEnd();
+				glLoadName(group);
+				glBegin(GL_LINES);
+			}
+			if(skip) continue;
+			if(!e[i].sharp) continue;
+
+//			glColor3f(0.5 + cos(2 * M_PI / 20.0 * e[i].group) * 0.5,
+//					0.5
+//							+ cos(
+//									2 * M_PI / 20.0 * e[i].group
+//											+ M_PI * 2.0 / 3.0) * 0.5,
+//					0.5
+//							+ cos(
+//									2 * M_PI / 20.0 * e[i].group
+//											+ M_PI * 4.0 / 3.0) * 0.5);
+
+			glNormal3f(e[i].n.x, e[i].n.y, e[i].n.z);
+			glVertex3f(v[e[i].va].x, v[e[i].va].y, v[e[i].va].z);
+			glVertex3f(v[e[i].vb].x, v[e[i].vb].y, v[e[i].vb].z);
+		}
+	}
+	glEnd();
+	glPopName();
+
+	if(paintNormals){
+		glBegin(GL_LINES);
+		for(size_t i = 0; i < e.size(); ++i){
+			glNormal3f(e[i].n.x, e[i].n.y, e[i].n.z);
+			const Vector3 center = (v[e[i].va] + v[e[i].vb]) / 2;
+			glVertex3f(center.x, center.y, center.z);
+			glVertex3f(center.x + e[i].n.x * normalscale,
+					center.y + e[i].n.y * normalscale,
+					center.z + e[i].n.z * normalscale);
+		}
+		glEnd();
+	}
+	glPopMatrix();
+}
+
+void Hull::PaintVertices(void) const
+{
+
+	const double normalscale = 0.1;
+	glPushMatrix();
+	matrix.GLMultMatrix();
+	for(size_t i = 0; i < v.size(); ++i){
+		glPushName(i);
+		glBegin(GL_POINTS);
+		glNormal3f(vn[i].x, vn[i].y, vn[i].z);
+		glVertex3f(v[i].x, v[i].y, v[i].z);
+		glEnd();
+		glPopName();
+	}
+
+	if(paintNormals){
+		glBegin(GL_LINES);
 		for(size_t i = 0; i < v.size(); ++i){
 			glNormal3f(vn[i].x, vn[i].y, vn[i].z);
 			glVertex3f(v[i].x, v[i].y, v[i].z);
+			glVertex3f(v[i].x + vn[i].x * normalscale,
+					v[i].y + vn[i].y * normalscale,
+					v[i].z + vn[i].z * normalscale);
 		}
-		::glEnd();
-		if(paintNormals){
-			glBegin(GL_LINES);
-			for(size_t i = 0; i < v.size(); ++i){
-				glNormal3f(vn[i].x, vn[i].y, vn[i].z);
-				glVertex3f(v[i].x, v[i].y, v[i].z);
-				glVertex3f(v[i].x + vn[i].x * normalscale,
-						v[i].y + vn[i].y * normalscale,
-						v[i].z + vn[i].z * normalscale);
-			}
-			glEnd();
-		}
-
+		glEnd();
 	}
+	glPopMatrix();
+}
 
-	if(paintSelected){
-		::glPointSize(10);
-		::glBegin(GL_POINTS);
-		for(std::set <size_t>::iterator n = selected.begin();
-				n != selected.end(); ++n){
-			size_t i = *n;
-			glNormal3f(vn[i].x, vn[i].y, vn[i].z);
-			glVertex3f(v[i].x, v[i].y, v[i].z);
-		}
-		::glEnd();
-		::glPointSize(1);
+void Hull::PaintSelected(void) const
+{
+	glPushMatrix();
+	matrix.GLMultMatrix();
+	glPointSize(10);
+	glBegin(GL_POINTS);
+	for(std::set <size_t>::iterator n = selected.begin(); n != selected.end();
+			++n){
+		size_t i = *n;
+		glNormal3f(vn[i].x, vn[i].y, vn[i].z);
+		glVertex3f(v[i].x, v[i].y, v[i].z);
 	}
-
-	::glPopMatrix();
+	glEnd();
+	glPointSize(1);
+	glPopMatrix();
 }
 
 bool Hull::IsClosed(void) const
 {
 	return (openedges.empty() && openvertices.empty());
+}
+
+bool Hull::IsEmpty(void) const
+{
+	return (v.size() == 0);
 }
 
 bool Hull::LoadObj(std::string filename)
@@ -283,10 +407,14 @@ bool Hull::LoadObj(std::string filename)
 	const size_t buffersize = 1048576;
 
 	char *buffer = new char[buffersize];
+	if(buffer == NULL) return false;
 	size_t charsread;
 	std::ifstream in(filename.c_str(), std::ifstream::in | std::ios::binary);
 
-	if(!in.good()) return false;
+	if(!in.good()){
+		delete[] buffer;
+		return false;
+	}
 
 	this->Clear();
 
@@ -571,14 +699,14 @@ void Hull::ApplyTransformation(void)
 void Hull::CopyFrom(const Geometry &geometry)
 {
 	Clear();
-	CopyTrianglesFrom(geometry);
+	AddTrianglesFrom(geometry);
 	this->matrix = geometry.matrix;
 //	wxLogMessage(
 //			wxString::Format(_T("V: %u E: %u T: %u"), v.size(),
 //					e.size(), t.size()));
 }
 
-void Hull::CopyTrianglesFrom(const Geometry &geometry)
+void Hull::AddTrianglesFrom(const Geometry &geometry)
 {
 	for(size_t i = 0; i < geometry.triangles.size(); i++){
 		AddTriangleWithNormals(geometry.triangles[i].p[0],
@@ -729,6 +857,132 @@ void Hull::CalcNormals(void)
 	}
 }
 
+void Hull::CalcGroups(void)
+{
+	// Every edge that connects two triangles that are oriented
+	// more than 25 degrees relative to each other is considered
+	// a sharp edge.
+	//TODO: Make this a parameter in the import settings.
+	const float sharplimit = cos(25.0 / 180.0 * M_PI);
+
+	// Set sharp edges based on enclosed angle
+	for(size_t i = 0; i < e.size(); ++i){
+		if(e[i].trianglecount <= 1){
+			e[i].sharp = true;
+		}else{
+			if(t[e[i].ta].n.Dot(t[e[i].tb].n) < sharplimit){
+				e[i].sharp = true;
+			}else{
+				e[i].sharp = false;
+			}
+		}
+	}
+
+	// Reset all triangle to group 0
+	for(size_t i = 0; i < t.size(); ++i)
+		t[i].group = 0;
+
+	size_t currentGroup = 0;
+
+	for(size_t i = 0; i < t.size(); ++i){
+		if(t[i].group != 0) continue;
+
+		++currentGroup;
+		std::set <size_t> checklist;
+		checklist.insert(i);
+		while(!checklist.empty()){
+			size_t j = *(checklist.begin());
+			{
+				const size_t k = t[j].ea;
+				if(!e[k].sharp && e[k].trianglecount >= 2){
+					size_t p = e[k].OtherTriangle(j);
+					if(t[p].group == 0) checklist.insert(p);
+				}
+			}
+			{
+				const size_t k = t[j].eb;
+				if(!e[k].sharp && e[k].trianglecount >= 2){
+					size_t p = e[k].OtherTriangle(j);
+					if(t[p].group == 0) checklist.insert(p);
+				}
+			}
+			{
+				const size_t k = t[j].ec;
+				if(!e[k].sharp && e[k].trianglecount >= 2){
+					size_t p = e[k].OtherTriangle(j);
+					if(t[p].group == 0) checklist.insert(p);
+				}
+			}
+			t[j].group = currentGroup;
+			checklist.erase(j);
+		}
+
+	}
+
+	// Count the number of sharp edges ending or starting in each vertex.
+	// Store the first two sharp edges connecting to a vertex.
+	std::vector <size_t> vecount;
+	std::vector <size_t> vea;
+	std::vector <size_t> veb;
+	vecount.assign(v.size(), 0);
+	vea.resize(v.size());
+	veb.resize(v.size());
+	for(size_t n = 0; n < e.size(); ++n){
+		if(!e[n].sharp) continue;
+		const size_t ja = e[n].va;
+		const size_t jb = e[n].vb;
+		vecount[ja]++;
+		if(vecount[ja] == 1) vea[ja] = n;
+		if(vecount[ja] == 2) veb[ja] = n;
+		vecount[jb]++;
+		if(vecount[jb] == 1) vea[jb] = n;
+		if(vecount[jb] == 2) veb[jb] = n;
+	}
+
+	// Reset all edges to group 0
+	for(size_t n = 0; n < e.size(); ++n)
+		e[n].group = 0;
+
+	// Assign groups
+	currentGroup = 0;
+	for(size_t n = 0; n < e.size(); ++n){
+		if(e[n].group != 0 || !e[n].sharp) continue;
+		currentGroup++;
+		e[n].group = currentGroup;
+
+		// Forward pass
+		{
+			size_t m = n;
+			size_t i = e[m].va;
+			while(vecount[i] == 2){
+				if(vea[i] == m){
+					m = veb[i];
+				}else{
+					m = vea[i];
+				}
+				if(e[m].group != 0) break;
+				i = e[m].OtherVertex(i);
+				e[m].group = currentGroup;
+			}
+		}
+		// Backward pass
+		{
+			size_t m = n;
+			size_t i = e[m].vb;
+			while(vecount[i] == 2){
+				if(veb[i] == m){
+					m = vea[i];
+				}else{
+					m = veb[i];
+				}
+				if(e[m].group != 0) break;
+				i = e[m].OtherVertex(i);
+				e[m].group = currentGroup;
+			}
+		}
+	}
+}
+
 void Hull::FlipNormals(void)
 {
 	for(size_t i = 0; i < t.size(); ++i)
@@ -741,7 +995,7 @@ void Hull::FlipNormals(void)
 
 size_t Hull::FindVertex(const Vector3& x)
 {
-	// Search open vertices
+// Search open vertices
 	for(std::set <size_t>::iterator it = openvertices.begin();
 			it != openvertices.end(); ++it){
 		const size_t i = *it;
@@ -751,7 +1005,7 @@ size_t Hull::FindVertex(const Vector3& x)
 		if((t1 * t1 + t2 * t2 + t3 * t3) <= epsilon2) return i;
 	}
 
-	// Search all vertices
+// Search all vertices
 	for(size_t i = 0; i < v.size(); ++i){
 		const double t1 = v[i].x - x.x;
 		const double t2 = v[i].y - x.y;
@@ -759,7 +1013,7 @@ size_t Hull::FindVertex(const Vector3& x)
 		if((t1 * t1 + t2 * t2 + t3 * t3) <= epsilon2) return i;
 	}
 
-	// Create new vertex
+// Create new vertex
 	v.push_back(x);
 	vn.push_back(x);
 	size_t index = v.size() - 1;
@@ -769,7 +1023,7 @@ size_t Hull::FindVertex(const Vector3& x)
 
 size_t Hull::FindEdge(const size_t indexa, const size_t indexb)
 {
-	// Search open edges
+// Search open edges
 	for(std::set <size_t>::iterator it = openedges.begin();
 			it != openedges.end(); ++it){
 		const size_t i = *it;
@@ -777,13 +1031,13 @@ size_t Hull::FindEdge(const size_t indexa, const size_t indexb)
 				|| (e[i].va == indexb && e[i].vb == indexa)) return i;
 	}
 
-	// Search all edges
+// Search all edges
 	for(size_t i = 0; i < e.size(); ++i){
 		if((e[i].va == indexa && e[i].vb == indexb)
 				|| (e[i].va == indexb && e[i].vb == indexa)) return i;
 	}
 
-	// Create new edge
+// Create new edge
 	Hull::Edge temp;
 	temp.va = indexa;
 	temp.vb = indexb;
@@ -812,7 +1066,7 @@ size_t Hull::AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c)
 				|| (t[i].va == nvc && t[i].vb == nvb && t[i].vc == nva)) return i;
 	}
 
-	// Add new triangle
+// Add new triangle
 	Hull::Triangle tempt;
 	tempt.va = nva;
 	tempt.vb = nvb;
@@ -909,6 +1163,7 @@ void Hull::AddQuad(const Vector3 &a, const Vector3 &b, const Vector3 &c,
 	AddTriangle(a, b, c);
 	AddTriangle(a, c, d);
 }
+
 void Hull::AddQuadTransform(const Vector3 &a, const Vector3 &b,
 		const Vector3 &c, const Vector3 &d,
 		const AffineTransformMatrix &transformMatrix)
@@ -976,6 +1231,14 @@ size_t Hull::UnselectByNormal(Vector3 n, double limit)
 
 size_t Hull::CountSelected(void) const
 {
+	return selected.size();
+}
+
+size_t Hull::Select(std::set <size_t>& select)
+{
+	selected = select;
+	std::set <size_t>::iterator n = selected.upper_bound(v.size());
+	if(n != selected.end()) selected.erase(n, selected.end());
 	return selected.size();
 }
 

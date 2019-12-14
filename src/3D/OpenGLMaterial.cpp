@@ -193,6 +193,104 @@ void OpenGLMaterial::Preset(Material preset)
 		specular.Set(0.7, 0.7, 0.04);
 		shininess = 5;
 		break;
+	case cRed: //Color Red
+		ambient.Set(1.0, 0.0, 0.0);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+
+	case cYellow: //Color Yellow
+		ambient.Set(1.0, 1.0, 0.0);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+	case cGreen: //Color Green
+		ambient.Set(0.0, 0.5, 0.0);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+	case cLime: //Color Lime
+		ambient.Set(0.0, 1.0, 0.0);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+	case cTeal: //Color Teal
+		ambient.Set(0.0, 0.5, 0.5);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+	case cOlive: //Color Olive
+		ambient.Set(0.5, 0.5, 0.0);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+	case cBlue: //Color Blue
+		ambient.Set(0.0, 0.0, 1.0);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+	case cAqua: //Color Aqua
+		ambient.Set(0.0, 1.0, 1.0);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+	case cNavy: //Color Navy
+		ambient.Set(0.0, 0.0, 0.5);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+	case cPurple: //Color Purple
+		ambient.Set(0.5, 0.0, 0.5);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+	case cFuchsia: //Color Fuchsia
+		ambient.Set(1.0, 0.0, 1.0);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+	case cMaroon: //Color Maroon
+		ambient.Set(0.5, 0.0, 0.0);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+	case cGray: //Color Gray
+		ambient.Set(0.75, 0.75, 0.75);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+	case cSilver: //Color Silver
+		ambient.Set(0.5, 0.5, 0.5);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+	case cBlack: //Color Black
+		ambient.Set(0.0, 0.0, 0.0);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+	case cWhite: //Color White
+		ambient.Set(1.0, 1.0, 1.0);
+		diffuse = ambient;
+		specular.Zero();
+		shininess = 0;
+		break;
+
 	}
 	emission.Zero();
 }
@@ -248,6 +346,38 @@ std::string OpenGLMaterial::GetPresetName(Material preset)
 		return ("White rubber");
 	case yellowrubber:
 		return ("Yellow rubber");
+	case cRed:
+		return ("Red");
+	case cYellow:
+		return ("Yellow");
+	case cGreen:
+		return ("Green");
+	case cLime:
+		return ("Lime");
+	case cTeal:
+		return ("Teal");
+	case cOlive:
+		return ("Olive");
+	case cBlue:
+		return ("Blue");
+	case cAqua:
+		return ("Aqua");
+	case cNavy:
+		return ("Navy");
+	case cPurple:
+		return ("Purple");
+	case cFuchsia:
+		return ("Fuchsia");
+	case cMaroon:
+		return ("Maroon");
+	case cGray:
+		return ("Gray");
+	case cSilver:
+		return ("Silver");
+	case cBlack:
+		return ("Black");
+	case cWhite:
+		return ("White");
 	}
 	return ("");
 }
@@ -273,10 +403,11 @@ bool OpenGLMaterial::ColorsAllowed(void)
 	return (colormask[0] && colormask[1] && colormask[2] && colormask[3]);
 }
 
-void OpenGLMaterial::UseMaterial(void)
+void OpenGLMaterial::UseMaterial(void) const
 {
 	if(!ColorsAllowed()) return;
 	glDisable(GL_COLOR_MATERIAL);
+	GLfloat buffer[4];
 	buffer[0] = ambient.x;
 	buffer[1] = ambient.y;
 	buffer[2] = ambient.z;
@@ -300,17 +431,31 @@ void OpenGLMaterial::UseMaterial(void)
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
 }
 
-void OpenGLMaterial::UseColor(float emit)
+void OpenGLMaterial::UseColor(float emit) const
 {
 	if(!ColorsAllowed()) return;
 	glEnable(GL_COLOR_MATERIAL);
-	GLfloat buffer[] = {0, 0, 0, 1};
+	GLfloat buffer[] =
+		{0, 0, 0, 1};
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, buffer);
-	if(emit != 0.0){
-		buffer[0] = diffuse.x * emit;
-		buffer[1] = diffuse.y * emit;
-		buffer[2] = diffuse.z * emit;
-	}
+	buffer[0] = diffuse.x * emit;
+	buffer[1] = diffuse.y * emit;
+	buffer[2] = diffuse.z * emit;
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, buffer);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0);
+	glColor3f(diffuse.x, diffuse.y, diffuse.z);
+}
+
+void OpenGLMaterial::UseColor(void) const
+{
+	if(!ColorsAllowed()) return;
+	glEnable(GL_COLOR_MATERIAL);
+	GLfloat buffer[] =
+		{0, 0, 0, 1};
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, buffer);
+	buffer[0] = emission.x;
+	buffer[1] = emission.y;
+	buffer[2] = emission.z;
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, buffer);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0);
 	glColor3f(diffuse.x, diffuse.y, diffuse.z);
@@ -320,7 +465,8 @@ void OpenGLMaterial::EnableColors(void)
 {
 	if(!ColorsAllowed()) return;
 	glEnable(GL_COLOR_MATERIAL);
-	GLfloat buffer[] = {0, 0, 0, 1};
+	GLfloat buffer[] =
+		{0, 0, 0, 1};
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, buffer);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, buffer);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0);

@@ -37,15 +37,16 @@
  * the postion, the object was loaded in.
  */
 
+#include "../3D/Hull.h"
 #include "../3D/BoundingBox.h"
-#include "../3D/Geometry.h"
 #include "../3D/AffineTransformMatrix.h"
 
 #include <wx/txtstrm.h>
 #include <wx/filename.h>
 #include <wx/string.h>
-#include <wx/dynarray.h>
 
+#include "../3D/OpenGLMaterial.h"
+#include "Selection.h"
 class Object {
 	// Constructor / Destructor
 public:
@@ -58,26 +59,20 @@ public:
 	wxFileName fileName;
 
 	AffineTransformMatrix matrix; //!< Transformation (rotation and scaling) of the object in the positive quadrant next to the origin.
-	AffineTransformMatrix displayTransform; //!< Shift of the object to the position it was loaded.
 
-	ArrayOfGeometry geometries;
+	Hull geometry;
 	BoundingBox bbox;
 
 	bool show; //!< An object can hide, e.g. if derived objects exist
-
-	bool selected;
+	bool selectable; //!< If marked as not selectable, it cannot be selected.
 
 private:
 
 	// Methods
 public:
-	void Update(void); //!< Update the split corrdinate system.
-	void UpdateNormals(void); //!< Normalize the normals for the object to shade correctly.
+	void Update(void);
 
 	void TransformFromCenter(void); //!< Shifts the origin for transfomration on 'matrix' to the center of the object.
-
-	void Paint(const bool absolutCoordinates = false,
-			const GeometryColorStyle style = geometryColorDefault) const;
 
 	bool LoadObject(wxFileName fileName);
 	bool ReloadObject(void);
@@ -92,9 +87,10 @@ public:
 	void ToStream(wxTextOutputStream & stream, size_t n);
 	bool FromStream(wxTextInputStream & stream);
 
-private:
+	void Paint(const OpenGLMaterial &face, const OpenGLMaterial &edge,
+			const Selection& sel) const;
+	void PaintPick(void) const;
 
 };
-WX_DECLARE_OBJARRAY(Object, ArrayOfObject);
 
 #endif /* OBJECT_H_ */

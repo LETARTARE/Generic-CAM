@@ -28,9 +28,6 @@
 
 #include <math.h>
 #include <stddef.h>
-#include <wx/arrimpl.cpp>
-
-WX_DEFINE_OBJARRAY(ArrayOfOctree)
 
 OctreeCell::OctreeCell(bool isSolid)
 {

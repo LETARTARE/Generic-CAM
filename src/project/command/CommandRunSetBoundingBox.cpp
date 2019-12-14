@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Support.cpp
-// Purpose            : 
-// Thread Safe        : Yes
+// Name               : CommandRunSetBoundingBox.cpp
+// Purpose            :
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 09.02.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 03.12.2019
+// Copyright          : (C) 2019 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,18 +24,27 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "Support.h"
+#include "CommandRunSetBoundingBox.h"
 
-#include <wx/arrimpl.cpp>
-WX_DEFINE_OBJARRAY(ArrayOfSupport)
+#include "../Project.h"
 
-Support::Support()
+CommandRunSetBoundingBox::CommandRunSetBoundingBox(const wxString& name, Project* project, double value) : wxCommand(true, name)
 {
-	// TODO Auto-generated constructor stub
+	this->project = project;
+	this->value = value;
+	oldValue = 0.0;
 }
 
-Support::~Support()
+bool CommandRunSetBoundingBox::Do(void)
 {
-	// TODO Auto-generated destructor stub
+	if(project == NULL) return false;
+	project->UpdateAllViews();
+	return true;
 }
 
+bool CommandRunSetBoundingBox::Undo(void)
+{
+	if(project == NULL) return false;
+	project->UpdateAllViews();
+	return true;
+}

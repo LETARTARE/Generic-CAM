@@ -40,45 +40,73 @@
  *
  */
 
+#include <stddef.h>
+#include <string>
+#include <vector>
+
 #include "../3D/Vector3.h"
 
-#include <wx/xml/xml.h>
-#include <wx/txtstrm.h>
-#include <wx/string.h>
-#include <wx/dynarray.h>
-
-class ToolContourElement {
-public:
-	ToolContourElement(bool cutting = false, bool partOfShaft = false);
-	virtual ~ToolContourElement();
-	Vector3 p1;
-	Vector3 p2;
-	Vector3 n1;
-	Vector3 n2;
-	bool isCutting;
-	bool belongsToShaft;
-};
-WX_DECLARE_OBJARRAY(ToolContourElement, ArrayOfToolContourElement);
-
-class ToolElement {
-public:
-	ToolElement();
-	ToolElement(const wxString & string);
-	virtual ~ToolElement();
-	float d;
-	float h;
-	float r;
-	//TODO Change the type to an enum.
-	unsigned char t;
-	bool cutting;
-
-	wxString ToString(void) const;
-	void FromString(wxString const &string);
-};
-WX_DECLARE_OBJARRAY(ToolElement, ArrayOfToolElement);
-
 class Tool {
-	friend class DexelTarget;
+public:
+	class Segment {
+	public:
+		Segment();
+		double height;
+		double lowerdiameter;
+		double upperdiameter;
+	};
+	class Geometry {
+	public:
+		Geometry();
+		bool CSP;
+		double DC;
+		bool HAND;
+		double LB;
+		double LCF;
+		size_t NOF;
+		double NT; //?
+		double OAL;
+		double RE;
+		double SFDM;
+		double SIG;
+		double TA;
+		double TP;
+		double shoulderlength;
+		double threadprofileangle;
+		double tipdiameter;
+		double tiplength;
+		double tipoffset;
+	};
+	class PostProcess {
+	public:
+		PostProcess();
+		bool breakcontrol;
+		std::string comment;
+		size_t diameteroffset;
+		size_t lengthoffset;
+		bool live;
+		bool manualtoolchange;
+		size_t number;
+		std::string toolcoolant;
+		size_t turret;
+	};
+	class StartValues {
+	public:
+		StartValues();
+		double fn;
+		double fz;
+		double n;
+		double nramp;
+		double vc;
+		double vf;
+		double vfleadin;
+		double vfleadout;
+		double vfplunge;
+		double vframp;
+		double vfretract;
+	};
+
+//	friend class DexelTarget;
 //	friend class DialogToolbox;
 	friend class PanelTool;
 	// Constructor / Destructor
@@ -86,21 +114,38 @@ public:
 	Tool();
 	virtual ~Tool();
 
-	// Member variables
-public:
-	//TODO: Rename to "name":
-	wxString toolName;
-	int slotNr;
-	wxString comment;
-	double shaftDiameter;
-	double shaftLength;
-	double maxSpeed;
-	double feedCoefficient;
-	unsigned int nrOfTeeth;
-	ArrayOfToolElement elements;
+	std::string description;
+	std::string guid;
+	std::string productid;
+	std::string type;
+	std::string vendor;
+	std::string unit;
+	std::string BMC;
+	std::string GRADE;
+	std::string productlink;
+
+	bool hasGeometry;
+	Geometry geometry;
+	bool hasPostProcess;
+	PostProcess postprocess;
+	bool hasStartValues;
+	StartValues startvalues;
+
+	std::vector <Segment> segments;
 
 private:
-	ArrayOfToolContourElement contour;
+
+	class ContourElement {
+	public:
+		ContourElement(bool cutting = false, bool partOfShaft = false);
+		Vector3 p1;
+		Vector3 p2;
+		Vector3 n1;
+		Vector3 n2;
+		bool isCutting;
+		bool belongsToShaft;
+	};
+	std::vector <ContourElement> contour;
 
 	// Methods
 public:
@@ -113,11 +158,10 @@ public:
 
 	void GenerateContour(void);
 
-	void ToStream(wxTextOutputStream & stream);
-	bool FromStream(wxTextInputStream & stream);
+//	void ToStream(wxTextOutputStream & stream);
+//	bool FromStream(wxTextInputStream & stream);
 
 	void Paint(void) const;
 };
-WX_DECLARE_OBJARRAY(Tool, ArrayOfTool);
 
 #endif /* TOOL_H_ */

@@ -32,8 +32,8 @@
 #include "AffineTransformMatrix.h"
 
 #include <wx/string.h>
-#include <wx/dynarray.h>
 #include <wx/xml/xml.h>
+#include <vector>
 
 /*!\class Geometry
  * \ingroup Base3D
@@ -64,7 +64,7 @@ public:
 	bool visible;
 
 	AffineTransformMatrix matrix; //!< Transformation of the data.
-	ArrayOfTriangle triangles; //!< The storage of the geometric data.
+	std::vector <Triangle> triangles; //!< The storage of the geometric data.
 
 	// Methods
 public:
@@ -74,6 +74,8 @@ public:
 	void Paint(GeometryColorStyle style = geometryColorDefault) const;
 
 	void Clear(void);
+	size_t Size(void) const;
+
 	void InsertTrianglesFrom(const Geometry& geometry, bool recolor = false);
 
 	void CalculateNormals(void);
@@ -99,6 +101,5 @@ public:
 	void AddQuadTransform(const Vector3& a, const Vector3& b, const Vector3& c,
 			const Vector3& d, const AffineTransformMatrix& transformMatrix);
 };
-WX_DECLARE_OBJARRAY(Geometry, ArrayOfGeometry);
 
 #endif /* GEOMETRY_H_ */

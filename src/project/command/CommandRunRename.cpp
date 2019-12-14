@@ -26,26 +26,30 @@
 
 #include "CommandRunRename.h"
 
+#include "../Project.h"
+
 CommandRunRename::CommandRunRename(const wxString& name, Project* project,
-		int runNr, const wxString newName) :
+		size_t ID, const wxString newName) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->runNr = runNr;
+	this->ID = ID;
 	this->newName = newName;
 }
 
 bool CommandRunRename::Do(void)
 {
-	this->oldName = project->run[runNr].name;
-	project->run[runNr].name = this->newName;
+	if(project == NULL) return false;
+	if(project->run.find(ID) == project->run.end()) return false;
+	this->oldName = project->run[ID].name;
+	project->run[ID].name = this->newName;
 	project->Update();
 	return true;
 }
 
 bool CommandRunRename::Undo(void)
 {
-	project->run[runNr].name = this->oldName;
+	project->run[ID].name = this->oldName;
 	project->Update();
 	return true;
 }

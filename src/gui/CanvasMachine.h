@@ -34,7 +34,7 @@
  */
 
 #include "../StdInclude.h"
-#include "../project/machine/Machine.h"
+//#include "../project/machine/Machine.h"
 #include "../3D/OpenGLCanvas.h"
 
 #include <wx/string.h>
@@ -48,11 +48,11 @@ public:
 	virtual ~CanvasMachine();
 
 private:
-	Machine* machine;
+//	Machine* machine;
 
 	// Methods
 public:
-	void InsertMachine(Machine* machine);
+//	void InsertMachine(Machine* machine);
 	void Render();
 };
 

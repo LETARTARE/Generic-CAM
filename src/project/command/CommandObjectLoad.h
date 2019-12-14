@@ -27,9 +27,11 @@
 #ifndef COMMANDOBJECTLOAD_H_
 #define COMMANDOBJECTLOAD_H_
 
-#include "../Project.h"
-
+#include <stddef.h>
 #include <wx/cmdproc.h>
+#include <wx/string.h>
+
+class Project;
 
 class CommandObjectLoad:public wxCommand {
 public:
@@ -40,6 +42,7 @@ public:
 	bool Undo(void);
 
 protected:
+	size_t ID;
 	Project * project;
 	wxString fileName;
 };

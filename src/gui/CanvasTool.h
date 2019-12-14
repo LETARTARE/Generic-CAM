@@ -29,7 +29,7 @@
 
 #include "../StdInclude.h"
 #include "../project/Tool.h"
-#include "../project/generator/DexelTarget.h"
+//#include "../project/generator/DexelTarget.h"
 #include "../3D/OpenGLCanvas.h"
 
 class CanvasTool:public OpenGLCanvas {
@@ -43,7 +43,7 @@ public:
 	// Member Variables
 private:
 	Tool* tool;
-	DexelTarget debug;
+//	DexelTarget debug;
 	// Methods
 public:
 	void InsertTool(Tool& t);

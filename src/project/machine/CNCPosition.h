@@ -46,9 +46,6 @@
 #include "../../3D/AffineTransformMatrix.h"
 #include "../../3D/Vector3.h"
 
-#include <wx/string.h>
-#include <wx/dynarray.h>
-
 class CNCPosition {
 	// Constructor/ Destructor
 public:
@@ -109,6 +106,5 @@ public:
 	AffineTransformMatrix GetMatrix(void) const; //!< Return a transformation matrix for this position
 
 };
-WX_DECLARE_OBJARRAY(CNCPosition, ArrayOfCNCPosition);
 
 #endif /* CNCPOSITION_H_ */

@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandObjectDelete.cpp
-// Purpose            : 
+// Name               : CommandRunSetCorrdinateSystem.h
+// Purpose            :
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 08.01.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 03.12.2019
+// Copyright          : (C) 2019 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,41 +24,32 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandObjectDelete.h"
+#ifndef __COMMANDRUNSETCORRDINATESYSTEM_H__
+#define __COMMANDRUNSETCORRDINATESYSTEM_H__
 
 #include <stddef.h>
+#include <wx/cmdproc.h>
+#include <wx/string.h>
 
-CommandObjectDelete::CommandObjectDelete(const wxString& name, Project* project,
-		int objectNr) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->objectNr = objectNr;
-	this->object = NULL;
-}
+#include "../../3D/AffineTransformMatrix.h"
 
-CommandObjectDelete::~CommandObjectDelete()
-{
-	if(object != NULL) delete object;
-}
+class Project;
 
-bool CommandObjectDelete::Do(void)
-{
-	object = project->objects.Detach(objectNr);
-	project->Update();
-	return true;
-}
+class CommandRunSetCorrdinateSystem:public wxCommand {
+public:
+	CommandRunSetCorrdinateSystem(const wxString& name, Project* project,
+			size_t ID, const AffineTransformMatrix &matrix);
 
-bool CommandObjectDelete::Undo(void)
-{
-	if(objectNr >= project->objects.GetCount()){
-		project->objects.Add(object);
-	}else{
-		project->objects.Insert(object, objectNr);
-	}
-	// If the the object was inserted back into the project,
-	// this function must not delete the object in the destructor.
-	object = NULL;
-	project->Update();
-	return true;
-}
+	bool Do(void);
+	bool Undo(void);
+
+protected:
+	Project* project;
+	size_t ID;
+	AffineTransformMatrix oldMatrix;
+	AffineTransformMatrix newMatrix;
+
+};
+
+#endif /* __COMMANDRUNSETCORRDINATESYSTEM_H__ */
+

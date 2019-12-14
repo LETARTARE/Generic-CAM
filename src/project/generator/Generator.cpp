@@ -26,12 +26,11 @@
 
 #include "Generator.h"
 
-#include "../Run.h"
 #include "../Workpiece.h"
 
-#include <wx/arrimpl.cpp>
-WX_DEFINE_OBJARRAY(ArrayOfGeneratorPointer)
 #include <GL/gl.h>
+
+#include "../Run.h"
 
 Generator::Generator()
 {
@@ -43,8 +42,6 @@ Generator::Generator()
 	freeHeight = 0.001;
 
 	settings = NULL;
-
-	selected = false;
 
 //	this->project = project;
 //	this->runNr = runNr;
@@ -87,7 +84,7 @@ void Generator::Paint(void) const
 {
 //	glPushMatrix();
 //	glTranslatef(area.xmin, area.ymin, area.zmin);
-	toolpath.Paint();
+//	toolpath.Paint();
 //	glPopMatrix();
 }
 

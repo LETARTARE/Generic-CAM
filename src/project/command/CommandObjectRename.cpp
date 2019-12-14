@@ -26,26 +26,31 @@
 
 #include "CommandObjectRename.h"
 
+#include "../Project.h"
+
 CommandObjectRename::CommandObjectRename(const wxString& name, Project* project,
-		int objectNr, const wxString objectName) :
+		size_t ID, const wxString objectName) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->objectNr = objectNr;
+	this->ID = ID;
 	this->newName = objectName;
 }
 
 bool CommandObjectRename::Do(void)
 {
-	this->oldName = project->objects[objectNr].name;
-	project->objects[objectNr].name = this->newName;
+	if(project == NULL) return false;
+	if(project->objects.find(ID) == project->objects.end()) return false;
+
+	this->oldName = project->objects[ID].name;
+	project->objects[ID].name = this->newName;
 	project->Update();
 	return true;
 }
 
 bool CommandObjectRename::Undo(void)
 {
-	project->objects[objectNr].name = this->oldName;
+	project->objects[ID].name = this->oldName;
 	project->Update();
 	return true;
 }

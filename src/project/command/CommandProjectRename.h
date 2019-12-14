@@ -27,10 +27,10 @@
 #ifndef COMMANDPROJECTRENAME_H_
 #define COMMANDPROJECTRENAME_H_
 
-#include "../Project.h"
-
 #include <wx/cmdproc.h>
 #include <wx/string.h>
+
+class Project;
 
 class CommandProjectRename:public wxCommand {
 public:

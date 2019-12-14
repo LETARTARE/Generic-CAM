@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : ProtoToolpath.h
+// Name               : CommandRunSetBoundingBox.h
 // Purpose            :
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
-// Author             : tobiassch
-// Created            : 03.01.2017
-// Copyright          : (C) 2017 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Author             : Tobias Schaefer
+// Created            : 03.12.2019
+// Copyright          : (C) 2019 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,16 +24,27 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "ProtoToolpath.h"
+#ifndef __COMMANDRUNSETBOUNDINGBOX_H__
+#define __COMMANDRUNSETBOUNDINGBOX_H__
 
-#include <wx/arrimpl.cpp>
-WX_DEFINE_OBJARRAY(ArrayOfProtoToolpath)
+#include <wx/cmdproc.h>
+#include <wx/string.h>
 
-ProtoToolpath::ProtoToolpath()
-{
-	inserted = false;
-}
+class Project;
 
-ProtoToolpath::~ProtoToolpath()
-{
-}
+class CommandRunSetBoundingBox:public wxCommand {
+public:
+    CommandRunSetBoundingBox(const wxString& name, Project* project, double value);
+
+    bool Do(void);
+    bool Undo(void);
+
+protected:
+    Project* project;
+    double value;
+    double oldValue;
+
+};
+
+#endif /* __COMMANDRUNSETBOUNDINGBOX_H__ */
+

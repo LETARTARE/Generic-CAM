@@ -141,7 +141,7 @@ bool Control3D::Pump(void)
 	return controller->Pump();
 }
 
-bool Control3D::GetConfigFrom(wxConfig *config)
+bool Control3D::Load(wxConfig *config)
 {
 	wxASSERT(config!=NULL);
 
@@ -160,16 +160,17 @@ bool Control3D::GetConfigFrom(wxConfig *config)
 
 	}
 
-	if(config->Read(_T("Control_Port"), &str)){
-		SetPort(str);
-	}else{
+	bool found = config->Read(_T("Control_Port"), &str);
+
+	if(!found || str.IsEmpty()){
 #ifdef __LINUX
-		SetPort(_T("/dev/ttyS0"));
+		str = _T("/dev/ttyS0");
 #endif
 #ifdef __WIN
-		SetPort(_T("COM1"));
+		str = _T("COM1");
 #endif
 	}
+	SetPort(str);
 	if(config->Read(_T("Control_ActivateOnStartUp"), &str)){
 		if(str == _T("Yes")){
 			this->Open();
@@ -178,7 +179,7 @@ bool Control3D::GetConfigFrom(wxConfig *config)
 	return true;
 }
 
-bool Control3D::WriteConfigTo(wxConfig *config)
+bool Control3D::Save(wxConfig *config)
 {
 	wxASSERT(config!=NULL);
 

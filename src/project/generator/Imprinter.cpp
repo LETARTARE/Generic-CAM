@@ -742,7 +742,7 @@ void Imprinter::InsertGeometrie(const Geometry *geometry,
 	AffineTransformMatrix m = geometry->matrix;
 	m = shift * m; // Premultiply the transformation globally.
 
-	for(size_t i = 0; i < geometry->triangles.GetCount(); i++){
+	for(size_t i = 0; i < geometry->triangles.size(); i++){
 		Triangle temp = geometry->triangles[i];
 		temp.ApplyTransformation(m);
 

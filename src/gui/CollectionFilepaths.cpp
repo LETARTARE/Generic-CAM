@@ -42,10 +42,11 @@ bool CollectionFilepaths::Load(wxConfig* config)
 	wxString cwd = wxFileName::GetCwd();
 	config->Read(_T("LastProjectDirectory"), &lastProjectDirectory, cwd);
 	config->Read(_T("LastObjectDirectory"), &lastObjectDirectory, cwd);
-	config->Read(_T("LastMachineDirectory"), &lastMachineDirectory, cwd);
-	config->Read(_T("LastStockDirectory"), &lastStockDirectory, cwd);
-	config->Read(_T("LastToolboxDirectory"), &lastToolboxDirectory, cwd);
 	config->Read(_T("LastToolpathDirectory"), &lastToolpathDirectory, cwd);
+	config->Read(_T("LastMachineDirectory"), &lastMachineDirectory, cwd);
+	config->Read(_T("LastToolboxDirectory"), &lastToolboxDirectory, cwd);
+	config->Read(_T("LastPostProcessorDirectory"), &lastPostProcessorDirectory,
+			cwd);
 
 	return true;
 }
@@ -57,10 +58,10 @@ bool CollectionFilepaths::Save(wxConfig* config)
 
 	config->Write(_T("LastProjectDirectory"), lastProjectDirectory);
 	config->Write(_T("LastObjectDirectory"), lastObjectDirectory);
-	config->Write(_T("LastMachineDirectory"), lastMachineDirectory);
-	config->Write(_T("LastStockDirectory"), lastStockDirectory);
-	config->Write(_T("LastToolboxDirectory"), lastToolboxDirectory);
 	config->Write(_T("LastToolpathDirectory"), lastToolpathDirectory);
+	config->Write(_T("LastMachineDirectory"), lastMachineDirectory);
+	config->Write(_T("LastToolboxDirectory"), lastToolboxDirectory);
+	config->Write(_T("LastPostProcessorDirectory"), lastPostProcessorDirectory);
 
 	return true;
 }

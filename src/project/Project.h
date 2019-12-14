@@ -40,17 +40,18 @@
 
 #include "../Config.h"
 
-#include "Run.h"
-#include "Workpiece.h"
 #include "Object.h"
 
 #include <wx/filename.h>
 #include <wx/string.h>
 #include <wx/defs.h>
+#include <map>
 
 #include <stddef.h>
 #include <wx/docview.h>
 
+#include "Run.h"
+#include "Selection.h"
 //
 //#if wxUSE_STD_IOSTREAM
 //typedef wxSTD istream DocumentIstream;
@@ -67,24 +68,24 @@ public:
 
 public:
 	// Project properties
-	wxFileName fileName;
 	wxString name;
+	wxFileName fileName;
 
-	ArrayOfObject objects; //!< Loaded objects
-	ArrayOfWorkpiece workpieces; //!< Workpieces with objects
-	ArrayOfRun run; //!< Machine runs on workpieces
+	std::map <size_t, Object> objects; //!< Loaded objects
+	std::map <size_t, Run> run; //!< Loaded objects
 
 //	bool processToolpath;
 //	bool interruptProcessing;
 
 	// Granularity
-	double resX;
-	double resY;
+//	double resX;
+//	double resY;
 	//TODO Make the granularity a parameter.
 
 	// Methods
 public:
 	void Clear(void);
+	void Update(void);
 
 	bool DoSaveDocument(const wxString& file);
 	bool DoOpenDocument(const wxString& file);
@@ -92,41 +93,26 @@ public:
 	bool Load(wxFileName fileName);
 	bool Save(wxFileName fileName);
 
-	void LoadPattern(wxFileName fileName);
-	bool SaveToolpath(wxFileName fileName, int runNr,
-			ToolPath::Dialect dialect);
-
-	void PaintObjects(void) const;
-	void PaintWorkpiece(void) const;
-	void PaintRun(void) const;
-
-	int GetFirstSelectedObject(void) const;
-	int GetFirstSelectedWorkpiece(void) const;
-	int GetFirstSelectedRun(void) const;
-
-//	void PaintDepthField(unsigned int runNr, unsigned int objectReferenceNr);
-
-	void Update(void);
+	bool Has(const Selection &sel) const;
+	bool Has(const Selection::Type type, const size_t ID) const;
 
 	bool GenerateToolpaths(void); ///< Direct generation of all toolpaths.
+	bool SaveToolpath(wxFileName fileName, int runNr);
 
-private:
-	void RenderCoordinateSystem(void) const;
+	void Paint(const OpenGLMaterial &face, const OpenGLMaterial &edge,
+			const Selection &sel) const;
 
-//	void PropagateChanges(void);
-//	size_t ToolpathToGenerate(void);
-//	bool ToolpathGenerate(void);
-
-//	wxString ToolPathGenerateCurrent(void);
-
-//	size_t generator_workpieceNr;
-//	size_t generator_runNr;
-//	size_t generator_toolpathNr;
+	void PaintPick(void) const;
 
 #if(_GENERICCAM_USEMULTITHREADING == 1)
 	wxMutex mtx_project;
 	wxMutex mtx_generator;
 #endif
+
+public:
+	size_t maxObjectID;
+	size_t maxRunID;
+
 DECLARE_DYNAMIC_CLASS(Project)
 	;
 };

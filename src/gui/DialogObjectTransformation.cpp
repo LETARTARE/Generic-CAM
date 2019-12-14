@@ -27,7 +27,6 @@
 #include "DialogObjectTransformation.h"
 
 #include "../project/command/CommandObjectTransform.h"
-#include "../project/command/CommandObjectSetColor.h"
 #include "IDs.h"
 #include <wx/event.h>
 #include <math.h>
@@ -38,8 +37,6 @@
 DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent) :
 		GUIObjectTransformation(parent)
 {
-	m_menuPreferences->Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
-
 	scaleProportional = true;
 	scalePercent = 1;
 	scalePercentX = 1;
@@ -62,58 +59,44 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 {
 	if(!this->IsShown()) return false;
 	Project* project = GetProject();
-	CollectionUnits* settings = &(wxStaticCast(GetParent()->GetParent(),FrameParent)->units);
+	ProjectView* view = GetView();
+	CollectionUnits* settings =
+			&(wxStaticCast(GetParent()->GetParent(),FrameParent)->units);
+
 	if(project == NULL) return false;
 
-	// Update Selection box
-	size_t n;
-	int selection = -1;
-	m_choiceObjectSelection->Clear();
-	for(n = 0; n < project->objects.GetCount(); n++){
-		m_choiceObjectSelection->Append(project->objects[n].name);
-		if(project->objects[n].selected){
-			if(selection == -1)
-				selection = n;
-			else
-				selection = -2;
-		}
+	if(selected.IsSetEmpty() || !selected.IsType(Selection::Object)){
+		SetTitle(_("No object selected..."));
+		m_textCtrlSizeX->SetValue(_T("-"));
+		m_textCtrlSizeY->SetValue(_T("-"));
+		m_textCtrlSizeZ->SetValue(_T("-"));
+		// Turn off other things.
+		return false;
 	}
-	if(n == 0) m_choiceObjectSelection->Append(_("No objects in project!"));
-	m_choiceObjectSelection->Enable(n > 0);
 
-	if(selection == -2){
-		m_choiceObjectSelection->Append(_("Multiple objects selected."));
-		m_choiceObjectSelection->SetSelection(n);
+	const bool multiselect = selected.Size() > 1;
+	size_t objID = selected[0];
+
+	std::set <size_t> set = selected.GetSet();
+	bbox.Clear();
+	for(std::set <size_t>::const_iterator it = set.begin(); it != set.end();
+			++it){
+		if(project->objects.find(*it) == project->objects.end()) continue;
+		bbox.Insert(project->objects[*it].bbox);
 	}
-	Vector3 color;
-	if(selection >= 0){
-		m_choiceObjectSelection->SetSelection(selection);
+	if(project->objects.find(objID) == project->objects.end()) return false;
+	const Object* obj = &(project->objects[objID]);
 
-		if(project->objects[selection].geometries.GetCount() > 0){
-			color = project->objects[selection].geometries[0].color;
-
-		}
+	if(multiselect){
+		SetTitle(_("Multiple object selected..."));
+	}else{
+		SetTitle(obj->name);
 	}
-	m_colourPickerObject->SetColour(
-	wxColor(floor(color.x * 255), floor(color.y * 255), floor(color.z * 255)));
 
 	// Update Units
-
-	if(selection >= 0){
-		m_textCtrlSizeX->SetValue(
-				settings->Distance.TextFromSI(
-						project->objects[selection].bbox.GetSizeX()));
-		m_textCtrlSizeY->SetValue(
-				settings->Distance.TextFromSI(
-						project->objects[selection].bbox.GetSizeY()));
-		m_textCtrlSizeZ->SetValue(
-				settings->Distance.TextFromSI(
-						project->objects[selection].bbox.GetSizeZ()));
-	}else{
-		m_textCtrlSizeX->SetValue(_T("---"));
-		m_textCtrlSizeY->SetValue(_T("---"));
-		m_textCtrlSizeZ->SetValue(_T("---"));
-	}
+	m_textCtrlSizeX->SetValue(settings->Distance.TextFromSI(bbox.GetSizeX()));
+	m_textCtrlSizeY->SetValue(settings->Distance.TextFromSI(bbox.GetSizeY()));
+	m_textCtrlSizeZ->SetValue(settings->Distance.TextFromSI(bbox.GetSizeZ()));
 
 	m_staticTextUnitX->SetLabel(settings->Distance.GetOtherName());
 	m_staticTextUnitY->SetLabel(settings->Distance.GetOtherName());
@@ -149,9 +132,11 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 	this->Refresh();
 	return true;
 }
+
 bool DialogObjectTransformation::TransferDataFromWindow(void)
 {
-	CollectionUnits* settings = &(wxStaticCast(GetParent(),FrameMain)->GetParentFrame()->units);
+	CollectionUnits* settings =
+			&(wxStaticCast(GetParent(),FrameMain)->GetParentFrame()->units);
 
 	m_textCtrlScalePercent->GetValue().ToDouble(&scalePercent);
 	m_textCtrlScalePercentX->GetValue().ToDouble(&scalePercentX);
@@ -180,255 +165,224 @@ bool DialogObjectTransformation::TransferDataFromWindow(void)
 	return true;
 }
 
-void DialogObjectTransformation::OnClose(wxCommandEvent& event)
-{
-	TransferDataFromWindow();
-	this->Show(false);
-}
 void DialogObjectTransformation::OnXClose(wxCloseEvent& event)
 {
 	TransferDataFromWindow();
 	this->Show(false);
 }
 
-void DialogObjectTransformation::OnSelectObject(wxCommandEvent& event)
-{
-	Project* project = GetProject();
-	int id = m_choiceObjectSelection->GetSelection();
-	// Return if "Multiple objects selected." was selected again.
-	if(id >= project->objects.GetCount()) return;
-
-	size_t n;
-	for(n = 0; n < project->objects.GetCount(); n++)
-		project->objects[n].selected = (n == id);
-
-	// Tell the main frame to update the selection in the treeview via custom command.
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
-	ProcessEvent(selectEvent);
-}
-
 void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 {
-	Project* project = GetProject();
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project * project = wxStaticCast(frame->GetDocument(), Project);
+	ProjectView * view = wxStaticCast(frame->GetView(), ProjectView);
 	CollectionUnits* settings = &(frame->GetParentFrame()->units);
 	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
 	if(project == NULL) return;
+	if(view->selection.IsType(Selection::Anything)) return;
+	if(project->objects.find(view->selection.GetBaseID())
+			== project->objects.end()) return;
+	Object* obj = &(project->objects[view->selection.GetBaseID()]);
+
 	TransferDataFromWindow();
 
 	AffineTransformMatrix newMatrix;
 	wxString description; // of the command executed (for the Undo/Redo menu)
 	CommandObjectTransform * command;
 
-	size_t n;
 	bool flipNormals = false;
 	bool flipX = false;
 	bool flipY = false;
 	bool flipZ = false;
 
-	// Calculate a common bounding box of all selected objects.
-	BoundingBox bbox;
-	for(n = 0; n < project->objects.GetCount(); ++n){
-		if(!project->objects[n].selected) continue;
-		BoundingBox temp = project->objects[n].bbox;
-		temp.Transform((project->objects[n].displayTransform));
-		bbox.Insert(temp);
+// Calculate a common bounding box of all selected objects.
+	BoundingBox bbox = obj->bbox;
+
+// Generate the commands for the modifications
+
+	description.Empty();
+	newMatrix = obj->matrix; // Copy old to new for a start
+
+	switch(event.GetId()){
+	case ID_MULTTEN:
+		description = obj->name + _T(": * 10");
+		newMatrix.ScaleGlobal(10, 10, 10);
+		break;
+	case ID_DIVTEN:
+		description = obj->name + _T(": / 10");
+		newMatrix.ScaleGlobal(0.1, 0.1, 0.1);
+		break;
+	case ID_SCALEPERCENT:
+		description = obj->name
+				+ wxString::Format(_T(": scale by %.1f %%"),
+						scalePercent * 100);
+		newMatrix.ScaleGlobal(scalePercent, scalePercent, scalePercent);
+		break;
+	case ID_SCALEPERCENTX:
+		description = obj->name
+				+ wxString::Format(_T(": scale X by %.1f %%"),
+						scalePercentX * 100);
+		newMatrix.ScaleGlobal(scalePercentX, 1, 1);
+		break;
+	case ID_SCALEPERCENTY:
+		description = obj->name
+				+ wxString::Format(_T(": scale Y by %.1f %%"),
+						scalePercentY * 100);
+		newMatrix.ScaleGlobal(1, scalePercentY, 1);
+		break;
+	case ID_SCALEPERCENTZ:
+		description = obj->name
+				+ wxString::Format(_T(": scale Z by %.1f %%"),
+						scalePercentZ * 100);
+		newMatrix.ScaleGlobal(1, 1, scalePercentZ);
+		break;
+
+	case ID_FLIPX:
+		description = obj->name
+				+ wxString::Format(_T(": mirroring along X axis"));
+		flipNormals = true;
+		flipX = true;
+		break;
+	case ID_FLIPY:
+		description = obj->name
+				+ wxString::Format(_T(": mirroring along Y axis"));
+		flipNormals = true;
+		flipY = true;
+		break;
+	case ID_FLIPZ:
+		description = obj->name
+				+ wxString::Format(_T(": mirroring along Z axis"));
+		flipNormals = true;
+		flipZ = true;
+		break;
+
+	case ID_MOVEXP:
+		description = obj->name
+				+ wxString::Format(
+						_T(": move along X by %.3f ")
+								+ settings->Distance.GetOtherName(),
+						settings->Distance.FromSI(moveStep));
+		newMatrix.TranslateGlobal(moveStep, 0, 0);
+		break;
+	case ID_MOVEXN:
+		description = obj->name
+				+ wxString::Format(
+						_T(": move along X by %.3f ")
+								+ settings->Distance.GetOtherName(),
+						settings->Distance.FromSI(-moveStep));
+		newMatrix.TranslateGlobal(-moveStep, 0, 0);
+		break;
+	case ID_MOVEYP:
+		description = obj->name
+				+ wxString::Format(
+						_T(": move along Y by %.3f ")
+								+ settings->Distance.GetOtherName(),
+						settings->Distance.FromSI(moveStep));
+		newMatrix.TranslateGlobal(0, moveStep, 0);
+		break;
+	case ID_MOVEYN:
+		description = obj->name
+				+ wxString::Format(
+						_T(": move along Y by %.3f ")
+								+ settings->Distance.GetOtherName(),
+						settings->Distance.FromSI(-moveStep));
+		newMatrix.TranslateGlobal(0, -moveStep, 0);
+		break;
+	case ID_MOVEZP:
+		description = obj->name
+				+ wxString::Format(
+						_T(": move along Z by %.3f ")
+								+ settings->Distance.GetOtherName(),
+						settings->Distance.FromSI(moveStep));
+		newMatrix.TranslateGlobal(0, 0, moveStep);
+		break;
+	case ID_MOVEZN:
+		description = obj->name
+				+ wxString::Format(
+						_T(": move along Z by %.3f ")
+								+ settings->Distance.GetOtherName(),
+						settings->Distance.FromSI(-moveStep));
+		newMatrix.TranslateGlobal(0, 0, -moveStep);
+		break;
+
+	case ID_ALIGNTOP:
+		if(bbox.IsVolumeZero()) break;
+		description = obj->name + wxString::Format(_T(": align top"));
+		newMatrix.TranslateGlobal(0, 0, -bbox.zmax);
+		break;
+	case ID_ALIGNMIDDLE:
+		if(bbox.IsVolumeZero()) break;
+		description = obj->name + wxString::Format(_T(": align middle"));
+		newMatrix.TranslateGlobal(0, 0, -(bbox.zmax + bbox.zmin) / 2.0);
+		break;
+	case ID_ALIGNBOTTOM:
+		if(bbox.IsVolumeZero()) break;
+		description = obj->name + wxString::Format(_T(": align bottom"));
+		newMatrix.TranslateGlobal(0, 0, -bbox.zmin);
+		break;
+	case ID_ALIGNCENTER:
+		if(bbox.IsVolumeZero()) break;
+		description = obj->name + wxString::Format(_T(": align center"));
+		newMatrix.TranslateGlobal(-(bbox.xmax + bbox.xmin) / 2.0,
+				-(bbox.ymax + bbox.ymin) / 2.0, -(bbox.zmax + bbox.zmin) / 2.0);
+		break;
+
+	case ID_ROTATEXP:
+		description = obj->name
+				+ wxString::Format(_T(": rotate around X by %.0f degree"),
+						rotateStep);
+		newMatrix = AffineTransformMatrix::RotationXYZ(rotateStep, 0, 0)
+				* newMatrix;
+		break;
+	case ID_ROTATEXN:
+		description = obj->name
+				+ wxString::Format(_T(": rotate around X by %.0f degree"),
+						-rotateStep);
+		newMatrix = AffineTransformMatrix::RotationXYZ(-rotateStep, 0, 0)
+				* newMatrix;
+		break;
+	case ID_ROTATEYP:
+		description = obj->name
+				+ wxString::Format(_T(": rotate around Y by %.0f degree"),
+						rotateStep);
+		newMatrix = AffineTransformMatrix::RotationXYZ(0, rotateStep, 0)
+				* newMatrix;
+		break;
+	case ID_ROTATEYN:
+		description = obj->name
+				+ wxString::Format(_T(": rotate around Y by %.0f degree"),
+						-rotateStep);
+		newMatrix = AffineTransformMatrix::RotationXYZ(0, -rotateStep, 0)
+				* newMatrix;
+		break;
+	case ID_ROTATEZP:
+		description = obj->name
+				+ wxString::Format(_T(": rotate around Z by %.0f degree"),
+						rotateStep);
+		newMatrix = AffineTransformMatrix::RotationXYZ(0, 0, rotateStep)
+				* newMatrix;
+		break;
+	case ID_ROTATEZN:
+		description = obj->name
+				+ wxString::Format(_T(": rotate around Z by %.0f degree"),
+						-rotateStep);
+		newMatrix = AffineTransformMatrix::RotationXYZ(0, 0, -rotateStep)
+				* newMatrix;
+		break;
 	}
 
-	// Generate the commands for the modifications
-	for(n = 0; n < project->objects.GetCount(); ++n){
-		if(!project->objects[n].selected) continue;
+	if(!description.IsEmpty()){
 
-		description.Empty();
-		newMatrix = project->objects[n].displayTransform
-				* project->objects[n].matrix; // Copy old to new for a start
-
-		switch(event.GetId()){
-		case ID_MULTTEN:
-			description = project->objects[n].name + _T(": * 10");
-			newMatrix.ScaleGlobal(10, 10, 10);
-			break;
-		case ID_DIVTEN:
-			description = project->objects[n].name + _T(": / 10");
-			newMatrix.ScaleGlobal(0.1, 0.1, 0.1);
-			break;
-		case ID_SCALEPERCENT:
-			description = project->objects[n].name
-					+ wxString::Format(_T(": scale by %.1f %%"),
-							scalePercent * 100);
-			newMatrix.ScaleGlobal(scalePercent, scalePercent, scalePercent);
-			break;
-		case ID_SCALEPERCENTX:
-			description = project->objects[n].name
-					+ wxString::Format(_T(": scale X by %.1f %%"),
-							scalePercentX * 100);
-			newMatrix.ScaleGlobal(scalePercentX, 1, 1);
-			break;
-		case ID_SCALEPERCENTY:
-			description = project->objects[n].name
-					+ wxString::Format(_T(": scale Y by %.1f %%"),
-							scalePercentY * 100);
-			newMatrix.ScaleGlobal(1, scalePercentY, 1);
-			break;
-		case ID_SCALEPERCENTZ:
-			description = project->objects[n].name
-					+ wxString::Format(_T(": scale Z by %.1f %%"),
-							scalePercentZ * 100);
-			newMatrix.ScaleGlobal(1, 1, scalePercentZ);
-			break;
-
-		case ID_FLIPX:
-			description = project->objects[n].name
-					+ wxString::Format(_T(": mirroring along X axis"));
-			flipNormals = true;
-			flipX = true;
-			break;
-		case ID_FLIPY:
-			description = project->objects[n].name
-					+ wxString::Format(_T(": mirroring along Y axis"));
-			flipNormals = true;
-			flipY = true;
-			break;
-		case ID_FLIPZ:
-			description = project->objects[n].name
-					+ wxString::Format(_T(": mirroring along Z axis"));
-			flipNormals = true;
-			flipZ = true;
-			break;
-
-		case ID_MOVEXP:
-			description = project->objects[n].name
-					+ wxString::Format(
-							_T(": move along X by %.3f ")
-									+ settings->Distance.GetOtherName(),
-							settings->Distance.FromSI(moveStep));
-			newMatrix.TranslateGlobal(moveStep, 0, 0);
-			break;
-		case ID_MOVEXN:
-			description = project->objects[n].name
-					+ wxString::Format(
-							_T(": move along X by %.3f ")
-									+ settings->Distance.GetOtherName(),
-							settings->Distance.FromSI(-moveStep));
-			newMatrix.TranslateGlobal(-moveStep, 0, 0);
-			break;
-		case ID_MOVEYP:
-			description = project->objects[n].name
-					+ wxString::Format(
-							_T(": move along Y by %.3f ")
-									+ settings->Distance.GetOtherName(),
-							settings->Distance.FromSI(moveStep));
-			newMatrix.TranslateGlobal(0, moveStep, 0);
-			break;
-		case ID_MOVEYN:
-			description = project->objects[n].name
-					+ wxString::Format(
-							_T(": move along Y by %.3f ")
-									+ settings->Distance.GetOtherName(),
-							settings->Distance.FromSI(-moveStep));
-			newMatrix.TranslateGlobal(0, -moveStep, 0);
-			break;
-		case ID_MOVEZP:
-			description = project->objects[n].name
-					+ wxString::Format(
-							_T(": move along Z by %.3f ")
-									+ settings->Distance.GetOtherName(),
-							settings->Distance.FromSI(moveStep));
-			newMatrix.TranslateGlobal(0, 0, moveStep);
-			break;
-		case ID_MOVEZN:
-			description = project->objects[n].name
-					+ wxString::Format(
-							_T(": move along Z by %.3f ")
-									+ settings->Distance.GetOtherName(),
-							settings->Distance.FromSI(-moveStep));
-			newMatrix.TranslateGlobal(0, 0, -moveStep);
-			break;
-
-		case ID_ALIGNTOP:
-			if(bbox.IsVolumeZero()) break;
-			description = project->objects[n].name
-					+ wxString::Format(_T(": align top"));
-			newMatrix.TranslateGlobal(0, 0, -bbox.zmax);
-			break;
-		case ID_ALIGNMIDDLE:
-			if(bbox.IsVolumeZero()) break;
-			description = project->objects[n].name
-					+ wxString::Format(_T(": align middle"));
-			newMatrix.TranslateGlobal(0, 0, -(bbox.zmax + bbox.zmin) / 2.0);
-			break;
-		case ID_ALIGNBOTTOM:
-			if(bbox.IsVolumeZero()) break;
-			description = project->objects[n].name
-					+ wxString::Format(_T(": align bottom"));
-			newMatrix.TranslateGlobal(0, 0, -bbox.zmin);
-			break;
-		case ID_ALIGNCENTER:
-			if(bbox.IsVolumeZero()) break;
-			description = project->objects[n].name
-					+ wxString::Format(_T(": align center"));
-			newMatrix.TranslateGlobal(-(bbox.xmax + bbox.xmin) / 2.0,
-					-(bbox.ymax + bbox.ymin) / 2.0,
-					-(bbox.zmax + bbox.zmin) / 2.0);
-			break;
-
-		case ID_ROTATEXP:
-			description = project->objects[n].name
-					+ wxString::Format(_T(": rotate around X by %.0f degree"),
-							rotateStep);
-			newMatrix = AffineTransformMatrix::RotationXYZ(rotateStep, 0, 0)
-					* newMatrix;
-			break;
-		case ID_ROTATEXN:
-			description = project->objects[n].name
-					+ wxString::Format(_T(": rotate around X by %.0f degree"),
-							-rotateStep);
-			newMatrix = AffineTransformMatrix::RotationXYZ(-rotateStep, 0, 0)
-					* newMatrix;
-			break;
-		case ID_ROTATEYP:
-			description = project->objects[n].name
-					+ wxString::Format(_T(": rotate around Y by %.0f degree"),
-							rotateStep);
-			newMatrix = AffineTransformMatrix::RotationXYZ(0, rotateStep, 0)
-					* newMatrix;
-			break;
-		case ID_ROTATEYN:
-			description = project->objects[n].name
-					+ wxString::Format(_T(": rotate around Y by %.0f degree"),
-							-rotateStep);
-			newMatrix = AffineTransformMatrix::RotationXYZ(0, -rotateStep, 0)
-					* newMatrix;
-			break;
-		case ID_ROTATEZP:
-			description = project->objects[n].name
-					+ wxString::Format(_T(": rotate around Z by %.0f degree"),
-							rotateStep);
-			newMatrix = AffineTransformMatrix::RotationXYZ(0, 0, rotateStep)
-					* newMatrix;
-			break;
-		case ID_ROTATEZN:
-			description = project->objects[n].name
-					+ wxString::Format(_T(": rotate around Z by %.0f degree"),
-							-rotateStep);
-			newMatrix = AffineTransformMatrix::RotationXYZ(0, 0, -rotateStep)
-					* newMatrix;
-			break;
-		}
-
-		if(!description.IsEmpty()){
-
-			command = new CommandObjectTransform(description, project, n, flipX,
-					flipY, flipZ, flipNormals, newMatrix);
-			cmdProc->Submit(command);
-		}else{
-			wxLogMessage
-			(
-					wxString::Format(
-							_T(
-									"Unknown ID_... (=%i) in DialogObjectTransformation::OnTransform(...)"),
-							event.GetId()));
-		}
+//		command = new CommandObjectTransform(description, project, n, flipX,
+//				flipY, flipZ, flipNormals, newMatrix);
+//		cmdProc->Submit(command);
+	}else{
+		wxLogMessage
+		(
+				wxString::Format(
+						_T(
+								"Unknown ID_... (=%i) in DialogObjectTransformation::OnTransform(...)"),
+						event.GetId()));
 	}
 
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
@@ -438,16 +392,20 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 void DialogObjectTransformation::OnSetFactors(wxCommandEvent& event)
 {
 	Project* project = GetProject();
+	ProjectView* view = GetView();
+	if(project == NULL) return;
+	if(view->selection.IsType(Selection::Anything)) return;
+	if(project->objects.find(view->selection.GetBaseID())
+			== project->objects.end()) return;
+	Object* obj = &(project->objects[view->selection.GetBaseID()]);
+
 	TransferDataFromWindow();
 
-	// Calculate a common bounding box of all selected objects.
+// Calculate a common bounding box of all selected objects.
 	BoundingBox bbox;
 	size_t n;
 	double scale;
-	for(n = 0; n < project->objects.GetCount(); ++n){
-		if(!project->objects[n].selected) continue;
-		bbox.Insert(project->objects[n].bbox);
-	}
+	bbox = obj->bbox;
 
 	switch(event.GetId()){
 	case ID_SCALEUNITX:
@@ -496,36 +454,49 @@ void DialogObjectTransformation::OnFlipNormals(wxCommandEvent& event)
 //			wxString::Format(_T("Propagation: %i, ID: %i"),
 //					event.ShouldPropagate(), event.GetId()));
 
-	// Button event is not a command event. A new event is generated here
-	// and passed to the main frame.
+// Button event is not a command event. A new event is generated here
+// and passed to the main frame.
 	wxCommandEvent flipEvent(wxEVT_COMMAND_MENU_SELECTED,
 	ID_OBJECTFLIPNORMALS);
 	ProcessEvent(flipEvent);
 }
 
-void DialogObjectTransformation::OnChangeObjectColor(wxColourPickerEvent& event)
-{
-	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
-	Project* project = wxStaticCast(frame->GetDocument(),Project);
-	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
-	Vector3 color;
-	wxColor temp = m_colourPickerObject->GetColour();
-	color.x = (float) temp.Red() / 255.0;
-	color.y = (float) temp.Green() / 255.0;
-	color.z = (float) temp.Blue() / 255.0;
-	for(size_t n = 0; n < project->objects.GetCount(); n++){
-		if(!project->objects[n].selected) continue;
-		CommandObjectSetColor* command = new CommandObjectSetColor(
-				_("Set object color"), project, n, color);
-		cmdProc->Submit(command);
-	}
-	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
-	ProcessEvent(selectEvent);
-}
+//void DialogObjectTransformation::OnChangeObjectColor(wxColourPickerEvent& event)
+//{
+//	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+//	Project* project = wxStaticCast(frame->GetDocument(), Project);
+//	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
+//	Vector3 color;
+//	wxColor temp = m_colourPickerObject->GetColour();
+//	color.x = (float) temp.Red() / 255.0;
+//	color.y = (float) temp.Green() / 255.0;
+//	color.z = (float) temp.Blue() / 255.0;
+//	for(size_t n = 0; n < project->objects.GetCount(); n++){
+//		if(!obj->selected) continue;
+//		CommandObjectSetColor* command = new CommandObjectSetColor(
+//				_("Set object color"), project, n, color);
+//		cmdProc->Submit(command);
+//	}
+//	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
+//	ProcessEvent(selectEvent);
+//}
 
 Project* DialogObjectTransformation::GetProject(void)
 {
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project * project = wxStaticCast(frame->GetDocument(), Project);
 	return project;
+}
+
+void DialogObjectTransformation::SetSelection(const Selection& selection)
+{
+	this->selected = selection;
+	TransferDataToWindow();
+}
+
+ProjectView* DialogObjectTransformation::GetView(void)
+{
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	ProjectView * view = wxStaticCast(frame->GetView(), ProjectView);
+	return view;
 }

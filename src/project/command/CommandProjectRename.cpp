@@ -26,6 +26,8 @@
 
 #include "CommandProjectRename.h"
 
+#include "../Project.h"
+
 CommandProjectRename::CommandProjectRename(const wxString& name,
 		Project* project, const wxString projectName) :
 		wxCommand(true, name)

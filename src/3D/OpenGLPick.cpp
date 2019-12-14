@@ -92,6 +92,7 @@ GLsizei OpenGLPick::GetBufferSize()
 {
 	return bufferSize;
 }
+
 GLuint* OpenGLPick::GetBuffer()
 {
 	// If the pointer to the buffer is requested, it is most likely, that
@@ -99,6 +100,7 @@ GLuint* OpenGLPick::GetBuffer()
 	bufferAssigned = true;
 	return buffer;
 }
+
 void OpenGLPick::SetHits(GLuint hits)
 {
 	// If the hits have been requested from the OpenGL context and entered into

@@ -42,9 +42,9 @@ void GeometryFileAbstract::Paint(void) const
 	size_t i;
 	::glPushMatrix();
 	matrix.GLMultMatrix();
-	for(i = 0; i < geometry.Count(); i++){
-		geometry[i].Paint();
-	}
+//	for(i = 0; i < geometry.Count(); i++){
+	geometry.Paint();
+//	}
 	::glPopMatrix();
 }
 

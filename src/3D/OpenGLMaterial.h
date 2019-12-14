@@ -72,7 +72,23 @@ public:
 		greenrubber,
 		redrubber,
 		whiterubber,
-		yellowrubber
+		yellowrubber,
+		cRed,
+		cYellow,
+		cGreen,
+		cLime,
+		cTeal,
+		cOlive,
+		cBlue,
+		cAqua,
+		cNavy,
+		cPurple,
+		cFuchsia,
+		cMaroon,
+		cGray,
+		cSilver,
+		cBlack,
+		cWhite
 	}; //<! Preset materials
 
 	OpenGLMaterial();
@@ -85,8 +101,9 @@ public:
 	void SetSimpleColor(float r, float g, float b, float emit = 0.0); ///< Equivalent to using the glColor command.
 	void SetSimpleColor(Vector3 c, float emit = 0.0); ///< Uses x,y,z of a vector as the color components.
 
-	void UseMaterial(void); ///< Start using this material. Turns off glColor command.
-	void UseColor(float emit = 0.0); ///< Activates glColor and sets the diffuse color of this material.
+	void UseMaterial(void) const; ///< Start using this material. Turns off glColor command.
+	void UseColor(void) const; ///< Activates glColor and sets the diffuse color of this material.
+	void UseColor(float emit) const; ///< Activates glColor and sets the diffuse color of this material.
 	static void EnableColors(void); ///< Switch back to using glColor.
 
 	static bool ColorsAllowed(void); ///< Test, if colores are allowed to use.
@@ -96,9 +113,6 @@ public:
 	Vector3 specular;
 	Vector3 emission;
 	GLfloat shininess;
-
-private:
-	GLfloat buffer[4]; // Buffer for passing values to OpenGL.
 };
 
 #endif /* SRC_3D_OPENGLMATERIAL_H_ */

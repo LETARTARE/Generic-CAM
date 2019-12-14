@@ -33,15 +33,10 @@
  *
  */
 
-#include "StockMaterial.h"
-#include "ObjectPlacement.h"
-#include "Support.h"
 #include "../3D/BooleanBox.h"
 #include "../3D/BoundingBox.h"
-#include "generator/DexelTarget.h"
 
 #include <wx/txtstrm.h>
-#include <wx/dynarray.h>
 
 class Project;
 
@@ -49,47 +44,42 @@ class Workpiece:public BoundingBox {
 	// Constructor / Destructor
 public:
 	Workpiece();
-	Workpiece(const StockMaterial &material);
 	virtual ~Workpiece();
 
-	void PrepareModel(void);
+//	void PrepareModel(void);
 
-	// Member variables
+// Member variables
 public:
 	wxString name;
 	Project * parent; //!< Pointer back to the Project this Workpiece belongs to.
-	AffineTransformMatrix matrix; //!< Matrix for flipping and rotating the Workpiece.
-	ArrayOfObjectPlacement placements; //!< List of objects to place into the Workpiece.
-	ArrayOfSupport supports; //!< List of extra geometry used as support.
+//	AffineTransformMatrix matrix; //!< Matrix for flipping and rotating the Workpiece.
+//	ArrayOfObjectPlacement placements; //!< List of objects to place into the Workpiece.
+//	ArrayOfSupport supports; //!< List of extra geometry used as support.
 
-	int refObject; //!< Use an Object as the Workpiece definition.
-
-	bool selected;
+	size_t refObject; //!< Use an Object as the Workpiece definition.
 
 	// The result is of Type DexelTarget. It is written to from each Run during Toolpath generation.
 	// it keeps track on how the Workpiece look like at the moment. This Structure is read by the
 	// Toolpath Generators as a reference point to start from.
 	// This is not optimal. In the end the result has to be stored into a more flexible
 	// structure (OctreeSomething, perhaps).
-	DexelTarget model; ///< Result after the Generators have run
+//	DexelTarget model; ///< Result after the Generators have run
 
 //	volatile bool hasRunningGenerator;
 
 private:
-	//TODO Sort out the different modes for Workpiece generation.
 	BooleanBox bbox; ///< A BooleanBox is used to generate the Workpiece from embedding the Objects into it.
 
 	// Methods
 public:
-	void ToStream(wxTextOutputStream & stream);
-	bool FromStream(wxTextInputStream & stream);
-
-	Vector3 GetCenter(void) const;
+//	void ToStream(wxTextOutputStream & stream);
+//	bool FromStream(wxTextInputStream & stream);
+//
+//	Vector3 GetCenter(void) const;
 
 	void Paint(void) const;
-	void Update(void);
+//	void Update(void);
 //	void SortTargets(void);
 };
-WX_DECLARE_OBJARRAY(Workpiece, ArrayOfWorkpiece);
 
 #endif /* WORKPIECE_H_ */

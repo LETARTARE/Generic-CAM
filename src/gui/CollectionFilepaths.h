@@ -43,10 +43,10 @@ public:
 
 	wxString lastProjectDirectory;
 	wxString lastObjectDirectory;
-	wxString lastStockDirectory;
+	wxString lastToolpathDirectory;
 	wxString lastMachineDirectory;
 	wxString lastToolboxDirectory;
-	wxString lastToolpathDirectory;
+	wxString lastPostProcessorDirectory;
 
 	bool Load(wxConfig * config);
 	bool Save(wxConfig * config);

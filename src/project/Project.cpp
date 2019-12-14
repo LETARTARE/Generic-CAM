@@ -27,7 +27,6 @@
 #include "Project.h"
 
 #include "../3D/BooleanBox.h"
-#include "generator/ToolpathGeneratorThread.h"
 
 #include "../3D/FileSTL.h"
 #include "../gui/IDs.h"
@@ -39,6 +38,39 @@
 #include <GL/gl.h>
 #include <math.h>
 #include <float.h>
+#include <algorithm>
+
+bool Project::Has(const Selection& sel) const
+{
+	if(sel.IsType(Selection::Object)){
+		std::set <size_t>::const_iterator itsel = sel.begin();
+		std::map <size_t, Object>::const_iterator itobj = objects.begin();
+		while(itsel != sel.end()){
+			if(itobj == objects.end() || *itsel < itobj->first) return false;
+			if(!(itobj->first < *itsel)) ++itsel;
+			++itobj;
+		}
+		return true;
+	}
+	if(sel.IsType(Selection::Run)){
+		std::set <size_t>::const_iterator itsel = sel.begin();
+		std::map <size_t, Run>::const_iterator itrun = run.begin();
+		while(itsel != sel.end()){
+			if(itrun == run.end() || *itsel < itrun->first) return false;
+			if(!(itrun->first < *itsel)) ++itsel;
+			++itrun;
+		}
+		return true;
+	}
+	return false;
+}
+
+bool Project::Has(const Selection::Type type, const size_t ID) const
+{
+	if(type == Selection::Object && objects.find(ID) != objects.end()) return true;
+	if(type == Selection::Run && run.find(ID) != run.end()) return true;
+	return false;
+}
 
 IMPLEMENT_DYNAMIC_CLASS(Project, wxDocument)
 
@@ -46,50 +78,21 @@ Project::Project() :
 		wxDocument()
 {
 	Clear();
+	maxObjectID = 0;
+	maxRunID = 0;
 }
 
 Project::~Project()
 {
+	printf("Project::Destructor\n");
 }
 
 void Project::Clear(void)
 {
 	name = _("Untitled");
 
-	resX = 0.001; // = 1 mm
-	resY = 0.001; // = 1 mm
-
-//	processToolpath = false;
-//	interruptProcessing = false;
-
-	objects.Clear();
-	workpieces.Clear();
-	run.Clear();
-
-//	FlipDrillPattern temp;
-//	temp.name = _T("Testpattern 1");
-//	pattern.Add(temp);
-}
-
-int Project::GetFirstSelectedObject(void) const
-{
-	for(size_t i = 0; i < objects.GetCount(); i++)
-		if(objects[i].selected) return i;
-	return -1;
-}
-
-int Project::GetFirstSelectedWorkpiece(void) const
-{
-	for(size_t i = 0; i < workpieces.GetCount(); i++)
-		if(workpieces[i].selected) return i;
-	return -1;
-}
-
-int Project::GetFirstSelectedRun(void) const
-{
-	for(size_t i = 0; i < run.GetCount(); i++)
-		if(run[i].selected) return i;
-	return -1;
+	objects.clear();
+	run.clear();
 }
 
 bool Project::GenerateToolpaths(void)
@@ -97,41 +100,10 @@ bool Project::GenerateToolpaths(void)
 	Update();
 
 	const AffineTransformMatrix rotx0 = AffineTransformMatrix::Identity();
-	const AffineTransformMatrix rotx180 = AffineTransformMatrix::RotationXYZ(M_PI,
-			0, 0);
+	const AffineTransformMatrix rotx180 = AffineTransformMatrix::RotationXYZ(
+	M_PI, 0, 0);
 
-	for(size_t n = 0; n < workpieces.GetCount(); n++)
-		workpieces[n].PrepareModel();
-
-	for(size_t n = 0; n < run.GetCount(); n++){
-		const int wp = run[n].refWorkpiece;
-
-		if(n > 0){
-			AffineTransformMatrix lastPlacement;
-			for(size_t m = n; m-- > 0;){
-				if(wp == run[m].refWorkpiece){
-					lastPlacement = run[m].workpiecePlacement;
-					break;
-				}
-			}
-			lastPlacement = run[n].workpiecePlacement / lastPlacement;
-			for(uint_fast8_t m = 12; m <= 14; m++)
-				lastPlacement[m] = 0;
-
-			if(lastPlacement.Distance(rotx0) < FLT_EPSILON){
-				// Nothing to do
-			}else{
-				if(lastPlacement.Distance(rotx180) < FLT_EPSILON){
-					workpieces[wp].model.RotateX180();
-				}else{
-					throw("This type of rotation has not been programmed yet.");
-				}
-			}
-		}
-
-		run[n].GenerateToolpaths();
-	}
-	return true;
+	return false;
 //#if(_GENERICCAM_USEMULTITHREADING == 1)
 //
 //	// Prevent the toolpath generation from being started in more than
@@ -188,21 +160,13 @@ bool Project::GenerateToolpaths(void)
 
 void Project::Update(void)
 {
-	for(size_t i = 0; i < objects.GetCount(); i++){
-		objects[i].Update();
+	for(std::map <size_t, Object>::iterator it = objects.begin();
+			it != objects.end(); ++it){
+		it->second.Update();
 	}
-	for(size_t i = 0; i < workpieces.GetCount(); i++){
-		workpieces[i].parent = this;
-		workpieces[i].Update();
-	}
-	for(size_t i = 0; i < run.GetCount(); i++){
-		run[i].parent = this;
-		if(i == 0){
-			run[i].prevRun = -1;
-		}else{
-			run[i].prevRun = i - 1;
-		}
-		run[i].Update();
+	for(std::map <size_t, Run>::iterator it = run.begin(); it != run.end();
+			++it){
+		it->second.Update();
 	}
 	UpdateAllViews();
 }
@@ -221,6 +185,8 @@ bool Project::Save(wxFileName fileName)
 {
 	if(!fileName.IsOk()) return false;
 
+	return false;
+
 	setlocale(LC_ALL, "C");
 
 	wxFFileOutputStream out(fileName.GetFullPath());
@@ -231,32 +197,32 @@ bool Project::Save(wxFileName fileName)
 	txt << _T("Name:") << endl;
 	txt << this->name << endl;
 
-	txt << wxString::Format(_T("Objects: %zu"), objects.GetCount()) << endl;
-	for(size_t n = 0; n < objects.GetCount(); n++){
-		txt << wxString::Format(_T("Object: %zu"), n) << endl;
-		objects[n].ToStream(txt, n);
-	}
-
-	txt << wxString::Format(_T("Workpieces: %zu"), workpieces.GetCount())
-			<< endl;
-	for(size_t n = 0; n < workpieces.GetCount(); n++){
-		txt << wxString::Format(_T("Workpiece: %zu"), n) << endl;
-		workpieces[n].ToStream(txt);
-	}
-	txt << wxString::Format(_T("Run: %zu"), run.GetCount()) << endl;
-	for(size_t n = 0; n < run.GetCount(); n++){
-		txt << wxString::Format(_T("Run: %zu"), n) << endl;
-		run[n].ToStream(txt);
-	}
-
-	for(size_t n = 0; n < objects.GetCount(); n++){
-		for(size_t m = 0; m < objects[n].geometries.GetCount(); m++){
-			wxString tempName = wxString::Format(
-					_T("object_%zu_geometry_%zu.stl"), n, m);
-			zip.PutNextEntry(tempName);
-			FileSTL::WriteStream(zip, objects[n].geometries[m]);
-		}
-	}
+//	txt << wxString::Format(_T("Objects: %zu"), objects.GetCount()) << endl;
+//	for(size_t n = 0; n < objects.GetCount(); n++){
+//		txt << wxString::Format(_T("Object: %zu"), n) << endl;
+//		objects[n].ToStream(txt, n);
+//	}
+//
+//	txt << wxString::Format(_T("Workpieces: %zu"), workpieces.GetCount())
+//			<< endl;
+//	for(size_t n = 0; n < workpieces.GetCount(); n++){
+//		txt << wxString::Format(_T("Workpiece: %zu"), n) << endl;
+//		workpieces[n].ToStream(txt);
+//	}
+//	txt << wxString::Format(_T("Run: %zu"), run.GetCount()) << endl;
+//	for(size_t n = 0; n < run.GetCount(); n++){
+//		txt << wxString::Format(_T("Run: %zu"), n) << endl;
+//		run[n].ToStream(txt);
+//	}
+//
+//	for(size_t n = 0; n < objects.GetCount(); n++){
+//		for(size_t m = 0; m < objects[n].geometries.GetCount(); m++){
+//			wxString tempName = wxString::Format(
+//					_T("object_%zu_geometry_%zu.stl"), n, m);
+//			zip.PutNextEntry(tempName);
+//			FileSTL::WriteStream(zip, objects[n].geometries[m]);
+//		}
+//	}
 	setlocale(LC_ALL, "");
 	this->fileName = fileName;
 	return true;
@@ -265,6 +231,7 @@ bool Project::Save(wxFileName fileName)
 bool Project::Load(wxFileName fileName)
 {
 	if(!fileName.IsOk()) return false;
+	return false;
 	setlocale(LC_ALL, "C");
 	wxFFileInputStream in(fileName.GetFullPath());
 
@@ -280,122 +247,122 @@ bool Project::Load(wxFileName fileName)
 
 	Clear();
 
-	in.SeekI(0, wxFromStart);
-	wxZipEntry* entry;
-	while((entry = zip.GetNextEntry()))
-		if(entry->GetName().Cmp(_T("project.txt")) == 0) break;
-	if(entry == NULL){
-		setlocale(LC_ALL, "");
-		return false;
-	}
-
-	zip.OpenEntry(*entry);
-
-	wxString temp;
-	size_t m;
-	temp = txt.ReadLine();
-	if(temp.Cmp(_T("Name:")) != 0){
-		setlocale(LC_ALL, "");
-		return false;
-	}
-	name = txt.ReadLine();
-	temp = txt.ReadWord();
-	if(temp.Cmp(_T("Objects:")) != 0){
-		setlocale(LC_ALL, "");
-		return false;
-	}
-	const size_t N = txt.Read32();
-	objects.Clear();
-	Object object;
-	for(size_t n = 0; n < N; n++){
-		temp = txt.ReadWord();
-		if(temp.Cmp(_T("Object:")) != 0){
-			setlocale(LC_ALL, "");
-			return false;
-		}
-		m = txt.Read32();
-		if(m != n){
-			setlocale(LC_ALL, "");
-			return false;
-		}
-		object.FromStream(txt);
-		objects.Add(object);
-	}
-
-	temp = txt.ReadWord();
-	if(temp.Cmp(_T("Workpieces:")) != 0){
-		setlocale(LC_ALL, "");
-		return false;
-	}
-	const size_t N2 = txt.Read32();
-	workpieces.Clear();
-	Workpiece workpiece;
-	for(size_t n = 0; n < N2; n++){
-		temp = txt.ReadWord();
-		if(temp.Cmp(_T("Workpiece:")) != 0){
-			setlocale(LC_ALL, "");
-			return false;
-		}
-		m = txt.Read32();
-		if(m != n){
-			setlocale(LC_ALL, "");
-			return false;
-		}
-		workpiece.FromStream(txt);
-		workpieces.Add(workpiece);
-	}
-
-	temp = txt.ReadWord();
-	if(temp.Cmp(_T("Run:")) != 0){
-		setlocale(LC_ALL, "");
-		return false;
-	}
-	const size_t N3 = txt.Read32();
-	run.Clear();
-	Run * tempRun;
-	for(size_t n = 0; n < N3; n++){
-		temp = txt.ReadWord();
-		if(temp.Cmp(_T("Run:")) != 0){
-			setlocale(LC_ALL, "");
-			return false;
-		}
-		m = txt.Read32();
-		if(m != n){
-			setlocale(LC_ALL, "");
-			return false;
-		}
-		tempRun = new Run();
-		tempRun->FromStream(txt, n, this);
-		run.Add(tempRun);
-	}
-	zip.CloseEntry();
-
-	// Load objects
-	//TODO: Rewind zip
-
-	while((entry = zip.GetNextEntry())){
-		temp = entry->GetName();
-		if(!temp.StartsWith(wxT("object_"), &temp)) continue;
-		long p;
-		temp.BeforeFirst('_').ToLong(&p);
-		long n = p;
-		temp = temp.AfterFirst('_');
-		if(!temp.StartsWith(wxT("geometry_"), &temp)) continue;
-		temp.BeforeFirst('.').ToLong(&p);
-		m = p;
-		temp = temp.AfterFirst('.');
-		if(!temp.StartsWith(wxT("stl"))) continue;
-
-		if(n < 0 || n >= objects.GetCount()) continue;
-		if(m < 0 || m >= objects[n].geometries.GetCount()) continue;
-
-		FileSTL stl;
-		zip.OpenEntry(*entry);
-		stl.ReadStream(zip);
-		objects[n].geometries[m].triangles = stl.geometry[0].triangles;
-		zip.CloseEntry();
-	}
-	setlocale(LC_ALL, "");
+//	in.SeekI(0, wxFromStart);
+//	wxZipEntry* entry;
+//	while((entry = zip.GetNextEntry()))
+//		if(entry->GetName().Cmp(_T("project.txt")) == 0) break;
+//	if(entry == NULL){
+//		setlocale(LC_ALL, "");
+//		return false;
+//	}
+//
+//	zip.OpenEntry(*entry);
+//
+//	wxString temp;
+//	size_t m;
+//	temp = txt.ReadLine();
+//	if(temp.Cmp(_T("Name:")) != 0){
+//		setlocale(LC_ALL, "");
+//		return false;
+//	}
+//	name = txt.ReadLine();
+//	temp = txt.ReadWord();
+//	if(temp.Cmp(_T("Objects:")) != 0){
+//		setlocale(LC_ALL, "");
+//		return false;
+//	}
+//	const size_t N = txt.Read32();
+//	objects.clear();
+//	Object object;
+//	for(size_t n = 0; n < N; n++){
+//		temp = txt.ReadWord();
+//		if(temp.Cmp(_T("Object:")) != 0){
+//			setlocale(LC_ALL, "");
+//			return false;
+//		}
+//		m = txt.Read32();
+//		if(m != n){
+//			setlocale(LC_ALL, "");
+//			return false;
+//		}
+//		object.FromStream(txt);
+//		objects.Add(object);
+//	}
+//
+//	temp = txt.ReadWord();
+//	if(temp.Cmp(_T("Workpieces:")) != 0){
+//		setlocale(LC_ALL, "");
+//		return false;
+//	}
+//	const size_t N2 = txt.Read32();
+//	workpieces.Clear();
+//	Workpiece workpiece;
+//	for(size_t n = 0; n < N2; n++){
+//		temp = txt.ReadWord();
+//		if(temp.Cmp(_T("Workpiece:")) != 0){
+//			setlocale(LC_ALL, "");
+//			return false;
+//		}
+//		m = txt.Read32();
+//		if(m != n){
+//			setlocale(LC_ALL, "");
+//			return false;
+//		}
+//		workpiece.FromStream(txt);
+//		workpieces.Add(workpiece);
+//	}
+//
+//	temp = txt.ReadWord();
+//	if(temp.Cmp(_T("Run:")) != 0){
+//		setlocale(LC_ALL, "");
+//		return false;
+//	}
+//	const size_t N3 = txt.Read32();
+//	run.Clear();
+//	Run * tempRun;
+//	for(size_t n = 0; n < N3; n++){
+//		temp = txt.ReadWord();
+//		if(temp.Cmp(_T("Run:")) != 0){
+//			setlocale(LC_ALL, "");
+//			return false;
+//		}
+//		m = txt.Read32();
+//		if(m != n){
+//			setlocale(LC_ALL, "");
+//			return false;
+//		}
+//		tempRun = new Run();
+//		tempRun->FromStream(txt, n, this);
+//		run.Add(tempRun);
+//	}
+//	zip.CloseEntry();
+//
+//	// Load objects
+//	//TODO: Rewind zip
+//
+//	while((entry = zip.GetNextEntry())){
+//		temp = entry->GetName();
+//		if(!temp.StartsWith(wxT("object_"), &temp)) continue;
+//		long p;
+//		temp.BeforeFirst('_').ToLong(&p);
+//		long n = p;
+//		temp = temp.AfterFirst('_');
+//		if(!temp.StartsWith(wxT("geometry_"), &temp)) continue;
+//		temp.BeforeFirst('.').ToLong(&p);
+//		m = p;
+//		temp = temp.AfterFirst('.');
+//		if(!temp.StartsWith(wxT("stl"))) continue;
+//
+//		if(n < 0 || n >= objects.GetCount()) continue;
+//		if(m < 0 || m >= objects[n].geometries.GetCount()) continue;
+//
+//		FileSTL stl;
+//		zip.OpenEntry(*entry);
+//		stl.ReadStream(zip);
+//		objects[n].geometries[m].triangles = stl.geometry[0].triangles;
+//		zip.CloseEntry();
+//	}
+//	setlocale(LC_ALL, "");
 	this->fileName = fileName;
 	this->Update();
 	return true;
@@ -499,15 +466,11 @@ bool Project::Load(wxFileName fileName)
 //			+ run[generator_runNr].toolpaths[generator_toolpathNr].generator->GetName());
 //}
 
-void Project::LoadPattern(wxFileName fileName)
+bool Project::SaveToolpath(wxFileName fileName, int runNr)
 {
-}
-
-bool Project::SaveToolpath(wxFileName fileName, int runNr,
-		ToolPath::Dialect dialect)
-{
-	if(runNr < 0 || runNr > run.GetCount()) return false;
-	return run[runNr].SaveToolpaths(fileName, dialect);
+//	if(runNr < 0 || runNr > run.GetCount()) return false;
+//	return run[runNr].SaveToolpaths(fileName);
+	return false;
 }
 
 // Experimental stuff:
@@ -560,111 +523,56 @@ bool Project::SaveToolpath(wxFileName fileName, int runNr,
 //	}
 //	::glLoadName(0);
 
-void Project::PaintObjects(void) const
+void Project::Paint(const OpenGLMaterial &face, const OpenGLMaterial &edge,
+		const Selection& sel) const
 {
-	RenderCoordinateSystem();
-	for(size_t i = 0; i < objects.GetCount(); i++){
-		glPushName(i + 1); // "+1" because the background is 0.
-		objects[i].Paint(true);
+	for(std::map <size_t, Object>::const_iterator obj = objects.begin();
+			obj != objects.end(); ++obj){
+		glPushName(obj->first);
+		if(sel.IsBase(Selection::BaseObject, obj->first)){
+			obj->second.Paint(face, edge, sel);
+		}else{
+			if(sel.IsInverted()) obj->second.Paint(face, edge, Selection(true));
+		}
 		glPopName();
 	}
 }
 
-void Project::PaintWorkpiece(void) const
+void Project::PaintPick(void) const
 {
-	const int i = GetFirstSelectedWorkpiece();
-	if(i < 0) return;
-	Vector3 center = workpieces[i].GetCenter();
-	glPushMatrix();
-	glTranslatef(-center.x, -center.y, -center.z);
-	RenderCoordinateSystem();
-	glPushName(i + 1);
-	workpieces[i].Paint();
-	glPopName();
-	glPopMatrix();
+	for(std::map <size_t, Object>::const_iterator obj = objects.begin();
+			obj != objects.end(); ++obj){
+		glPushName(obj->first);
+		obj->second.PaintPick();
+		glPopName();
+	}
 }
-
-void Project::PaintRun(void) const
-{
-	const int i = GetFirstSelectedRun();
-	if(i < 0) return;
-	Vector3 center = run[i].GetCenter();
-	glPushMatrix();
-	glTranslatef(-center.x, -center.y, -center.z);
-	glPushName(i + 1);
-	run[i].Paint();
-	glPopName();
-	glPopMatrix();
-}
-
-void Project::RenderCoordinateSystem(void) const
-{
-	GLfloat s = 0.1;
-	GLfloat n = sqrt(2.0);
-	GLfloat d = s / 10;
-
-	glBegin(GL_LINES);
-
-	glColor3f(1.0, 0, 0);
-	glNormal3f(-s, 0, 0);
-	glVertex3f(-s, 0, 0);
-	glNormal3f(s, 0, 0);
-	glVertex3f(s, 0, 0);
-
-	glNormal3f(n, n, 0);
-	glVertex3f(s, 0, 0);
-	glVertex3f(s - d, d, 0);
-	glNormal3f(n, -n, 0);
-	glVertex3f(s, 0, 0);
-	glVertex3f(s - d, -d, 0);
-	glNormal3f(n, 0, n);
-	glVertex3f(s, 0, 0);
-	glVertex3f(s - d, 0, d);
-	glNormal3f(n, 0, -n);
-	glVertex3f(s, 0, 0);
-	glVertex3f(s - d, 0, -d);
-
-	glColor3f(0, 1.0, 0);
-	glNormal3f(0, -s, 0);
-	glVertex3f(0, -s, 0);
-	glNormal3f(0, s, 0);
-	glVertex3f(0, s, 0);
-
-	glNormal3f(n, n, 0);
-	glVertex3f(0, s, 0);
-	glVertex3f(d, s - d, 0);
-	glNormal3f(-n, n, 0);
-	glVertex3f(0, s, 0);
-	glVertex3f(-d, s - d, 0);
-	glNormal3f(0, n, n);
-	glVertex3f(0, s, 0);
-	glVertex3f(0, s - d, d);
-	glNormal3f(0, n, -n);
-	glVertex3f(0, s, 0);
-	glVertex3f(0, s - d, -d);
-
-	glColor3f(0, 0, 1.0);
-	glNormal3f(0, 0, -s);
-	glVertex3f(0, 0, -s);
-	glNormal3f(0, 0, s);
-	glVertex3f(0, 0, s);
-
-	glNormal3f(n, 0, n);
-	glVertex3f(0, 0, s);
-	glVertex3f(d, 0, s - d);
-	glNormal3f(-n, 0, n);
-	glVertex3f(0, 0, s);
-	glVertex3f(-d, 0, s - d);
-	glNormal3f(0, n, n);
-	glVertex3f(0, 0, s);
-	glVertex3f(0, d, s - d);
-	glNormal3f(0, -n, n);
-	glVertex3f(0, 0, s);
-	glVertex3f(0, -d, s - d);
-
-	::glEnd();
-}
-
+//void Project::PaintWorkpiece(void) const
+//{
+//	const int i = GetFirstSelectedWorkpiece();
+//	if(i < 0) return;
+//	Vector3 center = workpieces[i].GetCenter();
+//	glPushMatrix();
+//	glTranslatef(-center.x, -center.y, -center.z);
+//	RenderCoordinateSystem();
+//	glPushName(i + 1);
+//	workpieces[i].Paint();
+//	glPopName();
+//	glPopMatrix();
+//}
+//
+//void Project::PaintRun(void) const
+//{
+//	const int i = GetFirstSelectedRun();
+//	if(i < 0) return;
+//	Vector3 center = run[i].GetCenter();
+//	glPushMatrix();
+//	glTranslatef(-center.x, -center.y, -center.z);
+//	glPushName(i + 1);
+//	run[i].Paint();
+//	glPopName();
+//	glPopMatrix();
+//}
 
 //void Project::PaintDepthField(unsigned int runNr,
 //		unsigned int objectReferenceNr)

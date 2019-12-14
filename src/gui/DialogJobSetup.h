@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : Support.h
+// Name               : DialogJobSetup.h
 // Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 09.02.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 28.11.2019
+// Copyright          : (C) 2019 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,35 +24,34 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef SUPPORT_H_
-#define SUPPORT_H_
+#ifndef SRC_GUI_DIALOGJOBSETUP_H_
+#define SRC_GUI_DIALOGJOBSETUP_H_
 
-/*!\class Support
- * \ingroup document
- * \brief Support structure around the object
+/*!\class DialogJobSetup
+ * \brief ...
  *
- * When manufacturing an object, that is atand alone (i.e. not just an incarving) the object
- * may be unconnected to the rest of the workpiece. It would float around.
- *
- * This object provides an support structure, that is added to the object, to keep it from
- * doing just that, by adding connections to the rest of the workpiece.
+ * ...
  */
 
-#include <wx/dynarray.h>
+#include "gui.h"
 
-class Support {
+class DialogJobSetup:public GUIJobSetup {
 public:
-	Support();
-	virtual ~Support();
+	DialogJobSetup(wxWindow* parent);
+	virtual ~DialogJobSetup();
 
+	void SetRunID(size_t runID);
 
-	//	double supportDistance;
-		//	double supportWidth;
-		//	double supportHeight;
-		//	double middleY;
-		//	double offsetX;
+	bool TransferDataToWindow(void);
+	bool TransferDataFromWindow(void);
 
+	void OnXClose(wxCloseEvent& event);
+	void OnSelect(wxCommandEvent& event);
+	bool OnSelected(size_t ID, Selection selection);
+	void OnGetSizeFromObject(wxCommandEvent& event);
+
+private:
+	size_t runID;
 };
-WX_DECLARE_OBJARRAY(Support, ArrayOfSupport);
 
-#endif /* SUPPORT_H_ */
+#endif /* SRC_GUI_DIALOGJOBSETUP_H_ */

@@ -27,22 +27,25 @@
 #ifndef COMMANDOBJECTTRANSFORM_H_
 #define COMMANDOBJECTTRANSFORM_H_
 
-#include "../Project.h"
+#include <stddef.h>
+#include <wx/cmdproc.h>
+#include <wx/string.h>
+
 #include "../../3D/AffineTransformMatrix.h"
 
-#include <wx/cmdproc.h>
+class Project;
 
 class CommandObjectTransform:public wxCommand {
 public:
 	CommandObjectTransform(const wxString& name, Project * project,
-			size_t objectNr, bool flipX, bool flipY, bool flipZ,
+			size_t ID, bool flipX, bool flipY, bool flipZ,
 			bool flipNormals, const AffineTransformMatrix& matrixNew);
 	bool Do(void);
 	bool Undo(void);
 
 protected:
 	Project * project;
-	size_t objectNr;
+	size_t ID;
 	bool flipX;
 	bool flipY;
 	bool flipZ;

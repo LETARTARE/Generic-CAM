@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : FlipDrillPattern.h
+// Name               : CommandObjectRemove.h
 // Purpose            : 
-// Thread Safe        : Yes
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 20.02.2015
+// Created            : 08.01.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,50 +24,28 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef FLIPDRILLPATTERN_H_
-#define FLIPDRILLPATTERN_H_
+#ifndef COMMANDOBJECTREMOVE_H_
+#define COMMANDOBJECTREMOVE_H_
 
-/*!\class FlipDrillPattern
- * \ingroup document
- * \brief Pattern for flipping the workpiece
- *
- * The for alignment of two-sided workpieces, a drillpattern is put on the top of the workpiece.
- * The same pattern is drilled into the base of the machine. This allows for simple turning-over
- * of the workpiece.
- *
- */
-
-#include "../3D/Polygon25.h"
-#include "Tool.h"
-#include "ToolPath.h"
-
+#include <stddef.h>
+#include <wx/cmdproc.h>
 #include <wx/string.h>
-#include <wx/dynarray.h>
 
-class DrillPosition {
+#include "../Object.h"
+
+class Project;
+
+class CommandObjectRemove:public wxCommand {
 public:
-	DrillPosition();
-	float x;
-	float y;
-	float depth;
-	float diameter;
+	CommandObjectRemove(const wxString& name, Project * project, size_t ID);
+	virtual ~CommandObjectRemove();
+	bool Do(void);
+	bool Undo(void);
+
+protected:
+	Project * project;
+	size_t ID;
+	Object object;
 };
-WX_DECLARE_OBJARRAY(DrillPosition, ArrayOfDrillPosition);
 
-class FlipDrillPattern {
-public:
-	FlipDrillPattern();
-	wxString name;
-	ArrayOfDrillPosition position;
-	ToolPath toolpath;
-	Polygon25 outLine;
-
-public:
-	void Paint(void) const;
-private:
-
-	void SetupDrill(Tool &tool, double diameter, double depth);
-};
-WX_DECLARE_OBJARRAY(FlipDrillPattern, ArrayOfFlipDrillPattern);
-
-#endif /* FLIPDRILLPATTERN_H_ */
+#endif /* COMMANDOBJECTREMOVE_H_ */

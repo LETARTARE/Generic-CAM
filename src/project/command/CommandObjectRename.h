@@ -27,14 +27,15 @@
 #ifndef COMMANDOBJECTRENAME_H_
 #define COMMANDOBJECTRENAME_H_
 
-#include "../Project.h"
-
+#include <stddef.h>
 #include <wx/cmdproc.h>
 #include <wx/string.h>
 
+class Project;
+
 class CommandObjectRename:public wxCommand {
 public:
-	CommandObjectRename(const wxString& name, Project * project, int objectNr,
+	CommandObjectRename(const wxString& name, Project * project, size_t ID,
 			const wxString objectName);
 
 	bool Do(void);
@@ -42,7 +43,7 @@ public:
 
 protected:
 	Project * project;
-	int objectNr;
+	size_t ID;
 	wxString newName;
 	wxString oldName;
 };

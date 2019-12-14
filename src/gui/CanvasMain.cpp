@@ -30,58 +30,26 @@ CanvasMain::CanvasMain(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 		const wxSize& size, long style, const wxString& name) :
 		OpenGLCanvas(parent, id, pos, size, style, name)
 {
-	displayCoordinateSystem = true;
-
-	display = displayObjects;
-
-	displayGeometry = true;
-	displayBoundingBox = false;
-	displayMachine = false;
-	displayStock = false;
-	displayTargets = false;
-	displayToolpath = false;
-	displayOutLines = false;
-	displayAnimation = false;
-	selectedObject = 0;
-	selectedWorkpiece = 0;
-	selectedRun = 0;
-
-	project = NULL;
-	c0 = 0;
+	projectview = NULL;
 }
 
 CanvasMain::~CanvasMain()
 {
 }
 
-void CanvasMain::InsertProject(Project* project)
+void CanvasMain::InsertProjectView(ProjectView* projectview)
 {
-	this->project = project;
+	this->projectview = projectview;
 }
 
 void CanvasMain::Render()
 {
-	c0++;
-	if(project == NULL) return;
-	switch(display){
-	case displayObjects:
-	{
-		glLoadName(1);
-		project->PaintObjects();
-		break;
-	}
-	case displayWorkpieces:
-	{
-		glLoadName(2);
-		project->PaintWorkpiece();
-		break;
-	}
-	case displayRun:
-	{
-		glLoadName(3);
-		project->PaintRun();
-		break;
-	}
-	}
+	if(projectview == NULL) return;
+	projectview->Render();
 }
 
+void CanvasMain::RenderPick()
+{
+	if(projectview == NULL) return;
+	projectview->RenderPick();
+}

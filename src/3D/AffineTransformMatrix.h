@@ -70,7 +70,7 @@ class AffineTransformMatrix {
 public:
 	enum orientation {
 		rhs, //!< Right-handed system
-		lhs  //!< Left-handed system
+		lhs //!< Left-handed system
 	};
 
 	AffineTransformMatrix();
@@ -182,6 +182,14 @@ public:
 	static AffineTransformMatrix RotationTrackball(double const& x1,
 			double const& y1, double const& x2, double const& y2,
 			double const& r);
+
+	/*!\brief Construct a rotational matrix from a quarternion
+	 *
+	 * The quarternion is defined as w+i*x+j*y+k*z
+	 * with (1,0,0,0) being the unit rotation (= no rotation at all).
+	 */
+	static AffineTransformMatrix RotationQuarternion(double const& w,
+			double const&x, double const& y, double const& z);
 
 	void TranslateGlobal(double const& x, double const& y, double const& z); //!< Translate matrix in the global coordinate system.
 	void TranslateLocal(double const& x, double const& y, double const& z); //!< Translate matrix in the local, rotated coordinate system.

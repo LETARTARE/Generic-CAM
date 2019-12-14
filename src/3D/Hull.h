@@ -41,7 +41,6 @@
 #include <vector>
 
 #include "AffineTransformMatrix.h"
-#include "BoundingBox.h"
 #include "Vector3.h"
 
 class Geometry;
@@ -56,16 +55,20 @@ public:
 	class Edge {
 	public:
 		Edge();
+		bool sharp;
+		size_t group;
 		size_t va, vb;
 		size_t ta, tb;
 		uint_least8_t trianglecount;
 		Vector3 n;
-		size_t OtherTriangle(size_t n) const;
-		bool AttachTriangle(size_t index);
+		size_t OtherVertex(size_t n) const; //!< Return the index of the other vertex connected to the other end of the edge given the vertex n.
+		size_t OtherTriangle(size_t n) const; //!< Return the index of the other triangle connected to an edge given the triangle n.
+		bool AttachTriangle(size_t index); //!< Attach a triangle to the Edge. Returns true is there is one more free slot for a triangle.
 	};
 	class Triangle {
 	public:
 		Triangle();
+		size_t group;
 		size_t va, vb, vc;
 		size_t ea, eb, ec;
 		Vector3 n;
@@ -92,14 +95,25 @@ private:
 
 	// Methods
 public:
-	void Clear(void);
-	void SetEpsilon(double newEpsilon);
+	void Clear(void); //!< Remove all triangles, edges and vertices from the object.
+	void SetEpsilon(double newEpsilon); //!< Distance, below that vertices are considered the same vertex.
+
 	void Paint(void) const;
+	void PaintTriangles(const std::set <size_t>&sel = std::set <size_t>(),
+			bool invert = true) const;
+	void PaintEdges(const std::set <size_t>&sel = std::set <size_t>(),
+			bool invert = true) const;
+	void PaintVertices(void) const;
+	void PaintSelected(void) const;
+
 	bool IsClosed(void) const; //!< Test, if the hull is perfectly closed.
+	bool IsEmpty(void) const;
 
 	void CalcNormals(void);
+	void CalcGroups(void); //!< Group triangles and edges by assigning labels
 	void FlipNormals(void);
 
+	size_t Select(std::set <size_t> &select);
 	size_t SelectAll(void);
 	size_t UnselectAll(void);
 	size_t SelectByPlane(Vector3 n, double d);
@@ -112,7 +126,7 @@ public:
 	void ApplyTransformation(void);
 
 	void CopyFrom(const Geometry &geometry);
-	void CopyTrianglesFrom(const Geometry &geometry);
+	void AddTrianglesFrom(const Geometry &geometry);
 
 	bool LoadObj(std::string filename); //!< Load Wavefront OBJ file.
 	void SaveObj(std::string filename) const; //!< Write Wavefront OBJ file.
@@ -120,11 +134,11 @@ public:
 	size_t AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c);
 	size_t AddTriangleTransform(const Vector3 &a, const Vector3 &b,
 			const Vector3 &c, const AffineTransformMatrix &transformMatrix);
+	size_t AddTriangleWithNormal(const Vector3 &a, const Vector3 &b,
+			const Vector3 &c, const Vector3 &n);
 	size_t AddTriangleWithNormals(const Vector3 &a, const Vector3 &b,
 			const Vector3 &c, const Vector3 &na, const Vector3 &nb,
 			const Vector3 &nc);
-	size_t AddTriangleWithNormal(const Vector3 &a, const Vector3 &b,
-			const Vector3 &c, const Vector3 &n);
 
 	void AddQuad(const Vector3 &a, const Vector3 &b, const Vector3 &c,
 			const Vector3 &d);
@@ -133,7 +147,7 @@ public:
 
 	Polygon3 IntersectPlane(Vector3 n, double d) const;
 	Vector3 IntersectArrow(Vector3 p0, Vector3 dir) const;
-	Vector3 GetCenter(void) const;
+	Vector3 GetCenter(void) const; //!< Mean of all vertices
 
 	size_t GetVertexCount(void) const
 	{
@@ -146,7 +160,7 @@ public:
 
 private:
 	double epsilon;
-	double epsilon2;
+	double epsilon2; // = epsilon^2
 	std::set <size_t> openedges;
 	std::set <size_t> openvertices;
 
@@ -154,6 +168,12 @@ private:
 	size_t FindEdge(const size_t indexa, const size_t indexb);
 	static Vector3 PlaneProjection(const Vector3 &a, const Vector3 &b,
 			Vector3 n, double d);
+
+//	mutable size_t count;
+//	size_t Sequence() const
+//	{
+//		return ++count;
+//	}
 };
 
 #endif /* HULL_H_ */
