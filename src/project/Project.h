@@ -50,6 +50,7 @@
 #include <stddef.h>
 #include <wx/docview.h>
 
+#include "../3D/BoundingBox.h"
 #include "Run.h"
 #include "Selection.h"
 //
@@ -62,22 +63,31 @@
 //#endif // wxUSE_STD_IOSTREAM/!wxUSE_STD_IOSTREAM
 
 class Project:public wxDocument {
+	friend class CommandProjectRename;
+	friend class CommandObjectLoad;
+	friend class CommandObjectRename;
+	friend class CommandObjectTransform;
+	friend class CommandObjectRemove;
+	friend class CommandRunAdd;
+	friend class CommandRunRename;
+	friend class CommandRunSetObject;
+	friend class CommandRunSetCorrdinateSystem;
+	friend class CommandRunSetStockType;
+	friend class CommandRunSetStockObject;
+	friend class CommandRunSetStockBox;
+	friend class CommandRunSetStockOrigin;
+	friend class CommandRunRemove;
+
 public:
 	Project();
 	virtual ~Project();
 
 public:
-	// Project properties
-	wxString name;
-	wxFileName fileName;
-
-	std::map <size_t, Object> objects; //!< Loaded objects
-	std::map <size_t, Run> run; //!< Loaded objects
 
 //	bool processToolpath;
 //	bool interruptProcessing;
 
-	// Granularity
+// Granularity
 //	double resX;
 //	double resY;
 	//TODO Make the granularity a parameter.
@@ -87,31 +97,44 @@ public:
 	void Clear(void);
 	void Update(void);
 
+	bool Has(const Selection &sel) const;
+	bool Has(const Selection::Type type, const size_t ID) const;
+
 	bool DoSaveDocument(const wxString& file);
 	bool DoOpenDocument(const wxString& file);
 	//TODO Remove the functions below and join them into the functions above
 	bool Load(wxFileName fileName);
 	bool Save(wxFileName fileName);
 
-	bool Has(const Selection &sel) const;
-	bool Has(const Selection::Type type, const size_t ID) const;
-
 	bool GenerateToolpaths(void); ///< Direct generation of all toolpaths.
 	bool SaveToolpath(wxFileName fileName, int runNr);
 
 	void Paint(const OpenGLMaterial &face, const OpenGLMaterial &edge,
 			const Selection &sel) const;
-
 	void PaintPick(void) const;
+
+	BoundingBox GetBBox(const Selection & selected) const;
+
+	size_t GetMaxObjectID(void) const;
+	size_t GetMaxRunID(void) const;
+
+	std::set <size_t> GetAllObjectIDs(void) const;
+	const Object & GetObject(size_t ID) const;
+
+	std::set <size_t> GetAllRunIDs(void) const;
+	const Run & GetRun(size_t ID) const;
+
+private:
+
+	std::map <size_t, Object> objects; //!< Loaded objects
+	size_t maxObjectID;
+	std::map <size_t, Run> run; //!< Loaded objects
+	size_t maxRunID;
 
 #if(_GENERICCAM_USEMULTITHREADING == 1)
 	wxMutex mtx_project;
 	wxMutex mtx_generator;
 #endif
-
-public:
-	size_t maxObjectID;
-	size_t maxRunID;
 
 DECLARE_DYNAMIC_CLASS(Project)
 	;

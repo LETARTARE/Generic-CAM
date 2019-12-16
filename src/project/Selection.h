@@ -38,12 +38,14 @@
 
 class Selection {
 public:
+	//Note: BaseType and Type describing the same thing have to have the same ID.
 	enum BaseType {
-		BaseNone = 0, BaseObject, BaseRun
+		BaseNone = 0, BaseObject = 1, BaseRun = 2
 	};
 	enum Type {
 		Anything = 0,
-		Object,
+		Object = 1,
+		Run = 2,
 		Triangle,
 		TriangleGroup,
 		Edge,
@@ -51,7 +53,6 @@ public:
 		Vertex,
 		VertexGroup,
 		Axis,
-		Run,
 		Generator
 	};
 

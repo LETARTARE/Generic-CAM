@@ -29,21 +29,40 @@
 #include "../Project.h"
 
 CommandRunSetCorrdinateSystem::CommandRunSetCorrdinateSystem(
-		const wxString& name, Project* project, size_t ID,
-		const AffineTransformMatrix &matrix) :
+		const wxString& name, Project* project, size_t runID, size_t axis,
+		const Selection &selection) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->ID = ID;
-	newMatrix = matrix;
+	this->runID = runID;
+	this->newSelection = selection;
+	this->axis = axis;
 }
 
 bool CommandRunSetCorrdinateSystem::Do(void)
 {
 	if(project == NULL) return false;
-	if(project->run.find(ID) == project->run.end()) return false;
-	this->oldMatrix = project->run[ID].origin;
-	project->run[ID].origin = this->newMatrix;
+	if(!project->Has(Selection::Run, runID)) return false;
+	switch(axis){
+	case 0:
+	{
+		this->oldSelection = project->run[runID].coordX;
+		project->run[runID].coordX = this->newSelection;
+		break;
+	}
+	case 1:
+	{
+		this->oldSelection = project->run[runID].coordY;
+		project->run[runID].coordY = this->newSelection;
+		break;
+	}
+	case 2:
+	{
+		this->oldSelection = project->run[runID].coordZ;
+		project->run[runID].coordZ = this->newSelection;
+		break;
+	}
+	}
 	project->Update();
 	return true;
 }
@@ -51,8 +70,24 @@ bool CommandRunSetCorrdinateSystem::Do(void)
 bool CommandRunSetCorrdinateSystem::Undo(void)
 {
 	if(project == NULL) return false;
-	if(project->run.find(ID) == project->run.end()) return false;
-	project->run[ID].origin = this->oldMatrix;
+	if(!project->Has(Selection::Run, runID)) return false;
+	switch(axis){
+	case 0:
+	{
+		project->run[runID].coordX = this->oldSelection;
+		break;
+	}
+	case 1:
+	{
+		project->run[runID].coordY = this->oldSelection;
+		break;
+	}
+	case 2:
+	{
+		project->run[runID].coordZ = this->oldSelection;
+		break;
+	}
+	}
 	project->Update();
 	return true;
 }

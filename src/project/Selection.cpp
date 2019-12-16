@@ -131,11 +131,7 @@ void Selection::ClearSetBase(BaseType basetype, size_t baseID)
 void Selection::SetBase(BaseType basetype, size_t baseID)
 {
 	if(basetype == BaseNone) baseID = 0;
-	if(this->basetype != basetype || this->baseID != baseID){
-		selected.clear();
-		lastrequestvalid = false;
-		inverted = false;
-	}
+	lastrequestvalid = false;
 	this->basetype = basetype;
 	this->baseID = baseID;
 }
@@ -560,24 +556,38 @@ std::string Selection::ToString(void) const
 {
 	std::ostringstream x;
 
-	x << "Base:" << GetBaseTypeName();
-	if(basetype != BaseNone){
-		x << "(" << baseID << ")";
-	}
-	x << "-" << GetTypeName() << "(";
-	size_t c = 0;
-	for(std::set <size_t>::iterator it = this->selected.begin();
-			it != this->selected.end(); ++it){
-		if(c > 0) x << ",";
-		x << *it;
-		++c;
-		if(c >= 10){
-			x << ",...";
-			break;
+	if(basetype == BaseNone && type == Anything){
+		if(inverted){
+			x << "Everything";
+		}else{
+			x << "Nothing";
 		}
+	}else{
+		if(inverted) x << "inv(";
+		if(basetype != BaseNone){
+			x << GetBaseTypeName();
+			if(basetype != BaseNone){
+				x << "#" << baseID;
+			}
+			x << ":";
+		}
+		x << GetTypeName();
+		if(selected.size() > 0) x << "#";
+		if(selected.size() > 1) x << "[";
+		size_t c = 0;
+		for(std::set <size_t>::iterator it = this->selected.begin();
+				it != this->selected.end(); ++it){
+			if(c > 0) x << ",";
+			x << *it;
+			++c;
+			if(c >= 10){
+				x << ",...";
+				break;
+			}
+		}
+		if(selected.size() > 1) x << "]";
+		if(inverted) x << ")";
 	}
-	x << ")";
-	if(inverted) x << "inverted";
 	return x.str();
 }
 

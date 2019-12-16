@@ -73,7 +73,7 @@
 //#include <wx/chartype.h>
 #include <cmath>
 
-//#include "../Config.h"
+#include "../Config.h"
 
 #ifdef _USE_MATHPARSER
 #include "MathParser.h"

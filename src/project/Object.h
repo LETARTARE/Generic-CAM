@@ -72,8 +72,6 @@ private:
 public:
 	void Update(void);
 
-	void TransformFromCenter(void); //!< Shifts the origin for transfomration on 'matrix' to the center of the object.
-
 	bool LoadObject(wxFileName fileName);
 	bool ReloadObject(void);
 

@@ -239,6 +239,7 @@ void TreeSetup::Update(void)
 
 	// The function UpdateSelection uses this flag to temporally disable variable update.
 	if(loopGuard.TryLock() == wxMUTEX_BUSY) return;
+	std::cout << "TreeSetup::Update -> loopGuard.Lock();\n";
 
 	wxTreeItemId root = tree->GetRootItem();
 	if(!root.IsOk()){
@@ -250,7 +251,8 @@ void TreeSetup::Update(void)
 	ProjectView * const view = wxStaticCast(parent->GetView(), ProjectView);
 
 	wxString tempName = tree->GetItemText(root);
-	if(tempName != project->name) tree->SetItemText(root, project->name);
+	if(tempName != project->GetTitle()) tree->SetItemText(root,
+			project->GetTitle());
 
 	id[0] = root;
 	currentLevel = 0;
@@ -259,9 +261,11 @@ void TreeSetup::Update(void)
 	groupObjects = id[1];
 
 	bool foundItem = false;
-	for(std::map <size_t, Object>::const_iterator obj =
-			project->objects.begin(); obj != project->objects.end(); ++obj){
-		SetAtLevel(2, obj->second.name, TreeItem::itemObject, obj->first);
+	std::set <size_t> objIDs = project->GetAllObjectIDs();
+	for(std::set <size_t>::const_iterator objID = objIDs.begin();
+			objID != objIDs.end(); ++objID){
+		SetAtLevel(2, project->GetObject(*objID).name, TreeItem::itemObject,
+				*objID);
 		foundItem = true;
 	}
 	if(foundItem){
@@ -275,18 +279,19 @@ void TreeSetup::Update(void)
 	groupRun = id[1];
 
 	foundItem = false;
-	for(std::map <size_t, Run>::const_iterator run = project->run.begin();
-			run != project->run.end(); ++run){
-		SetAtLevel(2, run->second.name, TreeItem::itemRun, run->first);
+	std::set <size_t> runIDs = project->GetAllRunIDs();
+	for(std::set <size_t>::const_iterator runID = runIDs.begin();
+			runID != runIDs.end(); ++runID){
+		SetAtLevel(2, project->GetRun(*runID).name, TreeItem::itemRun, *runID);
 
 		bool foundItem2 = false;
-		for(std::map <size_t, Generator*>::const_iterator generator =
-				run->second.generators.begin();
-				generator != run->second.generators.end(); ++generator){
-			SetAtLevel(3, generator->second->name, TreeItem::itemGenerator,
-					generator->first);
-			foundItem2 = true;
-		}
+//		for(std::map <size_t, Generator*>::const_iterator generator =
+//				run->second.generators.begin();
+//				generator != run->second.generators.end(); ++generator){
+//			SetAtLevel(3, generator->second->name, TreeItem::itemGenerator,
+//					generator->first);
+//			foundItem2 = true;
+//		}
 		if(foundItem2){
 			FinishLevel(3, true);
 		}else{
@@ -362,6 +367,7 @@ void TreeSetup::Update(void)
 
 	tree->Expand(id[0]);
 
+	std::cout << "TreeSetup::Update -> loopGuard.Unlock();\n";
 	loopGuard.Unlock();
 }
 
@@ -370,12 +376,17 @@ void TreeSetup::SelectonToTree(const Selection &sel)
 	// Disable the function variable update. This function would otherwise
 	// be called by the main window, whenever a selection changes.
 	// The function UpdateSelection uses this flag to temporally disable variable update.
-	if(loopGuard.TryLock() == wxMUTEX_BUSY) return;
-
-	std::cout << " SelectionToTree:\n  " << sel.ToString() << "\n";
+	std::cout << "TreeSetup::SelectonToTree(" << sel.ToString() << ")";
+	if(loopGuard.TryLock() == wxMUTEX_BUSY){
+		std::cout << " -> wxMUTEX_BUSY;\n";
+		return;
+	}
+	std::cout << ";\n";
+	std::cout << "TreeSetup::SelectonToTree -> loopGuard.Lock();\n";
 
 	// Check if all groups are ok.
-	if(!groupObjects.IsOk()){
+	if(!groupObjects.IsOk() || !groupRun.IsOk()){
+		std::cout << "TreeSetup::SelectonToTree -> loopGuard.Unlock();\n";
 		loopGuard.Unlock();
 		return;
 	}
@@ -385,8 +396,8 @@ void TreeSetup::SelectonToTree(const Selection &sel)
 	// Updates for Objects:
 	{
 
-		std::map <size_t, Object>::const_iterator obj =
-				project->objects.begin();
+		std::set <size_t> objIDs = project->GetAllObjectIDs();
+		std::set <size_t>::const_iterator objID = objIDs.begin();
 
 //		obj != project->objects.end(); ++obj){
 //			SetAtLevel(2, obj->second.name, TreeItem::itemObject, obj->first);
@@ -396,13 +407,13 @@ void TreeSetup::SelectonToTree(const Selection &sel)
 		while(temp.IsOk()){
 			TreeItem * data = (TreeItem*) tree->GetItemData(temp);
 			if(data != NULL && data->type == TreeItem::itemObject){
-				if(obj == project->objects.end()) break;
+				if(objID == objIDs.end()) break;
 				const bool flag = tree->IsSelected(temp);
-				const bool inSelection = sel.Has(Selection::Object, obj->first);
+				const bool inSelection = sel.Has(Selection::Object, *objID);
 				if(flag != inSelection){
 					tree->SelectItem(temp, inSelection);
 				}
-				++obj;
+				++objID;
 			}
 			temp = tree->GetNextSibling(temp);
 		}
@@ -430,20 +441,20 @@ void TreeSetup::SelectonToTree(const Selection &sel)
 
 	// Updates for Run:
 	{
-
-		std::map <size_t, Run>::const_iterator run = project->run.begin();
+		std::set <size_t> runIDs = project->GetAllRunIDs();
+		std::set <size_t>::const_iterator runID = runIDs.begin();
 
 		wxTreeItemId temp = tree->GetFirstChild(groupRun, cookie);
 		while(temp.IsOk()){
 			TreeItem * data = (TreeItem*) tree->GetItemData(temp);
 			if(data != NULL && data->type == TreeItem::itemRun){
-				if(run == project->run.end()) break;
+				if(runID == runIDs.end()) break;
 				const bool flag = tree->IsSelected(temp);
-				const bool inSelection = sel.Has(Selection::Run, run->first);
+				const bool inSelection = sel.Has(Selection::Run, *runID);
 				if(flag != inSelection){
 					tree->SelectItem(temp, inSelection);
 				}
-				++run;
+				++runID;
 			}
 			temp = tree->GetNextSibling(temp);
 		}
@@ -482,6 +493,7 @@ void TreeSetup::SelectonToTree(const Selection &sel)
 //			temp = tree->GetNextSibling(temp);
 //		}
 	}
+	std::cout << "TreeSetup::SelectonToTree -> loopGuard.Unlock();\n";
 	loopGuard.Unlock();
 //	TreeToProject();
 }
@@ -498,16 +510,16 @@ Selection TreeSetup::TreeToSelection(void)
 
 	// Updates for Objects:
 	{
-		std::map <size_t, Object>::const_iterator obj =
-				project->objects.begin();
+
+		std::set <size_t> objIDs = project->GetAllObjectIDs();
+		std::set <size_t>::const_iterator objID = objIDs.begin();
 		wxTreeItemId temp = tree->GetFirstChild(groupObjects, cookie);
 		while(temp.IsOk()){
 			TreeItem * data = (TreeItem*) tree->GetItemData(temp);
 			if(data != NULL && data->type == TreeItem::itemObject){
-				if(obj == project->objects.end()) break;
-				if(tree->IsSelected(temp)) sel.Add(Selection::Object,
-						obj->first);
-				++obj;
+				if(objID == objIDs.end()) break;
+				if(tree->IsSelected(temp)) sel.Add(Selection::Object, *objID);
+				++objID;
 			}
 			temp = tree->GetNextSibling(temp);
 		}
@@ -532,15 +544,15 @@ Selection TreeSetup::TreeToSelection(void)
 
 	// Updates for Run:
 	{
-
-		std::map <size_t, Run>::const_iterator run = project->run.begin();
+		std::set <size_t> runIDs = project->GetAllRunIDs();
+		std::set <size_t>::const_iterator runID = runIDs.begin();
 		wxTreeItemId temp = tree->GetFirstChild(groupRun, cookie);
 		while(temp.IsOk()){
 			TreeItem * data = (TreeItem*) tree->GetItemData(temp);
 			if(data != NULL && data->type == TreeItem::itemRun){
-				if(run == project->run.end()) break;
-				if(tree->IsSelected(temp)) sel.Add(Selection::Run, run->first);
-				++run;
+				if(runID == runIDs.end()) break;
+				if(tree->IsSelected(temp)) sel.Add(Selection::Run, *runID);
+				++runID;
 			}
 			temp = tree->GetNextSibling(temp);
 		}

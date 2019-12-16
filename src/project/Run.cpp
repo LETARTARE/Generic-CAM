@@ -40,8 +40,13 @@ Run::Run()
 {
 	parent = NULL;
 	object = 0;
-	type = BoxBottom;
+	stocktype = BoxBottom;
 	stockobject = 0;
+	coordX.Add(Selection::Axis, 0);
+	coordY.Add(Selection::Axis, 1);
+	coordZ.Add(Selection::Axis, 2);
+	touchpoint = wxImage(touchpoint_xpm);
+	touchpoint.SetAlphaColor(255, 255, 255);
 }
 
 Run::~Run()
@@ -52,6 +57,45 @@ Run::~Run()
 
 void Run::Update(void)
 {
+	if(parent == NULL) return;
+	origin.SetIdentity();
+	// Calculate coordinate system
+	if(coordX.Has(Selection::Axis, 0)) origin.SetEx(Vector3(1, 0, 0));
+	if(coordX.Has(Selection::Axis, 1)) origin.SetEx(Vector3(0, 1, 0));
+	if(coordX.Has(Selection::Axis, 2)) origin.SetEx(Vector3(0, 0, 1));
+
+	if(coordY.Has(Selection::Axis, 0)) origin.SetEy(Vector3(1, 0, 0));
+	if(coordY.Has(Selection::Axis, 1)) origin.SetEy(Vector3(0, 1, 0));
+	if(coordY.Has(Selection::Axis, 2)) origin.SetEy(Vector3(0, 0, 1));
+	origin.CalculateEz();
+	if(coordZ.Has(Selection::Axis, 0)) origin.SetEz(Vector3(1, 0, 0));
+	if(coordZ.Has(Selection::Axis, 1)) origin.SetEz(Vector3(0, 1, 0));
+	if(coordZ.Has(Selection::Axis, 2)) origin.SetEz(Vector3(0, 0, 1));
+	origin.CalculateEx();
+	origin.CalculateEy();
+	origin.Normalize();
+
+	if(stocktype == Object){
+		stock = parent->GetBBox(Selection(Selection::Object, stockobject));
+	}
+	if(stocktype == BoxTop || stocktype == BoxCenter || stocktype == BoxBottom){
+		BoundingBox bbox = parent->GetBBox(object);
+		Vector3 center((bbox.xmax + bbox.xmin - stocksize.x) / 2.0,
+				(bbox.ymax + bbox.ymin - stocksize.y) / 2.0,
+				(bbox.zmax + bbox.zmin - stocksize.z) / 2.0);
+		const double diff = (bbox.GetSizeZ() - stocksize.z) / 2.0;
+
+		if(stocktype == BoxTop) stock.SetSize(stocksize.x, stocksize.y,
+				stocksize.z, center.x, center.y, center.z + diff);
+		if(stocktype == BoxCenter) stock.SetSize(stocksize.x, stocksize.y,
+				stocksize.z, center.x, center.y, center.z);
+		if(stocktype == BoxBottom) stock.SetSize(stocksize.x, stocksize.y,
+				stocksize.z, center.x, center.y, center.z - diff);
+
+	}
+	AffineTransformMatrix M = stock.GetCoordinateSystem();
+	origin.SetOrigin(M.Transform(stockorigin));
+
 //	for(size_t i = 0; i < generators.size(); i++){
 //		assert(generators[i] != NULL);
 //		generators[i]->parent = this;
@@ -189,6 +233,39 @@ void Run::Paint(void) const
 	const Project * pr = parent;
 	if(pr == NULL) return;
 
+	OpenGLMaterial::EnableColors();
+
+	glColor4f(0.8, 0.8, 0.8, 1.0);
+	stock.PaintVertices(1, 10);
+
+	// Draw the "Touchpoint" symbol
+	const float s = 0.03;
+	glPushName(0);
+	glPushName(0);
+
+	glPushMatrix();
+	origin.GLMultMatrix();
+	glScalef(s, s, s);
+	glRotatef(90, 1, 0, 0);
+	touchpoint.Paint();
+	glRotatef(90, 0, 1, 0);
+	touchpoint.Paint();
+	glRotatef(90, 0, 1, 0);
+	touchpoint.Paint();
+	glRotatef(90, 0, 1, 0);
+	touchpoint.Paint();
+	glPopMatrix();
+
+	glPopName();
+	glPopName();
+
+	if(stocktype == BoxTop || stocktype == BoxCenter || stocktype == BoxBottom){
+		if(OpenGLMaterial::ColorsAllowed()){
+			glColor4f(0.2, 0.2, 0.2, 0.6);
+			stock.Paint();
+		}
+	}
+
 //	::glPushMatrix();
 //	if(refWorkpiece > -1){
 //		Vector3 center = pr->workpieces[refWorkpiece].GetCenter();
@@ -224,25 +301,11 @@ void Run::Paint(void) const
 //			::glPopMatrix();
 //		}
 //
-//		// Draw the "Touchpoint" symbol
-//		const float s = 0.03;
-//
-//		glTranslatef(0, 0, touchoffHeight);
-//		glScalef(s, s, s);
-//		glRotatef(90, 1, 0, 0);
-//		touchpoint.Paint();
-//		glRotatef(90, 0, 1, 0);
-//		touchpoint.Paint();
-//		glRotatef(90, 0, 1, 0);
-//		touchpoint.Paint();
-//		glRotatef(90, 0, 1, 0);
-//		touchpoint.Paint();
-//		::glPopMatrix();
+
 //	}
 //
 //	::glPopMatrix();
 }
-
 
 //void Run::ToolpathToStream(wxTextOutputStream & stream)
 //{

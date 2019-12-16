@@ -500,7 +500,7 @@ bool OpenGLCanvas::OnPick(OpenGLPick &result, wxPoint pos)
 	GLenum err = glGetError();
 	if(err){
 		if(err == GL_INVALID_OPERATION){
-			printf("OpenGLCanvas::OnPick - GL_INVALID_OPERATION returned.\n",
+			printf("OpenGLCanvas::OnPick - GL_INVALID_OPERATION returned %u.\n",
 					err);
 		}else{
 			printf("OpenGLCanvas::OnPick - Error %u.\n", err);

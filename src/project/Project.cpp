@@ -40,6 +40,28 @@
 #include <float.h>
 #include <algorithm>
 
+IMPLEMENT_DYNAMIC_CLASS(Project, wxDocument)
+
+Project::Project() :
+		wxDocument()
+{
+	Clear();
+	SetTitle(_("Untitled"));
+	maxObjectID = 0;
+	maxRunID = 0;
+}
+
+Project::~Project()
+{
+	printf("Project::Destructor\n");
+}
+
+void Project::Clear(void)
+{
+	objects.clear();
+	run.clear();
+}
+
 bool Project::Has(const Selection& sel) const
 {
 	if(sel.IsType(Selection::Object)){
@@ -72,27 +94,46 @@ bool Project::Has(const Selection::Type type, const size_t ID) const
 	return false;
 }
 
-IMPLEMENT_DYNAMIC_CLASS(Project, wxDocument)
-
-Project::Project() :
-		wxDocument()
+size_t Project::GetMaxObjectID(void) const
 {
-	Clear();
-	maxObjectID = 0;
-	maxRunID = 0;
+	return maxObjectID;
 }
 
-Project::~Project()
+std::set <size_t> Project::GetAllObjectIDs(void) const
 {
-	printf("Project::Destructor\n");
+	std::set <size_t> temp;
+	for(std::map <size_t, Object>::const_iterator it = objects.begin();
+			it != objects.end(); ++it)
+		temp.insert(it->first);
+	return temp;
 }
 
-void Project::Clear(void)
+const Object& Project::GetObject(size_t ID) const
 {
-	name = _("Untitled");
+	if(objects.find(ID) == objects.end()) throw(std::range_error(
+			"Project::GetObject - Object not found."));
+	return objects.at(ID); //TODO: Rewrite by [] lookup
+}
 
-	objects.clear();
-	run.clear();
+size_t Project::GetMaxRunID(void) const
+{
+	return maxRunID;
+}
+
+std::set <size_t> Project::GetAllRunIDs(void) const
+{
+	std::set <size_t> temp;
+	for(std::map <size_t, Run>::const_iterator it = run.begin();
+			it != run.end(); ++it)
+		temp.insert(it->first);
+	return temp;
+}
+
+const Run& Project::GetRun(size_t ID) const
+{
+	if(run.find(ID) == run.end()) throw(std::range_error(
+			"Project::GetRun - Run not found."));
+	return run.at(ID); //TODO: Rewrite by [] lookup
 }
 
 bool Project::GenerateToolpaths(void)
@@ -166,6 +207,7 @@ void Project::Update(void)
 	}
 	for(std::map <size_t, Run>::iterator it = run.begin(); it != run.end();
 			++it){
+		it->second.parent = this;
 		it->second.Update();
 	}
 	UpdateAllViews();
@@ -195,7 +237,7 @@ bool Project::Save(wxFileName fileName)
 
 	zip.PutNextEntry(_T("project.txt"));
 	txt << _T("Name:") << endl;
-	txt << this->name << endl;
+	txt << this->GetTitle() << endl;
 
 //	txt << wxString::Format(_T("Objects: %zu"), objects.GetCount()) << endl;
 //	for(size_t n = 0; n < objects.GetCount(); n++){
@@ -224,7 +266,7 @@ bool Project::Save(wxFileName fileName)
 //		}
 //	}
 	setlocale(LC_ALL, "");
-	this->fileName = fileName;
+	this->SetFilename(fileName.GetFullName(), true);
 	return true;
 }
 
@@ -363,7 +405,7 @@ bool Project::Load(wxFileName fileName)
 //		zip.CloseEntry();
 //	}
 //	setlocale(LC_ALL, "");
-	this->fileName = fileName;
+	this->SetFilename(fileName.GetFullName(), true);
 	this->Update();
 	return true;
 }
@@ -528,25 +570,53 @@ void Project::Paint(const OpenGLMaterial &face, const OpenGLMaterial &edge,
 {
 	for(std::map <size_t, Object>::const_iterator obj = objects.begin();
 			obj != objects.end(); ++obj){
-		glPushName(obj->first);
 		if(sel.IsBase(Selection::BaseObject, obj->first)){
 			obj->second.Paint(face, edge, sel);
 		}else{
 			if(sel.IsInverted()) obj->second.Paint(face, edge, Selection(true));
 		}
-		glPopName();
 	}
+
+	for(std::map <size_t, Run>::const_iterator run = this->run.begin();
+			run != this->run.end(); ++run){
+		run->second.Paint();
+	}
+
 }
 
 void Project::PaintPick(void) const
 {
+	glPushName(Selection::BaseObject);
 	for(std::map <size_t, Object>::const_iterator obj = objects.begin();
 			obj != objects.end(); ++obj){
 		glPushName(obj->first);
 		obj->second.PaintPick();
 		glPopName();
 	}
+	glLoadName(Selection::BaseRun);
+	for(std::map <size_t, Run>::const_iterator run = this->run.begin();
+			run != this->run.end(); ++run){
+		glPushName(run->first);
+		run->second.Paint();
+		glPopName();
+	}
+	glPopName();
 }
+
+BoundingBox Project::GetBBox(const Selection &selected) const
+{
+	BoundingBox temp;
+	if(selected.IsType(Selection::Object)){
+		std::set <size_t> set = selected.GetSet();
+		for(std::set <size_t>::const_iterator it = set.begin(); it != set.end();
+				++it){
+			if(!this->Has(Selection::Object, *it)) continue;
+			temp.Insert(objects.at(*it).bbox);
+		}
+	}
+	return temp;
+}
+
 //void Project::PaintWorkpiece(void) const
 //{
 //	const int i = GetFirstSelectedWorkpiece();

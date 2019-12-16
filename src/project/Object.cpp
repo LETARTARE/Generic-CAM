@@ -115,17 +115,9 @@ void Object::Update(void)
 	for(size_t n = 0; n < N; ++n)
 		bbox.Insert(geometry.GetVertex(n));
 	bbox.Transform(geometry.matrix);
-
-//	matrix.TranslateGlobal(-bbox.xmin, -bbox.ymin, -bbox.zmin);
-//	bbox.xmax -= bbox.xmin;
-//	bbox.ymax -= bbox.ymin;
-//	bbox.zmax -= bbox.zmin;
-//	bbox.xmin = 0;
-//	bbox.ymin = 0;
-//	bbox.zmin = 0;
+	bbox.Transform(matrix);
 }
 
-//
 //void Object::UpdateNormals(void)
 //{
 //	geometry.CalculateNormals();
@@ -152,20 +144,6 @@ void Object::PaintPick(void) const
 	geometry.PaintVertices();
 	glPopName();
 	glPopMatrix();
-}
-
-void Object::TransformFromCenter(void)
-{
-	const double dx = bbox.xmin + bbox.GetSizeX() / 2;
-	const double dy = bbox.ymin + bbox.GetSizeY() / 2;
-	const double dz = bbox.zmin + bbox.GetSizeZ() / 2;
-	matrix.TranslateGlobal(-dx, -dy, -dz);
-	bbox.xmin -= dx;
-	bbox.ymin -= dy;
-	bbox.zmin -= dz;
-	bbox.xmax -= dx;
-	bbox.ymax -= dy;
-	bbox.zmax -= dz;
 }
 
 void Object::FlipNormals(void)

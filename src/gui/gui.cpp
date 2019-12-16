@@ -771,7 +771,7 @@ GUIJobSetup::GUIJobSetup( wxWindow* parent, wxWindowID id, const wxString& title
 	m_staticTextBoxX->Wrap( -1 );
 	fgSizerStockBox->Add( m_staticTextBoxX, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
 	
-	m_textCtrlBoxX = new wxTextCtrl( m_panelStockBox, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlBoxX = new wxTextCtrl( m_panelStockBox, ID_SETSIZEX, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	fgSizerStockBox->Add( m_textCtrlBoxX, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticTextUnitBoxX = new wxStaticText( m_panelStockBox, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -782,18 +782,18 @@ GUIJobSetup::GUIJobSetup( wxWindow* parent, wxWindowID id, const wxString& title
 	m_staticTextBoxY->Wrap( -1 );
 	fgSizerStockBox->Add( m_staticTextBoxY, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlBoxY = new wxTextCtrl( m_panelStockBox, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlBoxY = new wxTextCtrl( m_panelStockBox, ID_SETSIZEY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	fgSizerStockBox->Add( m_textCtrlBoxY, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticTextunitBoxY = new wxStaticText( m_panelStockBox, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextunitBoxY->Wrap( -1 );
-	fgSizerStockBox->Add( m_staticTextunitBoxY, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextUnitBoxY = new wxStaticText( m_panelStockBox, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitBoxY->Wrap( -1 );
+	fgSizerStockBox->Add( m_staticTextUnitBoxY, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticTextBoxZ = new wxStaticText( m_panelStockBox, wxID_ANY, _("Z:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextBoxZ->Wrap( -1 );
 	fgSizerStockBox->Add( m_staticTextBoxZ, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlBoxZ = new wxTextCtrl( m_panelStockBox, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlBoxZ = new wxTextCtrl( m_panelStockBox, ID_SETSIZEZ, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	fgSizerStockBox->Add( m_textCtrlBoxZ, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticTextUnitBoxZ = new wxStaticText( m_panelStockBox, wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -882,7 +882,12 @@ GUIJobSetup::GUIJobSetup( wxWindow* parent, wxWindowID id, const wxString& title
 	m_buttonAxisX->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIJobSetup::OnSelect ), NULL, this );
 	m_buttonAxisY->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIJobSetup::OnSelect ), NULL, this );
 	m_buttonAxisZ->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIJobSetup::OnSelect ), NULL, this );
+	m_choicebookStock->Connect( wxEVT_COMMAND_CHOICEBOOK_PAGE_CHANGED, wxChoicebookEventHandler( GUIJobSetup::OnChoicebookPageChanged ), NULL, this );
+	m_textCtrlBoxX->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIJobSetup::OnTextEnter ), NULL, this );
+	m_textCtrlBoxY->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIJobSetup::OnTextEnter ), NULL, this );
+	m_textCtrlBoxZ->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIJobSetup::OnTextEnter ), NULL, this );
 	m_buttonFromObject->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIJobSetup::OnGetSizeFromObject ), NULL, this );
+	m_radioBox->Connect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( GUIJobSetup::OnRadioBox ), NULL, this );
 	m_buttonStockObjectSelect->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIJobSetup::OnSelect ), NULL, this );
 	m_buttonOrigin->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIJobSetup::OnSelect ), NULL, this );
 }
@@ -895,7 +900,12 @@ GUIJobSetup::~GUIJobSetup()
 	m_buttonAxisX->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIJobSetup::OnSelect ), NULL, this );
 	m_buttonAxisY->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIJobSetup::OnSelect ), NULL, this );
 	m_buttonAxisZ->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIJobSetup::OnSelect ), NULL, this );
+	m_choicebookStock->Disconnect( wxEVT_COMMAND_CHOICEBOOK_PAGE_CHANGED, wxChoicebookEventHandler( GUIJobSetup::OnChoicebookPageChanged ), NULL, this );
+	m_textCtrlBoxX->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIJobSetup::OnTextEnter ), NULL, this );
+	m_textCtrlBoxY->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIJobSetup::OnTextEnter ), NULL, this );
+	m_textCtrlBoxZ->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIJobSetup::OnTextEnter ), NULL, this );
 	m_buttonFromObject->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIJobSetup::OnGetSizeFromObject ), NULL, this );
+	m_radioBox->Disconnect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( GUIJobSetup::OnRadioBox ), NULL, this );
 	m_buttonStockObjectSelect->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIJobSetup::OnSelect ), NULL, this );
 	m_buttonOrigin->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIJobSetup::OnSelect ), NULL, this );
 	

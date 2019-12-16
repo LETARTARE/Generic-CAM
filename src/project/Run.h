@@ -56,7 +56,6 @@
  *  }
  *  \enddot
  *
- * \todo Implement copy and assignment constructors.
  */
 
 #include "generator/Generator.h"
@@ -75,30 +74,37 @@ class Project;
 class Run {
 	friend class Project;
 
-	// Constructor / Destructor
 public:
 	Run();
 	virtual ~Run();
 
-	// Member variables
 public:
 	Project * parent; ///< Pointer back to the Project this Run belongs to.
-
 	wxString name;
 
 	Selection object;
 
+	Selection coordX;
+	Selection coordY;
+	Selection coordZ;
+
 	enum StockType {
 		Object, BoxTop, BoxCenter, BoxBottom
-	} type;
+	} stocktype;
 	size_t stockobject;
 	Vector3 stocksize;
-
-	AffineTransformMatrix origin; //!< Origin and coordinate-system
+	Vector3 stockorigin;
 
 	std::map <size_t, Generator*> generators; ///< List of Generator%s applied to the workpiece in this run
 
-	// Methods
+	// Set up by Update()
+	BoundingBox stock;
+	AffineTransformMatrix origin; //!< Origin and coordinate-system
+
+private:
+	OpenGLImage touchpoint;
+
+
 public:
 	void Update(void);
 

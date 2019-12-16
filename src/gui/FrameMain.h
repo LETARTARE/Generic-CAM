@@ -103,7 +103,7 @@ public:
 			Selection selection0, Selection selection1);
 	void RequestSelection(wxFrame* requester, size_t ID, bool multiselect,
 			Selection selection0, Selection selection1, Selection selection2);
-	void AnswerSelection(void);
+	void AnswerSelection(const Selection &selection);
 
 	void ProjectLoad(wxString fileName); ///> Load a project from the command line
 	bool TransferDataToWindow(void);

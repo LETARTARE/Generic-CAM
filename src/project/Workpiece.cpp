@@ -74,7 +74,7 @@ void Workpiece::Paint(void) const
 //
 //	}
 
-	glColor3f(color.x, color.y, color.z);
+//	glColor3f(color.x, color.y, color.z);
 	if(glIsEnabled(GL_COLOR_MATERIAL)){
 //		BoundingBox::Paint();
 //		StockMaterial::Paint(0.2, false);

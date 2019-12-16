@@ -37,6 +37,7 @@
 
 //#define _DEBUGMODE
 #define _USE_CPPUNIT
+#define _USE_MATHPARSER
 #define _USE_3DVIEWS
 #define _USE_3DPICKING
 #define _USE_MIDI

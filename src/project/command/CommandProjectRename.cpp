@@ -38,15 +38,15 @@ CommandProjectRename::CommandProjectRename(const wxString& name,
 
 bool CommandProjectRename::Do(void)
 {
-	this->oldName = project->name;
-	project->name = this->newName;
+	this->oldName = project->GetTitle();
+	project->SetTitle(this->newName);
 	project->Update();
 	return true;
 }
 
 bool CommandProjectRename::Undo(void)
 {
-	project->name = this->oldName;
+	project->SetTitle(this->oldName);
 	project->Update();
 	return true;
 }

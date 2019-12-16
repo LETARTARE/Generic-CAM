@@ -52,14 +52,6 @@ public:
 	double ymin, ymax;
 	double zmin, zmax;
 
-	bool displayBox; ///< Show a box (default: true)
-	bool displaySides; ///< Display the sides of the box as overlapping single colored planes. The colors are the 1st, 2nd and 3rd component of the color variable.
-
-	Vector3 color; ///< Color for displaying as box
-	float alpha; ///< Alphy value
-
-	float overlap; ///< Length of the overlap (absolute value)
-
 	// Methods
 public:
 	//! Reset the BoundingBox.
@@ -137,7 +129,11 @@ public:
 	bool FromStream(wxTextInputStream & stream);
 
 	//! Paint the box in OpenGL.
-	void Paint(void) const;
+	void Paint(double overlap = 0.0) const;
+	void PaintEdges(double cornerlength = 0.5,
+			unsigned int edgewidth = 1) const;
+	void PaintVertices(unsigned int extrapoints = 0,
+			unsigned int pointsize = 1) const;
 };
 
 #endif /* BOUNDINGBOX_H_ */

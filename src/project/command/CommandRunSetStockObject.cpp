@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : DialogJobSetup.h
-// Purpose            : 
-// Thread Safe        : Yes
+// Name               : CommandRunSetStockObject.cpp
+// Purpose            :
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 28.11.2019
+// Created            : 16.12.2019
 // Copyright          : (C) 2019 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,39 +24,31 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef SRC_GUI_DIALOGJOBSETUP_H_
-#define SRC_GUI_DIALOGJOBSETUP_H_
+#include "CommandRunSetStockObject.h"
 
-/*!\class DialogJobSetup
- * \brief ...
- *
- * ...
- */
+CommandRunSetStockObject::CommandRunSetStockObject(const wxString& name,
+		Project* project, size_t runID, size_t objID) :
+		wxCommand(true, name)
+{
+	this->project = project;
+	this->runID = runID;
+	this->newObjID = objID;
+	this->oldObjID = 0;
+}
 
-#include "../project/Run.h"
-#include "gui.h"
+bool CommandRunSetStockObject::Do(void)
+{
+	if(project == NULL) return false;
+	oldObjID = project->run[runID].stockobject;
+	project->run[runID].stockobject = newObjID;
+	project->Update();
+	return true;
+}
 
-class DialogJobSetup:public GUIJobSetup {
-public:
-	DialogJobSetup(wxWindow* parent);
-	virtual ~DialogJobSetup();
-
-	void SetRunID(size_t runID);
-
-	bool TransferDataToWindow(void);
-	bool TransferDataFromWindow(void);
-
-	void OnXClose(wxCloseEvent& event);
-	void OnSelect(wxCommandEvent& event);
-	bool OnSelected(size_t ID, Selection selection);
-	void OnGetSizeFromObject(wxCommandEvent& event);
-	void OnChoicebookPageChanged( wxChoicebookEvent& event);
-	void OnTextEnter(wxCommandEvent& event);
-	void OnRadioBox(wxCommandEvent& event);
-
-private:
-	size_t runID;
-	Run::StockType oldType;
-};
-
-#endif /* SRC_GUI_DIALOGJOBSETUP_H_ */
+bool CommandRunSetStockObject::Undo(void)
+{
+	if(project == NULL) return false;
+	project->run[runID].stockobject = oldObjID;
+	project->Update();
+	return true;
+}

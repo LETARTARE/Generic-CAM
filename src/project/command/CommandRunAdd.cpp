@@ -42,7 +42,7 @@ CommandRunAdd::CommandRunAdd(const wxString& name, Project* project,
 bool CommandRunAdd::Do(void)
 {
 	if(project == NULL) return false;
-	project->run[ID] = run;
+	project->run[ID] = this->run;
 	project->Update();
 	return true;
 }
@@ -50,7 +50,7 @@ bool CommandRunAdd::Do(void)
 bool CommandRunAdd::Undo(void)
 {
 	if(project == NULL) return false;
-	project->objects.erase(ID);
+	project->run.erase(ID);
 	project->Update();
 	return true;
 }

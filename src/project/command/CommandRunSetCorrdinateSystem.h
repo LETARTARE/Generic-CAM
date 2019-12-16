@@ -31,23 +31,24 @@
 #include <wx/cmdproc.h>
 #include <wx/string.h>
 
-#include "../../3D/AffineTransformMatrix.h"
+#include "../Selection.h"
 
 class Project;
 
 class CommandRunSetCorrdinateSystem:public wxCommand {
 public:
 	CommandRunSetCorrdinateSystem(const wxString& name, Project* project,
-			size_t ID, const AffineTransformMatrix &matrix);
+			size_t runID, size_t axis, const Selection &selection);
 
 	bool Do(void);
 	bool Undo(void);
 
 protected:
 	Project* project;
-	size_t ID;
-	AffineTransformMatrix oldMatrix;
-	AffineTransformMatrix newMatrix;
+	size_t runID;
+	size_t axis;
+	Selection oldSelection;
+	Selection newSelection;
 
 };
 

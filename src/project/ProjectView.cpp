@@ -155,8 +155,10 @@ void ProjectView::Render(void) const
 void ProjectView::RenderPick(void) const
 {
 	if(displayCoordinateSystem){
+		glPushName((unsigned int) Selection::BaseNone);
 		glPushName(0);
 		RenderCoordinateSystem();
+		glPopName();
 		glPopName();
 	}
 	Project* project = wxStaticCast(GetDocument(), Project);

@@ -36,13 +36,13 @@
 #include "DialogObjectTransformation.h"
 
 //#include "../project/generator/ToolpathGeneratorThread.h"
+//#include "../project/command/CommandWorkpieceRename.h"
+//#include "../project/command/CommandWorkpieceDelete.h"
 #include "../project/command/CommandProjectRename.h"
 #include "../project/command/CommandObjectLoad.h"
 #include "../project/command/CommandObjectRemove.h"
 #include "../project/command/CommandObjectRename.h"
 #include "../project/command/CommandObjectTransform.h"
-//#include "../project/command/CommandWorkpieceRename.h"
-//#include "../project/command/CommandWorkpieceDelete.h"
 #include "../project/command/CommandRunAdd.h"
 #include "../project/command/CommandRunRename.h"
 #include "../project/command/CommandRunRemove.h"
@@ -183,6 +183,7 @@ bool FrameMain::TransferDataToWindow(void)
 {
 	// Populate the treeview
 	tree->Update();
+	Selection temp = tree->TreeToSelection();
 
 //	m_menuToolpath->Check(ID_GENERATORAUTOMATIC, project.processToolpath);
 //	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
@@ -196,7 +197,18 @@ bool FrameMain::TransferDataToWindow(void)
 
 //	m_canvas->displayAnimation = dialogAnimation->IsShown();
 
+	if(temp.IsType(Selection::Object)){
+		dialogObjectTransformation->SetSelection(temp);
+	}else{
+		dialogObjectTransformation->SetSelection(Selection());
+	}
+
 	dialogObjectTransformation->TransferDataToWindow();
+	if(temp.IsType(Selection::Run) && temp.Size() >= 1){
+		dialogJobSetup->SetRunID(temp[0]);
+	}else{
+		dialogJobSetup->SetRunID(0);
+	}
 	dialogJobSetup->TransferDataToWindow();
 
 //	dialogToolbox->TransferDataToWindow();
@@ -204,7 +216,7 @@ bool FrameMain::TransferDataToWindow(void)
 //	dialogToolpathGenerator->TransferDataToWindow();
 //	dialogAnimation->TransferDataToWindow();
 
-	Refresh();
+//	Refresh();
 	return true;
 }
 
@@ -263,10 +275,10 @@ void FrameMain::OnProjectRename(wxCommandEvent& event)
 {
 	Project* project = wxStaticCast(GetDocument(), Project);
 	wxTextEntryDialog dialog(this, _("Enter new project name:"),
-			_T("Rename Project"), project->name);
+			_T("Rename Project"), project->GetTitle());
 	if(dialog.ShowModal() == wxID_OK){
 		if(dialog.GetValue().IsEmpty()) return;
-		if(dialog.GetValue() == project->name) return;
+		if(dialog.GetValue() == project->GetTitle()) return;
 
 		CommandProjectRename * command = new CommandProjectRename(
 		_("Project renamed to ") + dialog.GetValue(), project,
@@ -371,16 +383,16 @@ void FrameMain::OnObjectRename(wxCommandEvent& event)
 
 	Selection temp = tree->TreeToSelection();
 	if(!temp.IsType(Selection::Object) || !project->Has(temp)
-			|| !temp.Size() == 1) return;
+			|| temp.Size() != 1) return;
 
 	const size_t ID = temp[0];
 
 	wxTextEntryDialog dialog(this, _("Enter new name:"),
-	_T("Rename Object ") + project->objects[ID].name,
-			project->objects[ID].name);
+	_T("Rename Object ") + project->GetObject(ID).name,
+			project->GetObject(ID).name);
 	if(dialog.ShowModal() == wxID_OK){
 		if(dialog.GetValue().IsEmpty()) return;
-		if(dialog.GetValue() == project->objects[ID].name) return;
+		if(dialog.GetValue() == project->GetObject(ID).name) return;
 		cmdProc->Submit(
 				new CommandObjectRename(
 				_("Object renamed to ") + dialog.GetValue(), project, ID,
@@ -397,8 +409,6 @@ void FrameMain::OnObjectModify(wxRibbonButtonBarEvent& event)
 
 void FrameMain::OnObjectModify(wxCommandEvent& event)
 {
-	Selection temp = tree->TreeToSelection();
-	dialogObjectTransformation->SetSelection(temp);
 	dialogObjectTransformation->Show();
 	dialogObjectTransformation->TransferDataToWindow();
 	dialogObjectTransformation->Raise();
@@ -411,13 +421,13 @@ void FrameMain::OnObjectDelete(wxCommandEvent& event)
 
 	Selection temp = tree->TreeToSelection();
 	if(!temp.IsType(Selection::Object) || !project->Has(temp)
-			|| !temp.Size() == 1) return;
+			|| temp.Size() != 1) return;
 
 	for(std::set <size_t>::iterator it = temp.begin(); it != temp.end(); ++it){
 		cmdProc->Submit(
 				new CommandObjectRemove(
 						_(
-								"Object ") + project->objects[*it].name + _(" deleted."),
+								"Object ") + project->GetObject(*it).name + _(" deleted."),
 						project, *it));
 	}
 	TransferDataToWindow();
@@ -438,9 +448,9 @@ void FrameMain::OnObjectFlipNormals(wxCommandEvent& event)
 
 	for(std::set <size_t>::const_iterator it = temp.begin(); it != temp.end();
 			++it){
-		AffineTransformMatrix matrix = project->objects[*it].matrix;
+		AffineTransformMatrix matrix = project->GetObject(*it).matrix;
 		CommandObjectTransform * command = new CommandObjectTransform(
-				project->objects[*it].name + _(": Flipped normal vectors"),
+				project->GetObject(*it).name + _(": Flipped normal vectors"),
 				project, *it, false, false, false, true, matrix);
 		cmdProc->Submit(command);
 	}
@@ -458,22 +468,22 @@ void FrameMain::OnCAMSetup(wxCommandEvent& event)
 	wxCommandProcessor* cmdProc = project->GetCommandProcessor();
 	Selection temp = tree->TreeToSelection();
 
-	if(temp.IsType(Selection::Run)){
-		if(temp.Size() >= 1) dialogJobSetup->SetRunID(temp[0]);
-	}else{
+	if(!temp.IsType(Selection::Run)){
 		wxString newName = wxString::Format(_T("Run %zu"),
-				project->maxRunID + 1);
+				project->GetMaxRunID() + 1);
 		size_t objID;
 		if(temp.IsType(Selection::Object)){
 			objID = temp[0];
-			newName += _(" - Object: ") + project->objects[objID].name;
+			newName += _(" - Object: ") + project->GetObject(objID).name;
 		}else{
 			objID = 0;
 		}
 		if(cmdProc->Submit(
 				new CommandRunAdd(_("Adding run ") + newName, project, newName,
 						objID))){
-			dialogJobSetup->SetRunID(project->maxRunID);
+//			dialogJobSetup->SetRunID(project->maxRunID);
+			tree->SelectonToTree(
+					Selection(Selection::Run, project->GetMaxRunID()));
 		}
 	}
 
@@ -487,14 +497,15 @@ void FrameMain::OnRunRename(wxCommandEvent& event)
 	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 	Selection temp = tree->TreeToSelection();
 
-	if(!temp.IsType(Selection::Run) || !project->Has(temp) || !temp.Size() == 1) return;
+	if(!temp.IsType(Selection::Run) || !project->Has(temp) || temp.Size() != 1) return;
 	const size_t ID = temp[0];
 
 	wxTextEntryDialog dialog(this, _("Enter new name:"),
-	_T("Rename Run ") + project->run[ID].name, project->run[ID].name);
+	_T("Rename Run ") + project->GetRun(ID).name,
+			project->GetRun(ID).name);
 	if(dialog.ShowModal() == wxID_OK){
 		if(dialog.GetValue().IsEmpty()) return;
-		if(dialog.GetValue() == project->run[ID].name) return;
+		if(dialog.GetValue() == project->GetRun(ID).name) return;
 		cmdProc->Submit(
 				new CommandRunRename(
 				_("Run renamed to ") + dialog.GetValue(), project, ID,
@@ -509,10 +520,10 @@ void FrameMain::OnRunDelete(wxCommandEvent& event)
 	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 
 	Selection temp = tree->TreeToSelection();
-	if(!temp.IsType(Selection::Run) || !project->Has(temp) || !temp.Size() == 1) return;
+	if(!temp.IsType(Selection::Run) || !project->Has(temp) || temp.Size() != 1) return;
 	const size_t ID = temp[0];
 	cmdProc->Submit(
-			new CommandRunRemove(_("Remove run ") + project->run[ID].name,
+			new CommandRunRemove(_("Remove run ") + project->GetRun(ID).name,
 					project, ID));
 	TransferDataToWindow();
 }
@@ -617,6 +628,10 @@ void FrameMain::OnSize(wxSizeEvent& event)
 void FrameMain::RequestSelection(wxFrame* requester, size_t ID,
 		bool multiselect, Selection selection0)
 {
+	std::cout << "--------------------------------\n";
+	std::cout << "FrameMain::RequestSelection(.., " << ID << ", " << multiselect
+			<< ", " << selection0.ToString() << ");\n";
+
 	ProjectView * view = wxStaticCast(GetView(), ProjectView);
 	oldSelection = tree->TreeToSelection();
 	tree->SelectonToTree(Selection());
@@ -626,15 +641,16 @@ void FrameMain::RequestSelection(wxFrame* requester, size_t ID,
 	this->selectRequestMulti = multiselect;
 	this->selectRequests.clear();
 	this->selectRequests.insert(selection0);
-	std::cout << " Request:\n  ";
-	for(std::set <Selection>::iterator sel = selectRequests.begin();
-			sel != selectRequests.end(); ++sel)
-		std::cout << sel->ToString() << "\n";
 }
 
 void FrameMain::RequestSelection(wxFrame* requester, size_t ID,
 		bool multiselect, Selection selection0, Selection selection1)
 {
+	std::cout << "--------------------------------\n";
+	std::cout << "FrameMain::RequestSelection(.., " << ID << ", " << multiselect
+			<< ", " << selection0.ToString() << ", " << selection1.ToString()
+			<< ");\n";
+
 	ProjectView * view = wxStaticCast(GetView(), ProjectView);
 	oldSelection = tree->TreeToSelection();
 	tree->SelectonToTree(Selection());
@@ -645,17 +661,17 @@ void FrameMain::RequestSelection(wxFrame* requester, size_t ID,
 	this->selectRequests.clear();
 	this->selectRequests.insert(selection0);
 	this->selectRequests.insert(selection1);
-	std::cout << " Request:\n  ";
-	for(std::set <Selection>::iterator sel = selectRequests.begin();
-			sel != selectRequests.end(); ++sel)
-		std::cout << sel->ToString() << "\n";
-
 }
 
 void FrameMain::RequestSelection(wxFrame* requester, size_t ID,
 		bool multiselect, Selection selection0, Selection selection1,
 		Selection selection2)
 {
+	std::cout << "--------------------------------\n";
+	std::cout << "FrameMain::RequestSelection(.., " << ID << ", " << multiselect
+			<< ", " << selection0.ToString() << ", " << selection1.ToString()
+			<< ", " << selection2.ToString() << ");\n";
+
 	ProjectView * view = wxStaticCast(GetView(), ProjectView);
 	oldSelection = tree->TreeToSelection();
 	tree->SelectonToTree(Selection());
@@ -667,32 +683,40 @@ void FrameMain::RequestSelection(wxFrame* requester, size_t ID,
 	this->selectRequests.insert(selection0);
 	this->selectRequests.insert(selection1);
 	this->selectRequests.insert(selection2);
-	std::cout << " Request:\n  ";
-	for(std::set <Selection>::iterator sel = selectRequests.begin();
-			sel != selectRequests.end(); ++sel)
-		std::cout << sel->ToString() << "\n";
-
 }
 
-void FrameMain::AnswerSelection(void)
+void FrameMain::AnswerSelection(const Selection &selection)
 {
-	ProjectView * const view = wxStaticCast(GetView(), ProjectView);
-	if(selectRequests.empty()) return;
-	if(selectRequestRequester == NULL) return;
-	std::cout << " Answer:\n  " << view->selection.ToString() << "\n";
-	if(selectRequestRequester == dialogJobSetup){
-		dialogJobSetup->OnSelected(selectRequestID, view->selection);
+	if(selectRequests.empty()){
+		std::cout << "FrameMain::AnswerSelection(" << selection.ToString()
+				<< ") without open requests;\n";
+		return;
 	}
+	if(selectRequestRequester == NULL) return;
+
+	std::cout << "FrameMain::AnswerSelection(" << selection.ToString()
+			<< ");\n";
+
+	if(selectRequestRequester == dialogJobSetup){
+		if(oldSelection.IsType(Selection::Run) && oldSelection.Size() > 0){
+			dialogJobSetup->SetRunID(oldSelection[0]);
+		}
+		dialogJobSetup->OnSelected(selectRequestID, selection);
+	}
+
+	std::cout << "in FrameMain::AnswerSelection -> Reset selection to "
+			<< oldSelection.ToString() << "\n";
+	tree->SelectonToTree(oldSelection);
 	selectRequestRequester = NULL;
 	selectRequests.clear();
-	tree->SelectonToTree(oldSelection);
 	Refresh();
 }
 
 void FrameMain::OnChar(wxKeyEvent& event)
 {
 	if(event.GetKeyCode() == WXK_RETURN && !this->selectRequests.empty()){
-		AnswerSelection();
+		ProjectView * view = wxStaticCast(GetView(), ProjectView);
+		AnswerSelection(view->selection);
 		return;
 	}
 	if(event.GetKeyCode() == WXK_ESCAPE && !this->selectRequests.empty()){
@@ -727,13 +751,15 @@ void FrameMain::On3DMotion(wxMouseEvent& event)
 		result.SortByNear();
 
 		if(view->selection.IsSetEmpty()){
-			view->hover.Add(Selection::BaseObject, (size_t) result.Get(0),
-					(Selection::Type) result.Get(1), (size_t) result.Get(2));
+			view->hover.Add((Selection::BaseType) result.Get(0, 0),
+					(size_t) result.Get(1, 0),
+					(Selection::Type) result.Get(2, 0),
+					(size_t) result.Get(3, 0));
 		}else{
 			for(size_t n = 0; n < result.GetCount(); ++n){
-				size_t object = result.Get(0);
-				Selection::Type type = (Selection::Type) result.Get(1);
-				size_t ID = result.Get(2);
+				size_t object = result.Get(1);
+				Selection::Type type = (Selection::Type) result.Get(2);
+				size_t ID = result.Get(3);
 				if(view->selection.CanAdd(Selection::BaseObject, object, type)){
 					view->hover.Add(Selection::BaseObject, object, type, ID);
 				}
@@ -753,7 +779,7 @@ void FrameMain::On3DSelect(wxMouseEvent& event)
 //		event.Skip();
 //		return;
 //	}
-
+	std::cout << "FrameMain::On3DSelect(...);\n";
 	int x = event.GetX();
 	int y = event.GetY();
 	OpenGLPick result(4096);
@@ -770,16 +796,22 @@ void FrameMain::On3DSelect(wxMouseEvent& event)
 	if(!selectRequests.empty()){
 		bool hitfound = false;
 		for(size_t n = 0; n < result.GetCount(); ++n){
-			Selection temp(Selection::BaseObject, (size_t) result.Get(0, n),
-					(Selection::Type) result.Get(1, n),
-					(size_t) result.Get(2, n));
+
+			Selection temp2((Selection::BaseType) result.Get(0, n),
+					(size_t) result.Get(1, n),
+					(Selection::Type) result.Get(2, n),
+					(size_t) result.Get(3, n));
+
+			if(temp2.IsType(Selection::Axis)) temp2.SetBase(
+					Selection::BaseNone);
+
 			for(std::set <Selection>::iterator it = selectRequests.begin();
 					it != selectRequests.end(); ++it){
 				if(it->IsType(Selection::Object)){
-					temp = Selection(Selection::Object,
-							(size_t) result.Get(0, n));
+					temp2 = Selection((Selection::Type) result.Get(0, n),
+							(size_t) result.Get(1, n));
 				}
-				if(it->CanAdd(temp) && temp.Add(temp)){
+				if(it->CanAdd(temp2) && temp.Add(temp2)){
 					hitfound = true;
 					break;
 				}
@@ -787,14 +819,19 @@ void FrameMain::On3DSelect(wxMouseEvent& event)
 			if(hitfound) break;
 		}
 
+		if(temp.IsType(Selection::Object)){
+			tree->SelectonToTree(temp);
+		}
 		view->selection = temp;
-		if(!event.ShiftDown() && hitfound) AnswerSelection();
+		if(!event.ShiftDown() && hitfound){
+			AnswerSelection(temp);
+		}
 	}else{
 		for(size_t n = 0; n < result.GetCount(); ++n){
-			size_t obj = (size_t) result.Get(0, n);
-			temp.Add(Selection::Object, obj);
+			temp.Add((Selection::Type) result.Get(0, n),
+					(size_t) result.Get(1, n));
 		}
-		dialogObjectTransformation->SetSelection(temp);
+//		dialogObjectTransformation->SetSelection(temp);
 		tree->SelectonToTree(temp);
 	}
 
@@ -806,35 +843,29 @@ void FrameMain::On3DSelect(wxMouseEvent& event)
 
 void FrameMain::OnSelectionChanged(wxTreeEvent& event)
 {
-	wxTreeItemId id = event.GetItem();
-	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
+//	wxTreeItemId id = event.GetItem();
+//	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
 	ProjectView* view = wxStaticCast(GetView(), ProjectView);
 
 	Selection temp = tree->TreeToSelection();
 
+	std::cout << "FrameMain::OnSelectionChanged(...) to " << temp.ToString()
+			<< ";\n";
+
 	bool foundsomething = false;
 	view->selection.Clear();
-	for(std::set <Selection>::iterator sel = selectRequests.begin();
-			sel != selectRequests.end(); ++sel){
-		if(!sel->CanAdd(temp.GetType())) continue;
-		if(!view->selection.Add(temp)) continue;
+
+	for(std::set <Selection>::iterator request = selectRequests.begin();
+			request != selectRequests.end(); ++request){
+		if(!request->CanAdd(temp.GetType())) continue;
+		if(request->IsType(Selection::Object)) view->selection.Add(temp);
 		foundsomething = true;
 		break;
 	}
-	if(foundsomething){
-		AnswerSelection();
-		return;
-	}
 
-	if(temp.IsType(Selection::Object)){
-		dialogObjectTransformation->SetSelection(temp);
-	}else{
-		dialogObjectTransformation->SetSelection(Selection());
-	}
-	if(temp.IsType(Selection::Run) && temp.Size() >= 1){
-		dialogJobSetup->SetRunID(temp[0]);
-	}else{
-		dialogJobSetup->SetRunID(0);
+	if(foundsomething){
+		AnswerSelection(view->selection);
+		return;
 	}
 
 //	switch(data->type){
@@ -858,7 +889,7 @@ void FrameMain::OnSelectionChanged(wxTreeEvent& event)
 //		m_canvas->display = CanvasMain::displayRun;
 //		break;
 //	}
-
+//	std::cout << "X\n";
 	TransferDataToWindow();
 }
 
@@ -1003,7 +1034,7 @@ void FrameMain::OnEndLabelEdit(wxTreeEvent& event)
 	}
 
 	if(data->type == TreeItem::itemProject){
-		if(newName == project->name) return;
+		if(newName == project->GetTitle()) return;
 		cmdProc->Submit(new CommandProjectRename(
 		_("Project renamed to ") + newName, project, newName));
 		return;
@@ -1011,7 +1042,7 @@ void FrameMain::OnEndLabelEdit(wxTreeEvent& event)
 
 	if(data->type == TreeItem::itemObject){
 		if(!project->Has(Selection::Object, data->ID)) return;
-		if(newName == project->objects[data->ID].name) return;
+		if(newName == project->GetObject(data->ID).name) return;
 		cmdProc->Submit(
 				new CommandObjectRename(_("Object renamed to ") + newName,
 						project, data->ID, newName));
@@ -1020,7 +1051,7 @@ void FrameMain::OnEndLabelEdit(wxTreeEvent& event)
 
 	if(data->type == TreeItem::itemRun){
 		if(!project->Has(Selection::Run, data->ID)) return;
-		if(newName == project->run[data->ID].name) return;
+		if(newName == project->GetRun(data->ID).name) return;
 		cmdProc->Submit(
 				new CommandRunRename(_("Run renamed to ") + newName, project,
 						data->ID, newName));
@@ -1057,11 +1088,11 @@ void FrameMain::UpdateSimulation(wxCommandEvent& event)
 ////
 ////	if(dialog.ShowModal() == wxID_OK){
 ////		wxFileName fileName(dialog.GetPath());
-////		if(project->run[selected].machine.Load(fileName)){
+////		if(project->GetRun(selected).machine.Load(fileName)){
 ////			filepaths.lastMachineDirectory = fileName.GetPath();
 ////		}else{
 ////			wxLogError
-////			(project->run[selected].machine.textOut);
+////			(project->GetRun(selected).machine.textOut);
 ////		}
 ////		TransferDataToWindow();
 ////	}
@@ -1072,9 +1103,9 @@ void FrameMain::UpdateSimulation(wxCommandEvent& event)
 ////	Project* project = wxStaticCast(GetDocument(), Project);
 ////	int selected = tree->GetFirstSelectedRun();
 ////	if(selected < 0) return;
-////	if(!project->run[selected].machine.ReLoad()){
+////	if(!project->GetRun(selected).machine.ReLoad()){
 ////		wxLogError
-////		(project->run[selected].machine.textOut);
+////		(project->GetRun(selected).machine.textOut);
 ////	}
 ////	TransferDataToWindow();
 //}

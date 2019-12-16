@@ -113,31 +113,34 @@
 #define ID_SELECTAXISX 1046
 #define ID_SELECTAXISY 1047
 #define ID_SELECTAXISZ 1048
-#define ID_SELECTOBJECTSTOCK 1049
-#define ID_SELECTORIGIN 1050
-#define ID_SELECTAREAOBJECT 1051
-#define ID_MARGINSIDE 1052
-#define ID_MARGINBELOW 1053
-#define ID_CONTROLLERSHOW 1054
-#define ID_VIEWSTEREO3D 1055
-#define ID_AXISX 1056
-#define ID_AXISY 1057
-#define ID_AXISZ 1058
-#define ID_TEXTX 1059
-#define ID_TEXTY 1060
-#define ID_TEXTZ 1061
-#define ID_AXISA 1062
-#define ID_AXISB 1063
-#define ID_AXISC 1064
-#define ID_TEXTA 1065
-#define ID_TEXTB 1066
-#define ID_TEXTC 1067
-#define ID_AXISU 1068
-#define ID_AXISV 1069
-#define ID_AXISW 1070
-#define ID_TEXTU 1071
-#define ID_TEXTV 1072
-#define ID_TEXTW 1073
+#define ID_SETSIZEX 1049
+#define ID_SETSIZEY 1050
+#define ID_SETSIZEZ 1051
+#define ID_SELECTOBJECTSTOCK 1052
+#define ID_SELECTORIGIN 1053
+#define ID_SELECTAREAOBJECT 1054
+#define ID_MARGINSIDE 1055
+#define ID_MARGINBELOW 1056
+#define ID_CONTROLLERSHOW 1057
+#define ID_VIEWSTEREO3D 1058
+#define ID_AXISX 1059
+#define ID_AXISY 1060
+#define ID_AXISZ 1061
+#define ID_TEXTX 1062
+#define ID_TEXTY 1063
+#define ID_TEXTZ 1064
+#define ID_AXISA 1065
+#define ID_AXISB 1066
+#define ID_AXISC 1067
+#define ID_TEXTA 1068
+#define ID_TEXTB 1069
+#define ID_TEXTC 1070
+#define ID_AXISU 1071
+#define ID_AXISV 1072
+#define ID_AXISW 1073
+#define ID_TEXTU 1074
+#define ID_TEXTV 1075
+#define ID_TEXTW 1076
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIFrameMain
@@ -352,7 +355,7 @@ class GUIJobSetup : public wxFrame
 		wxStaticText* m_staticTextUnitBoxX;
 		wxStaticText* m_staticTextBoxY;
 		wxTextCtrl* m_textCtrlBoxY;
-		wxStaticText* m_staticTextunitBoxY;
+		wxStaticText* m_staticTextUnitBoxY;
 		wxStaticText* m_staticTextBoxZ;
 		wxTextCtrl* m_textCtrlBoxZ;
 		wxStaticText* m_staticTextUnitBoxZ;
@@ -368,7 +371,10 @@ class GUIJobSetup : public wxFrame
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;
 		virtual void OnSelect( wxCommandEvent& event ) = 0;
+		virtual void OnChoicebookPageChanged( wxChoicebookEvent& event ) = 0;
+		virtual void OnTextEnter( wxCommandEvent& event ) = 0;
 		virtual void OnGetSizeFromObject( wxCommandEvent& event ) = 0;
+		virtual void OnRadioBox( wxCommandEvent& event ) = 0;
 		
 	
 	public:

@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : DialogJobSetup.h
-// Purpose            : 
-// Thread Safe        : Yes
+// Name               : CommandRunSetStockBox.h
+// Purpose            :
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 28.11.2019
+// Created            : 16.12.2019
 // Copyright          : (C) 2019 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,39 +24,28 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef SRC_GUI_DIALOGJOBSETUP_H_
-#define SRC_GUI_DIALOGJOBSETUP_H_
+#ifndef __COMMANDRUNSETSTOCKBOX_H__
+#define __COMMANDRUNSETSTOCKBOX_H__
 
-/*!\class DialogJobSetup
- * \brief ...
- *
- * ...
- */
+#include <wx/cmdproc.h>
+#include <wx/string.h>
 
-#include "../project/Run.h"
-#include "gui.h"
+#include "../Project.h"
 
-class DialogJobSetup:public GUIJobSetup {
+class CommandRunSetStockBox:public wxCommand {
 public:
-	DialogJobSetup(wxWindow* parent);
-	virtual ~DialogJobSetup();
+	CommandRunSetStockBox(const wxString& name, Project* project, size_t runID,
+			Vector3 size);
 
-	void SetRunID(size_t runID);
+	bool Do(void);
+	bool Undo(void);
 
-	bool TransferDataToWindow(void);
-	bool TransferDataFromWindow(void);
-
-	void OnXClose(wxCloseEvent& event);
-	void OnSelect(wxCommandEvent& event);
-	bool OnSelected(size_t ID, Selection selection);
-	void OnGetSizeFromObject(wxCommandEvent& event);
-	void OnChoicebookPageChanged( wxChoicebookEvent& event);
-	void OnTextEnter(wxCommandEvent& event);
-	void OnRadioBox(wxCommandEvent& event);
-
-private:
+protected:
+	Project* project;
 	size_t runID;
-	Run::StockType oldType;
+	Vector3 newValue;
+	Vector3 oldValue;
 };
 
-#endif /* SRC_GUI_DIALOGJOBSETUP_H_ */
+#endif /* __COMMANDRUNSETSTOCKBOX_H__ */
+
