@@ -28,50 +28,43 @@
 
 #include <GL/gl.h>
 #include <math.h>
+#include <float.h>
+#include <iostream>
 
 Tool::Tool()
 {
 	hasStartValues = false;
 	hasGeometry = false;
-	hasPostProcess = false;
-
-}
-
-void Tool::Clear(void)
-{
-
+	type = flat_end_mill;
+	GRADE = "generic";
 }
 
 Tool::~Tool()
 {
 }
 
-void Tool::GenerateContour(void)
+void Tool::Update(void)
 {
 	contour.clear();
+	ContourElement temp;
+
+	switch(type){
+	case flat_end_mill:
+		temp.Set(0, 0, geometry.DC / 2.0, 0, true);
+		contour.push_back(temp);
+		temp.Set(geometry.DC / 2.0, geometry.LCF, true);
+		contour.push_back(temp);
+		break;
+	default:
+		std::cout << "Tool::GenerateContour - Unsupported tooltype.\n";
+		return;
+		break;
+	}
 
 //	float xPosition = shaftDiameter / 2;
 //	float zPosition = 0.0;
 //
-//	ToolContourElement* temp;
 //
-//	// Cap on top
-//	temp = new ToolContourElement(false, true);
-//	temp->n1.z = -1;
-//	temp->p1.z = -shaftLength;
-//	temp->n2.z = -1;
-//	temp->p2.x = xPosition;
-//	temp->p2.z = -shaftLength;
-//	contour.Add(temp);
-//
-//	// Top part of shaft
-//	temp = new ToolContourElement(false, true);
-//	temp->n1.x = 1;
-//	temp->p1.x = xPosition;
-//	temp->p1.z = -shaftLength;
-//	temp->n2.x = 1;
-//	temp->p2.x = xPosition;
-//	contour.Add(temp);
 //
 //	float d, x, z, r;
 //	for(unsigned int j = 0; j < elements.Count(); j++){
@@ -239,16 +232,15 @@ void Tool::Paint(void) const
 	}
 	for(size_t i = 0; i < contour.size(); i++){
 		::glBegin(GL_QUAD_STRIP);
-		//TODO Note that Z is flipped. this has to be passed into the GenerateContour function.
 		for(size_t j = 0; j <= resolution; j++){
-			::glNormal3f(cc[j] * contour[i].n2.x, ss[j] * contour[i].n2.x,
-					-contour[i].n2.z);
-			::glVertex3f(cc[j] * contour[i].p2.x, ss[j] * contour[i].p2.x,
-					-contour[i].p2.z);
-			::glNormal3f(cc[j] * contour[i].n1.x, ss[j] * contour[i].n1.x,
-					-contour[i].n1.z);
-			::glVertex3f(cc[j] * contour[i].p1.x, ss[j] * contour[i].p1.x,
-					-contour[i].p1.z);
+			::glNormal3f(cc[j] * contour[i].nx, ss[j] * contour[i].nx,
+					contour[i].nz);
+			::glVertex3f(cc[j] * contour[i].x0, ss[j] * contour[i].x0,
+					contour[i].z0);
+			::glNormal3f(cc[j] * contour[i].nx, ss[j] * contour[i].nx,
+					contour[i].nz);
+			::glVertex3f(cc[j] * contour[i].x1, ss[j] * contour[i].x1,
+					contour[i].z1);
 		}
 		::glEnd();
 	}
@@ -256,40 +248,17 @@ void Tool::Paint(void) const
 
 float Tool::GetToolLength(void) const
 {
-//	float maxLength = 0.0;
-//	float zPosition = 0.0;
-//	for(unsigned int i = 0; i < elements.Count(); i++){
-//		zPosition += elements[i].h;
-//		//TODO: Extend this for round elements. Round elements can extend further downwards than the start or endpoint.
-//		if(zPosition > maxLength) maxLength = zPosition;
-//	}
-//	return maxLength;
-}
-
-float Tool::GetNegativeLength(void) const
-{
-//	return shaftLength;
+	return geometry.LB;
 }
 
 float Tool::GetMaxDiameter(void) const
 {
-//	float maxD = shaftDiameter;
-//	for(unsigned int i = 0; i < elements.Count(); i++){
-//		if(elements[i].d > maxD) maxD = elements[i].d;
-//	}
-//	return maxD;
+	return geometry.DC;
 }
 
 float Tool::GetCuttingDepth(void) const
 {
-//	float maxCuttingDepth = 0.0;
-//	float zPosition = 0.0;
-//	for(unsigned int i = elements.Count(); i > 0; i--){
-//		if(!elements[i - 1].cutting && elements[i - 1].h != 0.0) break;
-//		zPosition += elements[i - 1].h;
-//		if(zPosition > maxCuttingDepth) maxCuttingDepth = zPosition;
-//	}
-//	return maxCuttingDepth;
+	return geometry.LCF;
 }
 
 //void Tool::ToStream(wxTextOutputStream & stream)
@@ -366,7 +335,7 @@ Tool::Geometry::Geometry()
 	LB = 0.0;
 	LCF = 0.0;
 	NOF = 0;
-	NT = 0.0; //?
+	NT = 1;
 	OAL = 0.0;
 	RE = 0.0;
 	SFDM = 0.0;
@@ -385,7 +354,7 @@ Tool::PostProcess::PostProcess()
 	breakcontrol = false;
 	diameteroffset = 0;
 	lengthoffset = 0;
-	live = false;
+	live = true;
 	manualtoolchange = false;
 	number = 0;
 	turret = 0;
@@ -393,21 +362,55 @@ Tool::PostProcess::PostProcess()
 
 Tool::StartValues::StartValues()
 {
-	fn = 0.0;
-	fz = 0.0;
-	n = 0.0;
-	nramp = 0.0;
-	vc = 0.0;
-	vf = 0.0;
-	vfleadin = 0.0;
-	vfleadout = 0.0;
-	vfplunge = 0.0;
-	vframp = 0.0;
-	vfretract = 0.0;
+	fn = 1.0;
+	fz = 1.0;
+	n = 1.0;
+	nramp = 1.0;
+	vc = 1.0;
+	vf = 1.0;
+	vfleadin = 1.0;
+	vfleadout = 1.0;
+	vfplunge = 1.0;
+	vframp = 1.0;
+	vfretract = 1.0;
 }
 
-Tool::ContourElement::ContourElement(bool cutting, bool partOfShaft)
+Tool::ContourElement::ContourElement()
 {
+	x0 = 0.0;
+	z0 = 0.0;
+	x1 = 0.0;
+	z1 = 0.0;
+	nx = 1.0;
+	nz = 0.0;
 	isCutting = false;
 	belongsToShaft = false;
+}
+
+void Tool::ContourElement::Set(float x0, float z0, float x1, float z1,
+		bool isCutting, bool belongsToShaft)
+{
+	this->x0 = x0;
+	this->z0 = z0;
+	this->x1 = x1;
+	this->z1 = z1;
+	const float dx = x1 - x0;
+	const float dz = z1 - z0;
+	const float d2 = dx * dx + dz * dz;
+	if(d2 > FLT_EPSILON){
+		const float d = sqrt(d2);
+		this->nx = dz / d;
+		this->nz = -dx / d;
+	}else{
+		this->nx = 1.0;
+		this->nz = 0.0;
+	}
+	this->isCutting = isCutting;
+	this->belongsToShaft = belongsToShaft;
+}
+
+void Tool::ContourElement::Set(float x1, float z1, bool isCutting,
+		bool belongsToShaft)
+{
+	this->Set(this->x1, this->z1, x1, z1, isCutting, belongsToShaft);
 }

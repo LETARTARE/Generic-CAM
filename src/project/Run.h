@@ -67,8 +67,8 @@
 #include <map>
 #include <string>
 
+#include "../3D/BoundingBox.h"
 #include "Selection.h"
-#include "Workpiece.h"
 
 class Project;
 class Run {
@@ -89,11 +89,13 @@ public:
 	Selection coordZ;
 
 	enum StockType {
-		Object, BoxTop, BoxCenter, BoxBottom
+		sObject, BoxTop, BoxCenter, BoxBottom
 	} stocktype;
 	size_t stockobject;
 	Vector3 stocksize;
 	Vector3 stockorigin;
+
+	double slotWidth;
 
 	std::map <size_t, Generator*> generators; ///< List of Generator%s applied to the workpiece in this run
 
@@ -104,17 +106,17 @@ public:
 private:
 	OpenGLImage touchpoint;
 
-
 public:
-	void Update(void);
+	void Update(Project * project);
 
-//	void GenerateToolpaths(void);
+	void GenerateToolpaths(void);
 //	bool SaveToolpaths(wxFileName fileName);
 
 	void Paint(void) const;
 
-//	void ToStream(wxTextOutputStream & stream);
-//	bool FromStream(wxTextInputStream & stream, int runNr, Project * project);
+	void ToStream(wxTextOutputStream & stream) const;
+	bool FromStream(wxTextInputStream & stream, size_t runID,
+			Project * project);
 
 //	void ToolpathToStream(wxTextOutputStream & stream);
 

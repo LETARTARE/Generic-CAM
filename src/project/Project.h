@@ -38,31 +38,32 @@
  * \todo Rewrite to XML load/store for future backwards compatibility.
  */
 
-#include "../Config.h"
-
-#include "Object.h"
-
 #include <wx/filename.h>
 #include <wx/string.h>
 #include <wx/defs.h>
-#include <map>
-
-#include <stddef.h>
 #include <wx/docview.h>
 
-#include "../3D/BoundingBox.h"
-#include "Run.h"
+#include <stddef.h>
+#include <map>
+#include <vector>
+
 #include "Selection.h"
-//
-//#if wxUSE_STD_IOSTREAM
-//typedef wxSTD istream DocumentIstream;
-//typedef wxSTD ostream DocumentOstream;
-//#else // !wxUSE_STD_IOSTREAM
-//typedef wxInputStream DocumentIstream;
-//typedef wxOutputStream DocumentOstream;
-//#endif // wxUSE_STD_IOSTREAM/!wxUSE_STD_IOSTREAM
+#include "Object.h"
+#include "Run.h"
+#include "Tool.h"
+#include "../3D/BoundingBox.h"
+
+
+#if wxUSE_STD_IOSTREAM
+typedef wxSTD istream DocumentIstream;
+typedef wxSTD ostream DocumentOstream;
+#else // !wxUSE_STD_IOSTREAM
+typedef wxInputStream DocumentIstream;
+typedef wxOutputStream DocumentOstream;
+#endif // wxUSE_STD_IOSTREAM/!wxUSE_STD_IOSTREAM
 
 class Project:public wxDocument {
+	friend class ProjectView;
 	friend class CommandProjectRename;
 	friend class CommandObjectLoad;
 	friend class CommandObjectRename;
@@ -76,6 +77,10 @@ class Project:public wxDocument {
 	friend class CommandRunSetStockObject;
 	friend class CommandRunSetStockBox;
 	friend class CommandRunSetStockOrigin;
+	friend class CommandRunGeneratorAdd;
+	friend class CommandRunGeneratorUpdate;
+	friend class CommandRunGeneratorRename;
+	friend class CommandRunGeneratorDelete;
 	friend class CommandRunRemove;
 
 public:
@@ -87,14 +92,12 @@ public:
 //	bool processToolpath;
 //	bool interruptProcessing;
 
-// Granularity
-//	double resX;
-//	double resY;
-	//TODO Make the granularity a parameter.
+// Granularity for Dexel - Simulator
+	double minResolution;
+	size_t maxCells;
 
 	// Methods
 public:
-	void Clear(void);
 	void Update(void);
 
 	bool Has(const Selection &sel) const;
@@ -102,34 +105,39 @@ public:
 
 	bool DoSaveDocument(const wxString& file);
 	bool DoOpenDocument(const wxString& file);
+
 	//TODO Remove the functions below and join them into the functions above
 	bool Load(wxFileName fileName);
 	bool Save(wxFileName fileName);
 
-	bool GenerateToolpaths(void); ///< Direct generation of all toolpaths.
+	bool GenerateToolpaths(void);
 	bool SaveToolpath(wxFileName fileName, int runNr);
-
-	void Paint(const OpenGLMaterial &face, const OpenGLMaterial &edge,
-			const Selection &sel) const;
-	void PaintPick(void) const;
 
 	BoundingBox GetBBox(const Selection & selected) const;
 
 	size_t GetMaxObjectID(void) const;
 	size_t GetMaxRunID(void) const;
+	size_t GetMaxGeneratorID(void) const;
+	size_t GetToolCount(void) const;
 
 	std::set <size_t> GetAllObjectIDs(void) const;
-	const Object & GetObject(size_t ID) const;
-
 	std::set <size_t> GetAllRunIDs(void) const;
-	const Run & GetRun(size_t ID) const;
+	std::set <size_t> GetAllGeneratorIDs(size_t runID) const;
 
+	const Object & GetObject(size_t ID) const;
+	const Run & GetRun(size_t ID) const;
+	const Generator * GetGenerator(size_t runID, size_t ID);
+	const std::vector <Tool> * GetTools(void) const;
+	const std::map <size_t, Object> * GetObjects(void) const;
+	const Tool & GetTool(size_t index) const;
 private:
 
-	std::map <size_t, Object> objects; //!< Loaded objects
+	std::map <size_t, Object> objects;
 	size_t maxObjectID;
-	std::map <size_t, Run> run; //!< Loaded objects
+	std::map <size_t, Run> run;
 	size_t maxRunID;
+	size_t maxGeneratorID;
+	std::vector <Tool> tools;
 
 #if(_GENERICCAM_USEMULTITHREADING == 1)
 	wxMutex mtx_project;

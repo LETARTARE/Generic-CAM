@@ -232,6 +232,7 @@ bool Object::ReloadObject(void)
 		}
 		if(!temp.error.IsEmpty()) wxLogMessage
 		(temp.error);
+//		geometry.paintNormals = true;
 		return true;
 	}
 
@@ -268,42 +269,33 @@ bool Object::ReloadObject(void)
 		geometry.CalcNormals();
 		geometry.CalcGroups();
 		geometry.ApplyTransformation();
+
+//		geometry.paintNormals = true;
+
 		return true;
 	}
 	return false;
 }
 
-void Object::ToStream(wxTextOutputStream& stream, size_t n)
+void Object::ToStream(wxTextOutputStream& stream, size_t objID) const
 {
 	stream << _T("Name:") << endl;
 	stream << name << endl;
+	stream << _T("Filename:") << endl;
+	stream << wxString::Format(_T("object_%zu.obj"), objID) << endl;
 	stream << _T("Matrix: ");
 	matrix.ToStream(stream);
-	stream << endl;
-	stream << _T("DisplayMatrix: ");
 	stream << endl;
 	stream << _T("Show: ");
 	stream << ((show)? 1 : 0);
 	stream << endl;
-	stream << _T("Geometries: ");
-	stream << wxString::Format(_T("%zu"), 1);
-	stream << endl;
-
-	stream << _T("Geometry: ");
-	stream << wxString::Format(_T("%zu"), 0);
-	stream << endl;
-	stream << _T("Name:") << endl;
-	stream << this->name << endl;
-	stream << _T("Filename:") << endl;
-	stream << wxString::Format(_T("object_%zu_geometry_%zu.stl"), n, 0) << endl;
-	stream << _T("Matrix: ");
-	geometry.matrix.ToStream(stream);
+	stream << _T("Selectable: ");
+	stream << ((selectable)? 1 : 0);
 	stream << endl;
 //	stream << _T("Color: ");
 //	stream << geometry.color.x << _T(" ");
 //	stream << geometry.color.y << _T(" ");
 //	stream << geometry.color.z << endl;
-
 }
 
 bool Object::FromStream(wxTextInputStream& stream)
@@ -312,32 +304,20 @@ bool Object::FromStream(wxTextInputStream& stream)
 	temp = stream.ReadLine();
 	if(temp.Cmp(_T("Name:")) != 0) return false;
 	name = stream.ReadLine();
-	temp = stream.ReadWord();
-	if(temp.Cmp(_T("Matrix:")) != 0) return false;
-	matrix.FromStream(stream);
-	temp = stream.ReadWord();
-	if(temp.Cmp(_T("DisplayMatrix:")) != 0) return false;
-	temp = stream.ReadWord();
-	if(temp.Cmp(_T("Show:")) != 0) return false;
-	show = (stream.Read8() == 1);
-	temp = stream.ReadWord();
-	if(temp.Cmp(_T("Geometries:")) != 0) return false;
-	const size_t N = stream.Read32();
-
-	temp = stream.ReadWord();
-	if(temp.Cmp(_T("Geometry:")) != 0) return false;
-	if(0 != stream.Read32()) return false;
-	temp = stream.ReadLine();
-	if(temp.Cmp(_T("Name:")) != 0) return false;
-	this->name = stream.ReadLine();
 	temp = stream.ReadLine();
 	if(temp.Cmp(_T("Filename:")) != 0) return false;
 	temp = stream.ReadLine();
 	temp = stream.ReadWord();
 	if(temp.Cmp(_T("Matrix:")) != 0) return false;
-	geometry.matrix.FromStream(stream);
+	matrix.FromStream(stream);
 	temp = stream.ReadWord();
-//	if(temp.Cmp(_T("Color:")) != 0) return false;
+	if(temp.Cmp(_T("Show:")) != 0) return false;
+	show = (stream.Read8() == 1);
+	temp = stream.ReadWord();
+	if(temp.Cmp(_T("Selectable:")) != 0) return false;
+	show = (stream.Read8() == 1);
+
+	//	if(temp.Cmp(_T("Color:")) != 0) return false;
 //	geometry.color.x = stream.ReadDouble();
 //	geometry.color.y = stream.ReadDouble();
 //	geometry.color.z = stream.ReadDouble();

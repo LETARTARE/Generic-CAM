@@ -228,7 +228,7 @@ public:
 
 	wxString ToString(); //!< Generate a string containing the matrix.
 	void FromString(wxString const& string); //!< Setup the matrix from a string.
-	void ToStream(wxTextOutputStream & stream);
+	void ToStream(wxTextOutputStream & stream) const;
 	void FromStream(wxTextInputStream & stream);
 
 	void GLMultMatrix(void) const; //!< Multiply the matrix onto the active OpenGL matrix (right multiply)

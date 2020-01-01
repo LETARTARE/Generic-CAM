@@ -31,7 +31,7 @@
  * \brief Definition of a tool
  *
  *
- *  Various Stuff:
+ *  Stuff:
  *
  *	SFM = Surface Feet per Minute = edge speed of the tool
  *	450 - 650 for HSS cutters
@@ -58,24 +58,24 @@ public:
 	class Geometry {
 	public:
 		Geometry();
-		bool CSP;
-		double DC;
-		bool HAND;
-		double LB;
-		double LCF;
-		size_t NOF;
-		double NT; //?
-		double OAL;
-		double RE;
-		double SFDM;
-		double SIG;
-		double TA;
-		double TP;
-		double shoulderlength;
+		bool CSP; ///< Coolant supply property
+		double DC; ///< Cutting diameter
+		bool HAND; ///< Hand
+		double LB; ///< Body length: Length of tool from tip to chuck.
+		double LCF; ///< Chip flute length: Length that is cutting measured from the tip.
+		size_t NOF; ///< Number of flutes
+		size_t NT; ///< Tooth count
+		double OAL; ///< Overall length
+		double RE; ///< Corner radius
+		double SFDM; ///< Shaft diameter
+		double SIG; ///< Point angle
+		double TA; ///< Taper angle
+		double TP; ///< Thread pitch
+		double shoulderlength; ///< Shoulder length: Length from tip to point, where the tool widens to the shaft diameter. Otherwise same as overall length.
 		double threadprofileangle;
-		double tipdiameter;
-		double tiplength;
-		double tipoffset;
+		double tipdiameter; ///< Tip diameter
+		double tiplength; ///< Tip length
+		double tipoffset; ///< Tip offset
 	};
 	class PostProcess {
 	public:
@@ -93,17 +93,17 @@ public:
 	class StartValues {
 	public:
 		StartValues();
-		double fn;
-		double fz;
-		double n;
-		double nramp;
-		double vc;
-		double vf;
-		double vfleadin;
-		double vfleadout;
-		double vfplunge;
-		double vframp;
-		double vfretract;
+		double fn; ///<
+		double fz; ///< Feed per tooth [m]
+		double n; ///< max. Spindle speed [1/s]
+		double nramp; ///< Ramp spindle speed [1/s]
+		double vc; ///< Cutting feedrate [m/s]
+		double vf; ///<
+		double vfleadin; ///< Lead-in feedrate [m/s]
+		double vfleadout; ///< Lead-out feedrate [m/s]
+		double vfplunge; ///< Plunge feedrate [m/s]
+		double vframp; ///< Rampe feedrate [m/s]
+		double vfretract; ///< Retraction feedrate [m/s]
 	};
 
 //	friend class DexelTarget;
@@ -115,33 +115,39 @@ public:
 	virtual ~Tool();
 
 	std::string description;
-	std::string guid;
+	std::string guid; ///< UID to find the tool when it is copied around.
 	std::string productid;
-	std::string type;
+	enum ToolType {
+		flat_end_mill, radius_mill, camfer_mill, bull_nose_end_mill
+	} type; ///< Type of the cutting part of the tool.
 	std::string vendor;
-	std::string unit;
-	std::string BMC;
+	std::string unit; ///< Unit when writing or reading from file. Internalls everything is stored as SI-base-units. Values: "millimeters", "inches"
+	std::string BMC; ///< Material of tool ("carbide", "HSS")
 	std::string GRADE;
 	std::string productlink;
 
 	bool hasGeometry;
 	Geometry geometry;
-	bool hasPostProcess;
-	PostProcess postprocess;
 	bool hasStartValues;
 	StartValues startvalues;
 
-	std::vector <Segment> segments;
+	PostProcess postprocess;
 
-private:
+	std::vector <Segment> segments;
 
 	class ContourElement {
 	public:
-		ContourElement(bool cutting = false, bool partOfShaft = false);
-		Vector3 p1;
-		Vector3 p2;
-		Vector3 n1;
-		Vector3 n2;
+		ContourElement();
+		void Set(float x0, float z0, float x1, float z1, bool isCutting = false,
+				bool belongsToShaft = false);
+		void Set(float x1, float z1, bool isCutting = false,
+				bool belongsToShaft = false);
+		float x0;
+		float z0;
+		float x1;
+		float z1;
+		float nx;
+		float nz;
 		bool isCutting;
 		bool belongsToShaft;
 	};
@@ -149,14 +155,11 @@ private:
 
 	// Methods
 public:
-	void Clear(void);
+	void Update(void);
 
 	float GetToolLength(void) const; ///< Total length of the tool outside the chuck. (Distance between Controlled-Point and Gauge-Point).
-	float GetNegativeLength(void) const; ///< Length of the part, that disappears in the chuck.
 	float GetMaxDiameter(void) const; ///< Maximum diameter of the tool.
 	float GetCuttingDepth(void) const; ///< Length measured from the tip of the tool, that can cut.
-
-	void GenerateContour(void);
 
 //	void ToStream(wxTextOutputStream & stream);
 //	bool FromStream(wxTextInputStream & stream);

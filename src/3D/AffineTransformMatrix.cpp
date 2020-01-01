@@ -899,7 +899,7 @@ void AffineTransformMatrix::FromString(wxString const& string)
 	PutMatrixTogether();
 }
 
-void AffineTransformMatrix::ToStream(wxTextOutputStream& stream)
+void AffineTransformMatrix::ToStream(wxTextOutputStream& stream)const
 {
 	for(uint_fast8_t n = 0; n < 16; n++){
 		if(n > 0) stream << _T(" ");

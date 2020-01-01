@@ -31,6 +31,7 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <stdexcept>
 
 #include "Geometry.h"
@@ -358,65 +359,74 @@ bool Hull::IsEmpty(void) const
 
 bool Hull::LoadObj(std::string filename)
 {
+	std::ifstream in(filename.c_str(), std::ifstream::in | std::ios::binary);
+	if(!in.good()){
+		return false;
+	}
+	in >> *this;
+	return true;
+}
+
+std::istream& operator>>(std::istream &in, Hull &hull)
+{
 	// The state machine to parse the input stream of a Wavefront .obj file:
 
-	//	digraph{ rankdir=LR
-	//	0 -> 0 [label="\\r \\n \\s"]
-	//
-	//	0 -> 1 [label="g m o s u #"]
-	//	1 -> 1
-	//	1 -> 0 [label="\\r \\n"]
-	//
-	//	0 -> 2 [label="v"]
-	//	2 -> 3 [label="t n"]
-	//
-	//	{2,3} -> 4 -> 4[label="\\s"]
-	//
-	//	{2,3,4} -> 5 [label="+ -"]
-	//	{2,3,4,5} -> 6 -> 6[label="0-9"]
-	//
-	//	{2,3,4,5,6} -> 7 [label=", ."]
-	//
-	//	7 -> 8 -> 8[label="0-9"]
-	//
-	//	{6,7,8} -> 4 [label="\\s"]
-	//	{4,6,7,8} -> 0 [label="\\r \\n"]
-	//
-	//
-	//	0 -> 9 [label="f"]
-	//	9 -> 10 -> 10 [label="\\s"]
-	//
-	//	{9,10,12,16} -> 11 -> 11 [label="0-9"]
-	//
-	//	11 -> 12 -> 12 [label="\\s"]
-	//	{11,12} -> 13 [label="/"]
-	//	13 -> 14 -> 14 [label="\\s"]
-	//
-	//	{13,14} -> 15 -> 15 [label="0-9"]
-	//
-	//	15 -> 16 -> 16 [label="\\s"]
-	//	{13,14,15,16} -> 17 [label="/"]
-	//	17 -> 18 -> 18 [label="\\s"]
-	//
-	//	{17,18} -> 19 -> 19 [label="0-9"]
-	//
-	//	19 -> 10 [label="\\s"]
-	//	{10,11,12,15,16,19} -> 0 [label="\\r \\n"]
-	//	}
+//		digraph{ rankdir=LR
+//			0 -> 0 [label="\\r \\n \\s"]
+//
+//			0 -> 1 [label="g m o s u #"]
+//			1 -> 1
+//			1 -> 0 [label="\\r \\n"]
+//
+//			0 -> 2 [label="v"]
+//			2 -> 3 [label="t n"]
+//
+//			{2,3} -> 4 -> 4[label="\\s"]
+//
+//			{2,3,4} -> 5 [label="+ -"]
+//			{2,3,4,5} -> 6 -> 6[label="0-9"]
+//
+//			{2,3,4,5,6} -> 7 [label=", ."]
+//
+//			7 -> 8 -> 8[label="0-9"]
+//
+//			{6,7,8} -> 9 [label="e E"]
+//			9 -> 10 [label="+ -"]
+//			{9,10} -> {10} [label="0-9"]
+//
+//			{6,7,8,9,10} -> 4 [label="\\s"]
+//			{4,6,7,8,10} -> 0 [label="\\r \\n"]
+//
+//
+//			0 -> 11 [label="f"]
+//			11 -> 12 -> 12 [label="\\s"]
+//
+//			{11,12,14,18} -> 13 -> 13 [label="0-9"]
+//
+//			13 -> 14 -> 14 [label="\\s"]
+//			{13,14} -> 15 [label="/"]
+//			15 -> 16 -> 16 [label="\\s"]
+//
+//			{15,16} -> 17 -> 17 [label="0-9"]
+//
+//			17 -> 18 -> 18 [label="\\s"]
+//			{15,16,17,18} -> 19 [label="/"]
+//			19 -> 20 -> 20 [label="\\s"]
+//
+//			{19,20} -> 21 -> 21 [label="0-9"]
+//
+//			21 -> 12 [label="\\s"]
+//			{12,13,14,17,18,21} -> 0 [label="\\r \\n"]
+//			}
 
 	const size_t buffersize = 1048576;
 
 	char *buffer = new char[buffersize];
-	if(buffer == NULL) return false;
+	if(buffer == NULL) throw(std::runtime_error(
+			"operator>>(std::istream &in, Hull &hull) - Out of memory."));
 	size_t charsread;
-	std::ifstream in(filename.c_str(), std::ifstream::in | std::ios::binary);
 
-	if(!in.good()){
-		delete[] buffer;
-		return false;
-	}
-
-	this->Clear();
+	hull.Clear();
 
 	int_fast8_t state = 0;
 	char command = 0;
@@ -429,6 +439,8 @@ bool Hull::LoadObj(std::string filename)
 	int tempindex;
 	double factor = 1.0;
 	bool negative = false;
+	bool exponentnegative = false;
+	int exponent = 0;
 	do{
 		in.read(buffer, buffersize);
 		charsread = in.gcount();
@@ -445,7 +457,7 @@ bool Hull::LoadObj(std::string filename)
 				if(c == 'g' || c == 'm' || c == 'o' || c == 's' || c == 'u'
 						|| c == '#') nextstate = 1;
 				if(c == 'v') nextstate = 2;
-				if(c == 'f') nextstate = 9;
+				if(c == 'f') nextstate = 11;
 				break;
 			case 1:
 				if(c == '\r' || c == '\n')
@@ -481,74 +493,88 @@ bool Hull::LoadObj(std::string filename)
 			case 6:
 				if(c >= '0' && c <= '9') nextstate = 6;
 				if(c == ',' || c == '.') nextstate = 7;
+				if(c == 'e' || c == 'E') nextstate = 9;
 				if(c == ' ' || c == '\t') nextstate = 4;
 				if(c == '\r' || c == '\n') nextstate = 0;
 				break;
 			case 7:
 				if(c >= '0' && c <= '9') nextstate = 8;
+				if(c == 'e' || c == 'E') nextstate = 9;
 				if(c == ' ' || c == '\t') nextstate = 4;
 				if(c == '\r' || c == '\n') nextstate = 0;
 				break;
 			case 8:
 				if(c >= '0' && c <= '9') nextstate = 8;
+				if(c == 'e' || c == 'E') nextstate = 9;
 				if(c == ' ' || c == '\t') nextstate = 4;
 				if(c == '\r' || c == '\n') nextstate = 0;
 				break;
 			case 9:
-				if(c == ' ' || c == '\t') nextstate = 10;
-				if(c >= '0' && c <= '9') nextstate = 11;
+				if(c == ' ' || c == '\t') nextstate = 4;
+				if(c == '\r' || c == '\n') nextstate = 0;
+				if(c == '+' || c == '-') nextstate = 10;
+				if(c >= '0' && c <= '9') nextstate = 10;
 				break;
 			case 10:
-				if(c == ' ' || c == '\t') nextstate = 10;
+				if(c >= '0' && c <= '9') nextstate = 10;
+				if(c == ' ' || c == '\t') nextstate = 4;
 				if(c == '\r' || c == '\n') nextstate = 0;
-				if(c >= '0' && c <= '9') nextstate = 11;
 				break;
 			case 11:
 				if(c == ' ' || c == '\t') nextstate = 12;
-				if(c == '\r' || c == '\n') nextstate = 0;
-				if(c >= '0' && c <= '9') nextstate = 11;
-				if(c == '/') nextstate = 13;
+				if(c >= '0' && c <= '9') nextstate = 13;
 				break;
 			case 12:
 				if(c == ' ' || c == '\t') nextstate = 12;
 				if(c == '\r' || c == '\n') nextstate = 0;
-				if(c >= '0' && c <= '9') nextstate = 11;
-				if(c == '/') nextstate = 13;
+				if(c >= '0' && c <= '9') nextstate = 13;
 				break;
 			case 13:
 				if(c == ' ' || c == '\t') nextstate = 14;
-				if(c >= '0' && c <= '9') nextstate = 15;
-				if(c == '/') nextstate = 17;
+				if(c == '\r' || c == '\n') nextstate = 0;
+				if(c >= '0' && c <= '9') nextstate = 13;
+				if(c == '/') nextstate = 15;
 				break;
 			case 14:
 				if(c == ' ' || c == '\t') nextstate = 14;
-				if(c >= '0' && c <= '9') nextstate = 15;
-				if(c == '/') nextstate = 17;
+				if(c == '\r' || c == '\n') nextstate = 0;
+				if(c >= '0' && c <= '9') nextstate = 13;
+				if(c == '/') nextstate = 15;
 				break;
 			case 15:
 				if(c == ' ' || c == '\t') nextstate = 16;
-				if(c == '\r' || c == '\n') nextstate = 0;
-				if(c >= '0' && c <= '9') nextstate = 15;
-				if(c == '/') nextstate = 17;
+				if(c >= '0' && c <= '9') nextstate = 17;
+				if(c == '/') nextstate = 19;
 				break;
 			case 16:
 				if(c == ' ' || c == '\t') nextstate = 16;
-				if(c == '\r' || c == '\n') nextstate = 0;
-				if(c >= '0' && c <= '9') nextstate = 11;
-				if(c == '/') nextstate = 17;
+				if(c >= '0' && c <= '9') nextstate = 17;
+				if(c == '/') nextstate = 19;
 				break;
 			case 17:
 				if(c == ' ' || c == '\t') nextstate = 18;
-				if(c >= '0' && c <= '9') nextstate = 19;
+				if(c == '\r' || c == '\n') nextstate = 0;
+				if(c >= '0' && c <= '9') nextstate = 17;
+				if(c == '/') nextstate = 19;
 				break;
 			case 18:
 				if(c == ' ' || c == '\t') nextstate = 18;
-				if(c >= '0' && c <= '9') nextstate = 19;
+				if(c == '\r' || c == '\n') nextstate = 0;
+				if(c >= '0' && c <= '9') nextstate = 13;
+				if(c == '/') nextstate = 19;
 				break;
 			case 19:
-				if(c == ' ' || c == '\t') nextstate = 10;
+				if(c == ' ' || c == '\t') nextstate = 20;
+				if(c >= '0' && c <= '9') nextstate = 21;
+				break;
+			case 20:
+				if(c == ' ' || c == '\t') nextstate = 20;
+				if(c >= '0' && c <= '9') nextstate = 21;
+				break;
+			case 21:
+				if(c == ' ' || c == '\t') nextstate = 12;
 				if(c == '\r' || c == '\n') nextstate = 0;
-				if(c >= '0' && c <= '9') nextstate = 19;
+				if(c >= '0' && c <= '9') nextstate = 21;
 				break;
 			default:
 				delete[] buffer;
@@ -561,7 +587,11 @@ bool Hull::LoadObj(std::string filename)
 				// Normally at every node in the graph there should be a next node, if the
 				// fileformat is valid.
 				delete[] buffer;
-				return false;
+				std::ostringstream temp;
+				temp
+						<< "operator>>(std::istream &in, Hull &hull) - Error in file @ ";
+				temp << n << " (" << charsread << ")";
+				throw(std::runtime_error(temp.str()));
 			}
 
 			// Actions associated with the state changes
@@ -570,65 +600,81 @@ bool Hull::LoadObj(std::string filename)
 				tempvalue = 0.0;
 				factor = 1.0;
 				negative = false;
+				exponent = 0;
+				exponentnegative = false;
 			}
 			if(state == 2 && nextstate == 3) command = c;
 			if(nextstate == 5) negative = (c == '-');
 			if(nextstate == 6 || nextstate == 8) tempvalue = tempvalue * 10
 					+ (double) (c - '0');
 			if(nextstate == 8) factor /= 10;
-			if((nextstate == 4 || nextstate == 0) && state >= 6 && state <= 8){
-				value.push_back((negative? -tempvalue : tempvalue) * factor);
+			if(nextstate == 10){
+				if(state == 9) exponentnegative = (c == '-');
+				if(c >= '0' && c <= '9'){
+					if(state == 10) exponent *= 10;
+					exponent += (int) (c - '0');
+				}
+			}
+			if((nextstate == 4 || nextstate == 0) && state >= 6 && state <= 10){
+				double val = (negative? -tempvalue : tempvalue) * factor;
+				if(exponent != 0){
+					val *= exp10(
+							(double) (exponentnegative? -exponent : exponent));
+				}
+				value.push_back(val);
 				tempvalue = 0.0;
 				factor = 1.0;
 				negative = false;
+				exponent = 0;
+				exponentnegative = false;
 			}
-			if(nextstate == 0 && state >= 4 && state <= 8){
+			if(nextstate == 0 && state >= 4 && state <= 10){
 				const double x = (value.size() > 0)? value[0] : 0.0;
 				const double y = (value.size() > 1)? value[1] : 0.0;
 				const double z = (value.size() > 2)? value[2] : 0.0;
-				if(command == 'v') v.push_back(Vector3(x, y, z));
+				if(command == 'v') hull.v.push_back(Vector3(x, y, z));
 				if(command == 'n') tempnormals.push_back(Vector3(x, y, z));
 				// Ignore 't' for now. Texturecoordinates are not interpreted yet.
 				value.clear();
 			}
 
-			if(state == 0 && nextstate == 9){
+			if(state == 0 && nextstate == 11){
 				command = 'f';
 				tempindex = 0;
 			}
-			if(nextstate == 11 || nextstate == 15 || nextstate == 19) tempindex =
+			if(nextstate == 13 || nextstate == 17 || nextstate == 21) tempindex =
 					tempindex * 10 + (int) (c - '0');
-			if(state == 11 && nextstate != 11){
+			if(state == 13 && nextstate != 13){
 				index_v.push_back(tempindex - 1);
 				tempindex = 0;
 			}
-			if(state == 15 && nextstate != 15){
+			if(state == 17 && nextstate != 17){
 				index_t.push_back(tempindex - 1);
 				tempindex = 0;
 			}
-			if(state == 19 && nextstate != 19){
+			if(state == 21 && nextstate != 21){
 				index_n.push_back(tempindex - 1);
 				tempindex = 0;
 			}
-			if(state >= 9 && nextstate == 0){
+			if(state >= 11 && nextstate == 0){
 
 				if(index_v.size() >= 3){
 					Hull::Triangle tempt;
 					tempt.va = index_v[0];
 					tempt.vb = index_v[1];
 					tempt.vc = index_v[2];
-					tempt.ea = FindEdge(tempt.va, tempt.vb);
-					tempt.eb = FindEdge(tempt.vb, tempt.vc);
-					tempt.ec = FindEdge(tempt.vc, tempt.va);
+					tempt.ea = hull.FindEdge(tempt.va, tempt.vb);
+					tempt.eb = hull.FindEdge(tempt.vb, tempt.vc);
+					tempt.ec = hull.FindEdge(tempt.vc, tempt.va);
 					tempt.n = tempnormals[index_n[0]];
 
-					size_t tindex = t.size();
-					t.push_back(tempt);
-					if(!e[tempt.ea].AttachTriangle(tindex)) openedges.erase(
+					size_t tindex = hull.t.size();
+					hull.t.push_back(tempt);
+					if(!hull.e[tempt.ea].AttachTriangle(tindex)) hull.openedges.erase(
 							tempt.ea);
-					if(!e[tempt.eb].AttachTriangle(tindex)) openedges.erase(
+					if(!hull.e[tempt.eb].AttachTriangle(tindex)) hull.openedges.erase(
 							tempt.eb);
-					if(!e[tempt.ec].AttachTriangle(tindex)) openedges.erase(
+					if(!hull.e[tempt.ec].AttachTriangle(tindex)) hull.openedges.erase(
 							tempt.ec);
 				}
 				index_v.clear();
@@ -642,34 +688,42 @@ bool Hull::LoadObj(std::string filename)
 	delete[] buffer;
 
 	// Calculate missing normals
-	vn.assign(v.size(), Vector3(0, 0, 0));
-	for(size_t i = 0; i < e.size(); ++i){
-		if(e[i].trianglecount == 0) continue;
-		Vector3 temp = t[e[i].ta].n;
-		if(e[i].trianglecount > 1) temp += t[e[i].tb].n;
+	hull.vn.assign(hull.v.size(), Vector3(0, 0, 0));
+	for(size_t i = 0; i < hull.e.size(); ++i){
+		if(hull.e[i].trianglecount == 0) continue;
+		Vector3 temp = hull.t[hull.e[i].ta].n;
+		if(hull.e[i].trianglecount > 1) temp += hull.t[hull.e[i].tb].n;
 		temp.Normalize();
-		e[i].n = temp;
-		vn[e[i].va] += temp;
-		vn[e[i].vb] += temp;
+		hull.e[i].n = temp;
+		hull.vn[hull.e[i].va] += temp;
+		hull.vn[hull.e[i].vb] += temp;
 	}
-	for(size_t i = 0; i < vn.size(); ++i)
-		vn[i].Normalize();
+	for(size_t i = 0; i < hull.vn.size(); ++i)
+		hull.vn[i].Normalize();
 
-	return true;
+	return in;
 }
 
 void Hull::SaveObj(std::string filename) const
 {
 	std::ofstream out(filename.c_str(), std::ofstream::out);
-	for(size_t i = 0; i < v.size(); ++i)
-		out << "v " << v[i].x << " " << v[i].y << " " << v[i].z << "\n";
-	for(size_t i = 0; i < vn.size(); ++i)
-		out << "vn " << vn[i].x << " " << vn[i].y << " " << vn[i].z << "\n";
+	out << *this;
+}
+
+std::ostream& operator<<(std::ostream &out, const Hull &hull)
+{
+	for(size_t i = 0; i < hull.v.size(); ++i)
+		out << "v " << hull.v[i].x << " " << hull.v[i].y << " " << hull.v[i].z
+				<< "\n";
+	for(size_t i = 0; i < hull.vn.size(); ++i)
+		out << "vn " << hull.vn[i].x << " " << hull.vn[i].y << " "
+				<< hull.vn[i].z << "\n";
 	out << "s off\n";
-	for(size_t i = 0; i < t.size(); ++i)
-		out << "f " << t[i].va + 1 << "//" << t[i].va + 1 << " " << t[i].vb + 1
-				<< "//" << t[i].vb + 1 << " " << t[i].vc + 1 << "//"
-				<< t[i].vc + 1 << "\n";
+	for(size_t i = 0; i < hull.t.size(); ++i)
+		out << "f " << hull.t[i].va + 1 << "//" << hull.t[i].va + 1 << " "
+				<< hull.t[i].vb + 1 << "//" << hull.t[i].vb + 1 << " "
+				<< hull.t[i].vc + 1 << "//" << hull.t[i].vc + 1 << "\n";
+	return out;
 }
 
 void Hull::ApplyTransformation(const AffineTransformMatrix &matrix)

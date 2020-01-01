@@ -129,7 +129,9 @@ public:
 	void AddTrianglesFrom(const Geometry &geometry);
 
 	bool LoadObj(std::string filename); //!< Load Wavefront OBJ file.
+	friend std::istream& operator>> (std::istream &in, Hull &hull);
 	void SaveObj(std::string filename) const; //!< Write Wavefront OBJ file.
+	friend std::ostream& operator<<(std::ostream &out, const Hull &hull);
 
 	size_t AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c);
 	size_t AddTriangleTransform(const Vector3 &a, const Vector3 &b,
@@ -153,9 +155,26 @@ public:
 	{
 		return v.size();
 	}
-	Vector3 GetVertex(const size_t i) const
+	const Vector3 & GetVertex(const size_t index) const
 	{
-		return v[i];
+		return v[index];
+	}
+	size_t GetTriangleCount(void) const
+	{
+		return t.size();
+	}
+	const Hull::Triangle & GetTriangle(const size_t index) const
+	{
+		return t[index];
+	}
+	bool GetTriangle(const size_t index, Vector3 & a, Vector3 & b,
+			Vector3 & c) const
+	{
+		if(index >= t.size()) return false;
+		a = v[t[index].va];
+		b = v[t[index].vb];
+		c = v[t[index].vc];
+		return true;
 	}
 
 private:

@@ -30,11 +30,12 @@
 
 #include "../3D/FileSTL.h"
 #include "../gui/IDs.h"
+#include "../Config.h"
 
 #include <wx/zipstrm.h>
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
-
+#include <sstream>
 #include <GL/gl.h>
 #include <math.h>
 #include <float.h>
@@ -45,21 +46,33 @@ IMPLEMENT_DYNAMIC_CLASS(Project, wxDocument)
 Project::Project() :
 		wxDocument()
 {
-	Clear();
+	minResolution = 0.5e-3; // = 0.5 mm
+	maxCells = 1e5;
+
 	SetTitle(_("Untitled"));
 	maxObjectID = 0;
 	maxRunID = 0;
+	maxGeneratorID = 0;
+
+	Tool temp;
+	temp.guid = "#1";
+	temp.BMC = "carbide";
+	temp.GRADE = "Generic Mill";
+	temp.type = Tool::flat_end_mill;
+	temp.geometry.DC = 6e-3;
+	temp.geometry.LCF = 40e-3;
+	temp.geometry.LB = 60e-3;
+	temp.unit = "mm";
+	temp.description = "Cylindric endmill - 6 mm";
+	temp.vendor = "Someplace in China";
+	temp.postprocess.number = 1;
+	tools.push_back(temp);
+
 }
 
 Project::~Project()
 {
 	printf("Project::Destructor\n");
-}
-
-void Project::Clear(void)
-{
-	objects.clear();
-	run.clear();
 }
 
 bool Project::Has(const Selection& sel) const
@@ -84,6 +97,24 @@ bool Project::Has(const Selection& sel) const
 		}
 		return true;
 	}
+	if(sel.IsType(Selection::Generator) && sel.IsBaseType(Selection::BaseRun)){
+		size_t baseID = sel.GetBaseID();
+
+		if(run.find(baseID) == run.end()) return false;
+
+		const Run &temp = run.at(baseID);
+
+		std::set <size_t>::const_iterator itsel = sel.begin();
+		std::map <size_t, Generator*>::const_iterator itgenerator =
+				temp.generators.begin();
+		while(itsel != sel.end()){
+			if(itgenerator == temp.generators.end()
+					|| *itsel < itgenerator->first) return false;
+			if(!(itgenerator->first < *itsel)) ++itsel;
+			++itgenerator;
+		}
+		return true;
+	}
 	return false;
 }
 
@@ -99,6 +130,21 @@ size_t Project::GetMaxObjectID(void) const
 	return maxObjectID;
 }
 
+size_t Project::GetMaxRunID(void) const
+{
+	return maxRunID;
+}
+
+size_t Project::GetToolCount(void) const
+{
+	return tools.size();
+}
+
+const std::vector <Tool> * Project::GetTools(void) const
+{
+	return &tools;
+}
+
 std::set <size_t> Project::GetAllObjectIDs(void) const
 {
 	std::set <size_t> temp;
@@ -106,18 +152,6 @@ std::set <size_t> Project::GetAllObjectIDs(void) const
 			it != objects.end(); ++it)
 		temp.insert(it->first);
 	return temp;
-}
-
-const Object& Project::GetObject(size_t ID) const
-{
-	if(objects.find(ID) == objects.end()) throw(std::range_error(
-			"Project::GetObject - Object not found."));
-	return objects.at(ID); //TODO: Rewrite by [] lookup
-}
-
-size_t Project::GetMaxRunID(void) const
-{
-	return maxRunID;
 }
 
 std::set <size_t> Project::GetAllRunIDs(void) const
@@ -129,6 +163,29 @@ std::set <size_t> Project::GetAllRunIDs(void) const
 	return temp;
 }
 
+std::set <size_t> Project::GetAllGeneratorIDs(size_t runID) const
+{
+	std::set <size_t> temp;
+	if(run.find(runID) != run.end()){
+		for(std::map <size_t, Generator*>::const_iterator it =
+				run.at(runID).generators.begin();
+				it != run.at(runID).generators.end(); ++it)
+			temp.insert(it->first);
+	}
+	return temp;
+}
+
+const Object& Project::GetObject(size_t ID) const
+{
+	if(objects.find(ID) == objects.end()) throw(std::range_error(
+			"Project::GetObject - Object not found."));
+	return objects.at(ID); //TODO: Rewrite by [] lookup
+}
+
+const std::map <size_t, Object>* Project::GetObjects(void) const
+{
+	return &objects;
+}
 const Run& Project::GetRun(size_t ID) const
 {
 	if(run.find(ID) == run.end()) throw(std::range_error(
@@ -136,15 +193,58 @@ const Run& Project::GetRun(size_t ID) const
 	return run.at(ID); //TODO: Rewrite by [] lookup
 }
 
+const Generator * Project::GetGenerator(size_t runID, size_t ID)
+{
+	if(run.find(runID) == run.end()) throw(std::range_error(
+			"Project::GetGenerator - Run not found."));
+	if(run.at(runID).generators.find(ID) == run.at(runID).generators.end()) throw(std::range_error(
+			"Project::GetGenerator - Generator not found."));
+	return run.at(ID).generators.at(ID);
+}
+
+const Tool& Project::GetTool(size_t index) const
+{
+	if(index >= tools.size()) throw(std::range_error(
+			"Project::GetTools - index out of range."));
+	return tools.at(index); //TODO: Rewrite by [] lookup
+}
+size_t Project::GetMaxGeneratorID(void) const
+{
+	return maxGeneratorID;
+}
+
+BoundingBox Project::GetBBox(const Selection &selected) const
+{
+	BoundingBox temp;
+	if(selected.IsType(Selection::Object)){
+		std::set <size_t> set = selected.GetSet();
+		for(std::set <size_t>::const_iterator it = set.begin(); it != set.end();
+				++it){
+			if(!this->Has(Selection::Object, *it)) continue;
+			temp.Insert(objects.at(*it).bbox);
+		}
+	}
+	return temp;
+}
+
 bool Project::GenerateToolpaths(void)
 {
 	Update();
 
-	const AffineTransformMatrix rotx0 = AffineTransformMatrix::Identity();
-	const AffineTransformMatrix rotx180 = AffineTransformMatrix::RotationXYZ(
-	M_PI, 0, 0);
+//	const AffineTransformMatrix rotx0 = AffineTransformMatrix::Identity();
+//	const AffineTransformMatrix rotx180 = AffineTransformMatrix::RotationXYZ(
+//	M_PI, 0, 0);
 
-	return false;
+	for(std::vector <Tool>::iterator it = tools.begin(); it != tools.end();
+			++it)
+		it->Update();
+
+	for(std::map <size_t, Run>::iterator run = this->run.begin();
+			run != this->run.end(); ++run){
+		run->second.GenerateToolpaths();
+	}
+
+	return true;
 //#if(_GENERICCAM_USEMULTITHREADING == 1)
 //
 //	// Prevent the toolpath generation from being started in more than
@@ -157,11 +257,11 @@ bool Project::GenerateToolpaths(void)
 //
 //	PropagateChanges();
 //
+
 //	// Select and start the next generators to have a go
 //	// The selection is done workpiece-wise, even if spread across multiple runs.
-//	for(size_t workpieceNr = 0; workpieceNr < workpieces.GetCount();
-//			workpieceNr++){
-//		if(workpieces[workpieceNr].hasRunningGenerator) continue;
+//	for(std::map<size_t, Run>::iterator run = this->run.begin();run!=this->run.end();++run){
+////		if(workpieces[workpieceNr].hasRunningGenerator) continue;
 //		for(size_t runNr = 0; runNr < run.GetCount(); runNr++){
 //			if(run[runNr].workpieceNr != workpieceNr) continue;
 //
@@ -202,14 +302,13 @@ bool Project::GenerateToolpaths(void)
 void Project::Update(void)
 {
 	for(std::map <size_t, Object>::iterator it = objects.begin();
-			it != objects.end(); ++it){
+			it != objects.end(); ++it)
 		it->second.Update();
-	}
+
 	for(std::map <size_t, Run>::iterator it = run.begin(); it != run.end();
-			++it){
-		it->second.parent = this;
-		it->second.Update();
-	}
+			++it)
+		it->second.Update(this);
+
 	UpdateAllViews();
 }
 
@@ -227,8 +326,6 @@ bool Project::Save(wxFileName fileName)
 {
 	if(!fileName.IsOk()) return false;
 
-	return false;
-
 	setlocale(LC_ALL, "C");
 
 	wxFFileOutputStream out(fileName.GetFullPath());
@@ -239,173 +336,152 @@ bool Project::Save(wxFileName fileName)
 	txt << _T("Name:") << endl;
 	txt << this->GetTitle() << endl;
 
-//	txt << wxString::Format(_T("Objects: %zu"), objects.GetCount()) << endl;
-//	for(size_t n = 0; n < objects.GetCount(); n++){
-//		txt << wxString::Format(_T("Object: %zu"), n) << endl;
-//		objects[n].ToStream(txt, n);
-//	}
-//
-//	txt << wxString::Format(_T("Workpieces: %zu"), workpieces.GetCount())
-//			<< endl;
-//	for(size_t n = 0; n < workpieces.GetCount(); n++){
-//		txt << wxString::Format(_T("Workpiece: %zu"), n) << endl;
-//		workpieces[n].ToStream(txt);
-//	}
-//	txt << wxString::Format(_T("Run: %zu"), run.GetCount()) << endl;
-//	for(size_t n = 0; n < run.GetCount(); n++){
-//		txt << wxString::Format(_T("Run: %zu"), n) << endl;
-//		run[n].ToStream(txt);
-//	}
-//
-//	for(size_t n = 0; n < objects.GetCount(); n++){
-//		for(size_t m = 0; m < objects[n].geometries.GetCount(); m++){
-//			wxString tempName = wxString::Format(
-//					_T("object_%zu_geometry_%zu.stl"), n, m);
-//			zip.PutNextEntry(tempName);
-//			FileSTL::WriteStream(zip, objects[n].geometries[m]);
-//		}
-//	}
+	txt << wxString::Format(_T("Objects: %zu"), objects.size()) << endl;
+
+	for(std::map <size_t, Object>::const_iterator obj = objects.begin();
+			obj != objects.end(); ++obj){
+		txt << wxString::Format(_T("Object: %zu"), obj->first) << endl;
+		obj->second.ToStream(txt, obj->first);
+	}
+
+	txt << wxString::Format(_T("Run: %zu"), run.size()) << endl;
+	for(std::map <size_t, Run>::const_iterator it = run.begin();
+			it != run.end(); ++it){
+		txt << wxString::Format(_T("Run: %zu"), it->first) << endl;
+		it->second.ToStream(txt);
+	}
+
+	for(std::map <size_t, Object>::const_iterator obj = objects.begin();
+			obj != objects.end(); ++obj){
+
+		wxString tempName = wxString::Format(_T("object_%zu.obj"), obj->first);
+		zip.PutNextEntry(tempName);
+		std::ostringstream out;
+		out << obj->second.geometry;
+		txt << out.str();
+	}
+
 	setlocale(LC_ALL, "");
-	this->SetFilename(fileName.GetFullName(), true);
+	this->SetFilename(fileName.GetFullPath(), true);
+	std::cout << "Project::Save(" << fileName.GetFullPath() << ") - saved.\n";
 	return true;
 }
 
 bool Project::Load(wxFileName fileName)
 {
 	if(!fileName.IsOk()) return false;
-	return false;
 	setlocale(LC_ALL, "C");
 	wxFFileInputStream in(fileName.GetFullPath());
 
 	if(!in.IsOk()){
-		printf("File is not OK: ");
-		printf(fileName.GetFullPath().ToAscii());
-		printf("\n");
+		std::cout << "File is not OK: ";
+		std::cout << fileName.GetFullPath().ToAscii();
+		std::cout << "\n";
 		return false;
 	}
 
 	wxZipInputStream zip(in);
 	wxTextInputStream txt(zip);
 
-	Clear();
+	tools.clear();
+	objects.clear();
+	run.clear();
 
-//	in.SeekI(0, wxFromStart);
-//	wxZipEntry* entry;
-//	while((entry = zip.GetNextEntry()))
-//		if(entry->GetName().Cmp(_T("project.txt")) == 0) break;
-//	if(entry == NULL){
-//		setlocale(LC_ALL, "");
-//		return false;
-//	}
-//
-//	zip.OpenEntry(*entry);
-//
-//	wxString temp;
-//	size_t m;
-//	temp = txt.ReadLine();
-//	if(temp.Cmp(_T("Name:")) != 0){
-//		setlocale(LC_ALL, "");
-//		return false;
-//	}
-//	name = txt.ReadLine();
-//	temp = txt.ReadWord();
-//	if(temp.Cmp(_T("Objects:")) != 0){
-//		setlocale(LC_ALL, "");
-//		return false;
-//	}
-//	const size_t N = txt.Read32();
-//	objects.clear();
-//	Object object;
-//	for(size_t n = 0; n < N; n++){
-//		temp = txt.ReadWord();
-//		if(temp.Cmp(_T("Object:")) != 0){
-//			setlocale(LC_ALL, "");
-//			return false;
+	in.SeekI(0, wxFromStart);
+	wxZipEntry* entry;
+	while((entry = zip.GetNextEntry()))
+		if(entry->GetName().Cmp(_T("project.txt")) == 0) break;
+	if(entry == NULL){
+		setlocale(LC_ALL, "");
+		return false;
+	}
+
+	zip.OpenEntry(*entry);
+
+	wxString temp;
+	temp = txt.ReadLine();
+	if(temp.Cmp(_T("Name:")) != 0){
+		setlocale(LC_ALL, "");
+		return false;
+	}
+	SetTitle(txt.ReadLine());
+
+	temp = txt.ReadWord();
+	if(temp.Cmp(_T("Objects:")) != 0){
+		setlocale(LC_ALL, "");
+		return false;
+	}
+	const size_t N = txt.Read32();
+	for(size_t n = 0; n < N; n++){
+		temp = txt.ReadWord();
+		if(temp.Cmp(_T("Object:")) != 0){
+			setlocale(LC_ALL, "");
+			return false;
+		}
+		size_t objID = txt.Read32();
+		Object object;
+		object.FromStream(txt);
+		objects[objID] = object;
+	}
+
+	temp = txt.ReadWord();
+	if(temp.Cmp(_T("Run:")) != 0){
+		setlocale(LC_ALL, "");
+		return false;
+	}
+	const size_t N3 = txt.Read32();
+	run.clear();
+	for(size_t n = 0; n < N3; n++){
+		temp = txt.ReadWord();
+		if(temp.Cmp(_T("Run:")) != 0){
+			setlocale(LC_ALL, "");
+			return false;
+		}
+		size_t runID = txt.Read32();
+		Run tempRun;
+		tempRun.FromStream(txt, runID, this);
+		run[runID] = tempRun;
+	}
+	zip.CloseEntry();
+
+	// Load objects
+	//TODO: Rewind zip, because there may be object models before the main project file.
+
+	while((entry = zip.GetNextEntry())){
+		temp = entry->GetName();
+		if(!temp.StartsWith(wxT("object_"), &temp)) continue;
+		long p;
+		temp.BeforeFirst('.').ToLong(&p);
+		size_t objID = p;
+		temp = temp.AfterFirst('.');
+		if(!temp.StartsWith(wxT("obj"))) continue;
+		if(objects.find(objID) == objects.end()) continue;
+
+		zip.OpenEntry(*entry);
+		size_t N = entry->GetSize();
+
+		char* buffer = new char[N + 1];
+		zip.Read(buffer, N);
+		size_t L = zip.LastRead();
+		assert(L <= N);
+		std::istringstream in(std::string(buffer, L));
+		Hull temphull;
+		in >> temphull;
+		objects[objID].geometry = temphull;
+		objects[objID].geometry.CalcNormals();
+		objects[objID].geometry.CalcGroups();
+		objects[objID].geometry.ApplyTransformation();
+		delete[] buffer;
+
+//		try{
 //		}
-//		m = txt.Read32();
-//		if(m != n){
-//			setlocale(LC_ALL, "");
-//			return false;
+//		catch(const std::exception &ex){
+//			std::cout << "Exception caught: " << ex.what() << "\n";
 //		}
-//		object.FromStream(txt);
-//		objects.Add(object);
-//	}
-//
-//	temp = txt.ReadWord();
-//	if(temp.Cmp(_T("Workpieces:")) != 0){
-//		setlocale(LC_ALL, "");
-//		return false;
-//	}
-//	const size_t N2 = txt.Read32();
-//	workpieces.Clear();
-//	Workpiece workpiece;
-//	for(size_t n = 0; n < N2; n++){
-//		temp = txt.ReadWord();
-//		if(temp.Cmp(_T("Workpiece:")) != 0){
-//			setlocale(LC_ALL, "");
-//			return false;
-//		}
-//		m = txt.Read32();
-//		if(m != n){
-//			setlocale(LC_ALL, "");
-//			return false;
-//		}
-//		workpiece.FromStream(txt);
-//		workpieces.Add(workpiece);
-//	}
-//
-//	temp = txt.ReadWord();
-//	if(temp.Cmp(_T("Run:")) != 0){
-//		setlocale(LC_ALL, "");
-//		return false;
-//	}
-//	const size_t N3 = txt.Read32();
-//	run.Clear();
-//	Run * tempRun;
-//	for(size_t n = 0; n < N3; n++){
-//		temp = txt.ReadWord();
-//		if(temp.Cmp(_T("Run:")) != 0){
-//			setlocale(LC_ALL, "");
-//			return false;
-//		}
-//		m = txt.Read32();
-//		if(m != n){
-//			setlocale(LC_ALL, "");
-//			return false;
-//		}
-//		tempRun = new Run();
-//		tempRun->FromStream(txt, n, this);
-//		run.Add(tempRun);
-//	}
-//	zip.CloseEntry();
-//
-//	// Load objects
-//	//TODO: Rewind zip
-//
-//	while((entry = zip.GetNextEntry())){
-//		temp = entry->GetName();
-//		if(!temp.StartsWith(wxT("object_"), &temp)) continue;
-//		long p;
-//		temp.BeforeFirst('_').ToLong(&p);
-//		long n = p;
-//		temp = temp.AfterFirst('_');
-//		if(!temp.StartsWith(wxT("geometry_"), &temp)) continue;
-//		temp.BeforeFirst('.').ToLong(&p);
-//		m = p;
-//		temp = temp.AfterFirst('.');
-//		if(!temp.StartsWith(wxT("stl"))) continue;
-//
-//		if(n < 0 || n >= objects.GetCount()) continue;
-//		if(m < 0 || m >= objects[n].geometries.GetCount()) continue;
-//
-//		FileSTL stl;
-//		zip.OpenEntry(*entry);
-//		stl.ReadStream(zip);
-//		objects[n].geometries[m].triangles = stl.geometry[0].triangles;
-//		zip.CloseEntry();
-//	}
-//	setlocale(LC_ALL, "");
-	this->SetFilename(fileName.GetFullName(), true);
+		zip.CloseEntry();
+	}
+	setlocale(LC_ALL, "");
+	this->SetFilename(fileName.GetFullPath(), true);
 	this->Update();
 	return true;
 }
@@ -564,58 +640,6 @@ bool Project::SaveToolpath(wxFileName fileName, int runNr)
 //		break;
 //	}
 //	::glLoadName(0);
-
-void Project::Paint(const OpenGLMaterial &face, const OpenGLMaterial &edge,
-		const Selection& sel) const
-{
-	for(std::map <size_t, Object>::const_iterator obj = objects.begin();
-			obj != objects.end(); ++obj){
-		if(sel.IsBase(Selection::BaseObject, obj->first)){
-			obj->second.Paint(face, edge, sel);
-		}else{
-			if(sel.IsInverted()) obj->second.Paint(face, edge, Selection(true));
-		}
-	}
-
-	for(std::map <size_t, Run>::const_iterator run = this->run.begin();
-			run != this->run.end(); ++run){
-		run->second.Paint();
-	}
-
-}
-
-void Project::PaintPick(void) const
-{
-	glPushName(Selection::BaseObject);
-	for(std::map <size_t, Object>::const_iterator obj = objects.begin();
-			obj != objects.end(); ++obj){
-		glPushName(obj->first);
-		obj->second.PaintPick();
-		glPopName();
-	}
-	glLoadName(Selection::BaseRun);
-	for(std::map <size_t, Run>::const_iterator run = this->run.begin();
-			run != this->run.end(); ++run){
-		glPushName(run->first);
-		run->second.Paint();
-		glPopName();
-	}
-	glPopName();
-}
-
-BoundingBox Project::GetBBox(const Selection &selected) const
-{
-	BoundingBox temp;
-	if(selected.IsType(Selection::Object)){
-		std::set <size_t> set = selected.GetSet();
-		for(std::set <size_t>::const_iterator it = set.begin(); it != set.end();
-				++it){
-			if(!this->Has(Selection::Object, *it)) continue;
-			temp.Insert(objects.at(*it).bbox);
-		}
-	}
-	return temp;
-}
 
 //void Project::PaintWorkpiece(void) const
 //{

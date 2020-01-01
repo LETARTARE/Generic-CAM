@@ -36,6 +36,7 @@
 #include <float.h>
 #include <assert.h>
 
+#include "generator/CNCSimulator.h"
 Run::Run()
 {
 	parent = NULL;
@@ -45,19 +46,24 @@ Run::Run()
 	coordX.Add(Selection::Axis, 0);
 	coordY.Add(Selection::Axis, 1);
 	coordZ.Add(Selection::Axis, 2);
+	slotWidth = 0.01;
+
 	touchpoint = wxImage(touchpoint_xpm);
 	touchpoint.SetAlphaColor(255, 255, 255);
 }
 
 Run::~Run()
 {
-	for(size_t i = 0; i < generators.size(); i++)
-		delete generators[i];
+	for(std::map <size_t, Generator *>::iterator it = generators.begin();
+			it != generators.end(); ++it){
+		delete (it->second);
+	}
 }
 
-void Run::Update(void)
+void Run::Update(Project * project)
 {
-	if(parent == NULL) return;
+	if(project == NULL) return;
+	parent = project;
 	origin.SetIdentity();
 	// Calculate coordinate system
 	if(coordX.Has(Selection::Axis, 0)) origin.SetEx(Vector3(1, 0, 0));
@@ -75,7 +81,7 @@ void Run::Update(void)
 	origin.CalculateEy();
 	origin.Normalize();
 
-	if(stocktype == Object){
+	if(stocktype == sObject){
 		stock = parent->GetBBox(Selection(Selection::Object, stockobject));
 	}
 	if(stocktype == BoxTop || stocktype == BoxCenter || stocktype == BoxBottom){
@@ -96,58 +102,168 @@ void Run::Update(void)
 	AffineTransformMatrix M = stock.GetCoordinateSystem();
 	origin.SetOrigin(M.Transform(stockorigin));
 
-//	for(size_t i = 0; i < generators.size(); i++){
+//	for(std::map <size_t, Generator *>::iterator it = generators.begin();
+//	it != generators.end(); ++it){
 //		assert(generators[i] != NULL);
 //		generators[i]->parent = this;
 //	}
 }
 
-//void Run::GenerateToolpaths(void)
-//{
-//	assert(refWorkpiece >= 0);
+void Run::Paint(void) const
+{
+	const Project * pr = parent;
+	if(pr == NULL) return;
+
+	OpenGLMaterial::EnableColors();
+
+	glColor4f(0.8, 0.8, 0.8, 1.0);
+	stock.PaintVertices(1, 10);
+
+	// Draw the "Touchpoint" symbol
+	const float s = 0.03;
+	glPushName(0);
+	glPushName(0);
+
+	glPushMatrix();
+	origin.GLMultMatrix();
+	glScalef(s, s, s);
+	glRotatef(90, 1, 0, 0);
+	touchpoint.Paint();
+	glRotatef(90, 0, 1, 0);
+	touchpoint.Paint();
+	glRotatef(90, 0, 1, 0);
+	touchpoint.Paint();
+	glRotatef(90, 0, 1, 0);
+	touchpoint.Paint();
+	glPopMatrix();
+
+	glPopName();
+	glPopName();
+
+	if(stocktype == BoxTop || stocktype == BoxCenter || stocktype == BoxBottom){
+		if(OpenGLMaterial::ColorsAllowed()){
+			glColor4f(0.2, 0.2, 0.2, 0.6);
+			stock.Paint();
+		}
+	}
+
+//	::glPushMatrix();
+//	if(refWorkpiece > -1){
+//		Vector3 center = pr->workpieces[refWorkpiece].GetCenter();
+//		::glTranslatef(-center.x, -center.y, -center.z);
+//	}
 //
-//	Workpiece* const workpiece = &(parent->workpieces[this->refWorkpiece]);
-//	assert(workpiece != NULL);
+//	machine.Paint();
 //
-//	Update();
+//	if(refWorkpiece > -1){
+//		::glPushMatrix();
+//		machine.workpiecePosition.GLMultMatrix();
 //
-//	simulator.InsertMachine(&machine);
+//		if(showSimulation){
+//			simulator.Paint();
+//		}else{
 //
-//	for(size_t i = 0; i < generators.GetCount(); i++){
-//		assert(generators[i] != NULL);
-//
-//		generators[i]->GenerateToolpath();
-//
-//		if(!generators[i]->toolpath.positions.IsEmpty()){
-//			{
-//				GCodeBlock temp(_T("(Set spindle speed 1/min)"));
-//				temp.S = 200; // 1/s
-//				generators[i]->toolpath.positions.Insert(temp, 0);
+//			bool anySelected = false;
+//			for(std::map <size_t, Generator *>::iterator it = generators.begin();
+//	it != generators.end(); ++it){
+//				assert(generators[n] != NULL);
+//				if(generators[n]->selected) anySelected = true;
 //			}
-//			{
-//				GCodeBlock temp(_T("(Set feed-speed mm/s)"));
-//				temp.F = 0.025; // m/s
-//				generators[i]->toolpath.positions.Insert(temp, 1);
+//
+//			for(std::map <size_t, Generator *>::iterator it = generators.begin();
+//	it != generators.end(); ++it){
+//				assert(generators[n] != NULL);
+//				if(!anySelected || generators[n]->selected){
+//					generators[n]->Paint();
+//				}
 //			}
-//			{
-//				GCodeBlock temp(_T("M6 (Select tool)"));
-//				temp.T = generators[i]->refTool + 1; //TODO Refactor the tool numbering/handling in the Machine.
-//				generators[i]->toolpath.positions.Insert(temp, 2);
-//			}
+//
+//			::glPushMatrix();
+//			workpiecePlacement.GLMultMatrix();
+//			pr->workpieces[refWorkpiece].Paint();
+//			::glPopMatrix();
 //		}
 //
-//		simulator.InsertTarget((DexelTarget*) &(workpiece->model));
-//		simulator.InsertToolPath(&(generators[i]->toolpath));
-//		simulator.Reset(true);
-//		simulator.Last();
-//		(workpiece->model) = *(simulator.GetTarget());
+
 //	}
-//}
+//
+//	::glPopMatrix();
+}
+
+void Run::GenerateToolpaths(void)
+{
+
+//	Workpiece* const workpiece = &(parent->workpieces[this->refWorkpiece]);
+//	assert(workpiece != NULL);
+
+	Update(parent);
+
+	DexelTarget base;
+
+	const double A = stock.GetSizeX() * stock.GetSizeY();
+	size_t N = (A / (parent->minResolution * parent->minResolution));
+	N = (N > parent->maxCells)? (parent->maxCells) : N;
+	N = (N < 4)? 4 : N;
+	double res = sqrt(A / (double) N);
+	base.SetupBox(stock.GetSizeX(), stock.GetSizeY(), stock.GetSizeZ(), res,
+			res);
+
+	if(stocktype == sObject){
+		base.InitImprinting();
+		const Object & obj = parent->GetObject(stockobject);
+		base.InsertObject(obj, AffineTransformMatrix::Identity());
+		base.FinishImprint();
+	}else{
+		base.Fill();
+	}
+
+	const std::vector <Tool> * tools = parent->GetTools();
+
+	CNCSimulator simulator;
+	simulator.SetTools(tools);
+
+	for(std::map <size_t, Generator *>::iterator it = generators.begin();
+			it != generators.end(); ++it){
+		assert((it->second) != NULL);
+
+		// Find the tool in the tool-library
+		const Tool * tool = NULL;
+		for(size_t n = 0; n < tools->size(); ++n){
+			if(tools->at(n).guid.compare(it->second->toolguid) == 0){
+				tool = &(tools->at(n));
+				break;
+			}
+		}
+		if(tool == NULL){
+			it->second->output = _T("Tool empty.");
+			it->second->errorOccured = true;
+			continue;
+		}
+
+		it->second->GenerateToolpath(*this, *(parent->GetObjects()), tool,
+				&base);
+
+		if(!it->second->toolpath.empty()){
+			const size_t N = it->second->toolpath.size();
+			for(size_t n = 0; n < N; ++n){
+				it->second->toolpath[n].S = 200; // 1/s
+				it->second->toolpath[n].F = 0.025; // m/s
+			}
+		}
+
+		simulator.InsertTarget(&base);
+		simulator.InsertToolPath(&(it->second->toolpath), true);
+		simulator.Reset();
+		simulator.Last();
+//		(workpiece->model) = *(simulator.GetTarget());
+	}
+}
 //
 //bool Run::SaveToolpaths(wxFileName fileName)
 //{
 //	ToolPath generated;
-//	for(size_t i = 0; i < generators.GetCount(); i++){
+//	for(std::map <size_t, Generator *>::iterator it = generators.begin();
+//it != generators.end(); ++it){
 //		assert(generators[i] != NULL);
 //
 //		//TODO: Remove this?
@@ -228,95 +344,16 @@ void Run::Update(void)
 //	return flag;
 //}
 
-void Run::Paint(void) const
-{
-	const Project * pr = parent;
-	if(pr == NULL) return;
-
-	OpenGLMaterial::EnableColors();
-
-	glColor4f(0.8, 0.8, 0.8, 1.0);
-	stock.PaintVertices(1, 10);
-
-	// Draw the "Touchpoint" symbol
-	const float s = 0.03;
-	glPushName(0);
-	glPushName(0);
-
-	glPushMatrix();
-	origin.GLMultMatrix();
-	glScalef(s, s, s);
-	glRotatef(90, 1, 0, 0);
-	touchpoint.Paint();
-	glRotatef(90, 0, 1, 0);
-	touchpoint.Paint();
-	glRotatef(90, 0, 1, 0);
-	touchpoint.Paint();
-	glRotatef(90, 0, 1, 0);
-	touchpoint.Paint();
-	glPopMatrix();
-
-	glPopName();
-	glPopName();
-
-	if(stocktype == BoxTop || stocktype == BoxCenter || stocktype == BoxBottom){
-		if(OpenGLMaterial::ColorsAllowed()){
-			glColor4f(0.2, 0.2, 0.2, 0.6);
-			stock.Paint();
-		}
-	}
-
-//	::glPushMatrix();
-//	if(refWorkpiece > -1){
-//		Vector3 center = pr->workpieces[refWorkpiece].GetCenter();
-//		::glTranslatef(-center.x, -center.y, -center.z);
-//	}
-//
-//	machine.Paint();
-//
-//	if(refWorkpiece > -1){
-//		::glPushMatrix();
-//		machine.workpiecePosition.GLMultMatrix();
-//
-//		if(showSimulation){
-//			simulator.Paint();
-//		}else{
-//
-//			bool anySelected = false;
-//			for(size_t n = 0; n < generators.GetCount(); n++){
-//				assert(generators[n] != NULL);
-//				if(generators[n]->selected) anySelected = true;
-//			}
-//
-//			for(size_t n = 0; n < generators.GetCount(); n++){
-//				assert(generators[n] != NULL);
-//				if(!anySelected || generators[n]->selected){
-//					generators[n]->Paint();
-//				}
-//			}
-//
-//			::glPushMatrix();
-//			workpiecePlacement.GLMultMatrix();
-//			pr->workpieces[refWorkpiece].Paint();
-//			::glPopMatrix();
-//		}
-//
-
-//	}
-//
-//	::glPopMatrix();
-}
-
 //void Run::ToolpathToStream(wxTextOutputStream & stream)
 //{
 ////	toolPath.ToolpathToStream(f);
 //	throw(__FILE__ "Not yet implemented.");
 //}
-//
-//void Run::ToStream(wxTextOutputStream& stream)
-//{
-//	stream << _T("Name:") << endl;
-//	stream << name << endl;
+
+void Run::ToStream(wxTextOutputStream& stream) const
+{
+	stream << _T("Name:") << endl;
+	stream << name << endl;
 //	stream << wxString::Format(_T("WorkpieceRef: %i"), refWorkpiece) << endl;
 //	stream << _T("WorkpiecePlacement: ");
 //	workpiecePlacement.ToStream(stream);
@@ -339,14 +376,15 @@ void Run::Paint(void) const
 //		stream << gc.GetName(g) << endl;
 //		generators[n]->ToStream(stream);
 //	}
-//}
-//
-//bool Run::FromStream(wxTextInputStream& stream, int runNr, Project * project)
-//{
-//	wxString temp;
-//	temp = stream.ReadLine();
-//	if(temp.Cmp(_T("Name:")) != 0) return false;
-//	name = stream.ReadLine();
+}
+
+bool Run::FromStream(wxTextInputStream& stream, size_t runID, Project * project)
+{
+	if(project != NULL) parent = project;
+	wxString temp;
+	temp = stream.ReadLine();
+	if(temp.Cmp(_T("Name:")) != 0) return false;
+	name = stream.ReadLine();
 //	temp = stream.ReadWord();
 //	if(temp.Cmp(_T("WorkpieceRef:")) != 0) return false;
 //	refWorkpiece = stream.Read32S();
@@ -390,9 +428,9 @@ void Run::Paint(void) const
 //		tempGen->FromStream(stream);
 //		generators.Add(tempGen);
 //	}
-//	return true;
-//}
-//
+	return true;
+}
+
 //Vector3 Run::GetCenter(void) const
 //{
 //	Vector3 temp;

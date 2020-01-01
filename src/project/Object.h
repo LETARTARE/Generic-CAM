@@ -82,7 +82,7 @@ public:
 
 	bool IsEmpty(void) const;
 
-	void ToStream(wxTextOutputStream & stream, size_t n);
+	void ToStream(wxTextOutputStream & stream, size_t objID) const;
 	bool FromStream(wxTextInputStream & stream);
 
 	void Paint(const OpenGLMaterial &face, const OpenGLMaterial &edge,
