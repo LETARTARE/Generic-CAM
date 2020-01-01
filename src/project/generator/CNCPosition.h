@@ -49,62 +49,33 @@
 class CNCPosition {
 	// Constructor/ Destructor
 public:
-	CNCPosition(double x = 0.0, double y = 0.0, double z = 0.0, double a = 0.0,
-			double b = 0.0, double c = 0.0, double u = 0.0, double v = 0.0,
-			double w = 0.0);
-	CNCPosition(const AffineTransformMatrix &matrix);
+	CNCPosition(double x = 0.0, double y = 0.0, double z = 0.0, double nx = 0.0,
+			double ny = 0.0, double nz = 1.0);
+	CNCPosition(const Vector3& position, const Vector3& normal);
+	CNCPosition(const AffineTransformMatrix& matrix);
+	void Set(double x, double y, double z, bool rapid = false);
 	virtual ~CNCPosition();
 
 	// Member variables
 public:
-	double X; //!< X coordinate
-	double Y; //!< Y coordinate
-	double Z; //!< Z coordinate
-	double A; //!< rotation around X coordinate
-	double B; //!< rotation around Y coordinate
-	double C; //!< rotation around Z coordinate
-	double U; //!< axis parallel rotated X coordinate
-	double V; //!< axis parallel rotated Y coordinate
-	double W; //!< axis parallel rotated Z coordinate
+	size_t toolID;
+	Vector3 position;
+	Vector3 normal;
+	double S; //!< Spindle speed in 1/s
+	double F; //!< Feed in m/s
+	bool rapid;
+	std::string comment;
+	bool circle;
 
 	double dt; //!< Time taken to move to this position (optional, not directly manipulated by the functions of this class)
 	double t; //!< Absolute time this position is reached (optional, not directly manipulated by the functions of this class)
 
-	/*! \brief Overloaded operator to a positions to another
-	 *
-	 * Adds XYZ, ABC and UWV from the other position to this one.
-	 */
-	CNCPosition & operator+=(const CNCPosition& a);
+	CNCPosition& operator+=(const Vector3& a);
+	CNCPosition& operator-=(const Vector3& a);
+	double Abs(const CNCPosition& b) const; //!< Distance the tooltip moved
+	double Rotation(const CNCPosition& b) const; //!< Angle between two CNCPositions
 
-	/*! \brief Overloaded operator to add two positions
-	 *
-	 * Returns the sum of XYZ, ABC and UWV from two positions.
-	 */
-	const CNCPosition operator+(const CNCPosition &b) const;
-
-	/*! \brief Overloaded operator to a positions to another
-	 *
-	 * Adds XYZ, ABC and UWV from the other position to this one.
-	 */
-	CNCPosition & operator-=(const CNCPosition& a);
-	const CNCPosition operator-(const CNCPosition &b) const;
-	const CNCPosition operator-() const; //!< Inverts all components (XYZABCUWV).
-
-	CNCPosition & operator*=(const double &b); //!< Multiply all components of the position by a factor
-	const CNCPosition operator*(const double &b) const; //!< Multiply all components of the position by a factor
-
-	CNCPosition & operator/=(const double &b); //!< Divide all components of the position by a factor
-	const CNCPosition operator/(const double &b) const; //!< Divide all components of the position by a factor
-
-	double AbsXYZ() const; //!< Return the length of the XYZ components
-	double AbsABC() const; //!< Return the length of the ABC components
-	double AbsUVW() const; //!< Return the length of the UVW components
-	double AbsXYZUVW() const; //!< Return the length of the XYZUVW components
-
-	Vector3 GetPosition(void) const; //!< Return the XYZ component of this position
-	Vector3 GetNormal(void) const; //!< Return the normal vector for this position
 	AffineTransformMatrix GetMatrix(void) const; //!< Return a transformation matrix for this position
-
 };
 
 #endif /* CNCPOSITION_H_ */
