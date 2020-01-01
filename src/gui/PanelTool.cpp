@@ -75,13 +75,13 @@ void PanelTool::OnPaint(wxPaintEvent& event)
 
 	float scaleX = (float) sz.x / tool->GetMaxDiameter();
 	float scaleY = (float) sz.y
-			/ (tool->GetToolLength() + tool->GetNegativeLength());
+			/ (tool->GetToolLength() );
 
 	float scaleFactor = (scaleX < scaleY)? scaleX : scaleY;
 	scaleFactor *= 0.9;
 
 	int mx = sz.x / 2;
-	int my = (int) (scaleY * tool->GetNegativeLength());
+	int my = (int) (scaleY );
 
 	dc.CrossHair(mx, my);
 
@@ -94,14 +94,14 @@ void PanelTool::OnPaint(wxPaintEvent& event)
 			else
 			dc.SetPen(*wxBLACK_PEN);
 
-			dc.DrawLine(mx + scaleFactor * tool->contour[i].p1.x, my + scaleFactor
-					* tool->contour[i].p1.z, mx + scaleFactor
-					* tool->contour[i].p2.x, my + scaleFactor
-					* tool->contour[i].p2.z);
-			dc.DrawLine(mx - scaleFactor * tool->contour[i].p1.x, my + scaleFactor
-					* tool->contour[i].p1.z, mx - scaleFactor
-					* tool->contour[i].p2.x, my + scaleFactor
-					* tool->contour[i].p2.z);
+//			dc.DrawLine(mx + scaleFactor * tool->contour[i].p1.x, my + scaleFactor
+//					* tool->contour[i].p1.z, mx + scaleFactor
+//					* tool->contour[i].p2.x, my + scaleFactor
+//					* tool->contour[i].p2.z);
+//			dc.DrawLine(mx - scaleFactor * tool->contour[i].p1.x, my + scaleFactor
+//					* tool->contour[i].p1.z, mx - scaleFactor
+//					* tool->contour[i].p2.x, my + scaleFactor
+//					* tool->contour[i].p2.z);
 		}
 
 		//wxLogMessage((linkedField == NULL)? _T("NULL") : _T("not NULL"));

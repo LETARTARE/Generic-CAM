@@ -40,7 +40,6 @@
 //#include "DialogMachineDebugger.h"
 //#include "DialogToolbox.h"
 //#include "DialogAnimation.h"
-//#include "DialogToolpathGenerator.h"
 
 #include "TreeSetup.h"
 #include "CollectionFilepaths.h"
@@ -55,7 +54,10 @@
 
 class FrameParent;
 class DialogJobSetup;
+class DialogToolpathGenerator;
 class DialogObjectTransformation;
+class DialogAnimation;
+class DialogPostProcess;
 
 class FrameMain:public GUIFrameMain {
 	friend class DnDFile;
@@ -85,8 +87,9 @@ private:
 
 //	DialogMachineDebugger * dialogDebugger;
 //	DialogToolbox * dialogToolbox;
-//	DialogToolpathGenerator * dialogToolpathGenerator;
-//	DialogAnimation * dialogAnimation;
+	DialogToolpathGenerator * dialogToolpathGenerator;
+	DialogAnimation * dialogAnimation;
+	DialogPostProcess * dialogPostProcess;
 
 private:
 	std::set <Selection> selectRequests;
@@ -106,7 +109,7 @@ public:
 	void AnswerSelection(const Selection &selection);
 
 	void ProjectLoad(wxString fileName); ///> Load a project from the command line
-	bool TransferDataToWindow(void);
+	bool TransferDataToWindow(bool updatetree = true);
 	bool TransferDataFromWindow(void);
 
 	FrameParent* GetParentFrame(void);
@@ -150,7 +153,7 @@ private:
 	void OnCAMMultiAxisMenu(wxRibbonButtonBarEvent& event);
 	void OnCAMPostProcessSimulate(wxRibbonButtonBarEvent& event);
 	void OnCAMPostProcessExport(wxRibbonButtonBarEvent& event);
-	void OnCAMToolsMeasure(wxRibbonButtonBarEvent& event);
+		void OnCAMToolsMeasure(wxRibbonButtonBarEvent& event);
 	void OnCAMToolsTestGCode(wxRibbonButtonBarEvent& event);
 	void OnCAMManageTools(wxRibbonButtonBarEvent& event);
 	void OnCAMManagePostProcesses(wxRibbonButtonBarEvent& event);
@@ -186,10 +189,12 @@ private:
 //	void OnRunEdit(wxCommandEvent& event);
 	void OnRunRename(wxCommandEvent& event);
 	void OnRunDelete(wxCommandEvent& event);
-//	void OnGeneratorSetup(wxCommandEvent& event);
-//	void OnGeneratorStart(wxCommandEvent& event);
-//	void OnGeneratorAutomatic(wxCommandEvent& event);
-//	void OnGeneratorRestart(wxCommandEvent& event);
+	void OnGeneratorAdd(wxCommandEvent& event);
+	void OnGeneratorEdit(wxCommandEvent& event);
+	void OnGeneratorRename(wxCommandEvent& event);
+	void OnGeneratorDelete(wxCommandEvent& event);
+	void OnToolpathGenerate(wxCommandEvent& event);
+	void OnCAMPostProcessExport(wxCommandEvent& event);
 //	void OnGeneratorSaveToolpath(wxCommandEvent& event);
 //	void OnShowAnimationControl(wxCommandEvent& event);
 //	void OnActivateStereo3D(wxCommandEvent& event);

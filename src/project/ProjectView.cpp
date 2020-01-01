@@ -26,11 +26,12 @@
 
 #include "ProjectView.h"
 
-#include "../3D/OpenGLMaterial.h"
+#include "Project.h"
 #include "../genericcam.h"
 #include "../gui/FrameMain.h"
 #include "../gui/FrameParent.h"
 #include "../gui/IDs.h"
+#include <map>
 
 IMPLEMENT_DYNAMIC_CLASS(ProjectView, wxView)
 
@@ -41,17 +42,17 @@ ProjectView::ProjectView() :
 		wxView()
 {
 
-	displayCoordinateSystem = true;
+	type = vIdle;
 
-	display = displayObjects;
-	displayGeometry = true;
-	displayBoundingBox = false;
-	displayMachine = false;
-	displayStock = false;
-	displayTargets = false;
-	displayToolpath = false;
-	displayOutLines = false;
-	displayAnimation = false;
+//	displayCoordinateSystem = true;
+//	displayGeometry = true;
+//	displayBoundingBox = false;
+//	displayMachine = false;
+//	displayStock = false;
+//	displayTargets = false;
+//	displayToolpath = false;
+//	displayOutLines = false;
+//	displayAnimation = false;
 }
 
 ProjectView::~ProjectView()
@@ -134,35 +135,98 @@ void ProjectView::OnUpdate3D(void)
 
 void ProjectView::Render(void) const
 {
-	Project* project = wxStaticCast(GetDocument(), Project);
+	const Project* project = wxStaticCast(GetDocument(), Project);
 
-	if(displayCoordinateSystem){
+	if(type == vIdle || type == vObject){
 		RenderCoordinateSystem();
 	}
+	PaintObjects(Selection(true), OpenGLMaterial(0.3, 0.3, 1.0),
+			OpenGLMaterial(0, 0, 0));
+	if(type == vRun){
+		PaintRun(Selection(true));
+	}
 
-	Selection both = selection + hover;
-	both.Invert();
-
-	OpenGLMaterial::EnableColors();
-	project->Paint(OpenGLMaterial(0.3, 0.3, 1.0), OpenGLMaterial(0, 0, 0),
-			both);
-	project->Paint(OpenGLMaterial(0.8, 0.8, 1.0), OpenGLMaterial(0.8, 0.8, 0.8),
-			selection);
-	project->Paint(OpenGLMaterial(0.5, 0.5, 1.0), OpenGLMaterial(0.5, 0.5, 0.5),
-			hover);
+	if(false){
+		Selection both = selection + hover;
+		both.Invert();
+		OpenGLMaterial::EnableColors();
+		PaintObjects(both, OpenGLMaterial(0.3, 0.3, 1.0),
+				OpenGLMaterial(0, 0, 0));
+		PaintObjects(selection, OpenGLMaterial(0.8, 0.8, 1.0),
+				OpenGLMaterial(0.8, 0.8, 0.8));
+		PaintObjects(hover, OpenGLMaterial(0.5, 0.5, 1.0),
+				OpenGLMaterial(0.5, 0.5, 0.5));
+	}
 }
 
 void ProjectView::RenderPick(void) const
 {
-	if(displayCoordinateSystem){
+	Project* project = wxStaticCast(GetDocument(), Project);
+	if(type == vIdle || type == vObject){
 		glPushName((unsigned int) Selection::BaseNone);
 		glPushName(0);
 		RenderCoordinateSystem();
 		glPopName();
 		glPopName();
 	}
-	Project* project = wxStaticCast(GetDocument(), Project);
-	project->PaintPick();
+	glPushName(Selection::BaseObject);
+	for(std::map <size_t, Object>::const_iterator obj =
+			project->objects.begin(); obj != project->objects.end(); ++obj){
+		glPushName(obj->first);
+		obj->second.PaintPick();
+		glPopName();
+	}
+	glPopName();
+
+	if(type == vRun){
+		glPushName(Selection::BaseRun);
+		for(std::map <size_t, Run>::const_iterator run = project->run.begin();
+				run != project->run.end(); ++run){
+			glPushName(run->first);
+			run->second.Paint();
+			glPopName();
+		}
+		glPopName();
+	}
+}
+
+void ProjectView::PaintObjects(const Selection& sel, const OpenGLMaterial &face,
+		const OpenGLMaterial &edge) const
+{
+	const Project* project = wxStaticCast(GetDocument(), Project);
+	for(std::map <size_t, Object>::const_iterator obj =
+			project->objects.begin(); obj != project->objects.end(); ++obj){
+		if(sel.IsBase(Selection::BaseObject, obj->first)){
+			obj->second.Paint(face, edge, sel);
+		}else{
+			if(sel.IsInverted()) obj->second.Paint(face, edge, Selection(true));
+		}
+	}
+
+}
+
+void ProjectView::PaintRun(const Selection& sel) const
+{
+	const Project* project = wxStaticCast(GetDocument(), Project);
+	for(std::map <size_t, Run>::const_iterator run = project->run.begin();
+			run != project->run.end(); ++run){
+		glPushMatrix();
+		glTranslatef(run->second.stock.xmin, run->second.stock.ymin,
+				run->second.stock.zmin);
+		for(std::map <size_t, Generator*>::const_iterator it =
+				run->second.generators.begin();
+				it != run->second.generators.end(); ++it){
+			it->second->Paint();
+		}
+		glPopMatrix();
+
+		if(sel.IsBase(Selection::BaseRun, run->first)){
+			run->second.Paint();
+		}else{
+			if(sel.IsInverted()) run->second.Paint();
+		}
+	}
+
 }
 
 void ProjectView::RenderCoordinateSystem(void) const

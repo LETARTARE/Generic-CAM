@@ -76,7 +76,7 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 		m_textCtrlSizeX->SetValue(_T("-"));
 		m_textCtrlSizeY->SetValue(_T("-"));
 		m_textCtrlSizeZ->SetValue(_T("-"));
-		// Turn off other things.
+		//TODO: Turn off other things.
 		return false;
 	}
 

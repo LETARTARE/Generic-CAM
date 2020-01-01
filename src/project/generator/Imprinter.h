@@ -56,13 +56,14 @@
 #include <GL/gl.h>
 
 class ImprinterElement {
-	// Constructor / Destructor
 public:
 	ImprinterElement();
 	virtual ~ImprinterElement();
-	// Member variables
-public:
 
+	bool IsVisible(void) const; ///< A cell is visible, if the upper level is above the lower one.
+	void Swap(ImprinterElement& b);
+
+public:
 	float aboveUp;
 	float aboveDown;
 	float up;
@@ -70,20 +71,15 @@ public:
 	float belowUp;
 	float belowDown;
 
-	// TODO: Add a surface orientation to the dexel cells.
 	float normalx;
 	float normaly;
 	//  normalz is sqrt(1-normalx*normalx-normaly*normaly)
-
-	// Methods
-public:
-	bool IsVisible(void) const; ///< A cell is visible, if the upper level is above the lower one.
-	void Swap(ImprinterElement& b);
 };
 
 //TODO Base Imprinter on BoundingBox
 class Imprinter {
 	friend class GeneratorTest; //TODO: Remove this friend class.
+
 public:
 	enum face_t {
 		facing_up, //!< Triangle facing up
@@ -92,7 +88,6 @@ public:
 		other //!< Something else
 	};
 
-	// Constructor / Destructor
 public:
 	Imprinter();
 	Imprinter(const size_t countX, const size_t countY,
@@ -102,18 +97,47 @@ public:
 	Imprinter(const Imprinter& ip); ///< Copy constructor
 	Imprinter& operator=(const Imprinter &b); ///< Assignment operator
 	virtual ~Imprinter();
+
+protected:
+	double sx; ///< Size in x
+	double sy; ///< Size in y
+	double sz; ///< Size in z
+	double rx; ///< Resolution in x
+	double ry; ///< Resolution in y
+
+	ImprinterElement *field;
+	size_t nx; ///< Number of cells in x
+	size_t ny; ///< Number of cells in y
+	size_t N; ///< = nx * ny
+
+public:
+	bool displayBox; ///< Display the up surface as a continuous plane.
+	bool displayField; ///< Display the up and down surface as planar squares.
+	bool displayAboveDown; ///< Display the above down surface as a grid.
+	bool displayBelowUp; ///< Display the below up surface as a grid.
+	bool displayAboveUp; ///< Display the above up surface as a grid.
+	bool displayBelowDown; ///< Display the below down surface as a grid.
+
+	Vector3 colorNormal;
+	Vector3 colorUnscratched;
+	Vector3 colorTodo;
+
+protected:
+	mutable bool refresh; ///< Initialize an update of the OpenGL display-list.
+
+private:
+	mutable GLuint displayListIndex; ///< Index of a OpenGL display-list for speedup
+	mutable bool displayListGenerated; ///< Flag to initialize display-list only once
+
 private:
 	void InitInstance(void);
 
-	// Methods
 public:
-
-// **** Low level ****
+	// **** Low level ****
 
 	void PresetResolution(const double resolutionX, const double resolutionY =
 			-1);
 	void PresetResolution(const Imprinter &other);
-
 	void CopyRescale(const Imprinter &other, const size_t cellCount);
 
 	bool SetupField(const size_t sizeX, const size_t sizeY,
@@ -122,6 +146,9 @@ public:
 	void ClearField(void); ///< Deallocate the field from memory
 	bool IsMemoryAllocated(void) const; ///< Test, if memory has been allocated
 	size_t MemoryUsageInBytes(void) const;
+
+	void Paint() const; ///< Paint the Imprinter at the origin in OpenGL.
+	void Refresh(); ///< Regenerates the OpenGL displaylist.
 
 	double GetSizeX(void) const;
 	double GetSizeY(void) const;
@@ -132,19 +159,16 @@ public:
 	size_t GetCountX(void) const;
 	size_t GetCountY(void) const;
 
-	void Refresh(); ///< Regenerates the OpenGL displaylist.
-	void Paint() const; ///< Paint the Imprinter at the origin in OpenGL.
-
-// ***** Imprinting geometry *****
+	// ***** Imprinting geometry *****
 
 	void InitImprinting(void);
 	void InsertTriangle(Vector3 a, Vector3 b, Vector3 c,
 			face_t facetype = other);
-	void InsertGeometrie(const Geometry *geometry,
+	void InsertGeometry(const Geometry *geometry,
 			const AffineTransformMatrix & shift);
 	void FinishImprint(void);
 
-// ***** Basic shape setup *****
+	// ***** Basic shape setup *****
 
 	/**\brief Setup a box */
 	bool SetupBox(const double sizeX, const double sizeY, const double sizeZ,
@@ -159,13 +183,13 @@ public:
 	void SetupDisc(double radius, const double resolutionX = -1,
 			const double resolutionY = -1);
 
-// ***** Test functions *****
+	// ***** Test functions *****
 
 	bool IsFilled(int x, int y, double height) const; ///< Test, if at cell[x,y] the level at height is filled.
+	bool IsFilled(size_t p) const; ///< Test, if cell(p) has a particle somewhere.
 	bool IsFilled(size_t p, double height) const; ///< Test, if at cell[p] the level at height is filled.
 	bool IsFilledAbove(int x, int y, double height) const; ///< Test, if upper in cell(x,y) is above height.
 	bool IsFilledAbove(size_t p, double height) const; ///< Test, if upper in cell(x,y) is above height.
-	bool IsFilled(size_t p) const; ///< Test, if cell(p) has a particle somewhere.
 	bool IsVisible(int x, int y) const; ///< Synonymous with IsFilled
 	bool IsVisible(size_t p) const; ///< Synonymous with IsFilled
 	bool IsOnOuterBorder(size_t p) const; ///< Test, if cell belongs to the outermost row/column.
@@ -177,12 +201,12 @@ public:
 	double GetLevel(double x, double y) const; ///< Get the up-height at cell closest to point(x,y). Otherwise -1.
 	double GetMaxLevel(void) const; ///< Returns the max value of the visible elements in the field.
 	const ImprinterElement GetElement(double x, double y) const;
-	void SetLevel(double x, double y, double level); ///< Set the up-height at cell closest to point(x,y).
 
-// ***** Manipulation *****
+	// ***** Manipulation *****
 
 	void Empty(void); ///< Empty the volume
 	void Fill(void); ///< Fill the volume
+	void SetLevel(double x, double y, double level); ///< Set the up-height at cell closest to point(x,y).
 
 	/**\brief OR assignment operator (= Union)
 	 *
@@ -241,7 +265,7 @@ public:
 	 */
 	const Imprinter operator+(const double value) const;
 
-// ***** Inverting *****
+	// ***** Inverting *****
 
 	void HardInvert(void); ///< Invert field without contour.
 	void MaxFilling(void); ///< Fill up cells with particle to the max.
@@ -251,13 +275,19 @@ public:
 	void MirrorZ(void); ///< Mirror along the Z axis.
 	void RotateX180(void); ///< Rotate along the X axis.
 
-// ***** Complex functions *****
+	// ***** Complex functions *****
 
 	void CleanOutlier(void); ///< Defunct.
 	void Limit(void); ///< Limit values of the field to the size of the Imprinter in z.
+	void RemoveShadowed(const Imprinter &b);
 
-// ***** Folding *****
+	// ***** Folding *****
 
+	void FoldRaise(const Imprinter &b); ///< Folding operation of two Imprinters. Surface is only raised.
+	void MarkHeightDelta(const Imprinter &b, Imprinter &ref, bool processFull =
+			true); ///< FoldRaise() marking the residual error as well
+	void FoldReplace(const Imprinter &b); ///< Folding operation. Model is replaced.
+	void TouchErase(int x, int y, double z, double level, const Imprinter &b);
 	/**\brief Folding operation. Surface is dropped at position
 	 *
 	 * @param x Integer position of cell.
@@ -266,47 +296,10 @@ public:
 	 * @param b 2nd Imprinter
 	 */
 	void ShiftDown(int x, int y, double z, const Imprinter &b);
-	void TouchErase(int x, int y, double z, double level, const Imprinter &b);
-	void FoldRaise(const Imprinter &b); ///< Folding operation of two Imprinters. Surface is only raised.
-	void MarkHeightDelta(const Imprinter &b, Imprinter &ref,
-			bool processFull = true); ///< FoldRaise() marking the residual error as well
-	void FoldReplace(const Imprinter &b); ///< Folding operation. Model is replaced.
 
 private:
 	Vector3 RecalculateCellNormals(double p0, double p1, double p2,
 			double p3) const;
-
-	// Member variables
-protected:
-	double sx; ///< Size in x
-	double sy; ///< Size in y
-	double sz; ///< Size in z
-	double rx; ///< Resolution in x
-	double ry; ///< Resolution in y
-
-	ImprinterElement *field;
-	size_t nx; ///< Number of cells in x
-	size_t ny; ///< Number of cells in y
-	size_t N;  ///< = nx * ny
-
-public:
-	bool displayBox; ///< Display the up surface as a continuous plane.
-	bool displayField; ///< Display the up and down surface as planar squares.
-	bool displayAboveDown; ///< Display the above down surface as a grid.
-	bool displayBelowUp; ///< Display the below up surface as a grid.
-	bool displayAboveUp; ///< Display the above up surface as a grid.
-	bool displayBelowDown; ///< Display the below down surface as a grid.
-
-	Vector3 colorNormal;
-	Vector3 colorUnscratched;
-	Vector3 colorTodo;
-
-protected:
-	mutable bool refresh; ///< Initialize an update of the OpenGL display-list.
-
-private:
-	mutable GLuint displayListIndex; ///< Index of a OpenGL display-list for speedup
-	mutable bool displayListGenerated; ///< Flag to initialize display-list only once
 };
 
 #endif /* IMPRINTER_H_ */

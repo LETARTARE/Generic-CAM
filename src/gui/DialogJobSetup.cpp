@@ -92,7 +92,7 @@ bool DialogJobSetup::TransferDataToWindow(void)
 	m_textCtrlAxisY->SetValue(run.coordY.ToString());
 	m_textCtrlAxisZ->SetValue(run.coordZ.ToString());
 
-	m_choicebookStock->SetSelection((run.stocktype == Run::Object)? 1 : 0);
+	m_choicebookStock->SetSelection((run.stocktype == Run::sObject)? 1 : 0);
 
 	if(project->Has(Selection::Object, run.stockobject)){
 		m_textCtrlStockObject->SetValue(
@@ -300,7 +300,7 @@ void DialogJobSetup::OnChoicebookPageChanged(wxChoicebookEvent& event)
 		oldType = project->GetRun(runID).stocktype;
 		cmdProc->Submit(
 				new CommandRunSetStockType(_("Change type."), project, runID,
-						Run::Object));
+						Run::sObject));
 	}
 }
 

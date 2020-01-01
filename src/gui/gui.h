@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Aug 20 2017)
+// C++ code generated with wxFormBuilder (version Dec 20 2018)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO "NOT" EDIT THIS FILE!
+// PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
 #ifndef __GUI_H__
@@ -11,9 +11,6 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
-#include <wx/docview.h>
-#include <wx/config.h>
-
 #include <wx/string.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
@@ -119,28 +116,32 @@
 #define ID_SELECTOBJECTSTOCK 1052
 #define ID_SELECTORIGIN 1053
 #define ID_SELECTAREAOBJECT 1054
-#define ID_MARGINSIDE 1055
-#define ID_MARGINBELOW 1056
-#define ID_CONTROLLERSHOW 1057
-#define ID_VIEWSTEREO3D 1058
-#define ID_AXISX 1059
-#define ID_AXISY 1060
-#define ID_AXISZ 1061
-#define ID_TEXTX 1062
-#define ID_TEXTY 1063
-#define ID_TEXTZ 1064
-#define ID_AXISA 1065
-#define ID_AXISB 1066
-#define ID_AXISC 1067
-#define ID_TEXTA 1068
-#define ID_TEXTB 1069
-#define ID_TEXTC 1070
-#define ID_AXISU 1071
-#define ID_AXISV 1072
-#define ID_AXISW 1073
-#define ID_TEXTU 1074
-#define ID_TEXTV 1075
-#define ID_TEXTW 1076
+#define ID_TOOLLIBRARYMANAGE 1055
+#define ID_SPEED 1056
+#define ID_FEED 1057
+#define ID_MARGINSIDE 1058
+#define ID_MARGINBELOW 1059
+#define ID_CLEARANCEHEIGHT 1060
+#define ID_CONTROLLERSHOW 1061
+#define ID_VIEWSTEREO3D 1062
+#define ID_AXISX 1063
+#define ID_AXISY 1064
+#define ID_AXISZ 1065
+#define ID_TEXTX 1066
+#define ID_TEXTY 1067
+#define ID_TEXTZ 1068
+#define ID_AXISA 1069
+#define ID_AXISB 1070
+#define ID_AXISC 1071
+#define ID_TEXTA 1072
+#define ID_TEXTB 1073
+#define ID_TEXTC 1074
+#define ID_AXISU 1075
+#define ID_AXISV 1076
+#define ID_AXISW 1077
+#define ID_TEXTU 1078
+#define ID_TEXTV 1079
+#define ID_TEXTW 1080
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIFrameMain
@@ -398,6 +399,12 @@ class GUIToolpathGenerator : public wxFrame
 		wxButton* m_buttonSelectGeometry;
 		wxChoice* m_choiceTool;
 		wxButton* m_buttonToolSelect;
+		wxStaticText* m_staticTextSpindle;
+		wxTextCtrl* m_textCtrlSpindle;
+		wxStaticText* m_staticTextUnitSpindle;
+		wxStaticText* m_staticTextFeed;
+		wxTextCtrl* m_textCtrlFeed;
+		wxStaticText* m_staticTextUnitFeed;
 		wxStaticText* m_staticTextSide;
 		wxTextCtrl* m_textCtrlMarginSide;
 		wxStaticText* m_staticTextUnitMarginSide;
@@ -407,20 +414,23 @@ class GUIToolpathGenerator : public wxFrame
 		wxStaticText* m_staticTextFreeHeight;
 		wxTextCtrl* m_textCtrlFreeHeight;
 		wxStaticText* m_staticTextUnitFreeHeight;
-		wxChoicebook* m_choicebookGenerator;
+		wxPanel* m_panel;
+		wxButton* m_buttonUpdate;
 		wxTextCtrl* m_textCtrlInfo;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnChar( wxKeyEvent& event ) = 0;
 		virtual void OnXClose( wxCloseEvent& event ) = 0;
+		virtual void OnLeftDown( wxMouseEvent& event ) = 0;
 		virtual void OnSelectArea( wxCommandEvent& event ) = 0;
 		virtual void OnSelectTool( wxCommandEvent& event ) = 0;
-		virtual void OnChangeText( wxCommandEvent& event ) = 0;
-		virtual void OnPageChanged( wxChoicebookEvent& event ) = 0;
+		virtual void OnTextEnter( wxCommandEvent& event ) = 0;
+		virtual void OnUpdate( wxCommandEvent& event ) = 0;
 		
 	
 	public:
 		
-		GUIToolpathGenerator( wxWindow* parent, wxWindowID id = wxID_CLOSE, const wxString& title = _("Toolpath Generators"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 580,906 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxFRAME_TOOL_WINDOW|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIToolpathGenerator( wxWindow* parent, wxWindowID id = wxID_CLOSE, const wxString& title = _("..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 491,611 ), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~GUIToolpathGenerator();
 	
@@ -434,35 +444,35 @@ class GUIAnimation : public wxFrame
 	private:
 	
 	protected:
+		wxSlider* m_sliderTime;
 		wxStaticText* m_staticTextTime;
 		wxTextCtrl* m_textCtrlTime;
 		wxStaticText* m_staticTextSlash;
 		wxTextCtrl* m_textCtrlMaxTime;
-		wxSlider* m_sliderTime;
-		wxCheckBox* m_checkBoxSimulateWorkpiece;
 		wxBitmapButton* m_bpButtonFirst;
 		wxBitmapButton* m_bpButtonPrev;
 		wxBitmapButton* m_bpButtonPlayStop;
 		wxBitmapButton* m_bpButtonNext;
 		wxBitmapButton* m_bpButtonLast;
+		wxCheckBox* m_checkBoxSimulateWorkpiece;
 		wxButton* m_buttonClose;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;
-		virtual void OnChangeTime( wxCommandEvent& event ) = 0;
 		virtual void OnScroll( wxScrollEvent& event ) = 0;
-		virtual void OnChangeSimulation( wxCommandEvent& event ) = 0;
+		virtual void OnChangeTime( wxCommandEvent& event ) = 0;
 		virtual void OnFirst( wxCommandEvent& event ) = 0;
 		virtual void OnPrev( wxCommandEvent& event ) = 0;
 		virtual void OnPlayStop( wxCommandEvent& event ) = 0;
 		virtual void OnNext( wxCommandEvent& event ) = 0;
 		virtual void OnLast( wxCommandEvent& event ) = 0;
+		virtual void OnChangeSimulation( wxCommandEvent& event ) = 0;
 		virtual void OnClose( wxCommandEvent& event ) = 0;
 		
 	
 	public:
 		
-		GUIAnimation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolpath Animation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxFRAME_TOOL_WINDOW|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIAnimation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolpath Animation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 750,120 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxFRAME_TOOL_WINDOW|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~GUIAnimation();
 	
@@ -477,14 +487,22 @@ class GUIPostProcess : public wxFrame
 	
 	protected:
 		wxChoice* m_choiceSelect;
-		wxButton* m_buttonOpen;
+		wxButton* m_buttonRefresh;
 		wxPropertyGrid* m_propertyGrid;
 		wxFilePickerCtrl* m_filePickerExport;
 		wxButton* m_buttonExport;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnXClose( wxCloseEvent& event ) = 0;
+		virtual void OnChoice( wxCommandEvent& event ) = 0;
+		virtual void OnRefresh( wxCommandEvent& event ) = 0;
+		virtual void OnPropertyGridChange( wxPropertyGridEvent& event ) = 0;
+		virtual void OnExport( wxCommandEvent& event ) = 0;
+		
 	
 	public:
 		
-		GUIPostProcess( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Post-Process"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxTAB_TRAVERSAL );
+		GUIPostProcess( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Post-Process"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 536,300 ), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxTAB_TRAVERSAL );
 		
 		~GUIPostProcess();
 	

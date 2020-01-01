@@ -40,8 +40,9 @@
 #include <wx/docview.h>
 #include <wx/object.h>
 #include <wx/event.h>
-
+#include "../3D/OpenGLMaterial.h"
 #include "Selection.h"
+
 class ProjectView:public wxView {
 public:
 	ProjectView();
@@ -63,25 +64,28 @@ private:
 
 public:
 
+	enum ViewType {
+		vIdle = 0, vObject, vRun, vOrigin, vRuns, vGenerator
+	} type;
+
 	Selection selection;
 	Selection hover;
 
-	bool displayCoordinateSystem;
-
 private:
-	enum DisplayType {
-		displayObjects, displayWorkpieces, displayRun
-	};
-	DisplayType display;
 
-	bool displayAnimation;
-	bool displayGeometry;
-	bool displayMachine;
-	bool displayStock;
-	bool displayBoundingBox;
-	bool displayTargets;
-	bool displayToolpath;
-	bool displayOutLines;
+	void PaintObjects(const Selection& sel, const OpenGLMaterial &face,
+			const OpenGLMaterial &edge) const;
+	void PaintRun(const Selection& sel) const;
+
+//	bool displayCoordinateSystem;
+//	bool displayAnimation;
+//	bool displayGeometry;
+//	bool displayMachine;
+//	bool displayStock;
+//	bool displayBoundingBox;
+//	bool displayTargets;
+//	bool displayToolpath;
+//	bool displayOutLines;
 
 wxDECLARE_EVENT_TABLE();DECLARE_DYNAMIC_CLASS(ProjectView)
 	;

@@ -43,11 +43,11 @@ void CanvasTool::InsertTool(Tool& t)
 	tool = &t;
 #ifdef _DEBUGMODE
 	if(tool != NULL){
-		debug.SetupTool(*tool, 0.0001, 0.0001);
-		debug.NegateZ();
-		debug.displayField = true;
+//		debug.SetupTool(*tool, 0.0001, 0.0001);
+//		debug.NegateZ();
+//		debug.displayField = true;
 	}else{
-		debug.displayField = false;
+//		debug.displayField = false;
 	}
 #endif
 }
@@ -94,13 +94,13 @@ void CanvasTool::Render()
 	if(tool != NULL){
 		tool->Paint();
 #ifdef _DEBUGMODE
-		if(debug.displayField){
-			glPushMatrix();
-			glTranslatef(0.01 + tool->GetMaxDiameter(), -debug.GetSizeY() / 2,
-					tool->GetToolLength());
-			debug.Paint();
-			glPopMatrix();
-		}
+//		if(debug.displayField){
+//			glPushMatrix();
+//			glTranslatef(0.01 + tool->GetMaxDiameter(), -debug.GetSizeY() / 2,
+//					tool->GetToolLength());
+//			debug.Paint();
+//			glPopMatrix();
+//		}
 #endif
 	}
 

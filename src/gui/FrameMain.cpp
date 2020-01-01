@@ -31,9 +31,12 @@
 #include "FrameParent.h"
 
 #include "DialogTestGCode.h"
+#include "DialogToolpathGenerator.h"
 #include "DialogJobSetup.h"
 #include "DialogSetupPaths.h"
 #include "DialogObjectTransformation.h"
+#include "DialogPostProcess.h"
+#include "DialogAnimation.h"
 
 //#include "../project/generator/ToolpathGeneratorThread.h"
 //#include "../project/command/CommandWorkpieceRename.h"
@@ -50,6 +53,11 @@
 #include "DnDFile.h"
 
 #include "../math/MathParser.h"
+#include "../project/command/CommandRunGeneratorAdd.h"
+#include "../project/command/CommandRunGeneratorDelete.h"
+#include "../project/command/CommandRunGeneratorRename.h"
+#include "../project/generator/GeneratorDrillDexel.h"
+#include "../project/generator/GeneratorTest.h"
 #include "../project/ProjectView.h"
 #include "IDs.h"
 
@@ -81,6 +89,13 @@ EVT_MENU(ID_OBJECTFLIPNORMALS, FrameMain::OnObjectFlipNormals)
 EVT_MENU(ID_RUNRENAME, FrameMain::OnRunRename)
 EVT_MENU(ID_RUNMODIFY, FrameMain::OnCAMSetup)
 EVT_MENU(ID_RUNDELETE, FrameMain::OnRunDelete)
+EVT_MENU_RANGE(ID_GENERATORADDTYPE,ID_GENERATORADDTYPE+100, FrameMain::OnGeneratorAdd)
+EVT_MENU(ID_GENERATORMODIFY, FrameMain::OnGeneratorEdit)
+EVT_MENU(ID_GENERATORRENAME, FrameMain::OnGeneratorRename)
+EVT_MENU(ID_GENERATORDELETE, FrameMain::OnGeneratorDelete)
+EVT_MENU(ID_TOOLPATHGENERATE, FrameMain::OnToolpathGenerate)
+EVT_MENU(ID_TOOLPATHEXPORT, FrameMain::OnCAMPostProcessExport)
+
 wxEND_EVENT_TABLE()
 
 FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
@@ -130,13 +145,15 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 
 	dialogObjectTransformation = new DialogObjectTransformation(this);
 	dialogJobSetup = new DialogJobSetup(this);
+	dialogToolpathGenerator = new DialogToolpathGenerator(this);
+	dialogAnimation = new DialogAnimation(this);
+	dialogPostProcess = new DialogPostProcess(this);
 
 //	dialogDebugger = new DialogMachineDebugger(this);
 //#ifdef _USE_MIDI
 //	dialogDebugger->SetMidiPort(parentframe->midi);
 //#endif
 //	dialogToolbox = new DialogToolbox(this);
-//	dialogToolpathGenerator = new DialogToolpathGenerator(this);
 //	dialogAnimation = new DialogAnimation(this);
 
 	wxAcceleratorEntry entries[5];
@@ -179,10 +196,12 @@ size_t FrameMain::GetFreeSystemMemory()
 #endif
 }
 
-bool FrameMain::TransferDataToWindow(void)
+bool FrameMain::TransferDataToWindow(bool updatetree)
 {
-	// Populate the treeview
-	tree->Update();
+	if(updatetree){
+		// Populate the treeview
+		tree->Update();
+	}
 	Selection temp = tree->TreeToSelection();
 
 //	m_menuToolpath->Check(ID_GENERATORAUTOMATIC, project.processToolpath);
@@ -199,21 +218,24 @@ bool FrameMain::TransferDataToWindow(void)
 
 	if(temp.IsType(Selection::Object)){
 		dialogObjectTransformation->SetSelection(temp);
-	}else{
-		dialogObjectTransformation->SetSelection(Selection());
 	}
-
 	dialogObjectTransformation->TransferDataToWindow();
+
 	if(temp.IsType(Selection::Run) && temp.Size() >= 1){
 		dialogJobSetup->SetRunID(temp[0]);
-	}else{
-		dialogJobSetup->SetRunID(0);
 	}
 	dialogJobSetup->TransferDataToWindow();
 
+	if(temp.IsBaseType(Selection::BaseRun) && temp.IsType(Selection::Generator)
+			&& temp.Size() >= 1){
+		dialogToolpathGenerator->SetRunGenerator(temp.GetBaseID(), temp[0]);
+		dialogPostProcess->SetRunGenerator(temp.GetBaseID(), temp[0]);
+	}
+	dialogToolpathGenerator->TransferDataToWindow();
+
 //	dialogToolbox->TransferDataToWindow();
 //	dialogDebugger->TransferDataToWindow();
-//	dialogToolpathGenerator->TransferDataToWindow();
+
 //	dialogAnimation->TransferDataToWindow();
 
 //	Refresh();
@@ -546,6 +568,7 @@ void FrameMain::OnCAM3DMenu(wxRibbonButtonBarEvent& event)
 
 void FrameMain::OnCAMDrilling(wxRibbonButtonBarEvent& event)
 {
+	OnGeneratorAdd(event);
 }
 
 void FrameMain::OnCAMMultiAxisMenu(wxRibbonButtonBarEvent& event)
@@ -555,12 +578,86 @@ void FrameMain::OnCAMMultiAxisMenu(wxRibbonButtonBarEvent& event)
 	event.PopupMenu(&menu);
 }
 
+void FrameMain::OnGeneratorAdd(wxCommandEvent& event)
+{
+	Selection sel = tree->TreeToSelection();
+	if(sel.IsSetEmpty()) return;
+	if(!sel.IsType(Selection::Run) && !sel.IsBaseType(Selection::BaseRun)) return;
+	size_t runID = sel[0];
+	if(sel.IsBaseType(Selection::BaseRun)) runID = sel.GetBaseID();
+
+	Project* project = wxStaticCast(GetDocument(), Project);
+	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
+
+	Generator* generator = NULL;
+	switch(event.GetId()){
+
+	case ID_DRILLING:
+		generator = new GeneratorDrillDexel();
+		break;
+	case ID_GENERATORADDTYPE + 4:
+		generator = new GeneratorTest();
+		break;
+	default:
+		return;
+	}
+	if(!cmdProc->Submit(
+			new CommandRunGeneratorAdd(_("Add generator to run."), project,
+					runID, generator))){
+		// Generator was not added and need to be deleted again.
+		delete generator;
+		std::cout << "FrameMain::OnGeneratorAdd() - Adding failed.\n";
+		return;
+	}
+	generator->name = generator->GetTypeName();
+
+	std::cout << "  \\-> Added generator #" << project->GetMaxGeneratorID()
+			<< "\n";
+
+	dialogToolpathGenerator->SetRunGenerator(runID,
+			project->GetMaxGeneratorID());
+	dialogToolpathGenerator->Show();
+	dialogToolpathGenerator->Raise();
+}
+
+void FrameMain::OnGeneratorEdit(wxCommandEvent& event)
+{
+	dialogToolpathGenerator->Show();
+	dialogToolpathGenerator->Raise();
+}
+
+void FrameMain::OnGeneratorRename(wxCommandEvent& event)
+{
+}
+void FrameMain::OnGeneratorDelete(wxCommandEvent& event)
+{
+	Selection sel = tree->TreeToSelection();
+	if(sel.IsSetEmpty()) return;
+	if(!sel.IsType(Selection::Generator) || !sel.IsBaseType(Selection::BaseRun)) return;
+	size_t runID = sel.GetBaseID();
+	Project* project = wxStaticCast(GetDocument(), Project);
+	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
+	cmdProc->Submit(
+			new CommandRunGeneratorDelete(_("Deleting generator from run."),
+					project, runID, sel[0]));
+}
+
 void FrameMain::OnCAMPostProcessSimulate(wxRibbonButtonBarEvent& event)
 {
+	dialogAnimation->Show();
+	dialogAnimation->Raise();
 }
 
 void FrameMain::OnCAMPostProcessExport(wxRibbonButtonBarEvent& event)
 {
+	dialogPostProcess->Show();
+	dialogPostProcess->Raise();
+}
+
+void FrameMain::OnCAMPostProcessExport(wxCommandEvent& event)
+{
+	dialogPostProcess->Show();
+	dialogPostProcess->Raise();
 }
 
 void FrameMain::OnCAMToolsMeasure(wxRibbonButtonBarEvent& event)
@@ -703,7 +800,9 @@ void FrameMain::AnswerSelection(const Selection &selection)
 		}
 		dialogJobSetup->OnSelected(selectRequestID, selection);
 	}
-
+	if(selectRequestRequester == dialogToolpathGenerator){
+		dialogToolpathGenerator->OnSelected(selectRequestID, selection);
+	}
 	std::cout << "in FrameMain::AnswerSelection -> Reset selection to "
 			<< oldSelection.ToString() << "\n";
 	tree->SelectonToTree(oldSelection);
@@ -868,29 +967,12 @@ void FrameMain::OnSelectionChanged(wxTreeEvent& event)
 		return;
 	}
 
-//	switch(data->type){
-//	case itemProject:
-//	case itemGroupObject:
-//	case itemObject:
-//	case itemSubObject:
-//		m_canvas->display = CanvasMain::displayObjects;
-//		break;
-//	case itemGroupWorkpiece:
-//	case itemWorkpiece:
-//	case itemPlacement:
-//	case itemObjectLink:
-//		m_canvas->display = CanvasMain::displayWorkpieces;
-//		break;
-//	case itemGroupRun:
-//	case itemRun:
-//	case itemRunWorkpiece:
-//	case itemMachine:
-//	case itemToolpath:
-//		m_canvas->display = CanvasMain::displayRun;
-//		break;
-//	}
-//	std::cout << "X\n";
-	TransferDataToWindow();
+	view->type = ProjectView::vIdle;
+	if(temp.IsType(Selection::Object)) view->type = ProjectView::vObject;
+	if(temp.IsType(Selection::Run)) view->type = ProjectView::vRun;
+
+	TransferDataToWindow(false);
+	Refresh();
 }
 
 void FrameMain::OnSelectionChanging(wxTreeEvent& event)
@@ -983,6 +1065,9 @@ void FrameMain::OnActivateRightClickMenu(wxTreeEvent& event)
 	if(data->type == TreeItem::itemGroupRun){
 		tree->SelectonToTree(Selection());
 		menu.Append(ID_RUNMODIFY, wxT("&Add Run"));
+		menu.AppendSeparator();
+		menu.Append(ID_TOOLPATHGENERATE, wxT("&Generate Toolpath"));
+		menu.Append(ID_TOOLPATHEXPORT, wxT("E&xport Toolpaths"));
 	}
 
 	if(data->type == TreeItem::itemRun){
@@ -990,13 +1075,16 @@ void FrameMain::OnActivateRightClickMenu(wxTreeEvent& event)
 		menu.Append(ID_RUNRENAME, wxT("&Rename Run"));
 		menu.Append(ID_RUNDELETE, wxT("&Delete Run"));
 		menu.AppendSeparator();
-		menu.Append(ID_GENERATORADDTYPE, wxT("&Add Generator"));
+		menu.Append(ID_TOOLPATHGENERATE, wxT("&Generate Toolpath"));
+		menu.Append(ID_TOOLPATHEXPORT, wxT("E&xport Toolpath"));
 	}
 
 	if(data->type == TreeItem::itemGenerator){
 		menu.Append(ID_GENERATORMODIFY, wxT("&Edit Generator"));
-		menu.AppendSeparator();
+		menu.Append(ID_GENERATORRENAME, wxT("&Rename Run"));
 		menu.Append(ID_GENERATORDELETE, wxT("&Delete Generator"));
+		menu.AppendSeparator();
+		menu.Append(ID_TOOLPATHGENERATE, wxT("&Generate Toolpath"));
 	}
 
 //	if(data->type == itemToolpath){
@@ -1016,6 +1104,7 @@ void FrameMain::OnBeginLabelEdit(wxTreeEvent& event)
 	if(data->type == TreeItem::itemProject) return;
 	if(data->type == TreeItem::itemObject) return;
 	if(data->type == TreeItem::itemRun) return;
+	if(data->type == TreeItem::itemGenerator) return;
 
 // Stop editing, if it cannot be changed.
 	event.Veto();
@@ -1043,9 +1132,8 @@ void FrameMain::OnEndLabelEdit(wxTreeEvent& event)
 	if(data->type == TreeItem::itemObject){
 		if(!project->Has(Selection::Object, data->ID)) return;
 		if(newName == project->GetObject(data->ID).name) return;
-		cmdProc->Submit(
-				new CommandObjectRename(_("Object renamed to ") + newName,
-						project, data->ID, newName));
+		cmdProc->Submit(new CommandObjectRename(
+		_("Object renamed to ") + newName, project, data->ID, newName));
 		return;
 	};
 
@@ -1055,6 +1143,20 @@ void FrameMain::OnEndLabelEdit(wxTreeEvent& event)
 		cmdProc->Submit(
 				new CommandRunRename(_("Run renamed to ") + newName, project,
 						data->ID, newName));
+		return;
+	};
+
+	if(data->type == TreeItem::itemGenerator){
+		size_t runID = dialogToolpathGenerator->GetRunID();
+		size_t generatorID = data->ID;
+		if(!project->Has(
+				Selection(Selection::BaseRun, runID, Selection::Generator,
+						generatorID))) return;
+		if(newName == project->GetRun(runID).generators.at(generatorID)->name) return;
+		cmdProc->Submit(
+				new CommandRunGeneratorRename(
+				_("Generator renamed to ") + newName, project, runID,
+						generatorID, newName));
 		return;
 	};
 
@@ -1180,30 +1282,30 @@ void FrameMain::UpdateSimulation(wxCommandEvent& event)
 ////	TransferDataToWindow();
 //}
 //
-//void FrameMain::OnGeneratorStart(wxCommandEvent& event)
-//{
-//#ifndef _DEBUGMODE
-//	wxWindowDisabler disableAll;
-//	wxBusyInfo wait(_("Generating Toolpaths..."), this);
-//#endif
-//	Project* project = wxStaticCast(GetDocument(), Project);
-//	project->GenerateToolpaths();
+void FrameMain::OnToolpathGenerate(wxCommandEvent& event)
+{
+#ifndef _DEBUGMODE
+	wxWindowDisabler disableAll;
+	wxBusyInfo wait(_("Generating Toolpaths..."), this);
+#endif
+	Project* project = wxStaticCast(GetDocument(), Project);
+	project->GenerateToolpaths();
+
+//	project.PropagateChanges();
 //
-////	project.PropagateChanges();
-////
-////	size_t count = 0;
-////	size_t maxNr = project.ToolpathToGenerate();
-////
-////	wxProgressDialog dialog(_T("Generating Toolpaths"), _T(""), maxNr, this);
-////	dialog.Show();
-////
-////	count++;
-////	while(project.ToolpathGenerate()){
-////		dialog.Update(count, project.TollPathGenerateCurrent());
-////	}
+//	size_t count = 0;
+//	size_t maxNr = project.ToolpathToGenerate();
 //
-//	TransferDataToWindow();
-//}
+//	wxProgressDialog dialog(_T("Generating Toolpaths"), _T(""), maxNr, this);
+//	dialog.Show();
+//
+//	count++;
+//	while(project.ToolpathGenerate()){
+//		dialog.Update(count, project.TollPathGenerateCurrent());
+//	}
+
+	TransferDataToWindow();
+}
 //
 //void FrameMain::OnGeneratorAutomatic(wxCommandEvent& event)
 //{
@@ -1214,29 +1316,7 @@ void FrameMain::UpdateSimulation(wxCommandEvent& event)
 //void FrameMain::OnGeneratorRestart(wxCommandEvent& event)
 //{
 //}
-//
-//void FrameMain::OnGeneratorSaveToolpath(wxCommandEvent& event)
-//{
-////	FrameParent* parentframe = wxStaticCast(GetParent(), FrameParent);
-////	Project* project = wxStaticCast(GetDocument(), Project);
-////	const int runNr = tree->GetFirstSelectedRun();
-////	if(runNr < 0 || runNr >= project->run.GetCount()) return;
-////
-////	wxFileDialog dialog(this, _("Save toolpath..."), _T(""), _T(""),
-////			_("G-Code file (*.nc)|*.nc|All files|*.*"),
-////			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-////
-////	if(wxDir::Exists(filepaths.lastToolpathDirectory)){
-////		dialog.SetDirectory(filepaths.lastToolpathDirectory);
-////	}
-////	if(dialog.ShowModal() == wxID_OK){
-////		wxFileName fileName;
-////		fileName = dialog.GetPath();
-////		filepaths.lastToolpathDirectory = fileName.GetPath();
-////		project->SaveToolpath(fileName, runNr);
-////	}
-//}
-//
+
 //void FrameMain::OnActivateStereo3D(wxCommandEvent& event)
 //{
 ////	if(m_canvas->stereoMode == stereoOff){

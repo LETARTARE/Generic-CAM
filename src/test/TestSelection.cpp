@@ -51,11 +51,11 @@ void TestSelection::testCreation()
 	CPPUNIT_ASSERT_EQUAL(false, nothing.IsInverted());
 
 	Selection a(Selection::BaseNone, 12, Selection::Anything, 34);
-	Selection b(a);
-	Selection c = a;
 	CPPUNIT_ASSERT_EQUAL((size_t )1, a.Size());
 	CPPUNIT_ASSERT_EQUAL((size_t )34, a[0]);
+	CPPUNIT_ASSERT_EQUAL((size_t )0, a.GetBaseID());
 
+	Selection b(a);
 	CPPUNIT_ASSERT_EQUAL((size_t )1, b.Size());
 	b.SetBase(Selection::BaseNone, 12);
 	CPPUNIT_ASSERT_EQUAL((size_t )1, b.Size());
@@ -64,20 +64,18 @@ void TestSelection::testCreation()
 	b.Add(100);
 	CPPUNIT_ASSERT_EQUAL((size_t )2, b.Size());
 	b.SetBase(Selection::BaseRun, 123);
-	CPPUNIT_ASSERT_EQUAL((size_t )0, b.Size());
+	CPPUNIT_ASSERT_EQUAL((size_t )2, b.Size());
+	CPPUNIT_ASSERT_EQUAL((size_t )123, b.GetBaseID());
 
+	Selection c = a;
 	c.SetType(Selection::Axis);
 	c.ClearKeepBase();
 	CPPUNIT_ASSERT_EQUAL((size_t )0, c.Size());
+	CPPUNIT_ASSERT_EQUAL((size_t )0, c.GetBaseID());
 
 	Selection d(Selection::BaseObject);
 	CPPUNIT_ASSERT_EQUAL((size_t )0, d.Size());
-
-	CPPUNIT_ASSERT_EQUAL((size_t )0, a.GetBaseID());
-	CPPUNIT_ASSERT_EQUAL((size_t )123, b.GetBaseID());
-	CPPUNIT_ASSERT_EQUAL((size_t )0, c.GetBaseID());
 	CPPUNIT_ASSERT_EQUAL((size_t )0, d.GetBaseID());
-
 }
 
 void TestSelection::testBaseTests()
