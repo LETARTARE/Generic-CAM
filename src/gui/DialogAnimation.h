@@ -27,11 +27,13 @@
 #ifndef ANIMATIONFRAME_H_
 #define ANIMATIONFRAME_H_
 
-#include "../StdInclude.h"
-#include "gui.h"
+#include <wx/event.h>
+#include <wx/timer.h>
 
 #include "../project/generator/DexelTarget.h"
-#include <wx/timer.h>
+#include "gui.h"
+
+class CNCSimulator;
 
 class DialogAnimation:public GUIAnimation {
 	// Constructor/ Destructor
@@ -41,9 +43,8 @@ public:
 
 	bool TransferDataToWindow(void);
 
-	void OnXClose(wxCloseEvent& event);
 	void OnClose(wxCommandEvent& event);
-	void OnSelectToolpath(wxCommandEvent& event);
+	void OnXClose(wxCloseEvent& event);
 	void OnChangeSimulation(wxCommandEvent& event);
 	void OnChangeTime(wxCommandEvent& event);
 	void OnScroll(wxScrollEvent& event);
@@ -57,17 +58,12 @@ public:
 
 private:
 	void PositionSlider(void);
-	int GetSelectedRun(void);
-	Project* GetProject(void);
 	void InitSimulation(void);
 	wxString SecondsToTC(const double t);
 
-	// Member Variables
-public:
-
 private:
 	int runNr;
-	MachineSimulator* simulator;
+	CNCSimulator* simulator;
 
 	DexelTarget model;
 

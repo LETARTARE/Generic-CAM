@@ -47,14 +47,12 @@
 
 #include "Generator.h"
 #include "DexelTarget.h"
-#include "ProtoToolpath.h"
 
 #include <stddef.h>
 
 class GeneratorDexel:public Generator {
 public:
 	GeneratorDexel();
-	virtual void CopyParameterFrom(const Generator * other);
 	virtual ~GeneratorDexel();
 
 	virtual void ToStream(wxTextOutputStream & stream);
@@ -64,16 +62,15 @@ public:
 
 protected:
 
-	void GenerateToolpath(void);
+	void GenerateToolpath(const Run &run,
+			const std::map <size_t, Object>  &objects,
+			const Tool * tool, DexelTarget * base);
 
 	DexelTarget start;
 	DexelTarget target;
 	DexelTarget result;
 
 	DexelTarget debug;
-
-	void QuickCollectToolpaths(ArrayOfProtoToolpath &ptp, const double pathDistance);
-
 };
 
 #endif /* GENERATORDEXEL_H_ */

@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GeneratorDrillDexel.h
+// Name               : CommandRunGeneratorRename.cpp
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 23.12.2017
-// Copyright          : (C) 2017 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 23.12.2019
+// Copyright          : (C) 2019 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,37 +24,34 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef GENERATORDRILLDEXEL_H_
-#define GENERATORDRILLDEXEL_H_
+#include "CommandRunGeneratorRename.h"
 
-/*!\class GeneratorDrillDexel
- * \ingroup Generator
- * \brief ...
- *
- * ...
- */
+#include "../Project.h"
 
-#include "GeneratorDexel.h"
+CommandRunGeneratorRename::CommandRunGeneratorRename(const wxString& name,
+		Project* project, size_t runID, size_t generatorID,
+		const wxString newName) :
+		wxCommand(true, name)
+{
+	this->project = project;
+	this->runID = runID;
+	this->generatorID = generatorID;
+	this->newName = newName;
+}
 
-class GeneratorDrillDexel:public GeneratorDexel {
-public:
-	GeneratorDrillDexel();
-	virtual ~GeneratorDrillDexel();
+bool CommandRunGeneratorRename::Do(void)
+{
+	if(project == NULL) return false;
+	if(project->run.find(runID) == project->run.end()) return false;
+	this->oldName = project->run[runID].generators[generatorID]->name;
+	project->run[runID].generators[generatorID]->name = this->newName;
+	project->Update();
+	return true;
+}
 
-	virtual void CopyParameterFrom(const Generator * other);
-	virtual wxString GetName(void) const;
-	virtual void AddToPanel(wxPanel * panel, CollectionUnits* settings);
-	virtual void TransferDataToPanel(void) const;
-	virtual void TransferDataFromPanel(void);
-	virtual void GenerateToolpath(void);
-
-public:
-
-private:
-	wxStaticText* m_staticTextTwiddleFactor;
-	wxTextCtrl* m_textCtrlTwiddleFactor;
-	wxStaticText* m_staticTextUnit;
-
-};
-
-#endif /* GENERATORDRILLDEXEL_H_ */
+bool CommandRunGeneratorRename::Undo(void)
+{
+	project->run[runID].generators[generatorID]->name = this->oldName;
+	project->Update();
+	return true;
+}

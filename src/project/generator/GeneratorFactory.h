@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunGeneratorDelete.h
-// Purpose            : 
-// Thread Safe        : Yes
+// Name               : GeneratorFactory.h
+// Purpose            : Factory pattern for Generators
+// Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 15.02.2015
+// Created            : 06.03.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,36 +24,37 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDRUNDELETEGENERATOR_H_
-#define COMMANDRUNDELETEGENERATOR_H_
+#ifndef GENERATORFACTORY_H_
+#define GENERATORFACTORY_H_
 
-/*!\class CommandRunGeneratorDelete
- * \brief ...
+/*!\class GeneratorFactory
+ * \ingroup GeneratorBasics
+ * \brief Factory for all available Generator%s
  *
- * ...
+ * To add new Generator%s in GeneratorCollection.cpp, add Generator
+ * to the NewGenerator(...) function
  */
 
-#include "../Project.h"
-#include "../generator/Generator.h"
+#include "Generator.h"
 
-#include <wx/cmdproc.h>
-#include <wx/string.h>
+#include <stddef.h>
 
-class CommandRunGeneratorDelete:public wxCommand {
+class GeneratorFactory {
+	friend class DialogToolpathGenerator;
 public:
-	CommandRunGeneratorDelete(const wxString& name, Project * project,
-			size_t runNr, size_t position);
-	virtual ~CommandRunGeneratorDelete(void);
+	GeneratorFactory();
+//	GeneratorFactory(const GeneratorFactory& other);
+	virtual ~GeneratorFactory();
 
-	bool Do(void);
-	bool Undo(void);
+	static Generator * NewGenerator(size_t generatorNr);
 
-protected:
-	Project * project;
-	int runNr;
-	size_t position;
+//	static size_t GetCount();
+//	wxString GetName(size_t generatorNr) const;
+//	bool FindGenerator(const Generator* generator, size_t *nr) const;
+//	bool FindGenerator(const wxString& name, size_t *nr) const;
 
-	Generator * oldGenerator;
+private:
+//	Generator ** generators;
 };
 
-#endif /* COMMANDRUNDELETEGENERATOR_H_ */
+#endif /* GENERATORFACTORY_H_ */

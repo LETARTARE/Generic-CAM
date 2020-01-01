@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GeneratorCollection.h
-// Purpose            : Collection of Generators
-// Thread Safe        : No
+// Name               : CommandRunGeneratorDelete.h
+// Purpose            : 
+// Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 06.03.2015
+// Created            : 15.02.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,37 +24,36 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef GENERATORCOLLECTION_H_
-#define GENERATORCOLLECTION_H_
+#ifndef COMMANDRUNDELETEGENERATOR_H_
+#define COMMANDRUNDELETEGENERATOR_H_
 
-/*!\class GeneratorCollection
- * \ingroup GeneratorBasics
- * \brief Factory for all available Generator%s
+/*!\class CommandRunGeneratorDelete
+ * \brief ...
  *
- * To add new Generator%s in GeneratorCollection.cpp:
- *   - Increment const size_t N_GENERATORS
- *   - Add Generator to the NewGenerator(...) function
+ * ...
  */
 
-#include "Generator.h"
+#include "../Project.h"
+#include "../generator/Generator.h"
 
-#include <stddef.h>
+#include <wx/cmdproc.h>
+#include <wx/string.h>
 
-class GeneratorCollection {
-	friend class DialogToolpathGenerator;
+class CommandRunGeneratorDelete:public wxCommand {
 public:
-	static Generator * NewGenerator(size_t generatorNr);
-	static size_t GetCount();
-	wxString GetName(size_t generatorNr) const;
-	bool FindGenerator(const Generator* generator, size_t *nr) const;
-	bool FindGenerator(const wxString& name, size_t *nr) const;
+	CommandRunGeneratorDelete(const wxString& name, Project * project,
+			size_t runID, size_t generatorID);
+	virtual ~CommandRunGeneratorDelete(void);
 
-	GeneratorCollection();
-	GeneratorCollection(const GeneratorCollection& other);
-	virtual ~GeneratorCollection();
+	bool Do(void);
+	bool Undo(void);
 
-private:
-	Generator ** generators;
+protected:
+	Project * project;
+	int runID;
+	size_t generatorID;
+
+	Generator * oldGenerator;
 };
 
-#endif /* GENERATORCOLLECTION_H_ */
+#endif /* COMMANDRUNDELETEGENERATOR_H_ */

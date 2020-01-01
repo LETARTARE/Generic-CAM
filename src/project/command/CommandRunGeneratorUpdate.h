@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunGeneratorAdd.h
+// Name               : CommandRunGeneratorUpdate.h
 // Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,33 +24,42 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDRUNADDGENERATOR_H_
-#define COMMANDRUNADDGENERATOR_H_
+#ifndef COMMANDRUNGENERATORUPDATE_H_
+#define COMMANDRUNGENERATORUPDATE_H_
 
-/*!\class CommandRunGeneratorAdd
- * \brief Command to add a toolpath / generator to a project
+/*!\class CommandRunGeneratorUpdate
+ * \brief Update the settings of a toolpath generator
+ *
+ * The toolpath is cleared in this operation. It has to be calculated again afterwards.
+ *
+ * This command takes over the pointer passed to it. It also cares for the deletion of the
+ * generator object at the destruction of this command object or at the end of the
+ * program.
  */
 
-#include "../generator/Generator.h"
 #include "../Project.h"
+#include "../generator/Generator.h"
 
 #include <wx/cmdproc.h>
 #include <wx/string.h>
 
-class CommandRunGeneratorAdd:public wxCommand {
+class CommandRunGeneratorUpdate:public wxCommand {
 public:
-	CommandRunGeneratorAdd(const wxString& name, Project * project, size_t runNr,
-			size_t position, Generator* generator);
-	virtual ~CommandRunGeneratorAdd(void);
+	CommandRunGeneratorUpdate(const wxString& name, Project* project,
+			size_t runID, size_t generatorID, Generator* generator);
+	virtual ~CommandRunGeneratorUpdate(void);
 
 	bool Do(void);
 	bool Undo(void);
 
 protected:
 	Project * project;
-	int runNr;
-	size_t position;
+	int runID;
+	size_t generatorID;
+
 	Generator * newGenerator;
+	Generator * oldGenerator;
+
 };
 
-#endif /* COMMANDRUNADDGENERATOR_H_ */
+#endif /* COMMANDRUNGENERATORUPDATE_H_ */

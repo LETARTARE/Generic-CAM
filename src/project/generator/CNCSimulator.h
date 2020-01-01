@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : MachineSimulator.h
+// Name               : CNCSimulator.h
 // Purpose            : A simulator for the machine operation.
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -23,10 +23,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef MACHINESIMULATOR_H_
-#define MACHINESIMULATOR_H_
+#ifndef CNCSIMULATOR_H_
+#define CNCSIMULATOR_H_
 
-/*!\class MachineSimulator
+/*!\class CNCSimulator
  * \ingroup Machine
  * \brief Simlator of the movement and operation of the machine.
  *
@@ -36,46 +36,32 @@
  *
  */
 
-#include "Machine.h"
-
-#include "../ToolBox.h"
-#include "../ToolPath.h"
-#include "../Workpiece.h"
-#include "../generator/DexelTarget.h"
-
-#include <wx/filename.h>
+#include <stddef.h>
 #include <vector>
-#include "CNCPosition.h"
 
-class MachineSimulator {
+#include "../../3D/AffineTransformMatrix.h"
+#include "../Tool.h"
+#include "CNCPosition.h"
+#include "DexelTarget.h"
+
+class CNCSimulator {
 	// Constructor/ Destructor
 public:
-	MachineSimulator();
-	virtual ~MachineSimulator();
+	CNCSimulator();
+	virtual ~CNCSimulator();
 
-	void InsertMachine(Machine* machine);
-	void InsertToolPath(ToolPath* toolpath);
+	void SetTools(const std::vector <Tool> *tools);
+
 	void InsertTarget(DexelTarget* target); //!< Inserts a target into the simulator. This target remains unchanged.
 	const DexelTarget* GetTarget(void) const; //!< Returns the modified internal target.
 
-	/*! \brief Return the G-code currently executed by the machine
-	 *
-	 * The default value pos = 0 returns the G-code that is/was currently executed.
-	 *
-	 * \param pos Return another G-code block around the current position (0 = current code, -1 = last code, 1 = next code)
-	 * \return wxString with the G-code block
-	 */
-	wxString GetCurrentGCode(int pos = 0) const;
+	void InsertToolPath(std::vector <CNCPosition> * toolpath,
+			bool calculateTiming = true);
+
 	double GetTime(void) const;
 	double GetMaxTime(void) const;
 
-	/*! \brief Return to the first G-code block
-	 *
-	 * Actually it reads in the first G-code but the machine does not move for the time t is set to 0.
-	 *
-	 * \param calculateTiming Only calculates the duration of each G-code, without interpolating or cutting. Used to get the timing right.
-	 */
-	void Reset(bool calculateTiming = true);
+	void Reset(void);
 	void Previous(void);
 	void Step(float tTarget);
 	void Next(void);
@@ -84,15 +70,19 @@ public:
 	void Paint(void) const;
 
 	//Member variables
+	AffineTransformMatrix origin;
+	AffineTransformMatrix stockposition;
 private:
-	Machine* machine; //!< Linked Machine to move around.
-	ToolPath* toolpath; //!< Toolpath to apply to target.
+	const std::vector <Tool> * tools;
+	std::vector <CNCPosition> * toolpath; //!< Toolpath to apply to target.
+
 	DexelTarget* basetarget; //!< Provided target to initialize the internal copy from.
 	DexelTarget target; //!< Internal target to work on.
 
 	bool initialized;
+
 	float tStep;
 	size_t step;
 };
 
-#endif /* MACHINESIMULATOR_H_ */
+#endif /* CNCSIMULATOR_H_ */

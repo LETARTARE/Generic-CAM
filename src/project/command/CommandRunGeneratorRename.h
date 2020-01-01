@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GeneratorTest.h
+// Name               : CommandRunGeneratorRename.h
 // Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 13.07.2011
-// Copyright          : (C) 2011 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 23.12.2019
+// Copyright          : (C) 2019 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,42 +24,29 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef GENERATORTEST_H_
-#define GENERATORTEST_H_
+#ifndef SRC_PROJECT_COMMAND_COMMANDRUNGENERATORRENAME_H_
+#define SRC_PROJECT_COMMAND_COMMANDRUNGENERATORRENAME_H_
 
-/*!\class GeneratorTest
- * \ingroup Generator
- * \brief ...
- *
- * ...
- */
-
-#include "GeneratorDexel.h"
-#include "../Tool.h"
-
-#include <wx/string.h>
 #include <stddef.h>
+#include <wx/cmdproc.h>
+#include <wx/string.h>
 
-class GeneratorTest:public GeneratorDexel {
-	// Constructor/ Destructor
+class Project;
+
+class CommandRunGeneratorRename:public wxCommand {
 public:
-	GeneratorTest();
-	virtual ~GeneratorTest();
+	CommandRunGeneratorRename(const wxString& name, Project * project,
+			size_t runID, size_t generatorID, const wxString newName);
 
-	virtual void CopyParameterFrom(const Generator * other);
-	virtual wxString GetName(void) const;
-	virtual void AddToPanel(wxPanel * panel, CollectionUnits* settings);
-	virtual void TransferDataToPanel(void) const;
-	virtual void TransferDataFromPanel(void);
-	virtual void GenerateToolpath(void);
+	bool Do(void);
+	bool Undo(void);
 
-	//Member variables:
-public:
-	double twiddleFactor;
-
-	wxStaticText* m_staticTextTwiddleFactor;
-	wxTextCtrl* m_textCtrlTwiddleFactor;
-	wxStaticText* m_staticTextUnit;
+protected:
+	Project * project;
+	size_t runID;
+	size_t generatorID;
+	wxString newName;
+	wxString oldName;
 };
 
-#endif /* GENERATORTEST_H_ */
+#endif /* SRC_PROJECT_COMMAND_COMMANDRUNGENERATORRENAME_H_ */

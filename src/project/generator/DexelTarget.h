@@ -38,11 +38,13 @@
 #include "Imprinter.h"
 
 #include "../Tool.h"
-#include "../ToolPath.h"
 #include "../Object.h"
 #include "../../3D/Polygon25.h"
 
 #include <wx/xml/xml.h>
+#include <vector>
+
+#include "CNCPosition.h"
 //#include <cstddef>
 
 class DexelTarget:public Imprinter {
@@ -66,7 +68,7 @@ public:
 	void DocumentField(int x, int y, double height);
 	void DocumentField(int x, int y);
 	void Paint(void) const;
-	void Simulate(const ToolPath &toolpath, const Tool &tool);
+	void Simulate(const std::vector<CNCPosition> &toolpath, const Tool &tool);
 
 // ***** Traversing data *****
 

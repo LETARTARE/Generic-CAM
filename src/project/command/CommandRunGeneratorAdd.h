@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunGeneratorDelete.cpp
+// Name               : CommandRunGeneratorAdd.h
 // Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,41 +24,33 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandRunGeneratorDelete.h"
+#ifndef COMMANDRUNADDGENERATOR_H_
+#define COMMANDRUNADDGENERATOR_H_
 
-CommandRunGeneratorDelete::CommandRunGeneratorDelete(const wxString& name,
-		Project* project, size_t runNr, size_t position) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->runNr = runNr;
-	this->position = position;
-	this->oldGenerator = NULL;
-}
+/*!\class CommandRunGeneratorAdd
+ * \brief Command to add a toolpath / generator to a project
+ */
 
-CommandRunGeneratorDelete::~CommandRunGeneratorDelete(void)
-{
-	if(oldGenerator != NULL) delete oldGenerator;
-}
+#include "../generator/Generator.h"
+#include "../Project.h"
 
-bool CommandRunGeneratorDelete::Do(void)
-{
-	Run* run = &(project->run[runNr]);
-	oldGenerator = *(run->generators.Detach(position));
-	project->Update();
-	return true;
-}
+#include <wx/cmdproc.h>
+#include <wx/string.h>
 
-bool CommandRunGeneratorDelete::Undo(void)
-{
-	Run* run = &(project->run[runNr]);
-	size_t N = run->generators.GetCount();
+class CommandRunGeneratorAdd:public wxCommand {
+public:
+	CommandRunGeneratorAdd(const wxString& name, Project * project,
+			size_t runID, Generator* generator);
+	virtual ~CommandRunGeneratorAdd(void);
 
-	if(position >= N)
-		run->generators.Add(oldGenerator);
-	else
-		run->generators.Insert(oldGenerator, position);
-	oldGenerator = NULL;
-	project->Update();
-	return true;
-}
+	bool Do(void);
+	bool Undo(void);
+
+protected:
+	Project * project;
+	int runID;
+	size_t generatorID;
+	Generator * newGenerator;
+};
+
+#endif /* COMMANDRUNADDGENERATOR_H_ */

@@ -35,64 +35,73 @@
  * Note: The pointers in this class do not own objects. No copy constructor is needed.
  */
 
-#include "../Tool.h"
-//#include "../ToolPath.h"
-#include "../../3D/BoundingBox.h"
-//#include "../../3D/AffineTransformMatrix.h"
-
 #include "../../StdInclude.h"
 #include <wx/panel.h>
 #include <wx/string.h>
 #include <wx/txtstrm.h>
 #include <stddef.h>
+#include <vector>
+#include <map>
 
-#include "../../gui/CollectionUnits.h"
+#include "../Object.h"
+#include "../Tool.h"
+#include "../Selection.h"
+#include "CNCPosition.h"
+#include "DexelTarget.h"
+
 class Run;
-class Workpiece;
+class CollectionUnits;
 
 class Generator {
-	friend class DialogToolpathGenerator;
-	friend class GeneratorCollection;
+//	friend class DialogToolpathGenerator;
+	friend class CommandRunGeneratorAdd;
+//	friend class GeneratorFactory;
 
-	// Constructor/ Destructor
+// Constructor/ Destructor
 public:
 	Generator();
 	virtual ~Generator();
 
 	//Member variables:
 public:
+//	Run * parent; //!< Pointer back to the Run this Generator belongs to.
+
 	wxString name;
-
-	Run * parent; //!< Pointer back to the Run this Generator belongs to.
-	BoundingBox area; //!< Area to work in
-
-//	ToolPath toolpath; //!< Generated ToolPath
-	bool toolpathGenerated; //!< Flag if toolpath was generated
-
-	bool errorOccured;
-	wxString output;
-
-public:
-	// Common settings for all toolpath generators
-	unsigned int refTool; //!< Reference number of a Tool from Run //TODO:: Check for consistency over all classes.
+	Selection area; //!< Area to work in
+	std::string toolguid; //!< Reference to a Tool from Run
+	double spindlespeed;
+	double feedrate;
 	float freeHeight; //!< Distance from the top of the material for fast travel
 	float marginBelow; //!< Distance to the final shape below the tool
 	float marginSide; //!< Distance to the final shape next to the tool
 
-protected:
-	CollectionUnits * settings;
+	bool toolpathGenerated; //!< Flag if toolpath was generated
+	std::vector <CNCPosition> toolpath; //!< Generated ToolPath
+	bool errorOccured;
+	wxString output;
+
+private:
+	size_t ID;
 
 //Methods:
 public:
+	virtual size_t GetID(void);
+	virtual size_t GetType(void) const = 0;
+	virtual wxString GetTypeName(void) const = 0;
 	virtual wxString GetName(void) const;
 	virtual void CopyParameterFrom(const Generator * other);
-	virtual void AddToPanel(wxPanel * panel, CollectionUnits * settings);
-	virtual void TransferDataToPanel(void) const = 0;
-	virtual void TransferDataFromPanel(void) = 0;
+	virtual wxSizer * AddToPanel(wxPanel * panel,
+			CollectionUnits * settings) const = 0;
+	virtual void TransferDataToPanel(wxPanel* panel,
+			CollectionUnits* settings) const = 0;
+	virtual void TransferDataFromPanel(CollectionUnits* settings) = 0;
 	virtual void ToStream(wxTextOutputStream & stream);
 	virtual bool FromStream(wxTextInputStream & stream);
 	virtual void Paint(void) const;
-	virtual void GenerateToolpath(void) = 0;
+	virtual void GenerateToolpath(const Run &run,
+			const std::map <size_t, Object>  &objects,
+			const Tool * tool, DexelTarget * base) = 0;
+	virtual bool operator==(const Generator &b) const;
 };
 
 #endif /* GENERATOR_H_ */

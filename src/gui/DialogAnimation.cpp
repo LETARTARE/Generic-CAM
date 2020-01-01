@@ -29,6 +29,7 @@
 #include <math.h>
 #include "../icon/play.xpm"
 #include "../icon/stop.xpm"
+#include "../project/generator/CNCSimulator.h"
 #include "FrameMain.h"
 #include "IDs.h"
 
@@ -50,68 +51,14 @@ DialogAnimation::~DialogAnimation()
 	NULL, this);
 }
 
-Project* DialogAnimation::GetProject(void)
-{
-	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
-	Project * project = wxStaticCast(frame->GetDocument(), Project);
-	return project;
-}
-
-int DialogAnimation::GetSelectedRun(void)
-{
-	Project* project = GetProject();
-	if(project == NULL) return -1;
-	return project->GetFirstSelectedRun();
-}
-
-void DialogAnimation::InitSimulation(void)
-{
-	runNr = GetSelectedRun();
-	if(runNr >= 0){
-		Project* project = GetProject();
-		Run* run = &(project->run[runNr]);
-		Workpiece* workpiece = run->GetWorkpiece();
-		simulator = &(run->simulator);
-		simulator->InsertMachine(&(run->machine));
-		simulator->InsertToolPath(run->GetFirstSelectedToolpath());
-		if(workpiece != NULL){
-			workpiece->PrepareModel();
-			model.CopyRescale(workpiece->model, 2e5);
-		}
-		simulator->InsertTarget(&model);
-	}else{
-		if(simulator != NULL){
-			simulator->InsertMachine(NULL);
-			simulator->InsertToolPath(NULL);
-		}
-		simulator = NULL;
-	}
-}
-
 bool DialogAnimation::TransferDataToWindow(void)
 {
 	if(loopGuard) return false;
 
+	const FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	const Project * project = wxStaticCast(frame->GetDocument(), Project);
+
 	simulateWorkpiece = m_checkBoxSimulateWorkpiece->GetValue();
-
-	m_choiceToolpath->Clear();
-	m_choiceToolpath->Append(_T(""));
-
-	int selected = -1;
-	Project* project = GetProject();
-	if(project != NULL){
-		for(size_t i = 0; i < project->run.GetCount(); i++){
-			m_choiceToolpath->Append(project->run[i].name);
-			if(selected == -1 && project->run[i].selected) selected = i;
-		}
-		m_choiceToolpath->SetSelection(selected + 1);
-		if(selected >= 0 && this->IsShown()){
-			project->run[selected].showSimulation = simulateWorkpiece;
-		}
-	}else{
-		m_choiceToolpath->Append(_T("No run found."));
-		m_choiceToolpath->SetSelection(0);
-	}
 
 	if(this->IsShown()){
 		InitSimulation();
@@ -126,23 +73,11 @@ bool DialogAnimation::TransferDataToWindow(void)
 	}
 
 	if(simulator != NULL){
-		m_textCtrlMaxTime->SetValue(SecondsToTC(simulator->GetMaxTime()));
-		m_textCtrlTime->SetValue(SecondsToTC(simulator->GetTime()));
-
-		m_textCtrl0->SetValue(simulator->GetCurrentGCode(-2));
-		m_textCtrl1->SetValue(simulator->GetCurrentGCode(-1));
-		m_textCtrl2->SetValue(simulator->GetCurrentGCode(0));
-		m_textCtrl3->SetValue(simulator->GetCurrentGCode(1));
-		m_textCtrl4->SetValue(simulator->GetCurrentGCode(2));
+//		m_textCtrlMaxTime->SetValue(SecondsToTC(simulator->GetMaxTime()));
+//		m_textCtrlTime->SetValue(SecondsToTC(simulator->GetTime()));
 	}else{
 		m_textCtrlMaxTime->SetValue(SecondsToTC(0));
 		m_textCtrlTime->SetValue(SecondsToTC(0));
-
-		m_textCtrl0->SetValue(_T(""));
-		m_textCtrl1->SetValue(_T(""));
-		m_textCtrl2->SetValue(_T(""));
-		m_textCtrl3->SetValue(_T(""));
-		m_textCtrl4->SetValue(_T(""));
 	}
 
 	wxCommandEvent refreshEvent(wxEVT_COMMAND_MENU_SELECTED,
@@ -154,19 +89,28 @@ bool DialogAnimation::TransferDataToWindow(void)
 	return true;
 }
 
-void DialogAnimation::OnXClose(wxCloseEvent &event)
+void DialogAnimation::InitSimulation(void)
 {
-	if(timer.IsRunning()){
-		timer.Stop();
-		TransferDataToWindow();
-	}
-	int selectedRun = GetSelectedRun();
-	Project* project = GetProject();
-	if(project != NULL && selectedRun >= 0) project->run[selectedRun].showSimulation =
-			false;
-	this->Show(false);
-	wxCommandEvent refreshEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
-	ProcessEvent(refreshEvent);
+//	runNr = GetSelectedRun();
+//	if(runNr >= 0){
+//		Project* project = GetProject();
+//		Run* run = &(project->run[runNr]);
+//		Workpiece* workpiece = run->GetWorkpiece();
+//		simulator = &(run->simulator);
+//		simulator->InsertMachine(&(run->machine));
+//		simulator->InsertToolPath(run->GetFirstSelectedToolpath());
+//		if(workpiece != NULL){
+//			workpiece->PrepareModel();
+//			model.CopyRescale(workpiece->model, 2e5);
+//		}
+//		simulator->InsertTarget(&model);
+//	}else{
+//		if(simulator != NULL){
+//			simulator->InsertMachine(NULL);
+//			simulator->InsertToolPath(NULL);
+//		}
+//		simulator = NULL;
+//	}
 }
 
 void DialogAnimation::OnClose(wxCommandEvent& event)
@@ -175,18 +119,22 @@ void DialogAnimation::OnClose(wxCommandEvent& event)
 		timer.Stop();
 		TransferDataToWindow();
 	}
-	int selectedRun = GetSelectedRun();
-	Project* project = GetProject();
-	if(project != NULL && selectedRun >= 0) project->run[selectedRun].showSimulation =
-			false;
+	this->Show(false);
+}
+
+void DialogAnimation::OnXClose(wxCloseEvent &event)
+{
+	if(timer.IsRunning()){
+		timer.Stop();
+		TransferDataToWindow();
+	}
+//	int selectedRun = GetSelectedRun();
+//	Project* project = GetProject();
+//	if(project != NULL && selectedRun >= 0) project->run[selectedRun].showSimulation =
+//			false;
 	this->Show(false);
 	wxCommandEvent refreshEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 	ProcessEvent(refreshEvent);
-}
-
-void DialogAnimation::OnSelectToolpath(wxCommandEvent& event)
-{
-	TransferDataToWindow();
 }
 
 void DialogAnimation::OnChangeTime(wxCommandEvent& event)
@@ -219,7 +167,7 @@ void DialogAnimation::OnScroll(wxScrollEvent& event)
 void DialogAnimation::OnFirst(wxCommandEvent& event)
 {
 	if(simulator == NULL) return;
-	simulator->Reset(true); // TODO Remove the true, the recalculation of the timing is only needed here, because it is not handled correctly.
+	simulator->Reset(); // TODO Remove the true, the recalculation of the timing is only needed here, because it is not handled correctly.
 	PositionSlider();
 	TransferDataToWindow();
 }

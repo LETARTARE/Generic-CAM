@@ -26,22 +26,24 @@
 
 #include "Generator.h"
 
-#include "../Workpiece.h"
-
 #include <GL/gl.h>
 
+#include "../../3D/OpenGLMaterial.h"
 #include "../Run.h"
 
 Generator::Generator()
 {
-	parent = NULL;
-	refTool = 0;
+//	parent = NULL;
+
+	ID = 0;
 
 	marginBelow = 0.0;
 	marginSide = 0.0;
 	freeHeight = 0.001;
 
-	settings = NULL;
+	spindlespeed = 0.0;
+	feedrate = 0.0;
+	toolguid = "#1";
 
 //	this->project = project;
 //	this->runNr = runNr;
@@ -63,51 +65,83 @@ Generator::~Generator()
 
 wxString Generator::GetName(void) const
 {
-	return _T("Base Class");
+	return name;
 }
 
-void Generator::AddToPanel(wxPanel* panel, CollectionUnits* settings)
+size_t Generator::GetID(void)
 {
-	this->settings = settings;
+	return ID;
 }
 
 void Generator::CopyParameterFrom(const Generator * other)
 {
+	this->name = other->name;
 	this->area = other->area;
+	this->toolguid = other->toolguid;
+	this->spindlespeed = other->spindlespeed;
+	this->feedrate = other->feedrate;
+	this->freeHeight = other->freeHeight;
 	this->marginBelow = other->marginBelow;
 	this->marginSide = other->marginSide;
-	this->refTool = other->refTool;
-	this->freeHeight = other->freeHeight;
+}
+
+bool Generator::operator ==(const Generator& b) const
+{
+	std::cout << "Generator::operator==\n";
+	if(this->name != b.name) return false;
+	if(this->area != b.area) return false;
+	if(this->spindlespeed != b.spindlespeed) return false;
+	if(this->feedrate != b.feedrate) return false;
+	if(this->toolguid != b.toolguid) return false;
+	if(this->freeHeight != b.freeHeight) return false;
+	if(this->marginBelow != b.marginBelow) return false;
+	if(this->marginSide != b.marginSide) return false;
+	return true;
 }
 
 void Generator::Paint(void) const
 {
-//	glPushMatrix();
+	if(toolpath.size() < 2) return;
+//	std::cout << "Generator::Paint - " << toolpath.size() << "\n";
+	glPushMatrix();
 //	glTranslatef(area.xmin, area.ymin, area.zmin);
-//	toolpath.Paint();
-//	glPopMatrix();
+	OpenGLMaterial::EnableColors();
+	glBegin(GL_LINE_STRIP);
+	for(std::vector <CNCPosition>::const_iterator it = toolpath.begin();
+			it != toolpath.end(); ++it){
+		if(it->rapid)
+			glColor3f(1, 0, 0);
+		else
+			glColor3f(0, 1, 0);
+		glNormal3f(it->normal.x, it->normal.y, it->normal.z);
+		glVertex3f(it->position.x, it->position.y, it->position.z);
+	}
+	glEnd();
+	glPopMatrix();
+//	std::cout << "Generator::Paint - end\n";
 }
 
 void Generator::ToStream(wxTextOutputStream& stream)
 {
-	area.ToStream(stream);
+//	area.ToStream(stream);
 	stream << marginBelow << _T(" ") << marginSide << endl;
-	stream << refTool;
+	stream << toolguid;
 	stream << _T(" ") << freeHeight << endl;
 //	stream << (int) runNr << _T(" ") << (int) toolpathNr << endl;
 }
 
 bool Generator::FromStream(wxTextInputStream& stream)
 {
-	if(!area.FromStream(stream)) return false;
+//	if(!area.FromStream(stream)) return false;
 	stream >> marginBelow;
 	stream >> marginSide;
-	stream >> refTool;
+//	stream >> toolguid;
 	stream >> freeHeight;
 //	runNr = stream.Read32();
 //	toolpathNr = stream.Read32();
 	return true;
 }
+
 //void Project::GenerateToolPath(void)
 //{
 //	size_t i, j;

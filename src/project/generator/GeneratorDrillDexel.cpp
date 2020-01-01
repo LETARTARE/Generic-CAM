@@ -41,20 +41,19 @@ GeneratorDrillDexel::~GeneratorDrillDexel()
 void GeneratorDrillDexel::CopyParameterFrom(const Generator* other)
 {
 	GeneratorDexel::CopyParameterFrom(other);
-
 	const GeneratorDrillDexel * temp =
 			dynamic_cast <const GeneratorDrillDexel*>(other);
 }
 
-wxString GeneratorDrillDexel::GetName(void) const
+bool GeneratorDrillDexel::operator ==(const Generator& b) const
 {
-	return _T("Drilling Holes (using Dexel)");
+	if(!(this->Generator::operator ==(b))) return false;
+	return true;
 }
 
-void GeneratorDrillDexel::AddToPanel(wxPanel* panel, CollectionUnits* settings)
+wxSizer * GeneratorDrillDexel::AddToPanel(wxPanel* panel,
+		CollectionUnits* settings) const
 {
-	Generator::AddToPanel(panel, settings);
-
 	wxBoxSizer* bSizer;
 	bSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -81,33 +80,35 @@ void GeneratorDrillDexel::AddToPanel(wxPanel* panel, CollectionUnits* settings)
 
 	bSizer->Add(fgSizer, 0, wxALIGN_CENTER_HORIZONTAL, 5);
 
-	panel->SetSizer(bSizer);
-	panel->Layout();
-	bSizer->Fit(panel);
+	return bSizer;
 }
 
-void GeneratorDrillDexel::TransferDataToPanel(void) const
+void GeneratorDrillDexel::TransferDataToPanel(wxPanel* panel,
+		CollectionUnits* settings) const
 {
 }
 
-void GeneratorDrillDexel::TransferDataFromPanel(void)
+void GeneratorDrillDexel::TransferDataFromPanel(CollectionUnits* settings)
 {
 }
 
-void GeneratorDrillDexel::GenerateToolpath(void)
+void GeneratorDrillDexel::GenerateToolpath(const Run &run,
+		const std::map <size_t, Object> &objects,
+		const Tool * tool, DexelTarget * base)
 {
+	GeneratorDexel::GenerateToolpath(run, objects, tool, base);
+
 	output.Empty();
 	errorOccured = false;
 	toolpathGenerated = true;
-	const Run* const run = this->parent;
-	assert(run != NULL);
-	if(refTool >= run->machine.tools.GetCount()){
-		output = _T("Tool empty.");
-		errorOccured = true;
-		return;
-	}
-	GeneratorDexel::GenerateToolpath();
-	const Tool* const tool = &(run->machine.tools[refTool]);
+//	const Run* const run = this->parent;
+//	assert(run != NULL);
+//	if(refTool >= run->machine.tools.GetCount()){
+//		output = _T("Tool empty.");
+//		errorOccured = true;
+//		return;
+//	}
+//	const Tool* const tool = &(run->machine.tools[refTool]);
 
 //	DexelTarget surface = target;
 //	DexelTarget toolShape;
@@ -117,8 +118,8 @@ void GeneratorDrillDexel::GenerateToolpath(void)
 //	target.FoldRaise(toolShape);
 //	target.Limit();
 
-	target.GenerateDistanceMap(FLT_EPSILON, target.GetSizeZ() + FLT_EPSILON);
-	debug = target;
-	debug.CopyToUp(4, 1);
+//	target.GenerateDistanceMap(FLT_EPSILON, target.GetSizeZ() + FLT_EPSILON);
+//	debug = target;
+//	debug.CopyToUp(4, 1);
 
 }

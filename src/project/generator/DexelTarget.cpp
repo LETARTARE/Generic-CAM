@@ -88,8 +88,8 @@ DexelTarget::~DexelTarget()
 void DexelTarget::InsertObject(const Object &object,
 		const AffineTransformMatrix & shift)
 {
-	for(size_t i = 0; i < object.geometries.GetCount(); i++)
-		InsertGeometrie(&(object.geometries[i]), shift * object.matrix);
+//	for(size_t i = 0; i < object.geometry.GetCount(); i++)
+//		InsertGeometrie(&(object.geometries[i]), shift * object.matrix);
 }
 
 void DexelTarget::SetupTool(const Tool &tool, const double resolutionX,
@@ -125,28 +125,30 @@ void DexelTarget::SetupTool(const Tool &tool, const double resolutionX,
 				d = sqrt(d);
 			else
 				d = 0.0;
-			field[p].up = d;
-			field[p].down = FLT_MAX;
+			field[p].up = -FLT_MAX;
+			field[p].down = d;
 			px += rx;
 			p++;
 		}
 		py += ry;
 	}
-
-	for(size_t i = 0; i < tool.contour.GetCount(); i++){
-		const double dRadius = tool.contour[i].p2.x - tool.contour[i].p1.x;
-		if(dRadius >= 0) continue;
+	for(size_t i = 0; i < tool.contour.size(); i++){
+		const double dRadius = tool.contour[i].x1 - tool.contour[i].x0;
+		if(dRadius <= 0.0) continue;
 		for(size_t j = 0; j < this->N; j++){
-			if(field[j].up < tool.contour[i].p2.x
-					|| field[j].up > tool.contour[i].p1.x) continue;
+			if(field[j].down > tool.contour[i].x1
+					|| field[j].down < tool.contour[i].x0) continue;
 			// Linear interpolation for conic changes
-			double d = (tool.contour[i].p2.z - tool.contour[i].p1.z)
-					* (field[j].up - tool.contour[i].p1.x) / dRadius;
-			d += tool.contour[i].p1.z;
+			double d = (tool.contour[i].z1 - tool.contour[i].z0)
+					* (field[j].down - tool.contour[i].x0) / dRadius;
+			d += tool.contour[i].z0;
 			// Turn tool around, so that it is pointing in -Z direction, tip at 0.
-			d = depth - d;
-			if(d < field[j].down) field[j].down = d;
-
+//			d = depth - d;
+			if(d > field[j].up){
+				field[j].up = d;
+				field[j].normalx = tool.contour[i].nx;
+				field[j].normaly = tool.contour[i].nz;
+			}
 		}
 	}
 	if(addMachineSafety){
@@ -159,16 +161,10 @@ void DexelTarget::SetupTool(const Tool &tool, const double resolutionX,
 					(depth + 20e-3);
 			if(field[j].down > (depth + 25e-3)) field[j].down = (depth + 25e-3);
 		}
-
-		// Put a square cap on top of the tool.
-		for(size_t j = 0; j < this->N; j++)
-			field[j].up = depth + 35e-3;
-	}else{
-		// Put a square cap on top of the tool.
-		for(size_t j = 0; j < this->N; j++)
-			field[j].up = depth;
-
 	}
+	// Put a square cap on top of the tool.
+	for(size_t j = 0; j < this->N; j++)
+		field[j].down = -tool.geometry.LB;
 	refresh = true;
 }
 
@@ -218,17 +214,18 @@ void DexelTarget::Paint(void) const
 	outLine.Paint();
 }
 
-void DexelTarget::Simulate(const ToolPath &toolpath, const Tool &tool)
+void DexelTarget::Simulate(const std::vector <CNCPosition> &toolpath,
+		const Tool &tool)
 {
 	DexelTarget toolShape;
 	toolShape.SetupTool(tool, GetResolutionX(), GetResolutionY());
 	this->InitImprinting();
 	this->HardInvert();
 	Polygon3 temp;
-	for(size_t i = 0; i < toolpath.positions.GetCount(); i++){
-		temp.InsertPoint(toolpath.positions[i].X, toolpath.positions[i].Y,
-				toolpath.positions[i].Z);
-	}
+	for(std::vector <CNCPosition>::const_iterator position = toolpath.begin();
+			position != toolpath.end(); ++position)
+		temp.InsertPoint(position->position.x, position->position.y,
+				position->position.z);
 	this->PolygonCutInTarget(temp, toolShape);
 }
 

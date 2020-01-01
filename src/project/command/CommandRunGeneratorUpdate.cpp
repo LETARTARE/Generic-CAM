@@ -27,12 +27,13 @@
 #include "CommandRunGeneratorUpdate.h"
 
 CommandRunGeneratorUpdate::CommandRunGeneratorUpdate(const wxString& name,
-		Project* project, size_t runNr, size_t position, Generator* generator) :
+		Project* project, size_t runID, size_t generatorID,
+		Generator* generator) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->runNr = runNr;
-	this->position = position;
+	this->runID = runID;
+	this->generatorID = generatorID;
 	this->newGenerator = generator;
 	this->oldGenerator = NULL;
 }
@@ -45,9 +46,9 @@ CommandRunGeneratorUpdate::~CommandRunGeneratorUpdate(void)
 
 bool CommandRunGeneratorUpdate::Do(void)
 {
-	Run* run = &(project->run[runNr]);
-	oldGenerator = run->generators[position];
-	run->generators[position] = newGenerator;
+	Run* run = &(project->run[runID]);
+	oldGenerator = run->generators[generatorID];
+	run->generators[generatorID] = newGenerator;
 	newGenerator = NULL;
 	project->Update();
 	return true;
@@ -55,9 +56,9 @@ bool CommandRunGeneratorUpdate::Do(void)
 
 bool CommandRunGeneratorUpdate::Undo(void)
 {
-	Run* run = &(project->run[runNr]);
-	newGenerator = run->generators[position];
-	run->generators[position] = oldGenerator;
+	Run* run = &(project->run[runID]);
+	newGenerator = run->generators[generatorID];
+	run->generators[generatorID] = oldGenerator;
 	oldGenerator = NULL;
 	project->Update();
 	return true;

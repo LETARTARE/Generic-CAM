@@ -36,47 +36,37 @@
 
 #include "../StdInclude.h"
 #include "../project/Project.h"
-#include "../project/generator/GeneratorCollection.h"
 #include "gui.h"
-#include <wx/cmdproc.h>
+#include <wx/thread.h>
 
 class DialogToolpathGenerator:public GUIToolpathGenerator {
 public:
 	DialogToolpathGenerator(wxWindow* parent);
 	virtual ~DialogToolpathGenerator();
 
-	bool TransferDataToWindow(void);
-	bool TransferDataFromWindow(void);
+	void SetRunGenerator(size_t runID, size_t generatorID);
+	size_t GetRunID(void) const;
+	bool TransferDataToWindow(bool updateGeneratorPanel = false);
+	bool TransferDataFromWindow(Generator * generator) const;
 
-	void UndoChanges(void);
+	bool UpdateGenerator(void);
 
 	void OnXClose(wxCloseEvent& event);
-	void OnSelectRun(wxCommandEvent& event);
-	void OnSelectToolpath(wxCommandEvent& event);
-	void OnAdd(wxCommandEvent& event);
-	void OnChangeText(wxCommandEvent& event);
+	void OnChar(wxKeyEvent& event);
+	void OnLeftDown(wxMouseEvent& event);
 	void OnSelectArea(wxCommandEvent& event);
 	void OnSelectTool(wxCommandEvent& event);
-	void OnPageChanged(wxChoicebookEvent& event);
+	void OnTextEnter(wxCommandEvent& event);
+	bool OnSelected(size_t ID, Selection selection);
 	void OnUpdate(wxCommandEvent& event);
-	void OnResetChanges(wxCommandEvent& event);
-	void OnDelete(wxCommandEvent& event);
-	void OnClose(wxCommandEvent& event);
-
 private:
-	Project* GetProject(void);
-	GeneratorCollection gc;
-	int GetGeneratorNr(int runNr, int toolpathNr);
+	size_t runID;
+	size_t generatorID;
+	Generator * localGenerator;
 
-	int currentRun;
-	int currentToolpath;
-	BoundingBox box;
-	float marginSides;
-	float marginBelow;
-	size_t slotNr;
-	float freeHeight;
+	Selection bufferarea;
 
-	bool loopGuard;
+	wxMutex loopguard;
 };
 
 #endif /* DIALOGTOOLPATHGENERATOR_H_ */

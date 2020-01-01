@@ -33,9 +33,10 @@
 #include "../../3D/AffineTransformMatrix.h"
 #include "../../3D/Polygon25.h"
 #include "../../3D/Vector3.h"
-#include "../machine/CNCPosition.h"
+#include "../../gui/CollectionUnits.h"
+#include "../../gui/gui.h"
+#include "CNCPosition.h"
 #include "../Project.h"
-#include "../ToolPath.h"
 #include "DexelTarget.h"
 
 GeneratorTest::GeneratorTest()
@@ -45,27 +46,11 @@ GeneratorTest::GeneratorTest()
 
 GeneratorTest::~GeneratorTest()
 {
-
 }
 
-void GeneratorTest::CopyParameterFrom(const Generator* other)
+wxSizer * GeneratorTest::AddToPanel(wxPanel* panel,
+		CollectionUnits* settings) const
 {
-	GeneratorDexel::CopyParameterFrom(other);
-
-	const GeneratorTest * temp = dynamic_cast <const GeneratorTest*>(other);
-
-	twiddleFactor = temp->twiddleFactor;
-}
-
-wxString GeneratorTest::GetName(void) const
-{
-	return _T("Test Generator (using Dexel)");
-}
-
-void GeneratorTest::AddToPanel(wxPanel* panel, CollectionUnits* settings)
-{
-	Generator::AddToPanel(panel, settings);
-
 	wxBoxSizer* bSizer;
 	bSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -92,70 +77,80 @@ void GeneratorTest::AddToPanel(wxPanel* panel, CollectionUnits* settings)
 
 	bSizer->Add(fgSizer, 0, wxALIGN_CENTER_HORIZONTAL, 5);
 
-	panel->SetSizer(bSizer);
-	panel->Layout();
-	bSizer->Fit(panel);
-
+	return bSizer;
 }
 
-void GeneratorTest::TransferDataToPanel(void) const
+void GeneratorTest::CopyParameterFrom(const Generator* other)
 {
+	GeneratorDexel::CopyParameterFrom(other);
+	const GeneratorTest * temp = dynamic_cast <const GeneratorTest*>(other);
+	twiddleFactor = temp->twiddleFactor;
+//	m_textCtrlTwiddleFactor = temp->m_textCtrlTwiddleFactor;
+//	m_staticTextUnit = temp->m_staticTextUnit;
+}
+
+bool GeneratorTest::operator ==(const Generator& b) const
+{
+	const GeneratorTest * temp = dynamic_cast <const GeneratorTest*>(&b);
+	std::cout << "GeneratorTest::operator ==\n";
+	if(!(this->Generator::operator ==(b))) return false;
+	if(this->twiddleFactor != temp->twiddleFactor) return false;
+	return true;
+}
+
+void GeneratorTest::TransferDataToPanel(wxPanel* panel,
+		CollectionUnits* settings) const
+{
+	std::cout << "GeneratorTest::TransferDataToPanel(...)\n";
 	m_staticTextUnit->SetLabel(settings->SmallDistance.GetOtherName());
 	m_textCtrlTwiddleFactor->SetValue(
 			settings->SmallDistance.TextFromSI(twiddleFactor));
-
 }
 
-void GeneratorTest::TransferDataFromPanel(void)
+void GeneratorTest::TransferDataFromPanel(CollectionUnits* settings)
 {
+	std::cout << "GeneratorTest::TransferDataFromPanel(...)\n";
 	twiddleFactor = settings->SmallDistance.SIFromString(
 			m_textCtrlTwiddleFactor->GetValue());
 }
 
-void GeneratorTest::GenerateToolpath(void)
+void GeneratorTest::GenerateToolpath(const Run &run,
+		const std::map <size_t, Object> &objects, const Tool * tool,
+		DexelTarget * base)
 {
 	output.Empty();
-	const Run* const run = this->parent;
-	assert(run != NULL);
-	if(refTool >= run->machine.tools.GetCount()){
-		output = _T("Tool empty.");
-		errorOccured = true;
-		return;
-	}
 
-	GeneratorDexel::GenerateToolpath();
-
-	const Tool* const tool = &(run->machine.tools[refTool]);
+	GeneratorDexel::GenerateToolpath(run, objects, tool, base);
 
 	const double maxCutDepth = tool->GetCuttingDepth();
 
 	const double tolerance = 0.0001; // 1/10 mm
 
-	ToolPath tp;
+	std::vector <CNCPosition> tp;
 
 	DexelTarget toolShape;
 	toolShape.SetupTool(*tool, target.GetResolutionX(), target.GetResolutionY(),
 			false);
 
-	toolShape.NegateZ();
+//	toolShape.NegateZ();
 	DexelTarget temp = target;
 	DexelTarget tempStart = start;
-	temp.FoldRaise(toolShape);
-	tempStart.FoldRaise(toolShape);
+//	temp.FoldRaise(toolShape);
+//	tempStart.FoldRaise(toolShape);
 	temp.Limit();
 	tempStart.Limit();
-	toolShape.NegateZ();
+//	toolShape.NegateZ();
 
 	DexelTarget temptop = temp;
 	temp.InvertTop();
 	temp &= tempStart;
 	double level = temp.GetSizeZ(); // at upper surface
 
-	GCodeBlock m;
-	m.X = 0.0;
-	m.Y = 0.0;
-	m.Z = temp.GetSizeZ() + freeHeight;
-	m.Rapid();
+	CNCPosition m;
+	m.toolID = tool->postprocess.number;
+	m.F = tool->startvalues.fn;
+	m.S = tool->startvalues.n;
+	m.Set(0.0, 0.0, temp.GetSizeZ() + freeHeight, true);
 
 	std::vector <Polygon25> pgs;
 	Polygon25 pg;
@@ -198,38 +193,39 @@ void GeneratorTest::GenerateToolpath(void)
 		for(size_t i = pgs.size(); i > 0; i--){
 			if(pgs[i - 1].Size() == 0) continue;
 
-			pgs[i - 1].RotatePolygonStart(m.X, m.Y);
+			pgs[i - 1].RotatePolygonStart(m.position.x, m.position.y);
 
 			if(!isMillUp){
-				const double d2 = (m.X - pgs[i - 1][0].x)
-						* (m.X - pgs[i - 1][0].x)
-						+ (m.Y - pgs[i - 1][0].y) * (m.Y - pgs[i - 1][0].y);
+				const double d2 = (m.position.x - pgs[i - 1][0].x)
+						* (m.position.x - pgs[i - 1][0].x)
+						+ (m.position.y - pgs[i - 1][0].y)
+								* (m.position.y - pgs[i - 1][0].y);
 				if(d2 > (twiddleFactor * twiddleFactor)){
 					// Move tool out of material to travel to next polygon.
-					m.Rapid();
-					m.Z = temp.GetSizeZ() + freeHeight;
-					tp.positions.Add(m);
+					m.rapid = true;
+					m.position.z = temp.GetSizeZ() + freeHeight;
+					tp.push_back(m);
 					isMillUp = true;
 				}
 			}
 
 			if(isMillUp){
 				// Move tool to next position
-				m.X = pgs[i - 1][0].x;
-				m.Y = pgs[i - 1][0].y;
-				m.Z = temp.GetSizeZ() + freeHeight;
-				m.Rapid();
-				tp.positions.Add(m);
+				m.position.x = pgs[i - 1][0].x;
+				m.position.y = pgs[i - 1][0].y;
+				m.position.z = temp.GetSizeZ() + freeHeight;
+				m.rapid = true;
+				tp.push_back(m);
 			}
 			// Add polyg.positions[i].X,on
-			m.FeedSpeed();
+			m.rapid = false;
 			isMillUp = false;
 
 			for(size_t j = 0; j < pgs[i - 1].Size(); j++){
-				m.X = pgs[i - 1][j].x;
-				m.Y = pgs[i - 1][j].y;
-				m.Z = pgs[i - 1][j].z;
-				tp.positions.Add(m);
+				m.position.x = pgs[i - 1][j].x;
+				m.position.y = pgs[i - 1][j].y;
+				m.position.z = pgs[i - 1][j].z;
+				tp.push_back(m);
 			}
 		}
 		pgs.clear();
@@ -244,17 +240,18 @@ void GeneratorTest::GenerateToolpath(void)
 		}
 
 		// Move tool out of material
-		m.Z = temp.GetSizeZ() + freeHeight;
-		m.Rapid();
+		m.position.z = temp.GetSizeZ() + freeHeight;
+		m.rapid = true;
 		isMillUp = true;
-		tp.positions.Add(m);
+		tp.push_back(m);
 #ifdef _DEBUGMODE
-		wxLogMessage(wxString::Format(_T("Next Level: %.3f m"), level));
+		wxLogMessage
+		(wxString::Format(_T("Next Level: %.3f m"), level));
 //		level = -1;
 #endif
 	}
 //	debug = temp;
-	tp.FlagAll(true);
+//	tp.FlagAll(true);
 
 	toolpath = tp;
 }

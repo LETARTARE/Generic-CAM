@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunGeneratorUpdate.h
+// Name               : CommandRunGeneratorAdd.cpp
 // Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,42 +24,39 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDRUNGENERATORUPDATE_H_
-#define COMMANDRUNGENERATORUPDATE_H_
+#include "CommandRunGeneratorAdd.h"
 
-/*!\class CommandRunGeneratorUpdate
- * \brief Update the settings of a toolpath generator
- *
- * The toolpath is cleared in this operation. It has to be calculated again afterwards.
- *
- * This command takes over the pointer passed to it. It also cares for the deletion of the
- * generator object at the destruction of this command object or at the end of the
- * program.
- */
+CommandRunGeneratorAdd::CommandRunGeneratorAdd(const wxString& name,
+		Project* project, size_t runID, Generator* generator) :
+		wxCommand(true, name)
+{
+	this->project = project;
+	this->runID = runID;
+	project->maxGeneratorID++;
+	this->generatorID = project->maxGeneratorID;
+	generator->ID = project->maxGeneratorID;
+	this->newGenerator = generator;
+}
 
-#include "../Project.h"
-#include "../generator/Generator.h"
+CommandRunGeneratorAdd::~CommandRunGeneratorAdd()
+{
+	if(newGenerator != NULL) delete newGenerator;
+}
 
-#include <wx/cmdproc.h>
-#include <wx/string.h>
+bool CommandRunGeneratorAdd::Do(void)
+{
+	Run* run = &(project->run[runID]);
+	run->generators[generatorID] = newGenerator;
+	newGenerator = NULL;
+	project->Update();
+	return true;
+}
 
-class CommandRunGeneratorUpdate:public wxCommand {
-public:
-	CommandRunGeneratorUpdate(const wxString& name, Project * project,
-			size_t runNr, size_t position, Generator* generator);
-	virtual ~CommandRunGeneratorUpdate(void);
-
-	bool Do(void);
-	bool Undo(void);
-
-protected:
-	Project * project;
-	int runNr;
-	size_t position;
-
-	Generator * newGenerator;
-	Generator * oldGenerator;
-
-};
-
-#endif /* COMMANDRUNGENERATORUPDATE_H_ */
+bool CommandRunGeneratorAdd::Undo(void)
+{
+	Run* run = &(project->run[runID]);
+	newGenerator = run->generators[generatorID];
+	run->generators.erase(generatorID);
+	project->Update();
+	return true;
+}

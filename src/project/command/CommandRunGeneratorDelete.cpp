@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunGeneratorAdd.cpp
+// Name               : CommandRunGeneratorDelete.cpp
 // Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
@@ -24,40 +24,37 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandRunGeneratorAdd.h"
+#include "CommandRunGeneratorDelete.h"
 
-CommandRunGeneratorAdd::CommandRunGeneratorAdd(const wxString& name,
-		Project* project, size_t runNr, size_t position, Generator* generator) :
+CommandRunGeneratorDelete::CommandRunGeneratorDelete(const wxString& name,
+		Project* project, size_t runID, size_t generatorID) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->runNr = runNr;
-	this->position = position;
-	this->newGenerator = generator;
+	this->runID = runID;
+	this->generatorID = generatorID;
+	this->oldGenerator = NULL;
 }
 
-CommandRunGeneratorAdd::~CommandRunGeneratorAdd()
+CommandRunGeneratorDelete::~CommandRunGeneratorDelete(void)
 {
-	if(newGenerator != NULL) delete newGenerator;
+	if(oldGenerator != NULL) delete oldGenerator;
 }
 
-bool CommandRunGeneratorAdd::Do(void)
+bool CommandRunGeneratorDelete::Do(void)
 {
-	Run* run = &(project->run[runNr]);
-	size_t N = run->generators.GetCount();
-	if(position >= N)
-		run->generators.Add(newGenerator);
-	else
-		run->generators.Insert(newGenerator, position);
-	newGenerator = NULL;
+	Run* run = &(project->run[runID]);
+	oldGenerator = run->generators[generatorID];
+	run->generators.erase(generatorID);
 	project->Update();
 	return true;
 }
 
-bool CommandRunGeneratorAdd::Undo(void)
+bool CommandRunGeneratorDelete::Undo(void)
 {
-	Run* run = &(project->run[runNr]);
-	newGenerator = *(run->generators.Detach(position));
+	Run* run = &(project->run[runID]);
+	run->generators[generatorID] = oldGenerator;
+	oldGenerator = NULL;
 	project->Update();
 	return true;
 }
