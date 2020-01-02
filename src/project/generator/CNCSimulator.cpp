@@ -115,13 +115,13 @@ void CNCSimulator::Step(float tTarget)
 	const Tool * tool = NULL;
 	for(std::vector <Tool>::const_iterator it = tools->begin();
 			it != tools->end(); ++it){
-		if(it->postprocess.number == (*toolpath)[step].toolID){
+		if(it->postprocess.number == (*toolpath)[step].toolSlot){
 			tool = &(*it);
 		}
 	}
 	if(tool == NULL){
 		std::cout << "NCSimulator::Step(...) - Tool T"
-				<< (*toolpath)[step].toolID << " not found.\n";
+				<< (*toolpath)[step].toolSlot << " not found.\n";
 		return;
 	}
 	DexelTarget dex;

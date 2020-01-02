@@ -38,7 +38,7 @@ public:
 		friend std::ostream& operator<<(std::ostream &out, const Axis &axis);
 		std::string name;
 		bool negativ;
-		enum Direction{
+		enum Direction {
 			X = 0, Y = 1, Z = 2
 		} ref;
 		bool rotational;
@@ -53,9 +53,9 @@ public:
 
 	virtual std::map <std::string, std::string> GetParameter(void) const;
 	virtual bool SetParameter(std::string name, std::string value);
-	void Update(void);
 	virtual bool SaveGCode(std::string filename);
-
+private:
+	void Update(void);
 public:
 	std::vector <Axis> axis;
 

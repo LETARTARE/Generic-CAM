@@ -120,14 +120,16 @@ void DialogPostProcess::OnExport(wxCommandEvent& event)
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	if(!project->Has(selected)) return;
 
-	int processorID = -1;
+	int processorID = m_choiceSelect->GetSelection();
+	if(processorID < 0) return;
+
 	std::vector <CNCPosition> toolpath;
+	size_t runID = -1;
 
 	if(selected.IsBaseType(Selection::BaseRun)){
-		const Run & run = project->GetRun(selected.GetBaseID());
-		processorID = m_choiceSelect->GetSelection();
-		if(processorID < 0) return;
-		for(std::vector <size_t>::const_iterator generatorID = selected.begin();
+		runID = selected.GetBaseID();
+		const Run & run = project->GetRun(runID);
+		for(std::set <size_t>::const_iterator generatorID = selected.begin();
 				generatorID != selected.end(); ++generatorID){
 			const std::vector <CNCPosition> &other = run.generators.at(
 					*generatorID)->toolpath;
@@ -135,8 +137,19 @@ void DialogPostProcess::OnExport(wxCommandEvent& event)
 		}
 		postprocessors[processorID].SetCoordinateSystem(run.origin);
 	}
-
-	if(processorID < 0) return;
+	if(selected.IsType(Selection::Run)){
+		assert(selected.Size() == 1);
+		runID = selected[0];
+		const Run & run = project->GetRun(runID);
+		for(std::map <size_t, Generator*>::const_iterator generator =
+				run.generators.begin(); generator != run.generators.end();
+				++generator){
+			const std::vector <CNCPosition> &other =
+					(generator->second)->toolpath;
+			toolpath.insert(toolpath.end(), other.begin(), other.end());
+		}
+		postprocessors[processorID].SetCoordinateSystem(run.origin);
+	}
 	postprocessors[processorID].SetToolPath(&toolpath);
 	std::string filename = std::string(
 			m_filePickerExport->GetFileName().GetFullPath().mb_str());

@@ -243,11 +243,16 @@ void Run::GenerateToolpaths(void)
 		it->second->GenerateToolpath(*this, *(parent->GetObjects()), tool,
 				&base);
 
+		Vector3 temp(stock.xmin,stock.ymin,stock.zmin);
 		if(!it->second->toolpath.empty()){
 			const size_t N = it->second->toolpath.size();
 			for(size_t n = 0; n < N; ++n){
 				it->second->toolpath[n].S = 200; // 1/s
 				it->second->toolpath[n].F = 0.025; // m/s
+
+				// Shift origin into absolute coordinates.
+				it->second->toolpath[n].position+=temp;
+
 			}
 		}
 

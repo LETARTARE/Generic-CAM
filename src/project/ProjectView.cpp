@@ -211,8 +211,8 @@ void ProjectView::PaintRun(const Selection& sel) const
 	for(std::map <size_t, Run>::const_iterator run = project->run.begin();
 			run != project->run.end(); ++run){
 		glPushMatrix();
-		glTranslatef(run->second.stock.xmin, run->second.stock.ymin,
-				run->second.stock.zmin);
+//		glTranslatef(run->second.stock.xmin, run->second.stock.ymin,
+//				run->second.stock.zmin);
 		for(std::map <size_t, Generator*>::const_iterator it =
 				run->second.generators.begin();
 				it != run->second.generators.end(); ++it){

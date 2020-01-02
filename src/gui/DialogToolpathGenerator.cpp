@@ -95,7 +95,7 @@ bool DialogToolpathGenerator::TransferDataToWindow(bool updateGeneratorPanel)
 	for(size_t n = 0; n < project->GetToolCount(); ++n){
 		const Tool & tool = project->GetTool(n);
 		newTools.Add(
-				wxString::Format(_T("T%zu - "), tool.postprocess.number)
+				wxString::Format(_T("T%i - "), tool.postprocess.number)
 						+ tool.description);
 	}
 	wxArrayString oldTools = m_choiceTool->GetStrings();

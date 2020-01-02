@@ -30,6 +30,24 @@
 #include <fstream>
 #include <float.h>
 
+std::string UnEscape(const std::string &input)
+{
+	std::string temp = input;
+	size_t index = 0;
+	for(size_t index = 0; index < temp.size(); ++index){
+		index = temp.find("\\", index);
+		if(index == std::string::npos) break;
+		if(index + 1 == temp.size()) break;
+		char c = temp[index + 1];
+		if(c == 't') c = (char) 9;
+		if(c == 'n') c = (char) 10;
+		if(c == 'r') c = (char) 13;
+		temp.erase(index, 1);
+		temp[index] = c;
+	}
+	return temp;
+}
+
 GenericPostProcessor::Axis::Axis()
 {
 	ref = X;
@@ -98,7 +116,7 @@ std::ostream& operator<<(std::ostream &out,
 		const GenericPostProcessor::Axis &axis)
 {
 	if(fabs(axis.oldValue - axis.value) < FLT_EPSILON) return out;
-	out << " " << axis.name << ((axis.negativ)? (-axis.value) : axis.value);
+	out << axis.name << ((axis.negativ)? (-axis.value) : axis.value) << " ";
 	return out;
 }
 
@@ -109,9 +127,9 @@ GenericPostProcessor::GenericPostProcessor(const std::string name) :
 	// 5 axis CNC: XYZB~X-A~Y   +X~X +Y~Y +Z~Z +B~X -A~Y
 	// Switched axes: X~Y Y~Z Z~X
 	preblock =
-			"G90 G80 G40 G54 G21 G17 G50 G94 G64 (safety block)\nG49 (disable tool length compensation)\nG80 (disable modal motion)\nG64 P2 (exact path mode)";
+			"G90 (set absolute distance mode)\\nG80 (cancel modal motion)\\nG40 (cutter radius compensation in XY plane)\\nG54 (coordinate system 1 active)\\nG21 (length units: mm)\\nG17 (work in XY plane)\\nG50 (cancel scaling function)\\nG94 (per minute feed)\\nG64 (continuous path control mode)\\nG49 (Disable tool length compensation)\\nG80 (disable modal motion)\\nG61 (exact path mode)\\nG64 P2 (cut corners)";
 	postblock =
-			"M5 (stop spindel)\nG4 P3 (wait for 3 seconds)\nM2 (end programm)";
+			"M5 (stop spindel)\\nG4 P3 (wait for 3 seconds)\\nM2 (end programm)";
 }
 
 GenericPostProcessor::~GenericPostProcessor()
@@ -163,11 +181,13 @@ void GenericPostProcessor::Update(void)
 						|| c == '+' || c == '-')){
 			axis.push_back(temp);
 			temp.negativ = false;
+			temp.rotational = false;
 			temp.oldValue = -FLT_MAX;
 		}
 		if(state == 1 || state == 3){
 			if(c == '-') temp.negativ = true;
 			if(c == '+') temp.negativ = false;
+			if(c == '-' || c == '+') newState = 0;
 		}
 		if(state == 0 || state == 1 || state == 3){
 			if(c == 'a' || c == 'A' || c == 'x' || c == 'X' || c == 'u'
@@ -176,8 +196,12 @@ void GenericPostProcessor::Update(void)
 					|| c == 'V') temp.ref = Axis::Y;
 			if(c == 'c' || c == 'C' || c == 'z' || c == 'Z' || c == 'w'
 					|| c == 'W') temp.ref = Axis::Z;
+			if((c >= 'a' && c <= 'c') || (c >= 'A' && c <= 'C')) temp.rotational =
+					true;
+			if((c >= 'u' && c <= 'z') || (c >= 'U' && c <= 'Z')) temp.rotational =
+					false;
 			if((c >= 'u' && c <= 'z') || (c >= 'U' && c <= 'Z')
-					|| (c >= 'A' && c <= 'C') || (c >= 'A' && c <= 'C')){
+					|| (c >= 'a' && c <= 'c') || (c >= 'A' && c <= 'C')){
 				temp.name = std::string(1, c);
 				newState = 1;
 			}
@@ -198,35 +222,53 @@ bool GenericPostProcessor::SaveGCode(std::string filename)
 {
 	Update();
 	std::ofstream out(filename.c_str(), std::ofstream::out);
-	out << preblock << "\n";
+	out << UnEscape(preblock) << "\n";
 
 	CNCPosition oldPosition;
 	double oldF = 0.0;
 	double oldS = 0.0;
+	int oldT = -1;
+	bool rapid = false;
+	bool circle = false;
 
 	for(std::vector <CNCPosition>::const_iterator it = toolpath->begin();
 			it != toolpath->end(); ++it){
 
-		if(oldS <= FLT_EPSILON && it->S > FLT_EPSILON){
-			out << "M3 (start spindel ccw)\nG4 P3 (wait for 3 seconds)\n";
-		}
-		if(oldS >= -FLT_EPSILON && it->S < FLT_EPSILON){
-			out << "M4 (start spindel cw)\nG4 P3 (wait for 3 seconds)\n";
-		}
-
-		Vector3 normal = it->normal;
-		for(std::vector <Axis>::iterator a = axis.begin(); a != axis.end();
-				++a){
-			a->Set(it->position, normal);
-			out << *a;
-		}
-		if(fabs(oldF - it->F) > FLT_EPSILON){
-			out << " F" << (fabs(it->F) * 1000.0);
+		if(oldT != it->toolSlot){
+			out << "M6 T" << it->toolSlot << "\n";
 		}
 
 		if(fabs(oldS - it->S) > FLT_EPSILON){
-			out << " S" << (fabs(it->S) * 60.0);
+			out << "S" << (fabs(it->S) * 60.0);
 		}
+
+		if(oldS <= FLT_EPSILON && it->S > FLT_EPSILON){
+			out << "\nM3 (start spindel ccw)\nG4 P3 (wait for 3 seconds)\n";
+		}
+		if(oldS >= -FLT_EPSILON && it->S < FLT_EPSILON){
+			out << "\nM4 (start spindel cw)\nG4 P3 (wait for 3 seconds)\n";
+		}
+
+		if(it == toolpath->begin() || it->rapid != rapid){
+			if(it->rapid){
+				out << "G0 ";
+			}else{
+				out << "G1 ";
+			}
+		}
+
+		AffineTransformMatrix invmatrix = matrix.Inverse();
+		Vector3 position = invmatrix.Transform(it->position);
+		Vector3 normal = invmatrix.TransformNoShift(it->normal);
+		for(std::vector <Axis>::iterator a = axis.begin(); a != axis.end();
+				++a){
+			a->Set(position, normal);
+			out << *a;
+		}
+		if(fabs(oldF - it->F) > FLT_EPSILON){
+			out << "F" << (fabs(it->F) * 1000.0) << " ";
+		}
+
 		out << "\n";
 
 		if(fabs(oldS) > FLT_EPSILON && fabs(it->S) < FLT_EPSILON){
@@ -234,8 +276,11 @@ bool GenericPostProcessor::SaveGCode(std::string filename)
 		}
 		oldF = it->F;
 		oldS = it->S;
+		oldT = it->toolSlot;
+		rapid = it->rapid;
+		circle = it->circle;
 	}
-	out << postblock << "\n";
+	out << UnEscape(postblock) << "\n";
 	return out.good();
 }
 

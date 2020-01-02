@@ -58,7 +58,7 @@ public:
 
 	// Member variables
 public:
-	size_t toolID;
+	int toolSlot;
 	Vector3 position;
 	Vector3 normal;
 	double S; //!< Spindle speed in 1/s

@@ -147,7 +147,7 @@ void GeneratorTest::GenerateToolpath(const Run &run,
 	double level = temp.GetSizeZ(); // at upper surface
 
 	CNCPosition m;
-	m.toolID = tool->postprocess.number;
+	m.toolSlot = tool->postprocess.number;
 	m.F = tool->startvalues.fn;
 	m.S = tool->startvalues.n;
 	m.Set(0.0, 0.0, temp.GetSizeZ() + freeHeight, true);

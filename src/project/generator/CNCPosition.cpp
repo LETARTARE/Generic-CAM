@@ -33,7 +33,7 @@ CNCPosition::CNCPosition(double x, double y, double z, double nx, double ny,
 {
 	position.Set(x, y, z);
 	normal.Set(nx, ny, nz);
-	toolID = 0;
+	toolSlot = -1;
 	S = 0;
 	F = 0;
 	rapid = false;
@@ -46,7 +46,7 @@ CNCPosition::CNCPosition(const Vector3& position, const Vector3& normal)
 {
 	this->position = position;
 	this->normal = normal;
-	toolID = 0;
+	toolSlot = -1;
 	S = 0;
 	F = 0;
 	rapid = false;
@@ -59,7 +59,7 @@ CNCPosition::CNCPosition(const AffineTransformMatrix& matrix)
 {
 	position = matrix.GetOrigin();
 	normal = matrix.GetEz();
-	toolID = 0;
+	toolSlot = -1;
 	S = 0;
 	F = 0;
 	rapid = false;

@@ -86,7 +86,7 @@ public:
 		size_t lengthoffset;
 		bool live;
 		bool manualtoolchange;
-		size_t number;
+		int number;
 		std::string toolcoolant;
 		size_t turret;
 	};
