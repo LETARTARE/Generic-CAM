@@ -127,7 +127,7 @@ GenericPostProcessor::GenericPostProcessor(const std::string name) :
 	// 5 axis CNC: XYZB~X-A~Y   +X~X +Y~Y +Z~Z +B~X -A~Y
 	// Switched axes: X~Y Y~Z Z~X
 	preblock =
-			"G90 (set absolute distance mode)\\nG80 (cancel modal motion)\\nG40 (cutter radius compensation in XY plane)\\nG54 (coordinate system 1 active)\\nG21 (length units: mm)\\nG17 (work in XY plane)\\nG50 (cancel scaling function)\\nG94 (per minute feed)\\nG64 (continuous path control mode)\\nG49 (Disable tool length compensation)\\nG80 (disable modal motion)\\nG61 (exact path mode)\\nG64 P2 (cut corners)";
+			"G90 (set absolute distance mode)\\nG80 (cancel modal motion)\\nG40 (cutter radius compensation in XY plane)\\nG54 (coordinate system 1 active)\\nG21 (length units: mm)\\nG17 (work in XY plane)\\nG50 (cancel scaling function)\\nG94 (per minute feed)\\nG64 (continuous path control mode)\\nG49 (disable tool length compensation)\\nG80 (disable modal motion)\\nG61 (exact path mode)\\nG64 P2 (cut corners)";
 	postblock =
 			"M5 (stop spindel)\\nG4 P3 (wait for 3 seconds)\\nM2 (end programm)";
 }
@@ -184,7 +184,7 @@ void GenericPostProcessor::Update(void)
 			temp.rotational = false;
 			temp.oldValue = -FLT_MAX;
 		}
-		if(state == 1 || state == 3){
+		if(state == 0 || state == 1 || state == 3){
 			if(c == '-') temp.negativ = true;
 			if(c == '+') temp.negativ = false;
 			if(c == '-' || c == '+') newState = 0;

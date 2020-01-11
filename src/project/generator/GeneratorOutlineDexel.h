@@ -36,24 +36,34 @@
 
 #include "GeneratorDexel.h"
 
+#include "GeneratorFactory.h"
+
 class GeneratorOutlineDexel:public GeneratorDexel {
 public:
 	GeneratorOutlineDexel();
 	virtual ~GeneratorOutlineDexel();
 
 	virtual void CopyParameterFrom(const Generator * other);
-	virtual wxString GetName(void) const;
-	virtual void AddToPanel(wxPanel * panel, CollectionUnits* settings);
-	virtual void TransferDataToPanel(void) const;
-	virtual void TransferDataFromPanel(void);
-	virtual void GenerateToolpath(void);
+	virtual size_t GetType(void) const
+			{
+				return TYPE_GENERATOROUTLINE;
+			}
+	virtual wxString GetTypeName(void) const;
+	virtual wxSizer * AddToPanel(wxPanel * panel, CollectionUnits* settings) const;
+	virtual void TransferDataToPanel(wxPanel* panel,
+			CollectionUnits* settings) const;
+	virtual void TransferDataFromPanel(CollectionUnits* settings);
+	virtual bool operator==(const Generator &b) const;
+	virtual void GenerateToolpath(const Run &run,
+			const std::map <size_t, Object> &objects, const Tool &tool,
+			const DexelTarget &base);
 
 public:
 
 private:
-	wxStaticText* m_staticTextTwiddleFactor;
-	wxTextCtrl* m_textCtrlTwiddleFactor;
-	wxStaticText* m_staticTextUnit;
+	mutable wxStaticText* m_staticTextTwiddleFactor;
+	mutable wxTextCtrl* m_textCtrlTwiddleFactor;
+	mutable wxStaticText* m_staticTextUnit;
 
 };
 

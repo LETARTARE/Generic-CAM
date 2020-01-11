@@ -32,16 +32,18 @@
 #define CONFIG_H_
 
 #define _GENERICCAM_VERSION_MAJOR 0
-#define _GENERICCAM_VERSION_MINOR 2
+#define _GENERICCAM_VERSION_MINOR 3
 #define _GENERICCAM_VERSION_PATCH 0
 
-//#define _DEBUGMODE
-#define _USE_CPPUNIT
+#ifdef DEBUG
+#define _DEBUGMODE
+#endif
+//#define _USE_CPPUNIT
+//#define _USE_MIDI
+//#define _USE_MULTITHREADING
 #define _USE_MATHPARSER
 #define _USE_3DVIEWS
 #define _USE_3DPICKING
-#define _USE_MIDI
 #define _USE_6DOFCONTROLLER
-//#define _USE_MULTITHREADING
 
 #endif /* CONFIG_H_ */

@@ -92,6 +92,8 @@ private:
 	DialogPostProcess * dialogPostProcess;
 
 private:
+	wxMutex loopguard;
+
 	std::set <Selection> selectRequests;
 	wxFrame * selectRequestRequester;
 	size_t selectRequestID;
@@ -101,11 +103,11 @@ private:
 // Methods
 public:
 	void RequestSelection(wxFrame* requester, size_t ID, bool multiselect,
-			Selection selection0);
+			Selection selection0, Selection selection1, Selection selection2);
 	void RequestSelection(wxFrame* requester, size_t ID, bool multiselect,
 			Selection selection0, Selection selection1);
 	void RequestSelection(wxFrame* requester, size_t ID, bool multiselect,
-			Selection selection0, Selection selection1, Selection selection2);
+			Selection selection0);
 	void AnswerSelection(const Selection &selection);
 
 	void ProjectLoad(wxString fileName); ///> Load a project from the command line
@@ -153,7 +155,7 @@ private:
 	void OnCAMMultiAxisMenu(wxRibbonButtonBarEvent& event);
 	void OnCAMPostProcessSimulate(wxRibbonButtonBarEvent& event);
 	void OnCAMPostProcessExport(wxRibbonButtonBarEvent& event);
-		void OnCAMToolsMeasure(wxRibbonButtonBarEvent& event);
+	void OnCAMToolsMeasure(wxRibbonButtonBarEvent& event);
 	void OnCAMToolsTestGCode(wxRibbonButtonBarEvent& event);
 	void OnCAMManageTools(wxRibbonButtonBarEvent& event);
 	void OnCAMManagePostProcesses(wxRibbonButtonBarEvent& event);

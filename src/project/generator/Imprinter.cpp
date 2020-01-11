@@ -127,11 +127,10 @@ Imprinter& Imprinter::operator=(const Imprinter &b)
 
 	//TODO: Change to memcpy(...)
 	if(b.N > 0){
-		for(size_t i = 0; i < b.N; i++)
+		for(size_t i = 0; i < b.N; ++i)
 			this->field[i] = b.field[i];
 	}
 
-	refresh = true;
 	return *this;
 }
 
@@ -246,10 +245,24 @@ bool Imprinter::SetupField(const size_t sizeX, const size_t sizeY,
 	return true;
 }
 
-bool Imprinter::SetupField(const Imprinter& other)
+void Imprinter::SetupField(const Imprinter& other)
 {
-	return SetupField(other.GetCountX(), other.GetCountY(),
-			other.GetResolutionX(), other.GetResolutionY());
+	if(this->N != other.N){
+		if(this->field != NULL) delete[] this->field;
+
+		if(other.N > 0){
+			this->N = other.N;
+			this->field = new ImprinterElement[this->N];
+		}
+	}
+	this->rx = other.rx;
+	this->ry = other.ry;
+	this->nx = other.nx;
+	this->ny = other.ny;
+	this->sx = other.sx;
+	this->sy = other.sy;
+	this->sz = other.sz;
+	this->refresh = true;
 }
 
 void Imprinter::ClearField(void)

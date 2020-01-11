@@ -65,7 +65,7 @@ private:
 public:
 
 	enum ViewType {
-		vIdle = 0, vObject, vRun, vOrigin, vRuns, vGenerator
+		vObject, vRun, vOrigin, vGenerator
 	} type;
 
 	Selection selection;
@@ -76,6 +76,7 @@ private:
 	void PaintObjects(const Selection& sel, const OpenGLMaterial &face,
 			const OpenGLMaterial &edge) const;
 	void PaintRun(const Selection& sel) const;
+	void PaintGenerators(const Selection& sel) const;
 
 //	bool displayCoordinateSystem;
 //	bool displayAnimation;

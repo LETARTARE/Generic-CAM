@@ -26,6 +26,7 @@
 
 #include "Direction.h"
 
+#include <float.h>
 //#include <cmath>
 
 Direction::Direction()
@@ -220,6 +221,18 @@ Vector3 Direction::GetNormal(void) const
 		return Vector3(M_SQRT1_2, -M_SQRT1_2, 0);
 	}
 	return Vector3();
+}
+
+bool Direction::operator ==(const Direction& b) const
+{
+	if(this->X != b.X) return false;
+	if(this->Y != b.Y) return false;
+	if(fabs(this->offsetX - b.offsetX) > FLT_EPSILON) return false;
+	if(fabs(this->offsetY - b.offsetY) > FLT_EPSILON) return false;
+	if(fabs(this->resolutionX - b.resolutionX) > FLT_EPSILON) return false;
+	if(fabs(this->resolutionY - b.resolutionY) > FLT_EPSILON) return false;
+	if(this->direction != b.direction) return false;
+	return true;
 }
 
 Vector3 Direction::GetPosition(void) const

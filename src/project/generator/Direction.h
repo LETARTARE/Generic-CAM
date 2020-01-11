@@ -56,6 +56,12 @@ public:
 	Direction& operator--();
 	Direction operator--(int);
 
+	bool operator==(const Direction &b) const;
+	bool operator!=(const Direction &b) const
+	{
+		return !(*this == b);
+	}
+
 	void SetResolution(double rx, double ry = -1);
 
 	void TurnRight();

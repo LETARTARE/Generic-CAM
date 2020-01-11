@@ -26,11 +26,13 @@
 
 #include "GeneratorFactory.h"
 
+#include "GeneratorAreaGridDexel.h"
+#include "GeneratorAreaMillingDynamic.h"
 #include "GeneratorDrillDexel.h"
+#include "GeneratorLoadFromFile.h"
+#include "GeneratorOutlineDexel.h"
+#include "GeneratorSurfaceDexel.h"
 #include "GeneratorTest.h"
-//#include "GeneratorSurfaceDexel.h"
-//#include "GeneratorAreaMillingDynamic.h"
-//#include "GeneratorOutlineDexel.h"
 
 #include <typeinfo>
 
@@ -39,33 +41,27 @@
 Generator* GeneratorFactory::NewGenerator(size_t generatortype)
 {
 	switch(generatortype){
-//	case 0:
-//		return new GeneratorNone();
-//		break;
-//	case 1:
-//		return new GeneratorPositioningDrills();
-//		break;
-//	case 2:
-//		return new GeneratorLoadFromFile();
-//		break;
-//	case 3:
-//		return new GeneratorAreaGridDexel();
-//		break;
-//	case 4:
-//		return new GeneratorAreaMillingDynamic();
-//		break;
+	case TYPE_GENERATORAREAGRID:
+		return new GeneratorAreaGridDexel();
+		break;
+	case TYPE_GENERATORAREAMILLINGDYNAMIC:
+		return new GeneratorAreaMillingDynamic();
+		break;
+	case TYPE_GENERATORLOADFROMFILE:
+		return new GeneratorLoadFromFile();
+		break;
 	case TYPE_GENERATORTEST:
 		return new GeneratorTest();
 		break;
 	case TYPE_GENERATORDRILLDEXEL:
 		return new GeneratorDrillDexel();
 		break;
-//	case 7:
-//		return new GeneratorOutlineDexel();
-//		break;
-//	case 8:
-//		return new GeneratorSurfaceDexel();
-//		break;
+	case TYPE_GENERATOROUTLINE:
+		return new GeneratorOutlineDexel();
+		break;
+	case TYPE_GENERATORSURFACE:
+		return new GeneratorSurfaceDexel();
+		break;
 	default:
 		throw std::range_error(
 				"GeneratorFactory::NewGenerator(...) - generatortype not found");

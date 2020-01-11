@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : GeneratorDrillDexel.h
-// Purpose            :
+// Name               : GeneratorAreaGridDexel.h
+// Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 23.12.2017
-// Copyright          : (C) 2017 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 11.02.2015
+// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,51 +24,62 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef GENERATORDRILLDEXEL_H_
-#define GENERATORDRILLDEXEL_H_
+#ifndef GENERATORAREAGRIDDEXEL_H_
+#define GENERATORAREAGRIDDEXEL_H_
 
-/*!\class GeneratorDrillDexel
+/*!\class GeneratorAreaGridDexel
  * \ingroup Generator
  * \brief ...
  *
  * ...
  */
 
-#include "GeneratorDexel.h"
+#include <stddef.h>
+#include <map>
+#include <vector>
 
+#include "../Object.h"
+#include "Direction.h"
+#include "GeneratorDexel.h"
+#include "ProtoToolpath.h"
 #include "GeneratorFactory.h"
 
-class GeneratorDrillDexel:public GeneratorDexel {
+class GeneratorAreaGridDexel:public GeneratorDexel {
 public:
-	GeneratorDrillDexel();
-	virtual ~GeneratorDrillDexel();
-
-	virtual void CopyParameterFrom(const Generator * other);
-	virtual bool operator==(const Generator &b) const;
+	GeneratorAreaGridDexel();
+	virtual ~GeneratorAreaGridDexel();
 	virtual size_t GetType(void) const
 	{
-		return TYPE_GENERATORDRILLDEXEL;
+		return TYPE_GENERATORAREAGRID;
 	}
-	virtual wxString GetTypeName(void) const
-	{
-		return _("Drillpattern (dexel-based)");
-	}
+	virtual wxString GetTypeName(void) const;
+	virtual void CopyParameterFrom(const Generator * other);
+	virtual bool operator==(const Generator &b) const;
 	virtual wxSizer * AddToPanel(wxPanel * panel,
-			CollectionUnits * settings) const;
+			CollectionUnits* settings) const;
 	virtual void TransferDataToPanel(wxPanel* panel,
 			CollectionUnits* settings) const;
 	virtual void TransferDataFromPanel(CollectionUnits* settings);
 	virtual void GenerateToolpath(const Run &run,
 			const std::map <size_t, Object> &objects, const Tool &tool,
 			const DexelTarget &base);
+private:
+	void CollectToolpaths(std::vector <ProtoToolpath> &ptp,
+			const double pathDistance);
 
 public:
+	double overlap;
+	double maxStepUp;
+	Direction type;
 
 private:
-	mutable wxStaticText* m_staticTextTwiddleFactor;
-	mutable wxTextCtrl* m_textCtrlTwiddleFactor;
-	mutable wxStaticText* m_staticTextUnit;
-
+	mutable wxRadioButton* m_radioBtnXthenY;
+	mutable wxStaticBitmap* m_bitmapXthenY;
+	mutable wxRadioButton* m_radioBtnYthenX;
+	mutable wxStaticBitmap* m_bitmapYthenX;
+	mutable wxStaticText* m_staticTextOverlap;
+	mutable wxTextCtrl* m_textCtrlOverlap;
+	mutable wxStaticText* m_staticTextUnitOverlap;
 };
 
-#endif /* GENERATORDRILLDEXEL_H_ */
+#endif /* GENERATORAREAGRIDDEXEL_H_ */

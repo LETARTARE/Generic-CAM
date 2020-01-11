@@ -60,8 +60,8 @@ Project::Project() :
 	temp.GRADE = "Generic Mill";
 	temp.type = Tool::flat_end_mill;
 	temp.geometry.DC = 6e-3;
-	temp.geometry.LCF = 40e-3;
-	temp.geometry.LB = 60e-3;
+	temp.geometry.LCF = 22e-3;
+	temp.geometry.LB = 48e-3;
 	temp.unit = "mm";
 	temp.description = "Cylindric endmill - 6 mm";
 	temp.vendor = "Someplace in China";

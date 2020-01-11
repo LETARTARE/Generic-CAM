@@ -100,6 +100,16 @@ void CNCPosition::Set(double x, double y, double z, bool rapid)
 	this->rapid = rapid;
 }
 
+void CNCPosition::Rapid(void)
+{
+	rapid = true;
+}
+
+void CNCPosition::FeedSpeed(void)
+{
+	rapid = false;
+}
+
 AffineTransformMatrix CNCPosition::GetMatrix(void) const
 {
 	AffineTransformMatrix temp;

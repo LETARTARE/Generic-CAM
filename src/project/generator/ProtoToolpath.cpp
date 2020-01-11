@@ -26,10 +26,15 @@
 
 #include "ProtoToolpath.h"
 
-
 ProtoToolpath::ProtoToolpath()
 {
 	inserted = false;
+}
+
+ProtoToolpath::ProtoToolpath(const std::vector <CNCPosition> &p)
+{
+	inserted = false;
+	this->p = p;
 }
 
 ProtoToolpath::~ProtoToolpath()

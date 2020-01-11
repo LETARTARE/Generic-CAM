@@ -142,7 +142,7 @@ public:
 
 	bool SetupField(const size_t sizeX, const size_t sizeY,
 			const double resolutionX = -1, const double resolutionY = -1);
-	bool SetupField(const Imprinter& other);
+	void SetupField(const Imprinter& other);
 	void ClearField(void); ///< Deallocate the field from memory
 	bool IsMemoryAllocated(void) const; ///< Test, if memory has been allocated
 	size_t MemoryUsageInBytes(void) const;

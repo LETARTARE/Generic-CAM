@@ -47,16 +47,14 @@ void GeneratorOutlineDexel::CopyParameterFrom(const Generator* other)
 			dynamic_cast <const GeneratorOutlineDexel*>(other);
 }
 
-wxString GeneratorOutlineDexel::GetName(void) const
+wxString GeneratorOutlineDexel::GetTypeName(void) const
 {
 	return _T("Outline (using Dexel)");
 }
 
-void GeneratorOutlineDexel::AddToPanel(wxPanel* panel,
-		CollectionUnits* settings)
+wxSizer * GeneratorOutlineDexel::AddToPanel(wxPanel* panel,
+		CollectionUnits* settings) const
 {
-	Generator::AddToPanel(panel, settings);
-
 	wxBoxSizer* bSizer;
 	bSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -82,38 +80,40 @@ void GeneratorOutlineDexel::AddToPanel(wxPanel* panel,
 	fgSizer->Add(m_staticTextUnit, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
 
 	bSizer->Add(fgSizer, 0, wxALIGN_CENTER_HORIZONTAL, 5);
-
-	panel->SetSizer(bSizer);
-	panel->Layout();
-	bSizer->Fit(panel);
+	return bSizer;
 }
 
-void GeneratorOutlineDexel::TransferDataToPanel(void) const
+void GeneratorOutlineDexel::TransferDataToPanel(wxPanel* panel,
+		CollectionUnits* settings) const
 {
 }
 
-void GeneratorOutlineDexel::TransferDataFromPanel(void)
+void GeneratorOutlineDexel::TransferDataFromPanel(CollectionUnits* settings)
 {
 }
 
-void GeneratorOutlineDexel::GenerateToolpath(void)
+bool GeneratorOutlineDexel::operator ==(const Generator& b) const
 {
-	output.Empty();
+	const GeneratorOutlineDexel * temp =
+			dynamic_cast <const GeneratorOutlineDexel*>(&b);
+	std::cout << "GeneratorOutlineDexel::operator ==\n";
+	if(!(this->Generator::operator ==(b))) return false;
+	return true;
+}
+
+void GeneratorOutlineDexel::GenerateToolpath(const Run &run,
+		const std::map <size_t, Object> &objects, const Tool &tool,
+		const DexelTarget &base)
+{
 	errorOccured = false;
 	toolpathGenerated = true;
-	const Run* const run = this->parent;
-	assert(run != NULL);
-	if(refTool >= run->machine.tools.GetCount()){
-		output = _T("Tool empty.");
-		errorOccured = true;
-		return;
-	}
-	GeneratorDexel::GenerateToolpath();
-	const Tool* const tool = &(run->machine.tools[refTool]);
+	output.Empty();
+
+	GeneratorDexel::PrepareTargets(run, objects, tool, base);
 
 //	DexelTarget surface = target;
 	DexelTarget toolShape;
-	toolShape.SetupTool(*tool, target.GetResolutionX(),
+	toolShape.SetupTool(tool, target.GetResolutionX(),
 			target.GetResolutionY());
 	debug = target;
 	toolShape.NegateZ();
@@ -123,35 +123,30 @@ void GeneratorOutlineDexel::GenerateToolpath(void)
 	Polygon25 pg = target.GeneratePolygon(-1, -1, FLT_EPSILON);
 	pg.RotatePolygonStart(0, 0);
 
-	toolpath.Clear();
+	toolpath.clear();
 
-	GCodeBlock m;
+	CNCPosition m;
 	if(pg.Size() > 0){
 		m.Rapid();
-		m.X = pg[0].x;
-		m.Y = pg[0].y;
-		m.Z = target.GetSizeZ() + freeHeight;
-		toolpath.positions.Add(m);
+		m.position.Set(pg[0].x, pg[0].y, target.GetSizeZ() + freeHeight);
+		toolpath.push_back(m);
 
-		const double cutdepth = tool->GetCuttingDepth();
-		const int N = ceil((area.zmax - area.zmin) / cutdepth);
+		const double cutdepth = tool.GetCuttingDepth();
+		const int N = ceil((start.GetSizeZ() - 0) / cutdepth);
 		for(int n = 1; n <= N; n++){
-			const double level = fmax(area.zmax - n * cutdepth, area.zmin);
+			const double level = fmax(start.GetSizeZ() - n * cutdepth, 0);
 
 			for(size_t n = 0; n < pg.Size(); n++){
-				m.X = pg[n].x;
-				m.Y = pg[n].y;
-				m.Z = level;
+				m.position.Set(pg[n].x, pg[n].y, level);
 				m.FeedSpeed();
-				toolpath.positions.Add(m);
+				toolpath.push_back(m);
 			}
-			m.X = pg[0].x;
-			m.Y = pg[0].y;
-			toolpath.positions.Add(m);
+			m.position.x = pg[0].x;
+			m.position.y = pg[0].y;
+			toolpath.push_back(m);
 		}
-		m.Z = target.GetSizeZ() + freeHeight;
+		m.position.z = target.GetSizeZ() + freeHeight;
 		m.Rapid();
-		toolpath.positions.Add(m);
+		toolpath.push_back(m);
 	}
-	toolpath.FlagAll(true);
 }

@@ -289,6 +289,7 @@ void TreeSetup::Update(void)
 		for(std::map <size_t, Generator*>::const_iterator generator =
 				run.generators.begin(); generator != run.generators.end();
 				++generator){
+			std::cout << " => " << generator->second->GetName() << "\n";
 			SetAtLevel(3, generator->second->GetName(), TreeItem::itemGenerator,
 					generator->first);
 			foundItem2 = true;
@@ -569,6 +570,7 @@ Selection TreeSetup::TreeToSelection(void)
 								*runID, Selection::Generator, *generatorID);
 						++generatorID;
 					}
+					temp2 = tree->GetNextSibling(temp2);
 				}
 				++runID;
 			}

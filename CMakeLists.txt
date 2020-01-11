@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(genericcam)
 
-find_package(wxWidgets COMPONENTS richtext gl core base html xml adv REQUIRED)
+find_package(wxWidgets COMPONENTS richtext gl core base html xml adv ribbon propgrid REQUIRED)
 include( "${wxWidgets_USE_FILE}" )
 
 if(MINGW)
@@ -49,6 +49,8 @@ if(MINGW)
 		controller
 		project
 		3D
+		math
+		cppunittest
 		${wxWidgets_LIBRARIES}
 		opengl32
 		glu32
@@ -62,11 +64,13 @@ else(MINGW)
 		controller
 		project
 		3D
+		math
+		cppunittest
 		${wxWidgets_LIBRARIES}
 		GL
 		GLU
 		lua5.3
-		portmidi
+#		portmidi
 	)
 endif(MINGW)
 

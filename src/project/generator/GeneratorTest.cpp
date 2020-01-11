@@ -115,25 +115,33 @@ void GeneratorTest::TransferDataFromPanel(CollectionUnits* settings)
 }
 
 void GeneratorTest::GenerateToolpath(const Run &run,
-		const std::map <size_t, Object> &objects, const Tool * tool,
-		DexelTarget * base)
+		const std::map <size_t, Object> &objects, const Tool &tool,
+		const DexelTarget &base)
 {
 	output.Empty();
+	GeneratorDexel::PrepareTargets(run, objects, tool, base);
 
-	GeneratorDexel::GenerateToolpath(run, objects, tool, base);
+	const double resx = base.GetResolutionX();
+	const double resy = base.GetResolutionY();
 
-	const double maxCutDepth = tool->GetCuttingDepth();
+	DexelTarget toolShape;
+	toolShape.SetupTool(tool, resx, resy, false);
+	target.FoldRaise(toolShape);
+	selected.FoldRaise(toolShape);
+	selected.RemoveShadowed(target);
 
+	DexelTarget mask;
+	mask = selected;
+	mask.HardInvert();
+	selected |= mask;
+
+	const double maxCutDepth = tool.GetCuttingDepth();
 	const double tolerance = 0.0001; // 1/10 mm
 
 	std::vector <CNCPosition> tp;
 
-	DexelTarget toolShape;
-	toolShape.SetupTool(*tool, target.GetResolutionX(), target.GetResolutionY(),
-			false);
-
 //	toolShape.NegateZ();
-	DexelTarget temp = target;
+	DexelTarget temp = selected;
 	DexelTarget tempStart = start;
 //	temp.FoldRaise(toolShape);
 //	tempStart.FoldRaise(toolShape);
@@ -147,9 +155,9 @@ void GeneratorTest::GenerateToolpath(const Run &run,
 	double level = temp.GetSizeZ(); // at upper surface
 
 	CNCPosition m;
-	m.toolSlot = tool->postprocess.number;
-	m.F = tool->startvalues.fn;
-	m.S = tool->startvalues.n;
+	m.toolSlot = tool.postprocess.number;
+	m.F = tool.startvalues.fn;
+	m.S = tool.startvalues.n;
 	m.Set(0.0, 0.0, temp.GetSizeZ() + freeHeight, true);
 
 	std::vector <Polygon25> pgs;

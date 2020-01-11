@@ -135,11 +135,12 @@ void DialogJobSetup::OnSelect(wxCommandEvent& event)
 	if(runID == 0) return;
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 //	Project * project = wxStaticCast(frame->GetDocument(), Project);
-//	ProjectView * view = wxStaticCast(frame->GetView(), ProjectView);
+	ProjectView * view = wxStaticCast(frame->GetView(), ProjectView);
 //	CollectionUnits* settings = &(frame->GetParentFrame()->units);
 
 	switch(event.GetId()){
 	case ID_SELECTOBJECT:
+		view->type = ProjectView::vObject;
 		frame->RequestSelection(this, event.GetId(), false,
 				Selection(Selection::Object));
 		break;
@@ -153,11 +154,13 @@ void DialogJobSetup::OnSelect(wxCommandEvent& event)
 		break;
 
 	case ID_SELECTOBJECTSTOCK:
+		view->type = ProjectView::vObject;
 		frame->RequestSelection(this, event.GetId(), false,
 				Selection(Selection::Object));
 		break;
 
 	case ID_SELECTORIGIN:
+		view->type = ProjectView::vOrigin;
 		frame->RequestSelection(this, event.GetId(), false,
 				Selection(Selection::BaseRun, runID, Selection::Vertex));
 		break;

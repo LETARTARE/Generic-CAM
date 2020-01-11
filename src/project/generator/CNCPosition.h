@@ -54,6 +54,8 @@ public:
 	CNCPosition(const Vector3& position, const Vector3& normal);
 	CNCPosition(const AffineTransformMatrix& matrix);
 	void Set(double x, double y, double z, bool rapid = false);
+	void Rapid(void);
+	void FeedSpeed(void);
 	virtual ~CNCPosition();
 
 	// Member variables

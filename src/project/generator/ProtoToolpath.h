@@ -34,16 +34,24 @@
  * sections of a toolpath for later sorting and joining.
  */
 
-#include "../ToolPath.h"
+#include <stddef.h>
+#include <vector>
 
-class ProtoToolpath:public ToolPath {
+#include "CNCPosition.h"
+
+class ProtoToolpath {
 public:
 	ProtoToolpath();
+	ProtoToolpath(const std::vector <CNCPosition> &p);
 	virtual ~ProtoToolpath();
 
 public:
 	bool inserted;
-	wxArrayInt parents;
+	std::vector <size_t> parents;
+
+	std::vector <CNCPosition> p;
+
+private:
 };
 
 #endif /* PROTOTOOLPATH_H_ */

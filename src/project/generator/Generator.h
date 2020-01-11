@@ -89,6 +89,7 @@ public:
 	virtual size_t GetType(void) const = 0;
 	virtual wxString GetTypeName(void) const = 0;
 	virtual wxString GetName(void) const;
+	virtual bool operator==(const Generator &b) const;
 	virtual void CopyParameterFrom(const Generator * other);
 	virtual wxSizer * AddToPanel(wxPanel * panel,
 			CollectionUnits * settings) const = 0;
@@ -99,9 +100,8 @@ public:
 	virtual bool FromStream(wxTextInputStream & stream);
 	virtual void Paint(void) const;
 	virtual void GenerateToolpath(const Run &run,
-			const std::map <size_t, Object>  &objects,
-			const Tool * tool, DexelTarget * base) = 0;
-	virtual bool operator==(const Generator &b) const;
+			const std::map <size_t, Object> &objects, const Tool &tool,
+			const DexelTarget &base) = 0;
 };
 
 #endif /* GENERATOR_H_ */

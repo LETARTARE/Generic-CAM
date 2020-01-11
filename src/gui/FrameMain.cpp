@@ -56,8 +56,7 @@
 #include "../project/command/CommandRunGeneratorAdd.h"
 #include "../project/command/CommandRunGeneratorDelete.h"
 #include "../project/command/CommandRunGeneratorRename.h"
-#include "../project/generator/GeneratorDrillDexel.h"
-#include "../project/generator/GeneratorTest.h"
+#include "../project/generator/GeneratorFactory.h"
 #include "../project/ProjectView.h"
 #include "IDs.h"
 
@@ -223,6 +222,7 @@ bool FrameMain::TransferDataToWindow(bool updatetree)
 
 	if(temp.IsType(Selection::Run) && temp.Size() >= 1){
 		dialogJobSetup->SetRunID(temp[0]);
+		dialogPostProcess->SetRunGenerator(temp[0]);
 	}
 	dialogJobSetup->TransferDataToWindow();
 
@@ -318,7 +318,9 @@ void FrameMain::OnViewPreferencesMenu(wxRibbonButtonBarEvent& event)
 	menu.Append(ID_SETUPLANGUAGE, _T("Change Language"));
 	menu.Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
 	menu.Append(ID_SETUPPATHS, _("Setup &Paths"));
+#ifdef _USE_MIDI
 	menu.Append(ID_SETUPMIDI, _("Setup &MIDI"));
+#endif
 	event.PopupMenu(&menu);
 }
 
@@ -553,6 +555,7 @@ void FrameMain::OnCAM2DMenu(wxRibbonButtonBarEvent& event)
 {
 	wxMenu menu;
 	menu.Append(ID_GENERATORADDTYPE + 5, wxT("Outline Dexel"));
+	menu.Append(ID_GENERATORADDTYPE + 7, wxT("Load from file"));
 	event.PopupMenu(&menu);
 }
 
@@ -592,15 +595,33 @@ void FrameMain::OnGeneratorAdd(wxCommandEvent& event)
 	Generator* generator = NULL;
 	switch(event.GetId()){
 
-	case ID_DRILLING:
-		generator = new GeneratorDrillDexel();
+	case ID_GENERATORADDTYPE + 1:
+		generator = GeneratorFactory::NewGenerator(TYPE_GENERATORAREAGRID);
+		break;
+	case ID_GENERATORADDTYPE + 2:
+		generator = GeneratorFactory::NewGenerator(TYPE_GENERATORDRILLDEXEL);
+		break;
+	case ID_GENERATORADDTYPE + 3:
+		generator = GeneratorFactory::NewGenerator(
+		TYPE_GENERATORAREAMILLINGDYNAMIC);
 		break;
 	case ID_GENERATORADDTYPE + 4:
-		generator = new GeneratorTest();
+		generator = GeneratorFactory::NewGenerator(
+		TYPE_GENERATORTEST);
+		break;
+	case ID_GENERATORADDTYPE + 5:
+		generator = GeneratorFactory::NewGenerator(TYPE_GENERATOROUTLINE);
+		break;
+	case ID_GENERATORADDTYPE + 6:
+		generator = GeneratorFactory::NewGenerator(TYPE_GENERATORSURFACE);
+		break;
+	case ID_GENERATORADDTYPE + 7:
+		generator = GeneratorFactory::NewGenerator(TYPE_GENERATORLOADFROMFILE);
 		break;
 	default:
 		return;
 	}
+	generator->name = generator->GetTypeName();
 	if(!cmdProc->Submit(
 			new CommandRunGeneratorAdd(_("Add generator to run."), project,
 					runID, generator))){
@@ -609,7 +630,6 @@ void FrameMain::OnGeneratorAdd(wxCommandEvent& event)
 		std::cout << "FrameMain::OnGeneratorAdd() - Adding failed.\n";
 		return;
 	}
-	generator->name = generator->GetTypeName();
 
 	std::cout << "  \\-> Added generator #" << project->GetMaxGeneratorID()
 			<< "\n";
@@ -728,11 +748,8 @@ void FrameMain::RequestSelection(wxFrame* requester, size_t ID,
 	std::cout << "--------------------------------\n";
 	std::cout << "FrameMain::RequestSelection(.., " << ID << ", " << multiselect
 			<< ", " << selection0.ToString() << ");\n";
-
-	ProjectView * view = wxStaticCast(GetView(), ProjectView);
 	oldSelection = tree->TreeToSelection();
-	tree->SelectonToTree(Selection());
-	view->selection.Clear();
+//	tree->SelectonToTree(Selection());
 	this->selectRequestRequester = requester;
 	this->selectRequestID = ID;
 	this->selectRequestMulti = multiselect;
@@ -747,11 +764,8 @@ void FrameMain::RequestSelection(wxFrame* requester, size_t ID,
 	std::cout << "FrameMain::RequestSelection(.., " << ID << ", " << multiselect
 			<< ", " << selection0.ToString() << ", " << selection1.ToString()
 			<< ");\n";
-
-	ProjectView * view = wxStaticCast(GetView(), ProjectView);
 	oldSelection = tree->TreeToSelection();
-	tree->SelectonToTree(Selection());
-	view->selection.Clear();
+//	tree->SelectonToTree(Selection());
 	this->selectRequestRequester = requester;
 	this->selectRequestID = ID;
 	this->selectRequestMulti = multiselect;
@@ -768,11 +782,8 @@ void FrameMain::RequestSelection(wxFrame* requester, size_t ID,
 	std::cout << "FrameMain::RequestSelection(.., " << ID << ", " << multiselect
 			<< ", " << selection0.ToString() << ", " << selection1.ToString()
 			<< ", " << selection2.ToString() << ");\n";
-
-	ProjectView * view = wxStaticCast(GetView(), ProjectView);
 	oldSelection = tree->TreeToSelection();
-	tree->SelectonToTree(Selection());
-	view->selection.Clear();
+//	tree->SelectonToTree(Selection());
 	this->selectRequestRequester = requester;
 	this->selectRequestID = ID;
 	this->selectRequestMulti = multiselect;
@@ -942,37 +953,48 @@ void FrameMain::On3DSelect(wxMouseEvent& event)
 
 void FrameMain::OnSelectionChanged(wxTreeEvent& event)
 {
+	if(loopguard.TryLock() == wxMUTEX_BUSY) return;
+
 //	wxTreeItemId id = event.GetItem();
 //	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
 	ProjectView* view = wxStaticCast(GetView(), ProjectView);
 
-	Selection temp = tree->TreeToSelection();
+	Selection treeSelection = tree->TreeToSelection();
 
-	std::cout << "FrameMain::OnSelectionChanged(...) to " << temp.ToString()
-			<< ";\n";
+	std::cout << "FrameMain::OnSelectionChanged(...) to "
+			<< treeSelection.ToString();
 
 	bool foundsomething = false;
-	view->selection.Clear();
 
+	Selection clicked;
 	for(std::set <Selection>::iterator request = selectRequests.begin();
 			request != selectRequests.end(); ++request){
-		if(!request->CanAdd(temp.GetType())) continue;
-		if(request->IsType(Selection::Object)) view->selection.Add(temp);
+		if(!request->CanAdd(treeSelection.GetType())) continue;
+		if(request->IsType(Selection::Object)) clicked.Add(treeSelection);
 		foundsomething = true;
 		break;
 	}
 
+	view->selection = treeSelection;
+
 	if(foundsomething){
-		AnswerSelection(view->selection);
+		AnswerSelection(clicked);
+		loopguard.Unlock();
+		std::cout << "\n";
 		return;
 	}
+//	view->type = ProjectView::vIdle;
+	if(treeSelection.IsType(Selection::Object)) view->type =
+			ProjectView::vObject;
+	if(treeSelection.IsType(Selection::Run)) view->type = ProjectView::vRun;
+	if(treeSelection.IsType(Selection::Generator)) view->type =
+			ProjectView::vGenerator;
 
-	view->type = ProjectView::vIdle;
-	if(temp.IsType(Selection::Object)) view->type = ProjectView::vObject;
-	if(temp.IsType(Selection::Run)) view->type = ProjectView::vRun;
+	std::cout << " view->type = " << (int) view->type << ";\n";
 
 	TransferDataToWindow(false);
 	Refresh();
+	loopguard.Unlock();
 }
 
 void FrameMain::OnSelectionChanging(wxTreeEvent& event)
@@ -1067,7 +1089,6 @@ void FrameMain::OnActivateRightClickMenu(wxTreeEvent& event)
 		menu.Append(ID_RUNMODIFY, wxT("&Add Run"));
 		menu.AppendSeparator();
 		menu.Append(ID_TOOLPATHGENERATE, wxT("&Generate Toolpath"));
-		menu.Append(ID_TOOLPATHEXPORT, wxT("E&xport Toolpaths"));
 	}
 
 	if(data->type == TreeItem::itemRun){
@@ -1076,7 +1097,7 @@ void FrameMain::OnActivateRightClickMenu(wxTreeEvent& event)
 		menu.Append(ID_RUNDELETE, wxT("&Delete Run"));
 		menu.AppendSeparator();
 		menu.Append(ID_TOOLPATHGENERATE, wxT("&Generate Toolpath"));
-		menu.Append(ID_TOOLPATHEXPORT, wxT("E&xport Toolpath"));
+		menu.Append(ID_TOOLPATHEXPORT, wxT("E&xport Toolpaths"));
 	}
 
 	if(data->type == TreeItem::itemGenerator){
@@ -1085,6 +1106,7 @@ void FrameMain::OnActivateRightClickMenu(wxTreeEvent& event)
 		menu.Append(ID_GENERATORDELETE, wxT("&Delete Generator"));
 		menu.AppendSeparator();
 		menu.Append(ID_TOOLPATHGENERATE, wxT("&Generate Toolpath"));
+		menu.Append(ID_TOOLPATHEXPORT, wxT("E&xport Toolpath"));
 	}
 
 //	if(data->type == itemToolpath){

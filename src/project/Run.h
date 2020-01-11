@@ -113,6 +113,7 @@ public:
 //	bool SaveToolpaths(wxFileName fileName);
 
 	void Paint(void) const;
+	void PaintVertices(void) const;
 
 	void ToStream(wxTextOutputStream & stream) const;
 	bool FromStream(wxTextInputStream & stream, size_t runID,

@@ -42,7 +42,7 @@ ProjectView::ProjectView() :
 		wxView()
 {
 
-	type = vIdle;
+	type = vObject;
 
 //	displayCoordinateSystem = true;
 //	displayGeometry = true;
@@ -137,13 +137,41 @@ void ProjectView::Render(void) const
 {
 	const Project* project = wxStaticCast(GetDocument(), Project);
 
-	if(type == vIdle || type == vObject){
+	if(type == vObject || type == vOrigin){
 		RenderCoordinateSystem();
 	}
+
 	PaintObjects(Selection(true), OpenGLMaterial(0.3, 0.3, 1.0),
 			OpenGLMaterial(0, 0, 0));
-	if(type == vRun){
+
+	if(type == vRun || type == vOrigin){
 		PaintRun(Selection(true));
+	}
+
+	if(type == vOrigin){
+		for(std::map <size_t, Run>::const_iterator run = project->run.begin();
+				run != project->run.end(); ++run){
+			run->second.PaintVertices();
+		}
+	}
+
+	if(type == vGenerator){
+		glPushName(Selection::BaseRun);
+		for(std::map <size_t, Run>::const_iterator run = project->run.begin();
+				run != project->run.end(); ++run){
+			//			if(!selection.IsBase(Selection::BaseRun, run->first)
+			//					|| !selection.IsType(Selection::Generator)) continue;
+
+			for(std::map <size_t, Generator*>::const_iterator generator =
+					run->second.generators.begin();
+					generator != run->second.generators.end(); ++generator){
+
+//				if(!selection.Has(generator->first)) continue;
+
+				generator->second->Paint();
+			}
+		}
+		glPopName();
 	}
 
 	if(false){
@@ -162,7 +190,7 @@ void ProjectView::Render(void) const
 void ProjectView::RenderPick(void) const
 {
 	Project* project = wxStaticCast(GetDocument(), Project);
-	if(type == vIdle || type == vObject){
+	if(type == vObject || type == vOrigin){
 		glPushName((unsigned int) Selection::BaseNone);
 		glPushName(0);
 		RenderCoordinateSystem();
@@ -188,6 +216,38 @@ void ProjectView::RenderPick(void) const
 		}
 		glPopName();
 	}
+	if(type == vOrigin){
+		glPushName(Selection::BaseRun);
+		for(std::map <size_t, Run>::const_iterator run = project->run.begin();
+				run != project->run.end(); ++run){
+			glPushName(run->first);
+			run->second.PaintVertices();
+			glPopName();
+		}
+		glPopName();
+	}
+
+	if(type == vGenerator){
+
+		glPushName(Selection::BaseObject);
+		for(std::map <size_t, Object>::const_iterator obj =
+				project->objects.begin(); obj != project->objects.end(); ++obj){
+
+			for(std::map <size_t, Run>::const_iterator run =
+					project->run.begin(); run != project->run.end(); ++run){
+
+				//			if(!selection.IsBase(Selection::BaseRun, run->first)
+				//					|| !selection.IsType(Selection::Generator)) continue;
+
+				if(!run->second.object.Has(Selection::Object, obj->first)) continue;
+				glPushName(obj->first);
+				obj->second.PaintPick();
+				glPopName();
+			}
+		}
+		glPopName();
+
+	}
 }
 
 void ProjectView::PaintObjects(const Selection& sel, const OpenGLMaterial &face,
@@ -210,18 +270,15 @@ void ProjectView::PaintRun(const Selection& sel) const
 	const Project* project = wxStaticCast(GetDocument(), Project);
 	for(std::map <size_t, Run>::const_iterator run = project->run.begin();
 			run != project->run.end(); ++run){
-		glPushMatrix();
-//		glTranslatef(run->second.stock.xmin, run->second.stock.ymin,
-//				run->second.stock.zmin);
-		for(std::map <size_t, Generator*>::const_iterator it =
-				run->second.generators.begin();
-				it != run->second.generators.end(); ++it){
-			it->second->Paint();
-		}
-		glPopMatrix();
-
 		if(sel.IsBase(Selection::BaseRun, run->first)){
 			run->second.Paint();
+
+			for(std::map <size_t, Generator*>::const_iterator it =
+					run->second.generators.begin();
+					it != run->second.generators.end(); ++it){
+				it->second->Paint();
+			}
+
 		}else{
 			if(sel.IsInverted()) run->second.Paint();
 		}
@@ -229,6 +286,25 @@ void ProjectView::PaintRun(const Selection& sel) const
 
 }
 
+void ProjectView::PaintGenerators(const Selection& sel) const
+{
+	const Project* project = wxStaticCast(GetDocument(), Project);
+	for(std::map <size_t, Run>::const_iterator run = project->run.begin();
+			run != project->run.end(); ++run){
+		if(!sel.IsBase(Selection::BaseRun, run->first)
+				&& !sel.IsType(Selection::Run)) continue;
+
+		glPushMatrix();
+		//		glTranslatef(run->second.stock.xmin, run->second.stock.ymin,
+		//				run->second.stock.zmin);
+		for(std::map <size_t, Generator*>::const_iterator it =
+				run->second.generators.begin();
+				it != run->second.generators.end(); ++it){
+			it->second->Paint();
+		}
+		glPopMatrix();
+	}
+}
 void ProjectView::RenderCoordinateSystem(void) const
 {
 	GLfloat s = 0.1;
@@ -309,3 +385,4 @@ void ProjectView::RenderCoordinateSystem(void) const
 	glPopName();
 	glPopName();
 }
+

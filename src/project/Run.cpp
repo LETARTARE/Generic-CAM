@@ -115,31 +115,29 @@ void Run::Paint(void) const
 	if(pr == NULL) return;
 
 	OpenGLMaterial::EnableColors();
+	if(OpenGLMaterial::ColorsAllowed()){
 
-	glColor4f(0.8, 0.8, 0.8, 1.0);
-	stock.PaintVertices(1, 10);
+		// Draw the "Touchpoint" symbol
+		const float s = 0.03;
+		glPushName(0);
+		glPushName(0);
 
-	// Draw the "Touchpoint" symbol
-	const float s = 0.03;
-	glPushName(0);
-	glPushName(0);
+		glPushMatrix();
+		origin.GLMultMatrix();
+		glScalef(s, s, s);
+		glRotatef(90, 1, 0, 0);
+		touchpoint.Paint();
+		glRotatef(90, 0, 1, 0);
+		touchpoint.Paint();
+		glRotatef(90, 0, 1, 0);
+		touchpoint.Paint();
+		glRotatef(90, 0, 1, 0);
+		touchpoint.Paint();
+		glPopMatrix();
 
-	glPushMatrix();
-	origin.GLMultMatrix();
-	glScalef(s, s, s);
-	glRotatef(90, 1, 0, 0);
-	touchpoint.Paint();
-	glRotatef(90, 0, 1, 0);
-	touchpoint.Paint();
-	glRotatef(90, 0, 1, 0);
-	touchpoint.Paint();
-	glRotatef(90, 0, 1, 0);
-	touchpoint.Paint();
-	glPopMatrix();
-
-	glPopName();
-	glPopName();
-
+		glPopName();
+		glPopName();
+	}
 	if(stocktype == BoxTop || stocktype == BoxCenter || stocktype == BoxBottom){
 		if(OpenGLMaterial::ColorsAllowed()){
 			glColor4f(0.2, 0.2, 0.2, 0.6);
@@ -188,6 +186,13 @@ void Run::Paint(void) const
 //	}
 //
 //	::glPopMatrix();
+}
+
+void Run::PaintVertices(void) const
+{
+	OpenGLMaterial::EnableColors();
+	glColor4f(0.8, 0.8, 0.8, 1.0);
+	stock.PaintVertices(1, 10);
 }
 
 void Run::GenerateToolpaths(void)
@@ -240,10 +245,10 @@ void Run::GenerateToolpaths(void)
 			continue;
 		}
 
-		it->second->GenerateToolpath(*this, *(parent->GetObjects()), tool,
-				&base);
+		it->second->GenerateToolpath(*this, *(parent->GetObjects()), *tool,
+				base);
 
-		Vector3 temp(stock.xmin,stock.ymin,stock.zmin);
+		Vector3 temp(stock.xmin, stock.ymin, stock.zmin);
 		if(!it->second->toolpath.empty()){
 			const size_t N = it->second->toolpath.size();
 			for(size_t n = 0; n < N; ++n){
@@ -251,7 +256,7 @@ void Run::GenerateToolpaths(void)
 				it->second->toolpath[n].F = 0.025; // m/s
 
 				// Shift origin into absolute coordinates.
-				it->second->toolpath[n].position+=temp;
+				it->second->toolpath[n].position += temp;
 
 			}
 		}

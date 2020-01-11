@@ -30,8 +30,6 @@
 #include <wx/button.h>
 #include <wx/log.h>
 
-#include "../ToolPath.h"
-
 GeneratorLoadFromFile::GeneratorLoadFromFile()
 {
 	m_filePicker = NULL;
@@ -54,16 +52,14 @@ GeneratorLoadFromFile::~GeneratorLoadFromFile()
 {
 }
 
-wxString GeneratorLoadFromFile::GetName(void) const
+wxString GeneratorLoadFromFile::GetTypeName(void) const
 {
 	return wxString(_T("Load from File"));
 }
 
-void GeneratorLoadFromFile::AddToPanel(wxPanel* panel,
-		CollectionUnits* settings)
+wxSizer * GeneratorLoadFromFile::AddToPanel(wxPanel* panel,
+		CollectionUnits* settings) const
 {
-	Generator::AddToPanel(panel, settings);
-
 	wxBoxSizer* bSizer1;
 	bSizer1 = new wxBoxSizer(wxVERTICAL);
 
@@ -83,26 +79,35 @@ void GeneratorLoadFromFile::AddToPanel(wxPanel* panel,
 
 	bSizer1->Add(bSizer2, 0, wxEXPAND, 5);
 
-	panel->SetSizer(bSizer1);
-	panel->Layout();
-	bSizer1->Fit(panel);
-
 	m_filePicker->SetPath(_T(""));
+	return bSizer1;
 }
 
-void GeneratorLoadFromFile::TransferDataToPanel(void) const
+void GeneratorLoadFromFile::TransferDataToPanel(wxPanel* panel,
+		CollectionUnits* settings) const
 {
 	if(filename.IsOk()) m_filePicker->SetPath(filename.GetFullPath());
 }
 
-void GeneratorLoadFromFile::TransferDataFromPanel(void)
+void GeneratorLoadFromFile::TransferDataFromPanel(CollectionUnits* settings)
 {
 	filename = m_filePicker->GetPath();
 	wxLogMessage
 	(_T("Filename: ") + filename.GetFullPath());
 }
 
-void GeneratorLoadFromFile::GenerateToolpath(void)
+bool GeneratorLoadFromFile::operator ==(const Generator& b) const
+{
+	const GeneratorLoadFromFile * temp = dynamic_cast <const GeneratorLoadFromFile*>(&b);
+		std::cout << "GeneratorLoadFromFile::operator ==\n";
+		if(!(this->Generator::operator ==(b))) return false;
+		if(this->filename != temp->filename) return false;
+		return true;
+}
+
+void GeneratorLoadFromFile::GenerateToolpath(const Run &run,
+		const std::map <size_t, Object> &objects, const Tool &tool,
+		const DexelTarget &base)
 {
 	toolpathGenerated = false;
 	errorOccured = false;
@@ -112,12 +117,12 @@ void GeneratorLoadFromFile::GenerateToolpath(void)
 		_("Load G-Code: Not a valid file: >")+filename.GetFullName()+_T("<.");
 		return;
 	}
-	if(!toolpath.ReadGCodeFile(filename)){
-		errorOccured = true;
-		output =
-				_(
-						"Load G-Code: Could not read file: >")+filename.GetFullName()+_T("<.");
-		return;
-	}
-	toolpathGenerated = true;
+//	if(!toolpath.ReadGCodeFile(filename)){
+//		errorOccured = true;
+//		output =
+//				_(
+//						"Load G-Code: Could not read file: >")+filename.GetFullName()+_T("<.");
+//		return;
+//	}
+//	toolpathGenerated = true;
 }

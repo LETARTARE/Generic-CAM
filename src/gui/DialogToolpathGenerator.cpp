@@ -28,9 +28,9 @@
 
 #include "../project/generator/GeneratorFactory.h"
 
-#include "../project/command/CommandRunGeneratorAdd.h"
+//#include "../project/command/CommandRunGeneratorAdd.h"
 #include "../project/command/CommandRunGeneratorUpdate.h"
-#include "../project/command/CommandRunGeneratorDelete.h"
+//#include "../project/command/CommandRunGeneratorDelete.h"
 #include "CollectionUnits.h"
 #include "FrameParent.h"
 #include "FrameMain.h"
@@ -57,13 +57,12 @@ void DialogToolpathGenerator::OnXClose(wxCloseEvent& event)
 
 void DialogToolpathGenerator::SetRunGenerator(size_t runID, size_t generatorID)
 {
-	std::cout << "DialogToolpathGenerator::SetRunGenerator(" << runID << ", "
-			<< generatorID << ")\n";
 	const bool updatePanel = (runID != this->runID
 			|| this->generatorID != generatorID);
+	std::cout << "DialogToolpathGenerator::SetRunGenerator(" << runID << ", "
+			<< generatorID << "): updatePanel=" << updatePanel << "\n";
 	this->runID = runID;
 	this->generatorID = generatorID;
-
 	TransferDataToWindow(updatePanel);
 }
 

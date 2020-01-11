@@ -54,12 +54,14 @@ void DialogPostProcess::OnRefresh(wxCommandEvent& event)
 void DialogPostProcess::SetRunGenerator(size_t runID)
 {
 	selected = Selection(Selection::Run, runID);
+	SetTitle(_("Export toolpath - ") + selected.ToString());
 }
 
 void DialogPostProcess::SetRunGenerator(size_t runID, size_t generatorID)
 {
 	selected = Selection(Selection::BaseRun, runID, Selection::Generator,
 			generatorID);
+	SetTitle(_("Export toolpath - ") + selected.ToString());
 }
 
 void DialogPostProcess::UpdateParameter(void)
@@ -73,10 +75,11 @@ void DialogPostProcess::UpdateParameter(void)
 				parameter.begin(); it != parameter.end(); ++it){
 
 			wxPGProperty *p = new wxStringProperty(it->first, wxPG_LABEL);
-			if(it->second.find_first_of((char) 10) == std::string::npos){
-				p = new wxStringProperty(it->first, wxPG_LABEL);
-			}else{
+			if(it->second.find_first_of((char) 10) != std::string::npos
+					|| it->second.find_first_of('\\') != std::string::npos){
 				p = new wxLongStringProperty(it->first, wxPG_LABEL);
+			}else{
+				p = new wxStringProperty(it->first, wxPG_LABEL);
 			}
 			p->SetValue(it->second);
 			m_propertyGrid->Append(p);

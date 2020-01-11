@@ -45,10 +45,13 @@
  *
  */
 
+#include <stddef.h>
+#include <vector>
+
 #include "Generator.h"
 #include "DexelTarget.h"
-
-#include <stddef.h>
+#include "ProtoToolpath.h"
+#include "../../Config.h"
 
 class GeneratorDexel:public Generator {
 public:
@@ -62,15 +65,23 @@ public:
 
 protected:
 
-	void GenerateToolpath(const Run &run,
-			const std::map <size_t, Object>  &objects,
-			const Tool * tool, DexelTarget * base);
+	void PrepareTargets(const Run &run,
+			const std::map <size_t, Object> &objects, const Tool &tool,
+			const DexelTarget &start);
+
+	void QuickCollectToolpaths(std::vector <ProtoToolpath> &ptp,
+			const double pathDistance);
 
 	DexelTarget start;
 	DexelTarget target;
-	DexelTarget result;
+	DexelTarget selected;
 
+	DexelTarget simulation;
 	DexelTarget debug;
+
+#ifdef _DEBUGMODE
+	Vector3 debugOrigin;
+#endif
 };
 
 #endif /* GENERATORDEXEL_H_ */

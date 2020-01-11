@@ -30,8 +30,9 @@
 
 #include <math.h>
 
+#include "../../gui/CollectionUnits.h"
 #include "../Project.h"
-#include "../machine/CNCPosition.h"
+#include "CNCPosition.h"
 
 GeneratorAreaMillingDynamic::GeneratorAreaMillingDynamic()
 {
@@ -59,16 +60,14 @@ void GeneratorAreaMillingDynamic::CopyParameterFrom(const Generator* other)
 	dropStep = temp->dropStep;
 }
 
-wxString GeneratorAreaMillingDynamic::GetName(void) const
+wxString GeneratorAreaMillingDynamic::GetTypeName(void) const
 {
 	return _T("Area Milling - Dynamic (using Dexel)");
 }
 
-void GeneratorAreaMillingDynamic::AddToPanel(wxPanel* panel,
-		CollectionUnits* settings)
+wxSizer * GeneratorAreaMillingDynamic::AddToPanel(wxPanel* panel,
+		CollectionUnits* settings) const
 {
-	Generator::AddToPanel(panel, settings);
-
 	wxBoxSizer* bSizer;
 	bSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -132,13 +131,11 @@ void GeneratorAreaMillingDynamic::AddToPanel(wxPanel* panel,
 
 	bSizer->Add(bSizer11, 0, wxALIGN_CENTER_HORIZONTAL, 5);
 
-	panel->SetSizer(bSizer);
-	panel->Layout();
-	bSizer->Fit(panel);
-
+	return bSizer;
 }
 
-void GeneratorAreaMillingDynamic::TransferDataToPanel(void) const
+void GeneratorAreaMillingDynamic::TransferDataToPanel(wxPanel* panel,
+		CollectionUnits* settings) const
 {
 	m_staticTextUnit1->SetLabel(settings->SmallDistance.GetOtherName());
 	m_staticTextUnit2->SetLabel(settings->SmallDistance.GetOtherName());
@@ -151,7 +148,8 @@ void GeneratorAreaMillingDynamic::TransferDataToPanel(void) const
 	m_textCtrlDropStep->SetValue(settings->SmallDistance.TextFromSI(dropStep));
 }
 
-void GeneratorAreaMillingDynamic::TransferDataFromPanel(void)
+void GeneratorAreaMillingDynamic::TransferDataFromPanel(
+		CollectionUnits* settings)
 {
 	maxSingleStep = settings->SmallDistance.SIFromString(
 			m_textCtrlMaxSingleStep->GetValue());
@@ -161,63 +159,61 @@ void GeneratorAreaMillingDynamic::TransferDataFromPanel(void)
 			m_textCtrlDropStep->GetValue());
 }
 
-ToolPath GeneratorAreaMillingDynamic::GenerateDrill(double x, double y,
-		double diameter, double depth)
+std::vector <CNCPosition> GeneratorAreaMillingDynamic::GenerateDrill(double x,
+		double y, double diameter, double depth)
 {
-	ToolPath temp;
-	GCodeBlock mp;
+	std::vector <CNCPosition> temp;
+	CNCPosition mp;
 
 	const double r = (diameter - toolDiameter) / 2.0;
 
 	mp.FeedSpeed();
-	mp.X = x;
-	mp.Y = y;
-	mp.Z = 0.0;
-	temp.positions.Add(mp);
+	mp.position.Set(x, y, 0.0);
+	temp.push_back(mp);
 
 	if(r <= 0.001){
 		double d = 0.0;
 		while(d > dropStep - depth){
 			d -= dropStep;
 
-			mp.Z = d;
-			temp.positions.Add(mp);
-			mp.Z = 0.0;
-			temp.positions.Add(mp);
+			mp.position.z = d;
+			temp.push_back(mp);
+			mp.position.z = 0.0;
+			temp.push_back(mp);
 		}
-		mp.Z = -depth;
-		mp.X += r;
-		temp.positions.Add(mp);
-		mp.I = -r;
-		temp.positions.Add(mp);
-		mp.I = 0.0;
-		mp.X = x;
-		temp.positions.Add(mp);
+		mp.position.z = -depth;
+		mp.position.x += r;
+		temp.push_back(mp);
+//		mp.I = -r;
+		temp.push_back(mp);
+//		mp.I = 0.0;
+		mp.position.x = x;
+		temp.push_back(mp);
 	}else{
-		mp.X += r;
-		temp.positions.Add(mp);
-		mp.ArcCCW();
-		mp.I = -r;
-		while(mp.Z > dropStep - depth){
-			mp.Z -= dropStep;
-			temp.positions.Add(mp);
+		mp.position.x += r;
+		temp.push_back(mp);
+//		mp.ArcCCW();
+//		mp.I = -r;
+		while(mp.position.z > dropStep - depth){
+			mp.position.z -= dropStep;
+			temp.push_back(mp);
 		}
-		mp.Z = -depth;
-		temp.positions.Add(mp);
-		temp.positions.Add(mp);
+		mp.position.z = -depth;
+		temp.push_back(mp);
+		temp.push_back(mp);
 		mp.Rapid();
-		mp.I = 0.0;
-		mp.X = x;
-		temp.positions.Add(mp);
+//		mp.I = 0.0;
+		mp.position.x = x;
+		temp.push_back(mp);
 	}
 	return temp;
 }
 
-ToolPath GeneratorAreaMillingDynamic::GenerateSpiral(double x, double y,
-		double radius)
+std::vector <CNCPosition> GeneratorAreaMillingDynamic::GenerateSpiral(double x,
+		double y, double radius)
 {
-	ToolPath temp;
-	GCodeBlock mp;
+	std::vector <CNCPosition> temp;
+	CNCPosition mp;
 
 	const double rinc = toolDiameter / 2.0;
 
@@ -227,19 +223,17 @@ ToolPath GeneratorAreaMillingDynamic::GenerateSpiral(double x, double y,
 
 	throw("Is this used?");
 
-	mp.X = x;
-	mp.Y = y;
-	mp.Z = 0.0;
+	mp.position.Set(x, y, 0.0);
 	mp.FeedSpeed();
-	temp.positions.Add(mp);
+	temp.push_back(mp);
 
-	mp.ArcCCW();
+//	mp.ArcCCW();
 	for(n = 1; n <= Nt; n++){
 		const double r = radius / (double) Nt * (double) n;
-		mp.R = r;
-		mp.X = x + r * cos(2 * M_PI / (double) Npt * (double) n);
-		mp.Y = y + r * sin(2 * M_PI / (double) Npt * (double) n);
-		temp.positions.Add(mp);
+//		mp.R = r;
+		mp.position.x = x + r * cos(2 * M_PI / (double) Npt * (double) n);
+		mp.position.y = y + r * sin(2 * M_PI / (double) Npt * (double) n);
+		temp.push_back(mp);
 	}
 	return temp;
 }
@@ -266,11 +260,28 @@ bool GeneratorAreaMillingDynamic::IsDirectlyReachable(DexelTarget &target,
 	return true;
 }
 
-ToolPath GeneratorAreaMillingDynamic::MoveSafely(DexelTarget &target, double sx,
-		double sy, double sz, double x, double y, double z)
+bool GeneratorAreaMillingDynamic::operator ==(const Generator& b) const
 {
-	ToolPath tp;
-	GCodeBlock mp;
+	const GeneratorAreaMillingDynamic * temp =
+			dynamic_cast <const GeneratorAreaMillingDynamic*>(&b);
+	std::cout << "GeneratorAreaMillingDynamic::operator ==\n";
+	if(!(this->Generator::operator ==(b))) return false;
+	if(fabs(this->toolDiameter - temp->toolDiameter) > FLT_EPSILON) return false;
+	if(fabs(
+			this->freeHeightAboveMaterial
+					- temp->freeHeightAboveMaterial)>FLT_EPSILON) return false;
+	if(fabs(this->maxSingleStep - temp->maxSingleStep) > FLT_EPSILON) return false;
+	if(fabs(this->raiseStep - temp->raiseStep) > FLT_EPSILON) return false;
+	if(fabs(this->dropStep - temp->dropStep) > FLT_EPSILON) return false;
+	return true;
+}
+
+std::vector <CNCPosition> GeneratorAreaMillingDynamic::MoveSafely(
+		DexelTarget &target, double sx, double sy, double sz, double x,
+		double y, double z)
+{
+	std::vector <CNCPosition> tp;
+	CNCPosition mp;
 
 	bool hasToDrop = false;
 
@@ -282,9 +293,7 @@ ToolPath GeneratorAreaMillingDynamic::MoveSafely(DexelTarget &target, double sx,
 	double ry = target.GetResolutionY();
 	double r = (rx + ry) / 2;
 
-	mp.X = sx;
-	mp.Y = sy;
-	mp.Z = sz;
+	mp.position.Set(sx, sy, sz);
 	mp.Rapid();
 
 	double dx = x - sx;
@@ -295,8 +304,8 @@ ToolPath GeneratorAreaMillingDynamic::MoveSafely(DexelTarget &target, double sx,
 	double dt;
 
 	if(dz >= 0){
-		mp.Z = z + 0.001;
-		tp.positions.Add(mp);
+		mp.position.z = z + 0.001;
+		tp.push_back(mp);
 	}
 
 	const size_t n = round(d / r);
@@ -309,72 +318,63 @@ ToolPath GeneratorAreaMillingDynamic::MoveSafely(DexelTarget &target, double sx,
 
 		dt = d * (1 - (double) i / (double) n);
 
-		if(hz > mp.Z && !isCutting){
-			mp.X = sx + dx / (double) (n - 1) * (double) i;
-			mp.Y = sy + dy / (double) (n - 1) * (double) i;
-			mp.Z = target.GetSizeZ() + freeHeightAboveMaterial;
-			tp.positions.Add(mp);
+		if(hz > mp.position.z && !isCutting){
+			mp.position.x = sx + dx / (double) (n - 1) * (double) i;
+			mp.position.y = sy + dy / (double) (n - 1) * (double) i;
+			mp.position.z = target.GetSizeZ() + freeHeightAboveMaterial;
+			tp.push_back(mp);
 			hasToDrop = true;
 		}
 
 		if(dt <= toolDiameter / 2 && !isCutting && !hasToDrop){
-			mp.X = sx + dx / (double) (n - 1) * (double) i;
-			mp.Y = sy + dy / (double) (n - 1) * (double) i;
-			tp.positions.Add(mp);
-			mp.X = px;
-			mp.Y = py;
+			mp.position.x = sx + dx / (double) (n - 1) * (double) i;
+			mp.position.y = sy + dy / (double) (n - 1) * (double) i;
+			tp.push_back(mp);
+			mp.position.x = px;
+			mp.position.y = py;
 			isCutting = true;
 			mp.FeedSpeed();
-			tp.positions.Add(mp);
+			tp.push_back(mp);
 		}
 	}
 	mp.FeedSpeed();
-	mp.X = x;
-	mp.Y = y;
-	if(!hasToDrop) mp.Z = z;
-	tp.positions.Add(mp);
+	mp.position.x = x;
+	mp.position.y = y;
+	if(!hasToDrop) mp.position.z = z;
+	tp.push_back(mp);
 
 	if(hasToDrop){
 		double d = target.GetSizeZ();
 		while(d > dropStep + z){
 			mp.FeedSpeed();
 			d -= dropStep;
-			mp.Z = d;
-			tp.positions.Add(mp);
+			mp.position.z = d;
+			tp.push_back(mp);
 			mp.Rapid();
-			mp.Z = target.GetSizeZ();
+			mp.position.z = target.GetSizeZ();
 		}
 		mp.FeedSpeed();
-		mp.Z = z;
-		tp.positions.Add(mp);
+		mp.position.z = z;
+		tp.push_back(mp);
 	}
 	return tp;
 }
 
-void GeneratorAreaMillingDynamic::GenerateToolpath(void)
+void GeneratorAreaMillingDynamic::GenerateToolpath(const Run &run,
+		const std::map <size_t, Object> &objects, const Tool &tool,
+		const DexelTarget &base)
 {
 	output.Empty();
 
-//	size_t slotNr = project->run[runNr].toolpaths[toolpathNr].generator->slotNr;
-//	Tool * tool = project->run[runNr].toolbox.GetToolInSlot(slotNr);
-	Run* run = this->parent;
+	GeneratorDexel::PrepareTargets(run, objects, tool, base);
 
-	if(refTool >= run->machine.tools.GetCount()){
-		output = _T("Tool empty.");
-		errorOccured = true;
-		return;
-	}
-	Tool * tool = &(run->machine.tools[refTool]);
+	std::vector <CNCPosition> tp;
+	CNCPosition mp;
 
-	GeneratorDexel::GenerateToolpath();
-
-	ToolPath tp;
-	GCodeBlock mp;
-
-	toolDiameter = tool->GetMaxDiameter();
+	toolDiameter = tool.GetMaxDiameter();
 
 	DexelTarget toolShape;
-	toolShape.SetupTool(*tool, target.GetResolutionX(),
+	toolShape.SetupTool(tool, target.GetResolutionX(),
 			target.GetResolutionY());
 	toolShape.NegateZ();
 	DexelTarget temp = target;
@@ -417,12 +417,12 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(void)
 	int cx, cy;
 	double d = temptop.GetMaxLevelAD(cx, cy);
 
-	if(tp.IsEmpty()){ // New toolpath starting position
-		mp.X = rx * cx + rx2;
-		mp.Y = ry * cy + ry2;
-		mp.Z = temp.GetSizeZ() + freeHeightAboveMaterial;
+	if(tp.empty()){ // New toolpath starting position
+		mp.position.x = rx * cx + rx2;
+		mp.position.y = ry * cy + ry2;
+		mp.position.z = temp.GetSizeZ() + freeHeightAboveMaterial;
 		mp.Rapid();
-		tp.positions.Add(mp);
+		tp.push_back(mp);
 	}
 
 	// Remove material at drillhole
@@ -439,20 +439,20 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(void)
 			poly = temptop.FindCut(cx, cy);
 			temp.PolygonDropOntoTarget(poly, level);
 
-			if(mp.Z > level){
+			if(mp.position.z > level){
 				// Drill down
 				d = target.GetSizeZ();
 				while(d > level + dropStep){
 					mp.FeedSpeed();
 					d -= dropStep;
-					mp.Z = d;
-					tp.positions.Add(mp);
+					mp.position.z = d;
+					tp.push_back(mp);
 					mp.Rapid();
-					mp.Z = target.GetSizeZ();
+					mp.position.z = target.GetSizeZ();
 				}
 				mp.FeedSpeed();
-				mp.Z = level;
-				tp.positions.Add(mp);
+				mp.position.z = level;
+				tp.push_back(mp);
 			}
 			//if(poly.elements.GetCount() > 3){
 			for(size_t i = 0; i < poly.Size(); i++){
@@ -461,14 +461,16 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(void)
 						round((poly[i].y - ry2) / ry), toolShape);
 
 				if(i == 0){
-					tp += MoveSafely(temp, mp.X, mp.Y, mp.Z, poly[i].x,
-							poly[i].y, poly[i].z);
+					std::vector <CNCPosition> tempp = MoveSafely(temp,
+							mp.position.x, mp.position.y, mp.position.z,
+							poly[i].x, poly[i].y, poly[i].z);
+					tp.insert(tp.end(), tempp.begin(), tempp.end());
 				}
-				mp.X = poly[i].x;
-				mp.Y = poly[i].y;
-				mp.Z = poly[i].z;
+				mp.position.x = poly[i].x;
+				mp.position.y = poly[i].y;
+				mp.position.z = poly[i].z;
 				mp.FeedSpeed();
-				tp.positions.Add(mp);
+				tp.push_back(mp);
 				//}
 			}
 		}
@@ -481,9 +483,9 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(void)
 			level = temptop.GetSizeZ() + 0.0001;
 		}
 
-		mp.Z = level;
+		mp.position.z = level;
 		mp.Rapid();
-		tp.positions.Add(mp);
+		tp.push_back(mp);
 
 		if(level < temptop.GetSizeZ()){
 			temptop.RaiseDistanceMap(level, true);
@@ -513,19 +515,18 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(void)
 	//	tp += temptp;
 
 	// Move out of material
-	mp.Z = temp.GetSizeZ() + freeHeightAboveMaterial;
+	mp.position.z = temp.GetSizeZ() + freeHeightAboveMaterial;
 	mp.Rapid();
-	tp.positions.Add(mp);
+	tp.push_back(mp);
 
 	//target = temptop;
 
 	//tp.CleanPath(0.0003);
 
 //	for(size_t i = 0; i < tp.positions.GetCount(); i++)
-//		tp.positions[i].Z -= temp.GetSizeZ();
-	tp.FlagAll(true, true, true);
+//		tp.positions[i].position.Z -= temp.GetSizeZ();
 //	AffineTransformMatrix shiftback;
-//	shiftback.TranslateGlobal(area.xmin, area.ymin, area.zmin);
+//	shiftback.TranslateGlobal(0, 0, 0);
 //	tp.ApplyTransformation(shiftback);
 
 	toolpath = tp;
@@ -536,12 +537,12 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(void)
 	//
 	//	// Starting point
 	//	//
-	//	//	tp.positions.Add(m);
+	//	//	tp.push_back(m);
 	//
 	//	// Position at start (! not a toolpath position)
-	//	m.X = 0.0;
-	//	m.Y = 0.0;
-	//	m.Z = temp.GetSizeZ() + freeHeightAboveMaterial;
+	//	m.position.X = 0.0;
+	//	m.position.Y = 0.0;
+	//	m.position.Z = temp.GetSizeZ() + freeHeightAboveMaterial;
 	//	m.isCutting = false;
 	//
 	//	ArrayOfPolygon25 pgs;
@@ -552,14 +553,14 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(void)
 	//
 	//
 	//	// Move tool out of material
-	//	m.Z = temp.GetSizeZ() + freeHeightAboveMaterial;
+	//	m.position.Z = temp.GetSizeZ() + freeHeightAboveMaterial;
 	//	m.isCutting = false;
-	//	tp.positions.Add(m);
+	//	tp.push_back(m);
 	//
 	//
 	//	// Shift toolpath down to align 0 with top-of-stock
 	//	for(size_t i = 0; i < tp.positions.GetCount(); i++){
-	//		tp.positions[i].Z -= temp.GetSizeZ();
+	//		tp.positions[i].position.Z -= temp.GetSizeZ();
 	//	}
 	//	tp.matrix.TranslateGlobal(0, 0, temp.GetSizeZ());
 	//

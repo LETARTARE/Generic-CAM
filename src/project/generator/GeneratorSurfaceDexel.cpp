@@ -47,16 +47,14 @@ void GeneratorSurfaceDexel::CopyParameterFrom(const Generator* other)
 			dynamic_cast <const GeneratorSurfaceDexel*>(other);
 }
 
-wxString GeneratorSurfaceDexel::GetName(void) const
+wxString GeneratorSurfaceDexel::GetTypeName(void) const
 {
 	return _T("Surface refinement (using Dexel)");
 }
 
-void GeneratorSurfaceDexel::AddToPanel(wxPanel* panel,
-		CollectionUnits* settings)
+wxSizer * GeneratorSurfaceDexel::AddToPanel(wxPanel* panel,
+		CollectionUnits* settings) const
 {
-	Generator::AddToPanel(panel, settings);
-
 	wxBoxSizer* bSizer;
 	bSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -82,38 +80,39 @@ void GeneratorSurfaceDexel::AddToPanel(wxPanel* panel,
 	fgSizer->Add(m_staticTextUnit, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
 
 	bSizer->Add(fgSizer, 0, wxALIGN_CENTER_HORIZONTAL, 5);
-
-	panel->SetSizer(bSizer);
-	panel->Layout();
-	bSizer->Fit(panel);
+	return bSizer;
 }
 
-void GeneratorSurfaceDexel::TransferDataToPanel(void) const
+void GeneratorSurfaceDexel::TransferDataToPanel(wxPanel* panel,
+		CollectionUnits* settings) const
 {
 }
 
-void GeneratorSurfaceDexel::TransferDataFromPanel(void)
+void GeneratorSurfaceDexel::TransferDataFromPanel(CollectionUnits* settings)
 {
 }
 
-void GeneratorSurfaceDexel::GenerateToolpath(void)
+bool GeneratorSurfaceDexel::operator ==(const Generator& b) const
 {
-	output.Empty();
+	const GeneratorSurfaceDexel * temp =
+			dynamic_cast <const GeneratorSurfaceDexel*>(&b);
+	std::cout << "GeneratorSurfaceDexel::operator ==\n";
+	if(!(this->Generator::operator ==(b))) return false;
+	return true;
+}
+
+void GeneratorSurfaceDexel::GenerateToolpath(const Run &run,
+		const std::map <size_t, Object> &objects, const Tool &tool,
+		const DexelTarget &base)
+{
 	errorOccured = false;
 	toolpathGenerated = true;
-	const Run* const run = this->parent;
-	assert(run != NULL);
-	if(refTool >= run->machine.tools.GetCount()){
-		output = _T("Tool empty.");
-		errorOccured = true;
-		return;
-	}
-	GeneratorDexel::GenerateToolpath();
-	const Tool* const tool = &(run->machine.tools[refTool]);
+	output.Empty();
+	GeneratorDexel::PrepareTargets(run, objects, tool, base);
 
 	//	DexelTarget surface = target;
 	DexelTarget toolShape;
-	toolShape.SetupTool(*tool, target.GetResolutionX(), target.GetResolutionY(),
+	toolShape.SetupTool(tool, target.GetResolutionX(), target.GetResolutionY(),
 			true);
 	toolShape.NegateZ();
 
@@ -123,12 +122,12 @@ void GeneratorSurfaceDexel::GenerateToolpath(void)
 //	debug = start;
 //	debug.CopyToUp(4, 1.0);
 
-	toolShape.SetupTool(*tool, target.GetResolutionX(), target.GetResolutionY(),
+	toolShape.SetupTool(tool, target.GetResolutionX(), target.GetResolutionY(),
 			false);
 	toolShape.NegateZ();
 
-	ArrayOfProtoToolpath aptp;
-	GCodeBlock m;
+	std::vector <ProtoToolpath> aptp;
+	CNCPosition m;
 	m.FeedSpeed();
 	int x, y;
 	double d;
@@ -145,10 +144,10 @@ void GeneratorSurfaceDexel::GenerateToolpath(void)
 					+ target.GetResolutionY() / 2;
 
 			ImprinterElement t = target.GetElement(px, py);
-			m.X = px;
-			m.Y = py;
-			m.Z = t.up;
-			pt.positions.Add(m);
+			m.position.x = px;
+			m.position.y = py;
+			m.position.z = t.up;
+			pt.p.push_back(m);
 
 			double level = t.up;
 			double nd = sqrt(t.normalx * t.normalx + t.normaly * t.normaly);
@@ -158,10 +157,10 @@ void GeneratorSurfaceDexel::GenerateToolpath(void)
 				py -= t.normaly / nd * 0.8 * target.GetResolutionY();
 				t = target.GetElement(px, py);
 				if(t.up <= level) break;
-				m.X = px;
-				m.Y = py;
-				m.Z = t.up;
-				pt.positions.Add(m);
+				m.position.x = px;
+				m.position.y = py;
+				m.position.z = t.up;
+				pt.p.push_back(m);
 
 				level = t.up;
 				nd = sqrt(t.normalx * t.normalx + t.normaly * t.normaly);
@@ -178,44 +177,44 @@ void GeneratorSurfaceDexel::GenerateToolpath(void)
 				t = target.GetElement(px, py);
 				if(t.up >= level) break;
 
-				m.X = px;
-				m.Y = py;
-				m.Z = t.up;
-				pt.positions.Insert(m, 0);
+				m.position.x = px;
+				m.position.y = py;
+				m.position.z = t.up;
+				pt.p.insert(pt.p.begin(), m);
 
 				level = t.up;
 				nd = sqrt(t.normalx * t.normalx + t.normaly * t.normaly);
 			}
 
-			wxArrayInt k;
-			for(size_t n = 0; n < pt.positions.GetCount(); n++){
-				const ImprinterElement s = start.GetElement(pt.positions[n].X,
-						pt.positions[n].Y);
+			std::vector <int> k;
+			for(size_t n = 0; n < pt.p.size(); n++){
+				const ImprinterElement s = start.GetElement(pt.p[n].position.x,
+						pt.p[n].position.y);
 				if(s.up - s.down < -FLT_EPSILON){
 
-					k.Add(0);
+					k.push_back(0);
 					continue;
 				}
-				k.Add((s.aboveDown > residualError)? -1 : 0);
+				k.push_back((s.aboveDown > residualError)? -1 : 0);
 			}
 
-			for(size_t n = 0; n < k.GetCount(); n++){
+			for(size_t n = 0; n < k.size(); ++n){
 				const int ix = round(
-						(pt.positions[n].X - start.GetResolutionX() / 2)
+						(pt.p[n].position.x - start.GetResolutionX() / 2)
 								/ start.GetResolutionX());
 				const int iy = round(
-						(pt.positions[n].Y - start.GetResolutionY() / 2)
+						(pt.p[n].position.y - start.GetResolutionY() / 2)
 								/ start.GetResolutionY());
 				if(ix >= 0 && ix < start.GetCountX() && iy >= 0
 						&& iy < start.GetCountY()) start.TouchErase(ix, iy,
-						pt.positions[n].Z, pt.positions[n].Z, toolShape);
+						pt.p[n].position.z, pt.p[n].position.z, toolShape);
 			}
 
 			int c = 100;
-			for(size_t n = 0; n < pt.positions.GetCount(); n++){
+			for(size_t n = 0; n < pt.p.size(); ++n){
 				if(k[n] < 0){
 					if(c <= 2){
-						for(size_t m = 0; m < c; m++)
+						for(size_t m = 0; m < c; ++m)
 							k[n - m - 1] = -1;
 					}
 					c = 0;
@@ -224,19 +223,19 @@ void GeneratorSurfaceDexel::GenerateToolpath(void)
 				}
 			}
 
-			assert(k.GetCount() == pt.GetCount());
-			k.Add(0);
+			assert(k.size() == pt.p.size());
+			k.push_back(0);
 			ProtoToolpath temp;
-			for(size_t n = 0; n < k.GetCount(); n++){
+			for(size_t n = 0; n < k.size(); n++){
 				if(k[n]){
-					temp.positions.Add(pt.positions[n]);
+					temp.p.push_back(pt.p[n]);
 					continue;
 				}
 
-				if(!temp.positions.IsEmpty()){
-					aptp.Add(temp);
+				if(!temp.p.empty()){
+					aptp.push_back(temp);
 				}
-				temp.positions.Clear();
+				temp.p.clear();
 
 			}
 
@@ -260,52 +259,49 @@ void GeneratorSurfaceDexel::GenerateToolpath(void)
 //	pg.RotatePolygonStart(0, 0);
 //
 //
-//	GCodeBlock m;
+//	CNCPosition m;
 //	if(pg.GetCount() > 0){
 //		m.Rapid();
-//		m.X = pg.elements[0].x;
-//		m.Y = pg.elements[0].y;
-//		m.Z = target.GetSizeZ() + freeHeight;
-//		toolpath.positions.Add(m);
+//		m.position.X = pg.elements[0].x;
+//		m.position.Y = pg.elements[0].y;
+//		m.position.Z = target.GetSizeZ() + freeHeight;
+//		toolpath.push_back(m);
 //
 //		const double cutdepth = tool->GetCuttingDepth();
-//		const int N = ceil((area.zmax - area.zmin) / cutdepth);
+//		const int N = ceil((start.GetSizez() - 0) / cutdepth);
 //		for(int n = 1; n <= N; n++){
-//			const double level = fmax(area.zmax - n * cutdepth, area.zmin);
+//			const double level = fmax(start.GetSizez() - n * cutdepth, 0);
 //
 //			for(size_t n = 0; n < pg.GetCount(); n++){
-//				m.X = pg.elements[n].x;
-//				m.Y = pg.elements[n].y;
-//				m.Z = level;
+//				m.position.X = pg.elements[n].x;
+//				m.position.Y = pg.elements[n].y;
+//				m.position.Z = level;
 //				m.FeedSpeed();
-//				toolpath.positions.Add(m);
+//				toolpath.push_back(m);
 //			}
-//			m.X = pg.elements[0].x;
-//			m.Y = pg.elements[0].y;
-//			toolpath.positions.Add(m);
+//			m.position.X = pg.elements[0].x;
+//			m.position.Y = pg.elements[0].y;
+//			toolpath.push_back(m);
 //		}
-//		m.Z = target.GetSizeZ() + freeHeight;
+//		m.position.Z = target.GetSizeZ() + freeHeight;
 //		m.Rapid();
-//		toolpath.positions.Add(m);
+//		toolpath.push_back(m);
 //	}
 
 	QuickCollectToolpaths(aptp, 3 * 6e-3);
 
-	if(!toolpath.IsEmpty()){
+	if(!toolpath.empty()){
 		{
-			GCodeBlock m = toolpath.positions[0];
-			m.Z = target.GetSizeZ() + freeHeight;
+			CNCPosition m = toolpath[0];
+			m.position.z = target.GetSizeZ() + freeHeight;
 			m.Rapid();
-			toolpath.positions.Insert(m, 0);
+			toolpath.insert(toolpath.begin(), m);
 		}
 		{
-			GCodeBlock m = toolpath.positions.Last();
-			m.Z = target.GetSizeZ() + freeHeight;
+			CNCPosition m = *(toolpath.end() - 1);
+			m.position.z = target.GetSizeZ() + freeHeight;
 			m.Rapid();
-			toolpath.positions.Add(m);
+			toolpath.push_back(m);
 		}
 	}
-
-	toolpath.FlagAll(true);
-
 }

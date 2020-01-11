@@ -27,17 +27,20 @@
 #ifndef GENERATORAREAMILLINGDYNAMIC_H_
 #define GENERATORAREAMILLINGDYNAMIC_H_
 
-#include "GeneratorDexel.h"
-
-#include "../../3D/Polygon3.h"
-#include "../Tool.h"
-
 /*!\class GeneratorAreaMillingDynamic
  * \ingroup Generator
  * \brief ...
  *
  * ...
  */
+
+#include "GeneratorDexel.h"
+
+#include "../../3D/Polygon3.h"
+#include "../Tool.h"
+
+#include "GeneratorFactory.h"
+
 class GeneratorAreaMillingDynamic:public GeneratorDexel {
 	// Constructor/ Destructor
 public:
@@ -45,12 +48,20 @@ public:
 	virtual ~GeneratorAreaMillingDynamic();
 
 	virtual void CopyParameterFrom(const Generator * other);
-	virtual wxString GetName(void) const;
-	virtual void AddToPanel(wxPanel * panel, CollectionUnits* settings);
-	virtual void TransferDataToPanel(void) const;
-	virtual void TransferDataFromPanel(void);
+	virtual size_t GetType(void) const
+			{
+				return TYPE_GENERATORAREAMILLINGDYNAMIC;
+			}
+	virtual wxString GetTypeName(void) const;
+	virtual wxSizer * AddToPanel(wxPanel * panel, CollectionUnits* settings) const;
+	virtual void TransferDataToPanel(wxPanel* panel,
+			CollectionUnits* settings) const;
+	virtual void TransferDataFromPanel(CollectionUnits* settings);
+	virtual bool operator==(const Generator &b) const;
 
-	virtual void GenerateToolpath(void);
+	virtual void GenerateToolpath(const Run &run,
+			const std::map <size_t, Object> &objects, const Tool &tool,
+			const DexelTarget &base);
 
 	//Member variables:
 public:
@@ -62,24 +73,24 @@ public:
 
 private:
 
-	wxStaticText* m_staticText10;
-	wxTextCtrl* m_textCtrlMaxSingleStep;
-	wxStaticText* m_staticTextUnit1;
-	wxStaticText* m_staticText12;
-	wxTextCtrl* m_textCtrlRaiseStep;
-	wxStaticText* m_staticTextUnit2;
-	wxStaticText* m_staticText14;
-	wxTextCtrl* m_textCtrlDropStep;
-	wxStaticText* m_staticTextUnit3;
+	mutable wxStaticText* m_staticText10;
+	mutable wxTextCtrl* m_textCtrlMaxSingleStep;
+	mutable wxStaticText* m_staticTextUnit1;
+	mutable wxStaticText* m_staticText12;
+	mutable wxTextCtrl* m_textCtrlRaiseStep;
+	mutable wxStaticText* m_staticTextUnit2;
+	mutable wxStaticText* m_staticText14;
+	mutable wxTextCtrl* m_textCtrlDropStep;
+	mutable wxStaticText* m_staticTextUnit3;
 
 	//Methods:
 
 private:
-	ToolPath GenerateSpiral(double x, double y, double radius);
-	ToolPath GenerateDrill(double x, double y, double diameter, double depth);
+	std::vector <CNCPosition> GenerateSpiral(double x, double y, double radius);
+	std::vector <CNCPosition> GenerateDrill(double x, double y, double diameter, double depth);
 	bool IsDirectlyReachable(DexelTarget &target, double sx, double sy,
 			double sz, double x, double y, double z);
-	ToolPath MoveSafely(DexelTarget &target, double sx, double sy, double sz,
+	std::vector <CNCPosition> MoveSafely(DexelTarget &target, double sx, double sy, double sz,
 			double x, double y, double z);
 
 };

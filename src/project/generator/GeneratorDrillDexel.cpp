@@ -93,10 +93,10 @@ void GeneratorDrillDexel::TransferDataFromPanel(CollectionUnits* settings)
 }
 
 void GeneratorDrillDexel::GenerateToolpath(const Run &run,
-		const std::map <size_t, Object> &objects,
-		const Tool * tool, DexelTarget * base)
+		const std::map <size_t, Object> &objects, const Tool &tool,
+		const DexelTarget &base)
 {
-	GeneratorDexel::GenerateToolpath(run, objects, tool, base);
+	GeneratorDexel::PrepareTargets(run, objects, tool, base);
 
 	output.Empty();
 	errorOccured = false;

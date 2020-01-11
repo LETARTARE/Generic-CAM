@@ -40,7 +40,7 @@
 #include <wx/string.h>
 #include <stddef.h>
 
-#define TYPE_GENERATORTEST	34745572
+#include "GeneratorFactory.h"
 
 class GeneratorTest:public GeneratorDexel {
 	// Constructor/ Destructor
@@ -63,13 +63,13 @@ public:
 			CollectionUnits* settings) const;
 	virtual void TransferDataFromPanel(CollectionUnits* settings);
 	virtual void GenerateToolpath(const Run &run,
-			const std::map <size_t, Object>  &objects,
-			const Tool * tool, DexelTarget * base);
+			const std::map <size_t, Object> &objects, const Tool &tool,
+			const DexelTarget &base);
 
 	//Member variables:
 public:
 	double twiddleFactor;
-
+private:
 	mutable wxStaticText* m_staticTextTwiddleFactor;
 	mutable wxTextCtrl* m_textCtrlTwiddleFactor;
 	mutable wxStaticText* m_staticTextUnit;
