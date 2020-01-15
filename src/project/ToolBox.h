@@ -34,12 +34,12 @@
  * A collection of available tools for the machine.
  */
 
-#include "Tool.h"
-
-#include <wx/xml/xml.h>
-#include <wx/filename.h>
-#include <wx/string.h>
 #include <stddef.h>
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include "Tool.h"
 
 class ToolBox {
 	//Constructor / Destructor
@@ -49,31 +49,32 @@ public:
 
 	//Member variables
 public:
-	wxFileName fileName;
-private:
-	ArrayOfTool tools;
+	std::string filename;
+	std::string version;
 
 private:
-	bool initialized;
+	std::vector <Tool> tools;
 
 	// Methods
 public:
-	void Empty(void);
-	bool LoadToolBox(wxFileName& fileName);
-	bool SaveToolBox(wxFileName& fileName);
-	void ToStream(wxTextOutputStream & stream);
-	bool FromStream(wxTextInputStream & stream);
-	bool IsInitialized(void) const;
+	bool LoadJSON(std::string filename);
+//	void SaveJSON(std::string filename) const;
 
-	int AddTool(Tool& newTool);
-	bool RemoveToolSlot(int slotNr);
-	bool RemoveToolIndex(size_t index);
-	bool IsSlotFilled(int slotNr) const;
-	Tool * ToolInSlot(int slotNr);
-	const Tool * ToolInSlot(int slotNr) const;
-	Tool * ToolIndex(size_t index);
-	const Tool * ToolIndex(size_t index) const;
-	size_t GetToolCount(void) const;
+//	friend std::istream& operator>>(std::istream &in, ToolBox &hull);
+//	friend std::ostream& operator<<(std::ostream &out, const ToolBox &hull);
+
+	size_t Size(void) const;
+	Tool & operator[](size_t index);
+	const Tool & operator[](size_t index) const;
+
+	//	size_t AddTool(Tool& newTool);
+//	bool RemoveToolSlot(size_t slotNr);
+//	bool RemoveToolIndex(size_t index);
+//	bool IsSlotFilled(size_t slotNr) const;
+//	Tool & Slot(size_t slotNr);
+//	const Tool & Slot(size_t slotNr) const;
+
+
 };
 
 #endif /* TOOLBOX_H_ */

@@ -56,7 +56,7 @@ Project::Project() :
 
 	Tool temp;
 	temp.guid = "#1";
-	temp.BMC = "carbide";
+	temp.BMC = "VHM";
 	temp.GRADE = "Generic Mill";
 	temp.type = Tool::flat_end_mill;
 	temp.geometry.DC = 6e-3;

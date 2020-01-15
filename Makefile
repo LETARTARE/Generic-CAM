@@ -160,13 +160,13 @@ SOURCES += \
 	
 # project object files:
 SOURCES += \
-        src/project/JSON.cpp \
         src/project/Object.cpp \
         src/project/Project.cpp \
         src/project/ProjectView.cpp \
         src/project/Run.cpp \
         src/project/Selection.cpp \
         src/project/Tool.cpp \
+        src/project/ToolBox.cpp \
         src/test/TestSelection.cpp \
         src/test/test.cpp \
 

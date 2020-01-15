@@ -82,7 +82,7 @@ private:
 	wxMutex loopGuard; ///< Breaks update loops. Tree updates variable updates tree updates variable updates ...
 
 	bool levelModified;
-	wxTreeItemIdValue cookie;
+
 	wxTreeItemId * id;
 
 	wxTreeItemId groupObjects;

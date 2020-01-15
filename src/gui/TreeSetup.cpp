@@ -44,8 +44,6 @@ TreeSetup::TreeSetup(FrameMain * parent, wxTreeCtrl * tree)
 	this->id = new wxTreeItemId[maxId];
 	this->currentLevel = -1;
 
-	this->cookie = project;
-
 	long style = this->tree->GetWindowStyle() ^ wxTR_NO_LINES;
 	this->tree->SetWindowStyle(style);
 
@@ -79,7 +77,7 @@ void TreeSetup::SetAtLevel(int level, const wxString& name,
 		TreeItem::itemtype type, size_t ID)
 {
 	wxTreeItemId temp;
-
+	wxTreeItemIdValue cookie;
 	if(level < currentLevel){
 		FinishLevel(currentLevel);
 		currentLevel = level;
@@ -397,7 +395,7 @@ void TreeSetup::SelectonToTree(const Selection &sel)
 
 	// Updates for Objects:
 	{
-
+		wxTreeItemIdValue cookie;
 		std::set <size_t> objIDs = project->GetAllObjectIDs();
 		std::set <size_t>::const_iterator objID = objIDs.begin();
 
@@ -443,6 +441,7 @@ void TreeSetup::SelectonToTree(const Selection &sel)
 
 	// Updates for Run:
 	{
+		wxTreeItemIdValue cookie;
 		std::set <size_t> runIDs = project->GetAllRunIDs();
 		std::set <size_t>::const_iterator runID = runIDs.begin();
 
@@ -512,7 +511,7 @@ Selection TreeSetup::TreeToSelection(void)
 
 	// Updates for Objects:
 	{
-
+		wxTreeItemIdValue cookie;
 		std::set <size_t> objIDs = project->GetAllObjectIDs();
 		std::set <size_t>::const_iterator objID = objIDs.begin();
 		wxTreeItemId temp = tree->GetFirstChild(groupObjects, cookie);
@@ -546,7 +545,8 @@ Selection TreeSetup::TreeToSelection(void)
 
 	// Updates for Run:
 	{
-		wxTreeItemIdValue cookie2 = cookie + 1;
+		wxTreeItemIdValue cookie;
+		wxTreeItemIdValue cookie2;
 		std::set <size_t> runIDs = project->GetAllRunIDs();
 		std::set <size_t>::const_iterator runID = runIDs.begin();
 		wxTreeItemId temp = tree->GetFirstChild(groupRun, cookie);
