@@ -33,43 +33,43 @@
 #include "gui.h"
 
 class DialogToolbox:public GUIToolbox {
-	// Constructor/ Destructor
-
 public:
 	DialogToolbox(wxWindow* parent);
 	virtual ~DialogToolbox();
 
-	// Member Variables
+	void Update(void);
+
 protected:
 	int selectedTool;
 	int selectedElement;
 
 	Tool tempTool;
-	ToolElement tempElement;
 
-	// Methods
+	wxTreeListItem projectfolder;
+
+	ToolBox localtoolbox;
+	wxTreeListItem localtoolboxfolder;
+	std::vector<ToolBox> toolboxes;
+	std::vector<wxTreeListItem> toolboxfolders;
+
 public:
-	void SetController(Control3D& control);
-
 	void OnClose(wxCommandEvent& event);
 	void OnXClose(wxCloseEvent& event);
-
-	void OnChangeStereo3D(wxCommandEvent& event);
 
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 
 	void OnEnter(wxCommandEvent& event);
-	void OnToolSelect(wxCommandEvent& event);
-	void OnToolRename(wxCommandEvent& event);
-	void OnToolNew(wxCommandEvent& event);
-	void OnToolUpdate(wxCommandEvent& event);
-	void OnToolDelete(wxCommandEvent& event);
 	void OnShapeWizard(wxCommandEvent& event);
 	void OnShapeNew(wxCommandEvent& event);
 	void OnShapeUpdate(wxCommandEvent& event);
 	void OnShapeDelete(wxCommandEvent& event);
 	void OnShapeSelect(wxListEvent& event);
+
+	void OnItemChecked(wxTreeListEvent& event);
+	void OnItemContextMenu(wxTreeListEvent& event);
+	void OnSelectionChanged(wxTreeListEvent& event);
+
 };
 
 #endif /* TOOLBOXFRAME_H_ */

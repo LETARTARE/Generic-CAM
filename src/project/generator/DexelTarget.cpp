@@ -30,10 +30,11 @@
 
 #include <wx/log.h>
 #include <wx/string.h>
-#include <GL/gl.h>
+
 #include <math.h>
 #include <float.h>
 #include <stdint.h>
+#include <GL/gl.h>
 
 DexelTarget::DexelTarget()
 {
@@ -93,16 +94,9 @@ void DexelTarget::InsertObject(const Object &object,
 }
 
 void DexelTarget::SetupTool(const Tool &tool, const double resolutionX,
-		const double resolutionY, bool addMachineSafety)
+		const double resolutionY)
 {
-	//TODO: Integrate the hack for the chuck protection in a more organized way.
-	double radius;
-	if(addMachineSafety){
-		radius = fmax(tool.GetMaxDiameter() / 2.0, 60e-3 / 2.0);
-	}else{
-		radius = tool.GetMaxDiameter() / 2.0;
-	}
-	const double depth = tool.GetToolLength();
+	const double radius = tool.GetMaxDiameter() / 2.0;
 
 	// Calculate the size to be odd, so there always a cell in the center.
 	const size_t cellsX = ceil(radius / resolutionX) * 2 + 1;
@@ -112,7 +106,7 @@ void DexelTarget::SetupTool(const Tool &tool, const double resolutionX,
 	const double centerX = (ceil(radius / resolutionX) + 0.5) * this->rx;
 	const double centerY = (ceil(radius / resolutionY) + 0.5) * this->ry;
 
-	// Prefill the up-layer with the distance from the center
+	// Prefill the down-layer with the distance from the center
 	// (speeds up the toolshape creation)
 	size_t p = 0;
 	double py = ry / 2;
@@ -132,34 +126,27 @@ void DexelTarget::SetupTool(const Tool &tool, const double resolutionX,
 		}
 		py += ry;
 	}
-	for(size_t i = 0; i < tool.contour.size(); i++){
-		const double dRadius = tool.contour[i].x1 - tool.contour[i].x0;
-		if(dRadius <= 0.0) continue;
-		for(size_t j = 0; j < this->N; j++){
-			if(field[j].down > tool.contour[i].x1
-					|| field[j].down < tool.contour[i].x0) continue;
-			// Linear interpolation for conic changes
-			double d = (tool.contour[i].z1 - tool.contour[i].z0)
-					* (field[j].down - tool.contour[i].x0) / dRadius;
-			d += tool.contour[i].z0;
-			// Turn tool around, so that it is pointing in -Z direction, tip at 0.
-//			d = depth - d;
-			if(d > field[j].up){
-				field[j].up = d;
-				field[j].normalx = tool.contour[i].nx;
-				field[j].normaly = tool.contour[i].nz;
+	for(std::vector <Tool::Segment>::const_iterator segment =
+			tool.base.segments.begin(); segment != tool.base.segments.end();
+			++segment){
+		const double dRadius = segment->x1 - segment->x0;
+		for(size_t j = 0; j < this->N; ++j){
+			if(field[j].down <= segment->x0){
+				if(field[j].up < -segment->z0) field[j].up = -segment->z0;
+				continue;
 			}
-		}
-	}
-	if(addMachineSafety){
-		// Insert an approximation to prevent the generator from moving the chuck into the
-		// workpiece.
-		for(size_t j = 0; j < this->N; j++){
-			if(field[j].up < ((25e-3) / 2) && field[j].down > depth) field[j].down =
-					(depth);
-			if(field[j].up < ((45e-3) / 2) && field[j].down > (depth + 20e-3)) field[j].down =
-					(depth + 20e-3);
-			if(field[j].down > (depth + 25e-3)) field[j].down = (depth + 25e-3);
+			if(segment->x1 < segment->x0) continue;
+			if(field[j].down > segment->x1) continue;
+			// Linear interpolation for conic changes
+			double d = (segment->z1 - segment->z0)
+					* (field[j].down - segment->x0) / dRadius;
+			d += segment->z0;
+			// Turn tool around, so that it is pointing in -Z direction, tip at 0.
+			if(-d > field[j].up){
+				field[j].up = -d;
+				field[j].normalx = segment->nx;
+				field[j].normaly = segment->nz;
+			}
 		}
 	}
 	// Put a square cap on top of the tool.

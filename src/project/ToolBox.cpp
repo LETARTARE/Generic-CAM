@@ -26,73 +26,212 @@
 
 #include "ToolBox.h"
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
+#include <exception>
+
+#include "JSON.h"
 
 ToolBox::ToolBox()
 {
-
+	isLoaded = false;
 }
 
 ToolBox::~ToolBox()
 {
 }
 
-bool ToolBox::LoadJSON(std::string filename)
+bool ToolBox::Load(void)
 {
-//	std::ifstream in(filename.c_str(), std::ifstream::in | std::ios::binary);
-//		if(!in.good()){
-//			return false;
-//		}
-//
-//
-//		int state = 0;
-//		int newstate = 0;
-//
-//
-//
-//
-//
-//		const size_t buffersize = 1048576;
-//
-//		char *buffer = new char[buffersize];
-//		if(buffer == NULL) throw(std::runtime_error(
-//				"operator>>(std::istream &in, Hull &hull) - Out of memory."));
-//		size_t charsread;
-//
-//		hull.Clear();
-//
-//		int_fast8_t state = 0;
-//		char command = 0;
-//		std::vector <double> value;
-//		std::vector <int> index_v;
-//		std::vector <int> index_t;
-//		std::vector <int> index_n;
-//		std::vector <Vector3> tempnormals;
-//		double tempvalue;
-//		int tempindex;
-//		double factor = 1.0;
-//		bool negative = false;
-//		bool exponentnegative = false;
-//		int exponent = 0;
-//		do{
-//			in.read(buffer, buffersize);
-//			charsread = in.gcount();
-//
-//			for(size_t n = 0; n < charsread; ++n){
-//				const char c = buffer[n];
-//
-//				// State changes according to the graph above
-//				int_fast8_t nextstate = -1;
-//				switch(state){
-//				case 0:
-//
-//
+	if(filename.empty()) return false;
+	if(isLoaded) return false;
+	return this->Load(filename);
+}
 
+bool ToolBox::Load(std::string filename)
+{
+	JSON js;
+	try{
+		js.Load(filename);
+	}
+	catch(std::exception &x){
+		std::cout << x.what() << "\n";
+		return false;
+	}
+	if(!js.IsKey("data")) return false;
+	const JSON & toolarray = js["data"];
+	if(!toolarray.IsArray()) return false;
+	tools.clear();
+	tools.resize(toolarray.Size());
+	for(size_t n = 0; n < toolarray.Size(); ++n){
+		const JSON &tool = toolarray[n];
+		LoadContour(tools[n].base, tool);
+		if(tool.IsKey("GRADE")) tools[n].GRADE = tool["GRADE"].GetString();
+		if(tool.IsKey("BMC")) tools[n].BMC = tool["BMC"].GetString();
+		if(tool.IsKey("last_modified")) tools[n].lastmodified =
+				tool["last_modified"].GetNumber();
+		if(tool.IsKey("addtonewprojects")) tools[n].addtonewprojects =
+				tool["addtonewprojects"].GetBool();
+		if(tool.IsKey("geometry")){
+			tools[n].hasGeometry = true;
+			const JSON & geometry = tool["geometry"];
 
-		return true;
+			if(geometry.IsKey("CSP")) tools[n].geometry.CSP =
+					geometry["CSP"].GetBool();
+			if(geometry.IsKey("DC")) tools[n].geometry.DC =
+					geometry["DC"].GetNumber();
+			if(geometry.IsKey("HAND")) tools[n].geometry.HAND =
+					geometry["HAND"].GetBool();
+			if(geometry.IsKey("LB")) tools[n].geometry.LB =
+					geometry["LB"].GetNumber();
+			if(geometry.IsKey("LCF")) tools[n].geometry.LCF =
+					geometry["LCF"].GetNumber();
+			if(geometry.IsKey("NOF")) tools[n].geometry.NOF =
+					geometry["NOF"].GetNumber();
+			if(geometry.IsKey("NT")) tools[n].geometry.NT =
+					geometry["NT"].GetNumber();
+			if(geometry.IsKey("OAL")) tools[n].geometry.OAL =
+					geometry["OAL"].GetNumber();
+			if(geometry.IsKey("RE")) tools[n].geometry.RE =
+					geometry["RE"].GetNumber();
+			if(geometry.IsKey("SFDM")) tools[n].geometry.SFDM =
+					geometry["SFDM"].GetNumber();
+			if(geometry.IsKey("SIG")) tools[n].geometry.SIG =
+					geometry["SIG"].GetNumber();
+			if(geometry.IsKey("TA")) tools[n].geometry.TA =
+					geometry["TA"].GetNumber();
+			if(geometry.IsKey("TP")) tools[n].geometry.TP =
+					geometry["TP"].GetNumber();
+			if(geometry.IsKey("shoulder-length")) tools[n].geometry.shoulderlength =
+					geometry["shoulder-length"].GetNumber();
+			if(geometry.IsKey("thread-profile-angle")) tools[n].geometry.threadprofileangle =
+					geometry["thread-profile-angle"].GetNumber();
+			if(geometry.IsKey("tip-diameter")) tools[n].geometry.tipdiameter =
+					geometry["tip-diameter"].GetNumber();
+			if(geometry.IsKey("tip-length")) tools[n].geometry.tiplength =
+					geometry["tip-length"].GetNumber();
+			if(geometry.IsKey("tip-offset")) tools[n].geometry.tipoffset =
+					geometry["tip-offset"].GetNumber();
+		}
+		if(tool.IsKey("holder")){
+			tools[n].hasHolder = true;
+			LoadContour(tools[n].holder, tool["holder"]);
+		}
+		if(tool.IsKey("shaft")){
+			tools[n].hasShaft = true;
+			LoadContour(tools[n].shaft, tool["shaft"]);
+		}
+		if(tool.IsKey("start-values") && tool["start-values"].Size() > 0){
+			tools[n].hasStartValues = true;
+			const JSON & sv = tool["start-values"].Begin();
+			if(sv.IsKey("name")) tools[n].startvalues.name =
+					sv["name"].GetString();
+			if(sv.IsKey("guid")) tools[n].startvalues.guid =
+					sv["guid"].GetString();
+			if(sv.IsKey("description")) tools[n].startvalues.description =
+					sv["description"].GetString();
+			if(sv.IsKey("tool-coolant")) tools[n].startvalues.toolcoolant =
+					sv["tool-coolant"].GetString();
+			if(sv.IsKey("f_n")) tools[n].startvalues.fn = sv["f_n"].GetNumber();
+			if(sv.IsKey("f_z")) tools[n].startvalues.fz = sv["f_z"].GetNumber();
+			if(sv.IsKey("n")) tools[n].startvalues.n = sv["n"].GetNumber();
+			if(sv.IsKey("n_ramp")) tools[n].startvalues.nramp =
+					sv["n_ramp"].GetNumber();
+			if(sv.IsKey("v_c")) tools[n].startvalues.vc = sv["v_c"].GetNumber();
+			if(sv.IsKey("v_f")) tools[n].startvalues.vf = sv["v_f"].GetNumber();
+			if(sv.IsKey("v_f_leadIn")) tools[n].startvalues.vfleadin =
+					sv["v_f_leadIn"].GetNumber();
+			if(sv.IsKey("v_f_leadOut")) tools[n].startvalues.vfleadout =
+					sv["v_f_leadOut"].GetNumber();
+			if(sv.IsKey("v_f_plunge")) tools[n].startvalues.vfplunge =
+					sv["v_f_plunge"].GetNumber();
+			if(sv.IsKey("v_f_ramp")) tools[n].startvalues.vframp =
+					sv["v_f_ramp"].GetNumber();
+			if(sv.IsKey("v_f_retract")) tools[n].startvalues.vfretract =
+					sv["v_f_retract"].GetNumber();
+		}
+		if(tool.IsKey("post-process")){
+			tools[n].hasPostProcess = true;
+			const JSON & pp = tool["post-process"];
+
+			if(pp.IsKey("break-control")) tools[n].postprocess.breakcontrol =
+					pp["break-control"].GetBool();
+			if(pp.IsKey("comment")) tools[n].postprocess.comment =
+					pp["comment"].GetString();
+			if(pp.IsKey("diameter-offset")) tools[n].postprocess.diameteroffset =
+					pp["diameter-offset"].GetNumber();
+			if(pp.IsKey("length-offset")) tools[n].postprocess.lengthoffset =
+					pp["length-offset"].GetNumber();
+
+			if(pp.IsKey("live")) tools[n].postprocess.live =
+					pp["live"].GetBool();
+			if(pp.IsKey("manual-tool-change")) tools[n].postprocess.manualtoolchange =
+					pp["manual-tool-change"].GetBool();
+			if(pp.IsKey("number")) tools[n].postprocess.number =
+					pp["number"].GetNumber();
+			if(pp.IsKey("turret")) tools[n].postprocess.turret =
+					pp["turret"].GetNumber();
+			if(pp.IsKey("tool-coolant")) tools[n].postprocess.toolcoolant =
+					pp["tool-coolant"].GetString();
+		}
+		tools[n].ConvertToSI();
+		tools[n].Update();
+	}
+	isLoaded = true;
+	return true;
+}
+
+void ToolBox::LoadContour(Tool::Contour & contour, const JSON & json)
+{
+	if(json.IsKey("description")) contour.description =
+			json["description"].GetString();
+	if(json.IsKey("guid")) contour.guid = json["guid"].GetString();
+	if(json.IsKey("vendor")) contour.vendor = json["vendor"].GetString();
+	if(json.IsKey("product-id")) contour.productid =
+			json["product-id"].GetString();
+	if(json.IsKey("product-link")) contour.productlink =
+			json["product-link"].GetString();
+	if(json.IsKey("type")){
+		std::string type = json["type"].GetString();
+		contour.type = Tool::no_type;
+		if(type.compare("flat end mill") == 0) contour.type =
+				Tool::flat_end_mill;
+		if(type.compare("radius mill") == 0) contour.type = Tool::radius_mill;
+		if(type.compare("camfer mill") == 0) contour.type = Tool::camfer_mill;
+		if(type.compare("bull nose end mill") == 0) contour.type =
+				Tool::bull_nose_end_mill;
+		if(type.compare("ball end mill") == 0) contour.type =
+				Tool::ball_end_mill;
+		if(type.compare("holder") == 0) contour.type = Tool::tool_holder;
+		if(type.compare("shaft") == 0) contour.type = Tool::tool_shaft;
+		if(type.compare("probe") == 0) contour.type = Tool::probe;
+	}
+	if(json.IsKey("unit")){
+		std::string unit = json["unit"].GetString();
+		contour.unit = Tool::unit_none;
+		if(unit.compare("inches") == 0) contour.unit = Tool::unit_inch;
+		if(unit.compare("millimeters") == 0) contour.unit =
+				Tool::unit_millimeter;
+		if(unit.compare("meters") == 0) contour.unit = Tool::unit_SI;
+		if(unit.compare("inch") == 0) contour.unit = Tool::unit_inch;
+		if(unit.compare("millimeter") == 0) contour.unit =
+				Tool::unit_millimeter;
+		if(unit.compare("meter") == 0) contour.unit = Tool::unit_SI;
+	}
+	if(json.IsKey("segments")){
+		contour.hasSegments = true;
+		const JSON & segments = json["segments"];
+		contour.segments.resize(segments.Size());
+		for(size_t m = 0; m < segments.Size(); ++m){
+			const JSON & segment = segments[m];
+			if(segment.IsKey("height")) contour.segments[m].height =
+					segment["height"].GetNumber();
+			if(segment.IsKey("lower-diameter")) contour.segments[m].lowerdiameter =
+					segment["lower-diameter"].GetNumber();
+			if(segment.IsKey("upper-diameter")) contour.segments[m].upperdiameter =
+					segment["upper-diameter"].GetNumber();
+		}
+	}else{
+		contour.hasSegments = false;
+	}
 }
 
 //void ToolBox::SaveJSON(std::string filename) const
@@ -114,272 +253,16 @@ const Tool& ToolBox::operator [](size_t index) const
 	return tools.at(index);
 }
 
-//size_t ToolBox::AddTool(Tool& newTool)
-//{
-//}
-//
-//bool ToolBox::RemoveToolSlot(size_t slotNr)
-//{
-//}
-//
-//bool ToolBox::RemoveToolIndex(size_t index)
-//{
-//}
-//
-//bool ToolBox::IsSlotFilled(size_t slotNr) const
-//{
-//}
-//Tool& ToolBox::Slot(size_t slotNr)
-//{
-//}
-//
-//const Tool& ToolBox::Slot(size_t slotNr) const
-//{
-//}
+std::string ToolBox::GetName(void) const
+{
+	const size_t n = filename.find_last_of("/\\");
+	if(n == std::string::npos) return std::string("");
+	const size_t m = filename.find_last_of(".");
+	if(m == std::string::npos) return filename.substr(n + 1);
+	return filename.substr(n + 1, m - n - 1);
+}
 
-
-//ToolBox::ToolBox()
-//{
-////	xmlDocument = new wxXmlDocument();
-////	xmlDocument->SetFileEncoding(_T("UTF-8"));
-////	xmlDocument->SetVersion(_T(_GENERICCAM_VERSION));
-//
-//// an example Tool for the toolbox
-//
-//	Tool* temp;
-//	ToolElement* e;
-//
-//	initialized = false;
-//
-//	temp = new Tool;
-//
-//	e = new ToolElement;
-//	e->t = 0;
-//	e->h = 0.005;
-//	e->d = 0.005;
-//	e->r = 0.0;
-//	e->cutting = false;
-//	temp->elements.Add(e);
-//
-//	e = new ToolElement;
-//	e->t = 2;
-//	e->h = 0.01;
-//	e->d = 0.006;
-//	e->r = 0.0;
-//	e->cutting = false;
-//	temp->elements.Add(e);
-//
-//	e = new ToolElement;
-//	e->t = 2;
-//	e->h = 0.020;
-//	e->d = 0.00;
-//	e->r = 0.0;
-//	e->cutting = true;
-//	temp->elements.Add(e);
-//
-//	temp->toolName = _("Standard cutter");
-//	temp->comment = _("all purpose cylindrical");
-//	temp->shaftDiameter = 0.006;
-//	temp->shaftLength = 0.01;
-//	temp->maxSpeed = 166.67;
-//	temp->feedCoefficient = 0.004;
-//	temp->nrOfTeeth = 1;
-//
-//	temp->GenerateContour();
-//
-//	tools.Add(temp);
-//
-//	temp = new Tool;
-//
-//	e = new ToolElement;
-//	e->t = 0;
-//	e->h = 0.005;
-//	e->d = 0.005;
-//	e->r = 0.0;
-//	e->cutting = false;
-//	temp->elements.Add(e);
-//
-//	e = new ToolElement;
-//	e->t = 2;
-//	e->h = 0.02;
-//	e->d = 0.01;
-//	e->r = 0.0;
-//	e->cutting = false;
-//	temp->elements.Add(e);
-//
-//	e = new ToolElement;
-//	e->t = 4;
-//	e->h = 0.0;
-//	e->d = 0.02;
-//	e->r = 0.0;
-//	e->cutting = true;
-//	temp->elements.Add(e);
-//
-//	e = new ToolElement;
-//	e->t = 3;
-//	e->h = 0.0;
-//	e->d = 0.0;
-//	e->r = 0.0;
-//	e->cutting = true;
-//	temp->elements.Add(e);
-//
-//	temp->toolName = _T("Round cutter");
-//	temp->comment = _T("for testing circle generation");
-//	temp->shaftDiameter = 0.006;
-//	temp->shaftLength = 0.01;
-//	temp->maxSpeed = 300;
-//	temp->feedCoefficient = 0.003;
-//	temp->nrOfTeeth = 2;
-//
-//	temp->GenerateContour();
-//
-//	tools.Add(temp);
-//
-//}
-//
-//ToolBox::~ToolBox()
-//{
-////	if(xmlDocument != NULL) delete xmlDocument;
-//}
-//
-//bool ToolBox::LoadToolBox(wxFileName& fileName)
-//{
-//
-////	wxXmlDocument* tempTree = new wxXmlDocument();
-////	tempTree->SetFileEncoding(_T("UTF-8"));
-////	tempTree->SetVersion(_T(_GENERICCAM_VERSION));
-////	if(!tempTree->Load(fileName.GetFullPath(), wxT("UTF-8"),
-////			wxXMLDOC_KEEP_WHITESPACE_NODES)){
-////		delete tempTree;
-////		return false;
-////	}
-////	// Swap XML trees
-////	delete xmlDocument;
-////	xmlDocument = tempTree;
-////
-////	this->fileName = fileName;
-//
-////TODO: Add loading code.
-//
-//	return true;
-//}
-//
-//bool ToolBox::SaveToolBox(wxFileName& fileName)
-//{
-//
-////	if(!xmlDocument->Save(fileName.GetFullPath(), wxXML_NO_INDENTATION)){
-////		return false;
-////	}
-////	this->fileName = fileName;
-//	return true;
-//}
-//
-//void ToolBox::Empty(void)
-//{
-//	tools.Empty();
-//	initialized = false;
-//	fileName.Clear();
-//}
-//
-//size_t ToolBox::GetToolCount(void) const
-//{
-//	return tools.GetCount();
-//}
-//
-//bool ToolBox::IsInitialized(void) const
-//{
-//	return initialized;
-//}
-//
-//void ToolBox::ToStream(wxTextOutputStream& stream)
-//{
-//	stream << _T("ToolBox:") << endl;
-//	stream << fileName.GetFullPath() << endl;
-//	stream << _T("Tools: ");
-//	stream << wxString::Format(_T("%u"), tools.GetCount()) << endl;
-//	for(size_t n = 0; n < tools.GetCount(); n++){
-//		tools[n].ToStream(stream);
-//	}
-//}
-//
-//bool ToolBox::FromStream(wxTextInputStream& stream)
-//{
-//	wxString temp;
-//	temp = stream.ReadLine();
-//	if(temp.Cmp(_T("ToolBox:")) != 0) return false;
-//	fileName = stream.ReadLine();
-//	temp = stream.ReadWord();
-//	if(temp.Cmp(_T("Tools:")) != 0) return false;
-//	size_t N = stream.Read32();
-//	size_t n;
-//	Tool tool;
-//	bool flag = true;
-//	tools.Clear();
-//	for(n = 0; n < N; n++){
-//		flag = tool.FromStream(stream);
-//		if(!flag) break;
-//		tools.Add(tool);
-//	}
-//	return flag;
-//}
-//
-//Tool* ToolBox::ToolInSlot(int slotNr)
-//{
-//	for(size_t i = 0; i < tools.GetCount(); i++)
-//		if(tools[i].slotNr == slotNr) return &(tools[i]);
-//	return NULL;
-//}
-//
-//const Tool* ToolBox::ToolInSlot(int slotNr) const
-//{
-//	for(size_t i = 0; i < tools.GetCount(); i++)
-//		if(tools[i].slotNr == slotNr) return &(tools[i]);
-//	return NULL;
-//}
-//
-//Tool* ToolBox::ToolIndex(size_t index)
-//{
-//	return &(tools[index]);
-//}
-//
-//const Tool* ToolBox::ToolIndex(size_t index) const
-//{
-//	return &(tools[index]);
-//}
-//
-//int ToolBox::AddTool(Tool& newTool)
-//{
-//	size_t i;
-//	for(i = 0; i < tools.GetCount(); i++)
-//		if(tools[i].toolName.Cmp(newTool.toolName) == 0){
-//			tools[i] = newTool;
-//			return i;
-//		}
-//	tools.Add(newTool);
-//	return tools.GetCount() - 1;
-//}
-//
-//bool ToolBox::RemoveToolSlot(int slotNr)
-//{
-//	size_t i;
-//	for(i = 0; i < tools.GetCount(); i++)
-//		if(tools[i].slotNr == slotNr){
-//			tools.RemoveAt(i, 1);
-//			return true;
-//		}
-//	return false;
-//}
-//
-//bool ToolBox::RemoveToolIndex(size_t index)
-//{
-//	if(index >= tools.GetCount()) return false;
-//	tools.RemoveAt(index, 1);
-//	return true;
-//}
-//
-//bool ToolBox::IsSlotFilled(int slotNr) const
-//{
-//	for(size_t i = 0; i < tools.GetCount(); i++)
-//		if(tools[i].slotNr == slotNr) return true;
-//	return false;
-//}
+bool ToolBox::IsLoaded(void) const
+{
+	return isLoaded;
+}

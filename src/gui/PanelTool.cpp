@@ -87,9 +87,9 @@ void PanelTool::OnPaint(wxPaintEvent& event)
 
 	unsigned int i;
 
-	for(i = 0; i < tool->contour.size(); i++){
+	for(i = 0; i < tool->base.segments.size(); i++){
 
-		if(tool->contour[i].isCutting)
+		if(tool->base.segments[i].isCutting)
 			dc.SetPen(*wxRED_PEN);
 			else
 			dc.SetPen(*wxBLACK_PEN);

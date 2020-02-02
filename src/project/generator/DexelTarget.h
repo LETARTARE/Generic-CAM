@@ -62,7 +62,7 @@ public:
 
 	void InsertObject(const Object &object, const AffineTransformMatrix &shift);
 	void SetupTool(const Tool &tool, const double resolutionX,
-			const double resolutionY, bool addMachineSafety = true);
+			const double resolutionY);
 	void MarkOutline(void);
 
 	void DocumentField(int x, int y, double height);

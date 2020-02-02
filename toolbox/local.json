@@ -1,0 +1,98 @@
+{ "data":[
+    {
+     "BMC":"VHM",
+     "GRADE":"Mill Generic",
+     "description":"Cylindric endmill - 6 mm",
+     
+     "geometry":
+      {
+       "DC":    6,
+       "OAL":  50,
+       "LB":   48,
+       "LCF":  22,
+       "NOF":	1,
+      },
+      "holder":    {
+     "description":"UBERCHUCK APC-20 - 2.48\" GL",
+     "guid":"{1394468f-34f0-48b2-854d-68c9cd3d796c}",
+     "product-id":"74702",
+     "segments":[
+        {
+         "height":0.125,
+         "lower-diameter":1,
+         "upper-diameter":1
+        }, 
+        {
+         "height":0.79,
+         "lower-diameter":1.57,
+         "upper-diameter":1.57
+        }, 
+        {
+         "height":0.33,
+         "lower-diameter":1.57,
+         "upper-diameter":1.97
+        }, 
+        {
+         "height":0.61,
+         "lower-diameter":1.97,
+         "upper-diameter":1.97
+        }, 
+        {
+         "height":0.03,
+         "lower-diameter":2.442,
+         "upper-diameter":2.502
+        }, 
+        {
+         "height":0.145,
+         "lower-diameter":2.502,
+         "upper-diameter":2.502
+        }, 
+        {
+         "height":0.079,
+         "lower-diameter":2.502,
+         "upper-diameter":2.215
+        }, 
+        {
+         "height":0.118,
+         "lower-diameter":2.215,
+         "upper-diameter":2.215
+        }, 
+        {
+         "height":0.079,
+         "lower-diameter":2.215,
+         "upper-diameter":2.502
+        }, 
+        {
+         "height":0.143,
+         "lower-diameter":2.502,
+         "upper-diameter":2.502
+        }, 
+        {
+         "height":0.03,
+         "lower-diameter":2.502,
+         "upper-diameter":2.442
+        }, 
+        {
+         "height":0.125,
+         "lower-diameter":1.75,
+         "upper-diameter":1.75
+        }],
+     "type":"holder",
+     "unit":"inches",
+     "vendor":"ALBRECHT"
+    }, 
+      
+      
+     "guid":"#1",
+     "post-process":
+      {
+       "live":true,
+       "number": 1,
+      },
+     "type":"flat end mill",
+     "unit":"millimeters",
+     "addtonewprojects": true
+    }],
+ "version":1
+}
+

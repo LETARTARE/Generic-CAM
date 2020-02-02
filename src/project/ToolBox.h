@@ -35,11 +35,12 @@
  */
 
 #include <stddef.h>
-#include <iostream>
 #include <string>
 #include <vector>
 
 #include "Tool.h"
+
+class JSON;
 
 class ToolBox {
 	//Constructor / Destructor
@@ -52,12 +53,15 @@ public:
 	std::string filename;
 	std::string version;
 
-private:
 	std::vector <Tool> tools;
+private:
 
 	// Methods
 public:
-	bool LoadJSON(std::string filename);
+	std::string GetName(void) const;
+	bool IsLoaded(void) const;
+	bool Load(void);
+	bool Load(std::string filename);
 //	void SaveJSON(std::string filename) const;
 
 //	friend std::istream& operator>>(std::istream &in, ToolBox &hull);
@@ -74,7 +78,9 @@ public:
 //	Tool & Slot(size_t slotNr);
 //	const Tool & Slot(size_t slotNr) const;
 
-
+private:
+	bool isLoaded;
+	void LoadContour(Tool::Contour & contour, const JSON & json);
 };
 
 #endif /* TOOLBOX_H_ */

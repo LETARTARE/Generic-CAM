@@ -58,17 +58,15 @@
  *
  */
 
-#include "generator/Generator.h"
 
-#include "../3D/Geometry.h"
-#include "../3D/OpenGLImage.h"
 #include "../3D/AffineTransformMatrix.h"
+#include "../3D/OpenGLImage.h"
+#include "../3D/BoundingBox.h"
+#include "Selection.h"
+#include "generator/Generator.h"
 
 #include <map>
 #include <string>
-
-#include "../3D/BoundingBox.h"
-#include "Selection.h"
 
 class Project;
 class Run {

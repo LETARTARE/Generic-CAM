@@ -27,16 +27,15 @@
 #include "Run.h"
 
 #include "Project.h"
-//#include "generator/GeneratorCollection.h"
+#include "generator/CNCSimulator.h"
 
 #include "../icon/touchpoint.xpm"
 
 #include <wx/log.h>
-#include <GL/gl.h>
 #include <float.h>
 #include <assert.h>
+#include <GL/gl.h>
 
-#include "generator/CNCSimulator.h"
 Run::Run()
 {
 	parent = NULL;
@@ -115,6 +114,13 @@ void Run::Paint(void) const
 	if(pr == NULL) return;
 
 	OpenGLMaterial::EnableColors();
+	if(stocktype == BoxTop || stocktype == BoxCenter || stocktype == BoxBottom){
+		if(OpenGLMaterial::ColorsAllowed()){
+			glColor4f(0.2, 0.2, 0.2, 0.6);
+			stock.Paint();
+		}
+	}
+
 	if(OpenGLMaterial::ColorsAllowed()){
 
 		// Draw the "Touchpoint" symbol
@@ -124,6 +130,7 @@ void Run::Paint(void) const
 
 		glPushMatrix();
 		origin.GLMultMatrix();
+		glTranslatef(stockorigin.x * 1e-4, stockorigin.y * 1e-4, 0);
 		glScalef(s, s, s);
 		glRotatef(90, 1, 0, 0);
 		touchpoint.Paint();
@@ -137,12 +144,6 @@ void Run::Paint(void) const
 
 		glPopName();
 		glPopName();
-	}
-	if(stocktype == BoxTop || stocktype == BoxCenter || stocktype == BoxBottom){
-		if(OpenGLMaterial::ColorsAllowed()){
-			glColor4f(0.2, 0.2, 0.2, 0.6);
-			stock.Paint();
-		}
 	}
 
 //	::glPushMatrix();
@@ -215,7 +216,7 @@ void Run::GenerateToolpaths(void)
 
 	if(stocktype == sObject){
 		base.InitImprinting();
-		const Object & obj = parent->GetObject(stockobject);
+		const Object & obj = parent->Get3DObject(stockobject);
 		base.InsertObject(obj, AffineTransformMatrix::Identity());
 		base.FinishImprint();
 	}else{
@@ -234,7 +235,7 @@ void Run::GenerateToolpaths(void)
 		// Find the tool in the tool-library
 		const Tool * tool = NULL;
 		for(size_t n = 0; n < tools->size(); ++n){
-			if(tools->at(n).guid.compare(it->second->toolguid) == 0){
+			if(tools->at(n).base.guid.compare(it->second->toolguid) == 0){
 				tool = &(tools->at(n));
 				break;
 			}

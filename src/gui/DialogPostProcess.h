@@ -27,10 +27,12 @@
 #ifndef SRC_GUI_DIALOGPOSTPROCESS_H_
 #define SRC_GUI_DIALOGPOSTPROCESS_H_
 
-#include <wx/event.h>
+#include "gui.h"
 
 #include "../project/post/CollectionPostProcessor.h"
-#include "gui.h"
+#include "../project/Selection.h"
+
+#include <wx/event.h>
 
 class DialogPostProcess:public GUIPostProcess {
 public:

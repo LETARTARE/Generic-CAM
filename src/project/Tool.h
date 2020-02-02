@@ -44,38 +44,78 @@
 #include <string>
 #include <vector>
 
-#include "../3D/Vector3.h"
-
 class Tool {
 public:
+	enum UnitType {
+		unit_none, unit_SI, unit_inch, unit_millimeter
+	};
+	enum ToolType {
+		no_type,
+		flat_end_mill,
+		radius_mill,
+		camfer_mill,
+		bull_nose_end_mill,
+		ball_end_mill,
+		tool_holder,
+		tool_shaft,
+		probe
+	}; ///< Basic tool shape
+
 	class Segment {
 	public:
 		Segment();
 		double height;
 		double lowerdiameter;
 		double upperdiameter;
+
+	public:
+		float Update(float z);
+		float x0;
+		float z0;
+		float x1;
+		float z1;
+		float nx;
+		float nz;
+		bool isCutting;
+	};
+	class Contour {
+	public:
+		Contour();
+		std::string description;
+		std::string guid;
+		std::string vendor;
+		std::string productid;
+		std::string productlink;
+		bool hasSegments; ///< Indicates, wheather the tool itself has segments. If not, the segments are generated from the geometry section.
+		std::vector <Segment> segments;
+		ToolType type;
+		UnitType unit; ///< Unit of values in segments
+
+		void ConvertToSI(UnitType baseunit);
+		float Update(float z);
+		void Paint(void) const;
 	};
 	class Geometry {
 	public:
 		Geometry();
-		bool CSP; ///< Coolant supply property
 		double DC; ///< Cutting diameter
-		bool HAND; ///< Hand
-		double LB; ///< Body length: Length of tool from tip to chuck.
 		double LCF; ///< Chip flute length: Length that is cutting measured from the tip.
+		double LB; ///< Body length: Length of tool from tip to chuck.
+		double OAL; ///< Overall length
 		size_t NOF; ///< Number of flutes
 		size_t NT; ///< Tooth count
-		double OAL; ///< Overall length
 		double RE; ///< Corner radius
-		double SFDM; ///< Shaft diameter
 		double SIG; ///< Point angle
 		double TA; ///< Taper angle
 		double TP; ///< Thread pitch
+		bool CSP; ///< Coolant supply property
+		bool HAND; ///< Hand
+		double SFDM; ///< Shaft diameter
 		double shoulderlength; ///< Shoulder length: Length from tip to point, where the tool widens to the shaft diameter. Otherwise same as overall length.
-		double threadprofileangle;
 		double tipdiameter; ///< Tip diameter
 		double tiplength; ///< Tip length
 		double tipoffset; ///< Tip offset
+		double threadprofileangle;
 	};
 	class PostProcess {
 	public:
@@ -93,7 +133,11 @@ public:
 	class StartValues {
 	public:
 		StartValues();
-		double fn; ///<
+		std::string name;
+		std::string guid;
+		std::string description;
+		std::string toolcoolant;
+		double fn; ///< Feed per revolution [m]
 		double fz; ///< Feed per tooth [m]
 		double n; ///< max. Spindle speed [1/s]
 		double nramp; ///< Ramp spindle speed [1/s]
@@ -114,47 +158,32 @@ public:
 	Tool();
 	virtual ~Tool();
 
-	std::string description;
-	std::string guid; ///< UID to find the tool when it is copied around.
-	std::string productid;
-	enum ToolType {
-		flat_end_mill, radius_mill, camfer_mill, bull_nose_end_mill
-	} type; ///< Type of the cutting part of the tool.
-	std::string vendor;
-	std::string unit; ///< Unit when writing or reading from file. Internalls everything is stored as SI-base-units. Values: "millimeters", "inches"
-	std::string BMC; ///< Material of tool ("carbide", "HSS")
 	std::string GRADE;
-	std::string productlink;
+	std::string BMC; ///< Material of tool ("carbide", "HSS")
+
+	Contour base;
+
+	bool hasShaft;
+	Contour shaft;
+	bool hasHolder;
+	Contour holder;
 
 	bool hasGeometry;
 	Geometry geometry;
 	bool hasStartValues;
 	StartValues startvalues;
-
+	bool hasPostProcess;
 	PostProcess postprocess;
 
-	std::vector <Segment> segments;
-
-	class ContourElement {
-	public:
-		ContourElement();
-		void Set(float x0, float z0, float x1, float z1, bool isCutting = false,
-				bool belongsToShaft = false);
-		void Set(float x1, float z1, bool isCutting = false,
-				bool belongsToShaft = false);
-		float x0;
-		float z0;
-		float x1;
-		float z1;
-		float nx;
-		float nz;
-		bool isCutting;
-		bool belongsToShaft;
-	};
-	std::vector <ContourElement> contour;
+	double lastmodified;
+	bool addtonewprojects;
+private:
+	UnitType unitinfile;
 
 	// Methods
 public:
+	void ConvertToSI(void);
+
 	void Update(void);
 
 	float GetToolLength(void) const; ///< Total length of the tool outside the chuck. (Distance between Controlled-Point and Gauge-Point).
@@ -164,7 +193,8 @@ public:
 //	void ToStream(wxTextOutputStream & stream);
 //	bool FromStream(wxTextInputStream & stream);
 
-	void Paint(void) const;
+	void Paint(bool showHolder = true, bool showShaft = true, bool showTool =
+			true) const;
 };
 
 #endif /* TOOL_H_ */

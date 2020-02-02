@@ -26,17 +26,24 @@
 
 #include "Tool.h"
 
-#include <GL/gl.h>
+#include "../3D/OpenGLMaterial.h"
+
 #include <math.h>
 #include <float.h>
 #include <iostream>
 
+#include <GL/gl.h>
+
 Tool::Tool()
 {
 	hasStartValues = false;
+	hasPostProcess = false;
 	hasGeometry = false;
-	type = flat_end_mill;
-	GRADE = "generic";
+	hasHolder = false;
+	hasShaft = false;
+	lastmodified = 0;
+	addtonewprojects = false;
+	unitinfile = unit_none;
 }
 
 Tool::~Tool()
@@ -45,204 +52,69 @@ Tool::~Tool()
 
 void Tool::Update(void)
 {
-	contour.clear();
-	ContourElement temp;
-
-	switch(type){
-	case flat_end_mill:
-		temp.Set(0, 0, geometry.DC / 2.0, 0, true);
-		contour.push_back(temp);
-		temp.Set(geometry.DC / 2.0, geometry.LCF, true);
-		contour.push_back(temp);
-		break;
-	default:
-		std::cout << "Tool::GenerateContour - Unsupported tooltype.\n";
-		return;
-		break;
+	if(!base.hasSegments){
+		base.segments.clear();
+		switch(base.type){
+		case flat_end_mill:
+		{
+			Segment temp;
+			temp.lowerdiameter = geometry.DC;
+			temp.upperdiameter = geometry.DC;
+			temp.height = geometry.LCF;
+			temp.isCutting = true;
+			base.segments.push_back(temp);
+			if(geometry.shoulderlength > geometry.LCF){
+				temp.isCutting = false;
+				temp.height = geometry.shoulderlength - geometry.LCF;
+				base.segments.push_back(temp);
+			}
+		}
+			break;
+		default:
+			std::cout
+					<< "Tool::GenerateContour - (Yet) Unsupported tooltype.\n";
+			return;
+			break;
+		}
 	}
-
-//	float xPosition = shaftDiameter / 2;
-//	float zPosition = 0.0;
-//
-//
-//
-//	float d, x, z, r;
-//	for(unsigned int j = 0; j < elements.Count(); j++){
-//
-//		x = (elements[j].d / 2) - xPosition;
-//		z = elements[j].h;
-//		r = elements[j].r;
-//		d = x * x + z * z;
-//		if(d > 0)
-//			d = sqrt(d);
-//		else
-//			d = 1.0;
-//
-//		switch(elements[j].t){
-//		case 1:
-//			temp = new ToolContourElement(elements[j].cutting);
-//			if(x > 0){
-//				temp->n1.z = -1;
-//				temp->n2.z = -1;
-//			}else{
-//				temp->n1.z = 1;
-//				temp->n2.z = 1;
-//			}
-//			temp->p1.x = xPosition;
-//			temp->p1.z = zPosition;
-//			temp->p2.x = xPosition + x;
-//			temp->p2.z = zPosition;
-//			contour.Add(temp);
-//			temp = new ToolContourElement(elements[j].cutting);
-//			temp->n1.x = 1;
-//			temp->n2.x = 1;
-//			temp->p1.x = xPosition + x;
-//			temp->p1.z = zPosition;
-//			temp->p2.x = xPosition + x;
-//			temp->p2.z = zPosition + z;
-//			contour.Add(temp);
-//			break;
-//
-//		case 2:
-//			temp = new ToolContourElement(elements[j].cutting);
-//			temp->n1.x = 1;
-//			temp->n2.x = 1;
-//			temp->p1.x = xPosition;
-//			temp->p1.z = zPosition;
-//			temp->p2.x = xPosition;
-//			temp->p2.z = zPosition + z;
-//			contour.Add(temp);
-//			temp = new ToolContourElement(elements[j].cutting);
-//			if(x > 0){
-//				temp->n1.z = -1;
-//				temp->n2.z = -1;
-//			}else{
-//				temp->n1.z = 1;
-//				temp->n2.z = 1;
-//			}
-//			temp->p1.x = xPosition;
-//			temp->p1.z = zPosition + z;
-//			temp->p2.x = xPosition + x;
-//			temp->p2.z = zPosition + z;
-//			contour.Add(temp);
-//			break;
-//
-//		case 3:
-//			// calc h
-//			if(x < 0){
-//				r = xPosition;
-//				z = sqrt(r * r - (xPosition + x) * (xPosition + x));
-//			}else{
-//				r = -xPosition;
-//				if(x > 2 * xPosition) x = 2 * xPosition;
-//				z = sqrt(r * r - (x - xPosition) * (x - xPosition));
-//			}
-//			elements[j].h = z;
-//			elements[j].r = r;
-//			break;
-//		case 4:
-//			// calc h
-//			if(x > 0){
-//				r = xPosition + x;
-//				z = sqrt(r * r - xPosition * xPosition);
-//			}else{
-//				r = -(xPosition + x);
-//				if(x < 2 * (xPosition + x)) x = 2 * (xPosition + x);
-//				z = sqrt(r * r - (x + (x + xPosition)) * (x + (x + xPosition)));
-//			}
-//			elements[j].h = z;
-//			elements[j].r = r;
-//			break;
-//		}
-//
-//		if(elements[j].t == 0 || elements[j].t == 3 || elements[j].t == 4){
-//			if(fabs(r) < 1e-6){
-//				temp = new ToolContourElement(elements[j].cutting);
-//				temp->n1.x = z / d;
-//				temp->n1.z = -x / d;
-//				temp->n2.x = z / d;
-//				temp->n2.z = -x / d;
-//				temp->p1.x = xPosition;
-//				temp->p1.z = zPosition;
-//				temp->p2.x = xPosition + x;
-//				temp->p2.z = zPosition + z;
-//				contour.Add(temp);
-//
-//			}else{
-//				d = sqrt(x * x + z * z);
-//				float h = r * r - d * d / 4;
-//				if(h < 0)
-//					h = 0;
-//				else
-//					h = sqrt(h);
-//				float x2, z2;
-//				if(r > 0){
-//					x2 = x / 2 - z * h / d;
-//					z2 = z / 2 + x * h / d;
-//				}else{
-//					x2 = x / 2 + z * h / d;
-//					z2 = z / 2 - x * h / d;
-//				}
-//				//wxLogMessage(wxString::Format(_T("x: %f z: %f"),x,z));
-//				//wxLogMessage(wxString::Format(_T("x2: %f z2: %f"), x2, z2));
-//				const float a = atan2(x, z);
-//				const float a1 = a + asin(d / 2 / r);
-//				const float a2 = a - asin(d / 2 / r);
-//				//				wxLogMessage(wxString::Format(_T("a: %f a1: %f a2: %f"), a
-//				//						/ M_PI * 180, a1 / M_PI * 180, a2 / M_PI * 180));
-//				const unsigned int n = floor(fabs(a2 - a1) / M_PI * 180 / 15);
-//				//wxLogMessage(wxString::Format(_T("n: %u"),n));
-//				//wxLogMessage(wxString::Format(_T("r: %f x: %f, z: %f"),r,x,z));
-//				for(unsigned int k = 0; k < n; k++){
-//					const float cc1 = cos(
-//							a1 + (a2 - a1) / (float) n * (float) k);
-//					const float ss1 = -sin(
-//							a1 + (a2 - a1) / (float) n * (float) k);
-//					const float cc2 = cos(
-//							a1 + (a2 - a1) / (float) n * (float) (k + 1));
-//					const float ss2 = -sin(
-//							a1 + (a2 - a1) / (float) n * (float) (k + 1));
-//					temp = new ToolContourElement(elements[j].cutting);
-//					temp->n1.x = cc1;
-//					temp->n1.z = ss1;
-//					temp->n2.x = cc2;
-//					temp->n2.z = ss2;
-//					temp->p1.x = cc1 * r + x2 + xPosition;
-//					temp->p1.z = ss1 * r + z2 + zPosition;
-//					temp->p2.x = cc2 * r + x2 + xPosition;
-//					temp->p2.z = ss2 * r + z2 + zPosition;
-//					contour.Add(temp);
-//				}
-//			}
-//		}
-//
-//		zPosition += z;
-//		xPosition += x;
-//	}
+	float z = 0.0;
+	z = base.Update(z);
+	if(!shaft.hasSegments){
+		shaft.segments.clear();
+		Segment temp;
+		if(geometry.SFDM > 1e-6){
+			temp.lowerdiameter = geometry.SFDM;
+			temp.upperdiameter = geometry.SFDM;
+		}else{
+			temp.lowerdiameter = geometry.DC;
+			temp.upperdiameter = geometry.DC;
+		}
+		temp.height = geometry.OAL - z;
+		shaft.segments.push_back(temp);
+	}
+	z = shaft.Update(z);
+	if(hasGeometry){
+		if(geometry.LB > 1e-6) z = geometry.LB;
+	}
+	holder.Update(z);
 }
 
-void Tool::Paint(void) const
+void Tool::Paint(bool showHolder, bool showShaft, bool showTool) const
 {
-	const size_t resolution = 32;
-	float ss[resolution + 1];
-	float cc[resolution + 1];
-	for(size_t i = 0; i <= resolution; i++){
-		ss[i] = sin(-2.0 * M_PI / (float) resolution * (float) i);
-		cc[i] = cos(-2.0 * M_PI / (float) resolution * (float) i);
+	if(showTool){
+		OpenGLMaterial mat(OpenGLMaterial::cGray);
+		mat.UseMaterial();
+		base.Paint();
 	}
-	for(size_t i = 0; i < contour.size(); i++){
-		::glBegin(GL_QUAD_STRIP);
-		for(size_t j = 0; j <= resolution; j++){
-			::glNormal3f(cc[j] * contour[i].nx, ss[j] * contour[i].nx,
-					contour[i].nz);
-			::glVertex3f(cc[j] * contour[i].x0, ss[j] * contour[i].x0,
-					contour[i].z0);
-			::glNormal3f(cc[j] * contour[i].nx, ss[j] * contour[i].nx,
-					contour[i].nz);
-			::glVertex3f(cc[j] * contour[i].x1, ss[j] * contour[i].x1,
-					contour[i].z1);
-		}
-		::glEnd();
+	if(showShaft){
+		OpenGLMaterial mat(OpenGLMaterial::cSilver);
+		mat.UseMaterial();
+		shaft.Paint();
+	}
+	if(showHolder){
+		OpenGLMaterial mat(OpenGLMaterial::cAqua);
+		mat.UseMaterial();
+		holder.Paint();
 	}
 }
 
@@ -285,7 +157,7 @@ float Tool::GetCuttingDepth(void) const
 //		stream << elements[n].ToString() << endl;
 //	}
 //}
-//
+
 //bool Tool::FromStream(wxTextInputStream& stream)
 //{
 //	wxString temp;
@@ -325,6 +197,13 @@ Tool::Segment::Segment()
 	height = 0.0;
 	lowerdiameter = 0.0;
 	upperdiameter = 0.0;
+	x0 = 0.0;
+	z0 = 0.0;
+	x1 = 0.0;
+	z1 = 0.0;
+	nx = 1.0;
+	nz = 0.0;
+	isCutting = false;
 }
 
 Tool::Geometry::Geometry()
@@ -335,7 +214,7 @@ Tool::Geometry::Geometry()
 	LB = 0.0;
 	LCF = 0.0;
 	NOF = 0;
-	NT = 1;
+	NT = 0;
 	OAL = 0.0;
 	RE = 0.0;
 	SFDM = 0.0;
@@ -349,12 +228,80 @@ Tool::Geometry::Geometry()
 	tipoffset = 0.0;
 }
 
+void Tool::ConvertToSI(void)
+{
+	UnitType unit = base.unit;
+	if(unit == unit_SI || unit == unit_none) return;
+	this->unitinfile = unit;
+
+	// Geometry
+	if(unit == unit_millimeter){
+		geometry.DC *= 1.0e-3;
+		geometry.LB *= 1.0e-3;
+		geometry.LCF *= 1.0e-3;
+		geometry.OAL *= 1.0e-3;
+		geometry.RE *= 1.0e-3;
+		geometry.SFDM *= 1.0e-3;
+		geometry.TP *= 1.0e-3;
+		geometry.shoulderlength *= 1.0e-3;
+		geometry.tipdiameter *= 1.0e-3;
+		geometry.tiplength *= 1.0e-3;
+		geometry.tipoffset *= 1.0e-3;
+	}
+	if(unit == unit_inch){
+		geometry.DC *= 2.54e-2;
+		geometry.LB *= 2.54e-2;
+		geometry.LCF *= 2.54e-2;
+		geometry.OAL *= 2.54e-2;
+		geometry.RE *= 2.54e-2;
+		geometry.SFDM *= 2.54e-2;
+		geometry.TP *= 2.54e-2;
+		geometry.shoulderlength *= 2.54e-2;
+		geometry.tipdiameter *= 2.54e-2;
+		geometry.tiplength *= 2.54e-2;
+		geometry.tipoffset *= 2.54e-2;
+	}
+
+	// Start values
+	if(unit == unit_millimeter){
+		startvalues.fn *= 1.0e-3;
+		startvalues.fz *= 1.0e-3;
+
+		startvalues.n /= 60.0;
+		startvalues.nramp /= 60.0;
+
+		startvalues.vc *= (1.0e-3 / 60.0);
+		startvalues.vf *= (1.0e-3 / 60.0);
+		startvalues.vfleadin *= (1.0e-3 / 60.0);
+		startvalues.vfleadout *= (1.0e-3 / 60.0);
+		startvalues.vfplunge *= (1.0e-3 / 60.0);
+		startvalues.vframp *= (1.0e-3 / 60.0);
+		startvalues.vfretract *= (1.0e-3 / 60.0);
+	}
+	if(unit == unit_inch){
+		startvalues.fn *= 2.54e-2;
+		startvalues.fz *= 2.54e-2;
+		startvalues.n /= 60.0;
+		startvalues.nramp /= 60.0;
+		startvalues.vc *= (2.54e-2 / 60.0);
+		startvalues.vf *= (2.54e-2 / 60.0);
+		startvalues.vfleadin *= (2.54e-2 / 60.0);
+		startvalues.vfleadout *= (2.54e-2 / 60.0);
+		startvalues.vfplunge *= (2.54e-2 / 60.0);
+		startvalues.vframp *= (2.54e-2 / 60.0);
+		startvalues.vfretract *= (2.54e-2 / 60.0);
+	}
+	shaft.ConvertToSI(unit);
+	holder.ConvertToSI(unit);
+	this->base.unit = unit_SI;
+}
+
 Tool::PostProcess::PostProcess()
 {
 	breakcontrol = false;
 	diameteroffset = 0;
 	lengthoffset = 0;
-	live = true;
+	live = false;
 	manualtoolchange = false;
 	number = 0;
 	turret = 0;
@@ -362,38 +309,25 @@ Tool::PostProcess::PostProcess()
 
 Tool::StartValues::StartValues()
 {
-	fn = 1.0;
-	fz = 1.0;
-	n = 1.0;
-	nramp = 1.0;
-	vc = 1.0;
-	vf = 1.0;
-	vfleadin = 1.0;
-	vfleadout = 1.0;
-	vfplunge = 1.0;
-	vframp = 1.0;
-	vfretract = 1.0;
+	fn = 0.0;
+	fz = 0.0;
+	n = 0.0;
+	nramp = 0.0;
+	vc = 0.0;
+	vf = 0.0;
+	vfleadin = 0.0;
+	vfleadout = 0.0;
+	vfplunge = 0.0;
+	vframp = 0.0;
+	vfretract = 0.0;
 }
 
-Tool::ContourElement::ContourElement()
+float Tool::Segment::Update(float z)
 {
-	x0 = 0.0;
-	z0 = 0.0;
-	x1 = 0.0;
-	z1 = 0.0;
-	nx = 1.0;
-	nz = 0.0;
-	isCutting = false;
-	belongsToShaft = false;
-}
-
-void Tool::ContourElement::Set(float x0, float z0, float x1, float z1,
-		bool isCutting, bool belongsToShaft)
-{
-	this->x0 = x0;
-	this->z0 = z0;
-	this->x1 = x1;
-	this->z1 = z1;
+	z0 = z;
+	z1 = z0 + height;
+	x0 = lowerdiameter / 2.0;
+	x1 = upperdiameter / 2.0;
 	const float dx = x1 - x0;
 	const float dz = z1 - z0;
 	const float d2 = dx * dx + dz * dz;
@@ -405,12 +339,84 @@ void Tool::ContourElement::Set(float x0, float z0, float x1, float z1,
 		this->nx = 1.0;
 		this->nz = 0.0;
 	}
-	this->isCutting = isCutting;
-	this->belongsToShaft = belongsToShaft;
+	return z1;
 }
 
-void Tool::ContourElement::Set(float x1, float z1, bool isCutting,
-		bool belongsToShaft)
+Tool::Contour::Contour()
 {
-	this->Set(this->x1, this->z1, x1, z1, isCutting, belongsToShaft);
+	hasSegments = false;
+	type = no_type;
+	unit = unit_none;
+}
+
+void Tool::Contour::ConvertToSI(UnitType baseunit)
+{
+	if(!hasSegments) return;
+	UnitType unit = baseunit;
+	if(this->unit != unit_none) unit = this->unit;
+	if(unit == unit_millimeter){
+		for(std::vector <Segment>::iterator it = segments.begin();
+				it != segments.end(); ++it){
+			it->height *= 1.0e-3;
+			it->upperdiameter *= 1.0e-3;
+			it->lowerdiameter *= 1.0e-3;
+		}
+		this->unit = unit_SI;
+	}
+	if(unit == unit_inch){
+		for(std::vector <Segment>::iterator it = segments.begin();
+				it != segments.end(); ++it){
+			it->height *= 2.54e-2;
+			it->upperdiameter *= 2.54e-2;
+			it->lowerdiameter *= 2.54e-2;
+		}
+		this->unit = unit_SI;
+	}
+}
+
+float Tool::Contour::Update(float z)
+{
+	for(std::vector <Segment>::iterator it = segments.begin();
+			it != segments.end(); ++it)
+		z = it->Update(z);
+	return z;
+}
+
+void Tool::Contour::Paint(void) const
+{
+	const size_t resolution = 32;
+	float ss[resolution + 1];
+	float cc[resolution + 1];
+	for(size_t i = 0; i <= resolution; i++){
+		ss[i] = sin(-2.0 * M_PI / (float) resolution * (float) i);
+		cc[i] = cos(-2.0 * M_PI / (float) resolution * (float) i);
+	}
+	float r = 0.0;
+	for(size_t n = 0; n < segments.size(); ++n){
+		const Segment &seg = segments[n];
+		if(seg.x0 > r){
+			glNormal3f(0, 0, -1);
+			glBegin(GL_TRIANGLE_FAN);
+			glVertex3f(0, 0, seg.z0);
+			for(size_t n = 0; n <= resolution; ++n)
+				glVertex3f(seg.x0 * cc[n], seg.x0 * ss[n], seg.z0);
+			glEnd();
+		}
+		glBegin(GL_QUAD_STRIP);
+		for(size_t n = 0; n <= resolution; ++n){
+			glNormal3f(seg.nx * cc[n], seg.nx * ss[n], seg.nz);
+			glVertex3f(seg.x0 * cc[n], seg.x0 * ss[n], seg.z0);
+			glVertex3f(seg.x1 * cc[n], seg.x1 * ss[n], seg.z1);
+		}
+		glEnd();
+
+		glNormal3f(0, 0, 1);
+		glBegin(GL_TRIANGLE_FAN);
+		glVertex3f(0, 0, seg.z1);
+		for(size_t n = 0; n <= resolution; ++n)
+			glVertex3f(seg.x1 * cc[n], -seg.x1 * ss[n], seg.z1);
+		glEnd();
+		r = seg.x1;
+	}
+
 }
