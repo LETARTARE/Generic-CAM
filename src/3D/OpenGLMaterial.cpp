@@ -26,6 +26,8 @@
 
 #include "OpenGLMaterial.h"
 
+#include <GL/gl.h>
+
 OpenGLMaterial::OpenGLMaterial()
 {
 	ambient.Set(0.2, 0.2, 0.2);

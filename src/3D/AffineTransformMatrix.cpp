@@ -26,16 +26,17 @@
 
 #include "AffineTransformMatrix.h"
 
-#include <GL/gl.h>
-#include <math.h>
-#include <stdint.h>
+#include "OpenGLMaterial.h"
+#include "Vector3.h"
+
 #include <wx/chartype.h>
 #include <wx/string.h>
 #include <wx/tokenzr.h>
 #include <wx/txtstrm.h>
 
-#include "OpenGLMaterial.h"
-#include "Vector3.h"
+#include <stdint.h>
+#include <math.h>
+#include <GL/gl.h>
 
 AffineTransformMatrix::AffineTransformMatrix()
 {

@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunGeneratorAdd.h
+// Name               : OpenGL.h
 // Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 15.02.2015
-// Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 01.02.2020
+// Copyright          : (C) 2020 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,33 +24,31 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMANDRUNADDGENERATOR_H_
-#define COMMANDRUNADDGENERATOR_H_
+#ifndef SRC_3D_OPENGL_H_
+#define SRC_3D_OPENGL_H_
 
-/*!\class CommandRunGeneratorAdd
- * \brief Command to add a toolpath / generator to a project
- */
+#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__)
+#define __WIN
+#elif defined(linux) || defined(__linux)
+#define __LINUX
+#else
+#error "Neither a Linux nor a Windows system was found!"
+#endif
 
-#include <wx/cmdproc.h>
-#include <wx/string.h>
+#ifdef __WIN
+#ifdef _MSC_VER
+//#define WIN32_LEAN_AND_MEAN
+//#include <windows.h>
+#include <GL/glut.h>
+#include <gl/glew.h>
+//#include <wx/msw/winundef.h>
+#else
+#include <GL/gl.h>
+#endif
+#endif
 
-class Project;
-class Generator;
+#ifdef __LINUX
+#include <GL/gl.h>
+#endif
 
-class CommandRunGeneratorAdd:public wxCommand {
-public:
-	CommandRunGeneratorAdd(const wxString& name, Project * project,
-			size_t runID, Generator* generator);
-	virtual ~CommandRunGeneratorAdd(void);
-
-	bool Do(void);
-	bool Undo(void);
-
-protected:
-	Project * project;
-	int runID;
-	size_t generatorID;
-	Generator * newGenerator;
-};
-
-#endif /* COMMANDRUNADDGENERATOR_H_ */
+#endif /* SRC_3D_OPENGL_H_ */

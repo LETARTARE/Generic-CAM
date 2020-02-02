@@ -26,17 +26,18 @@
 
 #include "Object.h"
 
+#include "../Config.h"
 #include "../3D/FileSTL.h"
 #include "../3D/FileDXF.h"
 #include "../3D/FileGTS.h"
+#include "../3D/OpenGLMaterial.h"
 
 #include <wx/string.h>
 #include <wx/log.h>
-#include <GL/gl.h>
+
 #include <algorithm>
 
-#include "../3D/OpenGLMaterial.h"
-#include "../Config.h"
+#include <GL/gl.h>
 
 Object::Object()
 {

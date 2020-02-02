@@ -26,9 +26,8 @@
 
 #include "CommandObjectRemove.h"
 
-#include <stddef.h>
-
 #include "../Project.h"
+#include <stddef.h>
 
 CommandObjectRemove::CommandObjectRemove(const wxString& name, Project* project,
 		size_t ID) :

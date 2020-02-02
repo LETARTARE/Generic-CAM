@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Dec 20 2018)
+// C++ code generated with wxFormBuilder (version Aug 20 2017)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO *NOT* EDIT THIS FILE!
+// PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
 #ifndef __GUI_H__
@@ -11,6 +11,9 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
+#include <wx/docview.h>
+#include <wx/config.h>
+
 #include <wx/string.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
@@ -41,19 +44,17 @@
 #include <wx/notebook.h>
 #include <wx/radiobox.h>
 #include <wx/choicebk.h>
+#include <wx/filepicker.h>
 #include <wx/choice.h>
 #include <wx/scrolwin.h>
 #include <wx/slider.h>
 #include <wx/propgrid/propgrid.h>
 #include <wx/propgrid/advprops.h>
-#include <wx/filepicker.h>
 #include <wx/radiobut.h>
 #include <wx/dialog.h>
 #include <wx/treelist.h>
-#include "PanelTool.h"
-#include <wx/listctrl.h>
+#include <wx/dataview.h>
 #include "CanvasTool.h"
-#include <wx/statline.h>
 #include <wx/menu.h>
 #include "CanvasMachine.h"
 #include <wx/listbox.h>
@@ -74,74 +75,66 @@
 #define ID_SIMULATE 1010
 #define ID_TOOLPATHEXPORT 1011
 #define ID_MANAGETOOLS 1012
-#define ID_MANAGEPOSTPROCESS 1013
-#define ID_MANAGEMACHINES 1014
-#define ID_TOOLMEASURE 1015
-#define ID_GCODETEST 1016
-#define ID_MULTTEN 1017
-#define ID_DIVTEN 1018
-#define ID_SCALEUNITX 1019
-#define ID_SCALEUNITY 1020
-#define ID_SCALEUNITZ 1021
-#define ID_SCALEPERCENTX 1022
-#define ID_SCALEPERCENTY 1023
-#define ID_SCALEPERCENTZ 1024
-#define ID_SCALEPERCENT 1025
-#define ID_MOVEZP 1026
-#define ID_MOVEYP 1027
-#define ID_MOVEXN 1028
-#define ID_MOVEXP 1029
-#define ID_MOVEYN 1030
-#define ID_MOVEZN 1031
-#define ID_ALIGNTOP 1032
-#define ID_ALIGNMIDDLE 1033
-#define ID_ALIGNBOTTOM 1034
-#define ID_ALIGNCENTER 1035
-#define ID_ROTATEYN 1036
-#define ID_ROTATEXN 1037
-#define ID_ROTATEYP 1038
-#define ID_ROTATEZN 1039
-#define ID_ROTATEZP 1040
-#define ID_ROTATEXP 1041
-#define ID_FLIPX 1042
-#define ID_FLIPY 1043
-#define ID_FLIPZ 1044
-#define ID_SELECTOBJECT 1045
-#define ID_SELECTAXISX 1046
-#define ID_SELECTAXISY 1047
-#define ID_SELECTAXISZ 1048
-#define ID_SETSIZEX 1049
-#define ID_SETSIZEY 1050
-#define ID_SETSIZEZ 1051
-#define ID_SELECTOBJECTSTOCK 1052
-#define ID_SELECTORIGIN 1053
-#define ID_SELECTAREAOBJECT 1054
-#define ID_TOOLLIBRARYMANAGE 1055
-#define ID_SPEED 1056
-#define ID_FEED 1057
-#define ID_MARGINSIDE 1058
-#define ID_MARGINBELOW 1059
-#define ID_CLEARANCEHEIGHT 1060
-#define ID_CONTROLLERSHOW 1061
-#define ID_VIEWSTEREO3D 1062
-#define ID_AXISX 1063
-#define ID_AXISY 1064
-#define ID_AXISZ 1065
-#define ID_TEXTX 1066
-#define ID_TEXTY 1067
-#define ID_TEXTZ 1068
-#define ID_AXISA 1069
-#define ID_AXISB 1070
-#define ID_AXISC 1071
-#define ID_TEXTA 1072
-#define ID_TEXTB 1073
-#define ID_TEXTC 1074
-#define ID_AXISU 1075
-#define ID_AXISV 1076
-#define ID_AXISW 1077
-#define ID_TEXTU 1078
-#define ID_TEXTV 1079
-#define ID_TEXTW 1080
+#define ID_MANAGEMACHINES 1013
+#define ID_GCODETEST 1014
+#define ID_MULTTEN 1015
+#define ID_DIVTEN 1016
+#define ID_SCALEUNITX 1017
+#define ID_SCALEUNITY 1018
+#define ID_SCALEUNITZ 1019
+#define ID_SCALEPERCENTX 1020
+#define ID_SCALEPERCENTY 1021
+#define ID_SCALEPERCENTZ 1022
+#define ID_SCALEPERCENT 1023
+#define ID_MOVEZP 1024
+#define ID_MOVEYP 1025
+#define ID_MOVEXN 1026
+#define ID_MOVEXP 1027
+#define ID_MOVEYN 1028
+#define ID_MOVEZN 1029
+#define ID_ALIGNTOP 1030
+#define ID_ALIGNMIDDLE 1031
+#define ID_ALIGNBOTTOM 1032
+#define ID_ALIGNCENTER 1033
+#define ID_ROTATEYN 1034
+#define ID_ROTATEXN 1035
+#define ID_ROTATEYP 1036
+#define ID_ROTATEZN 1037
+#define ID_ROTATEZP 1038
+#define ID_ROTATEXP 1039
+#define ID_FLIPX 1040
+#define ID_FLIPY 1041
+#define ID_FLIPZ 1042
+#define ID_SELECTOBJECT 1043
+#define ID_SELECTAXISX 1044
+#define ID_SELECTAXISY 1045
+#define ID_SELECTAXISZ 1046
+#define ID_SETSIZEX 1047
+#define ID_SETSIZEY 1048
+#define ID_SETSIZEZ 1049
+#define ID_SELECTOBJECTSTOCK 1050
+#define ID_SELECTORIGIN 1051
+#define ID_SELECTAREAOBJECT 1052
+#define ID_TOOLLIBRARYMANAGE 1053
+#define ID_SPEED 1054
+#define ID_FEED 1055
+#define ID_MARGINSIDE 1056
+#define ID_MARGINBELOW 1057
+#define ID_CLEARANCEHEIGHT 1058
+#define ID_CONTROLLERSHOW 1059
+#define ID_VIEWSTEREO3D 1060
+#define ID_AXISX 1061
+#define ID_AXISY 1062
+#define ID_AXISZ 1063
+#define ID_TEXTX 1064
+#define ID_TEXTY 1065
+#define ID_TEXTZ 1066
+#define ID_AXISRX 1067
+#define ID_AXISRY 1068
+#define ID_AXISRZ 1069
+#define ID_TEXTRX 1070
+#define ID_TEXTRY 1071
+#define ID_TEXTRZ 1072
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIFrameMain
@@ -205,9 +198,7 @@ class GUIFrameMain : public wxDocChildFrame
 		virtual void OnCAMPostProcessSimulate( wxRibbonButtonBarEvent& event ) = 0;
 		virtual void OnCAMPostProcessExport( wxRibbonButtonBarEvent& event ) = 0;
 		virtual void OnCAMManageTools( wxRibbonButtonBarEvent& event ) = 0;
-		virtual void OnCAMManagePostProcesses( wxRibbonButtonBarEvent& event ) = 0;
 		virtual void OnCAMManageMachines( wxRibbonButtonBarEvent& event ) = 0;
-		virtual void OnCAMToolsMeasure( wxRibbonButtonBarEvent& event ) = 0;
 		virtual void OnCAMToolsTestGCode( wxRibbonButtonBarEvent& event ) = 0;
 		virtual void OnChar( wxKeyEvent& event ) = 0;
 		virtual void OnBeginLabelEdit( wxTreeEvent& event ) = 0;
@@ -368,6 +359,9 @@ class GUIJobSetup : public wxFrame
 		wxPanel* m_panelOrigin;
 		wxTextCtrl* m_textCtrlOrigin;
 		wxButton* m_buttonOrigin;
+		wxPanel* m_panelMachine;
+		wxStaticText* m_staticTextMachine;
+		wxFilePickerCtrl* m_filePickerMachine;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;
@@ -376,6 +370,7 @@ class GUIJobSetup : public wxFrame
 		virtual void OnTextEnter( wxCommandEvent& event ) = 0;
 		virtual void OnGetSizeFromObject( wxCommandEvent& event ) = 0;
 		virtual void OnRadioBox( wxCommandEvent& event ) = 0;
+		virtual void OnMachineSelected( wxFileDirPickerEvent& event ) = 0;
 		
 	
 	public:
@@ -472,7 +467,7 @@ class GUIAnimation : public wxFrame
 	
 	public:
 		
-		GUIAnimation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Simulation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 750,120 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxFRAME_TOOL_WINDOW|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIAnimation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Simulation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 892,120 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxFRAME_TOOL_WINDOW|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~GUIAnimation();
 	
@@ -580,29 +575,114 @@ class GUIToolbox : public wxFrame
 		wxTreeListCtrl* m_treeListCtrl;
 		wxNotebook* m_notebook;
 		wxPanel* m_panelTool;
-		wxRadioBox* m_radioBoxToolType;
+		wxStaticText* m_staticTextType;
+		wxChoice* m_choiceType;
+		wxScrolledWindow* m_scrolledWindowType;
+		wxStaticText* m_staticText81;
+		wxTextCtrl* m_textCtrlShaftDiameter2;
+		wxStaticText* m_staticText101;
+		wxTextCtrl* m_textCtrlShaftLength1;
+		wxStaticText* m_staticText131;
+		wxTextCtrl* m_textCtrlMaxSpeed1;
+		wxStaticText* m_staticText141;
+		wxTextCtrl* m_textCtrlFeedCoefficient1;
+		wxStaticText* m_staticTextFlutes1;
+		wxTextCtrl* m_textCtrlNrOfTeeth1;
+		wxStaticText* m_staticTextComment1;
+		wxTextCtrl* m_textCtrlComment1;
+		wxStaticText* m_staticText186;
+		wxTextCtrl* m_textCtrl101;
+		wxRadioBox* m_radioBox3;
+		wxPanel* m_panelGeometry;
+		wxScrolledWindow* m_scrolledWindowTool;
 		wxStaticText* m_staticText8;
+		wxTextCtrl* m_textCtrl90;
+		wxStaticText* m_staticText162;
+		wxStaticText* m_staticText164;
 		wxTextCtrl* m_textCtrlShaftDiameter;
 		wxStaticText* m_staticTextUnitShaftDiameter;
+		wxStaticText* m_staticText163;
+		wxTextCtrl* m_textCtrl91;
+		wxStaticText* m_staticText165;
 		wxStaticText* m_staticText10;
 		wxTextCtrl* m_textCtrlShaftLength;
 		wxStaticText* m_staticTextUnitShaftLength;
 		wxStaticText* m_staticText13;
 		wxTextCtrl* m_textCtrlMaxSpeed;
-		wxStaticText* m_staticTextUnitMaxSpeed;
 		wxStaticText* m_staticText14;
 		wxTextCtrl* m_textCtrlFeedCoefficient;
-		wxStaticText* m_staticTextUnitFeedCoefficient;
 		wxStaticText* m_staticTextFlutes;
 		wxTextCtrl* m_textCtrlNrOfTeeth;
-		wxStaticText* m_staticText26;
+		wxStaticText* m_staticText166;
+		wxStaticText* m_staticTextComment;
 		wxTextCtrl* m_textCtrlComment;
-		PanelTool* m_paneltool;
+		wxStaticText* m_staticText167;
+		wxStaticText* m_staticText168;
+		wxTextCtrl* m_textCtrl92;
+		wxStaticText* m_staticText169;
+		wxStaticText* m_staticText170;
+		wxChoice* m_choice13;
+		wxStaticText* m_staticText172;
+		wxChoice* m_choice12;
+		wxStaticText* m_staticText174;
+		wxTextCtrl* m_textCtrl95;
+		wxStaticText* m_staticText175;
+		wxStaticText* m_staticText176;
+		wxTextCtrl* m_textCtrl96;
+		wxStaticText* m_staticText177;
+		wxStaticText* m_staticText178;
+		wxTextCtrl* m_textCtrl97;
+		wxStaticText* m_staticText179;
+		wxStaticText* m_staticText180;
+		wxTextCtrl* m_textCtrl98;
+		wxStaticText* m_staticText1811;
+		wxStaticText* m_staticText1821;
+		wxTextCtrl* m_textCtrl99;
+		wxStaticText* m_staticText183;
+		wxStaticText* m_staticText184;
+		wxTextCtrl* m_textCtrl100;
+		wxStaticText* m_staticText185;
+		wxPanel* m_panelShape;
+		wxCheckBox* m_checkBoxShape;
+		wxButton* m_buttonShapeNew2;
+		wxButton* m_buttonShapeUpdate2;
+		wxButton* m_buttonShapeDelete2;
+		wxStaticText* m_staticText182;
+		wxTextCtrl* m_textCtrlDiameter3;
+		wxStaticText* m_staticTextUnitDiameter3;
+		wxStaticText* m_staticText202;
+		wxTextCtrl* m_textCtrlHeight2;
+		wxStaticText* m_staticTextUnitHeight2;
+		wxStaticText* m_staticText222;
+		wxTextCtrl* m_textCtrlRadius2;
+		wxStaticText* m_staticTextUnitRadius2;
+		wxDataViewListCtrl* m_dataViewListCtrlShape;
+		wxDataViewColumn* m_dataViewListColumn7;
+		wxDataViewColumn* m_dataViewListColumn8;
+		wxDataViewColumn* m_dataViewListColumn9;
+		wxPanel* m_panelHolder;
+		wxChoice* m_choiceHolder;
+		wxButton* m_buttonShapeNew1;
+		wxButton* m_buttonShapeUpdate1;
+		wxButton* m_buttonShapeDelete1;
+		wxStaticText* m_staticText181;
+		wxTextCtrl* m_textCtrlDiameter2;
+		wxStaticText* m_staticTextUnitDiameter2;
+		wxStaticText* m_staticText201;
+		wxTextCtrl* m_textCtrlHeight1;
+		wxStaticText* m_staticTextUnitHeight1;
+		wxStaticText* m_staticText221;
+		wxTextCtrl* m_textCtrlRadius1;
+		wxStaticText* m_staticTextUnitRadius1;
+		wxDataViewListCtrl* m_dataViewListCtrl2;
+		wxDataViewColumn* m_dataViewListColumn4;
+		wxDataViewColumn* m_dataViewListColumn5;
+		wxDataViewColumn* m_dataViewListColumn6;
 		wxPanel* m_panelShaft;
+		wxCheckBox* m_checkBoxShaft;
 		wxButton* m_buttonShapeNew;
 		wxButton* m_buttonShapeUpdate;
 		wxButton* m_buttonShapeDelete;
-		wxChoice* m_choiceType;
 		wxStaticText* m_staticText18;
 		wxTextCtrl* m_textCtrlDiameter;
 		wxStaticText* m_staticTextUnitDiameter;
@@ -612,33 +692,75 @@ class GUIToolbox : public wxFrame
 		wxStaticText* m_staticText22;
 		wxTextCtrl* m_textCtrlRadius;
 		wxStaticText* m_staticTextUnitRadius;
-		wxCheckBox* m_checkBoxCutting;
-		wxListCtrl* m_listCtrl;
-		CanvasTool* m_canvasshaft;
-		wxPanel* m_panelHolder;
-		CanvasTool* m_canvasholder;
+		wxDataViewListCtrl* m_dataViewListCtrl3;
+		wxDataViewColumn* m_dataViewListColumn1;
+		wxDataViewColumn* m_dataViewListColumn2;
+		wxDataViewColumn* m_dataViewListColumn3;
 		wxPanel* m_panelFeedsSpeeds;
+		wxScrolledWindow* m_scrolledWindow4;
+		wxStaticText* m_staticTextTipDiameter11;
+		wxTextCtrl* m_textCtrlTipDiameter11;
+		wxStaticText* m_staticTextUnitTipDiameter11;
+		wxStaticText* m_staticTextShaftDiameter11;
+		wxTextCtrl* m_textCtrlShaftDiameter111;
+		wxStaticText* m_staticTextUnitShaftDiameter111;
+		wxStaticText* m_staticTextLengthOutside11;
+		wxTextCtrl* m_textCtrlLengthOutside11;
+		wxStaticText* m_staticTextUnitLengthOutside11;
+		wxStaticText* m_staticTextLengthCutting11;
+		wxTextCtrl* m_textCtrlLengthCutting11;
+		wxStaticText* m_staticTextUnitLengthCutting11;
 		wxStaticText* m_staticTextDiameter;
 		wxTextCtrl* m_textCtrlDiameter1;
 		wxStaticText* m_staticTextUnitDiameter1;
-		wxStaticText* m_staticTextTipDiameter;
-		wxTextCtrl* m_textCtrlTipDiameter;
-		wxStaticText* m_staticTextUnitTipDiameter;
 		wxStaticText* m_staticTextShaftDiameter;
 		wxTextCtrl* m_textCtrlShaftDiameter1;
 		wxStaticText* m_staticTextUnitShaftDiameter1;
-		wxStaticLine* m_staticline1;
-		wxStaticLine* m_staticline2;
-		wxStaticLine* m_staticline3;
 		wxStaticText* m_staticTextLengthOutside;
 		wxTextCtrl* m_textCtrlLengthOutside;
 		wxStaticText* m_staticTextUnitLengthOutside;
 		wxStaticText* m_staticTextLengthCutting;
 		wxTextCtrl* m_textCtrlLengthCutting;
 		wxStaticText* m_staticTextUnitLengthCutting;
-		wxStaticText* m_staticTextToolLength;
-		wxTextCtrl* m_textCtrlToolLength;
-		wxStaticText* m_staticTextUnitToolLength;
+		wxStaticText* m_staticTextDiameter1;
+		wxTextCtrl* m_textCtrlDiameter11;
+		wxStaticText* m_staticTextUnitDiameter11;
+		wxStaticText* m_staticTextTipDiameter1;
+		wxTextCtrl* m_textCtrlTipDiameter1;
+		wxStaticText* m_staticTextUnitTipDiameter1;
+		wxStaticText* m_staticTextShaftDiameter1;
+		wxTextCtrl* m_textCtrlShaftDiameter11;
+		wxStaticText* m_staticTextUnitShaftDiameter11;
+		wxStaticText* m_staticTextLengthOutside1;
+		wxTextCtrl* m_textCtrlLengthOutside1;
+		wxStaticText* m_staticTextUnitLengthOutside1;
+		wxStaticText* m_staticTextLengthCutting1;
+		wxTextCtrl* m_textCtrlLengthCutting1;
+		wxStaticText* m_staticTextUnitLengthCutting1;
+		wxStaticText* m_staticTextToolLength1;
+		wxTextCtrl* m_textCtrlToolLength1;
+		wxStaticText* m_staticTextUnitToolLength1;
+		wxStaticText* m_staticTextDiameter11;
+		wxTextCtrl* m_textCtrlDiameter111;
+		wxStaticText* m_staticTextUnitDiameter111;
+		wxPanel* m_panelPostprocess;
+		wxScrolledWindow* m_scrolledWindow5;
+		wxCheckBox* m_checkBox5;
+		wxStaticText* m_staticText1661;
+		wxTextCtrl* m_textCtrl931;
+		wxStaticText* m_staticText1711;
+		wxTextCtrl* m_textCtrl981;
+		wxCheckBox* m_checkBox6;
+		wxCheckBox* m_checkBox7;
+		wxStaticText* m_staticText1671;
+		wxTextCtrl* m_textCtrl941;
+		wxStaticText* m_staticText1681;
+		wxTextCtrl* m_textCtrl951;
+		wxStaticText* m_staticText1691;
+		wxTextCtrl* m_textCtrl961;
+		wxStaticText* m_staticText1701;
+		wxTextCtrl* m_textCtrl971;
+		CanvasTool* m_canvasshaft;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;
@@ -649,12 +771,11 @@ class GUIToolbox : public wxFrame
 		virtual void OnShapeNew( wxCommandEvent& event ) = 0;
 		virtual void OnShapeUpdate( wxCommandEvent& event ) = 0;
 		virtual void OnShapeDelete( wxCommandEvent& event ) = 0;
-		virtual void OnShapeSelect( wxListEvent& event ) = 0;
 		
 	
 	public:
 		
-		GUIToolbox( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolbox"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 1089,944 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxFRAME_TOOL_WINDOW|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIToolbox( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Toolbox"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxMAXIMIZE_BOX|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~GUIToolbox();
 	
@@ -725,51 +846,36 @@ class GUIMachineControl : public wxFrame
 		wxMenuBar* m_menubar;
 		wxMenu* m_menuController;
 		wxMenu* m_menuPreferences;
-		wxStaticText* m_staticText69;
+		wxStaticText* m_staticTextX;
 		wxSlider* m_sliderX;
-		wxStaticText* m_staticText70;
+		wxStaticText* m_staticTextY;
 		wxSlider* m_sliderY;
-		wxStaticText* m_staticText71;
+		wxStaticText* m_staticTextZ;
 		wxSlider* m_sliderZ;
-		wxStaticText* m_staticText73;
+		wxStaticText* m_staticTexttX;
 		wxTextCtrl* m_textCtrlX;
 		wxStaticText* m_staticTextUnitX;
-		wxStaticText* m_staticText75;
+		wxStaticText* m_staticTexttY;
 		wxTextCtrl* m_textCtrlY;
 		wxStaticText* m_staticTextUnitY;
-		wxStaticText* m_staticText77;
+		wxStaticText* m_staticTexttZ;
 		wxTextCtrl* m_textCtrlZ;
 		wxStaticText* m_staticTextUnitZ;
-		wxStaticText* m_staticText78;
-		wxSlider* m_sliderA;
-		wxStaticText* m_staticText79;
+		wxStaticText* m_staticTextRX;
+		wxSlider* m_sliderRX;
+		wxStaticText* m_staticTextRY;
 		wxSlider* m_sliderB;
-		wxStaticText* m_staticText80;
+		wxStaticText* m_staticTextRZ;
 		wxSlider* m_sliderC;
-		wxStaticText* m_staticText731;
-		wxTextCtrl* m_textCtrlA;
-		wxStaticText* m_staticTextUnitA;
-		wxStaticText* m_staticText751;
-		wxTextCtrl* m_textCtrlB;
-		wxStaticText* m_staticTextUnitB;
-		wxStaticText* m_staticText771;
-		wxTextCtrl* m_textCtrlC;
-		wxStaticText* m_staticTextUnitC;
-		wxStaticText* m_staticText81;
-		wxSlider* m_sliderU;
-		wxStaticText* m_staticText82;
-		wxSlider* m_sliderV;
-		wxStaticText* m_staticText83;
-		wxSlider* m_sliderW;
-		wxStaticText* m_staticText732;
-		wxTextCtrl* m_textCtrlU;
-		wxStaticText* m_staticTextUnitU;
-		wxStaticText* m_staticText752;
-		wxTextCtrl* m_textCtrlV;
-		wxStaticText* m_staticTextUnitV;
-		wxStaticText* m_staticText772;
-		wxTextCtrl* m_textCtrlW;
-		wxStaticText* m_staticTextUnitW;
+		wxStaticText* m_staticTextrRX;
+		wxTextCtrl* m_textCtrlRX;
+		wxStaticText* m_staticTextUnitRX;
+		wxStaticText* m_staticTextrRY;
+		wxTextCtrl* m_textCtrlRY;
+		wxStaticText* m_staticTextUnitRY;
+		wxStaticText* m_staticTextrRZ;
+		wxTextCtrl* m_textCtrlRZ;
+		wxStaticText* m_staticTextUnitRZ;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;

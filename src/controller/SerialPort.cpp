@@ -27,7 +27,7 @@
 #include "SerialPort.h"
 
 #ifdef __WIN
-//#include <windows.h>
+#include <windows.h>
 #endif
 
 #ifdef __LINUX
@@ -39,6 +39,8 @@
 #include <sys/ioctl.h>
 #endif
 
+#include <sstream>
+
 #define FC_DTRDSR       0x01
 #define FC_RTSCTS       0x02
 #define FC_XONXOFF      0x04
@@ -48,6 +50,14 @@
 #define ASCII_CR        0x0D
 #define ASCII_XON       0x11
 #define ASCII_XOFF      0x13
+
+
+#ifdef __WIN
+	HANDLE m_hIDComDev;
+	OVERLAPPED m_OverlappedRead;
+	OVERLAPPED m_OverlappedWrite;
+#endif
+
 
 SerialPort::SerialPort()
 {
@@ -63,7 +73,7 @@ SerialPort::SerialPort()
 	res = 0;
 	fd = 0;
 #endif
-	Error[0] = 0;
+	Error.clear();
 	Opened = false;
 	szPort[0] = 0;
 }
@@ -76,36 +86,37 @@ SerialPort::~SerialPort()
 bool SerialPort::Open(int nPort, int nBaud)
 {
 	if(Opened) return (true);
-
+	std::ostringstream tempport;
 #ifdef __WIN
-	wsprintf(szPort, "COM%d", nPort);
+	if(nPort < 1) return false;
+	tempport << "COM" << nPort;
 #endif
 
 #ifdef __LINUX
-	if(nPort < 1) return false;
-	sprintf(szPort, "/dev/ttyS%1i", nPort - 1);
-	//  sprintf (szPort, "/dev/ttyUSB0");
+	if(nPort < 0) return false;
+	tempport << "/dev/ttyS" << nPort;
 #endif
+	szPort = tempport.str();
 	return Open(szPort, nBaud);
 }
 
 bool SerialPort::Open(const std::string& Port, int nBaud)
 {
-	return Open(Port.c_str(), nBaud);
-}
-
-bool SerialPort::Open(const char *Port, int nBaud)
-{
-	if(Port == NULL) return false;
+	if(Port.empty()) return false;
 	if(Opened) return true;
 
-#ifdef __WIN
+	szPort = Port;
 
-	char szComParams[50];
+#ifdef __WIN
+//	std::wstring szComParams;
 	DCB dcb;
 
-	wsprintf(szPort, "%s", Port);
-	m_hIDComDev = CreateFile(szPort, GENERIC_READ | GENERIC_WRITE, 0, NULL,
+	std::wostringstream tempportstream;
+	for(size_t n=0;n<Port.size();++n)
+		tempportstream << tempportstream.widen(Port[n]);
+	std::wstring tempport = tempportstream.str();
+
+	m_hIDComDev = CreateFile(tempport.data(), GENERIC_READ | GENERIC_WRITE, 0, NULL,
 			OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, NULL);
 	if(m_hIDComDev == NULL) return (FALSE);
 
@@ -120,7 +131,7 @@ bool SerialPort::Open(const char *Port, int nBaud)
 	CommTimeOuts.WriteTotalTimeoutConstant = 5000;
 	SetCommTimeouts(m_hIDComDev, &CommTimeOuts);
 
-	wsprintf(szComParams, "%s:%d,n,8,1", Port, nBaud);
+//	szComParams = tempport + ":" + std::to_wstring(nBaud) + std::wstring(",n,8,1");
 
 	m_OverlappedRead.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	m_OverlappedWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -150,11 +161,11 @@ bool SerialPort::Open(const char *Port, int nBaud)
 
 	//  if (nPort < 1)  return false;
 	//if(!spezial)
-	sprintf(szPort, "%s", Port);
+
 	//else
 	//  sprintf (szPort, "/dev/ttyUSB0");
 
-	fd = open(szPort, O_RDWR | O_NOCTTY | O_NONBLOCK | O_NDELAY);
+	fd = open(szPort.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK | O_NDELAY);
 	if(fd < 0) return false;
 
 	fcntl(fd, F_SETFL, FNDELAY); // Disables delay on read = read does not block, when called and no data is available.
@@ -270,6 +281,11 @@ bool SerialPort::Open(const char *Port, int nBaud)
 
 	Opened = true;
 	return (Opened);
+}
+
+std::string SerialPort::GetName(void) const
+{
+	return szPort;
 }
 
 int SerialPort::GetHandle(void) const
@@ -501,3 +517,4 @@ void SerialPort::WaitTXFinish(void)
 	tcdrain(fd);
 #endif
 }
+

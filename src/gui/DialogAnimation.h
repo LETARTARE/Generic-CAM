@@ -27,11 +27,13 @@
 #ifndef ANIMATIONFRAME_H_
 #define ANIMATIONFRAME_H_
 
+#include "gui.h"
+
+#include "../project/generator/DexelTarget.h"
+
 #include <wx/event.h>
 #include <wx/timer.h>
 
-#include "../project/generator/DexelTarget.h"
-#include "gui.h"
 
 class CNCSimulator;
 

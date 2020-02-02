@@ -28,15 +28,17 @@
 
 #include "../Run.h"
 #include "../Tool.h"
+#include "Generator.h"
+#include "../../gui/CollectionUnits.h"
 
 #include "../../icon/xtheny.xpm"
 #include "../../icon/ythenx.xpm"
 
-#include <wx/sizer.h>
 #include <float.h>
 
-#include "../../gui/CollectionUnits.h"
-#include "Generator.h"
+#include <wx/sizer.h>
+#include <wx/statbox.h>
+
 //#include <cmath>
 
 GeneratorAreaGridDexel::GeneratorAreaGridDexel()
@@ -185,7 +187,7 @@ void GeneratorAreaGridDexel::GenerateToolpath(const Run &run,
 	GeneratorDexel::PrepareTargets(run, objects, tool, base);
 	DexelTarget toolShape;
 	toolShape.SetupTool(tool, selected.GetResolutionX(),
-			selected.GetResolutionY(), false);
+			selected.GetResolutionY());
 	toolShape.NegateZ();
 
 	start.FoldRaise(toolShape);

@@ -28,9 +28,9 @@
 
 #include "AffineTransformMatrix.h"
 
-#include <GL/gl.h>
 #include <wx/tokenzr.h>
 #include <cmath>
+#include <GL/gl.h>
 
 Triangle::Triangle()
 {

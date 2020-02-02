@@ -26,6 +26,9 @@
 
 #include "CommandRunGeneratorAdd.h"
 
+#include "../Project.h"
+#include "../generator/Generator.h"
+
 CommandRunGeneratorAdd::CommandRunGeneratorAdd(const wxString& name,
 		Project* project, size_t runID, Generator* generator) :
 		wxCommand(true, name)

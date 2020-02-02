@@ -31,6 +31,8 @@
 
 #include <float.h>
 
+#include <wx/sizer.h>
+
 GeneratorOutlineDexel::GeneratorOutlineDexel()
 {
 }

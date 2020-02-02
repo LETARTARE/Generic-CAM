@@ -26,10 +26,9 @@
 
 #include "BooleanBox.h"
 
-#include <GL/gl.h>
-#include <wx/log.h>
-
 #include "Vector3.h"
+#include <wx/log.h>
+#include "OpenGL.h"
 
 BooleanBox::BooleanBox()
 {

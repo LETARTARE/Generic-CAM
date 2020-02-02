@@ -26,13 +26,15 @@
 
 #include "GeneratorAreaMillingDynamic.h"
 
-#include <float.h>
-
-#include <math.h>
-
 #include "../../gui/CollectionUnits.h"
 #include "../Project.h"
 #include "CNCPosition.h"
+
+#include <float.h>
+#include <math.h>
+
+#include <wx/sizer.h>
+
 
 GeneratorAreaMillingDynamic::GeneratorAreaMillingDynamic()
 {

@@ -36,12 +36,14 @@
  *
  */
 
+
+#include "../3D/OpenGLMaterial.h"
+#include "Selection.h"
+
 #include <stddef.h>
 #include <wx/docview.h>
 #include <wx/object.h>
 #include <wx/event.h>
-#include "../3D/OpenGLMaterial.h"
-#include "Selection.h"
 
 class ProjectView:public wxView {
 public:
@@ -88,8 +90,9 @@ private:
 //	bool displayToolpath;
 //	bool displayOutLines;
 
-wxDECLARE_EVENT_TABLE();DECLARE_DYNAMIC_CLASS(ProjectView)
-	;
+wxDECLARE_EVENT_TABLE();
+
+DECLARE_DYNAMIC_CLASS(ProjectView);
 };
 
 #endif /* SRC_PROJECT_PROJECTVIEW_H_ */

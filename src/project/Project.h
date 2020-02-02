@@ -38,21 +38,19 @@
  * \todo Rewrite to XML load/store for future backwards compatibility.
  */
 
-#include <wx/filename.h>
-#include <wx/string.h>
-#include <wx/defs.h>
-#include <wx/docview.h>
+#include "Selection.h"
+#include "Object.h"
+#include "Run.h"
+#include "Tool.h"
 
 #include <stddef.h>
 #include <map>
 #include <vector>
 
-#include "Selection.h"
-#include "Object.h"
-#include "Run.h"
-#include "Tool.h"
-#include "../3D/BoundingBox.h"
-
+#include <wx/filename.h>
+#include <wx/string.h>
+#include <wx/docview.h>
+#include <wx/defs.h>
 
 #if wxUSE_STD_IOSTREAM
 typedef wxSTD istream DocumentIstream;
@@ -113,6 +111,8 @@ public:
 	bool GenerateToolpaths(void);
 	bool SaveToolpath(wxFileName fileName, int runNr);
 
+	bool LoadDefaultTools(wxString fileName, bool loadAll = false);
+
 	BoundingBox GetBBox(const Selection & selected) const;
 
 	size_t GetMaxObjectID(void) const;
@@ -124,7 +124,7 @@ public:
 	std::set <size_t> GetAllRunIDs(void) const;
 	std::set <size_t> GetAllGeneratorIDs(size_t runID) const;
 
-	const Object & GetObject(size_t ID) const;
+	const Object & Get3DObject(size_t ID) const;
 	const Run & GetRun(size_t ID) const;
 	const Generator * GetGenerator(size_t runID, size_t ID);
 	const std::vector <Tool> * GetTools(void) const;
@@ -133,19 +133,19 @@ public:
 private:
 
 	std::map <size_t, Object> objects;
-	size_t maxObjectID;
 	std::map <size_t, Run> run;
+	std::vector <Tool> tools;
+
+	size_t maxObjectID;
 	size_t maxRunID;
 	size_t maxGeneratorID;
-	std::vector <Tool> tools;
 
 #if(_GENERICCAM_USEMULTITHREADING == 1)
 	wxMutex mtx_project;
 	wxMutex mtx_generator;
 #endif
 
-DECLARE_DYNAMIC_CLASS(Project)
-	;
+DECLARE_DYNAMIC_CLASS(Project);
 };
 
 #endif /* PROJECT_H_ */

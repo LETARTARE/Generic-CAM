@@ -33,6 +33,8 @@
 
 #include "../Run.h"
 
+class Project;
+
 class CommandRunAdd:public wxCommand {
 public:
 	CommandRunAdd(const wxString& name, Project * project, wxString runName,

@@ -53,8 +53,6 @@
 #include "../../3D/AffineTransformMatrix.h"
 #include "../../3D/Vector3.h"
 
-#include <GL/gl.h>
-
 class ImprinterElement {
 public:
 	ImprinterElement();
@@ -126,7 +124,7 @@ protected:
 	mutable bool refresh; ///< Initialize an update of the OpenGL display-list.
 
 private:
-	mutable GLuint displayListIndex; ///< Index of a OpenGL display-list for speedup
+	mutable unsigned int displayListIndex; ///< Index of a OpenGL display-list for speedup
 	mutable bool displayListGenerated; ///< Flag to initialize display-list only once
 
 private:

@@ -26,6 +26,8 @@
 
 #include "Octree.h"
 
+#include <GL/gl.h>
+
 #include <math.h>
 #include <stddef.h>
 

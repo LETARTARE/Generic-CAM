@@ -41,13 +41,11 @@
 #error "Neither a Linux nor a Windows system was found!"
 #endif
 
-#ifdef __WIN
-#include <windows.h>
-#endif
 #ifdef __LINUX
 #include <termios.h>
 #include <stdlib.h>
 #endif
+
 #include <string>
 
 class SerialPort {
@@ -56,9 +54,8 @@ public:
 	SerialPort();
 	virtual ~SerialPort();
 
-	bool Open(int nPort = 2, int nBaud = 19200);
-	bool Open(const char *Port = NULL, int nBaud = 19200);
-	bool Open(const std::string &Port = NULL, int nBaud = 19200);
+	bool Open(int nPort, int nBaud = 19200);
+	bool Open(const std::string &Port, int nBaud = 19200);
 	bool Close(void);
 
 	int ReadData(char *buffer, size_t limit);
@@ -70,10 +67,7 @@ public:
 	{
 		return (Opened);
 	}
-	const char* GetName(void) const
-	{
-		return (szPort);
-	}
+	std::string GetName(void) const;
 	int GetHandle(void) const;
 
 	void SetDTR(bool activate);
@@ -81,18 +75,15 @@ public:
 	void WaitTXFinish(void);
 
 public:
-	char Error[200];
+	std::string Error;
 
 private:
 	bool Opened;
-	char szPort[256]; ///< Name of the open port. //TODO: Use std::string ASAP.
+	std::string szPort; ///< Name of the open port.
 
 private:
-
 #ifdef __WIN
 	bool WriteCommByte( unsigned char );
-	HANDLE m_hIDComDev;
-	OVERLAPPED m_OverlappedRead, m_OverlappedWrite;
 #endif
 #ifdef __LINUX
 	static const unsigned int BUFFER_LEN = 2100;
@@ -100,10 +91,6 @@ private:
 	unsigned int buffer_RD, buffer_WR;
 	char m_buffer[BUFFER_LEN];
 	struct termios oldtio, newtio;
-#endif
-
-#ifdef __WIN
-//#include <wx/msw/winundef.h>
 #endif
 };
 

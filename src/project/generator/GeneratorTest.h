@@ -34,13 +34,15 @@
  * ...
  */
 
+#include "GeneratorFactory.h"
 #include "GeneratorDexel.h"
 #include "../Tool.h"
 
-#include <wx/string.h>
 #include <stddef.h>
 
-#include "GeneratorFactory.h"
+#include <wx/string.h>
+#include <wx/stattext.h>
+#include <wx/textctrl.h>
 
 class GeneratorTest:public GeneratorDexel {
 	// Constructor/ Destructor

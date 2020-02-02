@@ -26,18 +26,21 @@
 
 #include "GeneratorTest.h"
 
-#include <math.h>
-#include <wx/log.h>
-#include <wx/wxchar.h>
+#include "../Project.h"
+#include "DexelTarget.h"
+#include "CNCPosition.h"
 
 #include "../../3D/AffineTransformMatrix.h"
 #include "../../3D/Polygon25.h"
 #include "../../3D/Vector3.h"
 #include "../../gui/CollectionUnits.h"
 #include "../../gui/gui.h"
-#include "CNCPosition.h"
-#include "../Project.h"
-#include "DexelTarget.h"
+
+#include <wx/log.h>
+#include <wx/sizer.h>
+#include <wx/wxchar.h>
+
+#include <math.h>
 
 GeneratorTest::GeneratorTest()
 {
@@ -125,7 +128,7 @@ void GeneratorTest::GenerateToolpath(const Run &run,
 	const double resy = base.GetResolutionY();
 
 	DexelTarget toolShape;
-	toolShape.SetupTool(tool, resx, resy, false);
+	toolShape.SetupTool(tool, resx, resy);
 	target.FoldRaise(toolShape);
 	selected.FoldRaise(toolShape);
 	selected.RemoveShadowed(target);

@@ -26,6 +26,9 @@
 
 #include "CommandRunGeneratorUpdate.h"
 
+#include "../Project.h"
+#include "../generator/Generator.h"
+
 CommandRunGeneratorUpdate::CommandRunGeneratorUpdate(const wxString& name,
 		Project* project, size_t runID, size_t generatorID,
 		Generator* generator) :

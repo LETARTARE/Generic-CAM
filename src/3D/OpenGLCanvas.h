@@ -40,7 +40,7 @@
 
 #include "../Config.h"
 #ifdef _USE_6DOFCONTROLLER
-#include "../controller/Control3D.h"
+class Control3D;
 #include <wx/timer.h>
 #endif
 #ifdef _USE_3DPICKING
@@ -49,8 +49,8 @@
 #include "AffineTransformMatrix.h"
 #include "OpenGLLight.h"
 //#include "OpenGLShader.h"
+
 #include <wx/glcanvas.h>
-#include <GL/gl.h>
 
 enum Stereo3DType {
 	stereoOff = 0, //!< No stereo effect
@@ -106,7 +106,7 @@ protected:
 	float turntableX;
 	float turntableY;
 	float unitAtOrigin;
-	GLuint m_gllist;
+	unsigned int m_gllist;
 
 //	OpenGLShader shadows;
 //	GLuint depthBuffer;

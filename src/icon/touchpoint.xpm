@@ -2,7 +2,7 @@
 static char * touchpoint_xpm[] = {
 "64 64 3 1",
 " 	c #FFFFFF",
-".	c #000000",
+".	c #EEEEEE",
 "+	c #212121",
 "                                                                ",
 "                                                                ",

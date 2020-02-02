@@ -35,8 +35,10 @@
  */
 
 #include "../StdInclude.h"
-#include "../project/ProjectView.h"
+
 #include "../3D/OpenGLCanvas.h"
+
+class ProjectView;
 
 class CanvasMain:public OpenGLCanvas {
 	// Constructor / Destructor

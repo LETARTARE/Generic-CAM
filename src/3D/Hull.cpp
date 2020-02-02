@@ -26,7 +26,11 @@
 
 #include "Hull.h"
 
-#include <GL/gl.h>
+#include "Geometry.h"
+#include "OpenGLMaterial.h"
+#include "Polygon3.h"
+#include "Triangle.h"
+
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -34,10 +38,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "Geometry.h"
-#include "OpenGLMaterial.h"
-#include "Polygon3.h"
-#include "Triangle.h"
+#include <GL/gl.h>
 
 Hull::Edge::Edge()
 {
@@ -162,7 +163,7 @@ void Hull::PaintTriangles(const std::set <size_t>&sel, bool invert) const
 		for(size_t i = 0; i < t.size(); ++i){
 
 			if(t[i].group != group){
-				group = (GLuint) (t[i].group % 4294967295);
+				group = (GLuint) (t[i].group % ((size_t) -1));
 				skip = ((!invert && sel.find(group) == sel.end())
 						|| (invert && sel.find(group) != sel.end()));
 				if(skip) continue;
@@ -183,7 +184,7 @@ void Hull::PaintTriangles(const std::set <size_t>&sel, bool invert) const
 	}else{
 		for(size_t i = 0; i < t.size(); ++i){
 			if(t[i].group != group){
-				group = (GLuint) (t[i].group % 4294967295);
+				group = (GLuint) (t[i].group % ((size_t) -1));
 				skip = ((!invert && sel.find(t[i].group) == sel.end())
 						|| (invert && sel.find(t[i].group) != sel.end()));
 				if(skip) continue;
@@ -239,7 +240,7 @@ void Hull::PaintEdges(const std::set <size_t>&sel, bool invert) const
 	if(smooth){
 		for(size_t i = 0; i < e.size(); ++i){
 			if(e[i].group != group){
-				group = (GLuint) (e[i].group % 4294967295);
+				group = (GLuint) (e[i].group % ((size_t) -1));
 				skip = ((!invert && sel.find(group) == sel.end())
 						|| (invert && sel.find(group) != sel.end()));
 				if(skip) continue;
@@ -257,7 +258,7 @@ void Hull::PaintEdges(const std::set <size_t>&sel, bool invert) const
 	}else{
 		for(size_t i = 0; i < e.size(); ++i){
 			if(e[i].group != group){
-				group = (GLuint) (e[i].group % 4294967295);
+				group = (GLuint) (e[i].group % ((size_t) -1));
 				skip = ((!invert && sel.find(group) == sel.end())
 						|| (invert && sel.find(group) != sel.end()));
 				if(skip) continue;
@@ -618,8 +619,8 @@ std::istream& operator>>(std::istream &in, Hull &hull)
 			if((nextstate == 4 || nextstate == 0) && state >= 6 && state <= 10){
 				double val = (negative? -tempvalue : tempvalue) * factor;
 				if(exponent != 0){
-					val *= exp10(
-							(double) (exponentnegative? -exponent : exponent));
+					if(exponentnegative) exponent = -exponent;
+					val *= exp(M_LN10 * (double) exponent);
 				}
 				value.push_back(val);
 				tempvalue = 0.0;

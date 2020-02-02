@@ -35,8 +35,9 @@
 #ifndef _CVECTOR3_H_
 #define _CVECTOR3_H_
 
-#include <math.h>
 #include <wx/string.h>
+
+#include <math.h>
 #include <ostream>
 
 class Vector3 {

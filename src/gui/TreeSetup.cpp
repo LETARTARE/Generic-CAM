@@ -262,7 +262,7 @@ void TreeSetup::Update(void)
 	std::set <size_t> objIDs = project->GetAllObjectIDs();
 	for(std::set <size_t>::const_iterator objID = objIDs.begin();
 			objID != objIDs.end(); ++objID){
-		SetAtLevel(2, project->GetObject(*objID).name, TreeItem::itemObject,
+		SetAtLevel(2, project->Get3DObject(*objID).name, TreeItem::itemObject,
 				*objID);
 		foundItem = true;
 	}

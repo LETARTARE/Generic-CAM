@@ -26,12 +26,13 @@
 
 #include "Polygon3.h"
 
+#include "../math/MatlabFile.h"
+#include "../math/MatlabMatrix.h"
+
 #include <algorithm>
 #include <float.h>
 #include <GL/gl.h>
 
-#include "../math/MatlabFile.h"
-#include "../math/MatlabMatrix.h"
 
 Polygon3::Polygon3()
 {

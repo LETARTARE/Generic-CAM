@@ -31,9 +31,9 @@
 #include <wx/cmdproc.h>
 #include <wx/string.h>
 
-#include "../Object.h"
+#include "../Project.h"
 
-class Project;
+//class Project;
 
 class CommandObjectRemove:public wxCommand {
 public:

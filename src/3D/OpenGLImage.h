@@ -41,7 +41,6 @@
 
 #include <wx/image.h>
 #include <wx/string.h>
-#include <GL/gl.h>
 #include <stdint.h>
 
 class OpenGLImage:public wxImage {
@@ -68,11 +67,11 @@ public:
 protected:
 	void Update(void) const;
 	mutable bool refresh;
-	mutable GLfloat w;
-	mutable GLfloat h;
-	mutable GLfloat tex_w;
-	mutable GLfloat tex_h;
-	mutable GLuint textureID;
+	mutable float w;
+	mutable float h;
+	mutable float tex_w;
+	mutable float tex_h;
+	mutable unsigned int textureID;
 	mutable bool isOGLInit;
 private:
 	static uint32_t NextPowerOfTwo(uint32_t v);

@@ -26,13 +26,16 @@
 
 #include "DialogObjectTransformation.h"
 
-#include "../project/command/CommandObjectTransform.h"
 #include "IDs.h"
+#include "../project/command/CommandObjectTransform.h"
+#include "../project/Project.h"
+#include "../project/ProjectView.h"
+#include "FrameMain.h"
+#include "FrameParent.h"
+
 #include <wx/event.h>
 #include <math.h>
 
-#include "FrameMain.h"
-#include "FrameParent.h"
 
 DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent) :
 		GUIObjectTransformation(parent)
@@ -81,7 +84,7 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 	}
 
 	bbox = project->GetBBox(selected);
-	const Object& obj = project->GetObject(selected[0]);
+	const Object& obj = project->Get3DObject(selected[0]);
 
 	const bool multiselect = selected.Size() > 1;
 	if(multiselect){
@@ -184,7 +187,7 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 	for(std::set <size_t>::iterator objID = selected.begin();
 			objID != selected.end(); ++objID){
 
-		const Object & obj = project->GetObject(*objID);
+		const Object & obj = project->Get3DObject(*objID);
 
 		bool flipNormals = false;
 		bool flipX = false;

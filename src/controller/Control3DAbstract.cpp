@@ -61,7 +61,7 @@ wxString Control3DAbstract::GetPort()
 
 bool Control3DAbstract::Open(void)
 {
-	return port.Open(connection.ToAscii(), 9600);
+	return port.Open(connection.ToStdString(), 9600);
 }
 
 void Control3DAbstract::Close(void)

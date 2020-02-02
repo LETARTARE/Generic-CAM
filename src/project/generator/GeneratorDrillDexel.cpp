@@ -26,9 +26,11 @@
 
 #include "GeneratorDrillDexel.h"
 
-#include <float.h>
-
 #include "../Run.h"
+
+#include <float.h>
+#include <wx/sizer.h>
+
 
 GeneratorDrillDexel::GeneratorDrillDexel()
 {

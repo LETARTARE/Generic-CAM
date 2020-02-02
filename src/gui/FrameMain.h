@@ -37,26 +37,25 @@
 
 #include "gui.h"
 
-//#include "DialogMachineDebugger.h"
-//#include "DialogToolbox.h"
-//#include "DialogAnimation.h"
-
 #include "TreeSetup.h"
 #include "CollectionFilepaths.h"
 
 #include "../project/Project.h"
-//#include "../project/ToolBox.h"
 
 #include <wx/help.h>
 #include <wx/docview.h>
 #include <wx/config.h>
 #include <wx/cmdproc.h>
 
+//#include "DialogMachineDebugger.h"
+//#include "DialogToolbox.h"
+//#include "DialogAnimation.h"
 class FrameParent;
 class DialogJobSetup;
 class DialogToolpathGenerator;
 class DialogObjectTransformation;
 class DialogAnimation;
+class DialogToolbox;
 class DialogPostProcess;
 
 class FrameMain:public GUIFrameMain {
@@ -89,6 +88,7 @@ private:
 //	DialogToolbox * dialogToolbox;
 	DialogToolpathGenerator * dialogToolpathGenerator;
 	DialogAnimation * dialogAnimation;
+	DialogToolbox * dialogToolbox;
 	DialogPostProcess * dialogPostProcess;
 
 private:

@@ -34,9 +34,12 @@
  * ...
  */
 
-#include "GeneratorDexel.h"
 
+#include "GeneratorDexel.h"
 #include "GeneratorFactory.h"
+
+#include <wx/stattext.h>
+#include <wx/textctrl.h>
 
 class GeneratorOutlineDexel:public GeneratorDexel {
 public:

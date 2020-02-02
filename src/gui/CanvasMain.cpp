@@ -26,6 +26,8 @@
 
 #include "CanvasMain.h"
 
+#include "../project/ProjectView.h"
+
 CanvasMain::CanvasMain(wxWindow *parent, wxWindowID id, const wxPoint& pos,
 		const wxSize& size, long style, const wxString& name) :
 		OpenGLCanvas(parent, id, pos, size, style, name)

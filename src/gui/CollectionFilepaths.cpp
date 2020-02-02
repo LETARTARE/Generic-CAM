@@ -26,6 +26,8 @@
 
 #include "CollectionFilepaths.h"
 
+#include <wx/filename.h>
+
 CollectionFilepaths::CollectionFilepaths()
 {
 }

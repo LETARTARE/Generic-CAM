@@ -30,8 +30,9 @@
 
 #include "languages.h"
 
-#include "wx/richtext/richtextxml.h"
-
+//#include "wx/richtext/richtextxml.h"
+#include <wx/splash.h>
+#include "Config.h"
 #include "project/ProjectView.h"
 #include "test/test.h"
 
@@ -152,7 +153,13 @@ bool GenericCAMApp::OnInit()
 				wxDOC_SILENT);
 	}
 
-	// Show release notes
+	wxBitmap bitmap;
+	if(bitmap.LoadFile(_T("doc/images/splash.png"), wxBITMAP_TYPE_PNG)){
+		new wxSplashScreen(bitmap, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT,
+				6000, parent, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+				wxSIMPLE_BORDER | wxSTAY_ON_TOP);
+	}
+
 //	wxRichTextBuffer::AddHandler(new wxRichTextXMLHandler);
 //	StartupText * temp = new StartupText(frame);
 //	temp->m_richText->LoadFile(_T("releasenote.xml"), wxRICHTEXT_TYPE_XML);

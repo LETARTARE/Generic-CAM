@@ -26,6 +26,8 @@
 
 #include "ProjectView.h"
 
+//#include "../StdInclude.h"
+
 #include "Project.h"
 #include "../genericcam.h"
 #include "../gui/FrameMain.h"
@@ -33,7 +35,7 @@
 #include "../gui/IDs.h"
 #include <map>
 
-IMPLEMENT_DYNAMIC_CLASS(ProjectView, wxView)
+IMPLEMENT_DYNAMIC_CLASS(ProjectView, wxView);
 
 wxBEGIN_EVENT_TABLE(ProjectView, wxView) EVT_MENU(ID_REFRESHTREEVIEW, ProjectView::OnUpdateTree)
 wxEND_EVENT_TABLE()
@@ -144,8 +146,11 @@ void ProjectView::Render(void) const
 	PaintObjects(Selection(true), OpenGLMaterial(0.3, 0.3, 1.0),
 			OpenGLMaterial(0, 0, 0));
 
-	if(type == vRun || type == vOrigin){
-		PaintRun(Selection(true));
+	if(project->GetToolCount() > 0){
+		glPushMatrix();
+		glTranslatef(0.3, 0, 0);
+		project->GetTool(0).Paint();
+		glPopMatrix();
 	}
 
 	if(type == vOrigin){
@@ -155,7 +160,7 @@ void ProjectView::Render(void) const
 		}
 	}
 
-	if(type == vGenerator){
+	if(type == vRun || type == vGenerator){
 		glPushName(Selection::BaseRun);
 		for(std::map <size_t, Run>::const_iterator run = project->run.begin();
 				run != project->run.end(); ++run){
@@ -172,6 +177,10 @@ void ProjectView::Render(void) const
 			}
 		}
 		glPopName();
+	}
+
+	if(type == vRun || type == vOrigin){
+		PaintRun(Selection(true));
 	}
 
 	if(false){

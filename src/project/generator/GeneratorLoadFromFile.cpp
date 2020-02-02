@@ -26,6 +26,8 @@
 
 #include "GeneratorLoadFromFile.h"
 
+#include <iostream>
+
 #include <wx/sizer.h>
 #include <wx/button.h>
 #include <wx/log.h>

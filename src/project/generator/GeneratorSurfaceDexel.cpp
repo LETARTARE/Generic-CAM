@@ -26,10 +26,12 @@
 
 #include "GeneratorSurfaceDexel.h"
 
-#include <float.h>
-
 #include "../Run.h"
 #include "ProtoToolpath.h"
+
+#include <float.h>
+
+#include <wx/sizer.h>
 
 GeneratorSurfaceDexel::GeneratorSurfaceDexel()
 {
@@ -112,8 +114,7 @@ void GeneratorSurfaceDexel::GenerateToolpath(const Run &run,
 
 	//	DexelTarget surface = target;
 	DexelTarget toolShape;
-	toolShape.SetupTool(tool, target.GetResolutionX(), target.GetResolutionY(),
-			true);
+	toolShape.SetupTool(tool, target.GetResolutionX(), target.GetResolutionY());
 	toolShape.NegateZ();
 
 	target.FoldRaise(toolShape);
@@ -122,8 +123,7 @@ void GeneratorSurfaceDexel::GenerateToolpath(const Run &run,
 //	debug = start;
 //	debug.CopyToUp(4, 1.0);
 
-	toolShape.SetupTool(tool, target.GetResolutionX(), target.GetResolutionY(),
-			false);
+	toolShape.SetupTool(tool, target.GetResolutionX(), target.GetResolutionY());
 	toolShape.NegateZ();
 
 	std::vector <ProtoToolpath> aptp;

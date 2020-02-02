@@ -29,6 +29,10 @@
 #include "../Project.h"
 
 #include <wx/textfile.h>
+
+#include <GL/gl.h>
+
+#include <iostream>
 #include <float.h>
 
 CNCSimulator::CNCSimulator()
@@ -125,8 +129,7 @@ void CNCSimulator::Step(float tTarget)
 		return;
 	}
 	DexelTarget dex;
-	dex.SetupTool(*tool, target.GetResolutionX(), target.GetResolutionY(),
-			false);
+	dex.SetupTool(*tool, target.GetResolutionX(), target.GetResolutionY());
 //		dex.MirrorZ();
 //		dex.NegateZ();
 	target.PolygonCutInTarget(temp, dex);

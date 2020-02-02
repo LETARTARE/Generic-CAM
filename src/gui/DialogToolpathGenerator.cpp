@@ -27,14 +27,18 @@
 #include "DialogToolpathGenerator.h"
 
 #include "../project/generator/GeneratorFactory.h"
+#include "IDs.h"
+#include "CollectionUnits.h"
+#include "FrameParent.h"
+#include "FrameMain.h"
+#include "../project/Project.h"
+#include "../project/ProjectView.h"
 
 //#include "../project/command/CommandRunGeneratorAdd.h"
 #include "../project/command/CommandRunGeneratorUpdate.h"
 //#include "../project/command/CommandRunGeneratorDelete.h"
-#include "CollectionUnits.h"
-#include "FrameParent.h"
-#include "FrameMain.h"
-#include "IDs.h"
+
+#include <wx/cmdproc.h>
 
 DialogToolpathGenerator::DialogToolpathGenerator(wxWindow* parent) :
 		GUIToolpathGenerator(parent)
@@ -95,7 +99,7 @@ bool DialogToolpathGenerator::TransferDataToWindow(bool updateGeneratorPanel)
 		const Tool & tool = project->GetTool(n);
 		newTools.Add(
 				wxString::Format(_T("T%i - "), tool.postprocess.number)
-						+ tool.description);
+						+ tool.base.description);
 	}
 	wxArrayString oldTools = m_choiceTool->GetStrings();
 	if(oldTools != newTools) m_choiceTool->Set(newTools);
@@ -127,7 +131,7 @@ bool DialogToolpathGenerator::TransferDataToWindow(bool updateGeneratorPanel)
 	m_textCtrlGeometry->SetValue(generator.area.ToString());
 	int m = -1;
 	for(size_t n = 0; n < project->GetToolCount(); ++n){
-		if(project->GetTool(n).guid.compare(generator.toolguid) == 0){
+		if(project->GetTool(n).base.guid.compare(generator.toolguid) == 0){
 			m = n;
 			break;
 		}
@@ -184,7 +188,7 @@ bool DialogToolpathGenerator::TransferDataFromWindow(
 	if(m == wxNOT_FOUND || m < 0 || m >= project->GetToolCount()){
 		generator->toolguid.clear();
 	}else{
-		generator->toolguid = project->GetTool(m).guid;
+		generator->toolguid = project->GetTool(m).base.guid;
 	}
 	generator->spindlespeed = settings->RotationalSpeed.SIFromString(
 			m_textCtrlSpindle->GetValue());

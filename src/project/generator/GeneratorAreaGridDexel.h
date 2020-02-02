@@ -34,15 +34,21 @@
  * ...
  */
 
-#include <stddef.h>
-#include <map>
-#include <vector>
 
 #include "../Object.h"
 #include "Direction.h"
 #include "GeneratorDexel.h"
 #include "ProtoToolpath.h"
 #include "GeneratorFactory.h"
+
+#include <stddef.h>
+#include <map>
+#include <vector>
+
+#include <wx/radiobut.h>
+#include <wx/statbmp.h>
+#include <wx/stattext.h>
+#include <wx/textctrl.h>
 
 class GeneratorAreaGridDexel:public GeneratorDexel {
 public:

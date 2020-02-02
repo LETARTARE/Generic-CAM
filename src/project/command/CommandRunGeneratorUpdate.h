@@ -37,11 +37,11 @@
  * program.
  */
 
-#include "../Project.h"
-#include "../generator/Generator.h"
-
 #include <wx/cmdproc.h>
 #include <wx/string.h>
+
+class Project;
+class Generator;
 
 class CommandRunGeneratorUpdate:public wxCommand {
 public:

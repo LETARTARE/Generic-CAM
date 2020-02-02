@@ -26,6 +26,8 @@
 
 #include "Imprinter.h"
 
+#include <GL/gl.h>
+
 #include <float.h>
 #include <math.h>
 #include <cassert>

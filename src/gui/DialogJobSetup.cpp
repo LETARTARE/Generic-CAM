@@ -32,6 +32,8 @@
 #include "../project/command/CommandRunSetStockObject.h"
 #include "../project/command/CommandRunSetStockOrigin.h"
 #include "../project/command/CommandRunSetStockType.h"
+#include "../project/Project.h"
+#include "../project/ProjectView.h"
 #include "FrameMain.h"
 #include "FrameParent.h"
 
@@ -84,7 +86,7 @@ bool DialogJobSetup::TransferDataToWindow(void)
 		for(std::set <size_t>::iterator objID = run.object.begin();
 				objID != run.object.end(); ++objID){
 			if(!temp.IsEmpty()) temp += _T(", ");
-			temp += project->GetObject(*objID).name;
+			temp += project->Get3DObject(*objID).name;
 		}
 		m_textCtrlObject->SetValue(temp);
 	}
@@ -96,7 +98,7 @@ bool DialogJobSetup::TransferDataToWindow(void)
 
 	if(project->Has(Selection::Object, run.stockobject)){
 		m_textCtrlStockObject->SetValue(
-				project->GetObject(run.stockobject).name);
+				project->Get3DObject(run.stockobject).name);
 	}else{
 		m_textCtrlStockObject->SetValue(_T("-"));
 	}
@@ -359,4 +361,8 @@ void DialogJobSetup::OnRadioBox(wxCommandEvent& event)
 				new CommandRunSetStockType(_("Change type."), project, runID,
 						Run::BoxBottom));
 	}
+}
+
+void DialogJobSetup::OnMachineSelected(wxFileDirPickerEvent& event)
+{
 }

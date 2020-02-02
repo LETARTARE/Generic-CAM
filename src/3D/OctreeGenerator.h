@@ -31,6 +31,7 @@
 #include "Triangle.h"
 #include "Vector3.h"
 #include "BoundingBox.h"
+
 #include <stdint.h>
 
 /*!\class VectorInt64

@@ -33,8 +33,9 @@
  * ...
  */
 
-#include "../project/Run.h"
 #include "gui.h"
+
+#include "../project/Run.h"
 
 class DialogJobSetup:public GUIJobSetup {
 public:
@@ -53,7 +54,7 @@ public:
 	void OnChoicebookPageChanged( wxChoicebookEvent& event);
 	void OnTextEnter(wxCommandEvent& event);
 	void OnRadioBox(wxCommandEvent& event);
-
+	void OnMachineSelected(wxFileDirPickerEvent& event);
 private:
 	size_t runID;
 	Run::StockType oldType;

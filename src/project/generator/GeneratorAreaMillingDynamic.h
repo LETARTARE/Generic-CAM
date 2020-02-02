@@ -35,11 +35,13 @@
  */
 
 #include "GeneratorDexel.h"
+#include "GeneratorFactory.h"
 
 #include "../../3D/Polygon3.h"
 #include "../Tool.h"
 
-#include "GeneratorFactory.h"
+#include <wx/stattext.h>
+#include <wx/textctrl.h>
 
 class GeneratorAreaMillingDynamic:public GeneratorDexel {
 	// Constructor/ Destructor

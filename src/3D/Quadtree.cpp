@@ -28,10 +28,13 @@
 
 #include "Triangle.h"
 #include "Vector3.h"
-#include <wx/defs.h>
+
+#include <GL/gl.h>
+
 #include <stddef.h>
 //#include <cmath>
 
+#include <wx/defs.h>
 
 Quadtree::QuadtreeCell::QuadtreeCell()
 {

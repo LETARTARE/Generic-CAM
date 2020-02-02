@@ -29,12 +29,13 @@
 #include "Geometry.h"
 #include "AffineTransformMatrix.h"
 #include "Triangle.h"
+#include "../project/Selection.h"
 
-#include <GL/gl.h>
 #include <float.h>
 #include <stdint.h>
 
-#include "../project/Selection.h"
+#include <GL/gl.h>
+
 BoundingBox::BoundingBox()
 {
 	xmax = ymax = zmax = -DBL_MAX;

@@ -36,7 +36,6 @@
 #include "Vector3.h"
 #include "Triangle.h"
 #include "BoundingBox.h"
-#include <GL/gl.h>
 
 class BoundingBox;
 
@@ -65,9 +64,9 @@ private:
 		float bbTop;
 		float bbBot;
 
-		GLfloat r; ///< Red - Color of this particular element. Also inherited upon splitting.
-		GLfloat g; ///< Red - Color of this particular element. Also inherited upon splitting.
-		GLfloat b; ///< Red - Color of this particular element. Also inherited upon splitting.
+		float r; ///< Red - Color of this particular element. Also inherited upon splitting.
+		float g; ///< Red - Color of this particular element. Also inherited upon splitting.
+		float b; ///< Red - Color of this particular element. Also inherited upon splitting.
 
 	protected:
 		QuadtreeCell * sub; ///< Pointers to the 4 possible subelements
@@ -77,7 +76,7 @@ private:
 				const Vector3 & position, const float cubeSize,
 				const unsigned char depth);
 
-		void SetColor(GLfloat r = 1.0, GLfloat g = 1.0, GLfloat b = 1.0);
+		void SetColor(float r = 1.0, float g = 1.0, float b = 1.0);
 		void Split(void); ///< Splits an element into 8 subelements.
 		bool Clean(void);
 		void Paint(void); ///< Paints the element itself and its subelements (if any).
@@ -93,7 +92,7 @@ public:
 	double cellSize; ///< Size (length, width, depth) of one cell at the lowest level. Resolution of the Octree.
 
 private:
-	GLuint displayListIndex; ///< Variable pointing to the OpenGL display list.
+	unsigned int displayListIndex; ///< Variable pointing to the OpenGL display list.
 	bool displayListGenerated; ///< Flag showing if an OpenGL display list has been created.
 	bool refresh; ///< Flag to show, that the OpenGL display list has to be recreated.
 

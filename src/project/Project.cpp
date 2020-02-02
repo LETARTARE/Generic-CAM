@@ -26,22 +26,28 @@
 
 #include "Project.h"
 
-#include "../3D/BooleanBox.h"
+//#include "../StdInclude.h"
 
-#include "../3D/FileSTL.h"
-#include "../gui/IDs.h"
 #include "../Config.h"
+#include "../gui/IDs.h"
+
+#include "../3D/BooleanBox.h"
+#include "../3D/FileSTL.h"
+#include "ToolBox.h"
 
 #include <wx/zipstrm.h>
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
+
 #include <sstream>
-#include <GL/gl.h>
+#include <iostream>
 #include <math.h>
 #include <float.h>
 #include <algorithm>
 
-IMPLEMENT_DYNAMIC_CLASS(Project, wxDocument)
+IMPLEMENT_DYNAMIC_CLASS(Project, wxDocument);
+
+#include <GL/gl.h>
 
 Project::Project() :
 		wxDocument()
@@ -54,19 +60,8 @@ Project::Project() :
 	maxRunID = 0;
 	maxGeneratorID = 0;
 
-	Tool temp;
-	temp.guid = "#1";
-	temp.BMC = "VHM";
-	temp.GRADE = "Generic Mill";
-	temp.type = Tool::flat_end_mill;
-	temp.geometry.DC = 6e-3;
-	temp.geometry.LCF = 22e-3;
-	temp.geometry.LB = 48e-3;
-	temp.unit = "mm";
-	temp.description = "Cylindric endmill - 6 mm";
-	temp.vendor = "Someplace in China";
-	temp.postprocess.number = 1;
-	tools.push_back(temp);
+//	LoadDefaultTools(
+//			wxFileName(_T("/home/toby/Pojekte/genericcam/toolbox/local.json")));
 
 }
 
@@ -175,7 +170,7 @@ std::set <size_t> Project::GetAllGeneratorIDs(size_t runID) const
 	return temp;
 }
 
-const Object& Project::GetObject(size_t ID) const
+const Object & Project::Get3DObject(size_t ID) const
 {
 	if(objects.find(ID) == objects.end()) throw(std::range_error(
 			"Project::GetObject - Object not found."));
@@ -575,7 +570,6 @@ bool Project::Load(wxFileName fileName)
 
 //wxString Project::ToolPathGenerateCurrent(void)
 //{
-//	// TODO: Const correctnessl for this function.
 //	if(generator_workpieceNr >= workpieces.GetCount()) return _T("");
 //	if(generator_runNr >= run.GetCount()) return _T("");
 //	if(generator_workpieceNr >= run[generator_runNr].toolpaths.GetCount()) return _T(
@@ -591,87 +585,21 @@ bool Project::SaveToolpath(wxFileName fileName, int runNr)
 	return false;
 }
 
-// Experimental stuff:
-//	BooleanBox x;
-//	BooleanBox y(0.4, 0.4, 0.4);
-//	y.matrix.TranslateGlobal(0.1, -0.1, 0.5);
-//	x -= y;
-//	y.matrix.TranslateGlobal(0.1, 0.1, 0.1);
-//	x -= y;
-//	BooleanBox z = x;
-//	z.matrix.TranslateGlobal(0.3, 0.3, 0.3);
-//	x -= z;
-//	::glColor4f(0.75, 0.75, 0.0, 1);
-//	x.Paint(true);
-//	::glColor4f(0.75, 0.75, 0.75, 0.4);
-//	x.Paint();
-//	y.Paint();
-//
-//	size_t i;
-//
-//	switch(displayType){
-//	case displayObjects:
-//		glLoadName(1);
-//		for(i = 0; i < objects.GetCount(); i++){
-//			glPushName(i + 1);
-//			objects[i].Paint();
-//			glPopName();
-//		}
-//		break;
-//
-//	case displayWorkpieces:
-//		glLoadName(2);
-//		for(i = 0; i < workpieces.GetCount(); i++){
-//			if(!workpieces[i].selected) continue;
-//			glPushName(i);
-//			workpieces[i].Paint(objects);
-//			glPopName();
-//		}
-//		break;
-//	case displayRun:
-//		glLoadName(3);
-//		for(i = 0; i < run.GetCount(); i++){
-//			if(!run[i].selected) continue;
-//
-//			::glPushName(i);
-//			run[i].Paint(objects, workpieces);
-//			::glPopName();
-//		}
-//		break;
-//	}
-//	::glLoadName(0);
+bool Project::LoadDefaultTools(wxString fileName, bool loadAll)
+{
+	ToolBox localtools;
+	if(loadAll) tools.clear();
 
-//void Project::PaintWorkpiece(void) const
-//{
-//	const int i = GetFirstSelectedWorkpiece();
-//	if(i < 0) return;
-//	Vector3 center = workpieces[i].GetCenter();
-//	glPushMatrix();
-//	glTranslatef(-center.x, -center.y, -center.z);
-//	RenderCoordinateSystem();
-//	glPushName(i + 1);
-//	workpieces[i].Paint();
-//	glPopName();
-//	glPopMatrix();
-//}
-//
-//void Project::PaintRun(void) const
-//{
-//	const int i = GetFirstSelectedRun();
-//	if(i < 0) return;
-//	Vector3 center = run[i].GetCenter();
-//	glPushMatrix();
-//	glTranslatef(-center.x, -center.y, -center.z);
-//	glPushName(i + 1);
-//	run[i].Paint();
-//	glPopName();
-//	glPopMatrix();
-//}
+	// Only load the default tools into an empty project.
+	if(!tools.empty()) return true;
 
-//void Project::PaintDepthField(unsigned int runNr,
-//		unsigned int objectReferenceNr)
-//{
-//}
+	if(!localtools.Load(fileName.ToStdString())) return false;
+	for(size_t n = 0; n < localtools.Size(); ++n){
+		if(!loadAll && !localtools[n].addtonewprojects) continue;
+		tools.push_back(localtools[n]);
+	}
+	return true;
+}
 
 //void Project::FlipRun(void)
 //{

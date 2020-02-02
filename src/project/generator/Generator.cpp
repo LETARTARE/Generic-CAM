@@ -26,10 +26,11 @@
 
 #include "Generator.h"
 
-#include <GL/gl.h>
-
-#include "../../3D/OpenGLMaterial.h"
 #include "../Run.h"
+#include "../../3D/OpenGLMaterial.h"
+
+#include <iostream>
+#include <GL/gl.h>
 
 Generator::Generator()
 {

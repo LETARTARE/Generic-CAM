@@ -33,12 +33,13 @@
  * ...
  */
 
-//#include <wx/cmdproc.h>
-#include <wx/event.h>
+#include "gui.h"
 
 #include "../3D/BoundingBox.h"
 #include "../project/Selection.h"
-#include "gui.h"
+
+//#include <wx/cmdproc.h>
+#include <wx/event.h>
 
 class Project;
 

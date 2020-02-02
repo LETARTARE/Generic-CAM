@@ -27,7 +27,6 @@
 #ifndef OCTREE_H_
 #define OCTREE_H_
 
-#include <GL/gl.h>
 #include <stdint.h>
 
 /*!\class OctreeCell
@@ -49,9 +48,9 @@ public:
 	// Member variables
 public:
 
-	GLfloat r; ///< Red - Color of this particular element. Also inherited upon splitting.
-	GLfloat g; ///< Red - Color of this particular element. Also inherited upon splitting.
-	GLfloat b; ///< Red - Color of this particular element. Also inherited upon splitting.
+	float r; ///< Red - Color of this particular element. Also inherited upon splitting.
+	float g; ///< Red - Color of this particular element. Also inherited upon splitting.
+	float b; ///< Red - Color of this particular element. Also inherited upon splitting.
 
 	uint8_t clip; ///< Intersection of one edge.
 	uint8_t sign; ///< Sign of the clipping (1 = 1, 0 = -1).
@@ -63,7 +62,7 @@ protected:
 
 	// Methods
 public:
-	void SetColor(GLfloat r = 1.0, GLfloat g = 1.0, GLfloat b = 1.0);
+	void SetColor(float r = 1.0, float g = 1.0, float b = 1.0);
 	void Split(void); ///< Splits an element into 8 subelements.
 	void Paint(void); ///< Paints the element itself and its subelements (if any).
 
@@ -102,7 +101,7 @@ public:
 	double cellSize; ///< Size (length, width, depth) of one cell at the lowest level. Resolution of the Octree.
 
 private:
-	GLuint displayListIndex; ///< Variable pointing to the OpenGL display list.
+	unsigned int displayListIndex; ///< Variable pointing to the OpenGL display list.
 	bool displayListGenerated; ///< Flag showing if an OpenGL display list has been created.
 	bool refresh; ///< Flag to show, that the OpenGL display list has to be recreated.
 

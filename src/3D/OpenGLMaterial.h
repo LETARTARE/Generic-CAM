@@ -43,7 +43,6 @@
  */
 
 #include "Vector3.h"
-#include <GL/gl.h>
 #include <string.h>
 
 class OpenGLMaterial {
@@ -112,7 +111,7 @@ public:
 	Vector3 diffuse;
 	Vector3 specular;
 	Vector3 emission;
-	GLfloat shininess;
+	float shininess;
 };
 
 #endif /* SRC_3D_OPENGLMATERIAL_H_ */

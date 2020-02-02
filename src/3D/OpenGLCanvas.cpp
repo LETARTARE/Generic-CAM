@@ -24,21 +24,24 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#define GL_GLEXT_PROTOTYPES
+//#define GL_GLEXT_PROTOTYPES
+
+#include "OpenGLCanvas.h"
+
+#include "../StdInclude.h"
+#include "../controller/Control3D.h"
+
+#include <wx/dcclient.h>
 
 #ifdef __WXMAC__
 #include "OpenGL/glu.h"
 //#include "OpenGL/gl.h"
 #include "OpenGL/glext.h"
 #else
-#include <GL/gl.h>
 #include <GL/glext.h>
 #include <GL/glu.h>
+#include <GL/gl.h>
 #endif
-
-#include "OpenGLCanvas.h"
-
-#include "../StdInclude.h"
 
 static int wx_gl_attribs[] =
 	{WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24, 0};

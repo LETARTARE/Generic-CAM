@@ -28,6 +28,9 @@
 #include "../Config.h"
 
 #include "FrameMain.h"
+
+#include <wx/generic/textdlgg.h>
+
 #include "FrameParent.h"
 
 #include "DialogTestGCode.h"
@@ -36,6 +39,7 @@
 #include "DialogSetupPaths.h"
 #include "DialogObjectTransformation.h"
 #include "DialogPostProcess.h"
+#include "DialogToolbox.h"
 #include "DialogAnimation.h"
 
 //#include "../project/generator/ToolpathGeneratorThread.h"
@@ -75,6 +79,7 @@
 #include <wx/textfile.h>
 #include <wx/filename.h>
 #include <wx/dir.h>
+#include <wx/splash.h>
 #include <unistd.h>
 
 wxBEGIN_EVENT_TABLE(FrameMain, wxDocChildFrame) EVT_MENU(ID_TOGGLESTEREO3D, FrameMain::OnViewStereo3DToggle)
@@ -113,11 +118,28 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 
 	this->config = config;
 
-	filepaths.Load(config);
-
 	FrameParent* parentframe = wxStaticCast(parent, FrameParent);
 	Project* project = wxStaticCast(GetDocument(), Project);
 	ProjectView* projectview = wxStaticCast(GetView(), ProjectView);
+
+	filepaths.Load(config);
+
+	// Load the default tools into a new project.
+	// (Has to be done from here, because the set paths are
+	// only known at this point.)
+	wxDir dir(filepaths.lastToolboxDirectory);
+	if(dir.IsOpened()){
+		wxString filename;
+		bool cont = dir.GetFirst(&filename, _T("*.json"));
+		while(cont){
+			if(filename.CmpNoCase(_T("local.json")) == 0){
+				wxString fullfilename = dir.GetNameWithSep() + filename;
+				project->LoadDefaultTools(fullfilename);
+				break;
+			}
+			cont = dir.GetNext(&filename);
+		}
+	}
 
 	doc->GetDocumentManager()->FileHistoryAddFilesToMenu(&menuRecentFiles);
 	doc->GetCommandProcessor()->Initialize();
@@ -147,6 +169,7 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 	dialogToolpathGenerator = new DialogToolpathGenerator(this);
 	dialogAnimation = new DialogAnimation(this);
 	dialogPostProcess = new DialogPostProcess(this);
+	dialogToolbox = new DialogToolbox(this);
 
 //	dialogDebugger = new DialogMachineDebugger(this);
 //#ifdef _USE_MIDI
@@ -165,6 +188,7 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 	this->SetAcceleratorTable(accel);
 
 	TransferDataToWindow();
+//	std::cout << "FrameMain::FrameMain - leaving function.\n";
 }
 
 FrameMain::~FrameMain()
@@ -412,11 +436,11 @@ void FrameMain::OnObjectRename(wxCommandEvent& event)
 	const size_t ID = temp[0];
 
 	wxTextEntryDialog dialog(this, _("Enter new name:"),
-	_T("Rename Object ") + project->GetObject(ID).name,
-			project->GetObject(ID).name);
+	_T("Rename Object ") + project->Get3DObject(ID).name,
+			project->Get3DObject(ID).name);
 	if(dialog.ShowModal() == wxID_OK){
 		if(dialog.GetValue().IsEmpty()) return;
-		if(dialog.GetValue() == project->GetObject(ID).name) return;
+		if(dialog.GetValue() == project->Get3DObject(ID).name) return;
 		cmdProc->Submit(
 				new CommandObjectRename(
 				_("Object renamed to ") + dialog.GetValue(), project, ID,
@@ -451,7 +475,7 @@ void FrameMain::OnObjectDelete(wxCommandEvent& event)
 		cmdProc->Submit(
 				new CommandObjectRemove(
 						_(
-								"Object ") + project->GetObject(*it).name + _(" deleted."),
+								"Object ") + project->Get3DObject(*it).name + _(" deleted."),
 						project, *it));
 	}
 	TransferDataToWindow();
@@ -472,9 +496,9 @@ void FrameMain::OnObjectFlipNormals(wxCommandEvent& event)
 
 	for(std::set <size_t>::const_iterator it = temp.begin(); it != temp.end();
 			++it){
-		AffineTransformMatrix matrix = project->GetObject(*it).matrix;
+		AffineTransformMatrix matrix = project->Get3DObject(*it).matrix;
 		CommandObjectTransform * command = new CommandObjectTransform(
-				project->GetObject(*it).name + _(": Flipped normal vectors"),
+				project->Get3DObject(*it).name + _(": Flipped normal vectors"),
 				project, *it, false, false, false, true, matrix);
 		cmdProc->Submit(command);
 	}
@@ -498,7 +522,7 @@ void FrameMain::OnCAMSetup(wxCommandEvent& event)
 		size_t objID;
 		if(temp.IsType(Selection::Object)){
 			objID = temp[0];
-			newName += _(" - Object: ") + project->GetObject(objID).name;
+			newName += _(" - Object: ") + project->Get3DObject(objID).name;
 		}else{
 			objID = 0;
 		}
@@ -686,6 +710,9 @@ void FrameMain::OnCAMToolsMeasure(wxRibbonButtonBarEvent& event)
 
 void FrameMain::OnCAMManageTools(wxRibbonButtonBarEvent& event)
 {
+	dialogToolbox->Update();
+	dialogToolbox->Show();
+	dialogToolbox->Raise();
 }
 
 void FrameMain::OnCAMManagePostProcesses(wxRibbonButtonBarEvent& event)
@@ -1153,7 +1180,7 @@ void FrameMain::OnEndLabelEdit(wxTreeEvent& event)
 
 	if(data->type == TreeItem::itemObject){
 		if(!project->Has(Selection::Object, data->ID)) return;
-		if(newName == project->GetObject(data->ID).name) return;
+		if(newName == project->Get3DObject(data->ID).name) return;
 		cmdProc->Submit(new CommandObjectRename(
 		_("Object renamed to ") + newName, project, data->ID, newName));
 		return;

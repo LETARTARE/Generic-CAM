@@ -40,13 +40,13 @@
 #include "../3D/Hull.h"
 #include "../3D/BoundingBox.h"
 #include "../3D/AffineTransformMatrix.h"
+#include "../3D/OpenGLMaterial.h"
+#include "Selection.h"
 
 #include <wx/txtstrm.h>
 #include <wx/filename.h>
 #include <wx/string.h>
 
-#include "../3D/OpenGLMaterial.h"
-#include "Selection.h"
 class Object {
 	// Constructor / Destructor
 public:

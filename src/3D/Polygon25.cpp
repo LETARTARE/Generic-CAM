@@ -27,9 +27,10 @@
 #include "Polygon25.h"
 
 #include <wx/log.h>
-#include <GL/gl.h>
+
 #include <float.h>
 #include <stdint.h>
+#include <GL/gl.h>
 
 Polygon25::Polygon25()
 {

@@ -28,6 +28,7 @@
 
 #include "../StdInclude.h"
 #include <wx/generic/choicdgg.h>
+#include <wx/stockitem.h>
 #include <cstdio>
 #include "../languages.h"
 #include "../project/ProjectView.h"

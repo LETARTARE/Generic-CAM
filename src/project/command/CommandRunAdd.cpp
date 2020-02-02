@@ -27,6 +27,7 @@
 #include "CommandRunAdd.h"
 
 #include "../Project.h"
+#include "../Selection.h"
 
 CommandRunAdd::CommandRunAdd(const wxString& name, Project* project,
 		wxString runName, size_t objID) :

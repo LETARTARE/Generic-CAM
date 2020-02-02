@@ -26,6 +26,8 @@
 
 #include "OpenGLImage.h"
 
+#include <GL/gl.h>
+
 OpenGLImage::OpenGLImage()
 {
 	refresh = true;

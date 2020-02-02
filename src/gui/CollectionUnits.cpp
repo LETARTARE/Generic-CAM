@@ -26,8 +26,6 @@
 
 #include "CollectionUnits.h"
 
-//#include <cmath>
-
 CollectionUnits::CollectionUnits()
 {
 	Time.Setup(_T("s"), _T("min"), (double) 60);

@@ -36,18 +36,20 @@
  */
 
 #include "../../StdInclude.h"
-#include <wx/panel.h>
-#include <wx/string.h>
-#include <wx/txtstrm.h>
-#include <stddef.h>
-#include <vector>
-#include <map>
 
 #include "../Object.h"
 #include "../Tool.h"
 #include "../Selection.h"
 #include "CNCPosition.h"
 #include "DexelTarget.h"
+
+#include <stddef.h>
+#include <vector>
+#include <map>
+
+#include <wx/string.h>
+#include <wx/txtstrm.h>
+#include <wx/panel.h>
 
 class Run;
 class CollectionUnits;

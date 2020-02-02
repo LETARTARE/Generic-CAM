@@ -1,3 +1,15 @@
+# Compiling on Windows (Visual Studio 2019)
+
+Start Visual Studio 2019.
+Check out the repository inside Visual Studios splash screen. Visual Studio registers the project as a CMAKE driven project.
+Wait till the imported projects fails. CMAKE reports a CMakeLists.txt:5 (find_package) error. This means,
+that the directories for the Libraries (wxWidgets and Lua) have not been set up.
+Now open the Project->CMAKE-Settings. After this failed attempt two extra vaiables have been set up here, that contain the value
+..._DIR-NOTFOUND. Direct these to to the directories, where wxWidgets_Dev was copied to and the Directory, where Lua was copied to.
+
+
+
+
 # Compiling and Cross-compiling projects
 
 All these instructions assume a native build on linux or for the cross

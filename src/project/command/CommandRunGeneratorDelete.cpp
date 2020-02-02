@@ -26,6 +26,9 @@
 
 #include "CommandRunGeneratorDelete.h"
 
+#include "../Project.h"
+#include "../generator/Generator.h"
+
 CommandRunGeneratorDelete::CommandRunGeneratorDelete(const wxString& name,
 		Project* project, size_t runID, size_t generatorID) :
 		wxCommand(true, name)
