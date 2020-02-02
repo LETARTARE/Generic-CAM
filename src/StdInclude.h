@@ -39,4 +39,12 @@
 //#include <wx/wx.h>
 #endif
 
+#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__)
+#define __WIN
+#elif defined(linux) || defined(__linux)
+#define __LINUX
+#else
+#error "Neither a Linux nor a Windows system was found!"
+#endif
+
 #endif /* STDINC_H_ */

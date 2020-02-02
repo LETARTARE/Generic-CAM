@@ -85,7 +85,9 @@
 #include <wx/filename.h>
 #include <wx/dir.h>
 #include <wx/splash.h>
+#ifdef __LINUX
 #include <unistd.h>
+#endif
 
 wxBEGIN_EVENT_TABLE(FrameMain, wxDocChildFrame) EVT_MENU(ID_TOGGLESTEREO3D, FrameMain::OnViewStereo3DToggle)
 EVT_MENU(ID_SETUPPATHS, FrameMain::OnPathSetup)
@@ -210,12 +212,12 @@ FrameParent* FrameMain::GetParentFrame(void)
 
 size_t FrameMain::GetFreeSystemMemory()
 {
-#ifdef __UNIX__
+#ifdef __LINUX
 	long pages = sysconf(_SC_AVPHYS_PAGES);
 	long page_size = sysconf(_SC_PAGE_SIZE);
 	return pages * page_size;
 #endif
-#ifdef __WIN__
+#ifdef __WIN
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);
 	GlobalMemoryStatusEx(&status);

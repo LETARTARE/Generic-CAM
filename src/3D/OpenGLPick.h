@@ -62,7 +62,7 @@
  * interface in this class.
  */
 
-#include <GL/gl.h>
+#include "OpenGL.h"
 
 class OpenGLPick {
 	friend class OpenGLCanvas;
