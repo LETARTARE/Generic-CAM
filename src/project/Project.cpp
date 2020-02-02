@@ -41,13 +41,16 @@
 
 #include <sstream>
 #include <iostream>
-#include <math.h>
 #include <float.h>
 #include <algorithm>
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
+#include <math.h>
 
 IMPLEMENT_DYNAMIC_CLASS(Project, wxDocument);
 
-#include <GL/gl.h>
+#include "../3D/OpenGL.h"
 
 Project::Project() :
 		wxDocument()

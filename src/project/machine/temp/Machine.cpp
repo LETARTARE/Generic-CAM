@@ -33,9 +33,9 @@
 #include <wx/zipstrm.h>
 #include <wx/textfile.h>
 #include <wx/log.h>
-#include <GL/gl.h>
 #include <float.h>
 #include <algorithm>
+#include "../../3D/OpenGL.h"
 
 Machine::Machine()
 {

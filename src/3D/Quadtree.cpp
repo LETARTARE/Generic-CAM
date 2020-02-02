@@ -29,12 +29,11 @@
 #include "Triangle.h"
 #include "Vector3.h"
 
-#include <GL/gl.h>
-
 #include <stddef.h>
-//#include <cmath>
-
+//#include <math.h>
 #include <wx/defs.h>
+
+#include "OpenGL.h"
 
 Quadtree::QuadtreeCell::QuadtreeCell()
 {

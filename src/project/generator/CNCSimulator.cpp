@@ -30,10 +30,9 @@
 
 #include <wx/textfile.h>
 
-#include <GL/gl.h>
-
 #include <iostream>
 #include <float.h>
+#include "../../3D/OpenGL.h"
 
 CNCSimulator::CNCSimulator()
 {

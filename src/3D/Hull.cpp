@@ -32,13 +32,15 @@
 #include "Triangle.h"
 
 #include <algorithm>
-#include <cmath>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
-
-#include <GL/gl.h>
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
+#include <math.h>
+#include "OpenGL.h"
 
 Hull::Edge::Edge()
 {

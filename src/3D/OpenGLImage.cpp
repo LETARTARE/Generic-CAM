@@ -26,7 +26,7 @@
 
 #include "OpenGLImage.h"
 
-#include <GL/gl.h>
+#include "OpenGL.h"
 
 OpenGLImage::OpenGLImage()
 {

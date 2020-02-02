@@ -34,8 +34,10 @@
 #include "FrameParent.h"
 
 #include <wx/event.h>
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
 #include <math.h>
-
 
 DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent) :
 		GUIObjectTransformation(parent)

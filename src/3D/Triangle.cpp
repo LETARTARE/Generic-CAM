@@ -27,10 +27,9 @@
 #include "Triangle.h"
 
 #include "AffineTransformMatrix.h"
-
 #include <wx/tokenzr.h>
-#include <cmath>
-#include <GL/gl.h>
+#include <math.h>
+#include "OpenGL.h"
 
 Triangle::Triangle()
 {

@@ -27,7 +27,10 @@
 #include "Direction.h"
 
 #include <float.h>
-//#include <cmath>
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
+#include <math.h>
 
 Direction::Direction()
 {

@@ -26,10 +26,9 @@
 
 #include "Octree.h"
 
-#include <GL/gl.h>
-
-#include <math.h>
 #include <stddef.h>
+#include <math.h>
+#include "OpenGL.h"
 
 OctreeCell::OctreeCell(bool isSolid)
 {

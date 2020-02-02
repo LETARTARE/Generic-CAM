@@ -26,11 +26,11 @@
 
 #include "Imprinter.h"
 
-#include <GL/gl.h>
-
 #include <float.h>
 #include <math.h>
 #include <cassert>
+
+#include "../../3D/OpenGL.h"
 
 ImprinterElement::ImprinterElement()
 {

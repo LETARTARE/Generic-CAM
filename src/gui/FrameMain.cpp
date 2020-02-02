@@ -71,6 +71,11 @@
 #include "../icon/logo128.xpm"
 #endif
 
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
+#include <math.h>
+
 #include <wx/msgdlg.h>
 #include <wx/progdlg.h>
 #include <wx/busyinfo.h>

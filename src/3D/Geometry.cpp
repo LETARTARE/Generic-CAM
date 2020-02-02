@@ -27,7 +27,7 @@
 #include "Geometry.h"
 
 #include <wx/log.h>
-#include <GL/gl.h>
+#include "OpenGL.h"
 
 Geometry::Geometry()
 {

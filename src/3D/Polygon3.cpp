@@ -31,7 +31,7 @@
 
 #include <algorithm>
 #include <float.h>
-#include <GL/gl.h>
+#include "OpenGL.h"
 
 
 Polygon3::Polygon3()

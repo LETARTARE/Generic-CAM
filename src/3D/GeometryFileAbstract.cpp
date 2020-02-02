@@ -26,7 +26,7 @@
 
 #include "GeometryFileAbstract.h"
 
-#include <GL/gl.h>
+#include "OpenGL.h"
 
 GeometryFileAbstract::GeometryFileAbstract()
 {

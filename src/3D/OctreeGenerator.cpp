@@ -28,7 +28,7 @@
 
 #include <stdint.h>
 #include <math.h>
-#include <GL/gl.h>
+#include "OpenGL.h"
 
 VectorInt64::VectorInt64()
 {

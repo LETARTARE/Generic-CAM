@@ -71,7 +71,6 @@
  */
 
 //#include <wx/chartype.h>
-#include <cmath>
 
 #include "../Config.h"
 
@@ -80,6 +79,11 @@
 #endif
 
 #include <string>
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
+#include <math.h>
+
 #include <wx/string.h> //TODO: Remove usage of wx/string.h
 
 class Unit {

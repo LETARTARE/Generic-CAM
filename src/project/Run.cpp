@@ -34,7 +34,8 @@
 #include <wx/log.h>
 #include <float.h>
 #include <assert.h>
-#include <GL/gl.h>
+
+#include "../3D/OpenGL.h"
 
 Run::Run()
 {

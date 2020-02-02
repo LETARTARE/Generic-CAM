@@ -30,7 +30,7 @@
 
 #include <float.h>
 #include <stdint.h>
-#include <GL/gl.h>
+#include "OpenGL.h"
 
 Polygon25::Polygon25()
 {

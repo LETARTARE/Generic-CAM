@@ -37,7 +37,7 @@
 
 #include <algorithm>
 
-#include <GL/gl.h>
+#include "../3D/OpenGL.h"
 
 Object::Object()
 {

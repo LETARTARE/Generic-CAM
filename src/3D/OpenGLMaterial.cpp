@@ -26,7 +26,7 @@
 
 #include "OpenGLMaterial.h"
 
-#include <GL/gl.h>
+#include "OpenGL.h"
 
 OpenGLMaterial::OpenGLMaterial()
 {

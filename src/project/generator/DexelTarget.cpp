@@ -31,10 +31,13 @@
 #include <wx/log.h>
 #include <wx/string.h>
 
-#include <math.h>
 #include <float.h>
 #include <stdint.h>
-#include <GL/gl.h>
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
+#include <math.h>
+#include "../../3D/OpenGL.h"
 
 DexelTarget::DexelTarget()
 {

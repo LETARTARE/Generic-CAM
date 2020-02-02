@@ -33,15 +33,22 @@
 
 #include <wx/dcclient.h>
 
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
+#include <math.h>
+
 #ifdef __WXMAC__
+#include "OpenGL/glext.h"
 #include "OpenGL/glu.h"
 //#include "OpenGL/gl.h"
-#include "OpenGL/glext.h"
 #else
-#include <GL/glext.h>
-#include <GL/glu.h>
-#include <GL/gl.h>
+//#include <GL/glext.h>
+//#include <GL/glu.h>
+//#include <GL/gl.h>
 #endif
+
+#include "OpenGL.h"
 
 static int wx_gl_attribs[] =
 	{WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24, 0};

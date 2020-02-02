@@ -37,17 +37,18 @@
 
 #ifdef __WIN
 #ifdef _MSC_VER
-//#define WIN32_LEAN_AND_MEAN
-//#include <windows.h>
-#include <GL/glut.h>
-#include <gl/glew.h>
-//#include <wx/msw/winundef.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <GL/GLU.h>
+#include <GL/GL.h>
 #else
+#include <GL/glu.h>
 #include <GL/gl.h>
 #endif
 #endif
 
 #ifdef __LINUX
+#include <GL/glu.h>
 #include <GL/gl.h>
 #endif
 

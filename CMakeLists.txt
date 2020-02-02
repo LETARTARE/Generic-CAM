@@ -27,7 +27,8 @@ add_subdirectory(src)
 
 if(MINGW)
 	add_executable(genericcam src/genericcam.cpp)
-	target_link_libraries(genericcam
+		target_link_libraries(
+		genericcam
 		gui
 		controller
 		project
@@ -38,11 +39,25 @@ if(MINGW)
 		opengl32
 		glu32
 #		lua53
-#		portmidi
+	)
+elseif(MSVC)
+	add_executable(genericcam src/genericcam.cpp)
+	target_link_libraries(
+		genericcam
+		gui
+		controller
+		project
+		3D
+		math
+		cppunittest
+		${wxWidgets_LIBRARIES}
+		OpenGL
+#		lua-5.3.5
 	)
 else(MINGW)
 	add_executable(genericcam src/genericcam.cpp)
-	target_link_libraries(genericcam
+	target_link_libraries(
+		genericcam
 		gui
 		controller
 		project
@@ -56,4 +71,3 @@ else(MINGW)
 #		portmidi
 	)
 endif(MINGW)
-
