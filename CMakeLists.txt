@@ -17,7 +17,7 @@ endif(MINGW)
 
 if(MSVC OR MINGW)
 	set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -DUNICODE")
-	set(wxWidgets_CONFIGURATION mswud)
+	set(wxWidgets_CONFIGURATION mswu)
 endif(MSVC OR MINGW)
 
 if(NOT MSVC)

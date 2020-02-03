@@ -185,13 +185,14 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 //	dialogToolbox = new DialogToolbox(this);
 //	dialogAnimation = new DialogAnimation(this);
 
-	wxAcceleratorEntry entries[5];
+	wxAcceleratorEntry entries[6];
 	entries[0].Set(0, WXK_F1, wxID_HELP);
 	entries[1].Set(wxACCEL_CTRL, (int) 'Z', wxID_UNDO);
 	entries[2].Set(wxACCEL_CTRL, (int) 'Y', wxID_REDO);
 	entries[3].Set(wxACCEL_CTRL, (int) 'Q', wxID_EXIT);
 	entries[4].Set(wxACCEL_CTRL, (int) '3', ID_TOGGLESTEREO3D);
-	wxAcceleratorTable accel(5, entries);
+	entries[5].Set(wxACCEL_NORMAL, WXK_F2, wxID_ABOUT);
+	wxAcceleratorTable accel(6, entries);
 	this->SetAcceleratorTable(accel);
 
 	TransferDataToWindow();

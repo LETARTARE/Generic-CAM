@@ -950,8 +950,9 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	wxStaticBoxSizer* sbSizerTool;
 	sbSizerTool = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow, wxID_ANY, _("Tool") ), wxVERTICAL );
 	
-	wxArrayString m_choiceToolChoices;
-	m_choiceTool = new wxChoice( sbSizerTool->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceToolChoices, 0 );
+	wxString m_choiceToolChoices[] = { _("-") };
+	int m_choiceToolNChoices = sizeof( m_choiceToolChoices ) / sizeof( wxString );
+	m_choiceTool = new wxChoice( sbSizerTool->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceToolNChoices, m_choiceToolChoices, 0 );
 	m_choiceTool->SetSelection( 0 );
 	sbSizerTool->Add( m_choiceTool, 0, wxALL|wxEXPAND, 5 );
 	
@@ -1237,8 +1238,9 @@ GUIPostProcess::GUIPostProcess( wxWindow* parent, wxWindowID id, const wxString&
 	wxBoxSizer* bSizerOpen;
 	bSizerOpen = new wxBoxSizer( wxHORIZONTAL );
 	
-	wxArrayString m_choiceSelectChoices;
-	m_choiceSelect = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceSelectChoices, 0 );
+	wxString m_choiceSelectChoices[] = { _("-") };
+	int m_choiceSelectNChoices = sizeof( m_choiceSelectChoices ) / sizeof( wxString );
+	m_choiceSelect = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceSelectNChoices, m_choiceSelectChoices, 0 );
 	m_choiceSelect->SetSelection( 0 );
 	bSizerOpen->Add( m_choiceSelect, 1, wxALL, 5 );
 	
@@ -1362,42 +1364,42 @@ GUISetupPaths::GUISetupPaths( wxWindow* parent, wxWindowID id, const wxString& t
 	m_staticTextProject->Wrap( -1 );
 	bSizer->Add( m_staticTextProject, 0, wxALL, 5 );
 	
-	m_dirPickerProjectDirectory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
+	m_dirPickerProjectDirectory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select project directory"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
 	bSizer->Add( m_dirPickerProjectDirectory, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticTextObjectDirectory = new wxStaticText( this, wxID_ANY, _("Objects are imported from:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextObjectDirectory->Wrap( -1 );
 	bSizer->Add( m_staticTextObjectDirectory, 0, wxALL, 5 );
 	
-	m_dirPickerObjectDirectory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
+	m_dirPickerObjectDirectory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select object directory"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
 	bSizer->Add( m_dirPickerObjectDirectory, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticTextToolpathDirectory = new wxStaticText( this, wxID_ANY, _("Output directory for exported NC toolpaths:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextToolpathDirectory->Wrap( -1 );
 	bSizer->Add( m_staticTextToolpathDirectory, 0, wxALL, 5 );
 	
-	m_dirPickerToolpathDirectory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
+	m_dirPickerToolpathDirectory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select toolpath output directory"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
 	bSizer->Add( m_dirPickerToolpathDirectory, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticTextToolboxDirectory = new wxStaticText( this, wxID_ANY, _("Tool libraries:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextToolboxDirectory->Wrap( -1 );
 	bSizer->Add( m_staticTextToolboxDirectory, 0, wxALL, 5 );
 	
-	m_dirPickerToolboxDirectory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
+	m_dirPickerToolboxDirectory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select toolbox directory"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
 	bSizer->Add( m_dirPickerToolboxDirectory, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticTextPostProcessorDirectory = new wxStaticText( this, wxID_ANY, _("Post-Processors:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextPostProcessorDirectory->Wrap( -1 );
 	bSizer->Add( m_staticTextPostProcessorDirectory, 0, wxALL, 5 );
 	
-	m_dirPickerPostProcessorDirectory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
+	m_dirPickerPostProcessorDirectory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select post-processor directory"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
 	bSizer->Add( m_dirPickerPostProcessorDirectory, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticTextMachineDirectory = new wxStaticText( this, wxID_ANY, _("Machine models:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextMachineDirectory->Wrap( -1 );
 	bSizer->Add( m_staticTextMachineDirectory, 0, wxALL, 5 );
 	
-	m_dirPickerMachineDirectory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
+	m_dirPickerMachineDirectory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select machine-model directory"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
 	bSizer->Add( m_dirPickerMachineDirectory, 0, wxALL|wxEXPAND, 5 );
 	
 	m_buttonClose = new wxButton( this, wxID_CLOSE, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -2986,7 +2988,7 @@ GUIMachineControl::~GUIMachineControl()
 GUISetupUnits::GUISetupUnits( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BACKGROUND ) );
+	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 	
 	wxBoxSizer* bSizer;
 	bSizer = new wxBoxSizer( wxVERTICAL );
@@ -3196,47 +3198,4 @@ GUISetupMidi::~GUISetupMidi()
 	m_buttonClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUISetupMidi::OnClose ), NULL, this );
 	m_textCtrlReceived->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( GUISetupMidi::OnClear ), NULL, this );
 	
-}
-
-GUIDialogAbout::GUIDialogAbout( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
-{
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
-	wxBoxSizer* bSizer;
-	bSizer = new wxBoxSizer( wxVERTICAL );
-	
-	m_textCtrl = new wxTextCtrl( this, wxID_ANY, _("Generic CAM  Copyright (C) 2010 - 2017 Tobias Schaefer\n\nFrench translation & additional debugging: Jacques-Louis Tartarin\nItalian Translation: Sandro Dalle Nogare\n\nLicence for Generic CAM:\nGNU General Public License version 3.0 (GPLv3)\n\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it under certain conditions.\n\nYou should have received a copy of the GNU General Public License along with this program.\nIf not, see <http://www.gnu.org/licenses/>."), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_WORDWRAP );
-	bSizer->Add( m_textCtrl, 1, wxALL|wxEXPAND, 5 );
-	
-	m_buttonClose = new wxButton( this, wxID_OK, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer->Add( m_buttonClose, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	
-	this->SetSizer( bSizer );
-	this->Layout();
-	
-	this->Centre( wxBOTH );
-}
-
-GUIDialogAbout::~GUIDialogAbout()
-{
-}
-
-StartupText::StartupText( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
-{
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
-	wxBoxSizer* bSizer;
-	bSizer = new wxBoxSizer( wxVERTICAL );
-	
-	m_richText = new wxRichTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxVSCROLL|wxHSCROLL|wxNO_BORDER|wxWANTS_CHARS );
-	bSizer->Add( m_richText, 1, wxALL|wxEXPAND, 5 );
-	
-	
-	this->SetSizer( bSizer );
-	this->Layout();
-}
-
-StartupText::~StartupText()
-{
 }

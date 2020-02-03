@@ -58,7 +58,6 @@
 #include <wx/menu.h>
 #include "CanvasMachine.h"
 #include <wx/listbox.h>
-#include <wx/richtext/richtextctrl.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -963,42 +962,6 @@ class GUISetupMidi : public wxFrame
 		GUISetupMidi( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup MIDI Connection"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 620,482 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
 		
 		~GUISetupMidi();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class GUIDialogAbout
-///////////////////////////////////////////////////////////////////////////////
-class GUIDialogAbout : public wxDialog 
-{
-	private:
-	
-	protected:
-		wxTextCtrl* m_textCtrl;
-		wxButton* m_buttonClose;
-	
-	public:
-		
-		GUIDialogAbout( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 504,373 ), long style = wxCAPTION|wxCLOSE_BOX|wxRESIZE_BORDER|wxSTAY_ON_TOP ); 
-		~GUIDialogAbout();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class StartupText
-///////////////////////////////////////////////////////////////////////////////
-class StartupText : public wxFrame 
-{
-	private:
-	
-	protected:
-	
-	public:
-		wxRichTextCtrl* m_richText;
-		
-		StartupText( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Release Info"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 629,481 ), long style = wxCAPTION|wxCLOSE_BOX|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
-		
-		~StartupText();
 	
 };
 

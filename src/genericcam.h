@@ -29,13 +29,12 @@
 
 #include "StdInclude.h"
 
-#include "gui/FrameMain.h"
-
 #include <wx/cmdline.h>
 #include <wx/string.h>
 #include <wx/app.h>
 #include <wx/intl.h>
 #include <wx/config.h>
+#include <wx/docview.h>
 
 class GenericCAMApp:public wxApp {
 public:

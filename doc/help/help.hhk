@@ -1,7 +1,41 @@
-<ul><!--> Index </!-->
-<li><object type="text/sitemap"><param name="Name" value="Router"><param name="Local" value="index.html"></object></li>
-<li><object type="text/sitemap"><param name="Name" value="Flute"><param name="Local" value="?"></object></li>
-<li><object type="text/sitemap"><param name="Name" value="CNC"><param name="Local" value="?"></object></li>
-<li><object type="text/sitemap"><param name="Name" value="Robot"><param name="Local" value="?"></object></li>
-<li><object type="text/sitemap"><param name="Name" value="Blender"><param name="Local" value="?"></object></li>
-</ul>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+
+<html>
+<head>
+  <meta name="generator" content=
+  "HTML Tidy for Linux (vers 25 March 2009), see www.w3.org">
+
+  <title></title>
+</head>
+
+<body>
+  <ul>
+    <!--> Index </!-->
+
+    <li><object type="text/sitemap">
+      <param name="Name" value="Router">
+      <param name="Local" value="index.html">
+    </object></li>
+
+    <li><object type="text/sitemap">
+      <param name="Name" value="Flute">
+      <param name="Local" value="?">
+    </object></li>
+
+    <li><object type="text/sitemap">
+      <param name="Name" value="CNC">
+      <param name="Local" value="?">
+    </object></li>
+
+    <li><object type="text/sitemap">
+      <param name="Name" value="Robot">
+      <param name="Local" value="?">
+    </object></li>
+
+    <li><object type="text/sitemap">
+      <param name="Name" value="Blender">
+      <param name="Local" value="?">
+    </object></li>
+  </ul>
+</body>
+</html>

@@ -50,7 +50,7 @@
 									<listOptionValue builtIn="false" value="lua5.3"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1318683508" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths"/>
-								<option id="gnu.cpp.link.option.flags.284247766" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="`wx-config --libs richtext,gl,core,base,html,xml,adv,ribbon,propgrid`" valueType="string"/>
+								<option id="gnu.cpp.link.option.flags.284247766" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="`wx-config --libs gl,core,base,html,xml,adv,ribbon,propgrid`" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1271724444" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

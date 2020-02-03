@@ -26,15 +26,14 @@
 
 #include "genericcam.h"
 
-#include "gui/FrameParent.h"
-
-#include "languages.h"
-
-//#include "wx/richtext/richtextxml.h"
-#include <wx/splash.h>
 #include "Config.h"
+#include "languages.h"
+#include "gui/FrameParent.h"
+#include "gui/FrameMain.h"
+#include "project/Project.h"
 #include "project/ProjectView.h"
 #include "test/test.h"
+#include <wx/splash.h>
 
 #if wxUSE_DEBUG_CONTEXT == 1
 #include  <wx/memory.h>
@@ -159,12 +158,6 @@ bool GenericCAMApp::OnInit()
 				6000, parent, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 				wxSIMPLE_BORDER | wxSTAY_ON_TOP);
 	}
-
-//	wxRichTextBuffer::AddHandler(new wxRichTextXMLHandler);
-//	StartupText * temp = new StartupText(frame);
-//	temp->m_richText->LoadFile(_T("releasenote.xml"), wxRICHTEXT_TYPE_XML);
-	//	temp->Show();
-
 	return true;
 }
 

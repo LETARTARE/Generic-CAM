@@ -34,7 +34,8 @@
  */
 
 #include <wx/config.h>
-#include "../3D/OpenGLCanvas.h"
+
+class OpenGLCanvas;
 
 class SettingsStereo3D {
 public:
