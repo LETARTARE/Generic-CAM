@@ -85,7 +85,7 @@ bool ProjectView::OnClose(bool deleteWindow)
 	wxList tempDocs = manager->GetDocuments();
 	wxList tempViews = doc->GetViews();
 
-	printf("ProjectView: %lu docs, %lu views\n", tempDocs.GetCount(),
+	printf("ProjectView: %zu docs, %zu views\n", tempDocs.GetCount(),
 			tempViews.GetCount());
 
 	if(!wxView::OnClose(deleteWindow)) return false;
@@ -320,12 +320,15 @@ void ProjectView::RenderCoordinateSystem(void) const
 	GLfloat n = sqrt(2.0);
 	GLfloat d = s / 10;
 
-	OpenGLMaterial::EnableColors();
+	OpenGLMaterial matX(0.8, 0.0, 0.0, 0.8);
+	OpenGLMaterial matY(0.0, 0.8, 0.0, 0.8);
+	OpenGLMaterial matZ(0.0, 0.0, 0.8, 0.8);
+
 	glPushName(Selection::Axis);
 	glPushName(0);
-	glBegin(GL_LINES);
 
-	glColor3f(1.0, 0, 0);
+	matX.UseMaterial();
+	glBegin(GL_LINES);
 	glNormal3f(-s, 0, 0);
 	glVertex3f(-s, 0, 0);
 	glNormal3f(s, 0, 0);
@@ -346,9 +349,9 @@ void ProjectView::RenderCoordinateSystem(void) const
 
 	glEnd();
 	glLoadName(1);
-	glBegin(GL_LINES);
 
-	glColor3f(0, 1.0, 0);
+	matY.UseMaterial();
+	glBegin(GL_LINES);
 	glNormal3f(0, -s, 0);
 	glVertex3f(0, -s, 0);
 	glNormal3f(0, s, 0);
@@ -369,9 +372,9 @@ void ProjectView::RenderCoordinateSystem(void) const
 
 	glEnd();
 	glLoadName(2);
-	glBegin(GL_LINES);
 
-	glColor3f(0, 0, 1.0);
+	matZ.UseMaterial();
+	glBegin(GL_LINES);
 	glNormal3f(0, 0, -s);
 	glVertex3f(0, 0, -s);
 	glNormal3f(0, 0, s);

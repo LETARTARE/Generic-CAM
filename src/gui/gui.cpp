@@ -715,7 +715,7 @@ GUIJobSetup::GUIJobSetup( wxWindow* parent, wxWindowID id, const wxString& title
 	m_panelObject->SetSizer( bSizerObject );
 	m_panelObject->Layout();
 	bSizerObject->Fit( m_panelObject );
-	m_notebook->AddPage( m_panelObject, _("Object"), false );
+	m_notebook->AddPage( m_panelObject, _("Object"), true );
 	m_panelCoordinates = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizerCoordinates;
 	bSizerCoordinates = new wxBoxSizer( wxVERTICAL );
@@ -841,7 +841,7 @@ GUIJobSetup::GUIJobSetup( wxWindow* parent, wxWindowID id, const wxString& title
 	m_panelStock->SetSizer( bSizerStock );
 	m_panelStock->Layout();
 	bSizerStock->Fit( m_panelStock );
-	m_notebook->AddPage( m_panelStock, _("Stock"), true );
+	m_notebook->AddPage( m_panelStock, _("Stock"), false );
 	m_panelOrigin = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizerOrigin;
 	bSizerOrigin = new wxBoxSizer( wxVERTICAL );
@@ -945,7 +945,7 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	sbSizerGeometry->Add( m_buttonSelectGeometry, 0, wxALL, 5 );
 	
 	
-	bSizerScrolled->Add( sbSizerGeometry, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizerScrolled->Add( sbSizerGeometry, 0, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizerTool;
 	sbSizerTool = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow, wxID_ANY, _("Tool") ), wxVERTICAL );
@@ -1164,7 +1164,7 @@ GUIAnimation::GUIAnimation( wxWindow* parent, wxWindowID id, const wxString& tit
 	bSizerButtons->Add( m_bpButtonLast, 0, 0, 5 );
 	
 	
-	bSizerTime->Add( bSizerButtons, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizerTime->Add( bSizerButtons, 0, 0, 5 );
 	
 	
 	bSizerTime->Add( 0, 0, 1, wxEXPAND, 5 );
@@ -1530,7 +1530,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_panelTool->SetSizer( bSizerPanelTool );
 	m_panelTool->Layout();
 	bSizerPanelTool->Fit( m_panelTool );
-	m_notebook->AddPage( m_panelTool, _("Tool"), false );
+	m_notebook->AddPage( m_panelTool, _("Tool"), true );
 	m_panelGeometry = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizerPanelGeometry;
 	bSizerPanelGeometry = new wxBoxSizer( wxVERTICAL );
@@ -2344,7 +2344,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_panelFeedsSpeeds->SetSizer( bSizerPanelFeedsSpeeds );
 	m_panelFeedsSpeeds->Layout();
 	bSizerPanelFeedsSpeeds->Fit( m_panelFeedsSpeeds );
-	m_notebook->AddPage( m_panelFeedsSpeeds, _("Feeds&&\nSpeeds"), true );
+	m_notebook->AddPage( m_panelFeedsSpeeds, _("Feeds&&\nSpeeds"), false );
 	m_panelPostprocess = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizerPanelPostProcess;
 	bSizerPanelPostProcess = new wxBoxSizer( wxVERTICAL );

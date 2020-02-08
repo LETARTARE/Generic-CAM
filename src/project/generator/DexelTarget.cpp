@@ -33,10 +33,12 @@
 
 #include <float.h>
 #include <stdint.h>
+
 #ifdef _MSC_VER
 #define _USE_MATH_DEFINES
 #endif
 #include <math.h>
+#include "../../3D/OpenGLMaterial.h"
 #include "../../3D/OpenGL.h"
 
 DexelTarget::DexelTarget()
@@ -195,6 +197,7 @@ void DexelTarget::DocumentField(int x, int y)
 
 void DexelTarget::Paint(void) const
 {
+	OpenGLMaterial::EnableColors();
 	Imprinter::Paint();
 	::glColor3f(colorNormal.x, colorNormal.y, colorNormal.z);
 //	toolpath.Paint();

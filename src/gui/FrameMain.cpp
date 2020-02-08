@@ -755,7 +755,7 @@ void FrameMain::OnClose(wxCloseEvent& event)
 //	Project* project = wxStaticCast(doc, Project);
 //	project->StopAllThreads();
 
-	printf("FrameMain: %lu docs, %lu views\n", tempDocs.GetCount(),
+	printf("FrameMain: %zu docs, %zu views\n", tempDocs.GetCount(),
 			tempViews.GetCount());
 
 	if(tempDocs.GetCount() > 1){

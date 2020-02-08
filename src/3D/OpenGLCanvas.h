@@ -131,7 +131,6 @@ public:
 #endif
 
 protected:
-	virtual void Init(void);
 	virtual void Render(void);
 	virtual void RenderPick(void);
 

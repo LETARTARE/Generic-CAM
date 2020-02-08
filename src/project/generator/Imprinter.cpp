@@ -30,6 +30,7 @@
 #include <math.h>
 #include <cassert>
 
+#include "../../3D/OpenGLMaterial.h"
 #include "../../3D/OpenGL.h"
 
 ImprinterElement::ImprinterElement()
@@ -294,6 +295,8 @@ void Imprinter::Paint() const
 		displayListGenerated = true;
 		refresh = true;
 	}
+
+	OpenGLMaterial::EnableColors();
 
 	const double rx2 = rx / 2.0;
 	const double ry2 = ry / 2.0;
