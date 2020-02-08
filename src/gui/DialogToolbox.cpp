@@ -63,28 +63,33 @@ DialogToolbox::~DialogToolbox()
 
 void DialogToolbox::Update(void)
 {
-	if(!toolboxes.empty()) return;
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
-	wxDir dir(frame->filepaths.lastToolboxDirectory);
-	if(dir.IsOpened()){
-		wxString filename;
-		bool cont = dir.GetFirst(&filename, _T("*.json"));
-		while(cont){
-			wxString fullfilename = dir.GetNameWithSep() + filename;
-			if(filename.CmpNoCase(_T("local.json")) == 0){
-				if(!localtoolbox.IsLoaded()) localtoolbox.Load(
-						fullfilename.ToStdString());
-			}else{
-				ToolBox temp;
-				temp.filename = fullfilename.ToStdString();
-				toolboxes.push_back(temp);
+	if(toolboxes.empty()){
+		wxDir dir(frame->filepaths.lastToolboxDirectory);
+		if(dir.IsOpened()){
+			wxString filename;
+			bool cont = dir.GetFirst(&filename, _T("*.json"));
+			while(cont){
+				wxString fullfilename = dir.GetNameWithSep() + filename;
+				if(filename.CmpNoCase(_T("local.json")) == 0){
+					if(!localtoolbox.IsLoaded()) localtoolbox.Load(
+							fullfilename.ToStdString());
+				}else{
+					ToolBox temp;
+					temp.filename = fullfilename.ToStdString();
+					toolboxes.push_back(temp);
+				}
+				cont = dir.GetNext(&filename);
 			}
-			cont = dir.GetNext(&filename);
 		}
 	}
 
 	wxTreeListItem root = m_treeListCtrl->GetRootItem();
+
+	if(projectfolder.IsOk()){
+		return;
+	}
 	projectfolder = m_treeListCtrl->AppendItem(root, _("Project"), 1, 2);
 
 	const std::vector <Tool> * temptools = project->GetTools();
@@ -102,14 +107,14 @@ void DialogToolbox::Update(void)
 
 	localtoolboxfolder = m_treeListCtrl->AppendItem(root, _("Local toolbox"), 1,
 			2);
-	m_treeListCtrl->AppendItem(localtoolboxfolder, _T("dummy"), 0, 0);
+	m_treeListCtrl->AppendItem(localtoolboxfolder, _T("loading..."), 0, 0);
 	m_treeListCtrl->Collapse(localtoolboxfolder);
 
 	for(std::vector <ToolBox>::const_iterator it = toolboxes.begin();
 			it != toolboxes.end(); ++it){
 		wxTreeListItem temp = m_treeListCtrl->AppendItem(root,
 				wxString(it->GetName()), 1, 2);
-		m_treeListCtrl->AppendItem(temp, _T("dummy"), 0, 0);
+		m_treeListCtrl->AppendItem(temp, _T("loading..."), 0, 0);
 		m_treeListCtrl->Collapse(temp);
 		toolboxfolders.push_back(temp);
 	}

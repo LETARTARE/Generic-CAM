@@ -233,8 +233,7 @@ void OpenGLImage::Paint(void) const
 
 	glColor3f(1, 1, 1);
 	glEnable(GL_TEXTURE_2D);
-#ifdef __LINUX
-	//TODO: Check if mingw32 can compile for anything higher than OPENGL_1_1
+#ifdef GL_VERSION_1_2
 	glActiveTexture(GL_TEXTURE0);
 #endif
 	glBindTexture(GL_TEXTURE_2D, textureID);

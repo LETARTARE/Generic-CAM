@@ -1,34 +1,40 @@
 cmake_minimum_required(VERSION 2.8)
 
 project(genericcam)
+#enable_language(CXX)
 
-find_package(wxWidgets COMPONENTS richtext gl core base html xml adv ribbon propgrid REQUIRED)
+find_package(wxWidgets COMPONENTS gl core base html xml adv ribbon propgrid REQUIRED)
 include(${wxWidgets_USE_FILE})
+
 
 if(MINGW)
 #	set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -I/usr/local/i586-mingw32/include")
-endif(MINGW)
-
-if(MINGW)
 #	include_directories( "/usr/local/i586-mingw32/include/lua5.3" )
-else(MINGW)
-#	include_directories( "/usr/include/lua5.3" )
-endif(MINGW)
+	set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -Wno-write-strings")
 
-if(MSVC OR MINGW)
 	set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -DUNICODE")
 	set(wxWidgets_CONFIGURATION mswu)
-endif(MSVC OR MINGW)
+	
+elseif(MSVC)
+	set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} /wd4018 /wd4305 /wd4996")
 
-if(NOT MSVC)
+	set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -DUNICODE")
+	set(wxWidgets_CONFIGURATION mswu)
+	
+else(MINGW)
 	set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -Wno-write-strings")
-endif(NOT MSVC)
+	
+#	include_directories( "/usr/include/lua5.3" )
+	
+endif(MINGW)
+
 
 add_subdirectory(src)
 
+
 if(MINGW)
 	add_executable(genericcam src/genericcam.cpp)
-		target_link_libraries(
+	target_link_libraries(
 		genericcam
 		gui
 		controller
@@ -41,6 +47,7 @@ if(MINGW)
 		glu32
 #		lua53
 	)
+	
 elseif(MSVC)
 	add_executable(genericcam WIN32 src/genericcam.cpp)
 	target_link_libraries(
@@ -55,6 +62,7 @@ elseif(MSVC)
 #		OpenGL
 #		lua-5.3.5
 	)
+	
 else(MINGW)
 	add_executable(genericcam src/genericcam.cpp)
 	target_link_libraries(
@@ -71,4 +79,5 @@ else(MINGW)
 #		lua5.3
 #		portmidi
 	)
+	
 endif(MINGW)

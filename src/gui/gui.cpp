@@ -715,7 +715,7 @@ GUIJobSetup::GUIJobSetup( wxWindow* parent, wxWindowID id, const wxString& title
 	m_panelObject->SetSizer( bSizerObject );
 	m_panelObject->Layout();
 	bSizerObject->Fit( m_panelObject );
-	m_notebook->AddPage( m_panelObject, _("Object"), true );
+	m_notebook->AddPage( m_panelObject, _("Object"), false );
 	m_panelCoordinates = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizerCoordinates;
 	bSizerCoordinates = new wxBoxSizer( wxVERTICAL );
@@ -841,7 +841,7 @@ GUIJobSetup::GUIJobSetup( wxWindow* parent, wxWindowID id, const wxString& title
 	m_panelStock->SetSizer( bSizerStock );
 	m_panelStock->Layout();
 	bSizerStock->Fit( m_panelStock );
-	m_notebook->AddPage( m_panelStock, _("Stock"), false );
+	m_notebook->AddPage( m_panelStock, _("Stock"), true );
 	m_panelOrigin = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizerOrigin;
 	bSizerOrigin = new wxBoxSizer( wxVERTICAL );
@@ -942,10 +942,10 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	sbSizerGeometry->Add( m_textCtrlGeometry, 0, wxALL|wxEXPAND, 5 );
 	
 	m_buttonSelectGeometry = new wxButton( sbSizerGeometry->GetStaticBox(), ID_SELECTAREAOBJECT, _("Select ..."), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizerGeometry->Add( m_buttonSelectGeometry, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerGeometry->Add( m_buttonSelectGeometry, 0, wxALL, 5 );
 	
 	
-	bSizerScrolled->Add( sbSizerGeometry, 0, wxEXPAND, 5 );
+	bSizerScrolled->Add( sbSizerGeometry, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxStaticBoxSizer* sbSizerTool;
 	sbSizerTool = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow, wxID_ANY, _("Tool") ), wxVERTICAL );
@@ -973,7 +973,7 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	
 	m_staticTextSpindle = new wxStaticText( sbSizerSpeeds->GetStaticBox(), wxID_ANY, _("Spindle-speed:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextSpindle->Wrap( -1 );
-	fgSizerSpeeds->Add( m_staticTextSpindle, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	fgSizerSpeeds->Add( m_staticTextSpindle, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxALL, 5 );
 	
 	m_textCtrlSpindle = new wxTextCtrl( sbSizerSpeeds->GetStaticBox(), ID_SPEED, _("from tool"), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	fgSizerSpeeds->Add( m_textCtrlSpindle, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
@@ -1457,7 +1457,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	
 	m_staticText81 = new wxStaticText( m_scrolledWindowType, wxID_ANY, _("Description:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText81->Wrap( -1 );
-	bSizer65->Add( m_staticText81, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
+	bSizer65->Add( m_staticText81, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
 	
 	m_textCtrlShaftDiameter2 = new wxTextCtrl( m_scrolledWindowType, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	m_textCtrlShaftDiameter2->SetToolTip( _("Diameter of the part that disappears inside the chuck.") );
@@ -1466,7 +1466,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	
 	m_staticText101 = new wxStaticText( m_scrolledWindowType, wxID_ANY, _("Vendor:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText101->Wrap( -1 );
-	bSizer65->Add( m_staticText101, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
+	bSizer65->Add( m_staticText101, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
 	
 	m_textCtrlShaftLength1 = new wxTextCtrl( m_scrolledWindowType, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	m_textCtrlShaftLength1->SetToolTip( _("This is the length of the that disappears inside the chuck.") );
@@ -1475,7 +1475,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	
 	m_staticText131 = new wxStaticText( m_scrolledWindowType, wxID_ANY, _("GUID:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText131->Wrap( -1 );
-	bSizer65->Add( m_staticText131, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
+	bSizer65->Add( m_staticText131, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
 	
 	m_textCtrlMaxSpeed1 = new wxTextCtrl( m_scrolledWindowType, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	m_textCtrlMaxSpeed1->SetToolTip( _("Max. speed: Look at label on box you got the tools shipped in.") );
@@ -1484,7 +1484,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	
 	m_staticText141 = new wxStaticText( m_scrolledWindowType, wxID_ANY, _("Product ID:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText141->Wrap( -1 );
-	bSizer65->Add( m_staticText141, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
+	bSizer65->Add( m_staticText141, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
 	
 	m_textCtrlFeedCoefficient1 = new wxTextCtrl( m_scrolledWindowType, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	m_textCtrlFeedCoefficient1->SetToolTip( _("Feed per tooth: How deep can a tooth cut per revolution. Usually in the range of 0.02 mm to 0.05 mm.") );
@@ -1493,7 +1493,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	
 	m_staticTextFlutes1 = new wxStaticText( m_scrolledWindowType, wxID_ANY, _("Product link:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextFlutes1->Wrap( -1 );
-	bSizer65->Add( m_staticTextFlutes1, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
+	bSizer65->Add( m_staticTextFlutes1, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
 	
 	m_textCtrlNrOfTeeth1 = new wxTextCtrl( m_scrolledWindowType, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	m_textCtrlNrOfTeeth1->SetToolTip( _("Number of teeth around the cutter.") );
@@ -1530,7 +1530,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_panelTool->SetSizer( bSizerPanelTool );
 	m_panelTool->Layout();
 	bSizerPanelTool->Fit( m_panelTool );
-	m_notebook->AddPage( m_panelTool, _("Tool"), true );
+	m_notebook->AddPage( m_panelTool, _("Tool"), false );
 	m_panelGeometry = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizerPanelGeometry;
 	bSizerPanelGeometry = new wxBoxSizer( wxVERTICAL );
@@ -1906,16 +1906,16 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	bSizerHolderButtons = new wxBoxSizer( wxHORIZONTAL );
 	
 	m_buttonShapeNew1 = new wxButton( m_panelHolder, wxID_ANY, _("New"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizerHolderButtons->Add( m_buttonShapeNew1, 0, wxALL, 5 );
+	bSizerHolderButtons->Add( m_buttonShapeNew1, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
 	
 	m_buttonShapeUpdate1 = new wxButton( m_panelHolder, wxID_ANY, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizerHolderButtons->Add( m_buttonShapeUpdate1, 0, wxALL, 5 );
+	bSizerHolderButtons->Add( m_buttonShapeUpdate1, 0, wxTOP|wxBOTTOM, 5 );
 	
 	m_buttonShapeDelete1 = new wxButton( m_panelHolder, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizerHolderButtons->Add( m_buttonShapeDelete1, 0, wxALL, 5 );
+	bSizerHolderButtons->Add( m_buttonShapeDelete1, 0, wxTOP|wxBOTTOM|wxRIGHT, 5 );
 	
 	
-	bSizerHolder->Add( bSizerHolderButtons, 0, wxEXPAND, 5 );
+	bSizerHolder->Add( bSizerHolderButtons, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxStaticBoxSizer* sbSizer241;
 	sbSizer241 = new wxStaticBoxSizer( new wxStaticBox( m_panelHolder, wxID_ANY, _("Segment") ), wxVERTICAL );
@@ -1994,16 +1994,16 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	bSizerShaftButtons = new wxBoxSizer( wxHORIZONTAL );
 	
 	m_buttonShapeNew = new wxButton( m_panelShaft, wxID_ANY, _("New"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizerShaftButtons->Add( m_buttonShapeNew, 0, wxALL, 5 );
+	bSizerShaftButtons->Add( m_buttonShapeNew, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
 	
 	m_buttonShapeUpdate = new wxButton( m_panelShaft, wxID_ANY, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizerShaftButtons->Add( m_buttonShapeUpdate, 0, wxALL, 5 );
+	bSizerShaftButtons->Add( m_buttonShapeUpdate, 0, wxTOP|wxBOTTOM, 5 );
 	
 	m_buttonShapeDelete = new wxButton( m_panelShaft, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizerShaftButtons->Add( m_buttonShapeDelete, 0, wxALL, 5 );
+	bSizerShaftButtons->Add( m_buttonShapeDelete, 0, wxTOP|wxBOTTOM|wxRIGHT, 5 );
 	
 	
-	bSizerPanelShaft->Add( bSizerShaftButtons, 0, wxEXPAND, 5 );
+	bSizerPanelShaft->Add( bSizerShaftButtons, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxStaticBoxSizer* sbSizer24;
 	sbSizer24 = new wxStaticBoxSizer( new wxStaticBox( m_panelShaft, wxID_ANY, _("Segment") ), wxVERTICAL );
@@ -2090,7 +2090,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	
 	m_staticTextTipDiameter11 = new wxStaticText( sbSizer271->GetStaticBox(), wxID_ANY, _("Name:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextTipDiameter11->Wrap( -1 );
-	fgSizerParameter11->Add( m_staticTextTipDiameter11, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
+	fgSizerParameter11->Add( m_staticTextTipDiameter11, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	
 	fgSizerParameter11->Add( 0, 0, 1, wxEXPAND, 5 );
@@ -2344,7 +2344,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_panelFeedsSpeeds->SetSizer( bSizerPanelFeedsSpeeds );
 	m_panelFeedsSpeeds->Layout();
 	bSizerPanelFeedsSpeeds->Fit( m_panelFeedsSpeeds );
-	m_notebook->AddPage( m_panelFeedsSpeeds, _("Feeds&&\nSpeeds"), false );
+	m_notebook->AddPage( m_panelFeedsSpeeds, _("Feeds&&\nSpeeds"), true );
 	m_panelPostprocess = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizerPanelPostProcess;
 	bSizerPanelPostProcess = new wxBoxSizer( wxVERTICAL );

@@ -6,9 +6,7 @@
 # make
 #
 
-# this one is important
 SET(CMAKE_SYSTEM_NAME Windows)
-#this one not so much
 SET(CMAKE_SYSTEM_VERSION 1)
 
 set(CMAKE_C_COMPILER_WORKS 1)
@@ -18,7 +16,6 @@ set(CMAKE_CXX_COMPILER_WORKS 1)
 SET(CMAKE_C_COMPILER   i686-w64-mingw32-gcc)
 SET(CMAKE_CXX_COMPILER i686-w64-mingw32-g++)
 SET(CMAKE_RC_COMPILER  i686-w64-mingw32-windres)
-
 
 #SET(wxWidgets_ROOT_DIR /usr/bin/i686-w64-mingw32)
 SET(wxWidgets_CONFIG_EXECUTABLE ${wxWidgets_ROOT_DIR}/bin/wx-config)
@@ -34,4 +31,3 @@ include_directories(SYSTEM ${wxWidgets_ROOT_DIR}/include)
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM FIRST)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-

@@ -260,10 +260,12 @@ void OpenGLCanvas::Init(void)
 	glEnable(GL_BLEND);
 	glEnable(GL_POINT_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
-#if defined (__WIN32__)
-	glEnable(GL_NORMALIZE);
-#else
+#ifdef GL_VERSION_1_2
+	// Use RESCALE_NORMAL in OpenGL 1.2 or higher
 	glEnable(GL_RESCALE_NORMAL);
+#else
+	// Fallback for OpenGL 1.1
+	glEnable(GL_NORMALIZE);
 #endif
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
@@ -310,9 +312,9 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 		context = new Context(this);
 		context->SetCurrent(*this); // Link OpenGL to this area
 		Init();
+	}else{
+		context->SetCurrent(*this); // Link OpenGL to this area
 	}
-	context->SetCurrent(*this); // Link OpenGL to this area
-
 	// set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
 
 	GetClientSize(&w, &h);
@@ -329,9 +331,7 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Background
-
 	if(stereoMode == stereoAnaglyph){
-		glEnable(GL_COLOR_MATERIAL);
 		glColor3ub(backgroundGrayLevel, backgroundGrayLevel,
 				backgroundGrayLevel);
 		glDisable(GL_COLOR_MATERIAL);
