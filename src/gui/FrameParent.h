@@ -80,14 +80,12 @@ public:
 
 	void OnTimer(wxTimerEvent& event);
 
-	void OnAbout(wxCommandEvent& WXUNUSED(event));
 	void OnHelp(wxCommandEvent& WXUNUSED(event));
 
 public:
 	wxConfig* config;
 
-	wxLogWindow* logWindow;
-	wxHelpController* m_helpController;
+	wxLogWindow* logWindow;wxHelpController* m_helpController;
 	DialogSetupStereo3D * dialogSetupStereo3D;
 	SettingsStereo3D settingsStereo3D;
 	CollectionUnits units;
@@ -96,8 +94,8 @@ public:
 	Control3D control;
 #endif
 #ifdef _USE_MIDI
-	DialogSetupMidi* dialogSetupMidi;
 	MidiPort midi;
+	DialogSetupMidi* dialogSetupMidi;
 #endif
 
 	wxTimer timer; ///> Animation timer

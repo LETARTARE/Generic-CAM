@@ -25,12 +25,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "DialogMachineControl.h"
+#include "DialogMachineDebugger.h"
+
 #include "IDs.h"
-
-#include <math.h>
-
 #include "FrameMain.h"
 #include "FrameParent.h"
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
+#include <math.h>
 
 DialogMachineControl::DialogMachineControl(wxWindow* parent) :
 		GUIMachineControl(parent)
@@ -38,41 +41,43 @@ DialogMachineControl::DialogMachineControl(wxWindow* parent) :
 	m_menuPreferences->Append(ID_SETUPMIDI, _("Setup &MIDI"));
 	m_menuPreferences->Append(ID_SETUPUNITS,
 	_("Setup &Units") + wxT("\tCtrl+U"));
-
-	this->midi = NULL;
 	X = Y = Z = 0.0;
-	A = B = C = 0.0;
-	U = V = W = 0.0;
+	RX = RY = RZ = 0.0;
 
 	groupXYZLimit = 1.0;
-	groupABCLimit = M_PI;
-	groupUVWLimit = 1.0;
+	groupRXRYRZLimit = M_PI;
 
 	sliderSteps = 201;
 	pageSize = 20;
 	lineSize = 1;
 
+#ifdef _USE_MIDI
+	this->midi = NULL;
 	timer.SetOwner(this);
 	this->Connect(wxEVT_TIMER,
 			wxTimerEventHandler(DialogMachineControl::OnTimer),
 			NULL, this);
 	timer.Start(50);
+#endif
 }
 
 DialogMachineControl::~DialogMachineControl()
 {
+#ifdef _USE_MIDI
 	timer.Stop();
 	this->Disconnect(wxEVT_TIMER,
 			wxTimerEventHandler(DialogMachineControl::OnTimer),
 			NULL, this);
+#endif
 }
-
+#ifdef _USE_MIDI
 void DialogMachineControl::SetMidiPort(MidiPort& midi)
 {
 	this->midi = &midi;
 	for(uint8_t n = 0; n < 10; n++)
-		this->midi->cc[n] = 64;
+	this->midi->cc[n] = 64;
 }
+#endif
 
 void DialogMachineControl::OnXClose(wxCloseEvent& event)
 {
@@ -118,42 +123,33 @@ bool DialogMachineControl::TransferDataToWindowSliders(void)
 	m_sliderX->SetRange(-((sliderSteps - 1) / 2), (sliderSteps - 1) / 2);
 	m_sliderY->SetRange(-((sliderSteps - 1) / 2), (sliderSteps - 1) / 2);
 	m_sliderZ->SetRange(-((sliderSteps - 1) / 2), (sliderSteps - 1) / 2);
-	m_sliderA->SetRange(-((sliderSteps - 1) / 2), (sliderSteps - 1) / 2);
-	m_sliderB->SetRange(-((sliderSteps - 1) / 2), (sliderSteps - 1) / 2);
-	m_sliderC->SetRange(-((sliderSteps - 1) / 2), (sliderSteps - 1) / 2);
-	m_sliderU->SetRange(-((sliderSteps - 1) / 2), (sliderSteps - 1) / 2);
-	m_sliderV->SetRange(-((sliderSteps - 1) / 2), (sliderSteps - 1) / 2);
-	m_sliderW->SetRange(-((sliderSteps - 1) / 2), (sliderSteps - 1) / 2);
+	m_sliderRX->SetRange(-((sliderSteps - 1) / 2), (sliderSteps - 1) / 2);
+	m_sliderRY->SetRange(-((sliderSteps - 1) / 2), (sliderSteps - 1) / 2);
+	m_sliderRZ->SetRange(-((sliderSteps - 1) / 2), (sliderSteps - 1) / 2);
 
 	m_sliderX->SetPageSize(pageSize);
 	m_sliderY->SetPageSize(pageSize);
 	m_sliderZ->SetPageSize(pageSize);
-	m_sliderA->SetPageSize(pageSize);
-	m_sliderB->SetPageSize(pageSize);
-	m_sliderC->SetPageSize(pageSize);
-	m_sliderU->SetPageSize(pageSize);
-	m_sliderV->SetPageSize(pageSize);
-	m_sliderW->SetPageSize(pageSize);
+	m_sliderRX->SetPageSize(pageSize);
+	m_sliderRY->SetPageSize(pageSize);
+	m_sliderRZ->SetPageSize(pageSize);
 
 	m_sliderX->SetLineSize(lineSize);
 	m_sliderY->SetLineSize(lineSize);
 	m_sliderZ->SetLineSize(lineSize);
-	m_sliderA->SetLineSize(lineSize);
-	m_sliderB->SetLineSize(lineSize);
-	m_sliderC->SetLineSize(lineSize);
-	m_sliderU->SetLineSize(lineSize);
-	m_sliderV->SetLineSize(lineSize);
-	m_sliderW->SetLineSize(lineSize);
+	m_sliderRX->SetLineSize(lineSize);
+	m_sliderRY->SetLineSize(lineSize);
+	m_sliderRZ->SetLineSize(lineSize);
 
 	m_sliderX->SetValue(round((X / groupXYZLimit) * (sliderSteps - 1) / 2));
 	m_sliderY->SetValue(round((Y / groupXYZLimit) * (sliderSteps - 1) / 2));
 	m_sliderZ->SetValue(round((Z / groupXYZLimit) * (sliderSteps - 1) / 2));
-	m_sliderA->SetValue(round((A / groupABCLimit) * (sliderSteps - 1) / 2));
-	m_sliderB->SetValue(round((B / groupABCLimit) * (sliderSteps - 1) / 2));
-	m_sliderC->SetValue(round((C / groupABCLimit) * (sliderSteps - 1) / 2));
-	m_sliderU->SetValue(round((U / groupUVWLimit) * (sliderSteps - 1) / 2));
-	m_sliderV->SetValue(round((V / groupUVWLimit) * (sliderSteps - 1) / 2));
-	m_sliderW->SetValue(round((W / groupUVWLimit) * (sliderSteps - 1) / 2));
+	m_sliderRX->SetValue(
+			round((RX / groupRXRYRZLimit) * (sliderSteps - 1) / 2));
+	m_sliderRY->SetValue(
+			round((RY / groupRXRYRZLimit) * (sliderSteps - 1) / 2));
+	m_sliderRZ->SetValue(
+			round((RZ / groupRXRYRZLimit) * (sliderSteps - 1) / 2));
 	return true;
 }
 
@@ -163,13 +159,13 @@ bool DialogMachineControl::TransferDataFromWindowSliders(void)
 	Y = (float) m_sliderY->GetValue() / ((sliderSteps - 1) / 2) * groupXYZLimit;
 	Z = (float) m_sliderZ->GetValue() / ((sliderSteps - 1) / 2) * groupXYZLimit;
 
-	A = (float) m_sliderA->GetValue() / ((sliderSteps - 1) / 2) * groupABCLimit;
-	B = (float) m_sliderB->GetValue() / ((sliderSteps - 1) / 2) * groupABCLimit;
-	C = (float) m_sliderC->GetValue() / ((sliderSteps - 1) / 2) * groupABCLimit;
+	RX = (float) m_sliderRX->GetValue() / ((sliderSteps - 1) / 2)
+			* groupRXRYRZLimit;
+	RY = (float) m_sliderRY->GetValue() / ((sliderSteps - 1) / 2)
+			* groupRXRYRZLimit;
+	RZ = (float) m_sliderRZ->GetValue() / ((sliderSteps - 1) / 2)
+			* groupRXRYRZLimit;
 
-	U = (float) m_sliderU->GetValue() / ((sliderSteps - 1) / 2) * groupUVWLimit;
-	V = (float) m_sliderV->GetValue() / ((sliderSteps - 1) / 2) * groupUVWLimit;
-	W = (float) m_sliderW->GetValue() / ((sliderSteps - 1) / 2) * groupUVWLimit;
 	return true;
 }
 
@@ -184,22 +180,16 @@ bool DialogMachineControl::TransferDataToWindowTextbox(void)
 	m_staticTextUnitX->SetLabel(settings->Distance.GetOtherName());
 	m_staticTextUnitY->SetLabel(settings->Distance.GetOtherName());
 	m_staticTextUnitZ->SetLabel(settings->Distance.GetOtherName());
-	m_staticTextUnitA->SetLabel(settings->Angle.GetOtherName());
-	m_staticTextUnitB->SetLabel(settings->Angle.GetOtherName());
-	m_staticTextUnitC->SetLabel(settings->Angle.GetOtherName());
-	m_staticTextUnitU->SetLabel(settings->Distance.GetOtherName());
-	m_staticTextUnitV->SetLabel(settings->Distance.GetOtherName());
-	m_staticTextUnitW->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitRX->SetLabel(settings->Angle.GetOtherName());
+	m_staticTextUnitRY->SetLabel(settings->Angle.GetOtherName());
+	m_staticTextUnitRZ->SetLabel(settings->Angle.GetOtherName());
 
 	m_textCtrlX->SetValue(settings->Distance.TextFromSI(X));
 	m_textCtrlY->SetValue(settings->Distance.TextFromSI(Y));
 	m_textCtrlZ->SetValue(settings->Distance.TextFromSI(Z));
-	m_textCtrlA->SetValue(settings->Angle.TextFromSI(A, 1));
-	m_textCtrlB->SetValue(settings->Angle.TextFromSI(B, 1));
-	m_textCtrlC->SetValue(settings->Angle.TextFromSI(C, 1));
-	m_textCtrlU->SetValue(settings->Distance.TextFromSI(U));
-	m_textCtrlV->SetValue(settings->Distance.TextFromSI(V));
-	m_textCtrlW->SetValue(settings->Distance.TextFromSI(W));
+	m_textCtrlRX->SetValue(settings->Angle.TextFromSI(RX, 1));
+	m_textCtrlRY->SetValue(settings->Angle.TextFromSI(RY, 1));
+	m_textCtrlRZ->SetValue(settings->Angle.TextFromSI(RZ, 1));
 	return true;
 }
 
@@ -215,23 +205,14 @@ void DialogMachineControl::OnZero(wxMouseEvent& event)
 	case ID_AXISZ:
 		Z = 0.0;
 		break;
-	case ID_AXISA:
-		A = 0.0;
+	case ID_AXISRX:
+		RX = 0.0;
 		break;
-	case ID_AXISB:
-		B = 0.0;
+	case ID_AXISRY:
+		RY = 0.0;
 		break;
-	case ID_AXISC:
-		C = 0.0;
-		break;
-	case ID_AXISU:
-		U = 0.0;
-		break;
-	case ID_AXISV:
-		V = 0.0;
-		break;
-	case ID_AXISW:
-		W = 0.0;
+	case ID_AXISRZ:
+		RZ = 0.0;
 		break;
 	}
 	TransferDataToWindow();
@@ -260,31 +241,18 @@ void DialogMachineControl::OnTextChanged(wxCommandEvent& event)
 		m_textCtrlZ->GetValue().ToDouble(&Z);
 		Z = settings->Distance.ToSI(Z);
 		break;
-	case ID_TEXTA:
-		m_textCtrlA->GetValue().ToDouble(&A);
-		A = settings->Angle.ToSI(A);
+	case ID_TEXTRX:
+		m_textCtrlRX->GetValue().ToDouble(&RX);
+		RX = settings->Angle.ToSI(RX);
 		break;
-	case ID_TEXTB:
-		m_textCtrlB->GetValue().ToDouble(&B);
-		B = settings->Angle.ToSI(B);
+	case ID_TEXTRY:
+		m_textCtrlRY->GetValue().ToDouble(&RY);
+		RY = settings->Angle.ToSI(RY);
 		break;
-	case ID_TEXTC:
-		m_textCtrlC->GetValue().ToDouble(&C);
-		C = settings->Angle.ToSI(C);
+	case ID_TEXTRZ:
+		m_textCtrlRZ->GetValue().ToDouble(&RZ);
+		RZ = settings->Angle.ToSI(RZ);
 		break;
-	case ID_TEXTU:
-		m_textCtrlU->GetValue().ToDouble(&U);
-		U = settings->Distance.ToSI(U);
-		break;
-	case ID_TEXTV:
-		m_textCtrlV->GetValue().ToDouble(&V);
-		V = settings->Distance.ToSI(V);
-		break;
-	case ID_TEXTW:
-		m_textCtrlW->GetValue().ToDouble(&W);
-		W = settings->Distance.ToSI(W);
-		break;
-
 	}
 	TransferDataToWindowSliders();
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
@@ -300,7 +268,7 @@ Project* DialogMachineControl::GetProject(void)
 	Project * project = wxStaticCast(frame->GetDocument(), Project);
 	return project;
 }
-
+#ifdef _USE_MIDI
 void DialogMachineControl::OnTimer(wxTimerEvent& event)
 {
 	if(midi == NULL) return;
@@ -310,16 +278,14 @@ void DialogMachineControl::OnTimer(wxTimerEvent& event)
 	X = ((double) midi->cc[1] - 64.0) / 64.0;
 	Y = ((double) midi->cc[2] - 64.0) / 64.0;
 	Z = ((double) midi->cc[3] - 64.0) / 64.0;
-	A = ((double) midi->cc[4] - 64.0) / 64.0 * M_PI;
-	B = ((double) midi->cc[5] - 64.0) / 64.0 * M_PI;
-	C = ((double) midi->cc[6] - 64.0) / 64.0 * M_PI;
-	U = ((double) midi->cc[7] - 64.0) / 64.0;
-	V = ((double) midi->cc[8] - 64.0) / 64.0;
-	W = ((double) midi->cc[9] - 64.0) / 64.0;
+	RX = ((double) midi->cc[4] - 64.0) / 64.0 * M_PI;
+	RY = ((double) midi->cc[5] - 64.0) / 64.0 * M_PI;
+	RZ = ((double) midi->cc[6] - 64.0) / 64.0 * M_PI;
 
 	TransferDataToWindowSliders();
 	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
-	ID_UPDATEMACHINESIMULATION);
+			ID_UPDATEMACHINESIMULATION);
 	ProcessEvent(selectEvent);
 
 }
+#endif

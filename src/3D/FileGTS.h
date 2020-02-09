@@ -24,12 +24,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef FILEGTS_H_
 #define FILEGTS_H_
-
-#include "GeometryFileAbstract.h"
-#include <wx/string.h>
 
 /*!\class FileGTS
  * \ingroup File3D
@@ -40,6 +36,10 @@
  * Documentation on GTS files can be found here:
  * http://gts.sourceforge.net/reference/gts-surfaces.html#GTS-SURFACE-WRITE
  */
+
+#include "GeometryFileAbstract.h"
+
+#include <wx/string.h>
 
 class FileGTS:public GeometryFileAbstract {
 	// Constructor/ Destructor

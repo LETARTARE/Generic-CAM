@@ -31,10 +31,6 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#define _GENERICCAM_VERSION_MAJOR 0
-#define _GENERICCAM_VERSION_MINOR 3
-#define _GENERICCAM_VERSION_PATCH 0
-
 #ifdef DEBUG
 #define _DEBUGMODE
 #endif

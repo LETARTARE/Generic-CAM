@@ -29,7 +29,6 @@
 #include "Geometry.h"
 #include "AffineTransformMatrix.h"
 #include "Triangle.h"
-#include "../project/Selection.h"
 
 #include <float.h>
 #include <stdint.h>
@@ -217,7 +216,6 @@ void BoundingBox::Paint(double overlap) const
 	if(ymax < ymin) return;
 	if(zmax < zmin) return;
 
-	glPushName((GLuint) Selection::TriangleGroup);
 	glPushName(0);
 	glBegin(GL_QUADS);
 
@@ -259,7 +257,6 @@ void BoundingBox::Paint(double overlap) const
 
 	glEnd();
 	glPopName();
-	glPopName();
 }
 
 void BoundingBox::PaintEdges(double cornerLength, unsigned int edgewidth) const
@@ -272,7 +269,6 @@ void BoundingBox::PaintEdges(double cornerLength, unsigned int edgewidth) const
 	const double dy = GetSizeY() * cornerLength;
 	const double dz = GetSizeZ() * cornerLength;
 
-	glPushName((GLuint) Selection::EdgeGroup);
 	glPushName(0);
 
 	glLineWidth(edgewidth);
@@ -344,7 +340,6 @@ void BoundingBox::PaintEdges(double cornerLength, unsigned int edgewidth) const
 	glEnd();
 	glLineWidth(1);
 	glPopName();
-	glPopName();
 }
 
 void BoundingBox::PaintVertices(unsigned int extrapoints,
@@ -357,7 +352,6 @@ void BoundingBox::PaintVertices(unsigned int extrapoints,
 	const double dy = GetSizeY() / (1 + extrapoints);
 	const double dz = GetSizeZ() / (1 + extrapoints);
 	glPointSize(pointsize);
-	glPushName(Selection::Vertex);
 
 	unsigned int N = 1 + extrapoints;
 	unsigned int c = 0;
@@ -381,7 +375,6 @@ void BoundingBox::PaintVertices(unsigned int extrapoints,
 		}
 		z += dz;
 	}
-	glPopName();
 	glPopName();
 	glPointSize(1);
 }

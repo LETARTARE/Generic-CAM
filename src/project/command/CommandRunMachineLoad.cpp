@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandRunWorkpieceTransform.cpp
+// Name               : commandRunLoadMachine.cpp
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
@@ -24,32 +24,30 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandRunWorkpieceTransform.h"
+#include "CommandRunMachineLoad.h"
 
-CommandRunWorkpieceTransform::CommandRunWorkpieceTransform(const wxString& name,
-		Project* project, size_t runNr, const AffineTransformMatrix& matrixNew) :
+#include "../Project.h"
+
+CommandRunMachineLoad::CommandRunMachineLoad(const wxString& name,
+		Project* project, size_t ID, const wxFileName& fileName) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->runNr = runNr;
-	this->matrixNew = matrixNew;
+	this->runNr = ID;
+	this->fileName = fileName;
 }
 
-bool CommandRunWorkpieceTransform::Do(void)
+bool CommandRunMachineLoad::Do(void)
 {
-	if(runNr >= project->run.GetCount()) return false;
-	matrixOld = project->run[runNr].workpiecePlacement;
-	project->run[runNr].workpiecePlacement = matrixNew;
-	project->run[runNr].Update();
+	oldFileName = project->run[runNr].machinefile;
+	project->run[runNr].machinefile = fileName;
 	project->Update();
 	return true;
 }
 
-bool CommandRunWorkpieceTransform::Undo(void)
+bool CommandRunMachineLoad::Undo(void)
 {
-	if(runNr >= project->run.GetCount()) return false;
-	project->run[runNr].workpiecePlacement = matrixOld;
-	project->run[runNr].Update();
+	project->run[runNr].machinefile = oldFileName;
 	project->Update();
 	return true;
 }

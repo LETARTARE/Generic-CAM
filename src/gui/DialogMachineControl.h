@@ -33,12 +33,15 @@
  * ...
  */
 
-#include <wx/timer.h>
-#include "../controller/MidiPort.h"
-#include "../StdInclude.h"
-#include "../project/Project.h"
-#include "CollectionUnits.h"
 #include "gui.h"
+#include "../StdInclude.h"
+#include "../Config.h"
+#include "CollectionUnits.h"
+#ifdef _USE_MIDI
+#include "../controller/MidiPort.h"
+#endif
+#include "../project/Project.h"
+#include <wx/timer.h>
 
 class DialogMachineControl:public GUIMachineControl {
 public:
@@ -49,12 +52,10 @@ public:
 	bool TransferDataFromWindow(void);
 
 	double X, Y, Z;
-	double A, B, C;
-	double U, V, W;
+	double RX, RY, RZ;
 
 	float groupXYZLimit;
-	float groupABCLimit;
-	float groupUVWLimit;
+	float groupRXRYRZLimit;
 
 	unsigned int sliderSteps;
 	unsigned int pageSize;
@@ -63,9 +64,8 @@ public:
 #ifdef _USE_MIDI
 	MidiPort * midi;
 	void SetMidiPort(MidiPort &midi);
-#endif
-
 	wxTimer timer;
+#endif
 
 private:
 	bool TransferDataToWindowSliders(void);

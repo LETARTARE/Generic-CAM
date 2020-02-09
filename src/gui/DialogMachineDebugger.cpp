@@ -67,24 +67,28 @@ DialogMachineDebugger::~DialogMachineDebugger()
 	this->Disconnect(ID_UPDATEMACHINESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(DialogMachineDebugger::Update));
 }
-
+#ifdef _USE_MIDI
 void DialogMachineDebugger::SetMidiPort(MidiPort& midi)
 {
 	this->midi = &midi;
 	if(machineControl != NULL) machineControl->SetMidiPort(midi);
 }
+#endif
 
 void DialogMachineDebugger::Update(wxCommandEvent& event)
 {
-	machine.currentpos.X = machineControl->X;
-	machine.currentpos.Y = machineControl->Y;
-	machine.currentpos.Z = machineControl->Z;
-	machine.currentpos.A = machineControl->A;
-	machine.currentpos.B = machineControl->B;
-	machine.currentpos.C = machineControl->C;
-	machine.currentpos.U = machineControl->U;
-	machine.currentpos.V = machineControl->V;
-	machine.currentpos.W = machineControl->W;
+	CNCPosition pos;
+	pos.Set(machineControl->X, machineControl->Y, machineControl->Z);
+	const double six = sin(machineControl->RX);
+	const double siy = sin(machineControl->RY);
+	const double siz = sin(machineControl->RZ);
+	const double cox = cos(machineControl->RX);
+	const double coy = cos(machineControl->RY);
+	const double coz = cos(machineControl->RZ);
+	pos.normal.x = six * siz + cox * coz * siy;
+	pos.normal.y = cox * siy * siz - coz * six;
+	pos.normal.z = cox * coy;
+	machine.SetPosition(pos);
 	machine.Assemble();
 	TransferDataToWindow();
 	this->Refresh();
@@ -129,18 +133,8 @@ void DialogMachineDebugger::OnScriptEvaluate(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
 	machine.EvaluateDescription();
-	machine.Reset();
-	machine.currentpos.X = machineControl->X;
-	machine.currentpos.Y = machineControl->Y;
-	machine.currentpos.Z = machineControl->Z;
-	machine.currentpos.A = machineControl->A;
-	machine.currentpos.B = machineControl->B;
-	machine.currentpos.C = machineControl->C;
-	machine.currentpos.U = machineControl->U;
-	machine.currentpos.V = machineControl->V;
-	machine.currentpos.W = machineControl->W;
-	machine.Assemble();
-	TransferDataToWindow();
+	machine.MoveToGlobalZero();
+	Update(event);
 }
 
 void DialogMachineDebugger::OnMachineLoad(wxCommandEvent& event)

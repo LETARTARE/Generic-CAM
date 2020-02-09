@@ -34,11 +34,11 @@
  * Class for reading in DXF files
  */
 
-#include <wx/string.h>
-#include <vector>
-
 #include "GeometryFileAbstract.h"
 #include "Vector3.h"
+
+#include <wx/string.h>
+#include <vector>
 
 class FileDXF:public GeometryFileAbstract {
 	// Constructor/ Destructor

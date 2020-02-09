@@ -33,12 +33,14 @@
  * ...
  */
 
-#include "../controller/MidiPort.h"
+#include "gui.h"
+#include "../Config.h"
+#include "DialogMachineControl.h"
 #include "../project/Project.h"
 #include "../project/machine/Machine.h"
-#include "DialogMachineControl.h"
-#include "CollectionUnits.h"
-#include "gui.h"
+#ifdef _USE_MIDI
+#include "../controller/MidiPort.h"
+#endif
 
 class DialogMachineDebugger:public GUIMachineDebugger {
 public:

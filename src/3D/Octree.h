@@ -49,8 +49,8 @@ public:
 public:
 
 	float r; ///< Red - Color of this particular element. Also inherited upon splitting.
-	float g; ///< Red - Color of this particular element. Also inherited upon splitting.
-	float b; ///< Red - Color of this particular element. Also inherited upon splitting.
+	float g; ///< Green - Color of this particular element. Also inherited upon splitting.
+	float b; ///< Blue - Color of this particular element. Also inherited upon splitting.
 
 	uint8_t clip; ///< Intersection of one edge.
 	uint8_t sign; ///< Sign of the clipping (1 = 1, 0 = -1).

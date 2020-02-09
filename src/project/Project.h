@@ -80,6 +80,7 @@ class Project:public wxDocument {
 	friend class CommandRunGeneratorRename;
 	friend class CommandRunGeneratorDelete;
 	friend class CommandRunRemove;
+	friend class CommandRunMachineLoad;
 
 public:
 	Project();

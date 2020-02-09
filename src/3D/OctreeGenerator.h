@@ -108,12 +108,14 @@ class OctreeGenerator {
 	// Constructor / Destructor
 public:
 	OctreeGenerator();
-	OctreeGenerator(const OctreeGenerator& other); //!< Copy constructor
-	OctreeGenerator& operator=(const OctreeGenerator& other); ///< Assignment operator
-
 	virtual ~OctreeGenerator();
 
-	// Member variables
+protected:
+	// By protecting the copy- and addignment constructor, this class
+	// cannot be directly copied.
+	OctreeGenerator(const OctreeGenerator&);
+	OctreeGenerator& operator=(const OctreeGenerator&);
+
 public:
 	Octree* root; ///< Pointer towards the octree class.
 

@@ -40,8 +40,6 @@ public:
 	Field();
 	Field(BoundingBox box, double resolutionX, double resolutionY);
 	Field(BoundingBox box, size_t cellCount);
-	Field(const Field& other); ///< Copy constructor
-	Field& operator=(const Field &other); ///< Assignment operator
 	virtual ~Field();
 
 	void SetSize(double x, double y, double z);
@@ -70,15 +68,15 @@ public:
 
 	void CopyRescale(const Field &other, const size_t newMaxCellCount);
 
-
-
 	void AdaptSizeZ(void);
 	void AdaptSizeOriginZ(void);
 
 private:
 	void SetupField(size_t nx, size_t ny);
 
-public:
+protected:
+	Field(const Field& other); ///< Copy constructor
+	Field& operator=(const Field &other); ///< Assignment operator
 
 private:
 	size_t nx;

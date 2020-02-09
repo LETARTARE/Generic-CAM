@@ -36,7 +36,6 @@
  *  - \b Refresh - Issue a request to refresh a window in the next run of the wxWidgets main event loop.
  *  - \b Update(in the context of wxWidgets) - Repaint the window immediately!
  *  - \b Update(in the context of Project) - Update the inner workings of the Project or the Simulation and issue a refresh for the next main event loop.
- *
  */
 
 //!> Refresh every view of every document:

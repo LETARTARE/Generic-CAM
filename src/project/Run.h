@@ -59,11 +59,11 @@
  */
 
 
+#include "generator/Generator.h"
 #include "../3D/AffineTransformMatrix.h"
 #include "../3D/OpenGLImage.h"
 #include "../3D/BoundingBox.h"
 #include "Selection.h"
-#include "generator/Generator.h"
 
 #include <map>
 #include <string>
@@ -97,6 +97,8 @@ public:
 
 	std::map <size_t, Generator*> generators; ///< List of Generator%s applied to the workpiece in this run
 
+	wxFileName machinefile;
+
 	// Set up by Update()
 	BoundingBox stock;
 	AffineTransformMatrix origin; //!< Origin and coordinate-system
@@ -118,7 +120,6 @@ public:
 			Project * project);
 
 //	void ToolpathToStream(wxTextOutputStream & stream);
-
 //	Workpiece* GetWorkpiece(void);
 //	const Workpiece* GetWorkpiece(void) const;
 //	ToolPath* GetFirstSelectedToolpath(void);

@@ -118,7 +118,9 @@ void Run::Paint(void) const
 	if(stocktype == BoxTop || stocktype == BoxCenter || stocktype == BoxBottom){
 		if(OpenGLMaterial::ColorsAllowed()){
 			glColor4f(0.2, 0.2, 0.2, 0.6);
+			glPushName((GLuint) Selection::TriangleGroup);
 			stock.Paint();
+			glPopName();
 		}
 	}
 
@@ -194,7 +196,9 @@ void Run::PaintVertices(void) const
 {
 	OpenGLMaterial::EnableColors();
 	glColor4f(0.8, 0.8, 0.8, 1.0);
+	glPushName(Selection::Vertex);
 	stock.PaintVertices(1, 10);
+	glPopName();
 }
 
 void Run::GenerateToolpaths(void)

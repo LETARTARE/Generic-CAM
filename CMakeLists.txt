@@ -9,7 +9,9 @@ include(${wxWidgets_USE_FILE})
 
 if(MINGW)
 #	set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -I/usr/local/i586-mingw32/include")
-#	include_directories( "/usr/local/i586-mingw32/include/lua5.3" )
+
+	include_directories( "/usr/local/i586-mingw32/include/lua5.3" )
+
 	set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -Wno-write-strings")
 
 	set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -DUNICODE")
@@ -24,7 +26,7 @@ elseif(MSVC)
 else(MINGW)
 	set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -Wno-write-strings")
 	
-#	include_directories( "/usr/include/lua5.3" )
+	include_directories( "/usr/include/lua5.3" )
 	
 endif(MINGW)
 
@@ -45,7 +47,7 @@ if(MINGW)
 		${wxWidgets_LIBRARIES}
 		opengl32
 		glu32
-#		lua53
+		lua53
 	)
 	
 elseif(MSVC)
@@ -60,7 +62,7 @@ elseif(MSVC)
 		cppunittest
 		${wxWidgets_LIBRARIES}
 #		OpenGL
-#		lua-5.3.5
+		lua-5.3.5
 	)
 	
 else(MINGW)
@@ -76,7 +78,7 @@ else(MINGW)
 		${wxWidgets_LIBRARIES}
 		GL
 		GLU
-#		lua5.3
+		lua5.3
 #		portmidi
 	)
 	

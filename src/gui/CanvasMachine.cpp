@@ -23,6 +23,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 ///////////////////////////////////////////////////////////////////////////////
+
 #include "CanvasMachine.h"
 
 CanvasMachine::CanvasMachine(wxWindow *parent, wxWindowID id,
@@ -30,20 +31,20 @@ CanvasMachine::CanvasMachine(wxWindow *parent, wxWindowID id,
 		const wxString& name) :
 		OpenGLCanvas(parent, id, pos, size, style, name)
 {
-//	machine = NULL;
+	machine = NULL;
 }
 
 CanvasMachine::~CanvasMachine()
 {
 }
 
-//void CanvasMachine::InsertMachine(Machine* machine)
-//{
-//	this->machine = machine;
-//}
+void CanvasMachine::InsertMachine(Machine* machine)
+{
+	this->machine = machine;
+}
 
 void CanvasMachine::Render()
 {
-//	if(machine == NULL) return;
-//	machine->Paint();
+	if(machine == NULL) return;
+	machine->Paint();
 }

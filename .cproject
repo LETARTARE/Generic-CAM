@@ -83,8 +83,18 @@
 						</toolChain>
 					</folderInfo>
 					<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.1074777317.1021935980" name="OctreeInt64.h" rcbsApplicability="disable" resourcePath="src/theAttic/OctreeInt64.h" toolsToInvoke=""/>
+					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1074777317.1339174972" name="/" resourcePath="toolbox">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.386074718" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.54046714" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.2138686872"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1846482616" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1358257702"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.820648134" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1283442708"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1539613029" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug.499271279"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1830275973" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.376884687"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1569886670" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug.585771149"/>
+						</toolChain>
+					</folderInfo>
 					<sourceEntries>
-						<entry excluding="doc|examples|FANUCM|machines|pdf|rawWWW|toolpath|WWW|src/project/machine/temp|src/project/generator/temp|src/gui/temp|src/project/command/temp|src/project/temp|Video|bin_release|bin_debug|bin_win|src/generator/temp.cpp|src/generator/temp.h|src/3D/OctreeInt64.h|src/3D/OctreeInt64.cpp|bin_linux|src/theAttic" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="toolbox|doc|examples|FANUCM|machines|pdf|rawWWW|toolpath|WWW|src/project/machine/temp|src/project/generator/temp|src/gui/temp|src/project/command/temp|src/project/temp|Video|bin_release|bin_debug|bin_win|src/generator/temp.cpp|src/generator/temp.h|src/3D/OctreeInt64.h|src/3D/OctreeInt64.cpp|bin_linux|src/theAttic" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

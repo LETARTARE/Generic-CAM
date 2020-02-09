@@ -450,6 +450,8 @@ class GUIAnimation : public wxFrame
 		wxBitmapButton* m_bpButtonLast;
 		wxCheckBox* m_checkBoxSimulateWorkpiece;
 		wxButton* m_buttonClose;
+		wxChoice* m_choiceDisplay;
+		wxChoice* m_choiceFocus;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;
@@ -466,7 +468,7 @@ class GUIAnimation : public wxFrame
 	
 	public:
 		
-		GUIAnimation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Simulation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 892,120 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxFRAME_TOOL_WINDOW|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIAnimation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Simulation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxFRAME_TOOL_WINDOW|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~GUIAnimation();
 	
@@ -863,9 +865,9 @@ class GUIMachineControl : public wxFrame
 		wxStaticText* m_staticTextRX;
 		wxSlider* m_sliderRX;
 		wxStaticText* m_staticTextRY;
-		wxSlider* m_sliderB;
+		wxSlider* m_sliderRY;
 		wxStaticText* m_staticTextRZ;
-		wxSlider* m_sliderC;
+		wxSlider* m_sliderRZ;
 		wxStaticText* m_staticTextrRX;
 		wxTextCtrl* m_textCtrlRX;
 		wxStaticText* m_staticTextUnitRX;

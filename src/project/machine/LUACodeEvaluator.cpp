@@ -30,6 +30,9 @@
 #include "Machine.h"
 #include <wx/debug.h>
 #include <wx/log.h>
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
 #include <math.h>
 
 LUACodeEvaluator::LUACodeEvaluator()
@@ -171,17 +174,17 @@ bool LUACodeEvaluator::EvaluateAssembly()
 	programOutput.Empty();
 	matrix.SetIdentity();
 
-	InsertVariable(_T("AXIS_X"), linkedMachine->currentpos.X);
-	InsertVariable(_T("AXIS_Y"), linkedMachine->currentpos.Y);
-	InsertVariable(_T("AXIS_Z"),
-			linkedMachine->currentpos.Z + linkedMachine->toolLengthOffset);
-	// The rotational axes are in degrees.
-	InsertVariable(_T("AXIS_A"), linkedMachine->currentpos.A * 180.0 / M_PI);
-	InsertVariable(_T("AXIS_B"), linkedMachine->currentpos.B * 180.0 / M_PI);
-	InsertVariable(_T("AXIS_C"), linkedMachine->currentpos.C * 180.0 / M_PI);
-	InsertVariable(_T("AXIS_U"), linkedMachine->currentpos.U);
-	InsertVariable(_T("AXIS_V"), linkedMachine->currentpos.V);
-	InsertVariable(_T("AXIS_W"), linkedMachine->currentpos.W);
+//	InsertVariable(_T("AXIS_X"), linkedMachine->currentpos.X);
+//	InsertVariable(_T("AXIS_Y"), linkedMachine->currentpos.Y);
+//	InsertVariable(_T("AXIS_Z"),
+//			linkedMachine->currentpos.Z + linkedMachine->toolLengthOffset);
+//	// The rotational axes are in degrees.
+//	InsertVariable(_T("AXIS_A"), linkedMachine->currentpos.A * 180.0 / M_PI);
+//	InsertVariable(_T("AXIS_B"), linkedMachine->currentpos.B * 180.0 / M_PI);
+//	InsertVariable(_T("AXIS_C"), linkedMachine->currentpos.C * 180.0 / M_PI);
+//	InsertVariable(_T("AXIS_U"), linkedMachine->currentpos.U);
+//	InsertVariable(_T("AXIS_V"), linkedMachine->currentpos.V);
+//	InsertVariable(_T("AXIS_W"), linkedMachine->currentpos.W);
 
 	// Insert the axes for the IK solver
 	for(size_t n = 0; n < linkedMachine->NR_IKAXIS; n++)

@@ -32,9 +32,9 @@
  * Stores the min and max values of Vector3%s, Triangle%s, other BoundingBox%es and Geometry.
  */
 
-#include <wx/txtstrm.h>
-
 #include "Vector3.h"
+
+#include <wx/txtstrm.h>
 
 class Triangle;
 class AffineTransformMatrix;

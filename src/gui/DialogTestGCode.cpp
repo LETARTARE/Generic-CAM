@@ -26,7 +26,7 @@
 
 #include "DialogTestGCode.h"
 
-#include "../project/machine/GCodeBlock.h"
+#include "../project/generator/GCodeBlock.h"
 #include <float.h>
 
 #include "FrameMain.h"

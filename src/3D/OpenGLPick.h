@@ -68,8 +68,6 @@ class OpenGLPick {
 	friend class OpenGLCanvas;
 public:
 	OpenGLPick(GLsizei bufferSize = 512);
-	OpenGLPick(const OpenGLPick& other); //!< Copy constructor
-	OpenGLPick& operator=(const OpenGLPick& other); ///< Assignment operator
 	virtual ~OpenGLPick();
 
 	bool SetBufferSize(GLsizei newSize); //!< Initialize the pick buffer
@@ -82,6 +80,12 @@ public:
 	int Get(unsigned int level, unsigned int hit = 0); //!< Return the levels of the namestack. Returns -1, if nothing is at this level.
 	unsigned int Near(unsigned int hit); //!< Return the Near value of the hit
 	unsigned int Far(unsigned int hit); //!< Return the Far value of the hit
+
+protected:
+	// By protecting the copy- and addignment constructor, this class
+	// cannot be directly copied.
+	OpenGLPick(const OpenGLPick&);
+	OpenGLPick& operator=(const OpenGLPick&);
 
 protected:
 	void SetHits(GLuint hits); //!< OpenGLCanvas tells this class the number of hits found

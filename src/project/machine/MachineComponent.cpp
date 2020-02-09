@@ -28,6 +28,7 @@
 
 #include "../../3D/FileSTL.h"
 #include "../../3D/FileDXF.h"
+
 #include <wx/log.h>
 #include <wx/glcanvas.h>
 
@@ -123,8 +124,8 @@ bool MachineComponent::InsertSTL(const AffineTransformMatrix &matrix,
 	FileSTL f;
 	f.color = geometry.colorNewObjects;
 	if(!f.ReadFile(file.GetFullPath())) return false;
-	f.geometry[0].ApplyTransformation(matrix);
-	geometry.InsertTrianglesFrom(f.geometry[0]);
+	f.geometry.ApplyTransformation(matrix);
+	geometry.InsertTrianglesFrom(f.geometry);
 //	geometry.matrix *= matrix;
 	return true;
 }
@@ -137,8 +138,8 @@ bool MachineComponent::InsertSTL(const AffineTransformMatrix &matrix,
 
 	if(!f.ReadStream(file)) return false;
 
-	f.geometry[0].ApplyTransformation(matrix);
-	geometry.InsertTrianglesFrom(f.geometry[0]);
+	f.geometry.ApplyTransformation(matrix);
+	geometry.InsertTrianglesFrom(f.geometry);
 //	geometry.matrix *= matrix;
 	return true;
 }
@@ -146,18 +147,17 @@ bool MachineComponent::InsertSTL(const AffineTransformMatrix &matrix,
 bool MachineComponent::InsertDXF(const AffineTransformMatrix &matrix,
 		wxFileName file, wxString componentName)
 {
-	wxLogMessage(_T("@MachineComponent::InsertDXF: "+file.GetFullPath()));
+	wxLogMessage
+	(_T("@MachineComponent::InsertDXF: "+file.GetFullPath()));
 
 	FileDXF f;
 	f.color = geometry.colorNewObjects;
 	if(!f.ReadFile(file.GetFullPath())) return false;
 
 	size_t i;
-	for(i = 0; i < f.geometry.GetCount(); i++){
-		if(f.geometry[i].name.Cmp(componentName) == 0){
-			f.geometry[i].ApplyTransformation(matrix);
-			geometry.InsertTrianglesFrom(f.geometry[i]);
-		}
+	if(f.geometry.name.Cmp(componentName) == 0){
+		f.geometry.ApplyTransformation(matrix);
+		geometry.InsertTrianglesFrom(f.geometry);
 	}
 	return true;
 }

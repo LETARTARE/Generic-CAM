@@ -28,7 +28,6 @@
 #define DIALOGTESTGCODE_H_
 
 #include "../StdInclude.h"
-#include "../project/machine/GCodeBlock.h"
 #include "gui.h"
 
 class DialogTestGCode:public GUITestGCode {

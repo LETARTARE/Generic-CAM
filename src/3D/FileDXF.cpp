@@ -26,16 +26,17 @@
 
 #include "FileDXF.h"
 
-#include <stddef.h>
-#include <string.h>
+#include "AffineTransformMatrix.h"
+#include "Geometry.h"
+
 #include <wx/chartype.h>
 //#include <wx/file.h>
 #include <wx/log.h>
 #include <wx/textbuf.h>
 #include <wx/textfile.h>
 
-#include "AffineTransformMatrix.h"
-#include "Geometry.h"
+#include <stddef.h>
+#include <string.h>
 
 FileDXF::FileDXF()
 {
@@ -151,7 +152,7 @@ void FileDXF::ProcessCode(long codeNr, wxString code)
 		}
 
 		if(objectType.Cmp(_T("INSERT")) == 0){
-			size_t i;
+//			size_t i;
 //			for(i = 0; i < geometry.GetCount(); i++){
 //				if(geometry[i].name.Cmp(blockName) == 0){
 //					geometry[i].matrix.ScaleGlobal(sx, sy, sz);
@@ -229,7 +230,7 @@ bool FileDXF::ReadFile(wxString fileName)
 	file.Close();
 
 	// Calculate normals to get the lighting right.
-	size_t i;
+//	size_t i;
 //	for(i = 0; i < geometry.GetCount(); i++){
 //		geometry[i].CalculateNormals();
 //	}

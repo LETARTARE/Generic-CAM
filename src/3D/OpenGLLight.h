@@ -35,7 +35,6 @@
  */
 
 #include "Vector3.h"
-
 #include "OpenGL.h"
 
 class OpenGLLight {

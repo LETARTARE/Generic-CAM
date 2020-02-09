@@ -31,7 +31,6 @@
 #include <wx/log.h>
 #include <wx/string.h>
 #include <stdint.h>
-#include <cmath>
 
 // Verify, that float is 32 bit on this architecture.
 #define __ASSERT(e) typedef char __ASSERT__[(e)?1:-1]

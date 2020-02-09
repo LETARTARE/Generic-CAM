@@ -33,10 +33,11 @@
 #ifdef _USE_6DOFCONTROLLER
 #include "../controller/DialogSetup6DOFController.h"
 #endif
-#include <cstdio>
+
 #include <wx/generic/choicdgg.h>
 #include <wx/stockitem.h>
 #include <wx/aboutdlg.h>
+#include <cstdio>
 
 wxBEGIN_EVENT_TABLE(FrameParent, wxDocParentFrame)
 
@@ -49,7 +50,6 @@ EVT_MENU(ID_SETUPCONTROLLER , FrameParent::OnSetupController)
 #ifdef _USE_MIDI
 EVT_MENU(ID_SETUPMIDI , FrameParent::OnSetupMidi)
 #endif
-EVT_MENU(wxID_ABOUT, FrameParent::OnAbout)
 EVT_MENU(wxID_HELP, FrameParent::OnHelp)
 
 EVT_MENU(ID_REFRESHALL, FrameParent::OnRefreshAll)
@@ -144,25 +144,6 @@ FrameParent::~FrameParent()
 	NULL, this);
 
 	delete m_helpController;
-}
-
-void FrameParent::OnAbout(wxCommandEvent&)
-{
-    wxAboutDialogInfo aboutInfo;
-    aboutInfo.SetName(_T("Generic CAM"));
-    aboutInfo.SetVersion(_T("0.3"));
-    aboutInfo.SetDescription(_("CAM Processor for CNC Machines"));
-    aboutInfo.SetCopyright(_T("(C) 2010-2020"));
-    aboutInfo.SetWebSite(_T("https://sourceforge.net/projects/genericcam/"));
-    aboutInfo.SetLicence(_T("GNU General Public License version 3.0 (GPLv3)\n\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it under certain conditions.\n\nYou should have received a copy of the GNU General Public License along with this program.\nIf not, see http://www.gnu.org/licenses/."));
-    aboutInfo.AddDeveloper(_T("Tobias Schäfer"));
-    aboutInfo.AddTranslator(_T("Jacques-Louis Tartarin (French)"));
-    aboutInfo.AddTranslator(_T("Sandro Dalle Nogare (Italian)"));
-
-    wxAboutBox(aboutInfo);
-
-//	GUIDialogAbout dialog(this);
-//	dialog.ShowModal();
 }
 
 void FrameParent::OnHelp(wxCommandEvent&)

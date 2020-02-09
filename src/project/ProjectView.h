@@ -38,6 +38,7 @@
 
 
 #include "../3D/OpenGLMaterial.h"
+#include "machine/Machine.h"
 #include "Selection.h"
 
 #include <stddef.h>
@@ -65,7 +66,6 @@ private:
 	void RenderCoordinateSystem(void) const;
 
 public:
-
 	enum ViewType {
 		vObject, vRun, vOrigin, vGenerator
 	} type;
@@ -73,22 +73,13 @@ public:
 	Selection selection;
 	Selection hover;
 
-private:
+	Machine machine;
 
+private:
 	void PaintObjects(const Selection& sel, const OpenGLMaterial &face,
 			const OpenGLMaterial &edge) const;
 	void PaintRun(const Selection& sel) const;
 	void PaintGenerators(const Selection& sel) const;
-
-//	bool displayCoordinateSystem;
-//	bool displayAnimation;
-//	bool displayGeometry;
-//	bool displayMachine;
-//	bool displayStock;
-//	bool displayBoundingBox;
-//	bool displayTargets;
-//	bool displayToolpath;
-//	bool displayOutLines;
 
 wxDECLARE_EVENT_TABLE();
 

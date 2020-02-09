@@ -71,15 +71,6 @@ OctreeGenerator::OctreeGenerator()
 
 }
 
-OctreeGenerator::OctreeGenerator(const OctreeGenerator& other)
-{
-}
-
-OctreeGenerator& OctreeGenerator::operator =(const OctreeGenerator& other)
-{
-	return *this;
-}
-
 OctreeGenerator::~OctreeGenerator()
 {
 	if(root != NULL) delete (root);

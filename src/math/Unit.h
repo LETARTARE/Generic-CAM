@@ -70,8 +70,6 @@
  * The used types are set in DialogSetupUnits.
  */
 
-//#include <wx/chartype.h>
-
 #include "../Config.h"
 
 #ifdef _USE_MATHPARSER

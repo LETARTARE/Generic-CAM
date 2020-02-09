@@ -27,12 +27,6 @@
 #ifndef FILESTL_H_
 #define FILESTL_H_
 
-#include "GeometryFileAbstract.h"
-#include <wx/string.h>
-#include <wx/wfstream.h>
-#include <wx/txtstrm.h>
-#include <wx/datstrm.h>
-
 /*!\class FileSTL
  * \ingroup File3D
  * \brief Stereolithography files
@@ -41,6 +35,13 @@
  * between CAD programms. This class reads a STL file and stores its
  * triangles.
  */
+
+#include "GeometryFileAbstract.h"
+
+#include <wx/string.h>
+#include <wx/wfstream.h>
+#include <wx/txtstrm.h>
+#include <wx/datstrm.h>
 
 class FileSTL:public GeometryFileAbstract {
 	// Constructor/ Destructor

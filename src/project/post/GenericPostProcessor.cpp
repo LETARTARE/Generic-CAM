@@ -37,7 +37,6 @@
 std::string UnEscape(const std::string &input)
 {
 	std::string temp = input;
-	size_t index = 0;
 	for(size_t index = 0; index < temp.size(); ++index){
 		index = temp.find("\\", index);
 		if(index == std::string::npos) break;

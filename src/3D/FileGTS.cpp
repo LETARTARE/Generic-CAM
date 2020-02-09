@@ -87,8 +87,6 @@ bool FileGTS::ReadFile(wxString fileName)
 	long i;
 	double x, y, z;
 	std::vector <Vector3> vectors;
-	Vector3* vec;
-	Triangle* tri;
 
 	for(i = 0; i < nv; i++){
 		if(file.Eof()){
@@ -151,7 +149,7 @@ bool FileGTS::ReadFile(wxString fileName)
 			wxLogError(_T("File is not a valid GTS file (too little triangles)!"));
 			return false;
 		}
-		tri = new Triangle;
+//		Triangle* tri = new Triangle;
 		tokenizer.GetNextToken().ToULong(&v1);
 		tokenizer.GetNextToken().ToULong(&v2);
 		tokenizer.GetNextToken().ToULong(&v3);

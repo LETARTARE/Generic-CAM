@@ -29,7 +29,9 @@
 #include "OpenGLCanvas.h"
 
 #include "../StdInclude.h"
+#ifdef _USE_6DOFCONTROLLER
 #include "../controller/Control3D.h"
+#endif
 
 #include <wx/dcclient.h>
 

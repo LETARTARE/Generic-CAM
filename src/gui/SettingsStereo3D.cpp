@@ -26,7 +26,6 @@
 
 #include "SettingsStereo3D.h"
 
-#include <math.h>
 #include "../3D/OpenGLCanvas.h"
 
 SettingsStereo3D::SettingsStereo3D()

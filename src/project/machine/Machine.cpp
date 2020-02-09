@@ -40,17 +40,16 @@
 Machine::Machine()
 {
 	initialized = false;
-	microstepMode = distanceBased;
-	microstepDistance = 0.001; // = 1mm;
-	microstepPosition = 0;
+	toolLength = 0.0;
+	// 0 = Machine coordinate system, 1 = first work coordinate system
+	selectedCoordSystem = 0;
+
 	for(size_t n = 0; n < NR_IKAXIS; n++){
 		IKaxis[n] = 0.0;
 		IKaxisused[n] = false;
 	}
-	calculateIK = false;
-
 	ClearComponents();
-	Reset();
+	MoveToGlobalZero();
 
 //	CNCPosition x(0, 0, 0, 0.3, -0.4, 0.1);
 //	AffineTransformMatrix m = x.GetMatrix();
@@ -60,19 +59,6 @@ Machine::Machine()
 //	AffineTransformMatrix n = y.GetMatrix();
 //	n.TakeMatrixApart();
 //	n.TakeMatrixApart();
-
-}
-
-Machine::Machine(const Machine &other)
-{
-	throw("'Machine::Copy constructor' is unimplemented!");
-}
-
-Machine& Machine::operator =(const Machine &other)
-{
-	if(&other == this) return *this;
-	throw("'Machine::operator=' is unimplemented!");
-	return *this;
 }
 
 Machine::~Machine()
@@ -85,6 +71,16 @@ void Machine::ClearComponents(void)
 	componentWithTool = NULL;
 	components.clear();
 	AddComponent(_T("Base"));
+}
+
+void Machine::MoveToGlobalZero()
+{
+	setposition = CNCPosition();
+	reachedposition = CNCPosition();
+	selectedCoordSystem = 0;
+	for(size_t n = 0; n < NR_IKAXIS; n++)
+		IKaxis[n] = 0.0;
+	Assemble();
 }
 
 bool Machine::Load(wxFileName const &fileName)
@@ -142,72 +138,8 @@ bool Machine::ReLoad(void)
 	}
 
 	EvaluateDescription();
-	Reset();
+	MoveToGlobalZero();
 	return IsInitialized();
-}
-
-void Machine::ToXml(wxXmlNode* parentNode)
-{
-	wxXmlNode *temp, *temp2;
-	wxXmlNode *nodeObject = NULL;
-
-	// Find out, if object already exists in XML tree.
-	temp = parentNode->GetChildren();
-	while(temp != NULL && nodeObject == NULL){
-		if(temp->GetName() == _T("machine")
-				&& temp->GetAttribute(_T("name"), _T(""))
-						== fileName.GetFullName()) nodeObject = temp;
-		temp = temp->GetNext();
-	}
-	if(nodeObject == NULL){
-		nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("machine"));
-		nodeObject->AddAttribute(_T("name"), fileName.GetFullName());
-		parentNode->InsertChild(nodeObject, NULL);
-	}
-
-	// Remove the subelements, that will be updated
-	temp = nodeObject->GetChildren();
-	while(temp != NULL){
-		temp2 = NULL;
-		if(temp->GetName() == _T("filename")) temp2 = temp;
-		if(temp->GetName() == _T("description")) temp2 = temp;
-		temp = temp->GetNext();
-		if(temp2 != NULL){
-			nodeObject->RemoveChild(temp2);
-			delete (temp2);
-		}
-	}
-
-	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("filename"));
-	nodeObject->InsertChild(temp, NULL);
-	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
-			fileName.GetFullPath());
-	temp->InsertChild(temp2, NULL);
-
-	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("description"));
-	nodeObject->InsertChild(temp, NULL);
-	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
-			machineDescription);
-	temp->InsertChild(temp2, NULL);
-
-}
-
-bool Machine::FromXml(wxXmlNode* node)
-{
-	//	objectName = node->GetAttribute(_T("name"), _T(""));
-	if(node->GetName() != _T("machine")) return false;
-
-	wxXmlNode *temp = node->GetChildren();
-	while(temp != NULL){
-		if(temp->GetName() == _T("filename")){
-			fileName = temp->GetNodeContent();
-		}
-		if(temp->GetName() == _T("description")){
-			machineDescription = temp->GetNodeContent();
-		}
-		temp = temp->GetNext();
-	}
-	return true;
 }
 
 void Machine::EvaluateDescription(void)
@@ -217,7 +149,6 @@ void Machine::EvaluateDescription(void)
 	if(evaluator.EvaluateProgram()){
 
 		// Initialize IK
-		calculateIK = false;
 		AffineTransformMatrix P0;
 		const double magicnumber = M_PI_4 / M_E;
 		for(size_t n = 0; n < NR_IKAXIS; n++)
@@ -230,30 +161,28 @@ void Machine::EvaluateDescription(void)
 			evaluator.EvaluateAssembly();
 			AffineTransformMatrix P = workpiecePosition.Inverse()
 					* toolPosition;
-			if(P.Distance(P0) > FLT_EPSILON){
+			if(P.Distance(P0) > FLT_EPSILON)
 				IKaxisused[n] = true;
-				calculateIK = true;
-			}
 		}
 		for(size_t n = 0; n < NR_IKAXIS; n++)
 			IKaxis[n] = 0.0;
-		toolLengthOffset = 0.0;
-		currentpos = CNCPosition();
+
 		evaluator.EvaluateAssembly();
-		offset0 = CNCPosition(workpiecePosition.Inverse() * toolPosition);
+		coordSystem[0] = workpiecePosition.Inverse() * toolPosition;
 		initialized = true;
 	}else{
 		initialized = false;
 	}
-
 	textOut = evaluator.GetOutput();
 }
 
 double Machine::GetE(void) const
 {
-	AffineTransformMatrix tpos = (currentpos + offset0).GetMatrix();
-	tpos.TranslateLocal(0, 0, toolLengthOffset);
+	AffineTransformMatrix tpos;// = (currentpos + offset0).GetMatrix();
+	tpos.TranslateLocal(0, 0, toolLength);
+
 	AffineTransformMatrix cpos = workpiecePosition.Inverse() * toolPosition;
+
 
 	// Scalar product of the normal vectors (0,0,1) for both matrices.
 	const double normalaligned = tpos[8] * cpos[8] + tpos[9] * cpos[9]
@@ -276,10 +205,10 @@ void Machine::Assemble()
 {
 	if(!initialized) return;
 
-	if(!calculateIK){
-		evaluator.EvaluateAssembly();
-		return;
-	}
+//	if(!calculateIK){
+//		evaluator.EvaluateAssembly();
+//		return;
+//	}
 
 	NelderMeadOptimizer optim;
 	for(size_t n = 0; n < NR_IKAXIS; n++){
@@ -318,20 +247,20 @@ void Machine::Paint(void) const
 
 	::glPushMatrix();
 	workpiecePosition.GLMultMatrix();
-	PaintCoordinateSystem(0.1);
+
 //	AffineTransformMatrix temp = workpiecePosition.Inverse() * toolPosition;
 //	::glMultMatrixd(temp.a);
 
-	AffineTransformMatrix temp = (currentpos + offset0).GetMatrix();
-	temp.TranslateLocal(0, 0, toolLengthOffset);
+	AffineTransformMatrix temp;// = (currentpos + offset0).GetMatrix();
+	temp.TranslateLocal(0, 0, toolLength);
 //	temp = temp.Inverse();
 	temp.GLMultMatrix();
-	if(selectedToolSlot > 0 && selectedToolSlot <= tools.GetCount()){
-		::glColor3f(0.7, 0.7, 0.7);
-		tools[selectedToolSlot - 1].Paint();
-	}else{
+//	if(selectedToolSlot > 0 && selectedToolSlot <= tools.GetCount()){
+//		::glColor3f(0.7, 0.7, 0.7);
+//		tools[selectedToolSlot - 1].Paint();
+//	}else{
 		PaintNullTool(0.05, 0.03);
-	}
+//	}
 	::glPopMatrix();
 }
 
@@ -353,24 +282,6 @@ void Machine::PaintNullTool(double length, double diameter) const
 	glVertex3d(0, -radius, 0);
 	glNormal3f(0, 1, 0);
 	glVertex3d(0, radius, 0);
-	glEnd();
-}
-
-void Machine::PaintCoordinateSystem(double diameter) const
-{
-	glBegin(GL_LINES);
-	glNormal3f(1, 0, 0);
-	glColor3f(1, 0, 0);
-	glVertex3f(0, 0, 0);
-	glVertex3d(diameter / 2.0, 0, 0);
-	glNormal3f(0, 1, 0);
-	glColor3f(0, 1, 0);
-	glVertex3f(0, 0, 0);
-	glVertex3d(0, diameter / 2.0, 0);
-	glNormal3f(0, 0, 1);
-	glColor3f(0, 0, 1);
-	glVertex3f(0, 0, 0);
-	glVertex3d(0, 0, diameter / 2.0);
 	glEnd();
 }
 
@@ -494,142 +405,83 @@ bool Machine::LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
 	return false;
 }
 
-void Machine::Reset()
+//bool Machine::InterpretGCode(GCodeBlock* block, bool generateMicroSteps)
+//{
+//	lastpos = currentpos;
+//	currentpos.dt = 0.0;
+//	block->t = currentpos.t;
+//	block->duration = 0.0;
+//	codestate.CopySelective(*block);
+//
+//	if(codestate.F > 0) feedRate = codestate.F;
+//
+//	// Change tool
+//	if(codestate.M[6] == 6){
+//		codestate.M[6] = -1;
+//		currentpos = coordSystem[0];
+//		Interpolate(&lastpos, &currentpos, generateMicroSteps);
+//		lastpos = currentpos;
+//		block->duration += currentpos.dt;
+//		currentpos.dt = 0.0;
+//		selectedTool = codestate.T;
+//		selectedToolSlot = 0;
+//		toolLengthOffset = 0.0;
+//		for(size_t n = 0; n < tools.GetCount(); n++){
+//			if(tools[n].slotNr == selectedTool){
+//				selectedToolSlot = n + 1;
+//				toolLengthOffset = tools[n].GetToolLength();
+//			}
+//		}
+//	}
+//	if(codestate.M[7] == 3) spindleSpeed = codestate.S;
+//	if(codestate.M[7] == 4) spindleSpeed = -codestate.S;
+//	if(codestate.M[7] == 5) spindleSpeed = 0;
+//
+//	const bool machineCoordinates = (codestate.G[0] == 530);
+//
+//	if(codestate.G[12] == 540) selectedCoordSystem = 1;
+//	if(codestate.G[12] == 550) selectedCoordSystem = 2;
+//	if(codestate.G[12] == 560) selectedCoordSystem = 3;
+//	if(codestate.G[12] == 570) selectedCoordSystem = 4;
+//	if(codestate.G[12] == 580) selectedCoordSystem = 5;
+//	if(codestate.G[12] == 590) selectedCoordSystem = 6;
+//	if(codestate.G[12] == 591) selectedCoordSystem = 7;
+//	if(codestate.G[12] == 592) selectedCoordSystem = 8;
+//	if(codestate.G[12] == 593) selectedCoordSystem = 9;
+//
+//	const unsigned char c = (machineCoordinates)? 0 : selectedCoordSystem;
+//
+//	currentpos.X = codestate.X + coordSystem[c].X;
+//	currentpos.Y = codestate.Y + coordSystem[c].Y;
+//	currentpos.Z = codestate.Z + coordSystem[c].Z;
+//	currentpos.A = codestate.A + coordSystem[c].A;
+//	currentpos.B = codestate.B + coordSystem[c].B;
+//	currentpos.C = codestate.C + coordSystem[c].C;
+//	currentpos.U = codestate.U + coordSystem[c].U;
+//	currentpos.V = codestate.V + coordSystem[c].V;
+//	currentpos.W = codestate.W + coordSystem[c].W;
+//
+//	Interpolate(&lastpos, &currentpos, generateMicroSteps);
+//	block->duration += currentpos.dt;
+//	return block->duration > FLT_EPSILON;
+//}
+
+
+void Machine::SetWorkCoordinateSystem(unsigned char index,
+		const AffineTransformMatrix& coordsys)
 {
-	currentpos = CNCPosition();
-	for(size_t i = 0; i < 10; i++)
-		coordSystem[i] = CNCPosition();
-	selectedCoordSystem = 1;
-	selectedTool = 0;
-	selectedToolSlot = 0;
-	feedRate = 0.01; // Feed = 1 cm/s
-	rapidMovement = false; // Move at feedrate
-	spindleSpeed = 0.0; // Spindle stopped
-	controlledpoint = CNCPosition();
-	mistCoolant = false;
-	floodCoolant = false;
-	activeUnits = mms;
-	selectedPlane = XY;
-	toolLengthOffset = 0.0;
-	codestate = GCodeBlock();
-	microsteps.clear();
-	for(size_t n = 0; n < NR_IKAXIS; n++)
-		IKaxis[n] = 0.0;
-	Assemble();
 }
 
-Vector3 Machine::GetCenter(void) const
+void Machine::SetToolLength(double toolLength)
 {
-	return workpiecePosition.GetOrigin();
+	this->toolLength = toolLength;
 }
 
-void Machine::TouchoffPoint(const CNCPosition &point)
+void Machine::SetPosition(const CNCPosition& position)
 {
-	CNCPosition diff = point - coordSystem[1];
-	codestate.X -= diff.X;
-	codestate.Y -= diff.Y;
-	codestate.Z -= diff.Z;
-	coordSystem[1] = point;
 }
 
-void Machine::TouchoffHeight(const double height)
+CNCPosition Machine::GetCurrentPosition(void) const
 {
-	AffineTransformMatrix temp;
-	temp.TranslateLocal(0, 0, height);
-	TouchoffPoint(CNCPosition(temp) - offset0);
-}
-
-bool Machine::InterpretGCode(GCodeBlock* block, bool generateMicroSteps)
-{
-	lastpos = currentpos;
-	currentpos.dt = 0.0;
-	block->t = currentpos.t;
-	block->duration = 0.0;
-	codestate.CopySelective(*block);
-
-	if(codestate.F > 0) feedRate = codestate.F;
-
-	// Change tool
-	if(codestate.M[6] == 6){
-		codestate.M[6] = -1;
-		currentpos = coordSystem[0];
-		Interpolate(&lastpos, &currentpos, generateMicroSteps);
-		lastpos = currentpos;
-		block->duration += currentpos.dt;
-		currentpos.dt = 0.0;
-		selectedTool = codestate.T;
-		selectedToolSlot = 0;
-		toolLengthOffset = 0.0;
-		for(size_t n = 0; n < tools.GetCount(); n++){
-			if(tools[n].slotNr == selectedTool){
-				selectedToolSlot = n + 1;
-				toolLengthOffset = tools[n].GetToolLength();
-			}
-		}
-	}
-	if(codestate.M[7] == 3) spindleSpeed = codestate.S;
-	if(codestate.M[7] == 4) spindleSpeed = -codestate.S;
-	if(codestate.M[7] == 5) spindleSpeed = 0;
-
-	const bool machineCoordinates = (codestate.G[0] == 530);
-
-	if(codestate.G[12] == 540) selectedCoordSystem = 1;
-	if(codestate.G[12] == 550) selectedCoordSystem = 2;
-	if(codestate.G[12] == 560) selectedCoordSystem = 3;
-	if(codestate.G[12] == 570) selectedCoordSystem = 4;
-	if(codestate.G[12] == 580) selectedCoordSystem = 5;
-	if(codestate.G[12] == 590) selectedCoordSystem = 6;
-	if(codestate.G[12] == 591) selectedCoordSystem = 7;
-	if(codestate.G[12] == 592) selectedCoordSystem = 8;
-	if(codestate.G[12] == 593) selectedCoordSystem = 9;
-
-	const unsigned char c = (machineCoordinates)? 0 : selectedCoordSystem;
-
-	currentpos.X = codestate.X + coordSystem[c].X;
-	currentpos.Y = codestate.Y + coordSystem[c].Y;
-	currentpos.Z = codestate.Z + coordSystem[c].Z;
-	currentpos.A = codestate.A + coordSystem[c].A;
-	currentpos.B = codestate.B + coordSystem[c].B;
-	currentpos.C = codestate.C + coordSystem[c].C;
-	currentpos.U = codestate.U + coordSystem[c].U;
-	currentpos.V = codestate.V + coordSystem[c].V;
-	currentpos.W = codestate.W + coordSystem[c].W;
-
-	Interpolate(&lastpos, &currentpos, generateMicroSteps);
-	block->duration += currentpos.dt;
-	return block->duration > FLT_EPSILON;
-}
-
-bool Machine::Step(void)
-{
-	if((microstepPosition + 1) >= microsteps.size()) return false;
-	microstepPosition++;
-	controlledpoint = microsteps[microstepPosition];
-	return true;
-}
-
-void Machine::Interpolate(CNCPosition *a, CNCPosition *b,
-		bool generateMicroSteps)
-{
-	CNCPosition dp = *b - *a;
-	const double L = dp.AbsXYZ();
-	if(feedRate > 0.0){
-		b->dt = L / feedRate;
-	}else{
-		b->dt = 0.0;
-	}
-	b->t = a->t + a->dt;
-	if(!generateMicroSteps) return;
-	if(L <= FLT_EPSILON) return;
-	const double r = fmin(fmin(gridDelta.X, gridDelta.Y), gridDelta.Z);
-	const size_t N = floor(L / r);
-	if(N == 0) return;
-	dp /= (double) N;
-	assert(dp.AbsXYZ() > 0);
-	CNCPosition p = *a + dp;
-	for(size_t n = 2; n < N; n++){
-		microsteps.push_back(p);
-		p += dp;
-	}
-	microsteps.push_back(*b);
+	return setposition;
 }

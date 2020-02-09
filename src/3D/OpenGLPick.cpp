@@ -39,20 +39,6 @@ OpenGLPick::OpenGLPick(GLsizei bufferSize)
 	this->hitpos = 0;
 }
 
-OpenGLPick::OpenGLPick(const OpenGLPick& other)
-{
-	throw("'OpenGLPick::Copy constructor' is unimplemented!");
-}
-
-OpenGLPick& OpenGLPick::operator=(const OpenGLPick& other)
-{
-	if(&other == this) return *this;
-
-	throw("'OpenGLPick::operator=' is unimplemented!");
-
-	return *this;
-}
-
 OpenGLPick::~OpenGLPick()
 {
 	if(buffer != NULL) delete[] buffer;

@@ -51,12 +51,14 @@ protected:
 
 	// Methods
 public:
+	void OnAbout(wxCommandEvent&);
 	virtual void OnInitCmdLine(wxCmdLineParser& parser);
 	virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
 	virtual bool OnInit();
 	virtual int OnExit();
 	wxFrame* CreateChildFrame(wxView* view);
 	wxDECLARE_NO_COPY_CLASS(GenericCAMApp);
+	wxDECLARE_EVENT_TABLE();
 };
 DECLARE_APP(GenericCAMApp)
 

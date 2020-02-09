@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CommandWorkpieceAssignObject.cpp
+// Name               : CommandRunMachineLoad.h
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 16.01.2015
+// Created            : 21.01.2015
 // Copyright          : (C) 2015 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
@@ -24,32 +24,29 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandWorkpieceObjectAssign.h"
+#ifndef COMMANDRUNLOADMACHINE_H_
+#define COMMANDRUNLOADMACHINE_H_
 
-CommandWorkpieceObjectAssign::CommandWorkpieceObjectAssign(const wxString& name,
-		Project* project, int workpieceNr, int objectNr) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->objectNr = objectNr;
-	this->workpieceNr = workpieceNr;
-}
+#include <stddef.h>
+#include <wx/cmdproc.h>
+#include <wx/filename.h>
+#include <wx/string.h>
 
-bool CommandWorkpieceObjectAssign::Do(void)
-{
-	ObjectPlacement temp;
-	temp.refObject = objectNr;
-	project->workpieces[workpieceNr].placements.Add(temp);
-	project->workpieces[workpieceNr].Update();
-	project->Update();
-	return true;
-}
+class Project;
 
-bool CommandWorkpieceObjectAssign::Undo(void)
-{
-	project->workpieces[workpieceNr].placements.RemoveAt(
-			project->workpieces[workpieceNr].placements.GetCount() - 1);
-	project->workpieces[workpieceNr].Update();
-	project->Update();
-	return true;
-}
+class CommandRunMachineLoad:public wxCommand {
+public:
+	CommandRunMachineLoad(const wxString& name, Project * project, size_t ID,
+			const wxFileName& fileName);
+
+	bool Do(void);
+	bool Undo(void);
+
+protected:
+	Project * project;
+	size_t runNr;
+	wxFileName fileName;
+	wxFileName oldFileName;
+};
+
+#endif /* COMMANDRUNLOADMACHINE_H_ */

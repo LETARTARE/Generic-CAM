@@ -63,42 +63,43 @@
  *  -# home (G28, G30) or change coordinate system data (G10) or set axis offsets (G92, G92.1, G92.2, G94). (G-modal-mode 0 - non-modal)
  *  -# perform motion (G0 to G3, G80 to G89), as modified (possibly) by G53. (G-modal-mode 1 - motion)
  *  -# stop (M0, M1, M2, M30, M60). (M-modal-mode 4 - stopping)
- *
  */
 
+#include "../../3D/AffineTransformMatrix.h"
+#include "../generator/CNCPosition.h"
 #include "LUACodeEvaluator.h"
 #include "MachineComponent.h"
-#include "GCodeBlock.h"
-#include "../Tool.h"
-#include <wx/xml/xml.h>
-#include <wx/string.h>
-#include <list>
 
-#include "../ToolPath.h"
-#include "CNCPosition.h"
+#include <wx/filename.h>
+#include <wx/string.h>
+#include <stddef.h>
+#include <list>
+#include <vector>
 
 class Machine {
 	friend class LUACodeEvaluator;
-	//Constructor / Destructor
 public:
 	Machine();
-	Machine(const Machine &other); //!< Copy constructor
-	Machine& operator=(const Machine &other); ///< Assignment operator
 	virtual ~Machine();
 
 public:
 	void ClearComponents(void); //!< Remove all loaded Geometry parts of the machine. Virtually removing the machine.
 	bool Load(wxFileName const& fileName); //!< Load a machine.
 	bool ReLoad(void); //!< Reload the machine from the file. E.g. after editing the file externally.
-	void ToXml(wxXmlNode* parentNode);
-	bool FromXml(wxXmlNode* node);
 
 	void EvaluateDescription(void);
 	bool IsInitialized(void) const;
 	void Assemble(void); //!< Place all components of the machine after reading the MachinePosition.
+
+	void MoveToGlobalZero(void);
+	void SetWorkCoordinateSystem(unsigned char index,
+			const AffineTransformMatrix &coordsys);
+	void SetToolLength(double toollength); //!< Shiftback of machine = Tool.geometry.LB + Holder-length outside of machine
+	void SetPosition(const CNCPosition &position);
+	CNCPosition GetCurrentPosition(void) const; //!< Return the position the machine actually reached.
+
 	void Paint(void) const;
 	void PaintNullTool(double length, double diameter) const;
-	void PaintCoordinateSystem(double diameter) const;
 private:
 	bool PlaceComponent(wxString const& nameOfComponent,
 			AffineTransformMatrix const& matrix);
@@ -108,79 +109,32 @@ private:
 	bool LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
 			const wxString &filename, MachineComponent* component,
 			const AffineTransformMatrix &matrix);
-public:
 
-	void Reset();
-
-	Vector3 GetCenter(void) const;
-
-	void TouchoffPoint(const CNCPosition &point);
-	void TouchoffHeight(const double height);
-
-	bool InterpretGCode(GCodeBlock* block, bool generateMicroSteps = true);
-	bool Step(void);
-
-	// Member variables
 public:
 	wxFileName fileName;
 	wxString machineDescription; //!< Lua script describing the machine.
 	wxString textOut; //!< Errors and output of the Lua script.
 
-	GCodeBlock codestate;
-	CNCPosition lastpos;
-	CNCPosition currentpos; //!< Absolute Position of the Machine
+	CNCPosition setposition; //!< Position of the controlled point (= tip of the tool)
+	CNCPosition reachedposition; //!< Position actually reached
+
+	double toolLength;
 
 	unsigned char selectedCoordSystem;
-	CNCPosition coordSystem[10];
-
-	CNCPosition controlledpoint; //!< Position of the controlled point (= tip of the tool)
-	double feedRate; //!< Feedrate (m/s)
-	int spindleSpeed; //!< Spindle speed (1/s)
-	bool floodCoolant;
-	bool mistCoolant;
-	enum Units {
-		mms, inches
-	};
-	Units activeUnits;
-	enum Plane {
-		XY, YZ, XZ
-	};
-	Plane selectedPlane;
-	ArrayOfTool tools; ///< Tool%s in the Machine
-	int selectedTool;
-	unsigned int selectedToolSlot;
-	double toolLengthOffset;
-
-	bool rapidMovement;
+	AffineTransformMatrix coordSystem[10];
 
 	AffineTransformMatrix toolPosition;
 	AffineTransformMatrix workpiecePosition;
 
-	CNCPosition offset0; //!< Offset from workpiece position to tool position zero. Used for rendering the machine and tools.
-
 	static const size_t NR_IKAXIS = 10;
 	double IKaxis[NR_IKAXIS]; //!< Axes for IK based model.
 	bool IKaxisused[NR_IKAXIS]; //!< Is the axis really used in the machine?
-	bool calculateIK; //!< Does IK needs to be calculated anyway?
-
-	// *** For simulation ***
-	enum MicrostepMode {
-		distanceBased, timeBased, gridBased
-	};
-	MicrostepMode microstepMode;
-	double microstepDistance;
-	double microstepDt;
-	CNCPosition gridOrigin;
-	CNCPosition gridDelta;
-	size_t microstepPosition;
-	std::vector <CNCPosition> microsteps;
 
 private:
-	void Interpolate(CNCPosition *a, CNCPosition *b, bool generateMicroSteps);
+	bool initialized;
 
 	double GetE(void) const;
 
-	bool initialized;
 	LUACodeEvaluator evaluator;
 	std::list <MachineComponent> components;
 
@@ -189,9 +143,12 @@ private:
 	MachineComponent* componentWithMaterial;
 	AffineTransformMatrix workpiecePositionRelativ; //!< Position of the tool relative to the component it is connected to.
 
-	//TODO Test if the variables below are really needed
-	GCodeBlock newcode;
-	GCodeBlock oldcode;
+protected:
+	// Prevent the machine from accidentally being copied by hiding the copy and
+	// assignment constructor.
+	Machine(const Machine &);
+	Machine& operator=(const Machine &);
+
 };
 
 #endif /* MACHINE_H_ */
