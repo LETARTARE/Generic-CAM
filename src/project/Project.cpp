@@ -457,7 +457,7 @@ bool Project::Load(wxFileName fileName)
 
 		zip.OpenEntry(*entry);
 		size_t N = entry->GetSize();
-
+		std::cout << "Expected object size: " << N << "bytes.\n";
 		char* buffer = new char[N + 1];
 		zip.Read(buffer, N);
 		size_t L = zip.LastRead();

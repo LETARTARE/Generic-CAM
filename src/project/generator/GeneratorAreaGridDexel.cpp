@@ -184,7 +184,7 @@ void GeneratorAreaGridDexel::GenerateToolpath(const Run &run,
 	errorOccured = false;
 	toolpathGenerated = true;
 
-	GeneratorDexel::PrepareTargets(run, objects, tool, base);
+	GeneratorDexel::PrepareTargets(run, objects, base);
 	DexelTarget toolShape;
 	toolShape.SetupTool(tool, selected.GetResolutionX(),
 			selected.GetResolutionY());

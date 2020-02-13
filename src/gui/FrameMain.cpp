@@ -41,6 +41,7 @@
 #include "DialogPostProcess.h"
 #include "DialogToolbox.h"
 #include "DialogAnimation.h"
+#include "DialogMachineDebugger.h"
 
 //#include "../project/generator/ToolpathGeneratorThread.h"
 //#include "../project/command/CommandWorkpieceRename.h"
@@ -178,12 +179,10 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 	dialogPostProcess = new DialogPostProcess(this);
 	dialogToolbox = new DialogToolbox(this);
 
-//	dialogDebugger = new DialogMachineDebugger(this);
-//#ifdef _USE_MIDI
-//	dialogDebugger->SetMidiPort(parentframe->midi);
-//#endif
-//	dialogToolbox = new DialogToolbox(this);
-//	dialogAnimation = new DialogAnimation(this);
+	dialogDebugger = new DialogMachineDebugger(this);
+#ifdef _USE_MIDI
+	dialogDebugger->SetMidiPort(parentframe->midi);
+#endif
 
 	wxAcceleratorEntry entries[6];
 	entries[0].Set(0, WXK_F1, wxID_HELP);
@@ -525,8 +524,13 @@ void FrameMain::OnCAMSetup(wxCommandEvent& event)
 	Selection temp = tree->TreeToSelection();
 
 	if(!temp.IsType(Selection::Run)){
+#ifdef _MSC_VER
+		wxString newName = wxString::Format(_T("Run %Iu"),
+				project->GetMaxRunID() + 1);
+#else
 		wxString newName = wxString::Format(_T("Run %zu"),
 				project->GetMaxRunID() + 1);
+#endif
 		size_t objID;
 		if(temp.IsType(Selection::Object)){
 			objID = temp[0];
@@ -712,10 +716,6 @@ void FrameMain::OnCAMPostProcessExport(wxCommandEvent& event)
 	dialogPostProcess->Raise();
 }
 
-void FrameMain::OnCAMToolsMeasure(wxRibbonButtonBarEvent& event)
-{
-}
-
 void FrameMain::OnCAMManageTools(wxRibbonButtonBarEvent& event)
 {
 	dialogToolbox->Update();
@@ -723,12 +723,10 @@ void FrameMain::OnCAMManageTools(wxRibbonButtonBarEvent& event)
 	dialogToolbox->Raise();
 }
 
-void FrameMain::OnCAMManagePostProcesses(wxRibbonButtonBarEvent& event)
-{
-}
-
 void FrameMain::OnCAMManageMachines(wxRibbonButtonBarEvent& event)
 {
+	dialogDebugger->Show(true);
+	dialogDebugger->Raise();
 }
 
 void FrameMain::OnCAMToolsTestGCode(wxRibbonButtonBarEvent& event)
@@ -1267,16 +1265,6 @@ void FrameMain::UpdateSimulation(wxCommandEvent& event)
 ////		(project->GetRun(selected).machine.textOut);
 ////	}
 ////	TransferDataToWindow();
-//}
-//
-//void FrameMain::OnMachineDebugger(wxCommandEvent& event)
-//{
-////	dialogDebugger->Show(true);
-////	dialogDebugger->Raise();
-//}
-//
-//void FrameMain::OnFlipDrillSetup(wxCommandEvent& event)
-//{
 //}
 //
 //void FrameMain::OnToolboxEdit(wxCommandEvent& event)

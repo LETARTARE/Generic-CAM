@@ -47,9 +47,6 @@
 #include <wx/config.h>
 #include <wx/cmdproc.h>
 
-//#include "DialogMachineDebugger.h"
-//#include "DialogToolbox.h"
-//#include "DialogAnimation.h"
 class FrameParent;
 class DialogJobSetup;
 class DialogToolpathGenerator;
@@ -57,6 +54,7 @@ class DialogObjectTransformation;
 class DialogAnimation;
 class DialogToolbox;
 class DialogPostProcess;
+class DialogMachineDebugger;
 
 class FrameMain:public GUIFrameMain {
 	friend class DnDFile;
@@ -84,7 +82,7 @@ private:
 	DialogObjectTransformation * dialogObjectTransformation;
 	DialogJobSetup * dialogJobSetup;
 
-//	DialogMachineDebugger * dialogDebugger;
+	DialogMachineDebugger * dialogDebugger;
 //	DialogToolbox * dialogToolbox;
 	DialogToolpathGenerator * dialogToolpathGenerator;
 	DialogAnimation * dialogAnimation;
@@ -155,10 +153,8 @@ private:
 	void OnCAMMultiAxisMenu(wxRibbonButtonBarEvent& event);
 	void OnCAMPostProcessSimulate(wxRibbonButtonBarEvent& event);
 	void OnCAMPostProcessExport(wxRibbonButtonBarEvent& event);
-	void OnCAMToolsMeasure(wxRibbonButtonBarEvent& event);
 	void OnCAMToolsTestGCode(wxRibbonButtonBarEvent& event);
 	void OnCAMManageTools(wxRibbonButtonBarEvent& event);
-	void OnCAMManagePostProcesses(wxRibbonButtonBarEvent& event);
 	void OnCAMManageMachines(wxRibbonButtonBarEvent& event);
 	void OnBeginLabelEdit(wxTreeEvent& event);
 	void OnEndLabelEdit(wxTreeEvent& event);

@@ -30,8 +30,10 @@
 #include "../Run.h"
 #include "../Tool.h"
 #include "../../Config.h"
-
+#include <iostream>
 #include <float.h>
+
+#include "../../3D/OpenGL.h"
 
 GeneratorDexel::GeneratorDexel()
 {
@@ -41,8 +43,11 @@ GeneratorDexel::GeneratorDexel()
 
 #ifdef _DEBUGMODE
 	start.displayField = true;
+//	start.displayBox = true;
 	target.displayField = true;
+	selected.displayField = true;
 	debug.displayField = true;
+	simulation.displayField = true;
 #else
 	target.displayField = false;
 	debug.displayField = false;
@@ -70,29 +75,27 @@ void GeneratorDexel::Paint(void) const
 	Generator::Paint();
 #ifdef _DEBUGMODE
 	glPushMatrix();
-	glTranslatef(-debugOrigin.x, -debugOrigin.y, -debugOrigin.z);
+	glTranslatef(debugOrigin.x, debugOrigin.y, debugOrigin.z);
 
 	glPushMatrix();
-	glTranslatef(-start.GetSizeX(), 0, 0);
+	glTranslatef(start.GetSizeX(), start.GetSizeY(), 0);
 	start.Paint();
 	glPopMatrix();
-
 	glPushMatrix();
-	glTranslatef(0, -start.GetSizeY(), 0);
+	glTranslatef(2 * start.GetSizeX(), start.GetSizeY(), 0);
 	target.Paint();
 	glPopMatrix();
 	glPushMatrix();
-	glTranslatef(0, start.GetSizeY(), 0);
-	selected.Paint();
-	glPopMatrix();
-
-	glPushMatrix();
 	glTranslatef(start.GetSizeX(), 0, 0);
-	debug.Paint();
+	selected.Paint();
 	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(2 * start.GetSizeX(), 0, 0);
 	simulation.Paint();
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(0, start.GetSizeY(), 0);
+	debug.Paint();
 	glPopMatrix();
 
 	glPopMatrix();
@@ -100,10 +103,10 @@ void GeneratorDexel::Paint(void) const
 }
 
 void GeneratorDexel::PrepareTargets(const Run &run,
-		const std::map <size_t, Object> &objects, const Tool &tool,
-		const DexelTarget &start)
+		const std::map <size_t, Object> &objects, const DexelTarget &start)
 {
 	this->start = start;
+	this->simulation = start;
 
 #ifdef _DEBUGMODE
 	debugOrigin.Set(run.stock.xmin, run.stock.ymin, run.stock.zmin);
@@ -118,8 +121,11 @@ void GeneratorDexel::PrepareTargets(const Run &run,
 	std::set <size_t> objIDs;
 	if(area.IsBaseType(Selection::BaseObject)) objIDs.insert(area.GetBaseID());
 	if(area.IsType(Selection::Object)) objIDs.insert(area.begin(), area.end());
-	if(objIDs.empty()) throw(std::logic_error(
-			"GeneratorDexel::GenerateToolpath - No object in area."));
+	if(objIDs.empty()){
+		std::cout << "GeneratorDexel::GenerateToolpath - No object in area.\n";
+		throw(std::logic_error(
+				"GeneratorDexel::GenerateToolpath - No object in area."));
+	}
 
 	for(std::map <size_t, Object>::const_iterator obj = objects.begin();
 			obj != objects.end(); ++obj){
@@ -189,6 +195,7 @@ void GeneratorDexel::PrepareTargets(const Run &run,
 	}
 	target.FinishImprint();
 	selected.FinishImprint();
+}
 
 //	for(size_t i = 0; i < workpiece->placements.GetCount(); i++){
 //		const ObjectPlacement* const opl = &(workpiece->placements[i]);
@@ -252,7 +259,6 @@ void GeneratorDexel::PrepareTargets(const Run &run,
 
 //	target.CleanOutlier();
 //	target.Refresh();
-}
 
 //	, temp2;
 //	TargetPlacement tempPlace;

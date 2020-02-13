@@ -577,8 +577,8 @@ class GUIToolbox : public wxFrame
 		wxNotebook* m_notebook;
 		wxPanel* m_panelTool;
 		wxStaticText* m_staticTextType;
-		wxChoice* m_choiceType;
 		wxScrolledWindow* m_scrolledWindowType;
+		wxChoice* m_choiceType;
 		wxStaticText* m_staticText81;
 		wxTextCtrl* m_textCtrlShaftDiameter2;
 		wxStaticText* m_staticText101;

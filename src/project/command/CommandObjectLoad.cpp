@@ -51,8 +51,8 @@ bool CommandObjectLoad::Do(void)
 	if(temp.LoadObject(fileName)){
 		project->objects[ID] = temp;
 #ifdef _DEBUGMODE
-		wxLogMessage(_T("CommandObjectLoad took %ld ms to execute."),
-				sw.Time());
+//		wxLogMessage(_T("CommandObjectLoad took %ld ms to execute."),
+//				sw.Time());
 #endif
 		project->Update();
 		return true;

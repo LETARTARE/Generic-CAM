@@ -80,7 +80,7 @@ GUIFrameMain::GUIFrameMain(wxDocument* doc, wxView* view, wxDocParentFrame* pare
 	m_ribbonPanelManage = new wxRibbonPanel( m_ribbonPageCAM, wxID_ANY, _("Manage") , wxNullBitmap , wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE );
 	m_ribbonButtonBarManageCam = new wxRibbonButtonBar( m_ribbonPanelManage, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 	m_ribbonButtonBarManageCam->AddButton( ID_MANAGETOOLS, _("Tool- Library"), wxArtProvider::GetBitmap( wxART_FIND_AND_REPLACE, wxART_CMN_DIALOG ), wxEmptyString);
-	m_ribbonButtonBarManageCam->AddButton( ID_MANAGEMACHINES, _("Machines"), wxArtProvider::GetBitmap( wxART_TIP, wxART_CMN_DIALOG ), wxEmptyString);
+	m_ribbonButtonBarManageCam->AddButton( ID_MANAGEMACHINES, _("Machine Debugger"), wxArtProvider::GetBitmap( wxART_TIP, wxART_CMN_DIALOG ), wxEmptyString);
 	m_ribbonPanelTools = new wxRibbonPanel( m_ribbonPageCAM, wxID_ANY, _("Tools") , wxNullBitmap , wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE );
 	m_ribbonButtonBarTools = new wxRibbonButtonBar( m_ribbonPanelTools, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 	m_ribbonButtonBarTools->AddButton( ID_GCODETEST, _("Test G-Code"), wxArtProvider::GetBitmap( wxART_QUESTION, wxART_CMN_DIALOG ), wxEmptyString);
@@ -950,7 +950,7 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	wxStaticBoxSizer* sbSizerTool;
 	sbSizerTool = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow, wxID_ANY, _("Tool") ), wxVERTICAL );
 	
-	wxString m_choiceToolChoices[] = { _("-") };
+	wxString m_choiceToolChoices[] = { _("Placeholder") };
 	int m_choiceToolNChoices = sizeof( m_choiceToolChoices ) / sizeof( wxString );
 	m_choiceTool = new wxChoice( sbSizerTool->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceToolNChoices, m_choiceToolChoices, 0 );
 	m_choiceTool->SetSelection( 0 );
@@ -1068,7 +1068,7 @@ GUIToolpathGenerator::GUIToolpathGenerator( wxWindow* parent, wxWindowID id, con
 	m_scrolledWindow->SetSizer( bSizerScrolled );
 	m_scrolledWindow->Layout();
 	bSizerScrolled->Fit( m_scrolledWindow );
-	bSizerMain->Add( m_scrolledWindow, 1, wxEXPAND | wxALL, 5 );
+	bSizerMain->Add( m_scrolledWindow, 1, wxALL|wxEXPAND, 5 );
 	
 	
 	this->SetSizer( bSizerMain );
@@ -1463,16 +1463,16 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_staticTextType->Wrap( -1 );
 	bSizerPanelTool->Add( m_staticTextType, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	wxString m_choiceTypeChoices[] = { _("Flat nose (cylindric)"), _("Ball nose (spheric)"), _("Bull nose (mixing ball and flat)"), _("Camfer (triangle)") };
-	int m_choiceTypeNChoices = sizeof( m_choiceTypeChoices ) / sizeof( wxString );
-	m_choiceType = new wxChoice( m_panelTool, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceTypeNChoices, m_choiceTypeChoices, 0 );
-	m_choiceType->SetSelection( 0 );
-	bSizerPanelTool->Add( m_choiceType, 0, wxALL|wxEXPAND, 5 );
-	
 	m_scrolledWindowType = new wxScrolledWindow( m_panelTool, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
 	m_scrolledWindowType->SetScrollRate( 5, 5 );
 	wxBoxSizer* bSizer65;
 	bSizer65 = new wxBoxSizer( wxVERTICAL );
+	
+	wxString m_choiceTypeChoices[] = { _("Flat nose (cylindric)"), _("Ball nose (spheric)"), _("Bull nose (mixing ball and flat)"), _("Camfer (triangle)") };
+	int m_choiceTypeNChoices = sizeof( m_choiceTypeChoices ) / sizeof( wxString );
+	m_choiceType = new wxChoice( m_scrolledWindowType, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceTypeNChoices, m_choiceTypeChoices, 0 );
+	m_choiceType->SetSelection( 0 );
+	bSizer65->Add( m_choiceType, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticText81 = new wxStaticText( m_scrolledWindowType, wxID_ANY, _("Description:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText81->Wrap( -1 );
@@ -1543,7 +1543,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_scrolledWindowType->SetSizer( bSizer65 );
 	m_scrolledWindowType->Layout();
 	bSizer65->Fit( m_scrolledWindowType );
-	bSizerPanelTool->Add( m_scrolledWindowType, 1, wxEXPAND | wxALL, 5 );
+	bSizerPanelTool->Add( m_scrolledWindowType, 1, wxALL|wxEXPAND, 5 );
 	
 	
 	m_panelTool->SetSizer( bSizerPanelTool );
@@ -1707,7 +1707,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	int m_choice13NChoices = sizeof( m_choice13Choices ) / sizeof( wxString );
 	m_choice13 = new wxChoice( m_scrolledWindowTool, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choice13NChoices, m_choice13Choices, 0 );
 	m_choice13->SetSelection( 0 );
-	fgSizerPanelTool->Add( m_choice13, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	fgSizerPanelTool->Add( m_choice13, 1, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
 	
 	
 	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
@@ -1723,7 +1723,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	int m_choice12NChoices = sizeof( m_choice12Choices ) / sizeof( wxString );
 	m_choice12 = new wxChoice( m_scrolledWindowTool, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choice12NChoices, m_choice12Choices, 0 );
 	m_choice12->SetSelection( 0 );
-	fgSizerPanelTool->Add( m_choice12, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	fgSizerPanelTool->Add( m_choice12, 1, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
 	
 	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );

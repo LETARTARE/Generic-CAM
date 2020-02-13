@@ -146,12 +146,12 @@ void ProjectView::Render(void) const
 	PaintObjects(Selection(true), OpenGLMaterial(0.3, 0.3, 1.0),
 			OpenGLMaterial(0, 0, 0));
 
-	if(project->GetToolCount() > 0){
-		glPushMatrix();
-		glTranslatef(0.3, 0, 0);
-		project->GetTool(0).Paint();
-		glPopMatrix();
-	}
+//	if(project->GetToolCount() > 0){
+//		glPushMatrix();
+//		glTranslatef(0.3, 0, 0);
+//		project->GetTool(0).Paint();
+//		glPopMatrix();
+//	}
 
 	if(type == vOrigin){
 		for(std::map <size_t, Run>::const_iterator run = project->run.begin();

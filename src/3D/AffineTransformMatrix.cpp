@@ -137,7 +137,7 @@ double& AffineTransformMatrix::operator [](unsigned char index)
 	return a[index];
 }
 
-const double AffineTransformMatrix::operator [](unsigned char index) const
+double AffineTransformMatrix::operator [](unsigned char index) const
 {
 	if(index >= 16) throw(std::range_error(
 	__FILE__ " operator[] - Out of range."));

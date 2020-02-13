@@ -90,7 +90,7 @@ FrameParent::FrameParent(wxDocManager *manager, wxConfig* config,
 
 	wxMenu *m_menuHelp = new wxMenu;
 	m_menuHelp->Append(wxID_HELP, _("&Help") + wxT("\tF1"));
-	m_menuHelp->Append(wxID_ABOUT);
+	m_menuHelp->Append(wxID_ABOUT, _("About") + wxT("\tF2"));
 
 	wxMenuBar *menubar = new wxMenuBar;
 	menubar->Append(m_menuFile, wxGetStockLabel(wxID_FILE));
@@ -101,9 +101,10 @@ FrameParent::FrameParent(wxDocManager *manager, wxConfig* config,
 
 	m_helpController = new wxHelpController();
 
-	wxAcceleratorEntry entries[1];
+	wxAcceleratorEntry entries[2];
 	entries[0].Set(0, WXK_F1, wxID_HELP);
-	wxAcceleratorTable accel(1, entries);
+	entries[1].Set(0, WXK_F2, wxID_ABOUT);
+	wxAcceleratorTable accel(2, entries);
 	this->SetAcceleratorTable(accel);
 
 	dialogSetupStereo3D = new DialogSetupStereo3D(this, &settingsStereo3D,

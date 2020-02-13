@@ -110,7 +110,7 @@ void GeneratorSurfaceDexel::GenerateToolpath(const Run &run,
 	errorOccured = false;
 	toolpathGenerated = true;
 	output.Empty();
-	GeneratorDexel::PrepareTargets(run, objects, tool, base);
+	GeneratorDexel::PrepareTargets(run, objects, base);
 
 	//	DexelTarget surface = target;
 	DexelTarget toolShape;

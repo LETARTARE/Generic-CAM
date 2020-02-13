@@ -59,9 +59,8 @@
  *
  */
 
-// http://www.parashift.com/c++-faq-lite/operator-overloading.html
-// http://courses.cms.caltech.edu/cs11/material/cpp/donnie/cpp-ops.html
-//
+// https://en.cppreference.com/w/cpp/language/operators
+
 class Vector3;
 class wxString;
 class wxTextOutputStream;
@@ -205,7 +204,7 @@ public:
 			const double z = 0.0) const;
 	Vector3 operator*(const Vector3& v) const;
 	double &operator[](unsigned char index);
-	const double operator[](unsigned char index) const;
+	double operator[](unsigned char index) const;
 	Vector3 operator()(const Vector3& v) const; //!< Operator reference for Vector3 transformations.
 	Vector3 operator()(const double x, const double y = 0.0, const double z =
 			0.0) const;

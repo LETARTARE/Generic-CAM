@@ -111,12 +111,11 @@ void GeneratorOutlineDexel::GenerateToolpath(const Run &run,
 	toolpathGenerated = true;
 	output.Empty();
 
-	GeneratorDexel::PrepareTargets(run, objects, tool, base);
+	GeneratorDexel::PrepareTargets(run, objects, base);
 
 //	DexelTarget surface = target;
 	DexelTarget toolShape;
-	toolShape.SetupTool(tool, target.GetResolutionX(),
-			target.GetResolutionY());
+	toolShape.SetupTool(tool, target.GetResolutionX(), target.GetResolutionY());
 	debug = target;
 	toolShape.NegateZ();
 	target.FoldRaise(toolShape);

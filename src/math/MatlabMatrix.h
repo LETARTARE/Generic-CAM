@@ -84,7 +84,7 @@ public:
 	bool IsFilled(void) const;
 
 	double& operator[](const size_t& index);
-	const double& operator[](const size_t& index) const;
+	double operator[](const size_t& index) const;
 
 	double& operator()(const size_t p1, const size_t p2, const size_t p3 = 0,
 			const size_t p4 = 0);

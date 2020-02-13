@@ -31,7 +31,6 @@
 #include <float.h>
 #include <wx/sizer.h>
 
-
 GeneratorDrillDexel::GeneratorDrillDexel()
 {
 }
@@ -98,7 +97,7 @@ void GeneratorDrillDexel::GenerateToolpath(const Run &run,
 		const std::map <size_t, Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
-	GeneratorDexel::PrepareTargets(run, objects, tool, base);
+	GeneratorDexel::PrepareTargets(run, objects, base);
 
 	output.Empty();
 	errorOccured = false;

@@ -38,7 +38,6 @@
 
 #include <wx/sizer.h>
 
-
 GeneratorAreaMillingDynamic::GeneratorAreaMillingDynamic()
 {
 	freeHeightAboveMaterial = 0.002;
@@ -371,7 +370,7 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(const Run &run,
 {
 	output.Empty();
 
-	GeneratorDexel::PrepareTargets(run, objects, tool, base);
+	GeneratorDexel::PrepareTargets(run, objects, base);
 
 	std::vector <CNCPosition> tp;
 	CNCPosition mp;
@@ -379,8 +378,7 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(const Run &run,
 	toolDiameter = tool.GetMaxDiameter();
 
 	DexelTarget toolShape;
-	toolShape.SetupTool(tool, target.GetResolutionX(),
-			target.GetResolutionY());
+	toolShape.SetupTool(tool, target.GetResolutionX(), target.GetResolutionY());
 	toolShape.NegateZ();
 	DexelTarget temp = target;
 	DexelTarget temptop;

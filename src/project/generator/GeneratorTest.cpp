@@ -122,15 +122,17 @@ void GeneratorTest::GenerateToolpath(const Run &run,
 		const DexelTarget &base)
 {
 	output.Empty();
-	GeneratorDexel::PrepareTargets(run, objects, tool, base);
+	GeneratorDexel::PrepareTargets(run, objects, base);
 
+	// Prepare Toolshape
 	const double resx = base.GetResolutionX();
 	const double resy = base.GetResolutionY();
-
 	DexelTarget toolShape;
 	toolShape.SetupTool(tool, resx, resy);
+
 	target.FoldRaise(toolShape);
 	selected.FoldRaise(toolShape);
+
 	selected.RemoveShadowed(target);
 
 	DexelTarget mask;
@@ -156,6 +158,7 @@ void GeneratorTest::GenerateToolpath(const Run &run,
 	temp.InvertTop();
 	temp &= tempStart;
 	double level = temp.GetSizeZ(); // at upper surface
+	debug = temp;
 
 	CNCPosition m;
 	m.toolSlot = tool.postprocess.number;

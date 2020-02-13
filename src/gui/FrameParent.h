@@ -85,7 +85,8 @@ public:
 public:
 	wxConfig* config;
 
-	wxLogWindow* logWindow;wxHelpController* m_helpController;
+	wxLogWindow* logWindow;
+	wxHelpController* m_helpController;
 	DialogSetupStereo3D * dialogSetupStereo3D;
 	SettingsStereo3D settingsStereo3D;
 	CollectionUnits units;

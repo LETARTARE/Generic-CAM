@@ -282,7 +282,7 @@ double& MatlabMatrix::operator[](const size_t& index)
 	return buffer[index];
 }
 
-const double& MatlabMatrix::operator[](const size_t& index) const
+double MatlabMatrix::operator[](const size_t& index) const
 {
 	if(index >= size) throw(std::out_of_range(
 			std::string(__FILE__) + ": operator[]: Access out of bounds!"));
