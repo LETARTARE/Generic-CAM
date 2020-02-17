@@ -134,7 +134,6 @@ void GeneratorTest::GenerateToolpath(const Run &run,
 	selected.FoldRaise(toolShape);
 
 	selected.RemoveShadowed(target);
-
 	DexelTarget mask;
 	mask = selected;
 	mask.HardInvert();

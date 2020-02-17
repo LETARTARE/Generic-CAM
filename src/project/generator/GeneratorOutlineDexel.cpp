@@ -117,7 +117,7 @@ void GeneratorOutlineDexel::GenerateToolpath(const Run &run,
 	DexelTarget toolShape;
 	toolShape.SetupTool(tool, target.GetResolutionX(), target.GetResolutionY());
 	debug = target;
-	toolShape.NegateZ();
+//	toolShape.NegateZ();
 	target.FoldRaise(toolShape);
 	target.Limit();
 

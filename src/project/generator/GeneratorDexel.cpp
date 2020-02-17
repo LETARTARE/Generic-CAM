@@ -78,6 +78,10 @@ void GeneratorDexel::Paint(void) const
 	glTranslatef(debugOrigin.x, debugOrigin.y, debugOrigin.z);
 
 	glPushMatrix();
+	glTranslatef(0, start.GetSizeY(), 0);
+	debug.Paint();
+	glPopMatrix();
+	glPushMatrix();
 	glTranslatef(start.GetSizeX(), start.GetSizeY(), 0);
 	start.Paint();
 	glPopMatrix();
@@ -85,6 +89,7 @@ void GeneratorDexel::Paint(void) const
 	glTranslatef(2 * start.GetSizeX(), start.GetSizeY(), 0);
 	target.Paint();
 	glPopMatrix();
+
 	glPushMatrix();
 	glTranslatef(start.GetSizeX(), 0, 0);
 	selected.Paint();
@@ -92,10 +97,6 @@ void GeneratorDexel::Paint(void) const
 	glPushMatrix();
 	glTranslatef(2 * start.GetSizeX(), 0, 0);
 	simulation.Paint();
-	glPopMatrix();
-	glPushMatrix();
-	glTranslatef(0, start.GetSizeY(), 0);
-	debug.Paint();
 	glPopMatrix();
 
 	glPopMatrix();

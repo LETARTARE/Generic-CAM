@@ -115,7 +115,7 @@ void GeneratorSurfaceDexel::GenerateToolpath(const Run &run,
 	//	DexelTarget surface = target;
 	DexelTarget toolShape;
 	toolShape.SetupTool(tool, target.GetResolutionX(), target.GetResolutionY());
-	toolShape.NegateZ();
+//	toolShape.NegateZ();
 
 	target.FoldRaise(toolShape);
 	target.Limit();
@@ -124,7 +124,7 @@ void GeneratorSurfaceDexel::GenerateToolpath(const Run &run,
 //	debug.CopyToUp(4, 1.0);
 
 	toolShape.SetupTool(tool, target.GetResolutionX(), target.GetResolutionY());
-	toolShape.NegateZ();
+//	toolShape.NegateZ();
 
 	std::vector <ProtoToolpath> aptp;
 	CNCPosition m;
@@ -253,7 +253,7 @@ void GeneratorSurfaceDexel::GenerateToolpath(const Run &run,
 //			false);
 //	toolShape.NegateZ();
 //
-//	toolpath.Clear();
+	toolpath.clear();
 
 //	Polygon25 pg = target.GeneratePolygon(-1, -1, FLT_EPSILON);
 //	pg.RotatePolygonStart(0, 0);

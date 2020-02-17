@@ -185,20 +185,30 @@ void GeneratorAreaGridDexel::GenerateToolpath(const Run &run,
 	toolpathGenerated = true;
 
 	GeneratorDexel::PrepareTargets(run, objects, base);
+
 	DexelTarget toolShape;
 	toolShape.SetupTool(tool, selected.GetResolutionX(),
 			selected.GetResolutionY());
-	toolShape.NegateZ();
+//	toolShape.NegateZ();
 
 	start.FoldRaise(toolShape);
 	start.Limit();
 	selected.FoldRaise(toolShape);
 	selected.Limit();
+	target.FoldRaise(toolShape);
+	target.Limit();
+
+	selected.RemoveShadowed(target);
+	DexelTarget mask;
+	mask = selected;
+	mask.HardInvert();
+	selected |= mask;
+
 //	debug = target;
-	type.resolutionX = selected.GetResolutionX();
-	type.resolutionY = selected.GetResolutionY();
-	type.offsetX = selected.GetResolutionX() / 2;
-	type.offsetY = selected.GetResolutionY() / 2;
+	type.resolutionX = start.GetResolutionX();
+	type.resolutionY = start.GetResolutionY();
+	type.offsetX = start.GetResolutionX() / 2;
+	type.offsetY = start.GetResolutionY() / 2;
 
 	toolpath.clear();
 
@@ -208,7 +218,7 @@ void GeneratorAreaGridDexel::GenerateToolpath(const Run &run,
 	const double cutdepth = tool.GetCuttingDepth();
 	const int N = ceil((start.GetSizeZ()) / cutdepth);
 
-//	debug = start;
+	debug = selected;
 
 	for(int n = 1; n <= N; n++){
 		const double level = fmax(start.GetSizeZ() - n * cutdepth, 0);
@@ -219,27 +229,27 @@ void GeneratorAreaGridDexel::GenerateToolpath(const Run &run,
 				x += tooldiameter * (1 - overlap)){
 
 			const int ix = round(
-					(x - selected.GetResolutionX() / 2)
-							/ selected.GetResolutionX());
-			if(ix < 0 || ix >= selected.GetCountX()) continue;
+					(x - start.GetResolutionX() / 2)
+							/ start.GetResolutionX());
+			if(ix < 0 || ix >= start.GetCountX()) continue;
 			int py0 = round(
-					(0 - selected.GetResolutionY() / 2)
-							/ selected.GetResolutionY());
+					(0 - start.GetResolutionY() / 2)
+							/ start.GetResolutionY());
 			int py1 = round(
-					(start.GetSizeY() - selected.GetResolutionY() / 2)
-							/ selected.GetResolutionY());
+					(start.GetSizeY() - start.GetResolutionY() / 2)
+							/ start.GetResolutionY());
 			if(py0 < 0) py0 = 0;
-			if(py1 >= selected.GetCountY()) py1 = selected.GetCountY() - 1;
+			if(py1 >= start.GetCountY()) py1 = start.GetCountY() - 1;
 			if(py1 < py0) continue;
 
 			ptp.clear();
 			CNCPosition m;
 			for(int iy = py0; iy <= py1; ++iy){
 
-				m.position.x = ix * selected.GetResolutionX()
-						+ selected.GetResolutionX() / 2;
-				m.position.y = iy * selected.GetResolutionY()
-						+ selected.GetResolutionY() / 2;
+				m.position.x = ix * start.GetResolutionX()
+						+ start.GetResolutionX() / 2;
+				m.position.y = iy * start.GetResolutionY()
+						+ start.GetResolutionY() / 2;
 				const ImprinterElement e = selected.GetElement(m.position.x,
 						m.position.y);
 				const ImprinterElement s = start.GetElement(m.position.x,
@@ -271,13 +281,13 @@ void GeneratorAreaGridDexel::GenerateToolpath(const Run &run,
 	if(!toolpath.empty()){
 		{
 			CNCPosition m = toolpath[0];
-			m.position.z = selected.GetSizeZ() + freeHeight;
+			m.position.z = start.GetSizeZ() + freeHeight;
 			m.Rapid();
 			toolpath.insert(toolpath.begin(), m);
 		}
 		{
 			CNCPosition m = *(toolpath.end() - 1);
-			m.position.z = selected.GetSizeZ() + freeHeight;
+			m.position.z = start.GetSizeZ() + freeHeight;
 			m.Rapid();
 			toolpath.push_back(m);
 		}

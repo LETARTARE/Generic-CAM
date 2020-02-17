@@ -379,7 +379,7 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(const Run &run,
 
 	DexelTarget toolShape;
 	toolShape.SetupTool(tool, target.GetResolutionX(), target.GetResolutionY());
-	toolShape.NegateZ();
+//	toolShape.NegateZ();
 	DexelTarget temp = target;
 	DexelTarget temptop;
 
