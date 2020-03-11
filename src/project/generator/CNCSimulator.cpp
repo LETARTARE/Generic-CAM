@@ -54,7 +54,7 @@ void CNCSimulator::SetTools(const std::vector <Tool> * tools)
 	this->tools = tools;
 }
 
-void CNCSimulator::InsertTarget(DexelTarget* target)
+void CNCSimulator::InsertBase(DexelTarget* target)
 {
 	if(this->basetarget == target && target != NULL) return;
 	this->basetarget = target;
@@ -67,7 +67,7 @@ void CNCSimulator::InsertToolPath(std::vector <CNCPosition> * toolpath,
 	std::cout << "CNCSimulator::InsertToolPath(..., " << calculateTiming
 			<< ")\n";
 
-	const double minimumFeed = 1e-9; // 1 nm/s (If this should ever be a problem, I would love to know the field.)
+	const double minimumFeed = 1e-9; // 1 nm/s (If this should ever be a problem, I would love to know the field of application.)
 
 	if(this->toolpath == toolpath && toolpath != NULL) return;
 	this->toolpath = toolpath;
@@ -87,13 +87,13 @@ void CNCSimulator::InsertToolPath(std::vector <CNCPosition> * toolpath,
 void CNCSimulator::Reset(void)
 {
 	if(!initialized){
-		target.displayBox = true;
+		simulated.displayBox = true;
 		initialized = true;
 	}
 	if(basetarget != NULL){
-		target = *basetarget;
+		simulated = *basetarget;
 	}else{
-		target.Empty();
+		simulated.Empty();
 	}
 	tStep = 0.0;
 	step = 0;
@@ -128,10 +128,13 @@ void CNCSimulator::Step(float tTarget)
 		return;
 	}
 	DexelTarget dex;
-	dex.SetupTool(*tool, target.GetResolutionX(), target.GetResolutionY());
+	dex.SetupTool(*tool, simulated.GetResolutionX(), simulated.GetResolutionY());
 //		dex.MirrorZ();
-//		dex.NegateZ();
-	target.PolygonCutInTarget(temp, dex);
+		dex.NegateZ();
+
+	AffineTransformMatrix shift = stockposition * (origin.Inverse());
+	temp.ApplyTransformation(shift);
+	simulated.PolygonCutInTarget(temp, dex);
 
 //	if(step + 1 == position.size()){
 //		machine->position = position[step];
@@ -172,15 +175,15 @@ double CNCSimulator::GetTime(void) const
 	return tStep;
 }
 
-const DexelTarget* CNCSimulator::GetTarget(void) const
+const DexelTarget* CNCSimulator::GetResult(void) const
 {
-	return &target;
+	return &simulated;
 }
 
 void CNCSimulator::Paint(void) const
 {
 	if(!initialized) return;
 	glPushMatrix();
-	target.Paint();
+	simulated.Paint();
 	glPopMatrix();
 }

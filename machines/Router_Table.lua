@@ -56,18 +56,19 @@ function AssembleMachine()
   -- The base of the machine is placed automatically.
   -- So only the moving parts have to be placed here.
   -- Variables for the axis positions are provided as
-  -- global variables ( AXIS_X, AXIS_Y, AXIS_Z,
-  -- AXIS_A, AXIS_B, AXIS_C, AXIS_U, AXIS_V, AXIS_W).
+  -- global variables (AXIS_1, ..., AXIS_9). The axes
+  -- can be used in a arbitrary order. GenericCAM checks
+  -- the type and orientation of every axis later.
   -- The following code puts all the parts of the
   -- machine in their positions using the above
   -- mentioned variables.
      
 	identity();
-	translate(AXIS_X+thicknessOfBridge/2+0.01+0.045-sizeX/2+offset, 0, 0);
+	translate(AXIS_1+thicknessOfBridge/2+0.01+0.045-sizeX/2+offset, 0, 0);
 	placecomponent("Bridge");
 
-	translate(0, AXIS_Y-sizeY/2+offset, 0);
-	translate(0, 0, AXIS_Z+0.20-0.4+0.1+0.1+0.06+heightOfBed/2);
+	translate(0, AXIS_2-sizeY/2+offset, 0);
+	translate(0, 0, AXIS_3+0.20-0.4+0.1+0.1+0.06+heightOfBed/2);
 	placecomponent("Head");
 
 end

@@ -52,8 +52,8 @@ public:
 
 	void SetTools(const std::vector <Tool> *tools);
 
-	void InsertTarget(DexelTarget* target); //!< Inserts a target into the simulator. This target remains unchanged.
-	const DexelTarget* GetTarget(void) const; //!< Returns the modified internal target.
+	void InsertBase(DexelTarget* target); //!< Inserts a target into the simulator. This target remains unchanged.
+	const DexelTarget* GetResult(void) const; //!< Returns the modified internal target.
 
 	void InsertToolPath(std::vector <CNCPosition> * toolpath,
 			bool calculateTiming = true);
@@ -61,9 +61,11 @@ public:
 	double GetTime(void) const;
 	double GetMaxTime(void) const;
 
+	void FullSimulation(void);
+
 	void Reset(void);
 	void Previous(void);
-	void Step(float tTarget);
+	void Step(float tTarget = -1.0);
 	void Next(void);
 	void Last(void);
 
@@ -76,8 +78,8 @@ private:
 	const std::vector <Tool> * tools;
 	std::vector <CNCPosition> * toolpath; //!< Toolpath to apply to target.
 
-	DexelTarget* basetarget; //!< Provided target to initialize the internal copy from.
-	DexelTarget target; //!< Internal target to work on.
+	const DexelTarget* basetarget; //!< Provided target to initialize the internal copy from.
+	DexelTarget simulated; //!< Internal target to work on.
 
 	bool initialized;
 

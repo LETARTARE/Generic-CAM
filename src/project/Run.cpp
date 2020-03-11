@@ -50,6 +50,8 @@ Run::Run()
 
 	touchpoint = wxImage(touchpoint_xpm);
 	touchpoint.SetAlphaColor(255, 255, 255);
+
+	base.displayField = true;
 }
 
 Run::~Run()
@@ -115,12 +117,19 @@ void Run::Paint(void) const
 	if(pr == NULL) return;
 
 	OpenGLMaterial::EnableColors();
+
+	// Paint semi-transparent stock object
 	if(stocktype == BoxTop || stocktype == BoxCenter || stocktype == BoxBottom){
 		if(OpenGLMaterial::ColorsAllowed()){
 			glColor4f(0.2, 0.2, 0.2, 0.6);
 			glPushName((GLuint) Selection::TriangleGroup);
 			stock.Paint();
 			glPopName();
+			glPushMatrix();
+			glTranslatef(stock.xmin, stock.ymin, stock.zmin);
+			glTranslatef(-base.GetSizeX(), 0, 0);
+			base.Paint();
+			glPopMatrix();
 		}
 	}
 
@@ -133,6 +142,7 @@ void Run::Paint(void) const
 
 		glPushMatrix();
 		origin.GLMultMatrix();
+		// Move the images a little bit out of the object, to display correctly.
 		glTranslatef(stockorigin.x * 1e-4, stockorigin.y * 1e-4, 0);
 		glScalef(s, s, s);
 		glRotatef(90, 1, 0, 0);
@@ -197,6 +207,7 @@ void Run::PaintVertices(void) const
 	OpenGLMaterial::EnableColors();
 	glColor4f(0.8, 0.8, 0.8, 1.0);
 	glPushName(Selection::Vertex);
+	// Paint the corner vertices and one extr vertex on the surfaces
 	stock.PaintVertices(1, 10);
 	glPopName();
 }
@@ -209,8 +220,7 @@ void Run::GenerateToolpaths(void)
 
 	Update(parent);
 
-	DexelTarget base;
-
+	// Prepare the workpiece to run the simulations on
 	const double A = stock.GetSizeX() * stock.GetSizeY();
 	size_t N = (A / (parent->minResolution * parent->minResolution));
 	N = (N > parent->maxCells)? (parent->maxCells) : N;
@@ -220,9 +230,14 @@ void Run::GenerateToolpaths(void)
 			res);
 
 	if(stocktype == sObject){
-		base.InitImprinting();
 		const Object & obj = parent->Get3DObject(stockobject);
-		base.InsertObject(obj, AffineTransformMatrix::Identity());
+		base.InitImprinting();
+
+		AffineTransformMatrix M = obj.matrix;
+		M.TranslateGlobal(-obj.bbox.xmin, -obj.bbox.ymin, -obj.bbox.zmin);
+		M.TranslateGlobal(-stock.xmin + obj.bbox.xmin,
+				-stock.ymin + obj.bbox.ymin, -stock.zmin + obj.bbox.zmin);
+		base.InsertObject(obj, M);
 		base.FinishImprint();
 	}else{
 		base.Fill();
@@ -266,14 +281,15 @@ void Run::GenerateToolpaths(void)
 
 			}
 		}
-
-		simulator.InsertTarget(&base);
+		simulator.origin.SetOrigin(Vector3(stock.xmin, stock.ymin, stock.zmin));
+		simulator.InsertBase(&base);
 		simulator.InsertToolPath(&(it->second->toolpath), true);
 		simulator.Reset();
 		simulator.Last();
-//		(workpiece->model) = *(simulator.GetTarget());
+		base = *(simulator.GetResult());
 	}
 }
+
 //
 //bool Run::SaveToolpaths(wxFileName fileName)
 //{

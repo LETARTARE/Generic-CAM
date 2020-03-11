@@ -68,6 +68,20 @@ CNCPosition::CNCPosition(const AffineTransformMatrix& matrix)
 	dt = 0.0;
 }
 
+CNCPosition& CNCPosition::operator =(const AffineTransformMatrix& matrix)
+{
+	position = matrix.GetOrigin();
+	normal = matrix.GetEz();
+	toolSlot = -1;
+	S = 0;
+	F = 0;
+	rapid = false;
+	circle = false;
+	t = 0.0;
+	dt = 0.0;
+	return *this;
+}
+
 CNCPosition::~CNCPosition()
 {
 }
@@ -91,7 +105,7 @@ double CNCPosition::Abs(const CNCPosition& b) const
 
 double CNCPosition::Rotation(const CNCPosition& b) const
 {
-	return asin(normal.Dot(b.normal));
+	return acos(normal.Dot(b.normal));
 }
 
 void CNCPosition::Set(double x, double y, double z, bool rapid)
@@ -110,6 +124,16 @@ void CNCPosition::FeedSpeed(void)
 	rapid = false;
 }
 
+double CNCPosition::Abs2(const CNCPosition& b) const
+{
+	return (position - b.position).Abs2();
+}
+
+double CNCPosition::Dot(const CNCPosition& b) const
+{
+	return normal.Dot(b.normal);
+}
+
 AffineTransformMatrix CNCPosition::GetMatrix(void) const
 {
 	AffineTransformMatrix temp;
@@ -119,6 +143,9 @@ AffineTransformMatrix CNCPosition::GetMatrix(void) const
 	temp.CalculateEy();
 	if(temp.GetEy().Abs2() < 1e-6){
 		temp.SetEy(Vector3(0, 1, 0));
+		temp.CalculateEx();
+		temp.CalculateEy();
+	}else{
 		temp.CalculateEx();
 	}
 	temp.Normalize();

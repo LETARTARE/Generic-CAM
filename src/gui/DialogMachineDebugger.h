@@ -63,12 +63,14 @@ protected:
 	void Update(wxCommandEvent& event);
 
 	void OnXClose(wxCloseEvent& event);
-	void OnMachineLoad(wxCommandEvent& event);
-	void OnMachineSave(wxCommandEvent& event);
+	void OnMachineLoad(wxRibbonButtonBarEvent& event);
+	void OnMachineSave(wxRibbonButtonBarEvent& event);
 	void OnClose(wxCommandEvent& event);
+	void OnScriptEvaluate(wxRibbonButtonBarEvent& event);
 	void OnScriptEvaluate(wxCommandEvent& event);
 	void OnShowController(wxCommandEvent& event);
-	void OnChangeStereo3D(wxCommandEvent& event);
+	void OnToggleStereo3D(wxCommandEvent& event);
+	void OnShowPreferencesMenu(wxRibbonButtonBarEvent& event);
 };
 
 #endif /* DIALOGMACHINEDEBUGGER_H_ */

@@ -83,11 +83,17 @@ void DialogMachineControl::OnXClose(wxCloseEvent& event)
 {
 	TransferDataFromWindow();
 	this->Show(false);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
+	ID_UPDATEMACHINESIMULATION);
+	ProcessEvent(selectEvent);
 }
 void DialogMachineControl::OnClose(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
 	this->Show(false);
+	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
+	ID_UPDATEMACHINESIMULATION);
+	ProcessEvent(selectEvent);
 }
 
 void DialogMachineControl::OnScroll(wxScrollEvent& event)

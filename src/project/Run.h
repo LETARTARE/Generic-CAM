@@ -58,15 +58,19 @@
  *
  */
 
-
+#include "generator/DexelTarget.h"
 #include "generator/Generator.h"
 #include "../3D/AffineTransformMatrix.h"
-#include "../3D/OpenGLImage.h"
 #include "../3D/BoundingBox.h"
+#include "../3D/OpenGLImage.h"
+#include "../3D/Vector3.h"
 #include "Selection.h"
 
+#include <stddef.h>
+#include <wx/filename.h>
+#include <wx/string.h>
+#include <wx/txtstrm.h>
 #include <map>
-#include <string>
 
 class Project;
 class Run {
@@ -102,6 +106,8 @@ public:
 	// Set up by Update()
 	BoundingBox stock;
 	AffineTransformMatrix origin; //!< Origin and coordinate-system
+
+	DexelTarget base;
 
 private:
 	OpenGLImage touchpoint;

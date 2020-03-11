@@ -55,8 +55,8 @@
 #include <wx/treelist.h>
 #include <wx/dataview.h>
 #include "CanvasTool.h"
-#include <wx/menu.h>
 #include "CanvasMachine.h"
+#include <wx/menu.h>
 #include <wx/listbox.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -120,20 +120,24 @@
 #define ID_MARGINSIDE 1056
 #define ID_MARGINBELOW 1057
 #define ID_CLEARANCEHEIGHT 1058
-#define ID_CONTROLLERSHOW 1059
-#define ID_VIEWSTEREO3D 1060
-#define ID_AXISX 1061
-#define ID_AXISY 1062
-#define ID_AXISZ 1063
-#define ID_TEXTX 1064
-#define ID_TEXTY 1065
-#define ID_TEXTZ 1066
-#define ID_AXISRX 1067
-#define ID_AXISRY 1068
-#define ID_AXISRZ 1069
-#define ID_TEXTRX 1070
-#define ID_TEXTRY 1071
-#define ID_TEXTRZ 1072
+#define wxID_LOAD 1059
+#define ID_MACHINEDESCRIPTIONEVALUATE 1060
+#define ID_MACHINEDEBUGGERSHOWCONTROLLER 1061
+#define ID_SHOWPREFERENCES 1062
+#define ID_MACHINEDEBUGGERTOGGLESTEREO3D 1063
+#define ID_CONTROLLERSHOW 1064
+#define ID_AXISX 1065
+#define ID_AXISY 1066
+#define ID_AXISZ 1067
+#define ID_TEXTX 1068
+#define ID_TEXTY 1069
+#define ID_TEXTZ 1070
+#define ID_AXISRX 1071
+#define ID_AXISRY 1072
+#define ID_AXISRZ 1073
+#define ID_TEXTRX 1074
+#define ID_TEXTRY 1075
+#define ID_TEXTRZ 1076
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIFrameMain
@@ -424,7 +428,7 @@ class GUIToolpathGenerator : public wxFrame
 	
 	public:
 		
-		GUIToolpathGenerator( wxWindow* parent, wxWindowID id = wxID_CLOSE, const wxString& title = _("..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 491,611 ), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIToolpathGenerator( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 491,611 ), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~GUIToolpathGenerator();
 	
@@ -468,7 +472,7 @@ class GUIAnimation : public wxFrame
 	
 	public:
 		
-		GUIAnimation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Simulation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxFRAME_TOOL_WINDOW|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIAnimation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Simulation"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~GUIAnimation();
 	
@@ -526,7 +530,7 @@ class GUITestGCode : public wxFrame
 	
 	public:
 		
-		GUITestGCode( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("G-Code parser"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxFRAME_TOOL_WINDOW|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUITestGCode( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("G-Code parser"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~GUITestGCode();
 	
@@ -560,7 +564,7 @@ class GUISetupPaths : public wxDialog
 	
 	public:
 		
-		GUISetupPaths( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup Paths"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 701,469 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		GUISetupPaths( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup Paths"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 701,469 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~GUISetupPaths();
 	
 };
@@ -790,10 +794,12 @@ class GUIMachineDebugger : public wxFrame
 	private:
 	
 	protected:
-		wxMenuBar* m_menubar;
-		wxMenu* m_menuMachine;
-		wxMenu* m_menuPreferences;
-		wxMenu* m_menuView;
+		wxRibbonBar* m_ribbonBar;
+		wxRibbonPage* m_ribbonPage;
+		wxRibbonPanel* m_ribbonPanelFileOperations;
+		wxRibbonButtonBar* m_ribbonButtonBarScript;
+		wxRibbonPanel* m_ribbonPanelSettings;
+		wxRibbonButtonBar* m_ribbonButtonBarSettings;
 		wxSplitterWindow* m_splitter;
 		wxPanel* m_panel;
 		wxSplitterWindow* m_splitter3;
@@ -808,17 +814,18 @@ class GUIMachineDebugger : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnXClose( wxCloseEvent& event ) = 0;
-		virtual void OnMachineLoad( wxCommandEvent& event ) = 0;
-		virtual void OnMachineSave( wxCommandEvent& event ) = 0;
-		virtual void OnScriptEvaluate( wxCommandEvent& event ) = 0;
+		virtual void OnMachineLoad( wxRibbonButtonBarEvent& event ) = 0;
+		virtual void OnMachineSave( wxRibbonButtonBarEvent& event ) = 0;
+		virtual void OnScriptEvaluate( wxRibbonButtonBarEvent& event ) = 0;
 		virtual void OnShowController( wxCommandEvent& event ) = 0;
-		virtual void OnClose( wxCommandEvent& event ) = 0;
-		virtual void OnChangeStereo3D( wxCommandEvent& event ) = 0;
+		virtual void OnShowPreferencesMenu( wxRibbonButtonBarEvent& event ) = 0;
+		virtual void OnToggleStereo3D( wxCommandEvent& event ) = 0;
+		virtual void OnScriptEvaluate( wxCommandEvent& event ) = 0;
 		
 	
 	public:
 		
-		GUIMachineDebugger( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine Debugger"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 831,596 ), long style = wxCAPTION|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxFRAME_TOOL_WINDOW|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIMachineDebugger( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine Debugger"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 831,596 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~GUIMachineDebugger();
 		
@@ -888,7 +895,7 @@ class GUIMachineControl : public wxFrame
 	
 	public:
 		
-		GUIMachineControl( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine Controller"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,500 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxFRAME_TOOL_WINDOW|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIMachineControl( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Machine Controller"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,500 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~GUIMachineControl();
 	
@@ -926,7 +933,7 @@ class GUISetupUnits : public wxFrame
 	
 	public:
 		
-		GUISetupUnits( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup Display Units"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxSTAY_ON_TOP|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		GUISetupUnits( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup Display Units"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxSTAY_ON_TOP|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		
 		~GUISetupUnits();
 	
@@ -961,7 +968,7 @@ class GUISetupMidi : public wxFrame
 	
 	public:
 		
-		GUISetupMidi( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup MIDI Connection"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 620,482 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
+		GUISetupMidi( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Setup MIDI Connection"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 620,482 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxSTAY_ON_TOP|wxTAB_TRAVERSAL );
 		
 		~GUISetupMidi();
 	

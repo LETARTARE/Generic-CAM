@@ -100,7 +100,8 @@ bool Machine::ReLoad(void)
 		flag = true;
 		wxTextFile file(fileName.GetFullPath());
 		if(!file.Open(wxConvLocal) && !file.Open(wxConvFile)){
-			wxLogError(_T("Opening of the file failed!"));
+			wxLogError
+			(_T("Opening of the file failed!"));
 			return false;
 		}
 		wxString str;
@@ -133,10 +134,10 @@ bool Machine::ReLoad(void)
 	}
 
 	if(!flag){
-		wxLogError(_("File format for machine descriptions not supported."));
+		wxLogError
+		(_("File format for machine descriptions not supported."));
 		return false;
 	}
-
 	EvaluateDescription();
 	MoveToGlobalZero();
 	return IsInitialized();
@@ -144,7 +145,8 @@ bool Machine::ReLoad(void)
 
 void Machine::EvaluateDescription(void)
 {
-	wxLogMessage(_T("Machine::InsertMachineDescription"));
+	wxLogMessage
+	(_T("Machine::InsertMachineDescription"));
 	evaluator.LinkToMachine(this);
 	if(evaluator.EvaluateProgram()){
 
@@ -161,8 +163,7 @@ void Machine::EvaluateDescription(void)
 			evaluator.EvaluateAssembly();
 			AffineTransformMatrix P = workpiecePosition.Inverse()
 					* toolPosition;
-			if(P.Distance(P0) > FLT_EPSILON)
-				IKaxisused[n] = true;
+			if(P.Distance(P0) > FLT_EPSILON) IKaxisused[n] = true;
 		}
 		for(size_t n = 0; n < NR_IKAXIS; n++)
 			IKaxis[n] = 0.0;
@@ -173,23 +174,16 @@ void Machine::EvaluateDescription(void)
 	}else{
 		initialized = false;
 	}
+	AffineTransformMatrix tpos = toolPosition;
+	tpos.TranslateLocal(0, 0, toolLength);
+	reachedposition = workpiecePosition.Inverse() * tpos;
 	textOut = evaluator.GetOutput();
 }
 
 double Machine::GetE(void) const
 {
-	AffineTransformMatrix tpos;// = (currentpos + offset0).GetMatrix();
-	tpos.TranslateLocal(0, 0, toolLength);
-
-	AffineTransformMatrix cpos = workpiecePosition.Inverse() * toolPosition;
-
-
-	// Scalar product of the normal vectors (0,0,1) for both matrices.
-	const double normalaligned = tpos[8] * cpos[8] + tpos[9] * cpos[9]
-			+ tpos[10] * cpos[10];
-
-	Vector3 tc = tpos.GetOrigin();
-	Vector3 cc = cpos.GetOrigin();
+	const double distance = reachedposition.Abs2(setposition);
+	const double normalangle = fabs(1.0 - reachedposition.Dot(setposition));
 
 	// Keep the axes rather straight.
 	double bend = 0.0;
@@ -197,8 +191,7 @@ double Machine::GetE(void) const
 		if(IKaxisused[n]) bend += IKaxis[n] * IKaxis[n];
 	}
 
-	return (tc - cc).Abs() + 3 * fabs(normalaligned - 1.0) + sqrt(bend) / 1000;
-//	return cpos.Distance(tpos);
+	return distance + 1.0 * normalangle + 0.0001 * sqrt(bend);
 }
 
 void Machine::Assemble()
@@ -215,8 +208,10 @@ void Machine::Assemble()
 		if(IKaxisused[n]) optim.param.push_back(IKaxis[n]);
 	}
 	optim.reevalBest = true;
-	optim.errorLimit = 0.01;
-	optim.evalLimit = 500;
+//	optim.keepSimplex = true;
+	optim.simplexSpread = 0.5;
+	optim.errorLimit = 0.0001;
+	optim.evalLimit = 50;
 
 	optim.Start();
 	while(optim.IsRunning()){
@@ -225,6 +220,9 @@ void Machine::Assemble()
 			if(IKaxisused[n]) IKaxis[n] = optim.param[m++];
 		}
 		evaluator.EvaluateAssembly();
+		AffineTransformMatrix tpos = toolPosition;
+		tpos.TranslateLocal(0, 0, toolLength);
+		reachedposition = workpiecePosition.Inverse() * tpos;
 		optim.SetError(GetE());
 	}
 }
@@ -251,15 +249,16 @@ void Machine::Paint(void) const
 //	AffineTransformMatrix temp = workpiecePosition.Inverse() * toolPosition;
 //	::glMultMatrixd(temp.a);
 
-	AffineTransformMatrix temp;// = (currentpos + offset0).GetMatrix();
-	temp.TranslateLocal(0, 0, toolLength);
+	AffineTransformMatrix temp = setposition.GetMatrix();
+	temp.Paint(0.1);
+//	temp.TranslateLocal(0, 0, toolLength);
 //	temp = temp.Inverse();
 	temp.GLMultMatrix();
 //	if(selectedToolSlot > 0 && selectedToolSlot <= tools.GetCount()){
 //		::glColor3f(0.7, 0.7, 0.7);
 //		tools[selectedToolSlot - 1].Paint();
 //	}else{
-		PaintNullTool(0.05, 0.03);
+	PaintNullTool(0.05, 0.03);
 //	}
 	::glPopMatrix();
 }
@@ -335,7 +334,8 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 
 	// Case 0: The lua file is inside a zip, so is the rest of the data.
 	if(machinedirectory.GetExt().CmpNoCase(_T("zip")) == 0){
-		wxLogMessage(_T("Inside Zip file."));
+		wxLogMessage
+		(_T("Inside Zip file."));
 		return LoadGeometryIntoComponentFromZip(machinedirectory, filename,
 				component, matrix);
 	}
@@ -344,7 +344,8 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 	wxFileName zipFile(machinedirectory);
 	zipFile.SetExt(_T("zip"));
 	if(zipFile.IsFileReadable()){
-		wxLogMessage(_T("Zip file found."));
+		wxLogMessage
+		(_T("Zip file found."));
 		return LoadGeometryIntoComponentFromZip(zipFile, filename, component,
 				matrix);
 	}
@@ -361,9 +362,11 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 	zipFile.SetName(path[0]);
 	zipFile.SetExt(_T("zip"));
 	zipFile.SetPath(machinedirectory.GetPath());
-	wxLogMessage(zipFile.GetFullPath());
+	wxLogMessage
+	(zipFile.GetFullPath());
 	if(zipFile.IsFileReadable()){
-		wxLogMessage(_T("Extra-Zip file found."));
+		wxLogMessage
+		(_T("Extra-Zip file found."));
 		return LoadGeometryIntoComponentFromZip(zipFile, filename, component,
 				matrix);
 	}
@@ -397,7 +400,8 @@ bool Machine::LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
 				inzip.CloseEntry();
 				return true;
 			}else{
-				wxLogMessage(_T("Geometries other than STL are not supported (yet)."));
+				wxLogMessage
+				(_T("Geometries other than STL are not supported (yet)."));
 			}
 			break;
 		}
@@ -466,7 +470,6 @@ bool Machine::LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
 //	return block->duration > FLT_EPSILON;
 //}
 
-
 void Machine::SetWorkCoordinateSystem(unsigned char index,
 		const AffineTransformMatrix& coordsys)
 {
@@ -479,6 +482,7 @@ void Machine::SetToolLength(double toolLength)
 
 void Machine::SetPosition(const CNCPosition& position)
 {
+	setposition = position;
 }
 
 CNCPosition Machine::GetCurrentPosition(void) const

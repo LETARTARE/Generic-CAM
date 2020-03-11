@@ -42,7 +42,8 @@
  */
 
 // C++ Operator Overloading Guidelines
-// http://www.cs.caltech.edu/courses/cs11/material/cpp/donnie/cpp-ops.html
+// https://en.cppreference.com/w/cpp/language/operators
+
 #include "../../3D/AffineTransformMatrix.h"
 #include "../../3D/Vector3.h"
 
@@ -53,6 +54,7 @@ public:
 			double ny = 0.0, double nz = 1.0);
 	CNCPosition(const Vector3& position, const Vector3& normal);
 	CNCPosition(const AffineTransformMatrix& matrix);
+	CNCPosition& operator=(const AffineTransformMatrix& matrix);
 	void Set(double x, double y, double z, bool rapid = false);
 	void Rapid(void);
 	void FeedSpeed(void);
@@ -75,6 +77,8 @@ public:
 	CNCPosition& operator+=(const Vector3& a);
 	CNCPosition& operator-=(const Vector3& a);
 	double Abs(const CNCPosition& b) const; //!< Distance the tooltip moved
+	double Abs2(const CNCPosition& b) const; //!< Distance^2 the tooltip moved
+	double Dot(const CNCPosition& b) const; //!< Dot product of the normal vectors
 	double Rotation(const CNCPosition& b) const; //!< Angle between two CNCPositions
 
 	AffineTransformMatrix GetMatrix(void) const; //!< Return a transformation matrix for this position

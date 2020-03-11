@@ -2509,48 +2509,25 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
-	m_menubar = new wxMenuBar( 0 );
-	m_menuMachine = new wxMenu();
-	wxMenuItem* m_menuItemLoad;
-	m_menuItemLoad = new wxMenuItem( m_menuMachine, wxID_ANY, wxString( _("&Load Machine Description") ) + wxT('\t') + wxT("CTRL+L"), wxEmptyString, wxITEM_NORMAL );
-	m_menuMachine->Append( m_menuItemLoad );
-	
-	wxMenuItem* m_menuItemSave;
-	m_menuItemSave = new wxMenuItem( m_menuMachine, wxID_ANY, wxString( _("&Save Machine Description") ) + wxT('\t') + wxT("CTRL+S"), wxEmptyString, wxITEM_NORMAL );
-	m_menuMachine->Append( m_menuItemSave );
-	
-	m_menuMachine->AppendSeparator();
-	
-	wxMenuItem* m_menuItemMachineReevaluateScript;
-	m_menuItemMachineReevaluateScript = new wxMenuItem( m_menuMachine, wxID_ANY, wxString( _("&Evaluate Script") ) + wxT('\t') + wxT("CTRL+E"), wxEmptyString, wxITEM_NORMAL );
-	m_menuMachine->Append( m_menuItemMachineReevaluateScript );
-	
-	wxMenuItem* m_menuItemShowControl;
-	m_menuItemShowControl = new wxMenuItem( m_menuMachine, ID_CONTROLLERSHOW, wxString( _("&Show Controller") ) + wxT('\t') + wxT("CTRL+SHIFT+C"), wxEmptyString, wxITEM_NORMAL );
-	m_menuMachine->Append( m_menuItemShowControl );
-	
-	m_menuMachine->AppendSeparator();
-	
-	wxMenuItem* m_menuItemClose;
-	m_menuItemClose = new wxMenuItem( m_menuMachine, wxID_CLOSE, wxString( _("Close Window") ) + wxT('\t') + wxT("CTRL+W"), wxEmptyString, wxITEM_NORMAL );
-	m_menuMachine->Append( m_menuItemClose );
-	
-	m_menubar->Append( m_menuMachine, _("&Machine") ); 
-	
-	m_menuPreferences = new wxMenu();
-	m_menubar->Append( m_menuPreferences, _("&Preferences") ); 
-	
-	m_menuView = new wxMenu();
-	wxMenuItem* m_menuItemEnable3D;
-	m_menuItemEnable3D = new wxMenuItem( m_menuView, ID_VIEWSTEREO3D, wxString( _("Enable &3D") ) + wxT('\t') + wxT("CTRL+3"), wxEmptyString, wxITEM_CHECK );
-	m_menuView->Append( m_menuItemEnable3D );
-	
-	m_menubar->Append( m_menuView, _("&View") ); 
-	
-	this->SetMenuBar( m_menubar );
-	
 	wxBoxSizer* bSizer;
 	bSizer = new wxBoxSizer( wxVERTICAL );
+	
+	m_ribbonBar = new wxRibbonBar( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxRIBBON_BAR_FLOW_HORIZONTAL );
+	m_ribbonBar->SetArtProvider(new wxRibbonMSWArtProvider); 
+	m_ribbonPage = new wxRibbonPage( m_ribbonBar, wxID_ANY, _("Menu") , wxNullBitmap , 0 );
+	m_ribbonPanelFileOperations = new wxRibbonPanel( m_ribbonPage, wxID_ANY, _("Machine Description") , wxNullBitmap , wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE );
+	m_ribbonButtonBarScript = new wxRibbonButtonBar( m_ribbonPanelFileOperations, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_ribbonButtonBarScript->AddButton( wxID_LOAD, _("Load"), wxArtProvider::GetBitmap( wxART_FILE_OPEN, wxART_CMN_DIALOG ), wxEmptyString);
+	m_ribbonButtonBarScript->AddButton( wxID_SAVE, _("Save"), wxArtProvider::GetBitmap( wxART_FILE_SAVE, wxART_CMN_DIALOG ), wxEmptyString);
+	m_ribbonButtonBarScript->AddButton( ID_MACHINEDESCRIPTIONEVALUATE, _("Evaluate Script"), wxArtProvider::GetBitmap( wxART_GO_UP, wxART_CMN_DIALOG ), wxEmptyString);
+	m_ribbonPanelSettings = new wxRibbonPanel( m_ribbonPage, wxID_ANY, _("Settings") , wxNullBitmap , wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE );
+	m_ribbonButtonBarSettings = new wxRibbonButtonBar( m_ribbonPanelSettings, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_ribbonButtonBarSettings->AddToggleButton( ID_MACHINEDEBUGGERSHOWCONTROLLER, _("Show Controller"), wxArtProvider::GetBitmap( wxART_EXECUTABLE_FILE, wxART_CMN_DIALOG ), wxEmptyString);
+	m_ribbonButtonBarSettings->AddDropdownButton( ID_SHOWPREFERENCES, _("Preferences"), wxArtProvider::GetBitmap( wxART_NORMAL_FILE, wxART_CMN_DIALOG ), wxEmptyString);
+	m_ribbonButtonBarSettings->AddToggleButton( ID_MACHINEDEBUGGERTOGGLESTEREO3D, _("Stereo 3D"), wxArtProvider::GetBitmap( wxART_ADD_BOOKMARK, wxART_CMN_DIALOG ), wxEmptyString);
+	m_ribbonBar->Realize();
+	
+	bSizer->Add( m_ribbonBar, 0, wxALL|wxEXPAND, 5 );
 	
 	m_splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D );
 	m_splitter->SetSashGravity( 0.3 );
@@ -2618,12 +2595,12 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	
 	// Connect Events
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineDebugger::OnXClose ) );
-	this->Connect( m_menuItemLoad->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineLoad ) );
-	this->Connect( m_menuItemSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineSave ) );
-	this->Connect( m_menuItemMachineReevaluateScript->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ) );
-	this->Connect( m_menuItemShowControl->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnShowController ) );
-	this->Connect( m_menuItemClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnClose ) );
-	this->Connect( m_menuItemEnable3D->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnChangeStereo3D ) );
+	this->Connect( wxID_LOAD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnMachineLoad ) );
+	this->Connect( wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnMachineSave ) );
+	this->Connect( ID_MACHINEDESCRIPTIONEVALUATE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnScriptEvaluate ) );
+	this->Connect( ID_MACHINEDEBUGGERSHOWCONTROLLER, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxCommandEventHandler( GUIMachineDebugger::OnShowController ) );
+	this->Connect( ID_SHOWPREFERENCES, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnShowPreferencesMenu ) );
+	this->Connect( ID_MACHINEDEBUGGERTOGGLESTEREO3D, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxCommandEventHandler( GUIMachineDebugger::OnToggleStereo3D ) );
 	m_buttonRestart->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ), NULL, this );
 }
 
@@ -2631,12 +2608,12 @@ GUIMachineDebugger::~GUIMachineDebugger()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineDebugger::OnXClose ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineLoad ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnMachineSave ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ) );
-	this->Disconnect( ID_CONTROLLERSHOW, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnShowController ) );
-	this->Disconnect( wxID_CLOSE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnClose ) );
-	this->Disconnect( ID_VIEWSTEREO3D, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GUIMachineDebugger::OnChangeStereo3D ) );
+	this->Disconnect( wxID_LOAD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnMachineLoad ) );
+	this->Disconnect( wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnMachineSave ) );
+	this->Disconnect( ID_MACHINEDESCRIPTIONEVALUATE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnScriptEvaluate ) );
+	this->Disconnect( ID_MACHINEDEBUGGERSHOWCONTROLLER, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxCommandEventHandler( GUIMachineDebugger::OnShowController ) );
+	this->Disconnect( ID_SHOWPREFERENCES, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnShowPreferencesMenu ) );
+	this->Disconnect( ID_MACHINEDEBUGGERTOGGLESTEREO3D, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxCommandEventHandler( GUIMachineDebugger::OnToggleStereo3D ) );
 	m_buttonRestart->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIMachineDebugger::OnScriptEvaluate ), NULL, this );
 	
 }

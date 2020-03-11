@@ -39,12 +39,6 @@
 DialogMachineDebugger::DialogMachineDebugger(wxWindow * parent) :
 		GUIMachineDebugger(parent)
 {
-	m_menuPreferences->Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
-	m_menuPreferences->Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
-	m_menuPreferences->Append(ID_SETUPMIDI, _("Setup &MIDI"));
-	m_menuPreferences->Append(ID_SETUPUNITS,
-	_("Setup &Units") + wxT("\tCtrl+U"));
-
 	this->Connect(ID_UPDATEMACHINESIMULATION, wxEVT_COMMAND_MENU_SELECTED,
 			wxCommandEventHandler(DialogMachineDebugger::Update));
 
@@ -58,7 +52,14 @@ DialogMachineDebugger::DialogMachineDebugger(wxWindow * parent) :
 	machine.EvaluateDescription();
 	m_textCtrlScript->SetValue(machine.machineDescription);
 
-	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
+	m_ribbonButtonBarSettings->ToggleButton(ID_MACHINEDEBUGGERSHOWCONTROLLER,
+			machineControl->IsShown());
+
+	m_ribbonButtonBarSettings->ToggleButton(ID_MACHINEDEBUGGERTOGGLESTEREO3D,
+			m_canvas->stereoMode != stereoOff);
+	FrameMain * frame = wxStaticCast(parent, FrameMain);
+	SettingsStereo3D * settings = &(frame->GetParentFrame()->settingsStereo3D);
+	settings->WriteToCanvas(m_canvas);
 	TransferDataToWindow();
 }
 
@@ -99,6 +100,8 @@ bool DialogMachineDebugger::TransferDataToWindow(void)
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	SettingsStereo3D * settings = &(frame->GetParentFrame()->settingsStereo3D);
 	settings->WriteToCanvas(m_canvas);
+	m_ribbonButtonBarSettings->ToggleButton(ID_MACHINEDEBUGGERSHOWCONTROLLER,
+			machineControl->IsShown());
 	if(!this->IsShown()){
 		if(machineControl->IsShown()) machineControl->Show(false);
 		return false;
@@ -129,6 +132,12 @@ void DialogMachineDebugger::OnClose(wxCommandEvent& event)
 	this->Show(false);
 }
 
+void DialogMachineDebugger::OnScriptEvaluate(wxRibbonButtonBarEvent& event)
+{
+	wxCommandEvent temp(event);
+	OnScriptEvaluate(temp);
+}
+
 void DialogMachineDebugger::OnScriptEvaluate(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
@@ -137,7 +146,7 @@ void DialogMachineDebugger::OnScriptEvaluate(wxCommandEvent& event)
 	Update(event);
 }
 
-void DialogMachineDebugger::OnMachineLoad(wxCommandEvent& event)
+void DialogMachineDebugger::OnMachineLoad(wxRibbonButtonBarEvent& event)
 {
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	CollectionFilepaths * settings = &(frame->filepaths);
@@ -164,7 +173,7 @@ void DialogMachineDebugger::OnMachineLoad(wxCommandEvent& event)
 	}
 }
 
-void DialogMachineDebugger::OnMachineSave(wxCommandEvent& event)
+void DialogMachineDebugger::OnMachineSave(wxRibbonButtonBarEvent& event)
 {
 
 	wxFileName fileName;
@@ -197,16 +206,29 @@ void DialogMachineDebugger::OnShowController(wxCommandEvent& event)
 	machineControl->TransferDataToWindow();
 }
 
-void DialogMachineDebugger::OnChangeStereo3D(wxCommandEvent& event)
+void DialogMachineDebugger::OnToggleStereo3D(wxCommandEvent& event)
 {
-	if(m_canvas->stereoMode != stereoOff){
-		m_canvas->stereoMode = stereoOff;
-	}else{
+	if(m_canvas->stereoMode == stereoOff){
 		m_canvas->stereoMode = stereoAnaglyph;
+	}else{
+		m_canvas->stereoMode = stereoOff;
 	}
-	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
+	m_ribbonButtonBarSettings->ToggleButton(ID_MACHINEDEBUGGERTOGGLESTEREO3D,
+			m_canvas->stereoMode != stereoOff);
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	SettingsStereo3D * settings = &(frame->GetParentFrame()->settingsStereo3D);
 	settings->WriteToCanvas(m_canvas);
 	m_canvas->Refresh();
+}
+
+void DialogMachineDebugger::OnShowPreferencesMenu(wxRibbonButtonBarEvent& event)
+{
+	wxMenu menu;
+	menu.Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	menu.Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
+	menu.Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
+#ifdef _USE_MIDI
+	menu.Append(ID_SETUPMIDI, _("Setup &MIDI"));
+#endif
+	event.PopupMenu(&menu);
 }
