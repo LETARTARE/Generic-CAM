@@ -46,7 +46,7 @@
 class GeneratorAreaMillingDynamic:public GeneratorDexel {
 	// Constructor/ Destructor
 public:
-	GeneratorAreaMillingDynamic();
+	GeneratorAreaMillingDynamic(size_t ID);
 	virtual ~GeneratorAreaMillingDynamic();
 
 	virtual void CopyParameterFrom(const Generator * other);
@@ -62,7 +62,7 @@ public:
 	virtual bool operator==(const Generator &b) const;
 
 	virtual void GenerateToolpath(const Run &run,
-			const std::map <size_t, Object> &objects, const Tool &tool,
+			const std::vector <Object> &objects, const Tool &tool,
 			const DexelTarget &base);
 
 	//Member variables:

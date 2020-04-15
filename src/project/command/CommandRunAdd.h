@@ -37,16 +37,17 @@ class Project;
 
 class CommandRunAdd:public wxCommand {
 public:
-	CommandRunAdd(const wxString& name, Project * project, wxString runName,
-			size_t objID = 0);
+	CommandRunAdd(const wxString& name, Project* project,
+			const wxString &runName, size_t runID,
+			const std::set <size_t> &objIDs);
 
 	bool Do(void);
 	bool Undo(void);
 
 protected:
+	size_t runID;
 	Run run;
 	Project * project;
-	size_t ID;
 };
 
 #endif /* __COMMANDRUNADD_H__ */

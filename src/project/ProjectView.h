@@ -36,9 +36,8 @@
  *
  */
 
-
-#include "../3D/OpenGLMaterial.h"
 #include "machine/Machine.h"
+#include "generator/CNCSimulator.h"
 #include "Selection.h"
 
 #include <stddef.h>
@@ -50,6 +49,9 @@ class ProjectView:public wxView {
 public:
 	ProjectView();
 	virtual ~ProjectView();
+
+	void SetSelection(const Selection &selection);
+	void SetHover(const Selection &hover);
 
 	void Render(void) const;
 	void RenderPick(void) const;
@@ -69,11 +71,22 @@ public:
 	enum ViewType {
 		vObject, vRun, vOrigin, vGenerator
 	} type;
+	enum CenterType {
+		vCenterMachine, vCenterTool, vCenterWorkpiece
+	};
+	enum SimulationDisplayType {
+		vSimulationWorkpiece,
+		vSimulationTool,
+		vSimulationChuck,
+		vSimulationMachine
+	};
 
-	Selection selection;
-	Selection hover;
+	CNCSimulator simulator; ///< Simulator, controlled by DialogAnimation
+	Machine machine; ///< Machine for simulation, controlled by DialogAnimation
 
-	Machine machine;
+private:
+	Selection selection; ///< Selection for displaying, set by FrameMain
+	Selection hover; ///< Hilighted element, set by FrameMain
 
 private:
 	void PaintObjects(const Selection& sel, const OpenGLMaterial &face,
@@ -83,7 +96,8 @@ private:
 
 wxDECLARE_EVENT_TABLE();
 
-DECLARE_DYNAMIC_CLASS(ProjectView);
+DECLARE_DYNAMIC_CLASS(ProjectView)
+	;
 };
 
 #endif /* SRC_PROJECT_PROJECTVIEW_H_ */

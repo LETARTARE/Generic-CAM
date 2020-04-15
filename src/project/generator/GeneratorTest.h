@@ -47,7 +47,7 @@
 class GeneratorTest:public GeneratorDexel {
 	// Constructor/ Destructor
 public:
-	GeneratorTest();
+	GeneratorTest(size_t ID);
 	virtual ~GeneratorTest();
 	virtual size_t GetType(void) const
 	{
@@ -65,7 +65,7 @@ public:
 			CollectionUnits* settings) const;
 	virtual void TransferDataFromPanel(CollectionUnits* settings);
 	virtual void GenerateToolpath(const Run &run,
-			const std::map <size_t, Object> &objects, const Tool &tool,
+			const std::vector <Object> &objects, const Tool &tool,
 			const DexelTarget &base);
 
 	//Member variables:

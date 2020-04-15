@@ -273,10 +273,25 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	glViewport(0, 0, (GLint) w, (GLint) h);
 
 	// Setup OpenGL state machine
-
-	glEnable(GL_BLEND);
 	glEnable(GL_POINT_SMOOTH);
+
+	glDrawBuffer(GL_BACK);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_ONE, GL_ZERO); // disable alpha blending
+	glEnable(GL_BLEND);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_COLOR_MATERIAL);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	glEnable(GL_COLOR_MATERIAL);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearDepth(1.0f);
 	glEnable(GL_DEPTH_TEST);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 #ifdef GL_VERSION_1_2
 	// Use RESCALE_NORMAL in OpenGL 1.2 or higher
 	glEnable(GL_RESCALE_NORMAL);
@@ -284,29 +299,8 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 	// Fallback for OpenGL 1.1
 	glEnable(GL_NORMALIZE);
 #endif
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
-	glEnable(GL_CULL_FACE);
-
-	glEnable(GL_COLOR_MATERIAL);
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-	glDrawBuffer(GL_BACK);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_ONE, GL_ZERO); // disable alpha blending
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClearDepth(1.0f);
 
 	{ // Render background
-		glDisable(GL_LIGHTING);
-		glEnable(GL_COLOR_MATERIAL);
-		if(stereoMode == stereoAnaglyph){
-			glColor3ub(backgroundGrayLevel, backgroundGrayLevel,
-					backgroundGrayLevel);
-			glDisable(GL_COLOR_MATERIAL);
-		}
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -314,12 +308,24 @@ void OpenGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
+		// Reset materials
+		GLfloat params[4] =
+			{0, 0, 0, 1};
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, params);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, params);
+		glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 0);
+
+		if(stereoMode == stereoAnaglyph){
+			glColor3ub(backgroundGrayLevel, backgroundGrayLevel,
+					backgroundGrayLevel);
+		}
+
 		glNormal3b(0, 0, 1);
 		glBegin(GL_QUADS);
-		glColor3ub(50, 50, 50);
+		if(stereoMode != stereoAnaglyph) glColor3ub(50, 50, 50);
 		glVertex2i(1, 1);
 		glVertex2i(0, 1);
-		glColor3ub(100, 100, 255);
+		if(stereoMode != stereoAnaglyph) glColor3ub(100, 100, 255);
 		glVertex2i(0, 0);
 		glVertex2i(1, 0);
 		glEnd();

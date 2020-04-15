@@ -59,17 +59,36 @@ void DialogToolpathGenerator::OnXClose(wxCloseEvent& event)
 	this->Hide();
 }
 
-void DialogToolpathGenerator::SetRunGenerator(size_t runID, size_t generatorID)
+void DialogToolpathGenerator::SetSelection(const Selection &selection)
 {
-	const bool updatePanel = (runID != this->runID
-			|| this->generatorID != generatorID);
-	std::cout << "DialogToolpathGenerator::SetRunGenerator(" << runID << ", "
-			<< generatorID << "): updatePanel=" << updatePanel << "\n";
-	this->runID = runID;
-	this->generatorID = generatorID;
+	if(!selection.IsBaseType(Selection::BaseRun)) return;
+	if(!selection.IsType(Selection::Generator)) return;
+	if(selection.IsSetEmpty()) return;
+
+	const bool updatePanel = (selection.GetBaseID() != this->runID
+			|| (selection[0] != this->generatorID));
+	this->runID = selection.GetBaseID();
+	this->generatorID = selection[0];
+
+	if(DEBUG) std::cout << "DialogToolpathGenerator::SetRunGenerator(" << runID
+			<< ", " << generatorID << "): updatePanel=" << updatePanel << "\n";
+
 	TransferDataToWindow(updatePanel);
 }
 
+bool DialogToolpathGenerator::SelectionIsOK(void) const
+{
+	const FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	const Project* project = wxStaticCast(frame->GetDocument(), Project);
+	return (project->Has(
+			Selection(Selection::BaseRun, runID, Selection::Generator,
+					generatorID)));
+}
+
+size_t DialogToolpathGenerator::GetRunID(void) const
+{
+	return runID;
+}
 bool DialogToolpathGenerator::TransferDataToWindow(bool updateGeneratorPanel)
 {
 	if(loopguard.TryLock() == wxMUTEX_BUSY){
@@ -96,10 +115,10 @@ bool DialogToolpathGenerator::TransferDataToWindow(bool updateGeneratorPanel)
 
 	wxArrayString newTools;
 	for(size_t n = 0; n < project->GetToolCount(); ++n){
-		const Tool & tool = project->GetTool(n);
+		const Tool * tool = project->GetTool(n);
 		newTools.Add(
-				wxString::Format(_T("T%i - "), tool.postprocess.number)
-						+ tool.base.description);
+				wxString::Format(_T("T%i - "), tool->postprocess.number)
+						+ tool->base.description);
 	}
 	wxArrayString oldTools = m_choiceTool->GetStrings();
 	if(oldTools != newTools) m_choiceTool->Set(newTools);
@@ -122,31 +141,31 @@ bool DialogToolpathGenerator::TransferDataToWindow(bool updateGeneratorPanel)
 //				<< "DialogToolpathGenerator::TransferDataToWindow - loopguard.Unlock()\n";
 		return false;
 	}
-	const Run & run = project->GetRun(runID);
-	const Generator & generator = *(run.generators.at(generatorID));
 
-	SetTitle(generator.GetName());
+	const Generator * generator = project->GetGenerator(runID, generatorID);
 
-	bufferarea = generator.area;
-	m_textCtrlGeometry->SetValue(generator.area.ToString());
+	SetTitle(generator->GetName());
+
+	bufferarea = generator->area;
+	m_textCtrlGeometry->SetValue(bufferarea.ToString());
 	int m = -1;
 	for(size_t n = 0; n < project->GetToolCount(); ++n){
-		if(project->GetTool(n).base.guid.compare(generator.toolguid) == 0){
+		if(*(project->GetTool(n)) == generator->toolguid){
 			m = n;
 			break;
 		}
 	}
 	m_choiceTool->SetSelection(m);
 	m_textCtrlSpindle->SetValue(
-			settings->RotationalSpeed.TextFromSI(generator.spindlespeed));
+			settings->RotationalSpeed.TextFromSI(generator->spindlespeed));
 	m_textCtrlFeed->SetValue(
-			settings->LinearSpeed.TextFromSI(generator.feedrate));
+			settings->LinearSpeed.TextFromSI(generator->feedrate));
 	m_textCtrlMarginBelow->SetValue(
-			settings->SmallDistance.TextFromSI(generator.marginBelow));
+			settings->SmallDistance.TextFromSI(generator->marginBelow));
 	m_textCtrlMarginSide->SetValue(
-			settings->SmallDistance.TextFromSI(generator.marginSide));
+			settings->SmallDistance.TextFromSI(generator->marginSide));
 	m_textCtrlFreeHeight->SetValue(
-			settings->SmallDistance.TextFromSI(generator.freeHeight));
+			settings->SmallDistance.TextFromSI(generator->freeHeight));
 
 	if(updateGeneratorPanel){
 		std::cout
@@ -155,7 +174,8 @@ bool DialogToolpathGenerator::TransferDataToWindow(bool updateGeneratorPanel)
 		m_panel->Freeze();
 		m_panel->DestroyChildren();
 		if(localGenerator != NULL) delete localGenerator;
-		localGenerator = GeneratorFactory::NewGenerator(generator.GetType());
+		localGenerator = GeneratorFactory::NewGenerator(generator->GetType(),
+				generator->GetID());
 		wxSizer * temp = localGenerator->AddToPanel(m_panel, settings);
 		m_panel->SetSizer(temp, true);
 		m_scrolledWindow->Layout();
@@ -164,7 +184,7 @@ bool DialogToolpathGenerator::TransferDataToWindow(bool updateGeneratorPanel)
 		m_panel->Thaw();
 //		wxWindowList& list = m_panel->GetChildren();
 	}
-	localGenerator->CopyParameterFrom(&generator);
+	localGenerator->CopyParameterFrom(generator);
 	localGenerator->TransferDataToPanel(m_panel, settings);
 	loopguard.Unlock();
 //	std::cout
@@ -188,7 +208,7 @@ bool DialogToolpathGenerator::TransferDataFromWindow(
 	if(m == wxNOT_FOUND || m < 0 || m >= project->GetToolCount()){
 		generator->toolguid.clear();
 	}else{
-		generator->toolguid = project->GetTool(m).base.guid;
+		generator->toolguid = project->GetTool(m)->base.guid;
 	}
 	generator->spindlespeed = settings->RotationalSpeed.SIFromString(
 			m_textCtrlSpindle->GetValue());
@@ -215,19 +235,21 @@ bool DialogToolpathGenerator::UpdateGenerator(void)
 		loopguard.Unlock();
 		return false;
 	}
-	const Run & run = project->GetRun(runID);
-	const Generator & generator = *(run.generators.at(generatorID));
-	CollectionUnits* settings = &(frame->GetParentFrame()->units);
+
+	const Generator * generator = project->GetGenerator(runID, generatorID);
+//	CollectionUnits* settings = &(frame->GetParentFrame()->units);
 
 	TransferDataFromWindow(localGenerator);
 
-	if(generator == *localGenerator){
+	if(*generator == *localGenerator){
 		std::cout << "DialogToolpathGenerator::UpdateGenerator - no changes.\n";
 		loopguard.Unlock();
 		return false;
 	}
 
-	Generator * temp = GeneratorFactory::NewGenerator(generator.GetType());
+	//TODO: Check if the double copy of the parameters can be cut.
+	Generator * temp = GeneratorFactory::NewGenerator(generator->GetType(),
+			generatorID);
 	temp->CopyParameterFrom(localGenerator);
 
 	wxCommandProcessor * cmdProc = project->GetCommandProcessor();
@@ -250,9 +272,11 @@ void DialogToolpathGenerator::OnSelectArea(wxCommandEvent& event)
 //			return;
 //		const Run & run = project->GetRun(runID);
 
-	frame->RequestSelection(this, event.GetId(), false,
-			Selection(Selection::VertexGroup),
+	frame->SetRequestSelection(this, event.GetId(), true,
 			Selection(Selection::TriangleGroup));
+//	frame->AddRequestSelection(Selection(Selection::TriangleGroup));
+	this->Hide();
+	frame->SetFocus();
 }
 
 void DialogToolpathGenerator::OnChar(wxKeyEvent& event)
@@ -277,26 +301,22 @@ void DialogToolpathGenerator::OnLeftDown(wxMouseEvent& event)
 	event.Skip();
 }
 
-bool DialogToolpathGenerator::OnSelected(size_t ID, Selection selection)
+bool DialogToolpathGenerator::OnSelected(size_t ID, Selection selection,
+		bool successful)
 {
-	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
-	Project * project = wxStaticCast(frame->GetDocument(), Project);
-	ProjectView * view = wxStaticCast(frame->GetView(), ProjectView);
-	wxCommandProcessor * cmdProc = project->GetCommandProcessor();
+	if(!SelectionIsOK()) return false;
 
-	if(!project->Has(
-			Selection(Selection::BaseRun, runID, Selection::Generator,
-					generatorID))) return false;
 	if(ID != ID_SELECTAREAOBJECT){
-		std::cout
+		if(DEBUG) std::cout
 				<< "DialogToolpathGenerator::OnSelected(...) -> unhandled ID: "
 				<< ID << "\n";
 		return false;
 	}
-	std::cout << "DialogToolpathGenerator::OnSelected(" << ID << ", "
+	if(DEBUG) std::cout << "DialogToolpathGenerator::OnSelected(" << ID << ", "
 			<< selection.ToString() << ")";
-	bufferarea = selection;
 	this->Show();
+	if(!successful) return true;
+	bufferarea = selection;
 	this->UpdateGenerator();
 	Refresh();
 	return true;
@@ -383,7 +403,3 @@ void DialogToolpathGenerator::OnUpdate(wxCommandEvent& event)
 	Refresh();
 }
 
-size_t DialogToolpathGenerator::GetRunID(void) const
-{
-	return runID;
-}

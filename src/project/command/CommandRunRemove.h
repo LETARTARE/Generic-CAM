@@ -35,7 +35,7 @@
 
 class CommandRunRemove:public wxCommand {
 public:
-	CommandRunRemove(const wxString& name, Project * project, size_t ID);
+	CommandRunRemove(const wxString& name, Project * project, size_t runID);
 	virtual ~CommandRunRemove();
 
 	bool Do(void);
@@ -43,8 +43,9 @@ public:
 
 protected:
 	Project * project;
-	size_t ID;
+	size_t runID;
 	Run run;
+	size_t position;
 };
 
 #endif /* COMMANDRUNREMOVE_H_ */

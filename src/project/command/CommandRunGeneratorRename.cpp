@@ -27,6 +27,7 @@
 #include "CommandRunGeneratorRename.h"
 
 #include "../Project.h"
+#include <algorithm>
 
 CommandRunGeneratorRename::CommandRunGeneratorRename(const wxString& name,
 		Project* project, size_t runID, size_t generatorID,
@@ -42,16 +43,37 @@ CommandRunGeneratorRename::CommandRunGeneratorRename(const wxString& name,
 bool CommandRunGeneratorRename::Do(void)
 {
 	if(project == NULL) return false;
-	if(project->run.find(runID) == project->run.end()) return false;
-	this->oldName = project->run[runID].generators[generatorID]->name;
-	project->run[runID].generators[generatorID]->name = this->newName;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+	std::vector <Generator*>::iterator it;
+	it = itRun->generators.begin();
+	while(it != itRun->generators.end()){
+		if((**it) == generatorID) break;
+		++it;
+	}
+	if(it == itRun->generators.end()) return false;
+
+	this->oldName = (*it)->name;
+	(*it)->name = this->newName;
 	project->Update();
 	return true;
 }
 
 bool CommandRunGeneratorRename::Undo(void)
 {
-	project->run[runID].generators[generatorID]->name = this->oldName;
+	if(project == NULL) return false;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+	std::vector <Generator*>::iterator it;
+	it = itRun->generators.begin();
+	while(it != itRun->generators.end()){
+		if((**it) == generatorID) break;
+		++it;
+	}
+	if(it == itRun->generators.end()) return false;
+	(*it)->name = this->oldName;
 	project->Update();
 	return true;
 }

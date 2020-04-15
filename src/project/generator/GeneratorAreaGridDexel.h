@@ -52,7 +52,7 @@
 
 class GeneratorAreaGridDexel:public GeneratorDexel {
 public:
-	GeneratorAreaGridDexel();
+	GeneratorAreaGridDexel(size_t ID);
 	virtual ~GeneratorAreaGridDexel();
 	virtual size_t GetType(void) const
 	{
@@ -67,7 +67,7 @@ public:
 			CollectionUnits* settings) const;
 	virtual void TransferDataFromPanel(CollectionUnits* settings);
 	virtual void GenerateToolpath(const Run &run,
-			const std::map <size_t, Object> &objects, const Tool &tool,
+			const std::vector <Object> &objects, const Tool &tool,
 			const DexelTarget &base);
 private:
 	void CollectToolpaths(std::vector <ProtoToolpath> &ptp,

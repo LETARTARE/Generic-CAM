@@ -59,25 +59,14 @@ public:
 	virtual ~TreeSetup();
 
 	void Update(void); ///< Populate the wxTreeView with all items from the Project. Also update the view.
-	void SelectonToTree(const Selection &sel); ///< Set the selection in the tree to the selection marked in the Project.
-	Selection TreeToSelection(void); ///< Update the "selected" variables in the Project from the selection in the tree.
-
-//	int GetFirstSelectedObject(void);
-//	int GetFirstSelectedWorkpiece(void);
-//	int GetFirstSelectedRun(void);
-//	int GetFirstSelectedToolpath(void);
-//
-//	int GetWorkpieceFromLink(int linkNr);
-//	int GetObjectFromLink(int linkNr);
+	void SetSelecton(const Selection &sel); ///< Set the selection in the tree to the selection marked in the Project.
+	Selection GetSelection(void); ///< Update the "selected" variables in the Project from the selection in the tree.
 
 private:
 	void Reset(void);
 	void SetAtLevel(int level, const wxString& name, TreeItem::itemtype type,
 			size_t ID);
 	void FinishLevel(int level, bool autoExpand = false);
-
-	bool GetSelection(void);
-	void SetSelection(bool selection = true);
 
 	wxMutex loopGuard; ///< Breaks update loops. Tree updates variable updates tree updates variable updates ...
 

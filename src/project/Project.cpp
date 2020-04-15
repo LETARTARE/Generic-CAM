@@ -59,9 +59,9 @@ Project::Project() :
 	maxCells = 1e5;
 
 	SetTitle(_("Untitled"));
-	maxObjectID = 0;
-	maxRunID = 0;
-	maxGeneratorID = 0;
+	maxObjectID = 20000;
+	maxRunID = 30000;
+	maxGeneratorID = 40000;
 
 //	LoadDefaultTools(
 //			wxFileName(_T("/home/toby/Pojekte/genericcam/toolbox/local.json")));
@@ -75,61 +75,52 @@ Project::~Project()
 
 bool Project::Has(const Selection& sel) const
 {
+	std::set <size_t> IDs = sel.GetSet();
 	if(sel.IsType(Selection::Object)){
-		std::set <size_t>::const_iterator itsel = sel.begin();
-		std::map <size_t, Object>::const_iterator itobj = objects.begin();
-		while(itsel != sel.end()){
-			if(itobj == objects.end() || *itsel < itobj->first) return false;
-			if(!(itobj->first < *itsel)) ++itsel;
-			++itobj;
-		}
-		return true;
+		for(std::vector <Object>::const_iterator itobj = objects.begin();
+				itobj != objects.end(); ++itobj)
+			IDs.erase(itobj->GetID());
 	}
 	if(sel.IsType(Selection::Run)){
-		std::set <size_t>::const_iterator itsel = sel.begin();
-		std::map <size_t, Run>::const_iterator itrun = run.begin();
-		while(itsel != sel.end()){
-			if(itrun == run.end() || *itsel < itrun->first) return false;
-			if(!(itrun->first < *itsel)) ++itsel;
-			++itrun;
-		}
-		return true;
+		for(std::vector <Run>::const_iterator itrun = run.begin();
+				itrun != run.end(); ++itrun)
+			IDs.erase(itrun->GetID());
 	}
 	if(sel.IsType(Selection::Generator) && sel.IsBaseType(Selection::BaseRun)){
-		size_t baseID = sel.GetBaseID();
-
-		if(run.find(baseID) == run.end()) return false;
-
-		const Run &temp = run.at(baseID);
-
-		std::set <size_t>::const_iterator itsel = sel.begin();
-		std::map <size_t, Generator*>::const_iterator itgenerator =
-				temp.generators.begin();
-		while(itsel != sel.end()){
-			if(itgenerator == temp.generators.end()
-					|| *itsel < itgenerator->first) return false;
-			if(!(itgenerator->first < *itsel)) ++itsel;
-			++itgenerator;
-		}
-		return true;
+		const size_t baseID = sel.GetBaseID();
+		std::vector <Run>::const_iterator itRun = std::find(run.begin(),
+				run.end(), baseID);
+		if(itRun == run.end()) return false;
+		for(std::vector <Generator*>::const_iterator itgenerator =
+				itRun->generators.begin();
+				itgenerator != itRun->generators.end(); ++itgenerator)
+			IDs.erase((*itgenerator)->GetID());
 	}
-	return false;
+	return IDs.empty();
 }
 
 bool Project::Has(const Selection::Type type, const size_t ID) const
 {
-	if(type == Selection::Object && objects.find(ID) != objects.end()) return true;
-	if(type == Selection::Run && run.find(ID) != run.end()) return true;
+	if(type == Selection::Object){
+		if(std::find(objects.begin(), objects.end(), ID) != objects.end()) return true;
+		return false;
+	}
+	if(type == Selection::Run){
+		if(std::find(run.begin(), run.end(), ID) != run.end()) return true;
+		return false;
+	}
 	return false;
 }
 
-size_t Project::GetMaxObjectID(void) const
+size_t Project::GetNextObjectID(void)
 {
+	maxObjectID++;
 	return maxObjectID;
 }
 
-size_t Project::GetMaxRunID(void) const
+size_t Project::GetNextRunID(void)
 {
+	maxRunID++;
 	return maxRunID;
 }
 
@@ -143,71 +134,87 @@ const std::vector <Tool> * Project::GetTools(void) const
 	return &tools;
 }
 
-std::set <size_t> Project::GetAllObjectIDs(void) const
+std::vector <size_t> Project::GetAllObjectIDs(void) const
 {
-	std::set <size_t> temp;
-	for(std::map <size_t, Object>::const_iterator it = objects.begin();
+	std::vector <size_t> temp;
+	for(std::vector <Object>::const_iterator it = objects.begin();
 			it != objects.end(); ++it)
-		temp.insert(it->first);
+		temp.push_back(it->GetID());
 	return temp;
 }
 
-std::set <size_t> Project::GetAllRunIDs(void) const
+std::vector <size_t> Project::GetAllRunIDs(void) const
 {
-	std::set <size_t> temp;
-	for(std::map <size_t, Run>::const_iterator it = run.begin();
-			it != run.end(); ++it)
-		temp.insert(it->first);
+	std::vector <size_t> temp;
+	for(std::vector <Run>::const_iterator it = run.begin(); it != run.end();
+			++it)
+		temp.push_back(it->GetID());
 	return temp;
 }
 
-std::set <size_t> Project::GetAllGeneratorIDs(size_t runID) const
+std::vector <size_t> Project::GetAllGeneratorIDs(size_t runID) const
 {
-	std::set <size_t> temp;
-	if(run.find(runID) != run.end()){
-		for(std::map <size_t, Generator*>::const_iterator it =
-				run.at(runID).generators.begin();
-				it != run.at(runID).generators.end(); ++it)
-			temp.insert(it->first);
+	std::vector <size_t> temp;
+	std::vector <Run>::const_iterator itRun;
+	itRun = std::find(run.begin(), run.end(), runID);
+	if(itRun != run.end()){
+		for(std::vector <Generator*>::const_iterator it =
+				itRun->generators.begin(); it != itRun->generators.end(); ++it)
+			temp.push_back((*it)->GetID());
 	}
 	return temp;
 }
 
-const Object & Project::Get3DObject(size_t ID) const
+const Object * Project::Get3DObject(size_t ID) const
 {
-	if(objects.find(ID) == objects.end()) throw(std::range_error(
+	std::vector <Object>::const_iterator it;
+	it = std::find(objects.begin(), objects.end(), ID);
+	if(it == objects.end()) throw(std::range_error(
 			"Project::GetObject - Object not found."));
-	return objects.at(ID); //TODO: Rewrite by [] lookup
+	return &(*it);
 }
 
-const std::map <size_t, Object>* Project::GetObjects(void) const
+const std::vector <Object> * Project::GetObjects(void) const
 {
 	return &objects;
 }
-const Run& Project::GetRun(size_t ID) const
+
+const Run * Project::GetRun(size_t ID) const
 {
-	if(run.find(ID) == run.end()) throw(std::range_error(
+	std::vector <Run>::const_iterator it;
+	it = std::find(run.begin(), run.end(), ID);
+	if(it == run.end()) throw(std::range_error(
 			"Project::GetRun - Run not found."));
-	return run.at(ID); //TODO: Rewrite by [] lookup
+	return &(*it);
 }
 
 const Generator * Project::GetGenerator(size_t runID, size_t ID)
 {
-	if(run.find(runID) == run.end()) throw(std::range_error(
+	std::vector <Run>::const_iterator itRun;
+	itRun = std::find(run.begin(), run.end(), runID);
+	if(itRun == run.end()) throw(std::range_error(
 			"Project::GetGenerator - Run not found."));
-	if(run.at(runID).generators.find(ID) == run.at(runID).generators.end()) throw(std::range_error(
+
+	std::vector <Generator *>::const_iterator itGenerator;
+	itGenerator = itRun->generators.begin();
+	while(itGenerator != itRun->generators.end()){
+		if((*itGenerator)->GetID() == ID) break;
+		++itGenerator;
+	}
+	if(itGenerator == itRun->generators.end()) throw(std::range_error(
 			"Project::GetGenerator - Generator not found."));
-	return run.at(ID).generators.at(ID);
+	return *itGenerator;
 }
 
-const Tool& Project::GetTool(size_t index) const
+const Tool * Project::GetTool(size_t index) const
 {
 	if(index >= tools.size()) throw(std::range_error(
 			"Project::GetTools - index out of range."));
-	return tools.at(index); //TODO: Rewrite by [] lookup
+	return &(tools[index]);
 }
-size_t Project::GetMaxGeneratorID(void) const
+size_t Project::GetNextGeneratorID(void)
 {
+	maxGeneratorID++;
 	return maxGeneratorID;
 }
 
@@ -216,10 +223,15 @@ BoundingBox Project::GetBBox(const Selection &selected) const
 	BoundingBox temp;
 	if(selected.IsType(Selection::Object)){
 		std::set <size_t> set = selected.GetSet();
-		for(std::set <size_t>::const_iterator it = set.begin(); it != set.end();
-				++it){
-			if(!this->Has(Selection::Object, *it)) continue;
-			temp.Insert(objects.at(*it).bbox);
+		if(selected.IsInverted()){
+
+		}else{
+			for(std::set <size_t>::const_iterator it = set.begin();
+					it != set.end(); ++it){
+				std::vector <Object>::const_iterator obj;
+				obj = std::find(objects.begin(), objects.end(), *it);
+				if(obj != objects.end()) temp.Insert(obj->bbox);
+			}
 		}
 	}
 	return temp;
@@ -237,9 +249,9 @@ bool Project::GenerateToolpaths(void)
 			++it)
 		it->Update();
 
-	for(std::map <size_t, Run>::iterator run = this->run.begin();
+	for(std::vector <Run>::iterator run = this->run.begin();
 			run != this->run.end(); ++run){
-		run->second.GenerateToolpaths();
+		run->GenerateToolpaths();
 	}
 
 	return true;
@@ -299,13 +311,12 @@ bool Project::GenerateToolpaths(void)
 
 void Project::Update(void)
 {
-	for(std::map <size_t, Object>::iterator it = objects.begin();
+	for(std::vector <Object>::iterator it = objects.begin();
 			it != objects.end(); ++it)
-		it->second.Update();
+		it->Update();
 
-	for(std::map <size_t, Run>::iterator it = run.begin(); it != run.end();
-			++it)
-		it->second.Update(this);
+	for(std::vector <Run>::iterator it = run.begin(); it != run.end(); ++it)
+		it->Update(this);
 
 	UpdateAllViews();
 }
@@ -336,26 +347,27 @@ bool Project::Save(wxFileName fileName)
 
 	txt << wxString::Format(_T("Objects: %zu"), objects.size()) << endl;
 
-	for(std::map <size_t, Object>::const_iterator obj = objects.begin();
+	for(std::vector <Object>::const_iterator obj = objects.begin();
 			obj != objects.end(); ++obj){
-		txt << wxString::Format(_T("Object: %zu"), obj->first) << endl;
-		obj->second.ToStream(txt, obj->first);
+		txt << wxString::Format(_T("Object: %zu"), obj->GetID()) << endl;
+		obj->ToStream(txt, obj->GetID());
 	}
 
 	txt << wxString::Format(_T("Run: %zu"), run.size()) << endl;
-	for(std::map <size_t, Run>::const_iterator it = run.begin();
-			it != run.end(); ++it){
-		txt << wxString::Format(_T("Run: %zu"), it->first) << endl;
-		it->second.ToStream(txt);
+	for(std::vector <Run>::const_iterator it = run.begin(); it != run.end();
+			++it){
+		txt << wxString::Format(_T("Run: %zu"), it->GetID()) << endl;
+		it->ToStream(txt);
 	}
 
-	for(std::map <size_t, Object>::const_iterator obj = objects.begin();
+	for(std::vector <Object>::const_iterator obj = objects.begin();
 			obj != objects.end(); ++obj){
 
-		wxString tempName = wxString::Format(_T("object_%zu.obj"), obj->first);
+		wxString tempName = wxString::Format(_T("object_%zu.obj"),
+				obj->GetID());
 		zip.PutNextEntry(tempName);
 		std::ostringstream out;
-		out << obj->second.geometry;
+		out << obj->geometry;
 		txt << out.str();
 	}
 
@@ -417,9 +429,9 @@ bool Project::Load(wxFileName fileName)
 			return false;
 		}
 		size_t objID = txt.Read32();
-		Object object;
+		Object object(GetNextObjectID());
 		object.FromStream(txt);
-		objects[objID] = object;
+		objects.push_back(object);
 	}
 
 	temp = txt.ReadWord();
@@ -436,9 +448,9 @@ bool Project::Load(wxFileName fileName)
 			return false;
 		}
 		size_t runID = txt.Read32();
-		Run tempRun;
+		Run tempRun(GetNextRunID());
 		tempRun.FromStream(txt, runID, this);
-		run[runID] = tempRun;
+		run.push_back(tempRun);
 	}
 	zip.CloseEntry();
 
@@ -453,7 +465,7 @@ bool Project::Load(wxFileName fileName)
 		size_t objID = p;
 		temp = temp.AfterFirst('.');
 		if(!temp.StartsWith(wxT("obj"))) continue;
-		if(objects.find(objID) == objects.end()) continue;
+		if(std::find(objects.begin(), objects.end(), objID) == objects.end()) continue;
 
 		zip.OpenEntry(*entry);
 		size_t N = entry->GetSize();

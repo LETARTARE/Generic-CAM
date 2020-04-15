@@ -38,7 +38,7 @@
 
 #include <wx/sizer.h>
 
-GeneratorAreaMillingDynamic::GeneratorAreaMillingDynamic()
+GeneratorAreaMillingDynamic::GeneratorAreaMillingDynamic(size_t ID):GeneratorDexel(ID)
 {
 	freeHeightAboveMaterial = 0.002;
 	maxSingleStep = 0.020;
@@ -365,7 +365,7 @@ std::vector <CNCPosition> GeneratorAreaMillingDynamic::MoveSafely(
 }
 
 void GeneratorAreaMillingDynamic::GenerateToolpath(const Run &run,
-		const std::map <size_t, Object> &objects, const Tool &tool,
+		const std::vector <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
 	output.Empty();
@@ -403,15 +403,13 @@ void GeneratorAreaMillingDynamic::GenerateToolpath(const Run &run,
 
 	temptop.GenerateDistanceMap(level, true);
 
-	double px, py, pz;
-
 //TODO Removed other side from flipped designs?
 //	ArrayOfMachinePosition mpa = target.toolpathFlipped.positions;
 //	if(!mpa.IsEmpty()){
 //		for(size_t i = 0; i < mpa.GetCount(); i++){
-//			px = mpa[i].X;
-//			py = target.GetSizeY() - mpa[i].Y;
-//			pz = target.GetSizeZ() - mpa[i].Z;
+//			double px = mpa[i].X;
+//			double py = target.GetSizeY() - mpa[i].Y;
+//			double pz = target.GetSizeZ() - mpa[i].Z;
 //			if(pz > level) temptop.FoldLowerDistance(round((px - rx2) / rx),
 //					round((py - ry2) / ry), toolShape);
 //		}

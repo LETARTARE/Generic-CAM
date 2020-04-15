@@ -36,20 +36,22 @@
 #include "gui.h"
 
 #include "../project/Run.h"
+#include "../project/Selection.h"
 
 class DialogJobSetup:public GUIJobSetup {
 public:
 	DialogJobSetup(wxWindow* parent);
 	virtual ~DialogJobSetup();
 
-	void SetRunID(size_t runID);
+	void SetSelection(const Selection &selection);
+	bool SelectionIsOK(void) const;
 
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 
 	void OnXClose(wxCloseEvent& event);
 	void OnSelect(wxCommandEvent& event);
-	bool OnSelected(size_t ID, Selection selection);
+	bool OnSelected(size_t ID, Selection selection, bool successful);
 	void OnGetSizeFromObject(wxCommandEvent& event);
 	void OnChoicebookPageChanged( wxChoicebookEvent& event);
 	void OnTextEnter(wxCommandEvent& event);

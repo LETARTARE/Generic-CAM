@@ -28,6 +28,7 @@
 
 #include "../Project.h"
 #include "../generator/Generator.h"
+#include <algorithm>
 
 CommandRunGeneratorAdd::CommandRunGeneratorAdd(const wxString& name,
 		Project* project, size_t runID, Generator* generator) :
@@ -35,9 +36,7 @@ CommandRunGeneratorAdd::CommandRunGeneratorAdd(const wxString& name,
 {
 	this->project = project;
 	this->runID = runID;
-	project->maxGeneratorID++;
-	this->generatorID = project->maxGeneratorID;
-	generator->ID = project->maxGeneratorID;
+	this->generatorID = generator->GetID();
 	this->newGenerator = generator;
 }
 
@@ -48,8 +47,11 @@ CommandRunGeneratorAdd::~CommandRunGeneratorAdd()
 
 bool CommandRunGeneratorAdd::Do(void)
 {
-	Run* run = &(project->run[runID]);
-	run->generators[generatorID] = newGenerator;
+	if(project == NULL) return false;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+	itRun->generators.push_back(newGenerator);
 	newGenerator = NULL;
 	project->Update();
 	return true;
@@ -57,9 +59,18 @@ bool CommandRunGeneratorAdd::Do(void)
 
 bool CommandRunGeneratorAdd::Undo(void)
 {
-	Run* run = &(project->run[runID]);
-	newGenerator = run->generators[generatorID];
-	run->generators.erase(generatorID);
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+	std::vector <Generator*>::iterator it;
+	it = itRun->generators.begin();
+	while(it != itRun->generators.end()){
+		if((**it) == generatorID) break;
+		++it;
+	}
+	if(it == itRun->generators.end()) return false;
+	newGenerator = *it;
+	itRun->generators.erase(it);
 	project->Update();
 	return true;
 }

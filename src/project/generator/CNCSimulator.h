@@ -52,11 +52,11 @@ public:
 
 	void SetTools(const std::vector <Tool> *tools);
 
-	void InsertBase(DexelTarget* target); //!< Inserts a target into the simulator. This target remains unchanged.
+	void InsertBase(const DexelTarget* target); //!< Inserts a target into the simulator. This target remains unchanged.
 	const DexelTarget* GetResult(void) const; //!< Returns the modified internal target.
 
-	void InsertToolPath(std::vector <CNCPosition> * toolpath,
-			bool calculateTiming = true);
+	void InsertToolPath(std::vector <CNCPosition> * toolpath);
+	double RecalculateTiming(double t0 = 0.0);
 
 	double GetTime(void) const;
 	double GetMaxTime(void) const;

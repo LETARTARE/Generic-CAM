@@ -70,36 +70,39 @@
 #include <wx/filename.h>
 #include <wx/string.h>
 #include <wx/txtstrm.h>
-#include <map>
+#include <vector>
 
 class Project;
 class Run {
 	friend class Project;
 
 public:
-	Run();
+	Run(size_t ID);
 	virtual ~Run();
 
 public:
 	Project * parent; ///< Pointer back to the Project this Run belongs to.
 	wxString name;
 
-	Selection object;
-
+	// Coordinate system for run
 	Selection coordX;
 	Selection coordY;
 	Selection coordZ;
 
+	// Object(s) to work on
+	Selection object;
+
+	// Stock around object
 	enum StockType {
 		sObject, BoxTop, BoxCenter, BoxBottom
 	} stocktype;
-	size_t stockobject;
-	Vector3 stocksize;
-	Vector3 stockorigin;
+	size_t stockobject; //<! used, if the stocktype is Object
+	Vector3 stocksize; //<! Size of a Box in x,y,z used as stock
+	Vector3 stockorigin; //<! Point where in the stock the origin lies
 
 	double slotWidth;
 
-	std::map <size_t, Generator*> generators; ///< List of Generator%s applied to the workpiece in this run
+	std::vector <Generator*> generators; ///< List of Generator%s applied to the workpiece in this run
 
 	wxFileName machinefile;
 
@@ -110,9 +113,12 @@ public:
 	DexelTarget base;
 
 private:
+	size_t ID; //!< Internal ID number
 	OpenGLImage touchpoint;
 
 public:
+	bool operator ==(const size_t ID) const;
+	size_t GetID(void) const;
 	void Update(Project * project);
 
 	void GenerateToolpaths(void);

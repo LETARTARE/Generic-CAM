@@ -38,6 +38,7 @@ DnDFile::DnDFile(Project* project, FrameMain* parent)
 bool DnDFile::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 {
 	wxCommandProcessor* cmdProc = parent->GetDocument()->GetCommandProcessor();
+	parent->selection.Set(Selection::Object);
 	for(size_t n = 0; n < filenames.GetCount(); n++){
 		wxFileName filename(filenames[n]);
 		if(!filename.IsOk()){
@@ -49,11 +50,14 @@ bool DnDFile::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 		if(filename.GetExt().CmpNoCase(_T("stl")) == 0
 				|| filename.GetExt().CmpNoCase(_T("dxf")) == 0
 				|| filename.GetExt().CmpNoCase(_T("gts")) == 0){
+			const size_t objID = project->GetNextObjectID();
 			cmdProc->Submit(
 					new CommandObjectLoad(
 							(_("Load Object: ") + filename.GetName()),
-							project, filename.GetFullPath()));
-			parent->TransferDataToWindow();
+							project, filename.GetFullPath(), objID));
+			parent->selection.Add(objID);
+			parent->TransferDataToWindow(true);
+			parent->tree->SetSelecton(parent->selection);
 		}else{
 			if(filename.GetExt().CmpNoCase(_T("zip")) == 0
 					|| filename.GetExt().CmpNoCase(_T("prj")) == 0){
@@ -66,7 +70,7 @@ bool DnDFile::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 				}
 				cmdProc->ClearCommands();
 				cmdProc->MarkAsSaved();
-				parent->TransferDataToWindow();
+				parent->TransferDataToWindow(true);
 
 			}else{
 				wxLogMessage

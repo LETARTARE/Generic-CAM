@@ -25,6 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "CommandRunSetStockObject.h"
+#include <algorithm>
 
 CommandRunSetStockObject::CommandRunSetStockObject(const wxString& name,
 		Project* project, size_t runID, size_t objID) :
@@ -39,8 +40,11 @@ CommandRunSetStockObject::CommandRunSetStockObject(const wxString& name,
 bool CommandRunSetStockObject::Do(void)
 {
 	if(project == NULL) return false;
-	oldObjID = project->run[runID].stockobject;
-	project->run[runID].stockobject = newObjID;
+		std::vector <Run>::iterator itRun;
+		itRun = std::find(project->run.begin(), project->run.end(), runID);
+		if(itRun == project->run.end()) return false;
+	oldObjID = itRun->stockobject;
+	itRun->stockobject = newObjID;
 	project->Update();
 	return true;
 }
@@ -48,7 +52,10 @@ bool CommandRunSetStockObject::Do(void)
 bool CommandRunSetStockObject::Undo(void)
 {
 	if(project == NULL) return false;
-	project->run[runID].stockobject = oldObjID;
+		std::vector <Run>::iterator itRun;
+		itRun = std::find(project->run.begin(), project->run.end(), runID);
+		if(itRun == project->run.end()) return false;
+	itRun->stockobject = oldObjID;
 	project->Update();
 	return true;
 }

@@ -72,8 +72,8 @@ Unit::Unit(const wxString SIName, const wxString otherName, const double factor)
 	power = 0.0;
 }
 
-Unit::Unit(int m, int kg, int s, int A, int K, int mol, int cd, int cur)
-		: m(m), kg(kg), s(s), A(A), K(K), mol(mol), cd(cd), cur(cur)
+Unit::Unit(int m, int kg, int s, int A, int K, int mol, int cd, int cur) :
+		m(m), kg(kg), s(s), A(A), K(K), mol(mol), cd(cd), cur(cur)
 {
 	power = 0.0;
 	factor = 1.0;
@@ -130,22 +130,23 @@ void Unit::SetCurrency(wxString currency)
 //	this->extra = currency;
 }
 
-double Unit::FromSI(const double value)
+double Unit::FromSI(const double value) const
 {
 	return value / factor;
 }
 
-double Unit::ToSI(const double value)
+double Unit::ToSI(const double value) const
 {
 	return value * factor;
 }
 
-wxString Unit::GetSIName(void)
+wxString Unit::GetSIName(void) const
 {
 	return SIName;
 }
 
-wxString Unit::TextFromSIWithUnit(const double value, int digitsAfterComma)
+wxString Unit::TextFromSIWithUnit(const double value,
+		int digitsAfterComma) const
 {
 	if(digitsAfterComma < 0){
 		return wxString::Format(_T("%g "), FromSI(value)) + otherName;
@@ -155,7 +156,7 @@ wxString Unit::TextFromSIWithUnit(const double value, int digitsAfterComma)
 	}
 }
 
-wxString Unit::TextFromSI(const double value, int digitsAfterComma)
+wxString Unit::TextFromSI(const double value, int digitsAfterComma) const
 {
 	if(digitsAfterComma < 0){
 		return wxString::Format(_T("%g"), FromSI(value));
@@ -165,7 +166,7 @@ wxString Unit::TextFromSI(const double value, int digitsAfterComma)
 	}
 }
 
-wxString Unit::GetOtherName(void)
+wxString Unit::GetOtherName(void) const
 {
 	return otherName;
 }

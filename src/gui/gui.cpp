@@ -694,7 +694,7 @@ GUIJobSetup::GUIJobSetup( wxWindow* parent, wxWindowID id, const wxString& title
 	wxBoxSizer* bSizer;
 	bSizer = new wxBoxSizer( wxVERTICAL );
 	
-	m_notebook = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_notebook = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNB_LEFT );
 	m_panelObject = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizerObject;
 	bSizerObject = new wxBoxSizer( wxVERTICAL );
@@ -863,6 +863,216 @@ GUIJobSetup::GUIJobSetup( wxWindow* parent, wxWindowID id, const wxString& title
 	m_panelOrigin->Layout();
 	bSizerOrigin->Fit( m_panelOrigin );
 	m_notebook->AddPage( m_panelOrigin, _("Origin"), false );
+	m_panelSupports = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxBoxSizer* bSizerSupports;
+	bSizerSupports = new wxBoxSizer( wxVERTICAL );
+	
+	m_scrolledWindowSupports = new wxScrolledWindow( m_panelSupports, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+	m_scrolledWindowSupports->SetScrollRate( 5, 5 );
+	wxBoxSizer* bSizerScrolledWindowSupports;
+	bSizerScrolledWindowSupports = new wxBoxSizer( wxVERTICAL );
+	
+	wxStaticBoxSizer* sbSizerSupportSize;
+	sbSizerSupportSize = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindowSupports, wxID_ANY, _("Size") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizerSupportSize;
+	fgSizerSupportSize = new wxFlexGridSizer( 3, 3, 0, 0 );
+	fgSizerSupportSize->AddGrowableCol( 1 );
+	fgSizerSupportSize->SetFlexibleDirection( wxBOTH );
+	fgSizerSupportSize->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticTextSupportWidth = new wxStaticText( sbSizerSupportSize->GetStaticBox(), wxID_ANY, _("Width:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSupportWidth->Wrap( -1 );
+	fgSizerSupportSize->Add( m_staticTextSupportWidth, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
+	m_textCtrlSupportWidth = new wxTextCtrl( sbSizerSupportSize->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizerSupportSize->Add( m_textCtrlSupportWidth, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticTextUnitSupportWidth = new wxStaticText( sbSizerSupportSize->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSupportWidth->Wrap( -1 );
+	fgSizerSupportSize->Add( m_staticTextUnitSupportWidth, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextSupportHeight = new wxStaticText( sbSizerSupportSize->GetStaticBox(), wxID_ANY, _("Height:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSupportHeight->Wrap( -1 );
+	fgSizerSupportSize->Add( m_staticTextSupportHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
+	m_textCtrlSupportHeight = new wxTextCtrl( sbSizerSupportSize->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizerSupportSize->Add( m_textCtrlSupportHeight, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticTextUnitSupportHeight = new wxStaticText( sbSizerSupportSize->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSupportHeight->Wrap( -1 );
+	fgSizerSupportSize->Add( m_staticTextUnitSupportHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextSupportSlotwidth = new wxStaticText( sbSizerSupportSize->GetStaticBox(), wxID_ANY, _("Slotwidth:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSupportSlotwidth->Wrap( -1 );
+	fgSizerSupportSize->Add( m_staticTextSupportSlotwidth, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
+	m_textCtrlSupportSlotwidth = new wxTextCtrl( sbSizerSupportSize->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizerSupportSize->Add( m_textCtrlSupportSlotwidth, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticTextUnitSupportSlotwidth = new wxStaticText( sbSizerSupportSize->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSupportSlotwidth->Wrap( -1 );
+	fgSizerSupportSize->Add( m_staticTextUnitSupportSlotwidth, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	sbSizerSupportSize->Add( fgSizerSupportSize, 0, wxEXPAND, 5 );
+	
+	
+	bSizerScrolledWindowSupports->Add( sbSizerSupportSize, 0, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizerSupportLevel;
+	sbSizerSupportLevel = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindowSupports, wxID_ANY, _("Level") ), wxVERTICAL );
+	
+	wxString m_choiceSupportLevelChoices[] = { _("Manual"), _("Individual automatic level"), _("Common automatic level") };
+	int m_choiceSupportLevelNChoices = sizeof( m_choiceSupportLevelChoices ) / sizeof( wxString );
+	m_choiceSupportLevel = new wxChoice( sbSizerSupportLevel->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceSupportLevelNChoices, m_choiceSupportLevelChoices, 0 );
+	m_choiceSupportLevel->SetSelection( 0 );
+	sbSizerSupportLevel->Add( m_choiceSupportLevel, 0, wxALL|wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizerSupportLevel;
+	fgSizerSupportLevel = new wxFlexGridSizer( 1, 3, 0, 0 );
+	fgSizerSupportLevel->AddGrowableCol( 1 );
+	fgSizerSupportLevel->SetFlexibleDirection( wxBOTH );
+	fgSizerSupportLevel->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticTextSupportlevel = new wxStaticText( sbSizerSupportLevel->GetStaticBox(), wxID_ANY, _("Level:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSupportlevel->Wrap( -1 );
+	fgSizerSupportLevel->Add( m_staticTextSupportlevel, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
+	m_textCtrlSupportLevel = new wxTextCtrl( sbSizerSupportLevel->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizerSupportLevel->Add( m_textCtrlSupportLevel, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticTextSupportLevel = new wxStaticText( sbSizerSupportLevel->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSupportLevel->Wrap( -1 );
+	fgSizerSupportLevel->Add( m_staticTextSupportLevel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	sbSizerSupportLevel->Add( fgSizerSupportLevel, 0, wxEXPAND, 5 );
+	
+	
+	bSizerScrolledWindowSupports->Add( sbSizerSupportLevel, 0, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizerGridlinesX;
+	sbSizerGridlinesX = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindowSupports, wxID_ANY, _("Gridlines X") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizerSupportGridlinesX;
+	fgSizerSupportGridlinesX = new wxFlexGridSizer( 2, 3, 0, 0 );
+	fgSizerSupportGridlinesX->AddGrowableCol( 1 );
+	fgSizerSupportGridlinesX->SetFlexibleDirection( wxBOTH );
+	fgSizerSupportGridlinesX->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticTextSupportXDistance = new wxStaticText( sbSizerGridlinesX->GetStaticBox(), wxID_ANY, _("Distance:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSupportXDistance->Wrap( -1 );
+	fgSizerSupportGridlinesX->Add( m_staticTextSupportXDistance, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
+	m_textCtrlSupportXDistance = new wxTextCtrl( sbSizerGridlinesX->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizerSupportGridlinesX->Add( m_textCtrlSupportXDistance, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticTextUnitSupportXDistance = new wxStaticText( sbSizerGridlinesX->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSupportXDistance->Wrap( -1 );
+	fgSizerSupportGridlinesX->Add( m_staticTextUnitSupportXDistance, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextSupportXOffset = new wxStaticText( sbSizerGridlinesX->GetStaticBox(), wxID_ANY, _("Offset:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSupportXOffset->Wrap( -1 );
+	fgSizerSupportGridlinesX->Add( m_staticTextSupportXOffset, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
+	m_textCtrlSupportXOffset = new wxTextCtrl( sbSizerGridlinesX->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizerSupportGridlinesX->Add( m_textCtrlSupportXOffset, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticTextUnitSupportXOffset = new wxStaticText( sbSizerGridlinesX->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSupportXOffset->Wrap( -1 );
+	fgSizerSupportGridlinesX->Add( m_staticTextUnitSupportXOffset, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	sbSizerGridlinesX->Add( fgSizerSupportGridlinesX, 1, wxEXPAND, 5 );
+	
+	
+	bSizerScrolledWindowSupports->Add( sbSizerGridlinesX, 0, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizerGridlinesY;
+	sbSizerGridlinesY = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindowSupports, wxID_ANY, _("Gridlines Y") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizerSupportGridlinesY;
+	fgSizerSupportGridlinesY = new wxFlexGridSizer( 2, 3, 0, 0 );
+	fgSizerSupportGridlinesY->AddGrowableCol( 1 );
+	fgSizerSupportGridlinesY->SetFlexibleDirection( wxBOTH );
+	fgSizerSupportGridlinesY->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticTextSupportYDistance = new wxStaticText( sbSizerGridlinesY->GetStaticBox(), wxID_ANY, _("Distance:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSupportYDistance->Wrap( -1 );
+	fgSizerSupportGridlinesY->Add( m_staticTextSupportYDistance, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
+	m_textCtrlSupportYDistance = new wxTextCtrl( sbSizerGridlinesY->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizerSupportGridlinesY->Add( m_textCtrlSupportYDistance, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticTextUnitSupportYDistance = new wxStaticText( sbSizerGridlinesY->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSupportYDistance->Wrap( -1 );
+	fgSizerSupportGridlinesY->Add( m_staticTextUnitSupportYDistance, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextSupportYOffset = new wxStaticText( sbSizerGridlinesY->GetStaticBox(), wxID_ANY, _("Offset:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSupportYOffset->Wrap( -1 );
+	fgSizerSupportGridlinesY->Add( m_staticTextSupportYOffset, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
+	m_textCtrlSupportYOffset = new wxTextCtrl( sbSizerGridlinesY->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizerSupportGridlinesY->Add( m_textCtrlSupportYOffset, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticTextUnitSupportYOffset = new wxStaticText( sbSizerGridlinesY->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSupportYOffset->Wrap( -1 );
+	fgSizerSupportGridlinesY->Add( m_staticTextUnitSupportYOffset, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	sbSizerGridlinesY->Add( fgSizerSupportGridlinesY, 1, wxEXPAND, 5 );
+	
+	
+	bSizerScrolledWindowSupports->Add( sbSizerGridlinesY, 0, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizerGridlinesOutline;
+	sbSizerGridlinesOutline = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindowSupports, wxID_ANY, _("Gridlines Outline") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizerSupportGridlinesOutline;
+	fgSizerSupportGridlinesOutline = new wxFlexGridSizer( 2, 3, 0, 0 );
+	fgSizerSupportGridlinesOutline->AddGrowableCol( 1 );
+	fgSizerSupportGridlinesOutline->SetFlexibleDirection( wxBOTH );
+	fgSizerSupportGridlinesOutline->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticTextSupportOCount = new wxStaticText( sbSizerGridlinesOutline->GetStaticBox(), wxID_ANY, _("Count:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSupportOCount->Wrap( -1 );
+	fgSizerSupportGridlinesOutline->Add( m_staticTextSupportOCount, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
+	m_textCtrlSupportOCount = new wxTextCtrl( sbSizerGridlinesOutline->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizerSupportGridlinesOutline->Add( m_textCtrlSupportOCount, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	fgSizerSupportGridlinesOutline->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_staticTextSupportOOffset = new wxStaticText( sbSizerGridlinesOutline->GetStaticBox(), wxID_ANY, _("Offset:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSupportOOffset->Wrap( -1 );
+	fgSizerSupportGridlinesOutline->Add( m_staticTextSupportOOffset, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
+	m_textCtrlSupportOOffset = new wxTextCtrl( sbSizerGridlinesOutline->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizerSupportGridlinesOutline->Add( m_textCtrlSupportOOffset, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticTextUnitSupportOOffset = new wxStaticText( sbSizerGridlinesOutline->GetStaticBox(), wxID_ANY, _("mm"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSupportOOffset->Wrap( -1 );
+	fgSizerSupportGridlinesOutline->Add( m_staticTextUnitSupportOOffset, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	sbSizerGridlinesOutline->Add( fgSizerSupportGridlinesOutline, 1, wxEXPAND, 5 );
+	
+	
+	bSizerScrolledWindowSupports->Add( sbSizerGridlinesOutline, 0, wxEXPAND, 5 );
+	
+	
+	m_scrolledWindowSupports->SetSizer( bSizerScrolledWindowSupports );
+	m_scrolledWindowSupports->Layout();
+	bSizerScrolledWindowSupports->Fit( m_scrolledWindowSupports );
+	bSizerSupports->Add( m_scrolledWindowSupports, 1, wxALL|wxEXPAND, 5 );
+	
+	
+	m_panelSupports->SetSizer( bSizerSupports );
+	m_panelSupports->Layout();
+	bSizerSupports->Fit( m_panelSupports );
+	m_notebook->AddPage( m_panelSupports, _("Supports"), false );
 	m_panelMachine = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizerMachine;
 	bSizerMachine = new wxBoxSizer( wxVERTICAL );
@@ -885,6 +1095,7 @@ GUIJobSetup::GUIJobSetup( wxWindow* parent, wxWindowID id, const wxString& title
 	
 	this->SetSizer( bSizer );
 	this->Layout();
+	bSizer->Fit( this );
 	
 	// Connect Events
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIJobSetup::OnXClose ) );
@@ -1144,7 +1355,7 @@ GUIAnimation::GUIAnimation( wxWindow* parent, wxWindowID id, const wxString& tit
 	bSizerButtons->Add( m_bpButtonFirst, 0, 0, 5 );
 	
 	m_bpButtonPrev = new wxBitmapButton( this, wxID_ANY, wxBitmap( prev_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	m_bpButtonPrev->SetToolTip( _("Step back") );
+	m_bpButtonPrev->SetToolTip( _("Previous toolpath") );
 	
 	bSizerButtons->Add( m_bpButtonPrev, 0, 0, 5 );
 	
@@ -1154,7 +1365,7 @@ GUIAnimation::GUIAnimation( wxWindow* parent, wxWindowID id, const wxString& tit
 	bSizerButtons->Add( m_bpButtonPlayStop, 0, 0, 5 );
 	
 	m_bpButtonNext = new wxBitmapButton( this, wxID_ANY, wxBitmap( next_xpm ), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	m_bpButtonNext->SetToolTip( _("Step forward") );
+	m_bpButtonNext->SetToolTip( _("Next toolpath") );
 	
 	bSizerButtons->Add( m_bpButtonNext, 0, 0, 5 );
 	

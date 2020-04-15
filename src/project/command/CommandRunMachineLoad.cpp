@@ -27,27 +27,38 @@
 #include "CommandRunMachineLoad.h"
 
 #include "../Project.h"
+#include <algorithm>
 
 CommandRunMachineLoad::CommandRunMachineLoad(const wxString& name,
-		Project* project, size_t ID, const wxFileName& fileName) :
+		Project* project, size_t runID, const wxFileName& fileName) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->runNr = ID;
+	this->runID = runID;
 	this->fileName = fileName;
 }
 
 bool CommandRunMachineLoad::Do(void)
 {
-	oldFileName = project->run[runNr].machinefile;
-	project->run[runNr].machinefile = fileName;
+	if(project == NULL) return false;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+
+	oldFileName = itRun->machinefile;
+	itRun->machinefile = fileName;
 	project->Update();
 	return true;
 }
 
 bool CommandRunMachineLoad::Undo(void)
 {
-	project->run[runNr].machinefile = oldFileName;
+	if(project == NULL) return false;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+
+	itRun->machinefile = oldFileName;
 	project->Update();
 	return true;
 }

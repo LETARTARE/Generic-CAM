@@ -970,11 +970,10 @@ bool DexelTarget::FindStartCutting(int &x, int &y)
 	int sx = x;
 	int sy = y;
 
-	int dx = x;
-	int dy = y;
-
 	size_t N = 1000 * 4; // Error counter
 
+//	int dx = x;
+//	int dy = y;
 //	if(dx == 54 && dy == 49){
 //		DocumentField(dx, dy);
 //		//return false;

@@ -42,7 +42,7 @@
 
 #include <math.h>
 
-GeneratorTest::GeneratorTest()
+GeneratorTest::GeneratorTest(size_t ID):GeneratorDexel(ID)
 {
 	twiddleFactor = 0.008;
 }
@@ -118,7 +118,7 @@ void GeneratorTest::TransferDataFromPanel(CollectionUnits* settings)
 }
 
 void GeneratorTest::GenerateToolpath(const Run &run,
-		const std::map <size_t, Object> &objects, const Tool &tool,
+		const std::vector <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
 	output.Empty();
@@ -160,9 +160,6 @@ void GeneratorTest::GenerateToolpath(const Run &run,
 	debug = temp;
 
 	CNCPosition m;
-	m.toolSlot = tool.postprocess.number;
-	m.F = tool.startvalues.fn;
-	m.S = tool.startvalues.n;
 	m.Set(0.0, 0.0, temp.GetSizeZ() + freeHeight, true);
 
 	std::vector <Polygon25> pgs;

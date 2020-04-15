@@ -27,6 +27,7 @@
 #include "CommandObjectRename.h"
 
 #include "../Project.h"
+#include <algorithm>
 
 CommandObjectRename::CommandObjectRename(const wxString& name, Project* project,
 		size_t ID, const wxString objectName) :
@@ -40,17 +41,21 @@ CommandObjectRename::CommandObjectRename(const wxString& name, Project* project,
 bool CommandObjectRename::Do(void)
 {
 	if(project == NULL) return false;
-	if(project->objects.find(ID) == project->objects.end()) return false;
-
-	this->oldName = project->objects[ID].name;
-	project->objects[ID].name = this->newName;
+	std::vector <Object>::iterator it;
+	it = std::find(project->objects.begin(), project->objects.end(), ID);
+	if(it == project->objects.end()) return false;
+	this->oldName = it->name;
+	it->name = this->newName;
 	project->Update();
 	return true;
 }
 
 bool CommandObjectRename::Undo(void)
 {
-	project->objects[ID].name = this->oldName;
+	std::vector <Object>::iterator it;
+	it = std::find(project->objects.begin(), project->objects.end(), ID);
+	if(it == project->objects.end()) return false;
+	it->name = this->oldName;
 	project->Update();
 	return true;
 }

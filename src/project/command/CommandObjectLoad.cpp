@@ -33,23 +33,22 @@
 #endif
 
 CommandObjectLoad::CommandObjectLoad(const wxString& name, Project * project,
-		const wxString& fileName) :
+		const wxString& fileName, const size_t objID) :
 		wxCommand(true, name)
 {
 	this->project = project;
 	this->fileName = fileName;
-	project->maxObjectID++;
-	this->ID = project->maxObjectID;
+	this->ID = objID;
 }
 
 bool CommandObjectLoad::Do(void)
 {
-	Object temp;
+	Object temp(ID);
 #ifdef _DEBUGMODE
 	wxStopWatch sw;
 #endif
 	if(temp.LoadObject(fileName)){
-		project->objects[ID] = temp;
+		project->objects.push_back(temp);
 #ifdef _DEBUGMODE
 //		wxLogMessage(_T("CommandObjectLoad took %ld ms to execute."),
 //				sw.Time());
@@ -62,7 +61,14 @@ bool CommandObjectLoad::Do(void)
 
 bool CommandObjectLoad::Undo(void)
 {
-	project->objects.erase(ID);
+	std::vector<Object>::iterator obj = project->objects.begin();
+	while(obj!=project->objects.end()){
+		if(*obj==ID){
+			obj = project->objects.erase(obj);
+		}else{
+			++obj;
+		}
+	}
 	project->Update();
 	return true;
 }

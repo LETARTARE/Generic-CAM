@@ -44,9 +44,9 @@
 #include <wx/notebook.h>
 #include <wx/radiobox.h>
 #include <wx/choicebk.h>
-#include <wx/filepicker.h>
 #include <wx/choice.h>
 #include <wx/scrolwin.h>
+#include <wx/filepicker.h>
 #include <wx/slider.h>
 #include <wx/propgrid/propgrid.h>
 #include <wx/propgrid/advprops.h>
@@ -362,6 +362,38 @@ class GUIJobSetup : public wxFrame
 		wxPanel* m_panelOrigin;
 		wxTextCtrl* m_textCtrlOrigin;
 		wxButton* m_buttonOrigin;
+		wxPanel* m_panelSupports;
+		wxScrolledWindow* m_scrolledWindowSupports;
+		wxStaticText* m_staticTextSupportWidth;
+		wxTextCtrl* m_textCtrlSupportWidth;
+		wxStaticText* m_staticTextUnitSupportWidth;
+		wxStaticText* m_staticTextSupportHeight;
+		wxTextCtrl* m_textCtrlSupportHeight;
+		wxStaticText* m_staticTextUnitSupportHeight;
+		wxStaticText* m_staticTextSupportSlotwidth;
+		wxTextCtrl* m_textCtrlSupportSlotwidth;
+		wxStaticText* m_staticTextUnitSupportSlotwidth;
+		wxChoice* m_choiceSupportLevel;
+		wxStaticText* m_staticTextSupportlevel;
+		wxTextCtrl* m_textCtrlSupportLevel;
+		wxStaticText* m_staticTextSupportLevel;
+		wxStaticText* m_staticTextSupportXDistance;
+		wxTextCtrl* m_textCtrlSupportXDistance;
+		wxStaticText* m_staticTextUnitSupportXDistance;
+		wxStaticText* m_staticTextSupportXOffset;
+		wxTextCtrl* m_textCtrlSupportXOffset;
+		wxStaticText* m_staticTextUnitSupportXOffset;
+		wxStaticText* m_staticTextSupportYDistance;
+		wxTextCtrl* m_textCtrlSupportYDistance;
+		wxStaticText* m_staticTextUnitSupportYDistance;
+		wxStaticText* m_staticTextSupportYOffset;
+		wxTextCtrl* m_textCtrlSupportYOffset;
+		wxStaticText* m_staticTextUnitSupportYOffset;
+		wxStaticText* m_staticTextSupportOCount;
+		wxTextCtrl* m_textCtrlSupportOCount;
+		wxStaticText* m_staticTextSupportOOffset;
+		wxTextCtrl* m_textCtrlSupportOOffset;
+		wxStaticText* m_staticTextUnitSupportOOffset;
 		wxPanel* m_panelMachine;
 		wxStaticText* m_staticTextMachine;
 		wxFilePickerCtrl* m_filePickerMachine;
@@ -378,7 +410,7 @@ class GUIJobSetup : public wxFrame
 	
 	public:
 		
-		GUIJobSetup( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 407,465 ), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxTAB_TRAVERSAL );
+		GUIJobSetup( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxTAB_TRAVERSAL );
 		
 		~GUIJobSetup();
 	

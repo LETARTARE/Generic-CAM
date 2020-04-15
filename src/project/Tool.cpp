@@ -28,7 +28,6 @@
 
 #include "../3D/OpenGLMaterial.h"
 
-
 #include <float.h>
 #include <iostream>
 #ifdef _MSC_VER
@@ -51,6 +50,11 @@ Tool::Tool()
 
 Tool::~Tool()
 {
+}
+
+bool Tool::operator ==(const std::string& guid) const
+{
+	return (base.guid.compare(guid) == 0);
 }
 
 void Tool::Update(void)
@@ -423,3 +427,4 @@ void Tool::Contour::Paint(void) const
 	}
 
 }
+

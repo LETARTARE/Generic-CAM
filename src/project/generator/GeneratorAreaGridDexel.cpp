@@ -41,7 +41,7 @@
 
 //#include <cmath>
 
-GeneratorAreaGridDexel::GeneratorAreaGridDexel()
+GeneratorAreaGridDexel::GeneratorAreaGridDexel(size_t ID):GeneratorDexel(ID)
 {
 	overlap = 0.1;
 	maxStepUp = 0.01;
@@ -177,7 +177,7 @@ void GeneratorAreaGridDexel::TransferDataFromPanel(CollectionUnits* settings)
 }
 
 void GeneratorAreaGridDexel::GenerateToolpath(const Run &run,
-		const std::map <size_t, Object> &objects, const Tool &tool,
+		const std::vector <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
 	output.Empty();

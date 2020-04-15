@@ -36,7 +36,7 @@ class Project;
 class CommandObjectLoad:public wxCommand {
 public:
 	CommandObjectLoad(const wxString& name, Project * project,
-			const wxString& fileName);
+			const wxString& fileName, const size_t objID);
 
 	bool Do(void);
 	bool Undo(void);

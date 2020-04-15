@@ -32,12 +32,9 @@
 #include <iostream>
 #include "../../3D/OpenGL.h"
 
-Generator::Generator()
+Generator::Generator(size_t ID) :
+		ID(ID)
 {
-//	parent = NULL;
-
-	ID = 0;
-
 	marginBelow = 0.0;
 	marginSide = 0.0;
 	freeHeight = 0.001;
@@ -69,9 +66,14 @@ wxString Generator::GetName(void) const
 	return name;
 }
 
-size_t Generator::GetID(void)
+size_t Generator::GetID(void) const
 {
 	return ID;
+}
+
+bool Generator::operator ==(const size_t ID) const
+{
+	return (this->ID == ID);
 }
 
 void Generator::CopyParameterFrom(const Generator * other)

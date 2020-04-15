@@ -28,22 +28,23 @@
 
 #include "../Project.h"
 #include "../Selection.h"
+#include <algorithm>
 
 CommandRunAdd::CommandRunAdd(const wxString& name, Project* project,
-		wxString runName, size_t objID) :
-		wxCommand(true, name)
+		const wxString &runName, size_t runID, const std::set <size_t> &objIDs) :
+		wxCommand(true, name), runID(runID), run(runID)
 {
 	this->project = project;
 	this->run.name = runName;
-	if(objID > 0) this->run.object.Add(Selection::Object, objID);
-	project->maxRunID++;
-	ID = project->maxRunID;
+	for(std::set <size_t>::const_iterator objID = objIDs.begin();
+			objID != objIDs.end(); ++objID)
+		this->run.object.Add(Selection::Object, *objID);
 }
 
 bool CommandRunAdd::Do(void)
 {
 	if(project == NULL) return false;
-	project->run[ID] = this->run;
+	project->run.push_back(this->run);
 	project->Update();
 	return true;
 }
@@ -51,7 +52,10 @@ bool CommandRunAdd::Do(void)
 bool CommandRunAdd::Undo(void)
 {
 	if(project == NULL) return false;
-	project->run.erase(ID);
+	std::vector <Run>::iterator it;
+	it = std::find(project->run.begin(), project->run.end(), runID);
+	if(it == project->run.end()) return false;
+	project->run.erase(it);
 	project->Update();
 	return true;
 }

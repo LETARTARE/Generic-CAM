@@ -168,7 +168,7 @@ public:
 	/*! \brief Resample the point in the polygon.
 	 *
 	 * The polygon is resampled into a polygon with N points. This can be an over- or undersampling of the original polygon.
-	 * @param N New number of points
+	 * @param Nnew New number of points
 	 */
 	void Resample(unsigned int Nnew);
 

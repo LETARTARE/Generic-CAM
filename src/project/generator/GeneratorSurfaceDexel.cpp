@@ -33,7 +33,7 @@
 
 #include <wx/sizer.h>
 
-GeneratorSurfaceDexel::GeneratorSurfaceDexel()
+GeneratorSurfaceDexel::GeneratorSurfaceDexel(size_t ID):GeneratorDexel(ID)
 {
 }
 
@@ -44,9 +44,8 @@ GeneratorSurfaceDexel::~GeneratorSurfaceDexel()
 void GeneratorSurfaceDexel::CopyParameterFrom(const Generator* other)
 {
 	GeneratorDexel::CopyParameterFrom(other);
-
-	const GeneratorSurfaceDexel * temp =
-			dynamic_cast <const GeneratorSurfaceDexel*>(other);
+//	const GeneratorSurfaceDexel * temp =
+//			dynamic_cast <const GeneratorSurfaceDexel*>(other);
 }
 
 wxString GeneratorSurfaceDexel::GetTypeName(void) const
@@ -96,15 +95,15 @@ void GeneratorSurfaceDexel::TransferDataFromPanel(CollectionUnits* settings)
 
 bool GeneratorSurfaceDexel::operator ==(const Generator& b) const
 {
-	const GeneratorSurfaceDexel * temp =
-			dynamic_cast <const GeneratorSurfaceDexel*>(&b);
-	std::cout << "GeneratorSurfaceDexel::operator ==\n";
+//	const GeneratorSurfaceDexel * temp =
+//			dynamic_cast <const GeneratorSurfaceDexel*>(&b);
+	if(DEBUG)std::cout << "GeneratorSurfaceDexel::operator ==\n";
 	if(!(this->Generator::operator ==(b))) return false;
 	return true;
 }
 
 void GeneratorSurfaceDexel::GenerateToolpath(const Run &run,
-		const std::map <size_t, Object> &objects, const Tool &tool,
+		const std::vector <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
 	errorOccured = false;

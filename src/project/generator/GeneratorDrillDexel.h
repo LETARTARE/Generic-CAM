@@ -42,7 +42,7 @@
 
 class GeneratorDrillDexel:public GeneratorDexel {
 public:
-	GeneratorDrillDexel();
+	GeneratorDrillDexel(size_t ID);
 	virtual ~GeneratorDrillDexel();
 
 	virtual void CopyParameterFrom(const Generator * other);
@@ -61,7 +61,7 @@ public:
 			CollectionUnits* settings) const;
 	virtual void TransferDataFromPanel(CollectionUnits* settings);
 	virtual void GenerateToolpath(const Run &run,
-			const std::map <size_t, Object> &objects, const Tool &tool,
+			const std::vector <Object> &objects, const Tool &tool,
 			const DexelTarget &base);
 
 public:

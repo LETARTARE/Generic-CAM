@@ -31,9 +31,13 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#ifdef DEBUG
+#ifndef DEBUG
+#define DEBUG 0
+#endif
+#if (DEBUG == 1)
 #define _DEBUGMODE
 #endif
+
 //#define _USE_CPPUNIT
 //#define _USE_MIDI
 //#define _USE_MULTITHREADING

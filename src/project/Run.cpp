@@ -37,7 +37,8 @@
 
 #include "../3D/OpenGL.h"
 
-Run::Run()
+Run::Run(size_t ID) :
+		ID(ID)
 {
 	parent = NULL;
 	object = 0;
@@ -52,16 +53,27 @@ Run::Run()
 	touchpoint.SetAlphaColor(255, 255, 255);
 
 	base.displayField = true;
+
+	printf("Run::Run - Created run %p with DexelTarget base %p\n", this, &base);
 }
 
 Run::~Run()
 {
-	for(std::map <size_t, Generator *>::iterator it = generators.begin();
+	for(std::vector <Generator *>::iterator it = generators.begin();
 			it != generators.end(); ++it){
-		delete (it->second);
+		delete (*it);
 	}
 }
 
+bool Run::operator ==(const size_t ID) const
+{
+	return (this->ID == ID);
+}
+
+size_t Run::GetID(void) const
+{
+	return ID;
+}
 void Run::Update(Project * project)
 {
 	if(project == NULL) return;
@@ -230,14 +242,14 @@ void Run::GenerateToolpaths(void)
 			res);
 
 	if(stocktype == sObject){
-		const Object & obj = parent->Get3DObject(stockobject);
+		const Object * obj = parent->Get3DObject(stockobject);
 		base.InitImprinting();
 
-		AffineTransformMatrix M = obj.matrix;
-		M.TranslateGlobal(-obj.bbox.xmin, -obj.bbox.ymin, -obj.bbox.zmin);
-		M.TranslateGlobal(-stock.xmin + obj.bbox.xmin,
-				-stock.ymin + obj.bbox.ymin, -stock.zmin + obj.bbox.zmin);
-		base.InsertObject(obj, M);
+		AffineTransformMatrix M = obj->matrix;
+		M.TranslateGlobal(-obj->bbox.xmin, -obj->bbox.ymin, -obj->bbox.zmin);
+		M.TranslateGlobal(-stock.xmin + obj->bbox.xmin,
+				-stock.ymin + obj->bbox.ymin, -stock.zmin + obj->bbox.zmin);
+		base.InsertObject(*obj, M);
 		base.FinishImprint();
 	}else{
 		base.Fill();
@@ -248,44 +260,49 @@ void Run::GenerateToolpaths(void)
 	CNCSimulator simulator;
 	simulator.SetTools(tools);
 
-	for(std::map <size_t, Generator *>::iterator it = generators.begin();
+	double t = 0.0;
+
+	for(std::vector <Generator *>::iterator it = generators.begin();
 			it != generators.end(); ++it){
-		assert((it->second) != NULL);
+		assert((*it) != NULL);
 
 		// Find the tool in the tool-library
 		const Tool * tool = NULL;
+		//TODO: Use std::find
 		for(size_t n = 0; n < tools->size(); ++n){
-			if(tools->at(n).base.guid.compare(it->second->toolguid) == 0){
+			if(tools->at(n).base.guid.compare((*it)->toolguid) == 0){
 				tool = &(tools->at(n));
 				break;
 			}
 		}
 		if(tool == NULL){
-			it->second->output = _T("Tool empty.");
-			it->second->errorOccured = true;
+			(*it)->output = _T("Tool empty.");
+			(*it)->errorOccured = true;
 			continue;
 		}
 
-		it->second->GenerateToolpath(*this, *(parent->GetObjects()), *tool,
-				base);
+		(*it)->GenerateToolpath(*this, *(parent->GetObjects()), *tool, base);
 
 		Vector3 temp(stock.xmin, stock.ymin, stock.zmin);
-		if(!it->second->toolpath.empty()){
-			const size_t N = it->second->toolpath.size();
+		if(!(*it)->toolpath.empty()){
+			const size_t N = (*it)->toolpath.size();
 			for(size_t n = 0; n < N; ++n){
-				it->second->toolpath[n].S = 200; // 1/s
-				it->second->toolpath[n].F = 0.025; // m/s
+				(*it)->toolpath[n].toolSlot = tool->postprocess.number;
+				(*it)->toolpath[n].S = 200; // 1/s
+//					m.S = tool.startvalues.n;
+				(*it)->toolpath[n].F = 0.025; // m/s
+//					m.F = tool.startvalues.fn;
 
 				// Shift origin into absolute coordinates.
-				it->second->toolpath[n].position += temp;
+				(*it)->toolpath[n].position += temp;
 
 			}
 		}
 		simulator.origin.SetOrigin(Vector3(stock.xmin, stock.ymin, stock.zmin));
 		simulator.InsertBase(&base);
-		simulator.InsertToolPath(&(it->second->toolpath), true);
-		simulator.Reset();
-		simulator.Last();
+		simulator.InsertToolPath(&((*it)->toolpath));
+		t = simulator.RecalculateTiming(t);
+		simulator.FullSimulation();
 		base = *(simulator.GetResult());
 	}
 }

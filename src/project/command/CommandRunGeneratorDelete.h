@@ -52,7 +52,7 @@ protected:
 	Project * project;
 	int runID;
 	size_t generatorID;
-
+	size_t position;
 	Generator * oldGenerator;
 };
 

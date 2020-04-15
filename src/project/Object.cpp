@@ -39,7 +39,8 @@
 
 #include "../3D/OpenGL.h"
 
-Object::Object()
+Object::Object(size_t ID) :
+		ID(ID)
 {
 	show = true;
 	selectable = true;
@@ -48,6 +49,16 @@ Object::Object()
 
 Object::~Object()
 {
+}
+
+bool Object::operator ==(const size_t ID) const
+{
+	return (this->ID == ID);
+}
+
+size_t Object::GetID(void) const
+{
+	return ID;
 }
 
 bool Object::IsEmpty(void) const

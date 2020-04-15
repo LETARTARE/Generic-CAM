@@ -263,6 +263,58 @@ Vector3 AffineTransformMatrix::GetEz(void) const
 	return Vector3(a[8], a[9], a[10]);
 }
 
+void AffineTransformMatrix::GetQuarternion(double* w, double* x, double* y,
+		double* z) const
+{
+	// To have a stable conversion the biggest value of t[w,x,y,z] is evaluated.
+	const double tw = 1.0 + a[0] + a[5] + a[10];
+	const double tx = 1.0 + a[0] - a[5] - a[10];
+	const double ty = 1.0 - a[0] + a[5] - a[10];
+	const double tz = 1.0 - a[0] - a[5] + a[10];
+
+	if(tw >= tx && tw >= ty && tw >= tz){
+		const double r = sqrt(tw);
+		const double s = 0.5 / r;
+		*w = r / 2.0;
+		*x = (a[6] - a[9]) * s;
+		*y = (a[8] - a[2]) * s;
+		*z = (a[1] - a[4]) * s;
+		return;
+	}
+	if(tx >= ty && tx >= tz && tx >= tw){
+		const double r = sqrt(tx);
+		const double s = 0.5 / r;
+		*w = (a[6] - a[9]) * s;
+		*x = r / 2.0;
+		*y = (a[1] + a[4]) * s;
+		*z = (a[8] + a[2]) * s;
+		return;
+	}
+	if(ty >= tx && ty >= tz && ty >= tw){
+		const double r = sqrt(ty);
+		const double s = 0.5 / r;
+		*w = (a[8] - a[2]) * s;
+		*x = (a[1] + a[4]) * s;
+		*y = r / 2.0;
+		*z = (a[6] + a[9]) * s;
+		return;
+	}
+	if(tz >= tx && tz >= ty && tz >= tw){
+		const double r = sqrt(tz);
+		const double s = 0.5 / r;
+		*w = (a[1] - a[4]) * s;
+		*x = (a[8] + a[2]) * s;
+		*y = (a[6] + a[9]) * s;
+		*z = r / 2.0;
+		return;
+	}
+}
+
+void AffineTransformMatrix::GetQuarternion(double* vector) const
+{
+	GetQuarternion(&(vector[0]), &(vector[1]), &(vector[2]), &(vector[3]));
+}
+
 AffineTransformMatrix& AffineTransformMatrix::operator*=(
 		const AffineTransformMatrix& b)
 {
@@ -528,8 +580,8 @@ AffineTransformMatrix AffineTransformMatrix::RotationTrackball(const double& x1,
 	return AffineTransformMatrix::RotationAroundVector(A, alpha);
 }
 
-AffineTransformMatrix AffineTransformMatrix::RotationQuarternion(
-		const double& w, const double& x, const double& y, const double& z)
+AffineTransformMatrix AffineTransformMatrix::RotationQuarternion(const double w,
+		const double x, const double y, const double z)
 {
 	// Conversion formula from
 	// https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion
@@ -566,6 +618,12 @@ AffineTransformMatrix AffineTransformMatrix::RotationQuarternion(
 	m.a[15] = 1.0;
 
 	return m;
+}
+
+AffineTransformMatrix AffineTransformMatrix::RotationQuarternion(
+		const double vector[4])
+{
+	return RotationQuarternion(vector[0], vector[1], vector[2], vector[3]);
 }
 
 void AffineTransformMatrix::TranslateGlobal(double const& x, double const& y,
@@ -903,7 +961,7 @@ void AffineTransformMatrix::FromString(wxString const& string)
 	PutMatrixTogether();
 }
 
-void AffineTransformMatrix::ToStream(wxTextOutputStream& stream)const
+void AffineTransformMatrix::ToStream(wxTextOutputStream& stream) const
 {
 	for(uint_fast8_t n = 0; n < 16; n++){
 		if(n > 0) stream << _T(" ");

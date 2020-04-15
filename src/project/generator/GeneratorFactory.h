@@ -54,7 +54,7 @@ public:
 //	GeneratorFactory(const GeneratorFactory& other);
 	virtual ~GeneratorFactory();
 
-	static Generator * NewGenerator(size_t generatorNr);
+	static Generator * NewGenerator(size_t generatorType, size_t ID);
 
 //	static size_t GetCount();
 //	wxString GetName(size_t generatorNr) const;

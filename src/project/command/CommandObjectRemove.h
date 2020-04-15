@@ -46,6 +46,7 @@ protected:
 	Project * project;
 	size_t ID;
 	Object object;
+	size_t position;
 };
 
 #endif /* COMMANDOBJECTREMOVE_H_ */

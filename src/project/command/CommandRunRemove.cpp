@@ -27,13 +27,15 @@
 #include "CommandRunRemove.h"
 
 #include "../Project.h"
+#include <algorithm>
 
 CommandRunRemove::CommandRunRemove(const wxString& name, Project* project,
-		size_t ID) :
-		wxCommand(true, name)
+		size_t runID) :
+		wxCommand(true, name), run(runID)
 {
 	this->project = project;
-	this->ID = ID;
+	this->runID = runID;
+	this->position = 0;
 }
 
 CommandRunRemove::~CommandRunRemove()
@@ -43,9 +45,12 @@ CommandRunRemove::~CommandRunRemove()
 bool CommandRunRemove::Do(void)
 {
 	if(project == NULL) return false;
-	if(project->run.find(ID) == project->run.end()) return false;
-	this->run = project->run[ID];
-	project->run.erase(ID);
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+	position = itRun - project->run.begin();
+	this->run = *itRun;
+	project->run.erase(itRun);
 	project->Update();
 	return true;
 }
@@ -53,7 +58,9 @@ bool CommandRunRemove::Do(void)
 bool CommandRunRemove::Undo(void)
 {
 	if(project == NULL) return false;
-	project->run[ID] = run;
+	std::vector <Run>::iterator itRun;
+	itRun = project->run.begin() + position;
+	project->run.insert(itRun, run);
 	project->Update();
 	return true;
 }

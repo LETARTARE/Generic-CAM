@@ -38,29 +38,29 @@
 
 //const size_t N_GENERATORS = 1;
 
-Generator* GeneratorFactory::NewGenerator(size_t generatortype)
+Generator* GeneratorFactory::NewGenerator(size_t generatorType, size_t ID)
 {
-	switch(generatortype){
+	switch(generatorType){
 	case TYPE_GENERATORAREAGRID:
-		return new GeneratorAreaGridDexel();
+		return new GeneratorAreaGridDexel(ID);
 		break;
 	case TYPE_GENERATORAREAMILLINGDYNAMIC:
-		return new GeneratorAreaMillingDynamic();
+		return new GeneratorAreaMillingDynamic(ID);
 		break;
 	case TYPE_GENERATORLOADFROMFILE:
-		return new GeneratorLoadFromFile();
+		return new GeneratorLoadFromFile(ID);
 		break;
 	case TYPE_GENERATORTEST:
-		return new GeneratorTest();
+		return new GeneratorTest(ID);
 		break;
 	case TYPE_GENERATORDRILLDEXEL:
-		return new GeneratorDrillDexel();
+		return new GeneratorDrillDexel(ID);
 		break;
 	case TYPE_GENERATOROUTLINE:
-		return new GeneratorOutlineDexel();
+		return new GeneratorOutlineDexel(ID);
 		break;
 	case TYPE_GENERATORSURFACE:
-		return new GeneratorSurfaceDexel();
+		return new GeneratorSurfaceDexel(ID);
 		break;
 	default:
 		throw std::range_error(

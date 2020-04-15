@@ -28,7 +28,9 @@
 
 #include "../Project.h"
 
-CommandRunSetBoundingBox::CommandRunSetBoundingBox(const wxString& name, Project* project, double value) : wxCommand(true, name)
+CommandRunSetBoundingBox::CommandRunSetBoundingBox(const wxString& name,
+		Project* project, double value) :
+		wxCommand(true, name)
 {
 	this->project = project;
 	this->value = value;

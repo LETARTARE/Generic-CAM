@@ -25,6 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "CommandRunSetStockOrigin.h"
+#include <algorithm>
 
 CommandRunSetStockOrigin::CommandRunSetStockOrigin(const wxString& name,
 		Project* project, size_t runID, Vector3 relOrigin) :
@@ -38,8 +39,11 @@ CommandRunSetStockOrigin::CommandRunSetStockOrigin(const wxString& name,
 bool CommandRunSetStockOrigin::Do(void)
 {
 	if(project == NULL) return false;
-	oldOrigin = project->run[runID].stockorigin;
-	project->run[runID].stockorigin = newOrigin;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+	oldOrigin = itRun->stockorigin;
+	itRun->stockorigin = newOrigin;
 	project->Update();
 	return true;
 }
@@ -47,7 +51,10 @@ bool CommandRunSetStockOrigin::Do(void)
 bool CommandRunSetStockOrigin::Undo(void)
 {
 	if(project == NULL) return false;
-	project->run[runID].stockorigin = oldOrigin;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+	itRun->stockorigin = oldOrigin;
 	project->Update();
 	return true;
 }

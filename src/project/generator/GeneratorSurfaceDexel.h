@@ -42,7 +42,7 @@
 
 class GeneratorSurfaceDexel:public GeneratorDexel {
 public:
-	GeneratorSurfaceDexel();
+	GeneratorSurfaceDexel(size_t ID);
 	virtual ~GeneratorSurfaceDexel();
 
 	virtual void CopyParameterFrom(const Generator * other);
@@ -57,7 +57,7 @@ public:
 	virtual void TransferDataFromPanel(CollectionUnits* settings);
 	virtual bool operator==(const Generator &b) const;
 	virtual void GenerateToolpath(const Run &run,
-			const std::map <size_t, Object> &objects, const Tool &tool,
+			const std::vector <Object> &objects, const Tool &tool,
 			const DexelTarget &base);
 
 public:

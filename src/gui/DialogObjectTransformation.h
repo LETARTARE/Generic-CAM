@@ -50,7 +50,7 @@ public:
 	virtual ~DialogObjectTransformation();
 
 	void SetSelection(const Selection &selection);
-
+	bool SelectionIsOK(void) const;
 	// Member Variables
 private:
 

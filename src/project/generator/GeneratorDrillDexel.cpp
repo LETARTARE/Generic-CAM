@@ -31,7 +31,7 @@
 #include <float.h>
 #include <wx/sizer.h>
 
-GeneratorDrillDexel::GeneratorDrillDexel()
+GeneratorDrillDexel::GeneratorDrillDexel(size_t ID):GeneratorDexel(ID)
 {
 }
 
@@ -42,8 +42,8 @@ GeneratorDrillDexel::~GeneratorDrillDexel()
 void GeneratorDrillDexel::CopyParameterFrom(const Generator* other)
 {
 	GeneratorDexel::CopyParameterFrom(other);
-	const GeneratorDrillDexel * temp =
-			dynamic_cast <const GeneratorDrillDexel*>(other);
+//	const GeneratorDrillDexel * temp =
+//			dynamic_cast <const GeneratorDrillDexel*>(other);
 }
 
 bool GeneratorDrillDexel::operator ==(const Generator& b) const
@@ -94,7 +94,7 @@ void GeneratorDrillDexel::TransferDataFromPanel(CollectionUnits* settings)
 }
 
 void GeneratorDrillDexel::GenerateToolpath(const Run &run,
-		const std::map <size_t, Object> &objects, const Tool &tool,
+		const std::vector <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
 	GeneratorDexel::PrepareTargets(run, objects, base);

@@ -35,7 +35,7 @@ class Project;
 
 class CommandRunRename:public wxCommand {
 public:
-	CommandRunRename(const wxString& name, Project * project, size_t ID,
+	CommandRunRename(const wxString& name, Project * project, size_t runID,
 			const wxString newName);
 
 	bool Do(void);
@@ -43,7 +43,7 @@ public:
 
 protected:
 	Project * project;
-	size_t ID;
+	size_t runID;
 	wxString newName;
 	wxString oldName;
 };

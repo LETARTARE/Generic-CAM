@@ -33,6 +33,7 @@
 #include "../gui/FrameMain.h"
 #include "../gui/FrameParent.h"
 #include "../gui/IDs.h"
+#include "../3D/OpenGLMaterial.h"
 #include <map>
 
 IMPLEMENT_DYNAMIC_CLASS(ProjectView, wxView);
@@ -115,7 +116,7 @@ void ProjectView::OnDraw(wxDC* dc)
 void ProjectView::OnUpdate(wxView* sender, wxObject* hint)
 {
 	FrameMain* frame = wxStaticCast(GetFrame(), FrameMain);
-	frame->TransferDataToWindow();
+	frame->TransferDataToWindow(true);
 	frame->Refresh();
 	wxView::OnUpdate(sender, hint);
 }
@@ -133,6 +134,28 @@ void ProjectView::OnUpdate3D(void)
 	FrameParent* parentframe = wxStaticCast(frame->GetParent(), FrameParent);
 	parentframe->settingsStereo3D.WriteToCanvas(frame->m_canvas);
 	frame->m_canvas->Refresh();
+}
+
+void ProjectView::SetSelection(const Selection& selected)
+{
+	//	type = vIdle;
+	if(selected.IsType(Selection::Object)) type = vObject;
+	if(selected.IsType(Selection::Axis)) type = vObject;
+	if(selected.IsType(Selection::Run)) type = vRun;
+	if(selected.IsType(Selection::Generator)) type = ProjectView::vGenerator;
+//	if(DEBUG) std::cout << "ProjectView::SetSelection - type = " << (int) type
+//			<< ";\n";
+	bool update = (this->selection != selected);
+	this->selection = selected;
+	if(update) OnUpdate3D();
+}
+
+void ProjectView::SetHover(const Selection& hover)
+{
+	bool update = (this->hover != hover);
+	this->hover = hover;
+	if(update) OnUpdate3D();
+
 }
 
 void ProjectView::Render(void) const
@@ -154,26 +177,26 @@ void ProjectView::Render(void) const
 //	}
 
 	if(type == vOrigin){
-		for(std::map <size_t, Run>::const_iterator run = project->run.begin();
+		for(std::vector <Run>::const_iterator run = project->run.begin();
 				run != project->run.end(); ++run){
-			run->second.PaintVertices();
+			run->PaintVertices();
 		}
 	}
 
 	if(type == vRun || type == vGenerator){
 		glPushName(Selection::BaseRun);
-		for(std::map <size_t, Run>::const_iterator run = project->run.begin();
+		for(std::vector <Run>::const_iterator run = project->run.begin();
 				run != project->run.end(); ++run){
-			//			if(!selection.IsBase(Selection::BaseRun, run->first)
+			//			if(!selection.IsBase(Selection::BaseRun, run->GetID())
 			//					|| !selection.IsType(Selection::Generator)) continue;
 
-			for(std::map <size_t, Generator*>::const_iterator generator =
-					run->second.generators.begin();
-					generator != run->second.generators.end(); ++generator){
+			for(std::vector <Generator*>::const_iterator generator =
+					run->generators.begin(); generator != run->generators.end();
+					++generator){
 
-//				if(!selection.Has(generator->first)) continue;
+//				if(!selection.Has(generator->GetID())) continue;
 
-				generator->second->Paint();
+				(*generator)->Paint();
 			}
 		}
 		glPopName();
@@ -200,37 +223,37 @@ void ProjectView::RenderPick(void) const
 {
 	Project* project = wxStaticCast(GetDocument(), Project);
 	if(type == vObject || type == vOrigin){
-		glPushName((unsigned int) Selection::BaseNone);
+		glPushName((unsigned int) Selection::BaseAnything);
 		glPushName(0);
 		RenderCoordinateSystem();
 		glPopName();
 		glPopName();
 	}
 	glPushName(Selection::BaseObject);
-	for(std::map <size_t, Object>::const_iterator obj =
-			project->objects.begin(); obj != project->objects.end(); ++obj){
-		glPushName(obj->first);
-		obj->second.PaintPick();
+	for(std::vector <Object>::const_iterator obj = project->objects.begin();
+			obj != project->objects.end(); ++obj){
+		glPushName(obj->GetID());
+		obj->PaintPick();
 		glPopName();
 	}
 	glPopName();
 
 	if(type == vRun){
 		glPushName(Selection::BaseRun);
-		for(std::map <size_t, Run>::const_iterator run = project->run.begin();
+		for(std::vector <Run>::const_iterator run = project->run.begin();
 				run != project->run.end(); ++run){
-			glPushName(run->first);
-			run->second.Paint();
+			glPushName(run->GetID());
+			run->Paint();
 			glPopName();
 		}
 		glPopName();
 	}
 	if(type == vOrigin){
 		glPushName(Selection::BaseRun);
-		for(std::map <size_t, Run>::const_iterator run = project->run.begin();
+		for(std::vector <Run>::const_iterator run = project->run.begin();
 				run != project->run.end(); ++run){
-			glPushName(run->first);
-			run->second.PaintVertices();
+			glPushName(run->GetID());
+			run->PaintVertices();
 			glPopName();
 		}
 		glPopName();
@@ -239,18 +262,18 @@ void ProjectView::RenderPick(void) const
 	if(type == vGenerator){
 
 		glPushName(Selection::BaseObject);
-		for(std::map <size_t, Object>::const_iterator obj =
-				project->objects.begin(); obj != project->objects.end(); ++obj){
+		for(std::vector <Object>::const_iterator obj = project->objects.begin();
+				obj != project->objects.end(); ++obj){
 
-			for(std::map <size_t, Run>::const_iterator run =
-					project->run.begin(); run != project->run.end(); ++run){
+			for(std::vector <Run>::const_iterator run = project->run.begin();
+					run != project->run.end(); ++run){
 
-				//			if(!selection.IsBase(Selection::BaseRun, run->first)
+				//			if(!selection.IsBase(Selection::BaseRun, run->GetID())
 				//					|| !selection.IsType(Selection::Generator)) continue;
 
-				if(!run->second.object.Has(Selection::Object, obj->first)) continue;
-				glPushName(obj->first);
-				obj->second.PaintPick();
+				if(!run->object.Has(Selection::Object, obj->GetID())) continue;
+				glPushName(obj->GetID());
+				obj->PaintPick();
 				glPopName();
 			}
 		}
@@ -263,12 +286,12 @@ void ProjectView::PaintObjects(const Selection& sel, const OpenGLMaterial &face,
 		const OpenGLMaterial &edge) const
 {
 	const Project* project = wxStaticCast(GetDocument(), Project);
-	for(std::map <size_t, Object>::const_iterator obj =
-			project->objects.begin(); obj != project->objects.end(); ++obj){
-		if(sel.IsBase(Selection::BaseObject, obj->first)){
-			obj->second.Paint(face, edge, sel);
+	for(std::vector <Object>::const_iterator obj = project->objects.begin();
+			obj != project->objects.end(); ++obj){
+		if(sel.IsBase(Selection::BaseObject, obj->GetID())){
+			obj->Paint(face, edge, sel);
 		}else{
-			if(sel.IsInverted()) obj->second.Paint(face, edge, Selection(true));
+			if(sel.IsInverted()) obj->Paint(face, edge, Selection(true));
 		}
 	}
 
@@ -277,19 +300,18 @@ void ProjectView::PaintObjects(const Selection& sel, const OpenGLMaterial &face,
 void ProjectView::PaintRun(const Selection& sel) const
 {
 	const Project* project = wxStaticCast(GetDocument(), Project);
-	for(std::map <size_t, Run>::const_iterator run = project->run.begin();
+	for(std::vector <Run>::const_iterator run = project->run.begin();
 			run != project->run.end(); ++run){
-		if(sel.IsBase(Selection::BaseRun, run->first)){
-			run->second.Paint();
+		if(sel.IsBase(Selection::BaseRun, run->GetID())){
+			run->Paint();
 
-			for(std::map <size_t, Generator*>::const_iterator it =
-					run->second.generators.begin();
-					it != run->second.generators.end(); ++it){
-				it->second->Paint();
+			for(std::vector <Generator*>::const_iterator it =
+					run->generators.begin(); it != run->generators.end(); ++it){
+				(*it)->Paint();
 			}
 
 		}else{
-			if(sel.IsInverted()) run->second.Paint();
+			if(sel.IsInverted()) run->Paint();
 		}
 	}
 
@@ -298,18 +320,17 @@ void ProjectView::PaintRun(const Selection& sel) const
 void ProjectView::PaintGenerators(const Selection& sel) const
 {
 	const Project* project = wxStaticCast(GetDocument(), Project);
-	for(std::map <size_t, Run>::const_iterator run = project->run.begin();
+	for(std::vector <Run>::const_iterator run = project->run.begin();
 			run != project->run.end(); ++run){
-		if(!sel.IsBase(Selection::BaseRun, run->first)
+		if(!sel.IsBase(Selection::BaseRun, run->GetID())
 				&& !sel.IsType(Selection::Run)) continue;
 
 		glPushMatrix();
-		//		glTranslatef(run->second.stock.xmin, run->second.stock.ymin,
-		//				run->second.stock.zmin);
-		for(std::map <size_t, Generator*>::const_iterator it =
-				run->second.generators.begin();
-				it != run->second.generators.end(); ++it){
-			it->second->Paint();
+		//		glTranslatef(run->stock.xmin, run->stock.ymin,
+		//				run->stock.zmin);
+		for(std::vector <Generator*>::const_iterator it =
+				run->generators.begin(); it != run->generators.end(); ++it){
+			(*it)->Paint();
 		}
 		glPopMatrix();
 	}

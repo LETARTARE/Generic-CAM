@@ -27,6 +27,7 @@
 #include "CommandRunSetObject.h"
 
 #include "../Project.h"
+#include <algorithm>
 
 CommandRunSetObject::CommandRunSetObject(const wxString& name, Project* project,
 		size_t runID, const Selection & selection) :
@@ -40,11 +41,13 @@ CommandRunSetObject::CommandRunSetObject(const wxString& name, Project* project,
 bool CommandRunSetObject::Do(void)
 {
 	if(project == NULL) return false;
-	if(project->run.find(runID) == project->run.end()) return false;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
 
-	this->oldSelection = project->run[runID].object;
+	this->oldSelection = itRun->object;
 
-	project->run[runID].object = this->newSelection;
+	itRun->object = this->newSelection;
 	project->Update();
 	return true;
 }
@@ -52,8 +55,10 @@ bool CommandRunSetObject::Do(void)
 bool CommandRunSetObject::Undo(void)
 {
 	if(project == NULL) return false;
-	if(project->run.find(runID) == project->run.end()) return false;
-	project->run[runID].object = this->oldSelection;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+	itRun->object = this->oldSelection;
 	project->Update();
 	return true;
 }

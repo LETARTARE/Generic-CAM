@@ -47,19 +47,21 @@ wxEND_EVENT_TABLE()
 
 void GenericCAMApp::OnAbout(wxCommandEvent&)
 {
-    wxAboutDialogInfo aboutInfo;
+	wxAboutDialogInfo aboutInfo;
 
-    aboutInfo.SetName(_T("Generic CAM"));
-    aboutInfo.SetVersion(_T("0.3"));
-    aboutInfo.SetDescription(_("CAM Processor for CNC Machines"));
-    aboutInfo.SetCopyright(_T("(C) 2010-2020"));
-    aboutInfo.SetWebSite(_T("https://sourceforge.net/projects/genericcam/"));
-    aboutInfo.SetLicence(_T("GNU General Public License version 3.0 (GPLv3)\n\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it under certain conditions.\n\nYou should have received a copy of the GNU General Public License along with this program.\nIf not, see http://www.gnu.org/licenses/."));
-    aboutInfo.AddDeveloper(_T("Tobias Schäfer"));
-    aboutInfo.AddTranslator(_T("Jacques-Louis Tartarin (French)"));
-    aboutInfo.AddTranslator(_T("Sandro Dalle Nogare (Italian)"));
+	aboutInfo.SetName(_T("Generic CAM"));
+	aboutInfo.SetVersion(_T("0.3"));
+	aboutInfo.SetDescription(_("CAM Processor for CNC Machines"));
+	aboutInfo.SetCopyright(_T("(C) 2010-2020"));
+	aboutInfo.SetWebSite(_T("https://sourceforge.net/projects/genericcam/"));
+	aboutInfo.SetLicence(
+			_T(
+					"GNU General Public License version 3.0 (GPLv3)\n\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it under certain conditions.\n\nYou should have received a copy of the GNU General Public License along with this program.\nIf not, see http://www.gnu.org/licenses/."));
+	aboutInfo.AddDeveloper(_T("Tobias Schäfer"));
+	aboutInfo.AddTranslator(_T("Jacques-Louis Tartarin (French)"));
+	aboutInfo.AddTranslator(_T("Sandro Dalle Nogare (Italian)"));
 
-    wxAboutBox(aboutInfo);
+	wxAboutBox(aboutInfo);
 }
 
 GenericCAMApp::GenericCAMApp()
@@ -163,13 +165,10 @@ bool GenericCAMApp::OnInit()
 	SetTopWindow(parent);
 	parent->Show(false);
 
-	Project* project;
 	if(loadOnStartup.IsEmpty()){
-		project = (Project*) docManager->CreateDocument(wxEmptyString,
-				wxDOC_NEW);
+		docManager->CreateDocument(wxEmptyString, wxDOC_NEW);
 	}else{
-		project = (Project*) docManager->CreateDocument(loadOnStartup,
-				wxDOC_SILENT);
+		docManager->CreateDocument(loadOnStartup, wxDOC_SILENT);
 	}
 
 	wxBitmap bitmap;

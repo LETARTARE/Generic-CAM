@@ -154,7 +154,6 @@ bool MachineComponent::InsertDXF(const AffineTransformMatrix &matrix,
 	f.color = geometry.colorNewObjects;
 	if(!f.ReadFile(file.GetFullPath())) return false;
 
-	size_t i;
 	if(f.geometry.name.Cmp(componentName) == 0){
 		f.geometry.ApplyTransformation(matrix);
 		geometry.InsertTrianglesFrom(f.geometry);

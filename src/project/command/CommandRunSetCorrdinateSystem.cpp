@@ -27,6 +27,7 @@
 #include "CommandRunSetCorrdinateSystem.h"
 
 #include "../Project.h"
+#include <algorithm>
 
 CommandRunSetCorrdinateSystem::CommandRunSetCorrdinateSystem(
 		const wxString& name, Project* project, size_t runID, size_t axis,
@@ -42,24 +43,27 @@ CommandRunSetCorrdinateSystem::CommandRunSetCorrdinateSystem(
 bool CommandRunSetCorrdinateSystem::Do(void)
 {
 	if(project == NULL) return false;
-	if(!project->Has(Selection::Run, runID)) return false;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+
 	switch(axis){
 	case 0:
 	{
-		this->oldSelection = project->run[runID].coordX;
-		project->run[runID].coordX = this->newSelection;
+		this->oldSelection = itRun->coordX;
+		itRun->coordX = this->newSelection;
 		break;
 	}
 	case 1:
 	{
-		this->oldSelection = project->run[runID].coordY;
-		project->run[runID].coordY = this->newSelection;
+		this->oldSelection = itRun->coordY;
+		itRun->coordY = this->newSelection;
 		break;
 	}
 	case 2:
 	{
-		this->oldSelection = project->run[runID].coordZ;
-		project->run[runID].coordZ = this->newSelection;
+		this->oldSelection = itRun->coordZ;
+		itRun->coordZ = this->newSelection;
 		break;
 	}
 	}
@@ -70,21 +74,23 @@ bool CommandRunSetCorrdinateSystem::Do(void)
 bool CommandRunSetCorrdinateSystem::Undo(void)
 {
 	if(project == NULL) return false;
-	if(!project->Has(Selection::Run, runID)) return false;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
 	switch(axis){
 	case 0:
 	{
-		project->run[runID].coordX = this->oldSelection;
+		itRun->coordX = this->oldSelection;
 		break;
 	}
 	case 1:
 	{
-		project->run[runID].coordY = this->oldSelection;
+		itRun->coordY = this->oldSelection;
 		break;
 	}
 	case 2:
 	{
-		project->run[runID].coordZ = this->oldSelection;
+		itRun->coordZ = this->oldSelection;
 		break;
 	}
 	}

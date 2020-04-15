@@ -136,14 +136,15 @@ public:
 	void SetUnit(unit predefinedUnit, wxString extra = _T("*"));
 	void SetCurrency(wxString currency);
 
-	wxString GetOtherName(void);
-	wxString GetSIName(void);
+	wxString GetOtherName(void) const;
+	wxString GetSIName(void) const;
 
-	double FromSI(const double value);
-	double ToSI(const double value);
+	double FromSI(const double value) const;
+	double ToSI(const double value) const;
 
-	wxString TextFromSI(const double value, int digitsAfterComma = -1);
-	wxString TextFromSIWithUnit(const double value, int digitsAfterComma = -1);
+	wxString TextFromSI(const double value, int digitsAfterComma = -1) const;
+	wxString TextFromSIWithUnit(const double value,
+			int digitsAfterComma = -1) const;
 
 	double SIFromString(const wxString &text, bool useEvaluator = true);
 	friend inline bool operator==(const Unit &lhs, const Unit &rhs)
@@ -158,7 +159,6 @@ public:
 	{
 		return !(lhs == rhs);
 	}
-
 
 	//TODO: Check if the functions below belong into the Measurement class.
 
@@ -195,7 +195,6 @@ public:
 	{
 		return lhs /= rhs;
 	}
-
 
 };
 

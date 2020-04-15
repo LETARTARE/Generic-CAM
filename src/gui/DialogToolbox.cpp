@@ -63,6 +63,7 @@ DialogToolbox::~DialogToolbox()
 
 void DialogToolbox::Update(void)
 {
+	if(!this->IsShown()) return;
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	if(toolboxes.empty()){

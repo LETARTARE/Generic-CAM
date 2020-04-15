@@ -33,6 +33,7 @@
 #include <iostream>
 #include <float.h>
 #include "../../3D/OpenGL.h"
+#include "../../Config.h"
 
 CNCSimulator::CNCSimulator()
 {
@@ -54,34 +55,33 @@ void CNCSimulator::SetTools(const std::vector <Tool> * tools)
 	this->tools = tools;
 }
 
-void CNCSimulator::InsertBase(DexelTarget* target)
+void CNCSimulator::InsertBase(const DexelTarget* target)
 {
 	if(this->basetarget == target && target != NULL) return;
 	this->basetarget = target;
 	initialized = false;
 }
 
-void CNCSimulator::InsertToolPath(std::vector <CNCPosition> * toolpath,
-		bool calculateTiming)
+void CNCSimulator::InsertToolPath(std::vector <CNCPosition> * toolpath)
 {
-	std::cout << "CNCSimulator::InsertToolPath(..., " << calculateTiming
-			<< ")\n";
+	this->toolpath = toolpath;
+}
 
+double CNCSimulator::RecalculateTiming(double t0)
+{
 	const double minimumFeed = 1e-9; // 1 nm/s (If this should ever be a problem, I would love to know the field of application.)
 
-	if(this->toolpath == toolpath && toolpath != NULL) return;
-	this->toolpath = toolpath;
-	if(calculateTiming && toolpath != NULL && toolpath->size() > 0){
-		const size_t N = toolpath->size();
-		double t = 0.0;
-		for(size_t n = 0; (n + 1) < N; ++n){
-			(*toolpath)[n].t = t;
-			const double d = (*toolpath)[n].Abs((*toolpath)[n + 1]);
-			(*toolpath)[n].dt = d * fmax((*toolpath)[n].F, minimumFeed);
-			t += (*toolpath)[n].dt;
-		}
-		if(N > 0) (*toolpath)[N - 1].t = t;
+	if(toolpath == NULL || toolpath->size() == 0) return t0;
+	const size_t N = toolpath->size();
+	double t = t0;
+	for(size_t n = 0; (n + 1) < N; ++n){
+		(*toolpath)[n].t = t;
+		const double d = (*toolpath)[n].Abs((*toolpath)[n + 1]);
+		(*toolpath)[n].dt = d * fmax((*toolpath)[n].F, minimumFeed);
+		t += (*toolpath)[n].dt;
 	}
+	if(N > 0) (*toolpath)[N - 1].t = t;
+	return t;
 }
 
 void CNCSimulator::Reset(void)
@@ -91,6 +91,7 @@ void CNCSimulator::Reset(void)
 		initialized = true;
 	}
 	if(basetarget != NULL){
+		if(DEBUG)printf("CNCSimulator::Reset: to Pointer %p with N=%zu\n", basetarget, basetarget->GetCountTotal());
 		simulated = *basetarget;
 	}else{
 		simulated.Empty();
@@ -128,9 +129,10 @@ void CNCSimulator::Step(float tTarget)
 		return;
 	}
 	DexelTarget dex;
-	dex.SetupTool(*tool, simulated.GetResolutionX(), simulated.GetResolutionY());
+	dex.SetupTool(*tool, simulated.GetResolutionX(),
+			simulated.GetResolutionY());
 //		dex.MirrorZ();
-		dex.NegateZ();
+	dex.NegateZ();
 
 	AffineTransformMatrix shift = stockposition * (origin.Inverse());
 	temp.ApplyTransformation(shift);
@@ -162,6 +164,12 @@ void CNCSimulator::Last(void)
 {
 	if(toolpath == NULL || toolpath->empty()) return;
 	Step(GetMaxTime());
+}
+
+void CNCSimulator::FullSimulation(void)
+{
+	Reset();
+	Last();
 }
 
 double CNCSimulator::GetMaxTime(void) const

@@ -47,7 +47,8 @@ public:
 	DialogToolpathGenerator(wxWindow* parent);
 	virtual ~DialogToolpathGenerator();
 
-	void SetRunGenerator(size_t runID, size_t generatorID);
+	void SetSelection(const Selection &selection);
+	bool SelectionIsOK(void) const;
 	size_t GetRunID(void) const;
 	bool TransferDataToWindow(bool updateGeneratorPanel = false);
 	bool TransferDataFromWindow(Generator * generator) const;
@@ -60,7 +61,7 @@ public:
 	void OnSelectArea(wxCommandEvent& event);
 	void OnSelectTool(wxCommandEvent& event);
 	void OnTextEnter(wxCommandEvent& event);
-	bool OnSelected(size_t ID, Selection selection);
+	bool OnSelected(size_t ID, Selection selection, bool successful);
 	void OnUpdate(wxCommandEvent& event);
 private:
 	size_t runID;

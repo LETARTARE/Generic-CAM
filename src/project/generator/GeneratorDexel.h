@@ -56,7 +56,7 @@
 
 class GeneratorDexel:public Generator {
 public:
-	GeneratorDexel();
+	GeneratorDexel(size_t ID);
 	virtual ~GeneratorDexel();
 
 	virtual void ToStream(wxTextOutputStream & stream);
@@ -67,7 +67,7 @@ public:
 protected:
 
 	void PrepareTargets(const Run &run,
-			const std::map <size_t, Object> &objects, const DexelTarget &start);
+			const std::vector <Object> &objects, const DexelTarget &start);
 
 	void QuickCollectToolpaths(std::vector <ProtoToolpath> &ptp,
 			const double pathDistance);

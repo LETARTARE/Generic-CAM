@@ -25,6 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "CommandRunSetStockType.h"
+#include <algorithm>
 
 CommandRunSetStockType::CommandRunSetStockType(const wxString& name,
 		Project* project, size_t runID, Run::StockType type) :
@@ -39,8 +40,11 @@ CommandRunSetStockType::CommandRunSetStockType(const wxString& name,
 bool CommandRunSetStockType::Do(void)
 {
 	if(project == NULL) return false;
-	oldType = project->run[runID].stocktype;
-	project->run[runID].stocktype = newType;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+	oldType = itRun->stocktype;
+	itRun->stocktype = newType;
 	project->Update();
 	return true;
 }
@@ -48,7 +52,10 @@ bool CommandRunSetStockType::Do(void)
 bool CommandRunSetStockType::Undo(void)
 {
 	if(project == NULL) return false;
-	project->run[runID].stocktype = oldType;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+	itRun->stocktype = oldType;
 	project->Update();
 	return true;
 }

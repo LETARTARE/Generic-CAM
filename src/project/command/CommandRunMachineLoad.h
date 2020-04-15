@@ -36,7 +36,7 @@ class Project;
 
 class CommandRunMachineLoad:public wxCommand {
 public:
-	CommandRunMachineLoad(const wxString& name, Project * project, size_t ID,
+	CommandRunMachineLoad(const wxString& name, Project * project, size_t runID,
 			const wxFileName& fileName);
 
 	bool Do(void);
@@ -44,7 +44,7 @@ public:
 
 protected:
 	Project * project;
-	size_t runNr;
+	size_t runID;
 	wxFileName fileName;
 	wxFileName oldFileName;
 };

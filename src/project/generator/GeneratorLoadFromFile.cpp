@@ -32,7 +32,8 @@
 #include <wx/button.h>
 #include <wx/log.h>
 
-GeneratorLoadFromFile::GeneratorLoadFromFile()
+GeneratorLoadFromFile::GeneratorLoadFromFile(size_t ID) :
+		Generator(ID)
 {
 	m_filePicker = NULL;
 	m_staticTextLoadFile = NULL;
@@ -100,15 +101,16 @@ void GeneratorLoadFromFile::TransferDataFromPanel(CollectionUnits* settings)
 
 bool GeneratorLoadFromFile::operator ==(const Generator& b) const
 {
-	const GeneratorLoadFromFile * temp = dynamic_cast <const GeneratorLoadFromFile*>(&b);
-		std::cout << "GeneratorLoadFromFile::operator ==\n";
-		if(!(this->Generator::operator ==(b))) return false;
-		if(this->filename != temp->filename) return false;
-		return true;
+	const GeneratorLoadFromFile * temp =
+			dynamic_cast <const GeneratorLoadFromFile*>(&b);
+	std::cout << "GeneratorLoadFromFile::operator ==\n";
+	if(!(this->Generator::operator ==(b))) return false;
+	if(this->filename != temp->filename) return false;
+	return true;
 }
 
 void GeneratorLoadFromFile::GenerateToolpath(const Run &run,
-		const std::map <size_t, Object> &objects, const Tool &tool,
+		const std::vector <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
 	toolpathGenerated = false;

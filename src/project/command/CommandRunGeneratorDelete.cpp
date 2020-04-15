@@ -28,6 +28,7 @@
 
 #include "../Project.h"
 #include "../generator/Generator.h"
+#include <algorithm>
 
 CommandRunGeneratorDelete::CommandRunGeneratorDelete(const wxString& name,
 		Project* project, size_t runID, size_t generatorID) :
@@ -37,6 +38,7 @@ CommandRunGeneratorDelete::CommandRunGeneratorDelete(const wxString& name,
 	this->runID = runID;
 	this->generatorID = generatorID;
 	this->oldGenerator = NULL;
+	this->position = 0;
 }
 
 CommandRunGeneratorDelete::~CommandRunGeneratorDelete(void)
@@ -46,17 +48,34 @@ CommandRunGeneratorDelete::~CommandRunGeneratorDelete(void)
 
 bool CommandRunGeneratorDelete::Do(void)
 {
-	Run* run = &(project->run[runID]);
-	oldGenerator = run->generators[generatorID];
-	run->generators.erase(generatorID);
+	if(project == NULL) return false;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+
+	std::vector <Generator*>::iterator it;
+	it = itRun->generators.begin();
+	while(it != itRun->generators.end()){
+		if((**it) == generatorID) break;
+		++it;
+	}
+	if(it == itRun->generators.end()) return false;
+	position = it - itRun->generators.begin();
+	oldGenerator = *it;
+	itRun->generators.erase(it);
 	project->Update();
 	return true;
 }
 
 bool CommandRunGeneratorDelete::Undo(void)
 {
-	Run* run = &(project->run[runID]);
-	run->generators[generatorID] = oldGenerator;
+	if(project == NULL) return false;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+	std::vector <Generator*>::iterator it;
+	it = itRun->generators.begin() + position;
+	itRun->generators.insert(it, this->oldGenerator);
 	oldGenerator = NULL;
 	project->Update();
 	return true;

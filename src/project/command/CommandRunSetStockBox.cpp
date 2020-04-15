@@ -25,6 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "CommandRunSetStockBox.h"
+#include <algorithm>
 
 CommandRunSetStockBox::CommandRunSetStockBox(const wxString& name,
 		Project* project, size_t runID, Vector3 size) :
@@ -38,8 +39,12 @@ CommandRunSetStockBox::CommandRunSetStockBox(const wxString& name,
 bool CommandRunSetStockBox::Do(void)
 {
 	if(project == NULL) return false;
-	oldValue = project->run[runID].stocksize;
-	project->run[runID].stocksize = newValue;
+		std::vector <Run>::iterator itRun;
+		itRun = std::find(project->run.begin(), project->run.end(), runID);
+		if(itRun == project->run.end()) return false;
+
+	oldValue = itRun->stocksize;
+	itRun->stocksize = newValue;
 	project->Update();
 	return true;
 }
@@ -47,7 +52,10 @@ bool CommandRunSetStockBox::Do(void)
 bool CommandRunSetStockBox::Undo(void)
 {
 	if(project == NULL) return false;
-	project->run[runID].stocksize = oldValue;
+		std::vector <Run>::iterator itRun;
+		itRun = std::find(project->run.begin(), project->run.end(), runID);
+		if(itRun == project->run.end()) return false;
+	itRun->stocksize = oldValue;
 	project->Update();
 	return true;
 }

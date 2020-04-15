@@ -42,13 +42,13 @@ class TreeItem:public wxTreeItemData {
 public:
 	enum itemtype {
 		itemUnknown = 0,
-		itemProject,
-		itemGroupObjects,
-		itemObject,
+		itemObject = 1,
+		itemRun = 2,
+		itemGenerator,
 		itemSubObject,
+		itemGroupObjects,
 		itemGroupRun,
-		itemRun,
-		itemGenerator
+		itemProject
 	};
 
 	TreeItem(itemtype type = itemUnknown, size_t ID = 0);

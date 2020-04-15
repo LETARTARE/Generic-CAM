@@ -27,29 +27,36 @@
 #include "CommandRunRename.h"
 
 #include "../Project.h"
+#include <algorithm>
 
 CommandRunRename::CommandRunRename(const wxString& name, Project* project,
-		size_t ID, const wxString newName) :
+		size_t runID, const wxString newName) :
 		wxCommand(true, name)
 {
 	this->project = project;
-	this->ID = ID;
+	this->runID = runID;
 	this->newName = newName;
 }
 
 bool CommandRunRename::Do(void)
 {
 	if(project == NULL) return false;
-	if(project->run.find(ID) == project->run.end()) return false;
-	this->oldName = project->run[ID].name;
-	project->run[ID].name = this->newName;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+	this->oldName = itRun->name;
+	itRun->name = this->newName;
 	project->Update();
 	return true;
 }
 
 bool CommandRunRename::Undo(void)
 {
-	project->run[ID].name = this->oldName;
+	if(project == NULL) return false;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+	itRun->name = this->oldName;
 	project->Update();
 	return true;
 }

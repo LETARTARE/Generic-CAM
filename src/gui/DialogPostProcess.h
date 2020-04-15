@@ -40,9 +40,8 @@ public:
 
 	CollectionPostProcessor postprocessors;
 
-	void SetRunGenerator(size_t runID);
-	void SetRunGenerator(size_t runID, size_t generatorID);
-
+	void SetSelection(const Selection &selection);
+	bool SelectionIsOK(void) const;
 	bool TransferDataToWindow(void);
 
 	void OnXClose(wxCloseEvent& event);

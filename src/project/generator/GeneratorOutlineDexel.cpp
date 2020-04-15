@@ -33,7 +33,8 @@
 
 #include <wx/sizer.h>
 
-GeneratorOutlineDexel::GeneratorOutlineDexel()
+GeneratorOutlineDexel::GeneratorOutlineDexel(size_t ID) :
+		GeneratorDexel(ID)
 {
 }
 
@@ -44,9 +45,8 @@ GeneratorOutlineDexel::~GeneratorOutlineDexel()
 void GeneratorOutlineDexel::CopyParameterFrom(const Generator* other)
 {
 	GeneratorDexel::CopyParameterFrom(other);
-
-	const GeneratorOutlineDexel * temp =
-			dynamic_cast <const GeneratorOutlineDexel*>(other);
+//	const GeneratorOutlineDexel * temp =
+//			dynamic_cast <const GeneratorOutlineDexel*>(other);
 }
 
 wxString GeneratorOutlineDexel::GetTypeName(void) const
@@ -96,15 +96,15 @@ void GeneratorOutlineDexel::TransferDataFromPanel(CollectionUnits* settings)
 
 bool GeneratorOutlineDexel::operator ==(const Generator& b) const
 {
-	const GeneratorOutlineDexel * temp =
-			dynamic_cast <const GeneratorOutlineDexel*>(&b);
-	std::cout << "GeneratorOutlineDexel::operator ==\n";
+//	const GeneratorOutlineDexel * temp =
+//			dynamic_cast <const GeneratorOutlineDexel*>(&b);
+	if(DEBUG) std::cout << "GeneratorOutlineDexel::operator ==\n";
 	if(!(this->Generator::operator ==(b))) return false;
 	return true;
 }
 
 void GeneratorOutlineDexel::GenerateToolpath(const Run &run,
-		const std::map <size_t, Object> &objects, const Tool &tool,
+		const std::vector <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
 	errorOccured = false;

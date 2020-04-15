@@ -194,7 +194,7 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 	wxAcceleratorTable accel(6, entries);
 	this->SetAcceleratorTable(accel);
 
-	TransferDataToWindow();
+	TransferDataToWindow(true);
 //	std::cout << "FrameMain::FrameMain - leaving function.\n";
 }
 
@@ -216,60 +216,55 @@ size_t FrameMain::GetFreeSystemMemory()
 	long pages = sysconf(_SC_AVPHYS_PAGES);
 	long page_size = sysconf(_SC_PAGE_SIZE);
 	return pages * page_size;
-#endif
-#ifdef __WIN
+#elif __WIN
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);
 	GlobalMemoryStatusEx(&status);
 	//TODO: Change this to return available memory.
 	return status.ullTotalPhys;
+#else
+	return 0;
 #endif
 }
 
 bool FrameMain::TransferDataToWindow(bool updatetree)
 {
-	if(updatetree){
-		// Populate the treeview
-		tree->Update();
-	}
-	Selection temp = tree->TreeToSelection();
-
-//	m_menuToolpath->Check(ID_GENERATORAUTOMATIC, project.processToolpath);
-//	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
-//	m_toolBar->ToggleTool(ID_DISPLAYMACHINE, project.displayMachine);
-//	m_toolBar->ToggleTool(ID_DISPLAYMATERIAL, project.displayGeometry);
-
 //	wxString temp = _T("Generic CAM - ");
 //	if(commandProcessor.IsDirty()) temp += _T("* ");
 //	temp += project.name;
 //	this->SetTitle(temp);
 
+	if(updatetree){
+		// Populate/update the treeview
+		if(loopguard.TryLock() != wxMUTEX_BUSY){
+			tree->Update();
+			loopguard.Unlock();
+		}
+	}
+
+//	m_menuToolpath->Check(ID_GENERATORAUTOMATIC, project.processToolpath);
+//	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
+//	m_toolBar->ToggleTool(ID_DISPLAYMACHINE, project.displayMachine);
+//	m_toolBar->ToggleTool(ID_DISPLAYMATERIAL, project.displayGeometry);
 //	m_canvas->displayAnimation = dialogAnimation->IsShown();
 
-	if(temp.IsType(Selection::Object)){
-		dialogObjectTransformation->SetSelection(temp);
+	if(selectRequests.empty()){
+		dialogObjectTransformation->SetSelection(selection);
+		dialogJobSetup->SetSelection(selection);
+		dialogToolpathGenerator->SetSelection(selection);
+		dialogAnimation->SetSelection(selection);
+		dialogPostProcess->SetSelection(selection);
 	}
+
 	dialogObjectTransformation->TransferDataToWindow();
-
-	if(temp.IsType(Selection::Run) && temp.Size() >= 1){
-		dialogJobSetup->SetRunID(temp[0]);
-		dialogPostProcess->SetRunGenerator(temp[0]);
-	}
 	dialogJobSetup->TransferDataToWindow();
-
-	if(temp.IsBaseType(Selection::BaseRun) && temp.IsType(Selection::Generator)
-			&& temp.Size() >= 1){
-		dialogToolpathGenerator->SetRunGenerator(temp.GetBaseID(), temp[0]);
-		dialogPostProcess->SetRunGenerator(temp.GetBaseID(), temp[0]);
-	}
-	dialogToolpathGenerator->TransferDataToWindow();
-
 //	dialogToolbox->TransferDataToWindow();
+	dialogToolpathGenerator->TransferDataToWindow();
+//	dialogAnimation->TransferDataToWindow();
 //	dialogDebugger->TransferDataToWindow();
 
-//	dialogAnimation->TransferDataToWindow();
-
-//	Refresh();
+	//	Refresh();
+	UpdateStatus();
 	return true;
 }
 
@@ -281,6 +276,18 @@ bool FrameMain::TransferDataFromWindow(void)
 //	project.displayGeometry = m_toolBar->GetToolState(ID_DISPLAYMATERIAL);
 
 	return true;
+}
+
+void FrameMain::UpdateStatus(void)
+{
+	m_statusBar->SetStatusText(wxString(selection.ToString()), 0);
+
+	if(loopguard.TryLock() != wxMUTEX_BUSY){
+		m_statusBar->SetStatusText(_T("loopguard: unlocked"), 1);
+		loopguard.Unlock();
+	}else{
+		m_statusBar->SetStatusText(_T("loopguard: locked"), 1);
+	}
 }
 
 void FrameMain::OnProjectNew(wxRibbonButtonBarEvent& event)
@@ -300,11 +307,6 @@ void FrameMain::OnProjectOpen(wxRibbonButtonBarEvent& event)
 void FrameMain::OnProjectOpenMenu(wxRibbonButtonBarEvent& event)
 {
 	event.PopupMenu(&menuRecentFiles);
-}
-
-void FrameMain::ProjectLoad(wxString fileName)
-{
-
 }
 
 void FrameMain::OnProjectSave(wxRibbonButtonBarEvent& event)
@@ -337,7 +339,7 @@ void FrameMain::OnProjectRename(wxCommandEvent& event)
 		_("Project renamed to ") + dialog.GetValue(), project,
 				dialog.GetValue());
 		project->GetCommandProcessor()->Submit(command);
-		TransferDataToWindow();
+		TransferDataToWindow(true);
 	}
 }
 
@@ -364,7 +366,6 @@ void FrameMain::OnPathSetup(wxCommandEvent& event)
 
 void FrameMain::OnViewStereo3DToggle(wxCommandEvent& event)
 {
-//	printf("Toggle Stereo3D\n");
 	if(m_canvas->stereoMode == stereoOff){
 		m_canvas->stereoMode = stereoAnaglyph;
 	}else{
@@ -392,13 +393,11 @@ void FrameMain::OnObjectLoad(wxRibbonButtonBarEvent& event)
 	wxCommandEvent temp(event);
 	OnObjectLoad(temp);
 }
-
 void FrameMain::OnObjectLoad(wxCommandEvent& event)
 {
 	Project* project = wxStaticCast(GetDocument(), Project);
 	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 
-	wxFileName fileName;
 	wxFileDialog dialog(this, _("Load Object..."), _T(""), _T(""),
 			_(
 					"All supported files (*.obj; *.dxf; *.stl; *.gts)|*.obj;*.dxf;*DXF;*.stl;*.STL;*.gts;*.GTS|Wavefront OBJ Files (*.obj)|*.obj;*.OBJ|DXF Files (*.dxf)|*.dxf;*.DXF|Stereolithography files (STL files) (*.stl)|*.stl;*.STL|GTS files (*.gts)|*.gts;*.GTS|All files|*.*"),
@@ -415,16 +414,27 @@ void FrameMain::OnObjectLoad(wxCommandEvent& event)
 	if(dialog.ShowModal() == wxID_OK){
 		wxArrayString paths;
 		dialog.GetPaths(paths);
+		selection.Set(Selection::Object);
 		for(size_t n = 0; n < paths.GetCount(); ++n){
-			fileName = paths[n];
+			wxFileName fileName = paths[n];
+			const size_t objID = project->GetNextObjectID();
 			cmdProc->Submit(
 					new CommandObjectLoad(
 							(_("Load Object: ") + fileName.GetName()),
-							project, paths[n]));
+							project, paths[n], objID));
+			selection.Add(objID);
 			if(n == paths.GetCount() - 1) filepaths.lastObjectDirectory =
 					fileName.GetPath();
 		}
-		TransferDataToWindow();
+		if(DEBUG) std::cout << "FrameMain::OnObjectLoad - Loaded: "
+				<< selection.ToString() << "\n";
+		SetSelection(selection, true);
+		TransferDataToWindow(false);
+		if(DEBUG){
+			Selection temp = tree->GetSelection();
+			std::cout << "FrameMain::OnObjectLoad - In tree: "
+					<< temp.ToString() << "\n";
+		}
 		wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 		ProcessEvent(menuEvent);
 	}
@@ -434,25 +444,22 @@ void FrameMain::OnObjectRename(wxCommandEvent& event)
 {
 	Project* project = wxStaticCast(GetDocument(), Project);
 	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
-//	TransferDataFromWindow();
 
-	Selection temp = tree->TreeToSelection();
-	if(!temp.IsType(Selection::Object) || !project->Has(temp)
-			|| temp.Size() != 1) return;
-
-	const size_t ID = temp[0];
+	if(!selection.IsType(Selection::Object) || !project->Has(selection)
+			|| selection.Size() != 1) return;
+	const size_t objID = selection[0];
 
 	wxTextEntryDialog dialog(this, _("Enter new name:"),
-	_T("Rename Object ") + project->Get3DObject(ID).name,
-			project->Get3DObject(ID).name);
+	_T("Rename Object ") + project->Get3DObject(objID)->name,
+			project->Get3DObject(objID)->name);
 	if(dialog.ShowModal() == wxID_OK){
 		if(dialog.GetValue().IsEmpty()) return;
-		if(dialog.GetValue() == project->Get3DObject(ID).name) return;
+		if(dialog.GetValue() == project->Get3DObject(objID)->name) return;
 		cmdProc->Submit(
 				new CommandObjectRename(
-				_("Object renamed to ") + dialog.GetValue(), project, ID,
-						dialog.GetValue()));
-		TransferDataToWindow();
+				_("Object renamed to ") + dialog.GetValue(), project,
+						objID, dialog.GetValue()));
+		TransferDataToWindow(true);
 	}
 }
 
@@ -474,18 +481,24 @@ void FrameMain::OnObjectDelete(wxCommandEvent& event)
 	Project* project = wxStaticCast(GetDocument(), Project);
 	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 
-	Selection temp = tree->TreeToSelection();
-	if(!temp.IsType(Selection::Object) || !project->Has(temp)
-			|| temp.Size() != 1) return;
+	if(DEBUG) std::cout << "FrameMain::OnObjectDelete - "
+			<< selection.ToString() << "\n";
 
-	for(std::set <size_t>::iterator it = temp.begin(); it != temp.end(); ++it){
+	if(!selection.IsType(Selection::Object) || !project->Has(selection)
+			|| selection.IsSetEmpty()){
+		if(DEBUG) std::cout << "\t \\->  Not found.\n";
+		return;
+	}
+
+	for(std::set <size_t>::iterator it = selection.begin();
+			it != selection.end(); ++it){
 		cmdProc->Submit(
 				new CommandObjectRemove(
 						_(
-								"Object ") + project->Get3DObject(*it).name + _(" deleted."),
+								"Object ") + project->Get3DObject(*it)->name + _(" deleted."),
 						project, *it));
 	}
-	TransferDataToWindow();
+	TransferDataToWindow(true);
 }
 
 void FrameMain::OnObjectFlipNormals(wxRibbonButtonBarEvent& event)
@@ -495,17 +508,16 @@ void FrameMain::OnObjectFlipNormals(wxRibbonButtonBarEvent& event)
 }
 void FrameMain::OnObjectFlipNormals(wxCommandEvent& event)
 {
-	Selection temp = tree->TreeToSelection();
 	Project* project = wxStaticCast(GetDocument(), Project);
 	wxCommandProcessor* cmdProc = project->GetCommandProcessor();
 
-	if(!temp.IsType(Selection::Object) || !project->Has(temp)) return;
+	if(!selection.IsType(Selection::Object) || !project->Has(selection)) return;
 
-	for(std::set <size_t>::const_iterator it = temp.begin(); it != temp.end();
-			++it){
-		AffineTransformMatrix matrix = project->Get3DObject(*it).matrix;
+	for(std::set <size_t>::const_iterator it = selection.begin();
+			it != selection.end(); ++it){
+		AffineTransformMatrix matrix = project->Get3DObject(*it)->matrix;
 		CommandObjectTransform * command = new CommandObjectTransform(
-				project->Get3DObject(*it).name + _(": Flipped normal vectors"),
+				project->Get3DObject(*it)->name + _(": Flipped normal vectors"),
 				project, *it, false, false, false, true, matrix);
 		cmdProc->Submit(command);
 	}
@@ -521,56 +533,52 @@ void FrameMain::OnCAMSetup(wxCommandEvent& event)
 {
 	Project* project = wxStaticCast(GetDocument(), Project);
 	wxCommandProcessor* cmdProc = project->GetCommandProcessor();
-	Selection temp = tree->TreeToSelection();
 
-	if(!temp.IsType(Selection::Run)){
+	if(!selection.IsType(Selection::Run)){
+		size_t newRunID = project->GetNextRunID();
 #ifdef _MSC_VER
-		wxString newName = wxString::Format(_T("Run %Iu"),
-				project->GetMaxRunID() + 1);
+		wxString newName = wxString::Format(_T("Run %Iu"), newRunID);
 #else
-		wxString newName = wxString::Format(_T("Run %zu"),
-				project->GetMaxRunID() + 1);
+		wxString newName = wxString::Format(_T("Run %zu"), newRunID);
 #endif
-		size_t objID;
-		if(temp.IsType(Selection::Object)){
-			objID = temp[0];
-			newName += _(" - Object: ") + project->Get3DObject(objID).name;
-		}else{
-			objID = 0;
+		std::set <size_t> objID;
+		if(selection.IsType(Selection::Object)){
+			objID = selection.GetSet();
+			if(objID.size() > 0) newName += _(" - Object: ")
+					+ project->Get3DObject(*(objID.begin()))->name;
+			if(objID.size() > 1) newName += _(", ...");
 		}
 		if(cmdProc->Submit(
 				new CommandRunAdd(_("Adding run ") + newName, project, newName,
-						objID))){
-//			dialogJobSetup->SetRunID(project->maxRunID);
-			tree->SelectonToTree(
-					Selection(Selection::Run, project->GetMaxRunID()));
+						newRunID, objID))){
+			SetSelection(Selection(Selection::Run, newRunID), true);
 		}
 	}
 
 	dialogJobSetup->Show();
-	dialogJobSetup->TransferDataToWindow();
+	TransferDataToWindow(false);
+	dialogJobSetup->Raise();
 }
 
 void FrameMain::OnRunRename(wxCommandEvent& event)
 {
 	Project* project = wxStaticCast(GetDocument(), Project);
 	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
-	Selection temp = tree->TreeToSelection();
 
-	if(!temp.IsType(Selection::Run) || !project->Has(temp) || temp.Size() != 1) return;
-	const size_t ID = temp[0];
+	if(!selection.IsType(Selection::Run) || !project->Has(selection)
+			|| selection.Size() != 1) return;
+	const Run * run = project->GetRun(selection[0]);
 
 	wxTextEntryDialog dialog(this, _("Enter new name:"),
-	_T("Rename Run ") + project->GetRun(ID).name,
-			project->GetRun(ID).name);
+	_T("Rename Run ") + run->name, run->name);
 	if(dialog.ShowModal() == wxID_OK){
 		if(dialog.GetValue().IsEmpty()) return;
-		if(dialog.GetValue() == project->GetRun(ID).name) return;
+		if(dialog.GetValue() == run->name) return;
 		cmdProc->Submit(
 				new CommandRunRename(
-				_("Run renamed to ") + dialog.GetValue(), project, ID,
-						dialog.GetValue()));
-		TransferDataToWindow();
+				_("Run renamed to ") + dialog.GetValue(), project,
+						run->GetID(), dialog.GetValue()));
+		TransferDataToWindow(true);
 	}
 }
 
@@ -579,14 +587,14 @@ void FrameMain::OnRunDelete(wxCommandEvent& event)
 	Project* project = wxStaticCast(GetDocument(), Project);
 	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 
-	Selection temp = tree->TreeToSelection();
-	if(!temp.IsType(Selection::Run) || !project->Has(temp) || temp.Size() != 1) return;
-	const size_t ID = temp[0];
-	cmdProc->Submit(
-			new CommandRunRemove(_("Remove run ") + project->GetRun(ID).name,
-					project, ID));
-	TransferDataToWindow();
+	if(!selection.IsType(Selection::Run) || !project->Has(selection)
+			|| selection.Size() != 1) return;
+	const size_t runID = selection[0];
+	cmdProc->Submit(new CommandRunRemove(
+	_("Remove run ") + project->GetRun(runID)->name, project, runID));
+	TransferDataToWindow(true);
 }
+
 void FrameMain::OnCAM2DMenu(wxRibbonButtonBarEvent& event)
 {
 	wxMenu menu;
@@ -619,40 +627,46 @@ void FrameMain::OnCAMMultiAxisMenu(wxRibbonButtonBarEvent& event)
 
 void FrameMain::OnGeneratorAdd(wxCommandEvent& event)
 {
-	Selection sel = tree->TreeToSelection();
-	if(sel.IsSetEmpty()) return;
-	if(!sel.IsType(Selection::Run) && !sel.IsBaseType(Selection::BaseRun)) return;
-	size_t runID = sel[0];
-	if(sel.IsBaseType(Selection::BaseRun)) runID = sel.GetBaseID();
+	if(!selection.IsType(Selection::Run)
+			&& !selection.IsBaseType(Selection::BaseRun)) return;
+	if(selection.IsSetEmpty()) return;
+	size_t runID = selection[0];
+	if(selection.IsBaseType(Selection::BaseRun)) runID = selection.GetBaseID();
 
 	Project* project = wxStaticCast(GetDocument(), Project);
 	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 
 	Generator* generator = NULL;
-	switch(event.GetId()){
+	const size_t generatorID = project->GetNextGeneratorID();
 
+	switch(event.GetId()){
 	case ID_GENERATORADDTYPE + 1:
-		generator = GeneratorFactory::NewGenerator(TYPE_GENERATORAREAGRID);
+		generator = GeneratorFactory::NewGenerator(TYPE_GENERATORAREAGRID,
+				generatorID);
 		break;
 	case ID_GENERATORADDTYPE + 2:
-		generator = GeneratorFactory::NewGenerator(TYPE_GENERATORDRILLDEXEL);
+		generator = GeneratorFactory::NewGenerator(TYPE_GENERATORDRILLDEXEL,
+				generatorID);
 		break;
 	case ID_GENERATORADDTYPE + 3:
 		generator = GeneratorFactory::NewGenerator(
-		TYPE_GENERATORAREAMILLINGDYNAMIC);
+		TYPE_GENERATORAREAMILLINGDYNAMIC, generatorID);
 		break;
 	case ID_GENERATORADDTYPE + 4:
 		generator = GeneratorFactory::NewGenerator(
-		TYPE_GENERATORTEST);
+		TYPE_GENERATORTEST, generatorID);
 		break;
 	case ID_GENERATORADDTYPE + 5:
-		generator = GeneratorFactory::NewGenerator(TYPE_GENERATOROUTLINE);
+		generator = GeneratorFactory::NewGenerator(TYPE_GENERATOROUTLINE,
+				generatorID);
 		break;
 	case ID_GENERATORADDTYPE + 6:
-		generator = GeneratorFactory::NewGenerator(TYPE_GENERATORSURFACE);
+		generator = GeneratorFactory::NewGenerator(TYPE_GENERATORSURFACE,
+				generatorID);
 		break;
 	case ID_GENERATORADDTYPE + 7:
-		generator = GeneratorFactory::NewGenerator(TYPE_GENERATORLOADFROMFILE);
+		generator = GeneratorFactory::NewGenerator(TYPE_GENERATORLOADFROMFILE,
+				generatorID);
 		break;
 	default:
 		return;
@@ -661,33 +675,37 @@ void FrameMain::OnGeneratorAdd(wxCommandEvent& event)
 	if(!cmdProc->Submit(
 			new CommandRunGeneratorAdd(_("Add generator to run."), project,
 					runID, generator))){
-		// Generator was not added and need to be deleted again.
+		// Generator was not added and needs to be deleted again.
 		delete generator;
 		std::cout << "FrameMain::OnGeneratorAdd() - Adding failed.\n";
 		return;
 	}
+	SetSelection(
+			Selection(Selection::BaseRun, runID, Selection::Generator,
+					generator->GetID()), true);
 
-	std::cout << "  \\-> Added generator #" << project->GetMaxGeneratorID()
+	if(DEBUG) std::cout << "  \\-> Added generator #" << generator->GetID()
 			<< "\n";
 
-	dialogToolpathGenerator->SetRunGenerator(runID,
-			project->GetMaxGeneratorID());
 	dialogToolpathGenerator->Show();
+	TransferDataToWindow(false);
 	dialogToolpathGenerator->Raise();
 }
 
 void FrameMain::OnGeneratorEdit(wxCommandEvent& event)
 {
 	dialogToolpathGenerator->Show();
+	TransferDataToWindow(false);
 	dialogToolpathGenerator->Raise();
 }
 
 void FrameMain::OnGeneratorRename(wxCommandEvent& event)
 {
 }
+
 void FrameMain::OnGeneratorDelete(wxCommandEvent& event)
 {
-	Selection sel = tree->TreeToSelection();
+	Selection sel = tree->GetSelection();
 	if(sel.IsSetEmpty()) return;
 	if(!sel.IsType(Selection::Generator) || !sel.IsBaseType(Selection::BaseRun)) return;
 	size_t runID = sel.GetBaseID();
@@ -701,31 +719,36 @@ void FrameMain::OnGeneratorDelete(wxCommandEvent& event)
 void FrameMain::OnCAMPostProcessSimulate(wxRibbonButtonBarEvent& event)
 {
 	dialogAnimation->Show();
+	TransferDataToWindow(false);
 	dialogAnimation->Raise();
 }
 
 void FrameMain::OnCAMPostProcessExport(wxRibbonButtonBarEvent& event)
 {
 	dialogPostProcess->Show();
+	TransferDataToWindow(false);
 	dialogPostProcess->Raise();
 }
 
 void FrameMain::OnCAMPostProcessExport(wxCommandEvent& event)
 {
 	dialogPostProcess->Show();
+	TransferDataToWindow(false);
 	dialogPostProcess->Raise();
 }
 
 void FrameMain::OnCAMManageTools(wxRibbonButtonBarEvent& event)
 {
-	dialogToolbox->Update();
 	dialogToolbox->Show();
+	TransferDataToWindow(false);
+	dialogToolbox->Update();
 	dialogToolbox->Raise();
 }
 
 void FrameMain::OnCAMManageMachines(wxRibbonButtonBarEvent& event)
 {
 	dialogDebugger->Show(true);
+	TransferDataToWindow(false);
 	dialogDebugger->Raise();
 }
 
@@ -734,15 +757,15 @@ void FrameMain::OnCAMToolsTestGCode(wxRibbonButtonBarEvent& event)
 //	//TODO: When the units change the change is not immediately propagated into the TestGCode dialog.
 	DialogTestGCode * dialog = new DialogTestGCode(this);
 	dialog->Show();
+	TransferDataToWindow(false);
 	dialog->Raise();
 }
 
 void FrameMain::OnHelp(wxRibbonBarEvent& event)
 {
-//	printf("Help\n");
+	if(DEBUG) std::cout << "FrameMain::OnHelp\n";
 	wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, wxID_HELP);
 	ProcessEvent(menuEvent);
-
 }
 
 void FrameMain::OnClose(wxCloseEvent& event)
@@ -753,7 +776,7 @@ void FrameMain::OnClose(wxCloseEvent& event)
 //	Project* project = wxStaticCast(doc, Project);
 //	project->StopAllThreads();
 
-	printf("FrameMain: %zu docs, %zu views\n", tempDocs.GetCount(),
+	if(DEBUG) printf("FrameMain: %zu docs, %zu views\n", tempDocs.GetCount(),
 			tempViews.GetCount());
 
 	if(tempDocs.GetCount() > 1){
@@ -765,111 +788,96 @@ void FrameMain::OnClose(wxCloseEvent& event)
 		return;
 	}
 	wxWindow* main = this->GetParent();
-	printf("FrameMain: parent->Close()\n");
+	if(DEBUG) printf("FrameMain: parent->Close()\n");
 	main->Close(); // Exit app by closing main window, this will close this window as well.
 }
 
 void FrameMain::OnSize(wxSizeEvent& event)
 {
-//	printf("Size\n");
 	event.Skip();
 }
 
-void FrameMain::RequestSelection(wxFrame* requester, size_t ID,
-		bool multiselect, Selection selection0)
+void FrameMain::SetSelection(const Selection& selection, bool updateTree)
 {
-	std::cout << "--------------------------------\n";
-	std::cout << "FrameMain::RequestSelection(.., " << ID << ", " << multiselect
-			<< ", " << selection0.ToString() << ");\n";
-	oldSelection = tree->TreeToSelection();
-//	tree->SelectonToTree(Selection());
+	ProjectView * const view = wxStaticCast(GetView(), ProjectView);
+	this->selection = selection;
+	if(selectRequests.empty()){
+		view->SetSelection(this->selection);
+	}else{
+		view->SetSelection(selectRequests[0]);
+	}
+	if(loopguard.TryLock() != wxMUTEX_BUSY){
+		if(updateTree) tree->Update();
+		tree->SetSelecton(this->selection);
+		loopguard.Unlock();
+	}
+	Refresh();
+}
+
+const Selection& FrameMain::GetSelection(void) const
+{
+	return selection;
+}
+
+void FrameMain::SetRequestSelection(wxFrame* requester, size_t ID,
+		bool multiselect, Selection selection)
+{
+	if(DEBUG){
+		std::cout << "--------------------------------\n";
+		std::cout << "FrameMain::RequestSelection(.., " << ID << ", "
+				<< multiselect << ", " << selection.ToString() << ");\n";
+	}
 	this->selectRequestRequester = requester;
 	this->selectRequestID = ID;
 	this->selectRequestMulti = multiselect;
 	this->selectRequests.clear();
-	this->selectRequests.insert(selection0);
+	this->selectRequests.push_back(selection);
+	oldSelection = this->selection;
+	this->selection.Reset();
+	SetSelection(this->selection, false);
+	UpdateStatus();
 }
 
-void FrameMain::RequestSelection(wxFrame* requester, size_t ID,
-		bool multiselect, Selection selection0, Selection selection1)
+void FrameMain::AddRequestSelection(Selection selection)
 {
-	std::cout << "--------------------------------\n";
-	std::cout << "FrameMain::RequestSelection(.., " << ID << ", " << multiselect
-			<< ", " << selection0.ToString() << ", " << selection1.ToString()
-			<< ");\n";
-	oldSelection = tree->TreeToSelection();
-//	tree->SelectonToTree(Selection());
-	this->selectRequestRequester = requester;
-	this->selectRequestID = ID;
-	this->selectRequestMulti = multiselect;
-	this->selectRequests.clear();
-	this->selectRequests.insert(selection0);
-	this->selectRequests.insert(selection1);
+	if(DEBUG){
+		std::cout << "FrameMain::AddRequestSelection(" << selection.ToString()
+				<< ");\n";
+	}
+	this->selectRequests.push_back(selection);
 }
 
-void FrameMain::RequestSelection(wxFrame* requester, size_t ID,
-		bool multiselect, Selection selection0, Selection selection1,
-		Selection selection2)
-{
-	std::cout << "--------------------------------\n";
-	std::cout << "FrameMain::RequestSelection(.., " << ID << ", " << multiselect
-			<< ", " << selection0.ToString() << ", " << selection1.ToString()
-			<< ", " << selection2.ToString() << ");\n";
-	oldSelection = tree->TreeToSelection();
-//	tree->SelectonToTree(Selection());
-	this->selectRequestRequester = requester;
-	this->selectRequestID = ID;
-	this->selectRequestMulti = multiselect;
-	this->selectRequests.clear();
-	this->selectRequests.insert(selection0);
-	this->selectRequests.insert(selection1);
-	this->selectRequests.insert(selection2);
-}
-
-void FrameMain::AnswerSelection(const Selection &selection)
+void FrameMain::AnswerSelection(const Selection &selection, bool successful)
 {
 	if(selectRequests.empty()){
-		std::cout << "FrameMain::AnswerSelection(" << selection.ToString()
-				<< ") without open requests;\n";
+		if(DEBUG) std::cout << "FrameMain::AnswerSelection("
+				<< selection.ToString() << ", " << successful
+				<< ") called without open requests.\n";
 		return;
 	}
 	if(selectRequestRequester == NULL) return;
 
-	std::cout << "FrameMain::AnswerSelection(" << selection.ToString()
-			<< ");\n";
+	if(DEBUG) std::cout << "FrameMain::AnswerSelection(" << selection.ToString()
+			<< ", " << successful << ");\n";
 
-	if(selectRequestRequester == dialogJobSetup){
-		if(oldSelection.IsType(Selection::Run) && oldSelection.Size() > 0){
-			dialogJobSetup->SetRunID(oldSelection[0]);
-		}
-		dialogJobSetup->OnSelected(selectRequestID, selection);
-	}
-	if(selectRequestRequester == dialogToolpathGenerator){
-		dialogToolpathGenerator->OnSelected(selectRequestID, selection);
-	}
-	std::cout << "in FrameMain::AnswerSelection -> Reset selection to "
-			<< oldSelection.ToString() << "\n";
-	tree->SelectonToTree(oldSelection);
+	if(selectRequestRequester == dialogJobSetup) dialogJobSetup->OnSelected(
+			selectRequestID, selection, successful);
+	if(selectRequestRequester == dialogToolpathGenerator) dialogToolpathGenerator->OnSelected(
+			selectRequestID, selection, successful);
+
 	selectRequestRequester = NULL;
 	selectRequests.clear();
-	Refresh();
+	UpdateStatus();
 }
 
 void FrameMain::OnChar(wxKeyEvent& event)
 {
 	if(event.GetKeyCode() == WXK_RETURN && !this->selectRequests.empty()){
-		ProjectView * view = wxStaticCast(GetView(), ProjectView);
-		AnswerSelection(view->selection);
+		AnswerSelection(selection, true);
 		return;
 	}
 	if(event.GetKeyCode() == WXK_ESCAPE && !this->selectRequests.empty()){
-		if(selectRequestRequester == dialogJobSetup){
-			dialogJobSetup->OnSelected(selectRequestID, Selection());
-		}
-		selectRequestRequester = NULL;
-		selectRequests.clear();
-		tree->SelectonToTree(oldSelection);
-		Refresh();
+		AnswerSelection(Selection(), false);
 		return;
 	}
 	event.Skip();
@@ -879,155 +887,141 @@ void FrameMain::On3DMotion(wxMouseEvent& event)
 {
 	ProjectView* view = wxStaticCast(GetView(), ProjectView);
 	if(selectRequests.empty()){
-//		event.Skip();
-//		return;
+		event.Skip();
+		return;
 	}
 	int x = event.GetX();
 	int y = event.GetY();
 	OpenGLPick result(4096);
 	m_canvas->OnPick(result, x, y);
 
-	Selection tempSelection = view->hover;
-	view->hover.Clear();
-
-	if(result.HasHits()){
-		result.SortByNear();
-
-		if(view->selection.IsSetEmpty()){
-			view->hover.Add((Selection::BaseType) result.Get(0, 0),
-					(size_t) result.Get(1, 0),
-					(Selection::Type) result.Get(2, 0),
-					(size_t) result.Get(3, 0));
-		}else{
-			for(size_t n = 0; n < result.GetCount(); ++n){
-				size_t object = result.Get(1);
-				Selection::Type type = (Selection::Type) result.Get(2);
-				size_t ID = result.Get(3);
-				if(view->selection.CanAdd(Selection::BaseObject, object, type)){
-					view->hover.Add(Selection::BaseObject, object, type, ID);
-				}
-			}
-		}
-		if(tempSelection != view->hover) Refresh();
+	if(!result.HasHits()){
+		view->SetHover(Selection());
+		event.Skip();
+		return;
 	}
-	m_statusBar->SetStatusText(wxString(view->hover.ToString()));
+
+	result.SortByNear();
+
+	Selection hover;
+	for(size_t n = 0; n < result.GetCount(); ++n){
+		// Compose selection from OpenGL-pick results.
+		Selection temp((Selection::BaseType) result.Get(0, 0),
+				(size_t) result.Get(1, 0), (Selection::Type) result.Get(2, 0),
+				(size_t) result.Get(3, 0));
+		if(temp.IsType(Selection::Axis)) temp.Set(Selection::BaseAnything);
+		for(std::vector <Selection>::iterator it = selectRequests.begin();
+				it != selectRequests.end(); ++it){
+			// If Objects are requested, shift up the Object from the base to the normal level.
+			if(it->IsType(Selection::Object)) temp.ShiftUp();
+			if(it->CanAdd(temp)) hover.Add(temp);
+		}
+	}
+	view->SetHover(hover);
+	UpdateStatus();
 	event.Skip();
 }
 
 void FrameMain::On3DSelect(wxMouseEvent& event)
 {
-	ProjectView * const view = wxStaticCast(GetView(), ProjectView);
+	if(loopguard.TryLock() == wxMUTEX_BUSY) return;
+	if(DEBUG) std::cout << "FrameMain::On3DSelect(...);\n";
 
-//	if(selectRequests.empty()){
-//		event.Skip();
-//		return;
-//	}
-	std::cout << "FrameMain::On3DSelect(...);\n";
 	int x = event.GetX();
 	int y = event.GetY();
 	OpenGLPick result(4096);
 	m_canvas->OnPick(result, x, y);
-
-	Selection temp;
-	if(event.ShiftDown()) temp = view->selection;
-
-	m_statusBar->SetStatusText(wxString(view->selection.ToString()), 1);
-
-	if(!result.HasHits()) return;
+	if(!result.HasHits()){
+		loopguard.Unlock();
+		if(!event.ShiftDown()) SetSelection(Selection());
+		UpdateStatus();
+		return;
+	}
 	result.SortByNear();
 
-	if(!selectRequests.empty()){
-		bool hitfound = false;
+	if(selectRequests.empty()){
+		if(!event.ShiftDown()) selection.Reset();
 		for(size_t n = 0; n < result.GetCount(); ++n){
-
-			Selection temp2((Selection::BaseType) result.Get(0, n),
+			Selection temp((Selection::BaseType) result.Get(0, n),
 					(size_t) result.Get(1, n),
 					(Selection::Type) result.Get(2, n),
 					(size_t) result.Get(3, n));
+			if(temp.IsBaseType(Selection::BaseObject)) temp.ShiftUp();
+			if(!temp.IsType(Selection::Object) && !temp.IsType(Selection::Run)
+					&& !temp.IsType(Selection::Generator)) continue;
+			if(selection.Add(temp)) break;
+		}
+		loopguard.Unlock();
+		SetSelection(selection, false);
 
-			if(temp2.IsType(Selection::Axis)) temp2.SetBase(
-					Selection::BaseNone);
-
-			for(std::set <Selection>::iterator it = selectRequests.begin();
+	}else{
+		if(!selectRequestMulti || !event.ShiftDown()) selection.Reset();
+		bool hitfound = false;
+		for(size_t n = 0; n < result.GetCount(); ++n){
+			for(std::vector <Selection>::iterator it = selectRequests.begin();
 					it != selectRequests.end(); ++it){
-				if(it->IsType(Selection::Object)){
-					temp2 = Selection((Selection::Type) result.Get(0, n),
-							(size_t) result.Get(1, n));
-				}
-				if(it->CanAdd(temp2) && temp.Add(temp2)){
+				// Compose selection from OpenGL-pick results.
+				Selection temp((Selection::BaseType) result.Get(0, n),
+						(size_t) result.Get(1, n),
+						(Selection::Type) result.Get(2, n),
+						(size_t) result.Get(3, n));
+				if(temp.IsType(Selection::Axis)) temp.Set(
+						Selection::BaseAnything);
+
+				std::cout << "\tFound " << temp.ToString() << "\n";
+
+				// If Objects or Runs are requested, shift up the temp-selection from the base to the normal.
+				if((it->IsType(Selection::Object) || it->IsType(Selection::Run))
+						&& (temp.IsBaseType(Selection::BaseObject)
+								|| temp.IsBaseType(Selection::BaseRun))) temp.ShiftUp();
+				if(it->CanAdd(temp) && selection.Add(temp)){
 					hitfound = true;
 					break;
 				}
 			}
 			if(hitfound) break;
 		}
-
-		if(temp.IsType(Selection::Object)){
-			tree->SelectonToTree(temp);
+		loopguard.Unlock();
+		if(!selectRequestMulti || !event.ShiftDown()){
+			AnswerSelection(selection, hitfound);
+			SetSelection(oldSelection, false);
 		}
-		view->selection = temp;
-		if(!event.ShiftDown() && hitfound){
-			AnswerSelection(temp);
-		}
-	}else{
-		for(size_t n = 0; n < result.GetCount(); ++n){
-			temp.Add((Selection::Type) result.Get(0, n),
-					(size_t) result.Get(1, n));
-		}
-//		dialogObjectTransformation->SetSelection(temp);
-		tree->SelectonToTree(temp);
+//		if(DEBUG) std::cout
+//				<< "FrameMain::On3DSelect(...) - Reset selection to "
+//				<< oldSelection.ToString() << ";\n";
 	}
-
-	m_statusBar->SetStatusText(wxString(view->selection.ToString()), 1);
-
-	TransferDataToWindow();
+	TransferDataToWindow(false);
 	Refresh();
 }
 
 void FrameMain::OnSelectionChanged(wxTreeEvent& event)
 {
 	if(loopguard.TryLock() == wxMUTEX_BUSY) return;
+	Selection treeSelection = tree->GetSelection();
 
-//	wxTreeItemId id = event.GetItem();
-//	TreeItem * data = (TreeItem*) m_tree->GetItemData(id);
-	ProjectView* view = wxStaticCast(GetView(), ProjectView);
+	if(DEBUG) std::cout << "FrameMain::OnSelectionChanged(...) to "
+			<< treeSelection.ToString() << "\n";
 
-	Selection treeSelection = tree->TreeToSelection();
-
-	std::cout << "FrameMain::OnSelectionChanged(...) to "
-			<< treeSelection.ToString();
-
-	bool foundsomething = false;
-
-	Selection clicked;
-	for(std::set <Selection>::iterator request = selectRequests.begin();
-			request != selectRequests.end(); ++request){
-		if(!request->CanAdd(treeSelection.GetType())) continue;
-		if(request->IsType(Selection::Object)) clicked.Add(treeSelection);
-		foundsomething = true;
-		break;
-	}
-
-	view->selection = treeSelection;
-
-	if(foundsomething){
-		AnswerSelection(clicked);
+	if(selectRequests.empty()){
+		SetSelection(treeSelection, false);
 		loopguard.Unlock();
-		std::cout << "\n";
-		return;
+	}else{
+		selection.Reset();
+		bool foundsomething = false;
+		for(std::vector <Selection>::iterator request = selectRequests.begin();
+				request != selectRequests.end(); ++request){
+			Selection temp = treeSelection;
+			if(request->IsType(Selection::Run)
+					&& temp.IsBaseType(Selection::BaseRun)) temp.ShiftUp();
+			if(request->CanAdd(temp) && selection.Add(temp)){
+				foundsomething = true;
+			}
+		}
+		loopguard.Unlock();
+		AnswerSelection(selection, foundsomething);
 	}
-//	view->type = ProjectView::vIdle;
-	if(treeSelection.IsType(Selection::Object)) view->type =
-			ProjectView::vObject;
-	if(treeSelection.IsType(Selection::Run)) view->type = ProjectView::vRun;
-	if(treeSelection.IsType(Selection::Generator)) view->type =
-			ProjectView::vGenerator;
-
-	std::cout << " view->type = " << (int) view->type << ";\n";
-
 	TransferDataToWindow(false);
 	Refresh();
-	loopguard.Unlock();
 }
 
 void FrameMain::OnSelectionChanging(wxTreeEvent& event)
@@ -1118,7 +1112,6 @@ void FrameMain::OnActivateRightClickMenu(wxTreeEvent& event)
 //	}
 
 	if(data->type == TreeItem::itemGroupRun){
-		tree->SelectonToTree(Selection());
 		menu.Append(ID_RUNMODIFY, wxT("&Add Run"));
 		menu.AppendSeparator();
 		menu.Append(ID_TOOLPATHGENERATE, wxT("&Generate Toolpath"));
@@ -1141,12 +1134,6 @@ void FrameMain::OnActivateRightClickMenu(wxTreeEvent& event)
 		menu.Append(ID_TOOLPATHGENERATE, wxT("&Generate Toolpath"));
 		menu.Append(ID_TOOLPATHEXPORT, wxT("E&xport Toolpath"));
 	}
-
-//	if(data->type == itemToolpath){
-//		menu.Append(ID_GENERATORSETUP, wxT("Setup &Generator"));
-//		menu.AppendSeparator();
-//		menu.Append(ID_TOOLPATHSAVE, wxT("Save &Toolpath"));
-//	}
 
 	if(menu.GetMenuItemCount() > 0) PopupMenu(&menu); //, event.GetPoint());
 }
@@ -1186,7 +1173,7 @@ void FrameMain::OnEndLabelEdit(wxTreeEvent& event)
 
 	if(data->type == TreeItem::itemObject){
 		if(!project->Has(Selection::Object, data->ID)) return;
-		if(newName == project->Get3DObject(data->ID).name) return;
+		if(newName == project->Get3DObject(data->ID)->name) return;
 		cmdProc->Submit(new CommandObjectRename(
 		_("Object renamed to ") + newName, project, data->ID, newName));
 		return;
@@ -1194,7 +1181,7 @@ void FrameMain::OnEndLabelEdit(wxTreeEvent& event)
 
 	if(data->type == TreeItem::itemRun){
 		if(!project->Has(Selection::Run, data->ID)) return;
-		if(newName == project->GetRun(data->ID).name) return;
+		if(newName == project->GetRun(data->ID)->name) return;
 		cmdProc->Submit(
 				new CommandRunRename(_("Run renamed to ") + newName, project,
 						data->ID, newName));
@@ -1207,7 +1194,7 @@ void FrameMain::OnEndLabelEdit(wxTreeEvent& event)
 		if(!project->Has(
 				Selection(Selection::BaseRun, runID, Selection::Generator,
 						generatorID))) return;
-		if(newName == project->GetRun(runID).generators.at(generatorID)->name) return;
+		if(newName == project->GetRun(runID)->generators.at(generatorID)->name) return;
 		cmdProc->Submit(
 				new CommandRunGeneratorRename(
 				_("Generator renamed to ") + newName, project, runID,
@@ -1245,11 +1232,11 @@ void FrameMain::UpdateSimulation(wxCommandEvent& event)
 ////
 ////	if(dialog.ShowModal() == wxID_OK){
 ////		wxFileName fileName(dialog.GetPath());
-////		if(project->GetRun(selected).machine.Load(fileName)){
+////		if(project->GetRun(selected)->machine.Load(fileName)){
 ////			filepaths.lastMachineDirectory = fileName.GetPath();
 ////		}else{
 ////			wxLogError
-////			(project->GetRun(selected).machine.textOut);
+////			(project->GetRun(selected)->machine.textOut);
 ////		}
 ////		TransferDataToWindow();
 ////	}
@@ -1260,9 +1247,9 @@ void FrameMain::UpdateSimulation(wxCommandEvent& event)
 ////	Project* project = wxStaticCast(GetDocument(), Project);
 ////	int selected = tree->GetFirstSelectedRun();
 ////	if(selected < 0) return;
-////	if(!project->GetRun(selected).machine.ReLoad()){
+////	if(!project->GetRun(selected)->machine.ReLoad()){
 ////		wxLogError
-////		(project->GetRun(selected).machine.textOut);
+////		(project->GetRun(selected)->machine.textOut);
 ////	}
 ////	TransferDataToWindow();
 //}
@@ -1349,8 +1336,9 @@ void FrameMain::OnToolpathGenerate(wxCommandEvent& event)
 //		dialog.Update(count, project.TollPathGenerateCurrent());
 //	}
 
-	TransferDataToWindow();
+	TransferDataToWindow(false);
 }
+
 //
 //void FrameMain::OnGeneratorAutomatic(wxCommandEvent& event)
 //{

@@ -61,7 +61,7 @@ class Generator {
 
 // Constructor/ Destructor
 public:
-	Generator();
+	Generator(size_t ID);
 	virtual ~Generator();
 
 	//Member variables:
@@ -87,7 +87,9 @@ private:
 
 //Methods:
 public:
-	virtual size_t GetID(void);
+	bool operator==(const size_t ID) const;
+	size_t GetID(void) const;
+
 	virtual size_t GetType(void) const = 0;
 	virtual wxString GetTypeName(void) const = 0;
 	virtual wxString GetName(void) const;
@@ -102,7 +104,7 @@ public:
 	virtual bool FromStream(wxTextInputStream & stream);
 	virtual void Paint(void) const;
 	virtual void GenerateToolpath(const Run &run,
-			const std::map <size_t, Object> &objects, const Tool &tool,
+			const std::vector <Object> &objects, const Tool &tool,
 			const DexelTarget &base) = 0;
 };
 

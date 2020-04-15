@@ -27,6 +27,7 @@
 #include "CommandObjectTransform.h"
 
 #include "../Project.h"
+#include <algorithm>
 
 CommandObjectTransform::CommandObjectTransform(const wxString& name,
 		Project* project, size_t ID, bool flipX, bool flipY, bool flipZ,
@@ -45,13 +46,16 @@ CommandObjectTransform::CommandObjectTransform(const wxString& name,
 bool CommandObjectTransform::Do(void)
 {
 	if(project == NULL) return false;
-	if(project->objects.find(ID) == project->objects.end()) return false;
-	matrixOld = project->objects[ID].matrix;
-	project->objects[ID].matrix = matrixNew;
-	if(flipX) project->objects[ID].FlipX();
-	if(flipY) project->objects[ID].FlipY();
-	if(flipZ) project->objects[ID].FlipZ();
-	if(flipNormals) project->objects[ID].FlipNormals();
+	std::vector <Object>::iterator it;
+	it = std::find(project->objects.begin(), project->objects.end(), ID);
+	if(it == project->objects.end()) return false;
+
+	matrixOld = it->matrix;
+	it->matrix = matrixNew;
+	if(flipX) it->FlipX();
+	if(flipY) it->FlipY();
+	if(flipZ) it->FlipZ();
+	if(flipNormals) it->FlipNormals();
 //	project->objects[objectNr].Update();
 	project->Update();
 	return true;
@@ -60,12 +64,14 @@ bool CommandObjectTransform::Do(void)
 bool CommandObjectTransform::Undo(void)
 {
 	if(project == NULL) return false;
-	if(project->objects.find(ID) == project->objects.end()) return false;
-	project->objects[ID].matrix = matrixOld;
-	if(flipX) project->objects[ID].FlipX();
-	if(flipY) project->objects[ID].FlipY();
-	if(flipZ) project->objects[ID].FlipZ();
-	if(flipNormals) project->objects[ID].FlipNormals();
+	std::vector <Object>::iterator it;
+	it = std::find(project->objects.begin(), project->objects.end(), ID);
+	if(it == project->objects.end()) return false;
+	it->matrix = matrixOld;
+	if(flipX) it->FlipX();
+	if(flipY) it->FlipY();
+	if(flipZ) it->FlipZ();
+	if(flipNormals) it->FlipNormals();
 //	project->objects[objectNr].Update();
 	project->Update();
 	return true;

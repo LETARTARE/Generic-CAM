@@ -49,7 +49,7 @@ class wxFilePickerCtrl;
 
 class GeneratorLoadFromFile:public Generator {
 public:
-	GeneratorLoadFromFile();
+	GeneratorLoadFromFile(size_t ID);
 	virtual void CopyParameterFrom(const Generator * other);
 	virtual ~GeneratorLoadFromFile();
 	virtual size_t GetType(void) const
@@ -63,7 +63,7 @@ public:
 	virtual void TransferDataFromPanel(CollectionUnits* settings);
 	virtual bool operator==(const Generator &b) const;
 	virtual void GenerateToolpath(const Run &run,
-			const std::map <size_t, Object> &objects, const Tool &tool,
+			const std::vector <Object> &objects, const Tool &tool,
 			const DexelTarget &base);
 
 private:

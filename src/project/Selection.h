@@ -40,57 +40,68 @@ class Selection {
 public:
 	//Note: BaseType and Type describing the same thing have to have the same ID.
 	enum BaseType {
-		BaseNone = 0, BaseObject = 1, BaseRun = 2
+		BaseAnything = 0, BaseObject = 1, BaseRun = 2
 	};
 	enum Type {
 		Anything = 0,
 		Object = 1,
 		Run = 2,
+		Generator,
 		Triangle,
 		TriangleGroup,
 		Edge,
 		EdgeGroup,
 		Vertex,
 		VertexGroup,
-		Axis,
-		Generator
+		Axis
 	};
 
+private:
+	BaseType basetype;
+	size_t baseID;
+	Type type;
+	std::set <size_t> selected;
+	bool invertedselection;
+
+public:
 	Selection(bool selecteverything = false);
 	Selection(Type type);
 	Selection(Type type, size_t ID);
 	Selection(BaseType basetype, size_t baseID = 0, Type type = Anything);
 	Selection(BaseType basetype, size_t baseID, Type type, size_t ID);
+	Selection& operator=(const Selection& other);
 
 	virtual ~Selection();
 
-	void Clear(void);
-	void ClearKeepBase(void);
-	void ClearSetBase(BaseType basetype, size_t baseID = 0);
+	void Set(Type type);
+	void Set(Type type, size_t ID);
+	void Set(BaseType basetype, size_t baseID = 0);
+	void Set(BaseType basetype, size_t baseID, Type type);
+	void Set(BaseType basetype, size_t baseID, Type type, size_t ID);
 
-	void SetBase(BaseType basetype, size_t baseID = 0);
-	size_t GetBaseID(void) const;
+	void Reset(bool selecteverything = false);
+	void ResetBase(void);
+
 	bool IsBase(BaseType basetype, size_t baseID = 0) const;
 	bool IsBaseType(BaseType basetype) const;
+	size_t GetBaseID(void) const;
 	static std::string GetBaseTypeName(BaseType basetype);
 	std::string GetBaseTypeName(void) const;
+	void ShiftUp(void);
 
-	size_t Size(void) const;
-	bool IsSetEmpty(void) const;
-	const std::set <size_t> & GetSet(void) const;
-	const std::set <size_t>::iterator begin(void) const;
-	const std::set <size_t>::iterator end(void) const;
-	size_t operator[](size_t index) const;
-
-	void Invert(void);
-	const bool IsInverted(void) const;
-
-	void SetType(Type type);
-	Selection::Type GetType(void) const;
 	bool IsType(Type type) const;
+	Selection::Type GetType(void) const;
 	static std::string GetTypeName(Type type);
 	std::string GetTypeName(void) const;
 
+	void ClearSet(bool selecteverything = false);
+
+	/*!\brief Check if something can be added to this class.
+	 *
+	 * Not that this is not bijective: The other Selection can be added to
+	 * this one, if true is returned, but not necessariely the other way
+	 * around.
+	 */
 	bool CanAdd(BaseType basetype) const;
 	bool CanAdd(BaseType basetype, Type type) const;
 	bool CanAdd(BaseType basetype, size_t baseID) const;
@@ -103,6 +114,16 @@ public:
 	bool Add(BaseType basetype, Type type, size_t ID);
 	bool Add(BaseType basetype, size_t baseID, Type type, size_t ID);
 	bool Add(const Selection &other);
+
+	void Invert(void);
+	const bool IsInverted(void) const;
+
+	bool IsSetEmpty(void) const;
+	size_t Size(void) const;
+	const std::set <size_t> & GetSet(void) const;
+	const std::set <size_t>::iterator begin(void) const;
+	const std::set <size_t>::iterator end(void) const;
+	size_t operator[](size_t index) const;
 
 	bool Has(size_t ID) const;
 	bool Has(Type type, size_t ID) const;
@@ -142,10 +163,14 @@ public:
 	}
 	friend bool operator==(const Selection& a, const Selection& b)
 	{
+		// Base
 		if(a.basetype != b.basetype) return false;
-		if(a.basetype != BaseNone && a.baseID != b.baseID) return false;
-		if(a.type != b.type) return false;
-		if(a.inverted != b.inverted) return false;
+		if(a.basetype != BaseAnything && b.basetype != BaseAnything
+				&& a.baseID != b.baseID) return false;
+		// Type
+		if(a.type != Anything && b.type != Anything && a.type != b.type) return false;
+		// Selected
+		if(a.invertedselection != b.invertedselection) return false;
 		if(a.selected.size() != b.selected.size()) return false;
 		if(!std::equal(a.selected.begin(), a.selected.end(),
 				b.selected.begin())) return false;
@@ -158,12 +183,6 @@ public:
 	std::string ToString(void) const;
 
 private:
-	BaseType basetype;
-	Type type;
-	size_t baseID;
-	std::set <size_t> selected;
-	bool inverted;
-
 	// Speedup of index lookup with operator[]
 	mutable bool lastrequestvalid;
 	mutable std::set <size_t>::iterator lastrequestediterator;

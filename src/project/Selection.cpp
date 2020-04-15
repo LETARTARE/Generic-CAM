@@ -32,10 +32,10 @@
 
 Selection::Selection(bool selecteverything)
 {
-	basetype = BaseNone;
+	basetype = BaseAnything;
 	baseID = 0;
 	type = Anything;
-	inverted = selecteverything;
+	invertedselection = selecteverything;
 
 	lastrequestvalid = false;
 	lastrequestediterator = selected.begin();
@@ -44,10 +44,10 @@ Selection::Selection(bool selecteverything)
 
 Selection::Selection(Type type)
 {
-	this->basetype = BaseNone;
+	this->basetype = BaseAnything;
 	this->baseID = 0;
 	this->type = type;
-	inverted = false;
+	invertedselection = false;
 
 	lastrequestvalid = false;
 	lastrequestediterator = selected.begin();
@@ -56,11 +56,11 @@ Selection::Selection(Type type)
 
 Selection::Selection(Type type, size_t ID)
 {
-	this->basetype = BaseNone;
+	this->basetype = BaseAnything;
 	this->baseID = 0;
 	this->type = type;
 	selected.insert(ID);
-	inverted = false;
+	invertedselection = false;
 
 	lastrequestvalid = false;
 	lastrequestediterator = selected.begin();
@@ -70,10 +70,9 @@ Selection::Selection(Type type, size_t ID)
 Selection::Selection(BaseType basetype, size_t baseID, Type type)
 {
 	this->basetype = basetype;
-	if(basetype == BaseNone) baseID = 0;
-	this->baseID = baseID;
+	this->baseID = (basetype == BaseAnything)? 0 : baseID;
 	this->type = type;
-	inverted = false;
+	invertedselection = false;
 
 	lastrequestvalid = false;
 	lastrequestediterator = selected.begin();
@@ -83,68 +82,104 @@ Selection::Selection(BaseType basetype, size_t baseID, Type type)
 Selection::Selection(BaseType basetype, size_t baseID, Type type, size_t ID)
 {
 	this->basetype = basetype;
-	if(basetype == BaseNone) baseID = 0;
-	this->baseID = baseID;
+	this->baseID = (basetype == BaseAnything)? 0 : baseID;
 	this->type = type;
 	selected.insert(ID);
-	inverted = false;
+	invertedselection = false;
 
 	lastrequestvalid = false;
 	lastrequestediterator = selected.begin();
 	lastrequestedindex = 0;
 }
 
+Selection& Selection::operator =(const Selection& other)
+{
+	if(this != &other){
+		this->basetype = other.basetype;
+		this->baseID = other.baseID;
+		this->type = other.type;
+		this->selected = other.selected;
+		this->invertedselection = other.invertedselection;
+		this->lastrequestvalid = false;
+		this->lastrequestediterator = this->selected.begin();
+		this->lastrequestedindex = 0;
+	}
+	return *this;
+}
+
 Selection::~Selection()
 {
 }
 
-void Selection::Clear(void)
+void Selection::Set(Type type)
 {
-	basetype = BaseNone;
+	this->basetype = BaseAnything;
+	this->baseID = 0;
+	this->type = type;
+	selected.clear();
+	lastrequestvalid = false;
+	invertedselection = false;
+}
+
+void Selection::Set(Type type, size_t ID)
+{
+	this->basetype = BaseAnything;
+	this->baseID = 0;
+	this->type = type;
+	selected.clear();
+	lastrequestvalid = false;
+	selected.insert(ID);
+	invertedselection = false;
+}
+
+void Selection::Set(BaseType basetype, size_t baseID)
+{
+	this->basetype = basetype;
+	this->baseID = (basetype == BaseAnything)? 0 : baseID;
+}
+
+void Selection::Set(BaseType basetype, size_t baseID, Type type)
+{
+	this->basetype = basetype;
+	this->baseID = (basetype == BaseAnything)? 0 : baseID;
+	this->type = type;
+	selected.clear();
+	lastrequestvalid = false;
+	invertedselection = false;
+}
+
+void Selection::Set(BaseType basetype, size_t baseID, Type type, size_t ID)
+{
+	this->basetype = basetype;
+	this->baseID = (basetype == BaseAnything)? 0 : baseID;
+	this->type = type;
+	selected.clear();
+	selected.insert(ID);
+	lastrequestvalid = false;
+	invertedselection = false;
+}
+
+void Selection::Reset(bool selecteverything)
+{
+	basetype = BaseAnything;
 	baseID = 0;
 	type = Anything;
-	inverted = false;
+	invertedselection = selecteverything;
 	selected.clear();
 	lastrequestvalid = false;
-}
-
-void Selection::ClearKeepBase(void)
-{
-	selected.clear();
-	lastrequestvalid = false;
-
-	inverted = false;
-}
-
-void Selection::ClearSetBase(BaseType basetype, size_t baseID)
-{
-	this->basetype = basetype;
-	if(basetype == BaseNone) baseID = 0;
-	this->baseID = baseID;
-	this->type = type;
-	inverted = false;
-
-	selected.clear();
 	lastrequestvalid = false;
 }
 
-void Selection::SetBase(BaseType basetype, size_t baseID)
+void Selection::ResetBase(void)
 {
-	if(basetype == BaseNone) baseID = 0;
-	lastrequestvalid = false;
-	this->basetype = basetype;
-	this->baseID = baseID;
-}
-
-size_t Selection::GetBaseID(void) const
-{
-	return baseID;
+	basetype = BaseAnything;
+	baseID = 0;
 }
 
 bool Selection::IsBase(BaseType basetype, size_t baseID) const
 {
 	return (this->basetype == basetype
-			&& (this->basetype == BaseNone || this->baseID == baseID));
+			&& (this->basetype == BaseAnything || this->baseID == baseID));
 }
 
 bool Selection::IsBaseType(BaseType basetype) const
@@ -152,11 +187,16 @@ bool Selection::IsBaseType(BaseType basetype) const
 	return (this->basetype == basetype);
 }
 
+size_t Selection::GetBaseID(void) const
+{
+	return baseID;
+}
+
 std::string Selection::GetBaseTypeName(BaseType basetype)
 {
 	switch(basetype){
-	case BaseNone:
-		return std::string("None");
+	case BaseAnything:
+		return std::string("Anything");
 	case BaseObject:
 		return std::string("Object");
 	case BaseRun:
@@ -170,72 +210,24 @@ std::string Selection::GetBaseTypeName(void) const
 	return Selection::GetBaseTypeName(this->basetype);
 }
 
-size_t Selection::Size(void) const
+void Selection::ShiftUp(void)
 {
-	return selected.size();
-}
-
-bool Selection::IsSetEmpty(void) const
-{
-	return selected.empty();
-}
-
-const std::set <size_t> & Selection::GetSet(void) const
-{
-	return selected;
-}
-
-const std::set <size_t>::iterator Selection::begin(void) const
-{
-	return selected.begin();
-}
-
-const std::set <size_t>::iterator Selection::end(void) const
-{
-	return selected.end();
-}
-
-size_t Selection::operator [](size_t index) const
-{
-	const size_t N = selected.size();
-	if(index > N) throw std::range_error(
-			"Selection::operator[] - out of range.");
-	if(!lastrequestvalid || lastrequestedindex > index){
-		lastrequestediterator = selected.begin();
-		lastrequestedindex = 0;
-		lastrequestvalid = true;
-	}
-	while(lastrequestedindex < index){
-		++lastrequestediterator;
-		++lastrequestedindex;
-	}
-	return *lastrequestediterator;
-}
-
-void Selection::Invert(void)
-{
-	inverted = !inverted;
-//	lastrequestvalid = false;
-}
-
-const bool Selection::IsInverted(void) const
-{
-	return inverted;
-}
-
-void Selection::SetType(Type type)
-{
-	if(this->type != type){
-		selected.clear();
-		lastrequestvalid = false;
-		inverted = false;
-	}
-	this->type = type;
+	type = (Type) basetype;
+	basetype = BaseAnything;
+	selected.clear();
+	selected.insert(baseID);
+	lastrequestvalid = false;
+	baseID = 0;
 }
 
 bool Selection::IsType(Type type) const
 {
 	return (type == this->type);
+}
+
+Selection::Type Selection::GetType(void) const
+{
+	return type;
 }
 
 std::string Selection::GetTypeName(Type type)
@@ -272,27 +264,34 @@ std::string Selection::GetTypeName(void) const
 	return Selection::GetTypeName(this->type);
 }
 
+void Selection::ClearSet(bool selecteverything)
+{
+	invertedselection = selecteverything;
+	selected.clear();
+	lastrequestvalid = false;
+}
+
 bool Selection::CanAdd(BaseType basetype) const
 {
-	return (this->basetype == BaseNone || this->basetype == basetype);
+	return (this->basetype == BaseAnything || this->basetype == basetype);
 }
 
 bool Selection::CanAdd(BaseType basetype, Type type) const
 {
-	return ((this->basetype == BaseNone || this->basetype == basetype)
+	return ((this->basetype == BaseAnything || this->basetype == basetype)
 			&& (this->type == Anything || this->type == type));
 }
 
 bool Selection::CanAdd(BaseType basetype, size_t baseID) const
 {
-	return ((this->basetype == BaseNone || this->basetype == basetype)
-			&& (this->basetype == BaseNone || this->baseID == baseID));
+	return (this->basetype == BaseAnything
+			|| (this->basetype == basetype && this->baseID == baseID));
 }
 
 bool Selection::CanAdd(BaseType basetype, size_t baseID, Type type) const
 {
-	return ((this->basetype == BaseNone || this->basetype == basetype)
-			&& (this->basetype == BaseNone || this->baseID == baseID)
+	return ((this->basetype == BaseAnything
+			|| (this->basetype == basetype && this->baseID == baseID))
 			&& (this->type == Anything || this->type == type));
 }
 
@@ -303,16 +302,15 @@ bool Selection::CanAdd(Type type) const
 
 bool Selection::CanAdd(const Selection& other) const
 {
-	return ((this->basetype == BaseNone || this->basetype == other.basetype)
-			&& (this->basetype == BaseNone || this->baseID == other.baseID)
-			&& (this->type == Anything || this->type == other.type)
-			&& (this->type == Anything || this->type == other.type));
-	//TODO: Check if it is a good idea to allow other.type==Anything here as well.
+	return ((this->basetype == BaseAnything
+			|| (this->basetype == other.basetype && this->baseID == other.baseID))
+			&& (this->type == Anything
+					|| (this->type == other.type && this->type == other.type)));
 }
 
 bool Selection::Add(size_t ID)
 {
-	if(inverted){
+	if(invertedselection){
 		selected.erase(ID);
 	}else{
 		selected.insert(ID);
@@ -325,7 +323,7 @@ bool Selection::Add(Type type, size_t ID)
 {
 	if(this->type == Anything) this->type = type;
 	if(this->type != Anything && this->type != type) return false;
-	if(inverted){
+	if(invertedselection){
 		selected.erase(ID);
 	}else{
 		selected.insert(ID);
@@ -336,14 +334,14 @@ bool Selection::Add(Type type, size_t ID)
 
 bool Selection::Add(BaseType basetype, Type type, size_t ID)
 {
-	if(this->basetype == BaseNone){
+	if(this->basetype == BaseAnything){
 		this->basetype = basetype;
-		if(basetype == BaseNone) this->baseID = 0;
+		if(basetype == BaseAnything) this->baseID = 0;
 	}
-	if(this->basetype != BaseNone && this->basetype != basetype) return false;
+	if(this->basetype != BaseAnything && this->basetype != basetype) return false;
 	if(this->type == Anything) this->type = type;
 	if(this->type != Anything && this->type != type) return false;
-	if(inverted){
+	if(invertedselection){
 		selected.erase(ID);
 	}else{
 		selected.insert(ID);
@@ -354,15 +352,15 @@ bool Selection::Add(BaseType basetype, Type type, size_t ID)
 
 bool Selection::Add(BaseType basetype, size_t baseID, Type type, size_t ID)
 {
-	if(this->basetype == BaseNone){
+	if(this->basetype == BaseAnything){
 		this->basetype = basetype;
-		this->baseID = (basetype == BaseNone)? 0 : baseID;
+		this->baseID = (basetype == BaseAnything)? 0 : baseID;
 	}
-	if(this->basetype != BaseNone && this->basetype != basetype) return false;
-	if(this->basetype != BaseNone && this->baseID != baseID) return false;
+	if(this->basetype != BaseAnything && this->basetype != basetype) return false;
+	if(this->basetype != BaseAnything && this->baseID != baseID) return false;
 	if(this->type == Anything) this->type = type;
 	if(this->type != Anything && this->type != type) return false;
-	if(inverted){
+	if(invertedselection){
 		selected.erase(ID);
 	}else{
 		selected.insert(ID);
@@ -373,16 +371,16 @@ bool Selection::Add(BaseType basetype, size_t baseID, Type type, size_t ID)
 
 bool Selection::Add(const Selection& other)
 {
-	if(this->basetype == BaseNone){
+	if(this->basetype == BaseAnything){
 		this->basetype = other.basetype;
-		this->baseID = (other.basetype == BaseNone)? 0 : other.baseID;
+		this->baseID = (other.basetype == BaseAnything)? 0 : other.baseID;
 	}
-	if(this->basetype != BaseNone && this->basetype != other.basetype) return false;
-	if(this->basetype != BaseNone && this->baseID != other.baseID) return false;
+	if(this->basetype != BaseAnything && this->basetype != other.basetype) return false;
+	if(this->basetype != BaseAnything && this->baseID != other.baseID) return false;
 	if(this->type == Anything) this->type = other.type;
 	if(this->type != Anything && this->type != other.type) return false;
 	std::set <size_t> temp;
-	if(this->inverted){
+	if(this->invertedselection){
 		std::set_difference(this->selected.begin(), this->selected.end(),
 				other.selected.begin(), other.selected.end(),
 				std::inserter(temp, temp.begin()));
@@ -396,41 +394,93 @@ bool Selection::Add(const Selection& other)
 	return true;
 }
 
+void Selection::Invert(void)
+{
+	invertedselection = !invertedselection;
+//	lastrequestvalid = false;
+}
+
+const bool Selection::IsInverted(void) const
+{
+	return invertedselection;
+}
+
+bool Selection::IsSetEmpty(void) const
+{
+	return selected.empty();
+}
+
+size_t Selection::Size(void) const
+{
+	return selected.size();
+}
+
+const std::set <size_t> & Selection::GetSet(void) const
+{
+	return selected;
+}
+
+const std::set <size_t>::iterator Selection::begin(void) const
+{
+	return selected.begin();
+}
+
+const std::set <size_t>::iterator Selection::end(void) const
+{
+	return selected.end();
+}
+
+size_t Selection::operator [](size_t index) const
+{
+	const size_t N = selected.size();
+	if(index >= N) throw std::range_error(
+			"Selection::operator[] - out of range.");
+	if(!lastrequestvalid || lastrequestedindex > index){
+		lastrequestediterator = selected.begin();
+		lastrequestedindex = 0;
+		lastrequestvalid = true;
+	}
+	while(lastrequestedindex < index){
+		++lastrequestediterator;
+		++lastrequestedindex;
+	}
+	return *lastrequestediterator;
+}
+
 bool Selection::Has(size_t ID) const
 {
-	return ((selected.find(ID) != selected.end()) != inverted);
+	return ((selected.find(ID) != selected.end()) != invertedselection);
 }
 
 bool Selection::Has(Type type, size_t ID) const
 {
-	if(this->type != Anything && this->type != type) return inverted;
-	return ((selected.find(ID) != selected.end()) != inverted);
+	if(this->type != Anything && this->type != type) return invertedselection;
+	return ((selected.find(ID) != selected.end()) != invertedselection);
 }
 
 bool Selection::Has(BaseType basetype, Type type, size_t ID) const
 {
-	if(this->basetype != BaseNone && this->basetype != basetype) return inverted;
-	if(this->type != Anything && this->type != type) return inverted;
-	return ((selected.find(ID) != selected.end()) != inverted);
+	if(this->basetype != BaseAnything && this->basetype != basetype) return invertedselection;
+	if(this->type != Anything && this->type != type) return invertedselection;
+	return ((selected.find(ID) != selected.end()) != invertedselection);
 }
 
 bool Selection::Has(BaseType basetype, size_t baseID, Type type,
 		size_t ID) const
 {
-	if(this->basetype != BaseNone && this->basetype != basetype) return inverted;
-	if(this->basetype != BaseNone && this->baseID != baseID) return inverted;
-	if(this->type != type) return inverted;
-	return ((selected.find(ID) != selected.end()) != inverted);
+	if(this->basetype != BaseAnything && this->basetype != basetype) return invertedselection;
+	if(this->basetype != BaseAnything && this->baseID != baseID) return invertedselection;
+	if(this->type != type) return invertedselection;
+	return ((selected.find(ID) != selected.end()) != invertedselection);
 }
 
 Selection& Selection::operator |=(const Selection& b)
 {
 	// Compare types
 	if(this->basetype != b.basetype) return *this;
-	lastrequestvalid = false;
-	if(this->basetype != BaseNone && !this->selected.empty()
+	if(this->basetype != BaseAnything && !this->selected.empty()
 			&& this->baseID != b.baseID) return *this;
-	if(this->basetype == BaseNone){
+	if(this->basetype == BaseAnything){
 		this->baseID = 0;
 	}else{
 		this->baseID = b.baseID;
@@ -439,6 +489,7 @@ Selection& Selection::operator |=(const Selection& b)
 			&& !b.selected.empty()){
 		this->type = b.type;
 	}
+	lastrequestvalid = false;
 	if(this->selected.empty()){
 		if(!b.selected.empty()) this->selected = b.selected;
 		return *this;
@@ -458,9 +509,9 @@ Selection& Selection::operator +=(const Selection& b)
 {
 	// Compare types
 	if(this->basetype != b.basetype) return *this;
-	if(this->basetype != BaseNone && !this->selected.empty()
+	if(this->basetype != BaseAnything && !this->selected.empty()
 			&& this->baseID != b.baseID) return *this;
-	if(this->basetype == BaseNone){
+	if(this->basetype == BaseAnything){
 		this->baseID = 0;
 	}else{
 		this->baseID = b.baseID;
@@ -493,12 +544,12 @@ Selection& Selection::operator &=(const Selection& b)
 		selected.clear();
 		return *this;
 	}
-	if(this->basetype != BaseNone && !this->selected.empty()
+	if(this->basetype != BaseAnything && !this->selected.empty()
 			&& this->baseID != b.baseID){
 		selected.clear();
 		return *this;
 	}
-	if(this->basetype == BaseNone){
+	if(this->basetype == BaseAnything){
 		this->baseID = 0;
 	}else{
 		this->baseID = b.baseID;
@@ -520,10 +571,9 @@ Selection& Selection::operator -=(const Selection& b)
 {
 // Compare types
 	if(this->basetype != b.basetype) return *this;
-	lastrequestvalid = false;
-	if(this->basetype != BaseNone && !this->selected.empty()
+	if(this->basetype != BaseAnything && !this->selected.empty()
 			&& this->baseID != b.baseID) return *this;
-	if(this->basetype == BaseNone){
+	if(this->basetype == BaseAnything){
 		this->baseID = 0;
 	}else{
 		this->baseID = b.baseID;
@@ -532,6 +582,7 @@ Selection& Selection::operator -=(const Selection& b)
 			&& !b.selected.empty()){
 		this->type = b.type;
 	}
+	lastrequestvalid = false;
 	if(this->selected.empty()){
 		if(!b.selected.empty()) this->selected = b.selected;
 		return *this;
@@ -547,26 +598,21 @@ Selection& Selection::operator -=(const Selection& b)
 	return *this;
 }
 
-Selection::Type Selection::GetType(void) const
-{
-	return type;
-}
-
 std::string Selection::ToString(void) const
 {
 	std::ostringstream x;
 
-	if(basetype == BaseNone && type == Anything){
-		if(inverted){
+	if(basetype == BaseAnything && type == Anything){
+		if(invertedselection){
 			x << "Everything";
 		}else{
 			x << "Nothing";
 		}
 	}else{
-		if(inverted) x << "inv(";
-		if(basetype != BaseNone){
+		if(invertedselection) x << "inv(";
+		if(basetype != BaseAnything){
 			x << GetBaseTypeName();
-			if(basetype != BaseNone){
+			if(basetype != BaseAnything){
 				x << "#" << baseID;
 			}
 			x << ":";
@@ -586,7 +632,7 @@ std::string Selection::ToString(void) const
 			}
 		}
 		if(selected.size() > 1) x << "]";
-		if(inverted) x << ")";
+		if(invertedselection) x << ")";
 	}
 	return x.str();
 }

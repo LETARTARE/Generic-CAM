@@ -44,7 +44,6 @@
 #include "Tool.h"
 
 #include <stddef.h>
-#include <map>
 #include <vector>
 
 #include <wx/filename.h>
@@ -116,25 +115,27 @@ public:
 
 	BoundingBox GetBBox(const Selection & selected) const;
 
-	size_t GetMaxObjectID(void) const;
-	size_t GetMaxRunID(void) const;
-	size_t GetMaxGeneratorID(void) const;
+	size_t GetNextObjectID(void) ;
+	size_t GetNextRunID(void) ;
+	size_t GetNextGeneratorID(void) ;
+
 	size_t GetToolCount(void) const;
 
-	std::set <size_t> GetAllObjectIDs(void) const;
-	std::set <size_t> GetAllRunIDs(void) const;
-	std::set <size_t> GetAllGeneratorIDs(size_t runID) const;
+	std::vector <size_t> GetAllObjectIDs(void) const;
+	std::vector <size_t> GetAllRunIDs(void) const;
+	std::vector <size_t> GetAllGeneratorIDs(size_t runID) const;
 
-	const Object & Get3DObject(size_t ID) const;
-	const Run & GetRun(size_t ID) const;
+	const Object * Get3DObject(size_t ID) const;
+	const Run * GetRun(size_t ID) const;
 	const Generator * GetGenerator(size_t runID, size_t ID);
-	const std::vector <Tool> * GetTools(void) const;
-	const std::map <size_t, Object> * GetObjects(void) const;
-	const Tool & GetTool(size_t index) const;
-private:
+	const Tool * GetTool(size_t index) const;
 
-	std::map <size_t, Object> objects;
-	std::map <size_t, Run> run;
+	const std::vector <Tool> * GetTools(void) const;
+	const std::vector <Object> * GetObjects(void) const;
+
+private:
+	std::vector <Object> objects;
+	std::vector <Run> run;
 	std::vector <Tool> tools;
 
 	size_t maxObjectID;

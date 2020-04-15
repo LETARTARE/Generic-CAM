@@ -34,7 +34,6 @@
 #include <wx/event.h>
 #include <wx/timer.h>
 
-
 class CNCSimulator;
 
 class DialogAnimation:public GUIAnimation {
@@ -42,6 +41,9 @@ class DialogAnimation:public GUIAnimation {
 public:
 	DialogAnimation(wxWindow *parent);
 	virtual ~DialogAnimation();
+
+	void SetSelection(const Selection &selection);
+	bool SelectionIsOK(void) const;
 
 	bool TransferDataToWindow(void);
 
@@ -64,7 +66,7 @@ private:
 	wxString SecondsToTC(const double t);
 
 private:
-	int runNr;
+	size_t runID;
 	CNCSimulator* simulator;
 
 	DexelTarget model;

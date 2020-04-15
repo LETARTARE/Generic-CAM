@@ -48,21 +48,34 @@ DialogJobSetup::~DialogJobSetup()
 {
 }
 
-void DialogJobSetup::SetRunID(size_t runID)
+void DialogJobSetup::SetSelection(const Selection &selection)
 {
-	std::cout << "DialogJobSetup::SetRunID(" << runID << ");\n";
-	if(this->runID == runID) return;
-	this->runID = runID;
+	size_t oldID = this->runID;
+	if(selection.IsBaseType(Selection::BaseRun)){
+		this->runID = selection.GetBaseID();
+	}
+	if(selection.IsType(Selection::Run) && !selection.IsSetEmpty()){
+		this->runID = selection[0];
+	}
+	if(this->runID == oldID) return;
+	std::cout << "DialogJobSetup::SetSelection(" << this->runID << ");\n";
 	TransferDataToWindow();
+}
+
+bool DialogJobSetup::SelectionIsOK(void) const
+{
+	const FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	const Project* project = wxStaticCast(frame->GetDocument(), Project);
+	if(project == NULL) return false;
+	return (project->Has(Selection(Selection::Run, this->runID)));
 }
 
 bool DialogJobSetup::TransferDataToWindow(void)
 {
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
-	Project * project = wxStaticCast(frame->GetDocument(), Project);
+	const Project * project = wxStaticCast(frame->GetDocument(), Project);
 	if(project == NULL) return false;
-	ProjectView * view = wxStaticCast(frame->GetView(), ProjectView);
-	CollectionUnits* settings = &(frame->GetParentFrame()->units);
+	const CollectionUnits* settings = &(frame->GetParentFrame()->units);
 
 	m_staticTextUnitBoxX->SetLabelText(settings->Distance.GetOtherName());
 	m_staticTextUnitBoxY->SetLabelText(settings->Distance.GetOtherName());
@@ -76,48 +89,48 @@ bool DialogJobSetup::TransferDataToWindow(void)
 		m_textCtrlAxisZ->SetValue(_T("-"));
 		return false;
 	}
-	const Run & run = project->GetRun(runID);
-	this->SetTitle(run.name);
+	const Run * run = project->GetRun(runID);
+	this->SetTitle(run->name);
 
-	if(!run.object.IsType(Selection::Object)){
+	if(!run->object.IsType(Selection::Object)){
 		m_textCtrlObject->SetValue(_("No Object selected."));
 	}else{
 		wxString temp;
-		for(std::set <size_t>::iterator objID = run.object.begin();
-				objID != run.object.end(); ++objID){
+		for(std::set <size_t>::iterator objID = run->object.begin();
+				objID != run->object.end(); ++objID){
 			if(!temp.IsEmpty()) temp += _T(", ");
-			temp += project->Get3DObject(*objID).name;
+			temp += project->Get3DObject(*objID)->name;
 		}
 		m_textCtrlObject->SetValue(temp);
 	}
-	m_textCtrlAxisX->SetValue(run.coordX.ToString());
-	m_textCtrlAxisY->SetValue(run.coordY.ToString());
-	m_textCtrlAxisZ->SetValue(run.coordZ.ToString());
+	m_textCtrlAxisX->SetValue(run->coordX.ToString());
+	m_textCtrlAxisY->SetValue(run->coordY.ToString());
+	m_textCtrlAxisZ->SetValue(run->coordZ.ToString());
 
-	m_choicebookStock->SetSelection((run.stocktype == Run::sObject)? 1 : 0);
+	m_choicebookStock->SetSelection((run->stocktype == Run::sObject)? 1 : 0);
 
-	if(project->Has(Selection::Object, run.stockobject)){
+	if(project->Has(Selection::Object, run->stockobject)){
 		m_textCtrlStockObject->SetValue(
-				project->Get3DObject(run.stockobject).name);
+				project->Get3DObject(run->stockobject)->name);
 	}else{
 		m_textCtrlStockObject->SetValue(_T("-"));
 	}
 
 	wxString temp = wxString::Format(_T("(%g, %g, %g)"),
-			run.stockorigin.x * 2 - 1, run.stockorigin.y * 2 - 1,
-			run.stockorigin.z * 2 - 1);
+			run->stockorigin.x * 2 - 1, run->stockorigin.y * 2 - 1,
+			run->stockorigin.z * 2 - 1);
 	m_textCtrlOrigin->SetValue(temp);
 
-	m_textCtrlBoxX->SetValue(settings->Distance.TextFromSI(run.stocksize.x));
-	m_textCtrlBoxY->SetValue(settings->Distance.TextFromSI(run.stocksize.y));
-	m_textCtrlBoxZ->SetValue(settings->Distance.TextFromSI(run.stocksize.z));
+	m_textCtrlBoxX->SetValue(settings->Distance.TextFromSI(run->stocksize.x));
+	m_textCtrlBoxY->SetValue(settings->Distance.TextFromSI(run->stocksize.y));
+	m_textCtrlBoxZ->SetValue(settings->Distance.TextFromSI(run->stocksize.z));
 
-	if(run.stocktype == Run::BoxTop) m_radioBox->SetSelection(0);
-	if(run.stocktype == Run::BoxCenter) m_radioBox->SetSelection(1);
-	if(run.stocktype == Run::BoxBottom) m_radioBox->SetSelection(2);
+	if(run->stocktype == Run::BoxTop) m_radioBox->SetSelection(0);
+	if(run->stocktype == Run::BoxCenter) m_radioBox->SetSelection(1);
+	if(run->stocktype == Run::BoxBottom) m_radioBox->SetSelection(2);
 
-	if(run.stocktype == Run::BoxTop || run.stocktype == Run::BoxCenter
-			|| run.stocktype == Run::BoxBottom) oldType = run.stocktype;
+	if(run->stocktype == Run::BoxTop || run->stocktype == Run::BoxCenter
+			|| run->stocktype == Run::BoxBottom) oldType = run->stocktype;
 
 	return true;
 }
@@ -143,27 +156,27 @@ void DialogJobSetup::OnSelect(wxCommandEvent& event)
 	switch(event.GetId()){
 	case ID_SELECTOBJECT:
 		view->type = ProjectView::vObject;
-		frame->RequestSelection(this, event.GetId(), false,
+		frame->SetRequestSelection(this, event.GetId(), true,
 				Selection(Selection::Object));
 		break;
 
 	case ID_SELECTAXISX:
 	case ID_SELECTAXISY:
 	case ID_SELECTAXISZ:
-		frame->RequestSelection(this, event.GetId(), false,
-				Selection(Selection::Axis),
-				Selection(Selection::TriangleGroup));
+		frame->SetRequestSelection(this, event.GetId(), false,
+				Selection(Selection::Axis));
+		frame->AddRequestSelection(Selection(Selection::EdgeGroup));
 		break;
 
 	case ID_SELECTOBJECTSTOCK:
 		view->type = ProjectView::vObject;
-		frame->RequestSelection(this, event.GetId(), false,
+		frame->SetRequestSelection(this, event.GetId(), false,
 				Selection(Selection::Object));
 		break;
 
 	case ID_SELECTORIGIN:
 		view->type = ProjectView::vOrigin;
-		frame->RequestSelection(this, event.GetId(), false,
+		frame->SetRequestSelection(this, event.GetId(), false,
 				Selection(Selection::BaseRun, runID, Selection::Vertex));
 		break;
 
@@ -176,12 +189,11 @@ void DialogJobSetup::OnSelect(wxCommandEvent& event)
 	frame->SetFocus();
 }
 
-bool DialogJobSetup::OnSelected(size_t ID, Selection selection)
+bool DialogJobSetup::OnSelected(size_t ID, Selection selection, bool successful)
 {
 	if(runID == 0) return false;
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project * project = wxStaticCast(frame->GetDocument(), Project);
-	ProjectView * view = wxStaticCast(frame->GetView(), ProjectView);
 	wxCommandProcessor * cmdProc = project->GetCommandProcessor();
 	//	CollectionUnits* settings = &(frame->GetParentFrame()->units);
 
@@ -271,10 +283,9 @@ void DialogJobSetup::OnGetSizeFromObject(wxCommandEvent& event)
 	if(runID == 0) return;
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project * project = wxStaticCast(frame->GetDocument(), Project);
-	ProjectView * view = wxStaticCast(frame->GetView(), ProjectView);
 	wxCommandProcessor * cmdProc = project->GetCommandProcessor();
-	if(project->GetRun(runID).object.Size() == 0) return;
-	size_t objID = project->GetRun(runID).object[0];
+	if(project->GetRun(runID)->object.Size() == 0) return;
+	size_t objID = project->GetRun(runID)->object[0];
 	if(!project->Has(Selection::Object, objID)) return;
 
 	BoundingBox bbox = project->GetBBox(Selection(Selection::Object, objID));
@@ -291,7 +302,6 @@ void DialogJobSetup::OnChoicebookPageChanged(wxChoicebookEvent& event)
 	if(runID == 0) return;
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project * project = wxStaticCast(frame->GetDocument(), Project);
-	ProjectView * view = wxStaticCast(frame->GetView(), ProjectView);
 	wxCommandProcessor * cmdProc = project->GetCommandProcessor();
 
 	if(event.GetSelection() == event.GetOldSelection()) return;
@@ -302,7 +312,7 @@ void DialogJobSetup::OnChoicebookPageChanged(wxChoicebookEvent& event)
 						oldType));
 	}
 	if(event.GetSelection() == 1){
-		oldType = project->GetRun(runID).stocktype;
+		oldType = project->GetRun(runID)->stocktype;
 		cmdProc->Submit(
 				new CommandRunSetStockType(_("Change type."), project, runID,
 						Run::sObject));
@@ -314,10 +324,9 @@ void DialogJobSetup::OnTextEnter(wxCommandEvent& event)
 	if(runID == 0) return;
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project * project = wxStaticCast(frame->GetDocument(), Project);
-	ProjectView * view = wxStaticCast(frame->GetView(), ProjectView);
 	wxCommandProcessor * cmdProc = project->GetCommandProcessor();
 	CollectionUnits* settings = &(frame->GetParentFrame()->units);
-	Vector3 size = project->GetRun(runID).stocksize;
+	Vector3 size = project->GetRun(runID)->stocksize;
 	double temp = settings->Distance.SIFromString(event.GetString());
 	if(event.GetId() == ID_SETSIZEX){
 		cmdProc->Submit(
@@ -341,10 +350,9 @@ void DialogJobSetup::OnRadioBox(wxCommandEvent& event)
 	if(runID == 0) return;
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project * project = wxStaticCast(frame->GetDocument(), Project);
-	ProjectView * view = wxStaticCast(frame->GetView(), ProjectView);
 	wxCommandProcessor * cmdProc = project->GetCommandProcessor();
 
-	oldType = project->GetRun(runID).stocktype;
+	oldType = project->GetRun(runID)->stocktype;
 
 	if(event.GetSelection() == 0){
 		cmdProc->Submit(

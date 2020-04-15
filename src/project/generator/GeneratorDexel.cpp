@@ -35,7 +35,7 @@
 
 #include "../../3D/OpenGL.h"
 
-GeneratorDexel::GeneratorDexel()
+GeneratorDexel::GeneratorDexel(size_t ID):Generator(ID)
 {
 //	area.alpha = 1.0;
 //	area.displaySides = false;
@@ -104,7 +104,7 @@ void GeneratorDexel::Paint(void) const
 }
 
 void GeneratorDexel::PrepareTargets(const Run &run,
-		const std::map <size_t, Object> &objects, const DexelTarget &start)
+		const std::vector <Object> &objects, const DexelTarget &start)
 {
 	this->start = start;
 	this->simulation = start;
@@ -128,21 +128,21 @@ void GeneratorDexel::PrepareTargets(const Run &run,
 				"GeneratorDexel::GenerateToolpath - No object in area."));
 	}
 
-	for(std::map <size_t, Object>::const_iterator obj = objects.begin();
+	for(std::vector <Object>::const_iterator obj = objects.begin();
 			obj != objects.end(); ++obj){
-		AffineTransformMatrix M = obj->second.matrix;
-		M.TranslateGlobal(-obj->second.bbox.xmin, -obj->second.bbox.ymin,
-				-obj->second.bbox.zmin);
-		M.TranslateGlobal(-run.stock.xmin + obj->second.bbox.xmin,
-				-run.stock.ymin + obj->second.bbox.ymin,
-				-run.stock.zmin + obj->second.bbox.zmin);
+		AffineTransformMatrix M = obj->matrix;
+		M.TranslateGlobal(-obj->bbox.xmin, -obj->bbox.ymin,
+				-obj->bbox.zmin);
+		M.TranslateGlobal(-run.stock.xmin + obj->bbox.xmin,
+				-run.stock.ymin + obj->bbox.ymin,
+				-run.stock.zmin + obj->bbox.zmin);
 
 		Vector3 a, b, c, normal;
 
-		const size_t N = obj->second.geometry.GetTriangleCount();
+		const size_t N = obj->geometry.GetTriangleCount();
 		for(size_t n = 0; n < N; ++n){
-			const Hull::Triangle & tri = obj->second.geometry.GetTriangle(n);
-			obj->second.geometry.GetTriangle(n, a, b, c);
+			const Hull::Triangle & tri = obj->geometry.GetTriangle(n);
+			obj->geometry.GetTriangle(n, a, b, c);
 			a = M.Transform(a);
 			b = M.Transform(b);
 			c = M.Transform(c);
@@ -154,11 +154,11 @@ void GeneratorDexel::PrepareTargets(const Run &run,
 			}
 		}
 
-		if(area.IsType(Selection::Object) && area.Has(obj->first)){
+		if(area.IsType(Selection::Object) && area.Has(obj->GetID())){
 			for(size_t n = 0; n < N; ++n){
-				const Hull::Triangle & tri = obj->second.geometry.GetTriangle(
+				const Hull::Triangle & tri = obj->geometry.GetTriangle(
 						n);
-				obj->second.geometry.GetTriangle(n, a, b, c);
+				obj->geometry.GetTriangle(n, a, b, c);
 				a = M.Transform(a);
 				b = M.Transform(b);
 				c = M.Transform(c);
@@ -170,15 +170,15 @@ void GeneratorDexel::PrepareTargets(const Run &run,
 				}
 			}
 		}
-		if(area.IsBase(Selection::BaseObject, obj->first)
+		if(area.IsBase(Selection::BaseObject, obj->GetID())
 				&& area.IsType(Selection::TriangleGroup)){
 			for(std::set <size_t>::const_iterator it = area.begin();
 					it != area.end(); ++it){
 				for(size_t n = 0; n < N; ++n){
 					const Hull::Triangle & tri =
-							obj->second.geometry.GetTriangle(n);
+							obj->geometry.GetTriangle(n);
 					if(tri.group != *it) continue;
-					obj->second.geometry.GetTriangle(n, a, b, c);
+					obj->geometry.GetTriangle(n, a, b, c);
 					a = M.Transform(a);
 					b = M.Transform(b);
 					c = M.Transform(c);

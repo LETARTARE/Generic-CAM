@@ -182,6 +182,7 @@ private:
 
 	// Methods
 public:
+	bool operator==(const std::string &guid)const;
 	void ConvertToSI(void);
 
 	void Update(void);

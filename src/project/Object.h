@@ -50,11 +50,12 @@
 class Object {
 	// Constructor / Destructor
 public:
-	Object();
+	Object(size_t ID);
 	virtual ~Object();
 
 	// Member variables
 public:
+
 	wxString name;
 	wxFileName fileName;
 
@@ -67,9 +68,12 @@ public:
 	bool selectable; //!< If marked as not selectable, it cannot be selected.
 
 private:
+	size_t ID; //!< Internal ID number
 
 	// Methods
 public:
+	bool operator==(const size_t ID) const;
+	size_t GetID(void) const;
 	void Update(void);
 
 	bool LoadObject(wxFileName fileName);

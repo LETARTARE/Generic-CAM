@@ -60,7 +60,6 @@
  */
 
 // https://en.cppreference.com/w/cpp/language/operators
-
 class Vector3;
 class wxString;
 class wxTextOutputStream;
@@ -187,8 +186,11 @@ public:
 	 * The quarternion is defined as w+i*x+j*y+k*z
 	 * with (1,0,0,0) being the unit rotation (= no rotation at all).
 	 */
-	static AffineTransformMatrix RotationQuarternion(double const& w,
-			double const&x, double const& y, double const& z);
+	static AffineTransformMatrix RotationQuarternion(const double w,
+			const double x, const double y, const double z);
+	static AffineTransformMatrix RotationQuarternion(const double vector[4]);
+	void GetQuarternion(double *w, double *x, double *y, double *z) const;
+	void GetQuarternion(double *vector) const;
 
 	void TranslateGlobal(double const& x, double const& y, double const& z); //!< Translate matrix in the global coordinate system.
 	void TranslateLocal(double const& x, double const& y, double const& z); //!< Translate matrix in the local, rotated coordinate system.

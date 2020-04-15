@@ -30,16 +30,20 @@
 #include "../icon/play.xpm"
 #include "../icon/stop.xpm"
 #include "../project/generator/CNCSimulator.h"
+#include "../project/ProjectView.h"
 #include "FrameMain.h"
 #include "IDs.h"
 
 DialogAnimation::DialogAnimation(wxWindow* parent) :
 		GUIAnimation(parent)
 {
-	runNr = -1;
+	runID = 0;
 	simulator = NULL;
 	loopGuard = false;
 	simulateWorkpiece = true;
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	ProjectView * view = wxStaticCast(frame->GetView(), ProjectView);
+	simulator = &(view->simulator);
 	timer.SetOwner(this);
 	this->Connect(wxEVT_TIMER, wxTimerEventHandler(DialogAnimation::OnTimer),
 	NULL, this);
@@ -49,6 +53,56 @@ DialogAnimation::~DialogAnimation()
 {
 	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(DialogAnimation::OnTimer),
 	NULL, this);
+}
+
+void DialogAnimation::SetSelection(const Selection &selection)
+{
+	if(!selection.IsBaseType(Selection::BaseRun)) return;
+	if(!selection.IsType(Selection::Generator)) return;
+	if(selection.IsSetEmpty()) return;
+	this->runID = selection.GetBaseID();
+
+//	this->generatorID = selection[0];
+
+	InitSimulation();
+//	TransferDataToWindow (updatePanel);
+}
+
+bool DialogAnimation::SelectionIsOK(void) const
+{
+	const FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	const Project* project = wxStaticCast(frame->GetDocument(), Project);
+	return (project->Has(Selection(Selection::BaseRun, this->runID)));
+}
+
+void DialogAnimation::InitSimulation(void)
+{
+	if(runID == 0) return;
+	const FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	const Project * project = wxStaticCast(frame->GetDocument(), Project);
+	const Run * run = project->GetRun(runID);
+	if(DEBUG) printf(
+			"DialogAnimation::InitSimulation - Dexeltarget: %p with N=%zu\n",
+			&(run->base), run->base.GetCountTotal());
+	simulator->InsertBase(&(run->base));
+
+//		Run* run = &(project->run[runNr]);
+//		Workpiece* workpiece = run->GetWorkpiece();
+//		simulator = &(run->simulator);
+//		simulator->InsertMachine(&(run->machine));
+//		simulator->InsertToolPath(run->GetFirstSelectedToolpath());
+//		if(workpiece != NULL){
+//			workpiece->PrepareModel();
+//			model.CopyRescale(workpiece->model, 2e5);
+//		}
+//		simulator->InsertTarget(&model);
+//	}else{
+//		if(simulator != NULL){
+//			simulator->InsertMachine(NULL);
+//			simulator->InsertToolPath(NULL);
+//		}
+//		simulator = NULL;
+//	}
 }
 
 bool DialogAnimation::TransferDataToWindow(void)
@@ -73,8 +127,8 @@ bool DialogAnimation::TransferDataToWindow(void)
 	}
 
 	if(simulator != NULL){
-//		m_textCtrlMaxTime->SetValue(SecondsToTC(simulator->GetMaxTime()));
-//		m_textCtrlTime->SetValue(SecondsToTC(simulator->GetTime()));
+		m_textCtrlMaxTime->SetValue(SecondsToTC(simulator->GetMaxTime()));
+		m_textCtrlTime->SetValue(SecondsToTC(simulator->GetTime()));
 	}else{
 		m_textCtrlMaxTime->SetValue(SecondsToTC(0));
 		m_textCtrlTime->SetValue(SecondsToTC(0));
@@ -87,30 +141,6 @@ bool DialogAnimation::TransferDataToWindow(void)
 	loopGuard = false;
 
 	return true;
-}
-
-void DialogAnimation::InitSimulation(void)
-{
-//	runNr = GetSelectedRun();
-//	if(runNr >= 0){
-//		Project* project = GetProject();
-//		Run* run = &(project->run[runNr]);
-//		Workpiece* workpiece = run->GetWorkpiece();
-//		simulator = &(run->simulator);
-//		simulator->InsertMachine(&(run->machine));
-//		simulator->InsertToolPath(run->GetFirstSelectedToolpath());
-//		if(workpiece != NULL){
-//			workpiece->PrepareModel();
-//			model.CopyRescale(workpiece->model, 2e5);
-//		}
-//		simulator->InsertTarget(&model);
-//	}else{
-//		if(simulator != NULL){
-//			simulator->InsertMachine(NULL);
-//			simulator->InsertToolPath(NULL);
-//		}
-//		simulator = NULL;
-//	}
 }
 
 void DialogAnimation::OnClose(wxCommandEvent& event)
