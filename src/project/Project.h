@@ -42,6 +42,7 @@
 #include "Object.h"
 #include "Run.h"
 #include "Tool.h"
+#include "ToolBox.h"
 
 #include <stddef.h>
 #include <vector>
@@ -109,7 +110,7 @@ public:
 	bool Save(wxFileName fileName);
 
 	bool GenerateToolpaths(void);
-	bool SaveToolpath(wxFileName fileName, int runNr);
+//	bool SaveToolpath(wxFileName fileName, int runNr);
 
 	bool LoadDefaultTools(wxString fileName, bool loadAll = false);
 
@@ -136,7 +137,7 @@ public:
 private:
 	std::vector <Object> objects;
 	std::vector <Run> run;
-	std::vector <Tool> tools;
+	ToolBox tools;
 
 	size_t maxObjectID;
 	size_t maxRunID;

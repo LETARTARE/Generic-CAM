@@ -46,14 +46,6 @@ JSON::Type JSON::GetType(void) const
 	return type;
 }
 
-bool JSON::Load(std::string filename)
-{
-	FileTokenizer ft(filename);
-	ft.NextToken();
-	*this = Parse(ft, 7);
-	return true;
-}
-
 size_t JSON::Size(void) const
 {
 	if(type == Array) return valueArray.size();
@@ -61,13 +53,13 @@ size_t JSON::Size(void) const
 	return 1;
 }
 
-JSON& JSON::operator [](std::string key)
+JSON& JSON::operator [](const std::string &key)
 {
 	if(type != Object) throw(std::logic_error("Not an object."));
-	return valueObject.at(key);
+	return valueObject[key];
 }
 
-const JSON& JSON::operator [](std::string key) const
+const JSON& JSON::operator [](const std::string &key) const
 {
 	if(type != Object) throw(std::logic_error("Not an object."));
 	return valueObject.at(key);
@@ -85,7 +77,7 @@ const JSON& JSON::operator [](size_t index) const
 	return valueArray.at(index);
 }
 
-bool JSON::IsKey(std::string key) const
+bool JSON::HasKey(std::string key) const
 {
 	if(type != Object) return false;
 	return (valueObject.find(key) != valueObject.end());
@@ -96,28 +88,28 @@ bool JSON::IsNull(void) const
 	return (type == Null);
 }
 
-double JSON::GetNumber(void) const
+double JSON::GetNumber(const double defaultvalue) const
 {
 	if(type == Number) return valueNumber;
 	if(type == Boolean) return (valueBoolean)? 1 : 0;
 	if(type == String) return strtod(valueString.c_str(), NULL);
-	if(type == Null) return 0;
+	if(type == Null) return defaultvalue;
 	throw(std::logic_error("Not a number."));
 }
 
-bool JSON::GetBool(void) const
+bool JSON::GetBool(const bool defaultvalue) const
 {
 	if(type == Boolean) return valueBoolean;
 	if(type == Number) return fabs(valueNumber) > 1e-6;
-	if(type == Null) return false;
-	throw(std::logic_error("Not a boolean."));
+	if(type == Null) return defaultvalue;
+	throw(std::logic_error("Not convertable to boolean."));
 }
 
-std::string JSON::GetString(void) const
+std::string JSON::GetString(const std::string &defaultvalue) const
 {
 	if(type == String) return valueString;
 	if(type == Boolean) return valueBoolean? "true" : "false";
-	if(type == Null) return "";
+	if(type == Null) return defaultvalue;
 	throw(std::logic_error("Not a string."));
 }
 
@@ -131,6 +123,71 @@ const JSON& JSON::Begin(void) const
 	if(type == Array) return *(valueArray.begin());
 	if(type == Object) return valueObject.begin()->second;
 	throw(std::logic_error("Not a string."));
+}
+
+void JSON::SetNull(void)
+{
+	type = Null;
+}
+
+void JSON::SetBool(const bool value)
+{
+	type = Boolean;
+	valueBoolean = value;
+}
+
+void JSON::SetNumber(const double value)
+{
+	type = Number;
+	valueNumber = value;
+}
+
+void JSON::SetString(const std::string& value)
+{
+	type = String;
+	valueString = value;
+}
+
+void JSON::SetArray(size_t size)
+{
+	type = Array;
+	valueArray.resize(size);
+}
+
+void JSON::SetObject(const bool clear)
+{
+	type = Object;
+	if(clear) valueObject.clear();
+}
+
+JSON JSON::Load(std::string filename)
+{
+	std::ifstream in;
+	in.open(filename.c_str(), std::ifstream::in | std::ios::binary);
+	if(!in.good()){
+		throw(std::runtime_error(
+				"JSON::BufferedFile::BufferedFile(...) - Could not read file."));
+	}
+	return JSON::Load(&in);
+}
+
+JSON JSON::Load(std::ifstream* in)
+{
+	FileTokenizer ft(in);
+	ft.NextToken();
+	return Parse(ft, 7);
+}
+
+void JSON::Save(std::string filename)
+{
+	std::ofstream out;
+	out.open(filename.c_str(), std::ofstream::out | std::ios::binary);
+	JSON::Save(out);
+}
+
+void JSON::Save(std::ofstream &out)
+{
+	ToStream(out, true);
 }
 
 JSON JSON::Parse(FileTokenizer &ft, int maxRecursion)
@@ -212,24 +269,38 @@ std::string JSON::Token::Lower(void) const
 	return temp;
 }
 
-JSON::FileTokenizer::FileTokenizer(std::string filename)
+JSON::FileTokenizer::FileTokenizer(std::ifstream * in)
 {
 	buffersize = 1e7;
-	buffer = new char[buffersize];
-	if(buffer == NULL) throw(std::logic_error(
-			"JSON::BufferedFile::BufferedFile(...) - Out of memory."));
-	in.open(filename.c_str(), std::ifstream::in | std::ios::binary);
-	if(!in.good()){
-		delete[] buffer;
-		throw(std::runtime_error(
-				"JSON::BufferedFile::BufferedFile(...) - Could not read file."));
-	}
+
 	charsread = 0;
 	position = 0;
 	linenumber = 1;
 	column = 0;
 	nextc = 0;
 
+	buffer = NULL;
+	statetable = NULL;
+	actiontable = NULL;
+
+	this->in = in;
+
+	buffer = new char[buffersize];
+	if(buffer == NULL) throw(std::logic_error(
+			"JSON::BufferedFile::BufferedFile(...) - Out of memory."));
+
+	SetupTables();
+}
+
+JSON::FileTokenizer::~FileTokenizer()
+{
+	if(actiontable != NULL) delete[] actiontable;
+	if(statetable != NULL) delete[] statetable;
+	if(buffer != NULL) delete[] buffer;
+}
+
+void JSON::FileTokenizer::SetupTables(void)
+{
 	// Setup state transition table with the states 0 - 26
 
 	statetable = new unsigned char[27 * 256];
@@ -337,13 +408,6 @@ JSON::FileTokenizer::FileTokenizer(std::string filename)
 	}
 }
 
-JSON::FileTokenizer::~FileTokenizer()
-{
-	delete[] actiontable;
-	delete[] statetable;
-	delete[] buffer;
-}
-
 void JSON::FileTokenizer::NextToken(void)
 {
 	bool negative = false;
@@ -362,8 +426,8 @@ void JSON::FileTokenizer::NextToken(void)
 
 	do{
 		if(position >= charsread){
-			in.read(buffer, buffersize);
-			charsread = in.gcount();
+			in->read(buffer, buffersize);
+			charsread = in->gcount();
 			if(charsread < buffersize){
 				// Add a 0 byte to the end
 				buffer[charsread] = 0;
@@ -444,3 +508,76 @@ void JSON::FileTokenizer::NextToken(void)
 	}while(charsread == buffersize);
 }
 
+void JSON::ToStream(std::ofstream &out, bool usenewline, size_t indent) const
+{
+	switch(type){
+	case Null:
+		out << "null";
+		break;
+	case Boolean:
+		if(valueBoolean){
+			out << "true";
+		}else{
+			out << "false";
+		}
+		break;
+	case Number:
+		out << valueNumber;
+		break;
+	case String:
+		out << '"' << EscapeString(valueString) << '"';
+		break;
+	case Array:
+	{
+		out << "[";
+		bool flag = false;
+		for(std::vector <JSON>::const_iterator it = valueArray.begin();
+				it != valueArray.end(); ++it){
+			if(flag) out << ",";
+			if(usenewline){
+				out << '\n';
+				for(size_t m = 0; m < indent; ++m)
+					out << "  ";
+			}
+			it->ToStream(out, usenewline, indent + 1);
+			flag = true;
+		}
+		out << "]";
+		break;
+	}
+	case Object:
+	{
+		out << "{";
+		bool flag = false;
+		for(std::map <std::string, JSON>::const_iterator it =
+				valueObject.begin(); it != valueObject.end(); ++it){
+			if(flag) out << ",";
+			if(usenewline){
+				out << '\n';
+				for(size_t m = 0; m < indent; ++m)
+					out << "  ";
+			}
+			out << '"' << EscapeString(it->first) << '"';
+			if(usenewline) out << "\t";
+			out << ':';
+			if(usenewline) out << " ";
+			it->second.ToStream(out, usenewline, indent + 1);
+			flag = true;
+		}
+		out << "}";
+		break;
+	}
+	}
+}
+
+std::string JSON::EscapeString(const std::string& txt)
+{
+	std::string temp = txt;
+	for(size_t index = 0; index < temp.size(); ++index){
+		index = temp.find_first_of("\"\\", index);
+		if(index == std::string::npos) break;
+		temp.insert(index, 1, '\\');
+		++index;
+	}
+	return temp;
+}

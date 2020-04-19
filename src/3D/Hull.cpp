@@ -782,6 +782,11 @@ Vector3 Hull::GetCenter(void) const
 	return (temp / v.size());
 }
 
+size_t Hull::Size(void) const
+{
+	return v.size();
+}
+
 Vector3 Hull::PlaneProjection(const Vector3& a, const Vector3& b, Vector3 n,
 		double d)
 {
@@ -1299,3 +1304,12 @@ size_t Hull::Select(std::set <size_t>& select)
 	return selected.size();
 }
 
+const Vector3& Hull::operator [](size_t index) const
+{
+	return v[index];
+}
+
+Vector3& Hull::operator [](size_t index)
+{
+	return v[index];
+}

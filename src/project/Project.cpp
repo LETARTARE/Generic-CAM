@@ -126,12 +126,12 @@ size_t Project::GetNextRunID(void)
 
 size_t Project::GetToolCount(void) const
 {
-	return tools.size();
+	return tools.tools.size();
 }
 
 const std::vector <Tool> * Project::GetTools(void) const
 {
-	return &tools;
+	return &(tools.tools);
 }
 
 std::vector <size_t> Project::GetAllObjectIDs(void) const
@@ -208,10 +208,11 @@ const Generator * Project::GetGenerator(size_t runID, size_t ID)
 
 const Tool * Project::GetTool(size_t index) const
 {
-	if(index >= tools.size()) throw(std::range_error(
+	if(index >= tools.tools.size()) throw(std::range_error(
 			"Project::GetTools - index out of range."));
 	return &(tools[index]);
 }
+
 size_t Project::GetNextGeneratorID(void)
 {
 	maxGeneratorID++;
@@ -245,8 +246,8 @@ bool Project::GenerateToolpaths(void)
 //	const AffineTransformMatrix rotx180 = AffineTransformMatrix::RotationXYZ(
 //	M_PI, 0, 0);
 
-	for(std::vector <Tool>::iterator it = tools.begin(); it != tools.end();
-			++it)
+	for(std::vector <Tool>::iterator it = tools.tools.begin();
+			it != tools.tools.end(); ++it)
 		it->Update();
 
 	for(std::vector <Run>::iterator run = this->run.begin();
@@ -393,7 +394,7 @@ bool Project::Load(wxFileName fileName)
 	wxZipInputStream zip(in);
 	wxTextInputStream txt(zip);
 
-	tools.clear();
+	tools.tools.clear();
 	objects.clear();
 	run.clear();
 
@@ -593,26 +594,32 @@ bool Project::Load(wxFileName fileName)
 //			+ run[generator_runNr].toolpaths[generator_toolpathNr].generator->GetName());
 //}
 
-bool Project::SaveToolpath(wxFileName fileName, int runNr)
-{
+//bool Project::SaveToolpath(wxFileName fileName, int runNr)
+//{
 //	if(runNr < 0 || runNr > run.GetCount()) return false;
 //	return run[runNr].SaveToolpaths(fileName);
-	return false;
-}
+//	return false;
+//}
 
 bool Project::LoadDefaultTools(wxString fileName, bool loadAll)
 {
 	ToolBox localtools;
-	if(loadAll) tools.clear();
+	if(loadAll) tools.tools.clear();
 
 	// Only load the default tools into an empty project.
-	if(!tools.empty()) return true;
+	if(!tools.tools.empty()) return true;
 
 	if(!localtools.Load(fileName.ToStdString())) return false;
 	for(size_t n = 0; n < localtools.Size(); ++n){
 		if(!loadAll && !localtools[n].addtonewprojects) continue;
-		tools.push_back(localtools[n]);
+		tools.tools.push_back(localtools[n]);
 	}
+
+	tools.Save("/tmp/tools.json");
+
+	ToolBox test;
+	bool success = test.Load("/tmp/tools.json");
+	if(success) std::cout << "File could be read back.\n";
 	return true;
 }
 

@@ -33,6 +33,7 @@
 ToolBox::ToolBox()
 {
 	isLoaded = false;
+	version = 0;
 }
 
 ToolBox::~ToolBox()
@@ -43,200 +44,21 @@ bool ToolBox::Load(void)
 {
 	if(filename.empty()) return false;
 	if(isLoaded) return false;
-	return this->Load(filename);
+	return Load(filename);
 }
 
 bool ToolBox::Load(std::string filename)
 {
 	JSON js;
 	try{
-		js.Load(filename);
+		js = JSON::Load(filename);
 	}
 	catch(std::exception &x){
 		std::cout << x.what() << "\n";
 		return false;
 	}
-	if(!js.IsKey("data")) return false;
-	const JSON & toolarray = js["data"];
-	if(!toolarray.IsArray()) return false;
-	tools.clear();
-	tools.resize(toolarray.Size());
-	for(size_t n = 0; n < toolarray.Size(); ++n){
-		const JSON &tool = toolarray[n];
-		LoadContour(tools[n].base, tool);
-		if(tool.IsKey("GRADE")) tools[n].GRADE = tool["GRADE"].GetString();
-		if(tool.IsKey("BMC")) tools[n].BMC = tool["BMC"].GetString();
-		if(tool.IsKey("last_modified")) tools[n].lastmodified =
-				tool["last_modified"].GetNumber();
-		if(tool.IsKey("addtonewprojects")) tools[n].addtonewprojects =
-				tool["addtonewprojects"].GetBool();
-		if(tool.IsKey("geometry")){
-			tools[n].hasGeometry = true;
-			const JSON & geometry = tool["geometry"];
-
-			if(geometry.IsKey("CSP")) tools[n].geometry.CSP =
-					geometry["CSP"].GetBool();
-			if(geometry.IsKey("DC")) tools[n].geometry.DC =
-					geometry["DC"].GetNumber();
-			if(geometry.IsKey("HAND")) tools[n].geometry.HAND =
-					geometry["HAND"].GetBool();
-			if(geometry.IsKey("LB")) tools[n].geometry.LB =
-					geometry["LB"].GetNumber();
-			if(geometry.IsKey("LCF")) tools[n].geometry.LCF =
-					geometry["LCF"].GetNumber();
-			if(geometry.IsKey("NOF")) tools[n].geometry.NOF =
-					geometry["NOF"].GetNumber();
-			if(geometry.IsKey("NT")) tools[n].geometry.NT =
-					geometry["NT"].GetNumber();
-			if(geometry.IsKey("OAL")) tools[n].geometry.OAL =
-					geometry["OAL"].GetNumber();
-			if(geometry.IsKey("RE")) tools[n].geometry.RE =
-					geometry["RE"].GetNumber();
-			if(geometry.IsKey("SFDM")) tools[n].geometry.SFDM =
-					geometry["SFDM"].GetNumber();
-			if(geometry.IsKey("SIG")) tools[n].geometry.SIG =
-					geometry["SIG"].GetNumber();
-			if(geometry.IsKey("TA")) tools[n].geometry.TA =
-					geometry["TA"].GetNumber();
-			if(geometry.IsKey("TP")) tools[n].geometry.TP =
-					geometry["TP"].GetNumber();
-			if(geometry.IsKey("shoulder-length")) tools[n].geometry.shoulderlength =
-					geometry["shoulder-length"].GetNumber();
-			if(geometry.IsKey("thread-profile-angle")) tools[n].geometry.threadprofileangle =
-					geometry["thread-profile-angle"].GetNumber();
-			if(geometry.IsKey("tip-diameter")) tools[n].geometry.tipdiameter =
-					geometry["tip-diameter"].GetNumber();
-			if(geometry.IsKey("tip-length")) tools[n].geometry.tiplength =
-					geometry["tip-length"].GetNumber();
-			if(geometry.IsKey("tip-offset")) tools[n].geometry.tipoffset =
-					geometry["tip-offset"].GetNumber();
-		}
-		if(tool.IsKey("holder")){
-			tools[n].hasHolder = true;
-			LoadContour(tools[n].holder, tool["holder"]);
-		}
-		if(tool.IsKey("shaft")){
-			tools[n].hasShaft = true;
-			LoadContour(tools[n].shaft, tool["shaft"]);
-		}
-		if(tool.IsKey("start-values") && tool["start-values"].Size() > 0){
-			tools[n].hasStartValues = true;
-			const JSON & sv = tool["start-values"].Begin();
-			if(sv.IsKey("name")) tools[n].startvalues.name =
-					sv["name"].GetString();
-			if(sv.IsKey("guid")) tools[n].startvalues.guid =
-					sv["guid"].GetString();
-			if(sv.IsKey("description")) tools[n].startvalues.description =
-					sv["description"].GetString();
-			if(sv.IsKey("tool-coolant")) tools[n].startvalues.toolcoolant =
-					sv["tool-coolant"].GetString();
-			if(sv.IsKey("f_n")) tools[n].startvalues.fn = sv["f_n"].GetNumber();
-			if(sv.IsKey("f_z")) tools[n].startvalues.fz = sv["f_z"].GetNumber();
-			if(sv.IsKey("n")) tools[n].startvalues.n = sv["n"].GetNumber();
-			if(sv.IsKey("n_ramp")) tools[n].startvalues.nramp =
-					sv["n_ramp"].GetNumber();
-			if(sv.IsKey("v_c")) tools[n].startvalues.vc = sv["v_c"].GetNumber();
-			if(sv.IsKey("v_f")) tools[n].startvalues.vf = sv["v_f"].GetNumber();
-			if(sv.IsKey("v_f_leadIn")) tools[n].startvalues.vfleadin =
-					sv["v_f_leadIn"].GetNumber();
-			if(sv.IsKey("v_f_leadOut")) tools[n].startvalues.vfleadout =
-					sv["v_f_leadOut"].GetNumber();
-			if(sv.IsKey("v_f_plunge")) tools[n].startvalues.vfplunge =
-					sv["v_f_plunge"].GetNumber();
-			if(sv.IsKey("v_f_ramp")) tools[n].startvalues.vframp =
-					sv["v_f_ramp"].GetNumber();
-			if(sv.IsKey("v_f_retract")) tools[n].startvalues.vfretract =
-					sv["v_f_retract"].GetNumber();
-		}
-		if(tool.IsKey("post-process")){
-			tools[n].hasPostProcess = true;
-			const JSON & pp = tool["post-process"];
-
-			if(pp.IsKey("break-control")) tools[n].postprocess.breakcontrol =
-					pp["break-control"].GetBool();
-			if(pp.IsKey("comment")) tools[n].postprocess.comment =
-					pp["comment"].GetString();
-			if(pp.IsKey("diameter-offset")) tools[n].postprocess.diameteroffset =
-					pp["diameter-offset"].GetNumber();
-			if(pp.IsKey("length-offset")) tools[n].postprocess.lengthoffset =
-					pp["length-offset"].GetNumber();
-
-			if(pp.IsKey("live")) tools[n].postprocess.live =
-					pp["live"].GetBool();
-			if(pp.IsKey("manual-tool-change")) tools[n].postprocess.manualtoolchange =
-					pp["manual-tool-change"].GetBool();
-			if(pp.IsKey("number")) tools[n].postprocess.number =
-					pp["number"].GetNumber();
-			if(pp.IsKey("turret")) tools[n].postprocess.turret =
-					pp["turret"].GetNumber();
-			if(pp.IsKey("tool-coolant")) tools[n].postprocess.toolcoolant =
-					pp["tool-coolant"].GetString();
-		}
-		tools[n].ConvertToSI();
-		tools[n].Update();
-	}
-	isLoaded = true;
-	return true;
+	return ParseTools(js);
 }
-
-void ToolBox::LoadContour(Tool::Contour & contour, const JSON & json)
-{
-	if(json.IsKey("description")) contour.description =
-			json["description"].GetString();
-	if(json.IsKey("guid")) contour.guid = json["guid"].GetString();
-	if(json.IsKey("vendor")) contour.vendor = json["vendor"].GetString();
-	if(json.IsKey("product-id")) contour.productid =
-			json["product-id"].GetString();
-	if(json.IsKey("product-link")) contour.productlink =
-			json["product-link"].GetString();
-	if(json.IsKey("type")){
-		std::string type = json["type"].GetString();
-		contour.type = Tool::no_type;
-		if(type.compare("flat end mill") == 0) contour.type =
-				Tool::flat_end_mill;
-		if(type.compare("radius mill") == 0) contour.type = Tool::radius_mill;
-		if(type.compare("camfer mill") == 0) contour.type = Tool::camfer_mill;
-		if(type.compare("bull nose end mill") == 0) contour.type =
-				Tool::bull_nose_end_mill;
-		if(type.compare("ball end mill") == 0) contour.type =
-				Tool::ball_end_mill;
-		if(type.compare("holder") == 0) contour.type = Tool::tool_holder;
-		if(type.compare("shaft") == 0) contour.type = Tool::tool_shaft;
-		if(type.compare("probe") == 0) contour.type = Tool::probe;
-	}
-	if(json.IsKey("unit")){
-		std::string unit = json["unit"].GetString();
-		contour.unit = Tool::unit_none;
-		if(unit.compare("inches") == 0) contour.unit = Tool::unit_inch;
-		if(unit.compare("millimeters") == 0) contour.unit =
-				Tool::unit_millimeter;
-		if(unit.compare("meters") == 0) contour.unit = Tool::unit_SI;
-		if(unit.compare("inch") == 0) contour.unit = Tool::unit_inch;
-		if(unit.compare("millimeter") == 0) contour.unit =
-				Tool::unit_millimeter;
-		if(unit.compare("meter") == 0) contour.unit = Tool::unit_SI;
-	}
-	if(json.IsKey("segments")){
-		contour.hasSegments = true;
-		const JSON & segments = json["segments"];
-		contour.segments.resize(segments.Size());
-		for(size_t m = 0; m < segments.Size(); ++m){
-			const JSON & segment = segments[m];
-			if(segment.IsKey("height")) contour.segments[m].height =
-					segment["height"].GetNumber();
-			if(segment.IsKey("lower-diameter")) contour.segments[m].lowerdiameter =
-					segment["lower-diameter"].GetNumber();
-			if(segment.IsKey("upper-diameter")) contour.segments[m].upperdiameter =
-					segment["upper-diameter"].GetNumber();
-		}
-	}else{
-		contour.hasSegments = false;
-	}
-}
-
-//void ToolBox::SaveJSON(std::string filename) const
-//{
-//}
 
 size_t ToolBox::Size(void) const
 {
@@ -265,4 +87,334 @@ std::string ToolBox::GetName(void) const
 bool ToolBox::IsLoaded(void) const
 {
 	return isLoaded;
+}
+
+bool ToolBox::ParseTools(const JSON &js)
+{
+	if(!js.HasKey("data")) return false;
+	const JSON & toolarray = js["data"];
+	if(!toolarray.IsArray()) return false;
+	tools.clear();
+	tools.resize(toolarray.Size());
+	for(size_t n = 0; n < toolarray.Size(); ++n){
+		const JSON &tool = toolarray[n];
+		if(!ParseTool(tool, tools[n])) return false;
+	}
+	if(js.HasKey("version")) version = js["version"].GetNumber();
+	isLoaded = true;
+	return true;
+}
+
+bool ToolBox::ParseTool(const JSON& js, Tool& tool)
+{
+	ParseContour(js, tool.base);
+	if(js.HasKey("GRADE")) tool.GRADE = js["GRADE"].GetString();
+	if(js.HasKey("BMC")) tool.BMC = js["BMC"].GetString();
+	if(js.HasKey("last_modified")) tool.lastmodified =
+			js["last_modified"].GetNumber();
+	if(js.HasKey("addtonewprojects")) tool.addtonewprojects =
+			js["addtonewprojects"].GetBool();
+	if(js.HasKey("geometry")){
+		tool.hasGeometry = true;
+		ParseGeometry(js["geometry"], tool.geometry);
+	}
+	if(js.HasKey("holder")){
+		tool.hasHolder = true;
+		ParseContour(js["holder"], tool.holder);
+	}
+	if(js.HasKey("shaft")){
+		tool.hasShaft = true;
+		ParseContour(js["shaft"], tool.shaft);
+	}
+	if(js.HasKey("start-values") && js["start-values"].Size() > 0){
+		tool.hasStartValues = true;
+		const JSON & sv = js["start-values"].Begin();
+		ParseStartValues(sv, tool.startvalues);
+	}
+	if(js.HasKey("post-process")){
+		tool.hasPostProcess = true;
+		ParsePostProcess(js["post-process"], tool.postprocess);
+	}
+	tool.ConvertToSI();
+	tool.Update();
+	return true;
+}
+
+void ToolBox::ParseGeometry(const JSON& js, Tool::Geometry& ge)
+{
+	if(js.HasKey("CSP")) ge.CSP = js["CSP"].GetBool();
+	if(js.HasKey("DC")) ge.DC = js["DC"].GetNumber();
+	if(js.HasKey("HAND")) ge.HAND = js["HAND"].GetBool();
+	if(js.HasKey("LB")) ge.LB = js["LB"].GetNumber();
+	if(js.HasKey("LCF")) ge.LCF = js["LCF"].GetNumber();
+	if(js.HasKey("NOF")) ge.NOF = js["NOF"].GetNumber();
+	if(js.HasKey("NT")) ge.NT = js["NT"].GetNumber();
+	if(js.HasKey("OAL")) ge.OAL = js["OAL"].GetNumber();
+	if(js.HasKey("RE")) ge.RE = js["RE"].GetNumber();
+	if(js.HasKey("SFDM")) ge.SFDM = js["SFDM"].GetNumber();
+	if(js.HasKey("SIG")) ge.SIG = js["SIG"].GetNumber();
+	if(js.HasKey("TA")) ge.TA = js["TA"].GetNumber();
+	if(js.HasKey("TP")) ge.TP = js["TP"].GetNumber();
+	if(js.HasKey("shoulder-length")) ge.shoulderlength =
+			js["shoulder-length"].GetNumber();
+	if(js.HasKey("thread-profile-angle")) ge.threadprofileangle =
+			js["thread-profile-angle"].GetNumber();
+	if(js.HasKey("tip-diameter")) ge.tipdiameter =
+			js["tip-diameter"].GetNumber();
+	if(js.HasKey("tip-length")) ge.tiplength = js["tip-length"].GetNumber();
+	if(js.HasKey("tip-offset")) ge.tipoffset = js["tip-offset"].GetNumber();
+}
+
+void ToolBox::ParseStartValues(const JSON& js, Tool::StartValues& sv)
+{
+	if(js.HasKey("name")) sv.name = js["name"].GetString();
+	if(js.HasKey("guid")) sv.guid = js["guid"].GetString();
+	if(js.HasKey("description")) sv.description = js["description"].GetString();
+	if(js.HasKey("tool-coolant")) sv.toolcoolant =
+			js["tool-coolant"].GetString();
+	if(js.HasKey("f_n")) sv.fn = js["f_n"].GetNumber();
+	if(js.HasKey("f_z")) sv.fz = js["f_z"].GetNumber();
+	if(js.HasKey("n")) sv.n = js["n"].GetNumber();
+	if(js.HasKey("n_ramp")) sv.nramp = js["n_ramp"].GetNumber();
+	if(js.HasKey("v_c")) sv.vc = js["v_c"].GetNumber();
+	if(js.HasKey("v_f")) sv.vf = js["v_f"].GetNumber();
+	if(js.HasKey("v_f_leadIn")) sv.vfleadin = js["v_f_leadIn"].GetNumber();
+	if(js.HasKey("v_f_leadOut")) sv.vfleadout = js["v_f_leadOut"].GetNumber();
+	if(js.HasKey("v_f_plunge")) sv.vfplunge = js["v_f_plunge"].GetNumber();
+	if(js.HasKey("v_f_ramp")) sv.vframp = js["v_f_ramp"].GetNumber();
+	if(js.HasKey("v_f_retract")) sv.vfretract = js["v_f_retract"].GetNumber();
+}
+
+void ToolBox::ParsePostProcess(const JSON& js, Tool::PostProcess& pp)
+{
+	if(js.HasKey("break-control")) pp.breakcontrol =
+			js["break-control"].GetBool();
+	if(js.HasKey("comment")) pp.comment = js["comment"].GetString();
+	if(js.HasKey("diameter-offset")) pp.diameteroffset =
+			js["diameter-offset"].GetNumber();
+	if(js.HasKey("length-offset")) pp.lengthoffset =
+			js["length-offset"].GetNumber();
+
+	if(js.HasKey("live")) pp.live = js["live"].GetBool();
+	if(js.HasKey("manual-tool-change")) pp.manualtoolchange =
+			js["manual-tool-change"].GetBool();
+	if(js.HasKey("number")) pp.number = js["number"].GetNumber();
+	if(js.HasKey("turret")) pp.turret = js["turret"].GetNumber();
+	if(js.HasKey("tool-coolant")) pp.toolcoolant =
+			js["tool-coolant"].GetString();
+}
+
+void ToolBox::Save(std::string filename) const
+{
+	JSON js;
+	js.SetObject();
+	JSON & data = js["data"];
+	data.SetArray(tools.size());
+	for(size_t n = 0; n < tools.size(); ++n){
+		JSON &tool = data[n];
+		tool.SetObject();
+		tool["GRADE"].SetString(tools[n].GRADE);
+		tool["BMC"].SetString(tools[n].BMC);
+		tool["last_modified"].SetNumber(tools[n].lastmodified);
+		tool["addtonewprojects"].SetBool(tools[n].addtonewprojects);
+
+		StoreContour(tool, tools[n].base);
+
+		if(tools[n].hasGeometry) StoreGeometry(tool["geometry"],
+				tools[n].geometry);
+		if(tools[n].hasHolder) StoreContour(tool["holder"], tools[n].holder);
+		if(tools[n].hasShaft) StoreContour(tool["shaft"], tools[n].shaft);
+
+		if(tools[n].hasStartValues){
+			tool["start-values"].SetArray(1);
+			StoreStartValues(tool["start-values"][0], tools[n].startvalues);
+		}
+		if(tools[n].hasPostProcess) StorePostProcess(tool["post-process"],
+				tools[n].postprocess);
+	}
+
+	js["version"].SetNumber(version);
+
+	std::ofstream out;
+	out.open(filename.c_str(), std::ofstream::out | std::ios::binary);
+
+	js.Save(out);
+}
+
+void ToolBox::ParseContour(const JSON & js, Tool::Contour & contour)
+{
+	if(js.HasKey("description")) contour.description =
+			js["description"].GetString();
+	if(js.HasKey("guid")) contour.guid = js["guid"].GetString();
+	if(js.HasKey("vendor")) contour.vendor = js["vendor"].GetString();
+	if(js.HasKey("product-id")) contour.productid =
+			js["product-id"].GetString();
+	if(js.HasKey("product-link")) contour.productlink =
+			js["product-link"].GetString();
+	if(js.HasKey("type")){
+		std::string type = js["type"].GetString();
+		contour.type = Tool::no_type;
+		if(type.compare("flat end mill") == 0) contour.type =
+				Tool::flat_end_mill;
+		if(type.compare("radius mill") == 0) contour.type = Tool::radius_mill;
+		if(type.compare("camfer mill") == 0) contour.type = Tool::camfer_mill;
+		if(type.compare("bull nose end mill") == 0) contour.type =
+				Tool::bull_nose_end_mill;
+		if(type.compare("ball end mill") == 0) contour.type =
+				Tool::ball_end_mill;
+		if(type.compare("holder") == 0) contour.type = Tool::tool_holder;
+		if(type.compare("shaft") == 0) contour.type = Tool::tool_shaft;
+		if(type.compare("probe") == 0) contour.type = Tool::probe;
+	}
+	if(js.HasKey("unit")){
+		std::string unit = js["unit"].GetString();
+		contour.unit = Tool::unit_none;
+		if(unit.compare("inches") == 0) contour.unit = Tool::unit_inch;
+		if(unit.compare("millimeters") == 0) contour.unit =
+				Tool::unit_millimeter;
+		if(unit.compare("meters") == 0) contour.unit = Tool::unit_SI;
+		if(unit.compare("inch") == 0) contour.unit = Tool::unit_inch;
+		if(unit.compare("millimeter") == 0) contour.unit =
+				Tool::unit_millimeter;
+		if(unit.compare("meter") == 0) contour.unit = Tool::unit_SI;
+	}
+	if(js.HasKey("segments")){
+		contour.hasSegments = true;
+		const JSON & segments = js["segments"];
+		contour.segments.resize(segments.Size());
+		for(size_t m = 0; m < segments.Size(); ++m){
+			const JSON & segment = segments[m];
+			if(segment.HasKey("height")) contour.segments[m].height =
+					segment["height"].GetNumber();
+			if(segment.HasKey("lower-diameter")) contour.segments[m].lowerdiameter =
+					segment["lower-diameter"].GetNumber();
+			if(segment.HasKey("upper-diameter")) contour.segments[m].upperdiameter =
+					segment["upper-diameter"].GetNumber();
+		}
+	}else{
+		contour.hasSegments = false;
+	}
+}
+
+void ToolBox::StoreGeometry(JSON& js, const Tool::Geometry& geometry) const
+{
+	js.SetObject(false);
+	js["CSP"].SetBool(geometry.CSP);
+	js["DC"].SetNumber(geometry.DC);
+	js["HAND"].SetBool(geometry.HAND);
+	js["LB"].SetNumber(geometry.LB);
+	js["LCF"].SetNumber(geometry.LCF);
+	js["NOF"].SetNumber(geometry.NOF);
+	js["NT"].SetNumber(geometry.NT);
+	js["OAL"].SetNumber(geometry.OAL);
+	js["RE"].SetNumber(geometry.RE);
+	js["SFDM"].SetNumber(geometry.SFDM);
+	js["SIG"].SetNumber(geometry.SIG);
+	js["TA"].SetNumber(geometry.TA);
+	js["TP"].SetNumber(geometry.TP);
+	js["shoulder-length"].SetNumber(geometry.shoulderlength);
+	js["thread-profile-angle"].SetNumber(geometry.threadprofileangle);
+	js["tip-diameter"].SetNumber(geometry.tipdiameter);
+	js["tip-length"].SetNumber(geometry.tiplength);
+	js["tip-offset"].SetNumber(geometry.tipoffset);
+}
+
+void ToolBox::StoreStartValues(JSON& js,
+		const Tool::StartValues& startvalues) const
+{
+	js.SetObject(false);
+	js["name"].SetString(startvalues.name);
+	js["guid"].SetString(startvalues.guid);
+	js["description"].SetString(startvalues.description);
+	js["tool-coolant"].SetString(startvalues.toolcoolant);
+	js["f_n"].SetNumber(startvalues.fn);
+	js["f_z"].SetNumber(startvalues.fz);
+	js["n"].SetNumber(startvalues.n);
+	js["n_ramp"].SetNumber(startvalues.nramp);
+	js["v_c"].SetNumber(startvalues.vc);
+	js["v_f"].SetNumber(startvalues.vf);
+	js["v_f_leadIn"].SetNumber(startvalues.vfleadin);
+	js["v_f_leadOut"].SetNumber(startvalues.vfleadout);
+	js["v_f_plunge"].SetNumber(startvalues.vfplunge);
+	js["v_f_ramp"].SetNumber(startvalues.vframp);
+	js["v_f_retract"].SetNumber(startvalues.vfretract);
+}
+
+void ToolBox::StorePostProcess(JSON& js,
+		const Tool::PostProcess& postprocess) const
+{
+	js.SetObject(false);
+	js["break-control"].SetBool(postprocess.breakcontrol);
+	js["comment"].SetString(postprocess.comment);
+	js["diameter-offset"].SetNumber(postprocess.diameteroffset);
+	js["length-offset"].SetNumber(postprocess.lengthoffset);
+
+	js["live"].SetBool(postprocess.live);
+	js["manual-tool-change"].SetBool(postprocess.manualtoolchange);
+	js["number"].SetNumber(postprocess.number);
+	js["turret"].SetNumber(postprocess.turret);
+	js["tool-coolant"].SetString(postprocess.toolcoolant);
+}
+
+void ToolBox::StoreContour(JSON& js, const Tool::Contour& contour) const
+{
+	js.SetObject(false);
+	js["description"].SetString(contour.description);
+	js["guid"].SetString(contour.guid);
+	js["vendor"].SetString(contour.vendor);
+	js["product-id"].SetString(contour.productid);
+	js["product-link"].SetString(contour.productlink);
+
+	switch(contour.type){
+
+	case Tool::flat_end_mill:
+		js["type"].SetString("flat end mill");
+		break;
+	case Tool::radius_mill:
+		js["type"].SetString("radius mill");
+		break;
+	case Tool::camfer_mill:
+		js["type"].SetString("camfer mill");
+		break;
+	case Tool::bull_nose_end_mill:
+		js["type"].SetString("bull nose end mill");
+		break;
+	case Tool::ball_end_mill:
+		js["type"].SetString("ball end mill");
+		break;
+	case Tool::tool_holder:
+		js["type"].SetString("holder");
+		break;
+	case Tool::tool_shaft:
+		js["type"].SetString("shaft");
+		break;
+	case Tool::probe:
+		js["type"].SetString("probe");
+		break;
+	}
+
+	switch(contour.unit){
+	case Tool::unit_SI:
+		js["unit"].SetString("meters");
+		break;
+	case Tool::unit_millimeter:
+		js["unit"].SetString("millimeters");
+		break;
+	case Tool::unit_inch:
+		js["unit"].SetString("inches");
+		break;
+	}
+
+	if(contour.hasSegments){
+		JSON & segments = js["segments"];
+		segments.SetArray(contour.segments.size());
+		for(size_t n = 0; n < contour.segments.size(); ++n){
+			segments[n].SetObject();
+			segments[n]["height"].SetNumber(contour.segments[n].height);
+			segments[n]["lower-diameter"].SetNumber(
+					contour.segments[n].lowerdiameter);
+			segments[n]["upper-diameter"].SetNumber(
+					contour.segments[n].upperdiameter);
+		}
+	}
 }

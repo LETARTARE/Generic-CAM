@@ -51,10 +51,9 @@ public:
 	//Member variables
 public:
 	std::string filename;
-	std::string version;
+	double version;
 
 	std::vector <Tool> tools;
-private:
 
 	// Methods
 public:
@@ -62,7 +61,7 @@ public:
 	bool IsLoaded(void) const;
 	bool Load(void);
 	bool Load(std::string filename);
-//	void SaveJSON(std::string filename) const;
+	void Save(std::string filename) const;
 
 //	friend std::istream& operator>>(std::istream &in, ToolBox &hull);
 //	friend std::ostream& operator<<(std::ostream &out, const ToolBox &hull);
@@ -80,7 +79,18 @@ public:
 
 private:
 	bool isLoaded;
-	void LoadContour(Tool::Contour & contour, const JSON & json);
+	bool ParseTools(const JSON &js);
+	bool ParseTool(const JSON &js, Tool &tool);
+	void ParseGeometry(const JSON &js, Tool::Geometry &geometry);
+	void ParseStartValues(const JSON &js, Tool::StartValues &startvalues);
+	void ParsePostProcess(const JSON &js, Tool::PostProcess &postprocess);
+	void ParseContour(const JSON &js, Tool::Contour &contour);
+
+	void StoreGeometry(JSON &js, const Tool::Geometry &geometry)const;
+	void StoreStartValues(JSON &js, const Tool::StartValues &startvalues)const;
+	void StorePostProcess(JSON &js, const Tool::PostProcess &postprocess)const;
+	void StoreContour(JSON &js, const Tool::Contour &contour) const;
+
 };
 
 #endif /* TOOLBOX_H_ */

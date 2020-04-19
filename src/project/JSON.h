@@ -37,7 +37,6 @@
  */
 
 // https://esprima.org/
-
 #include <stddef.h>
 #include <iostream>
 #include <fstream>
@@ -51,21 +50,35 @@ public:
 		Null, Boolean, Number, String, Array, Object
 	};
 	JSON();
-	bool Load(std::string filename);
 
-	Type GetType(void) const;
-	size_t Size(void) const;
+	static JSON Load(std::string filename);
+	static JSON Load(std::ifstream * in);
+	void Save(std::string filename);
+	void Save(std::ofstream &out);
+
 	const JSON & Begin(void) const;
-	JSON & operator[](std::string key);
-	const JSON & operator[](std::string key) const;
+
+	JSON & operator[](const std::string &key);
+	const JSON & operator[](const std::string &key) const;
 	JSON & operator[](size_t index);
 	const JSON & operator[](size_t index) const;
-	bool IsKey(std::string key) const;
-	bool IsArray(void) const;
+
 	bool IsNull(void) const;
-	double GetNumber(void) const;
-	bool GetBool(void) const;
-	std::string GetString(void) const;
+	Type GetType(void) const;
+	bool GetBool(const bool defaultvalue = false) const;
+	double GetNumber(const double defaultvalue = 0.0) const;
+	std::string GetString(
+			const std::string &defaultvalue = std::string("")) const;
+	bool IsArray(void) const;
+	size_t Size(void) const;
+	bool HasKey(std::string key) const;
+
+	void SetNull(void);
+	void SetBool(const bool value);
+	void SetNumber(const double value);
+	void SetString(const std::string &value);
+	void SetArray(size_t size);
+	void SetObject(const bool clear = true);
 
 private:
 	Type type;
@@ -90,12 +103,17 @@ private:
 
 	class FileTokenizer {
 	public:
-		FileTokenizer(std::string filename);
+		FileTokenizer(std::ifstream * in);
 		virtual ~FileTokenizer();
+		void SetupTables(void);
 		void NextToken(void);
 		Token token;
 	private:
-		std::ifstream in;
+		// Private copy operator/constructor prevents unintentional copying of the FileTokenizer (which would be a logic error).
+		FileTokenizer(const FileTokenizer&);
+		FileTokenizer& operator=(const FileTokenizer&);
+
+		std::ifstream * in;
 		char * buffer;
 		char nextc;
 		size_t charsread;
@@ -108,6 +126,9 @@ private:
 	};
 
 	static JSON Parse(FileTokenizer &ft, int maxRecursion);
+	void ToStream(std::ofstream &out, bool usenewline = true,
+			size_t indent = 0) const;
+	static std::string EscapeString(const std::string &txt);
 };
 
 #endif /* SRC_PROJECT_JSON_H_ */

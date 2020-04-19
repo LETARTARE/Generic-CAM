@@ -160,6 +160,7 @@ public:
 		return !(lhs == rhs);
 	}
 
+
 	//TODO: Check if the functions below belong into the Measurement class.
 
 	Unit& operator*=(const Unit &other)
@@ -195,6 +196,7 @@ public:
 	{
 		return lhs /= rhs;
 	}
+
 
 };
 
