@@ -34,8 +34,11 @@
 #include <wx/log.h>
 #include <float.h>
 #include <assert.h>
+#include <iostream>
 
 #include "../3D/OpenGL.h"
+#include "../math/JSON.h"
+#include "generator/GeneratorFactory.h"
 
 Run::Run(size_t ID) :
 		ID(ID)
@@ -43,7 +46,7 @@ Run::Run(size_t ID) :
 	parent = NULL;
 	object = 0;
 	stocktype = BoxBottom;
-	stockobject = 0;
+
 	coordX.Add(Selection::Axis, 0);
 	coordY.Add(Selection::Axis, 1);
 	coordZ.Add(Selection::Axis, 2);
@@ -95,8 +98,8 @@ void Run::Update(Project * project)
 	origin.CalculateEy();
 	origin.Normalize();
 
-	if(stocktype == sObject){
-		stock = parent->GetBBox(Selection(Selection::Object, stockobject));
+	if(stocktype == sObject && stockobject.IsType(Selection::Object)){
+		stock = parent->GetBBox(stockobject);
 	}
 	if(stocktype == BoxTop || stocktype == BoxCenter || stocktype == BoxBottom){
 		BoundingBox bbox = parent->GetBBox(object);
@@ -116,11 +119,6 @@ void Run::Update(Project * project)
 	AffineTransformMatrix M = stock.GetCoordinateSystem();
 	origin.SetOrigin(M.Transform(stockorigin));
 
-//	for(std::map <size_t, Generator *>::iterator it = generators.begin();
-//	it != generators.end(); ++it){
-//		assert(generators[i] != NULL);
-//		generators[i]->parent = this;
-//	}
 }
 
 void Run::Paint(void) const
@@ -241,8 +239,9 @@ void Run::GenerateToolpaths(void)
 	base.SetupBox(stock.GetSizeX(), stock.GetSizeY(), stock.GetSizeZ(), res,
 			res);
 
-	if(stocktype == sObject){
-		const Object * obj = parent->Get3DObject(stockobject);
+	if(stocktype == sObject && stockobject.IsType(Selection::Object)
+			&& stockobject.Size() >= 1){
+		const Object * obj = parent->Get3DObject(stockobject[0]);
 		base.InitImprinting();
 
 		AffineTransformMatrix M = obj->matrix;
@@ -399,130 +398,95 @@ void Run::GenerateToolpaths(void)
 //	throw(__FILE__ "Not yet implemented.");
 //}
 
-void Run::ToStream(wxTextOutputStream& stream) const
+void Run::ToJSON(JSON& js) const
 {
-	stream << _T("Name:") << endl;
-	stream << name << endl;
-//	stream << wxString::Format(_T("WorkpieceRef: %i"), refWorkpiece) << endl;
-//	stream << _T("WorkpiecePlacement: ");
-//	workpiecePlacement.ToStream(stream);
-//	stream << endl;
-//	stream << wxString::Format(_T("Tools: %zu"), machine.tools.GetCount())
-//			<< endl;
-//	for(size_t n = 0; n < machine.tools.GetCount(); n++){
-//		stream << wxString::Format(_T("Tool: %zu"), n) << endl;
-//		machine.tools[n].ToStream(stream);
-//	}
-//	stream << _T("Machine:") << endl;
-//	stream << machine.fileName.GetFullPath() << endl;
-//	GeneratorCollection gc;
-//	stream << wxString::Format(_T("Generators: %zu"), generators.GetCount())
-//			<< endl;
-//	for(size_t n = 0; n < generators.GetCount(); n++){
-//		stream << wxString::Format(_T("Generator: %zu"), n) << endl;
-//		size_t g;
-//		if(!gc.FindGenerator(generators[n], &g)) throw(__FILE__ "Cannot find generator.");
-//		stream << gc.GetName(g) << endl;
-//		generators[n]->ToStream(stream);
-//	}
+	js.SetObject(true);
+	js["ID"].SetNumber(ID);
+	js["Name"].SetString(name.ToStdString());
+
+	coordX.ToJSON(js["CoordX"]);
+	coordY.ToJSON(js["CoordY"]);
+	coordZ.ToJSON(js["CoordZ"]);
+	object.ToJSON(js["Object"]);
+
+	switch(stocktype){
+	case sObject:
+		js["StockType"].SetString("Object");
+		break;
+	case BoxTop:
+		js["StockType"].SetString("BoxTop");
+		break;
+	case BoxCenter:
+		js["StockType"].SetString("BoxCenter");
+		break;
+	case BoxBottom:
+		js["StockType"].SetString("BoxBottom");
+		break;
+	}
+
+	stockobject.ToJSON(js["StockObject"]);
+
+	js["StockSize"].SetObject(true);
+	js["StockSize"]["X"].SetNumber(stocksize.x);
+	js["StockSize"]["Y"].SetNumber(stocksize.y);
+	js["StockSize"]["Z"].SetNumber(stocksize.z);
+
+	js["StockOrigin"].SetObject(true);
+	js["StockOrigin"]["X"].SetNumber(stockorigin.x);
+	js["StockOrigin"]["Y"].SetNumber(stockorigin.y);
+	js["StockOrigin"]["Z"].SetNumber(stockorigin.z);
+
+	js["SlotWidth"].SetNumber(slotWidth);
+
+	js["Machine"].SetString(machinefile.GetName().ToStdString());
+
+	JSON &g = js["Generator"];
+	g.SetArray(generators.size());
+	size_t n = 0;
+	for(std::vector <Generator *>::const_iterator it = generators.begin();
+			it != generators.end(); ++it)
+		(*it)->ToJSON(g[n++]);
 }
 
-bool Run::FromStream(wxTextInputStream& stream, size_t runID, Project * project)
+bool Run::FromJSON(const JSON& js)
 {
-	if(project != NULL) parent = project;
-	wxString temp;
-	temp = stream.ReadLine();
-	if(temp.Cmp(_T("Name:")) != 0) return false;
-	name = stream.ReadLine();
-//	temp = stream.ReadWord();
-//	if(temp.Cmp(_T("WorkpieceRef:")) != 0) return false;
-//	refWorkpiece = stream.Read32S();
-//	temp = stream.ReadWord();
-//	if(temp.Cmp(_T("WorkpiecePlacement:")) != 0) return false;
-//	workpiecePlacement.FromStream(stream);
-//	temp = stream.ReadWord();
-//	if(temp.Cmp(_T("Tools:")) != 0) return false;
-//	size_t NTools = stream.Read32S();
-//	machine.tools.Clear();
-//	for(size_t n = 0; n < NTools; n++){
-//		temp = stream.ReadWord();
-//		if(temp.Cmp(_T("Tool:")) != 0) return false;
-//		size_t index = stream.Read32S();
-//		if(index != n) return false;
-//		Tool temp;
-//		temp.FromStream(stream);
-//		machine.tools.Add(temp);
-//	}
-//	temp = stream.ReadLine();
-//	if(temp.Cmp(_T("Machine:")) != 0) return false;
-//	wxFileName fileName(stream.ReadLine());
-//	machine.Load(fileName);
-//	temp = stream.ReadWord();
-//	if(temp.Cmp(_T("Generators:")) != 0) return false;
-//	size_t N = stream.Read32();
-//
-//	for(size_t n = 0; n < generators.GetCount(); n++)
-//		delete generators[n];
-//	generators.Clear();
-//	GeneratorCollection gc;
-//	for(size_t n = 0; n < N; n++){
-//		temp = stream.ReadWord();
-//		if(temp.Cmp(_T("Generator:")) != 0) return false;
-//		size_t index = stream.Read32S();
-//		if(index != n) return false;
-//		temp = stream.ReadLine();
-//		size_t generatorNr;
-//		if(!gc.FindGenerator(temp, &generatorNr)) return false;
-//		Generator* tempGen = gc.NewGenerator(generatorNr);
-//		tempGen->FromStream(stream);
-//		generators.Add(tempGen);
-//	}
+	if(!js.HasKey("ID")) return false;
+	ID = (size_t) round(js["ID"].GetNumber());
+	if(!js.HasKey("Name")) return false;
+	name = js["Name"].GetString();
+
+	coordX.FromJSON(js["CoordX"]);
+	coordY.FromJSON(js["CoordY"]);
+	coordZ.FromJSON(js["CoordZ"]);
+	object.FromJSON(js["Object"]);
+
+	std::string temp = js["StockType"].GetString();
+	if(temp.compare("Object")==0) stocktype = sObject;
+	if(temp.compare("BoxTop")==0) stocktype = BoxTop;
+	if(temp.compare("BoxCenter")==0) stocktype = BoxCenter;
+	if(temp.compare("BoxBottom")==0) stocktype = BoxBottom;
+
+	stockobject.FromJSON(js["StockObject"]);
+	const JSON &jsss = js["StockSize"];
+	stocksize.x = jsss["X"].GetNumber();
+	stocksize.y = jsss["Y"].GetNumber();
+	stocksize.z = jsss["Z"].GetNumber();
+	const JSON &jsso = js["StockOrigin"];
+	stockorigin.x = jsso["X"].GetNumber();
+	stockorigin.y = jsso["Y"].GetNumber();
+	stockorigin.z = jsso["Z"].GetNumber();
+
+	slotWidth = js["SlotWidth"].GetNumber();
+
+	machinefile.SetName(js["Machine"].GetString());
+	const JSON &g = js["Generator"];
+	for(size_t n = 0; n < g.Size(); ++n){
+		size_t generatortype = g[n]["Type"].GetNumber();
+		size_t generatorid = g[n]["ID"].GetNumber();
+		Generator* generator = GeneratorFactory::NewGenerator(generatortype,
+				generatorid);
+		generator->FromJSON(g[n]);
+		generators.push_back(generator);
+	}
 	return true;
 }
-
-//Vector3 Run::GetCenter(void) const
-//{
-//	Vector3 temp;
-//	if(machine.IsInitialized()){
-//		temp = machine.GetCenter();
-//	}
-//	return temp;
-//}
-//
-//Workpiece* Run::GetWorkpiece(void)
-//{
-//	if(parent == NULL) return NULL;
-//	if(refWorkpiece < 0) return NULL;
-//	if(refWorkpiece >= parent->workpieces.GetCount()) return NULL;
-//	return &(parent->workpieces[refWorkpiece]);
-//}
-//
-//const Workpiece* Run::GetWorkpiece(void) const
-//{
-//	if(parent == NULL) return NULL;
-//	if(refWorkpiece < 0) return NULL;
-//	if(refWorkpiece >= parent->workpieces.GetCount()) return NULL;
-//	return &(parent->workpieces[refWorkpiece]);
-//}
-//
-//ToolPath* Run::GetFirstSelectedToolpath(void)
-//{
-//	for(size_t n = 0; n < generators.GetCount(); n++){
-//		if(((generators[n]))->selected) return &((generators[n])->toolpath);
-//	}
-//	return NULL;
-//}
-//
-//const ToolPath* Run::GetFirstSelectedToolpath(void) const
-//{
-//	for(size_t n = 0; n < generators.GetCount(); n++){
-//		if(((generators[n]))->selected) return &((generators[n])->toolpath);
-//	}
-//	return NULL;
-//}
-//
-//void Run::Select(bool select)
-//{
-//	selected = select;
-//	showSimulation = false;
-//}

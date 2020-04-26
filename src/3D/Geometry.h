@@ -49,6 +49,7 @@ enum GeometryColorStyle {
 	geometryColorDefault
 };
 
+class JSON;
 class Geometry {
 	// Constructor/ Destructor
 public:
@@ -68,8 +69,6 @@ public:
 
 	// Methods
 public:
-	void ToXml(wxXmlNode* parentNode);
-	bool FromXml(wxXmlNode* parentNode);
 
 	void Paint(GeometryColorStyle style = geometryColorDefault) const;
 
@@ -100,6 +99,8 @@ public:
 			const Vector3& d);
 	void AddQuadTransform(const Vector3& a, const Vector3& b, const Vector3& c,
 			const Vector3& d, const AffineTransformMatrix& transformMatrix);
+	void ToJSON(JSON &js) const;
+	bool FromJSON(const JSON &js);
 };
 
 #endif /* GEOMETRY_H_ */

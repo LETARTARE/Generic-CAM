@@ -26,6 +26,7 @@
 
 #include "DialogJobSetup.h"
 
+#include "../project/command/CommandRunMachineSet.h"
 #include "../project/command/CommandRunSetCorrdinateSystem.h"
 #include "../project/command/CommandRunSetObject.h"
 #include "../project/command/CommandRunSetStockBox.h"
@@ -77,11 +78,30 @@ bool DialogJobSetup::TransferDataToWindow(void)
 	if(project == NULL) return false;
 	const CollectionUnits* settings = &(frame->GetParentFrame()->units);
 
+	// Set all units
 	m_staticTextUnitBoxX->SetLabelText(settings->Distance.GetOtherName());
 	m_staticTextUnitBoxY->SetLabelText(settings->Distance.GetOtherName());
 	m_staticTextUnitBoxZ->SetLabelText(settings->Distance.GetOtherName());
+	m_staticTextUnitSupportSlotwidth->SetLabelText(
+			settings->Distance.GetOtherName());
+	m_staticTextUnitSupportWidth->SetLabelText(
+			settings->Distance.GetOtherName());
+	m_staticTextUnitSupportHeight->SetLabelText(
+			settings->Distance.GetOtherName());
+	m_staticTextUnitSupportLevel->SetLabelText(
+			settings->Distance.GetOtherName());
+	m_staticTextUnitSupportXDistance->SetLabelText(
+			settings->Distance.GetOtherName());
+	m_staticTextUnitSupportXOffset->SetLabelText(
+			settings->Distance.GetOtherName());
+	m_staticTextUnitSupportYDistance->SetLabelText(
+			settings->Distance.GetOtherName());
+	m_staticTextUnitSupportYOffset->SetLabelText(
+			settings->Distance.GetOtherName());
+	m_staticTextUnitSupportOOffset->SetLabelText(
+			settings->Distance.GetOtherName());
 
-	if(!project->Has(Selection::Run, runID)){
+	if(!SelectionIsOK()){
 		this->SetTitle(_("No run selected..."));
 		m_textCtrlObject->SetValue(_T("-"));
 		m_textCtrlAxisX->SetValue(_T("-"));
@@ -92,6 +112,7 @@ bool DialogJobSetup::TransferDataToWindow(void)
 	const Run * run = project->GetRun(runID);
 	this->SetTitle(run->name);
 
+	// Object:
 	if(!run->object.IsType(Selection::Object)){
 		m_textCtrlObject->SetValue(_("No Object selected."));
 	}else{
@@ -103,24 +124,22 @@ bool DialogJobSetup::TransferDataToWindow(void)
 		}
 		m_textCtrlObject->SetValue(temp);
 	}
+
+	// Coordinates
 	m_textCtrlAxisX->SetValue(run->coordX.ToString());
 	m_textCtrlAxisY->SetValue(run->coordY.ToString());
 	m_textCtrlAxisZ->SetValue(run->coordZ.ToString());
 
+	// Stock
 	m_choicebookStock->SetSelection((run->stocktype == Run::sObject)? 1 : 0);
-
-	if(project->Has(Selection::Object, run->stockobject)){
+	if(project->Has(run->stockobject)
+			&& run->stockobject.IsType(Selection::Object)
+			&& run->stockobject.Size() >= 1){
 		m_textCtrlStockObject->SetValue(
-				project->Get3DObject(run->stockobject)->name);
+				project->Get3DObject(run->stockobject[0])->name);
 	}else{
 		m_textCtrlStockObject->SetValue(_T("-"));
 	}
-
-	wxString temp = wxString::Format(_T("(%g, %g, %g)"),
-			run->stockorigin.x * 2 - 1, run->stockorigin.y * 2 - 1,
-			run->stockorigin.z * 2 - 1);
-	m_textCtrlOrigin->SetValue(temp);
-
 	m_textCtrlBoxX->SetValue(settings->Distance.TextFromSI(run->stocksize.x));
 	m_textCtrlBoxY->SetValue(settings->Distance.TextFromSI(run->stocksize.y));
 	m_textCtrlBoxZ->SetValue(settings->Distance.TextFromSI(run->stocksize.z));
@@ -131,6 +150,22 @@ bool DialogJobSetup::TransferDataToWindow(void)
 
 	if(run->stocktype == Run::BoxTop || run->stocktype == Run::BoxCenter
 			|| run->stocktype == Run::BoxBottom) oldType = run->stocktype;
+
+	// Origin
+	wxString temp = wxString::Format(_T("(%g, %g, %g)"),
+			run->stockorigin.x * 2 - 1, run->stockorigin.y * 2 - 1,
+			run->stockorigin.z * 2 - 1);
+	m_textCtrlOrigin->SetValue(temp);
+
+	// Supports
+
+	// Machine
+	if(run->machinefile.IsOk()){
+		m_filePickerMachine->SetFileName(run->machinefile);
+	}else{
+		m_filePickerMachine->SetInitialDirectory(
+				frame->filepaths.lastMachineDirectory);
+	}
 
 	return true;
 }
@@ -373,4 +408,13 @@ void DialogJobSetup::OnRadioBox(wxCommandEvent& event)
 
 void DialogJobSetup::OnMachineSelected(wxFileDirPickerEvent& event)
 {
+
+	if(!SelectionIsOK()) return;
+	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	Project * project = wxStaticCast(frame->GetDocument(), Project);
+	wxCommandProcessor * cmdProc = project->GetCommandProcessor();
+	cmdProc->Submit(
+			new CommandRunMachineSet(_("Selected machine."), project, runID,
+					m_filePickerMachine->GetFileName()));
+	TransferDataToWindow();
 }

@@ -63,6 +63,7 @@ NelderMeadOptimizer::~NelderMeadOptimizer()
 
 void NelderMeadOptimizer::Start(void)
 {
+	if(param.size() != N) simplexIsSetup = false;
 	if(!keepSimplex) simplexIsSetup = false;
 	if(!simplexIsSetup){
 		N = param.size();
@@ -95,20 +96,21 @@ void NelderMeadOptimizer::Start(void)
 
 bool NelderMeadOptimizer::IsRunning(void)
 {
+	if(N == 0) return false;
 	switch(state){
 	case 0:
 		throw(std::logic_error(
 				"NelderMeadOptimizer::IsRunning - StartRun was not called."));
 
 	case 1:
-		{
-			if(index >= M) throw(std::logic_error(
-					"NelderMeadOptimizer::IsRunning - State progression not working."));
-			for(size_t n = 0; n < N; n++)
-				param[n] = simplex[index * N + n];
-			state = 2;
-			return true;
-		}
+	{
+		if(index >= M) throw(std::logic_error(
+				"NelderMeadOptimizer::IsRunning - State progression not working."));
+		for(size_t n = 0; n < N; n++)
+			param[n] = simplex[index * N + n];
+		state = 2;
+		return true;
+	}
 
 	case 2:
 		throw(std::logic_error(

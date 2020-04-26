@@ -27,8 +27,10 @@
 #include "ToolBox.h"
 
 #include <exception>
+#include <fstream>
+#include <iostream>
 
-#include "JSON.h"
+#include "../math/JSON.h"
 
 ToolBox::ToolBox()
 {
@@ -52,6 +54,19 @@ bool ToolBox::Load(std::string filename)
 	JSON js;
 	try{
 		js = JSON::Load(filename);
+	}
+	catch(std::exception &x){
+		std::cout << x.what() << "\n";
+		return false;
+	}
+	return ParseTools(js);
+}
+
+bool ToolBox::Load(std::istream& in)
+{
+	JSON js;
+	try{
+		js = JSON::Load(in);
 	}
 	catch(std::exception &x){
 		std::cout << x.what() << "\n";
@@ -87,6 +102,20 @@ std::string ToolBox::GetName(void) const
 bool ToolBox::IsLoaded(void) const
 {
 	return isLoaded;
+}
+
+void ToolBox::Save(std::string filename) const
+{
+	std::ofstream out;
+	out.open(filename.c_str(), std::ofstream::out | std::ios::binary);
+	Save(out);
+}
+
+void ToolBox::Save(std::ostream &out) const
+{
+	JSON js;
+	StoreTools(js);
+	js.Save(out);
 }
 
 bool ToolBox::ParseTools(const JSON &js)
@@ -204,43 +233,6 @@ void ToolBox::ParsePostProcess(const JSON& js, Tool::PostProcess& pp)
 			js["tool-coolant"].GetString();
 }
 
-void ToolBox::Save(std::string filename) const
-{
-	JSON js;
-	js.SetObject();
-	JSON & data = js["data"];
-	data.SetArray(tools.size());
-	for(size_t n = 0; n < tools.size(); ++n){
-		JSON &tool = data[n];
-		tool.SetObject();
-		tool["GRADE"].SetString(tools[n].GRADE);
-		tool["BMC"].SetString(tools[n].BMC);
-		tool["last_modified"].SetNumber(tools[n].lastmodified);
-		tool["addtonewprojects"].SetBool(tools[n].addtonewprojects);
-
-		StoreContour(tool, tools[n].base);
-
-		if(tools[n].hasGeometry) StoreGeometry(tool["geometry"],
-				tools[n].geometry);
-		if(tools[n].hasHolder) StoreContour(tool["holder"], tools[n].holder);
-		if(tools[n].hasShaft) StoreContour(tool["shaft"], tools[n].shaft);
-
-		if(tools[n].hasStartValues){
-			tool["start-values"].SetArray(1);
-			StoreStartValues(tool["start-values"][0], tools[n].startvalues);
-		}
-		if(tools[n].hasPostProcess) StorePostProcess(tool["post-process"],
-				tools[n].postprocess);
-	}
-
-	js["version"].SetNumber(version);
-
-	std::ofstream out;
-	out.open(filename.c_str(), std::ofstream::out | std::ios::binary);
-
-	js.Save(out);
-}
-
 void ToolBox::ParseContour(const JSON & js, Tool::Contour & contour)
 {
 	if(js.HasKey("description")) contour.description =
@@ -354,6 +346,36 @@ void ToolBox::StorePostProcess(JSON& js,
 	js["number"].SetNumber(postprocess.number);
 	js["turret"].SetNumber(postprocess.turret);
 	js["tool-coolant"].SetString(postprocess.toolcoolant);
+}
+
+void ToolBox::StoreTools(JSON& js) const
+{
+	js.SetObject();
+	JSON & data = js["data"];
+	data.SetArray(tools.size());
+	for(size_t n = 0; n < tools.size(); ++n){
+		JSON &tool = data[n];
+		tool.SetObject();
+		tool["GRADE"].SetString(tools[n].GRADE);
+		tool["BMC"].SetString(tools[n].BMC);
+		tool["last_modified"].SetNumber(tools[n].lastmodified);
+		tool["addtonewprojects"].SetBool(tools[n].addtonewprojects);
+
+		StoreContour(tool, tools[n].base);
+
+		if(tools[n].hasGeometry) StoreGeometry(tool["geometry"],
+				tools[n].geometry);
+		if(tools[n].hasHolder) StoreContour(tool["holder"], tools[n].holder);
+		if(tools[n].hasShaft) StoreContour(tool["shaft"], tools[n].shaft);
+
+		if(tools[n].hasStartValues){
+			tool["start-values"].SetArray(1);
+			StoreStartValues(tool["start-values"][0], tools[n].startvalues);
+		}
+		if(tools[n].hasPostProcess) StorePostProcess(tool["post-process"],
+				tools[n].postprocess);
+	}
+	js["version"].SetNumber(version);
 }
 
 void ToolBox::StoreContour(JSON& js, const Tool::Contour& contour) const

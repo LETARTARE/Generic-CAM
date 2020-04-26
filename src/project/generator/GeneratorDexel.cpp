@@ -35,7 +35,8 @@
 
 #include "../../3D/OpenGL.h"
 
-GeneratorDexel::GeneratorDexel(size_t ID):Generator(ID)
+GeneratorDexel::GeneratorDexel(size_t ID) :
+		Generator(ID)
 {
 //	area.alpha = 1.0;
 //	area.displaySides = false;
@@ -56,18 +57,6 @@ GeneratorDexel::GeneratorDexel(size_t ID):Generator(ID)
 
 GeneratorDexel::~GeneratorDexel()
 {
-}
-
-void GeneratorDexel::ToStream(wxTextOutputStream& stream)
-{
-	Generator::ToStream(stream);
-}
-
-bool GeneratorDexel::FromStream(wxTextInputStream& stream)
-{
-	bool result = Generator::FromStream(stream);
-//	target.SetupBox(area.GetSizeX(), area.GetSizeY(), area.GetSizeZ());
-	return result;
 }
 
 void GeneratorDexel::Paint(void) const
@@ -131,8 +120,7 @@ void GeneratorDexel::PrepareTargets(const Run &run,
 	for(std::vector <Object>::const_iterator obj = objects.begin();
 			obj != objects.end(); ++obj){
 		AffineTransformMatrix M = obj->matrix;
-		M.TranslateGlobal(-obj->bbox.xmin, -obj->bbox.ymin,
-				-obj->bbox.zmin);
+		M.TranslateGlobal(-obj->bbox.xmin, -obj->bbox.ymin, -obj->bbox.zmin);
 		M.TranslateGlobal(-run.stock.xmin + obj->bbox.xmin,
 				-run.stock.ymin + obj->bbox.ymin,
 				-run.stock.zmin + obj->bbox.zmin);
@@ -156,8 +144,7 @@ void GeneratorDexel::PrepareTargets(const Run &run,
 
 		if(area.IsType(Selection::Object) && area.Has(obj->GetID())){
 			for(size_t n = 0; n < N; ++n){
-				const Hull::Triangle & tri = obj->geometry.GetTriangle(
-						n);
+				const Hull::Triangle & tri = obj->geometry.GetTriangle(n);
 				obj->geometry.GetTriangle(n, a, b, c);
 				a = M.Transform(a);
 				b = M.Transform(b);
@@ -175,8 +162,7 @@ void GeneratorDexel::PrepareTargets(const Run &run,
 			for(std::set <size_t>::const_iterator it = area.begin();
 					it != area.end(); ++it){
 				for(size_t n = 0; n < N; ++n){
-					const Hull::Triangle & tri =
-							obj->geometry.GetTriangle(n);
+					const Hull::Triangle & tri = obj->geometry.GetTriangle(n);
 					if(tri.group != *it) continue;
 					obj->geometry.GetTriangle(n, a, b, c);
 					a = M.Transform(a);
@@ -616,3 +602,13 @@ void GeneratorDexel::QuickCollectToolpaths(std::vector <ProtoToolpath> &ptp,
 
 }
 
+void GeneratorDexel::ToJSON(JSON& js) const
+{
+	Generator::ToJSON(js);
+}
+
+bool GeneratorDexel::FromJSON(const JSON& js)
+{
+	bool result = Generator::FromJSON(js);
+	return result;
+}

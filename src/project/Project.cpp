@@ -34,6 +34,7 @@
 #include "../3D/BooleanBox.h"
 #include "../3D/FileSTL.h"
 #include "ToolBox.h"
+#include "../math/JSON.h"
 
 #include <wx/zipstrm.h>
 #include <wx/txtstrm.h>
@@ -322,43 +323,45 @@ void Project::Update(void)
 	UpdateAllViews();
 }
 
-bool Project::DoSaveDocument(const wxString& file)
+bool Project::DoSaveDocument(const wxString& filename)
 {
-	return Save(wxFileName(file));
-}
-
-bool Project::DoOpenDocument(const wxString& file)
-{
-	return Load(wxFileName(file));
-}
-
-bool Project::Save(wxFileName fileName)
-{
-	if(!fileName.IsOk()) return false;
-
 	setlocale(LC_ALL, "C");
 
-	wxFFileOutputStream out(fileName.GetFullPath());
+	wxFFileOutputStream out(filename);
 	wxZipOutputStream zip(out);
 	wxTextOutputStream txt(zip);
 
-	zip.PutNextEntry(_T("project.txt"));
-	txt << _T("Name:") << endl;
-	txt << this->GetTitle() << endl;
-
-	txt << wxString::Format(_T("Objects: %zu"), objects.size()) << endl;
-
-	for(std::vector <Object>::const_iterator obj = objects.begin();
-			obj != objects.end(); ++obj){
-		txt << wxString::Format(_T("Object: %zu"), obj->GetID()) << endl;
-		obj->ToStream(txt, obj->GetID());
+	zip.PutNextEntry(_T("project.json"));
+	JSON js;
+	js.SetObject();
+	js["Name"].SetString(this->GetTitle().ToStdString());
+	{
+		JSON &objs = js["Objects"];
+		objs.SetArray(objects.size());
+		size_t n = 0;
+		for(std::vector <Object>::const_iterator obj = objects.begin();
+				obj != objects.end(); ++obj)
+			obj->ToJSON(objs[n++]);
+	}
+	{
+		JSON &r = js["Run"];
+		r.SetArray(run.size());
+		size_t n = 0;
+		for(std::vector <Run>::const_iterator it = run.begin(); it != run.end();
+				++it)
+			it->ToJSON(r[n++]);
+	}
+	{
+		std::ostringstream out;
+		js.Save(out);
+		txt << out.str();
 	}
 
-	txt << wxString::Format(_T("Run: %zu"), run.size()) << endl;
-	for(std::vector <Run>::const_iterator it = run.begin(); it != run.end();
-			++it){
-		txt << wxString::Format(_T("Run: %zu"), it->GetID()) << endl;
-		it->ToStream(txt);
+	zip.PutNextEntry(_T("tools.json"));
+	{
+		std::ostringstream out;
+		tools.Save(out);
+		txt << out.str();
 	}
 
 	for(std::vector <Object>::const_iterator obj = objects.begin();
@@ -373,20 +376,23 @@ bool Project::Save(wxFileName fileName)
 	}
 
 	setlocale(LC_ALL, "");
-	this->SetFilename(fileName.GetFullPath(), true);
-	std::cout << "Project::Save(" << fileName.GetFullPath() << ") - saved.\n";
+	this->Modify(false);
+	this->SetFilename(filename, true);
+	if(DEBUG) std::cout << "Project::Save(" << filename << ") - saved.\n";
+
 	return true;
 }
 
-bool Project::Load(wxFileName fileName)
+bool Project::DoOpenDocument(const wxString& filename)
 {
-	if(!fileName.IsOk()) return false;
+	if(DEBUG) std::cout << "Project::DoOpenDocument(" << filename.ToStdString()
+			<< ")\n";
 	setlocale(LC_ALL, "C");
-	wxFFileInputStream in(fileName.GetFullPath());
+	wxFFileInputStream in(filename);
 
 	if(!in.IsOk()){
 		std::cout << "File is not OK: ";
-		std::cout << fileName.GetFullPath().ToAscii();
+		std::cout << filename.ToStdString();
 		std::cout << "\n";
 		return false;
 	}
@@ -398,101 +404,101 @@ bool Project::Load(wxFileName fileName)
 	objects.clear();
 	run.clear();
 
-	in.SeekI(0, wxFromStart);
 	wxZipEntry* entry;
+	in.SeekI(0, wxFromStart);
+
 	while((entry = zip.GetNextEntry()))
-		if(entry->GetName().Cmp(_T("project.txt")) == 0) break;
+		if(entry->GetName().Cmp(_T("project.json")) == 0) break;
 	if(entry == NULL){
 		setlocale(LC_ALL, "");
+		if(DEBUG) std::cout << "Entry 'project.json' not found.\n";
 		return false;
 	}
-
-	zip.OpenEntry(*entry);
-
-	wxString temp;
-	temp = txt.ReadLine();
-	if(temp.Cmp(_T("Name:")) != 0){
-		setlocale(LC_ALL, "");
-		return false;
-	}
-	SetTitle(txt.ReadLine());
-
-	temp = txt.ReadWord();
-	if(temp.Cmp(_T("Objects:")) != 0){
-		setlocale(LC_ALL, "");
-		return false;
-	}
-	const size_t N = txt.Read32();
-	for(size_t n = 0; n < N; n++){
-		temp = txt.ReadWord();
-		if(temp.Cmp(_T("Object:")) != 0){
-			setlocale(LC_ALL, "");
-			return false;
-		}
-		size_t objID = txt.Read32();
-		Object object(GetNextObjectID());
-		object.FromStream(txt);
-		objects.push_back(object);
-	}
-
-	temp = txt.ReadWord();
-	if(temp.Cmp(_T("Run:")) != 0){
-		setlocale(LC_ALL, "");
-		return false;
-	}
-	const size_t N3 = txt.Read32();
-	run.clear();
-	for(size_t n = 0; n < N3; n++){
-		temp = txt.ReadWord();
-		if(temp.Cmp(_T("Run:")) != 0){
-			setlocale(LC_ALL, "");
-			return false;
-		}
-		size_t runID = txt.Read32();
-		Run tempRun(GetNextRunID());
-		tempRun.FromStream(txt, runID, this);
-		run.push_back(tempRun);
-	}
-	zip.CloseEntry();
-
-	// Load objects
-	//TODO: Rewind zip, because there may be object models before the main project file.
-
-	while((entry = zip.GetNextEntry())){
-		temp = entry->GetName();
-		if(!temp.StartsWith(wxT("object_"), &temp)) continue;
-		long p;
-		temp.BeforeFirst('.').ToLong(&p);
-		size_t objID = p;
-		temp = temp.AfterFirst('.');
-		if(!temp.StartsWith(wxT("obj"))) continue;
-		if(std::find(objects.begin(), objects.end(), objID) == objects.end()) continue;
-
+	{
 		zip.OpenEntry(*entry);
 		size_t N = entry->GetSize();
-		std::cout << "Expected object size: " << N << "bytes.\n";
 		char* buffer = new char[N + 1];
 		zip.Read(buffer, N);
 		size_t L = zip.LastRead();
 		assert(L <= N);
 		std::istringstream in(std::string(buffer, L));
-		Hull temphull;
-		in >> temphull;
-		objects[objID].geometry = temphull;
-		objects[objID].geometry.CalcNormals();
-		objects[objID].geometry.CalcGroups();
-		objects[objID].geometry.ApplyTransformation();
-		delete[] buffer;
 
-//		try{
-//		}
-//		catch(const std::exception &ex){
-//			std::cout << "Exception caught: " << ex.what() << "\n";
-//		}
+		JSON js = JSON::Load(in);
+
+		this->SetTitle(js["Name"].GetString());
+		{
+			JSON &objs = js["Objects"];
+			objects.resize(objs.Size(), Object(0));
+			size_t n = 0;
+			for(std::vector <Object>::iterator obj = objects.begin();
+					obj != objects.end(); ++obj)
+				obj->FromJSON(objs[n++]);
+		}
+		JSON &r = js["Run"];
+		run.resize(r.Size(), Run(0));
+		size_t n = 0;
+		for(std::vector <Run>::iterator it = run.begin(); it != run.end();
+				++it){
+			try{
+				it->FromJSON(r[n++]);
+			}
+			catch(std::exception &e){
+				std::cout << "While loading run: " << e.what() << "\n";
+			}
+		}
+		std::cout << "Run loaded (count = " << n << ")\n";
 		zip.CloseEntry();
+		delete[] buffer;
+	}
+	// Load objects
+	//TODO: Rewind zip, because there may be object models before the main project file.
+
+	while((entry = zip.GetNextEntry())){
+		wxString temp = entry->GetName();
+		if(temp.compare(_T("tools.json")) == 0){
+			zip.OpenEntry(*entry);
+			size_t N = entry->GetSize();
+			char* buffer = new char[N + 1];
+			zip.Read(buffer, N);
+			size_t L = zip.LastRead();
+			assert(L <= N);
+			std::istringstream in(std::string(buffer, L));
+			tools.Load(in);
+			zip.CloseEntry();
+			delete[] buffer;
+			std::cout << "Tools loaded\n";
+		}
+		if(temp.StartsWith(wxT("object_"), &temp)){
+			long p;
+			temp.BeforeFirst('.').ToLong(&p);
+			size_t objID = p;
+			temp = temp.AfterFirst('.');
+			if(!temp.StartsWith(wxT("obj"))) continue;
+			std::vector <Object>::iterator obj = std::find(objects.begin(),
+					objects.end(), objID);
+			if(obj == objects.end()) continue;
+
+			zip.OpenEntry(*entry);
+			size_t N = entry->GetSize();
+			if(DEBUG) std::cout << "Expected object size: " << N << "bytes.\n";
+			char* buffer = new char[N + 1];
+			zip.Read(buffer, N);
+			size_t L = zip.LastRead();
+			assert(L <= N);
+			std::istringstream in(std::string(buffer, L));
+			Hull temphull;
+			in >> temphull;
+			obj->geometry = temphull;
+			obj->geometry.CalcNormals();
+			obj->geometry.CalcGroups();
+			obj->geometry.ApplyTransformation();
+			zip.CloseEntry();
+			delete[] buffer;
+		}
 	}
 	setlocale(LC_ALL, "");
-	this->SetFilename(fileName.GetFullPath(), true);
+	this->Modify(false);
+	this->SetFilename(filename, true);
 	this->Update();
 	return true;
 }
@@ -615,11 +621,10 @@ bool Project::LoadDefaultTools(wxString fileName, bool loadAll)
 		tools.tools.push_back(localtools[n]);
 	}
 
-	tools.Save("/tmp/tools.json");
-
-	ToolBox test;
-	bool success = test.Load("/tmp/tools.json");
-	if(success) std::cout << "File could be read back.\n";
+//	tools.Save("/tmp/tools.json");
+//	ToolBox test;
+//	bool success = test.Load("/tmp/tools.json");
+//	if(success) std::cout << "File could be read back.\n";
 	return true;
 }
 

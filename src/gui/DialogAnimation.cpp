@@ -57,10 +57,15 @@ DialogAnimation::~DialogAnimation()
 
 void DialogAnimation::SetSelection(const Selection &selection)
 {
-	if(!selection.IsBaseType(Selection::BaseRun)) return;
+	if(selection.IsBaseType(Selection::BaseRun)){
+		this->runID = selection.GetBaseID();
+	}
+	if(selection.IsType(Selection::Run) && !selection.IsSetEmpty()){
+		this->runID = selection[0];
+	}
+
 	if(!selection.IsType(Selection::Generator)) return;
 	if(selection.IsSetEmpty()) return;
-	this->runID = selection.GetBaseID();
 
 //	this->generatorID = selection[0];
 
@@ -150,6 +155,8 @@ void DialogAnimation::OnClose(wxCommandEvent& event)
 		TransferDataToWindow();
 	}
 	this->Show(false);
+	wxCommandEvent refreshEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
+	ProcessEvent(refreshEvent);
 }
 
 void DialogAnimation::OnXClose(wxCloseEvent &event)

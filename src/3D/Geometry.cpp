@@ -27,6 +27,8 @@
 #include "Geometry.h"
 
 #include <wx/log.h>
+
+#include "../math/JSON.h"
 #include "OpenGL.h"
 
 Geometry::Geometry()
@@ -283,80 +285,37 @@ void Geometry::FlipNormals(void)
 	}
 }
 
-void Geometry::ToXml(wxXmlNode* parentNode)
+void Geometry::ToJSON(JSON& js) const
 {
-	wxXmlNode *temp, *temp2;
-	wxXmlNode *nodeObject = NULL;
+	js.SetObject(true);
+	js["Name"].SetString(name.ToStdString());
 
-	// Find out, if object already exists in XML tree.
-	temp = parentNode->GetChildren();
-	while(temp != NULL && nodeObject == NULL){
-		if(temp->GetName() == _T("geometry")
-				&& temp->GetAttribute(_T("name"), _T("")) == name) nodeObject =
-				temp;
-		temp = temp->GetNext();
-	}
-	if(nodeObject == NULL){
-		nodeObject = new wxXmlNode(wxXML_ELEMENT_NODE, _T("geometry"));
-		nodeObject->AddAttribute(_T("name"), name);
-		parentNode->InsertChild(nodeObject, NULL);
-	}
+	JSON &m = js["Matrix"];
+	m.SetArray(16);
+	for(size_t n = 0; n < 16; ++n)
+		m[n].SetNumber(matrix[n]);
 
-	// Remove the subelements, that will be updated
-	temp = nodeObject->GetChildren();
-	while(temp != NULL){
-		temp2 = NULL;
-		if(temp->GetName() == _T("matrix")) temp2 = temp;
-		if(temp->GetName() == _T("tri")) temp2 = temp;
-		temp = temp->GetNext();
-		if(temp2 != NULL){
-			nodeObject->RemoveChild(temp2);
-			delete (temp2);
-		}
-	}
-
-	// Insert new matrix
-	temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("matrix"));
-	nodeObject->InsertChild(temp, NULL);
-	temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
-			matrix.ToString());
-	temp->InsertChild(temp2, NULL);
-
-	// Insert new triangles
-	size_t i;
-	for(i = 0; i < triangles.size(); i++){
-		temp = new wxXmlNode(wxXML_ELEMENT_NODE, _T("tri"));
-		nodeObject->InsertChild(temp, NULL);
-		temp2 = new wxXmlNode(wxXML_CDATA_SECTION_NODE, wxEmptyString,
-				triangles[i].ToString());
-		temp->InsertChild(temp2, NULL);
-	}
+	JSON &t = js["Triangles"];
+	t.SetArray(triangles.size());
+	for(size_t i = 0; i < triangles.size(); ++i)
+		t[i].SetString(triangles[i].ToString().ToStdString());
 }
 
-bool Geometry::FromXml(wxXmlNode* parentNode)
+bool Geometry::FromJSON(const JSON& js)
 {
-	if(parentNode->GetName() != _T("geometry")) return false;
-	name = parentNode->GetAttribute(_T("name"), _T(""));
-	wxXmlNode *temp = parentNode->GetChildren();
+	if(!js.HasKey("Name")) return false;
+	name = js["Name"].GetString();
+	const JSON &m = js["Matrix"];
+	for(size_t n = 0; n < 16; ++n)
+		matrix[n] = m[n].GetNumber();
 
 	triangles.clear();
-	Triangle tri;
 
-	while(temp != NULL){
-		if(temp->GetName() == _T("tri")){
-			tri.FromString(temp->GetNodeContent());
-			//			if(triangles.GetCount() < 20) wxLogMessage(
-			//					_T("Geometry::FromXml: Tri from >")
-			//							+ temp->GetNodeContent() + _T("<."));
+	const JSON &t = js["Triangles"];
+	const size_t N = t.Size();
+	triangles.resize(N);
+	for(size_t n = 0; n < N; ++n)
+		triangles[n].FromString(t[n].GetString());
 
-			triangles.push_back(tri);
-		}
-		if(temp->GetName() == _T("matrix")){
-			matrix.FromString(temp->GetNodeContent());
-			//			wxLogMessage(_T("Geometry::FromXml: Matrix from >")
-			//					+ temp->GetNodeContent() + _T("<."));
-		}
-		temp = temp->GetNext();
-	}
 	return true;
 }

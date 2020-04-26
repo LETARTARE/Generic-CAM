@@ -43,8 +43,8 @@ public:
 protected:
 	Project* project;
 	size_t runID;
-	size_t newObjID;
-	size_t oldObjID;
+	Selection newObjID;
+	Selection oldObjID;
 };
 
 #endif /* __COMMANDRUNSETSTOCKOBJECT_H__ */

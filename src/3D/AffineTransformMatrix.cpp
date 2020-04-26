@@ -29,11 +29,7 @@
 #include "OpenGLMaterial.h"
 #include "Vector3.h"
 
-#include <wx/chartype.h>
-#include <wx/string.h>
-#include <wx/tokenzr.h>
-#include <wx/txtstrm.h>
-
+#include <sstream>
 #include <stdint.h>
 #ifdef _MSC_VER
 #define _USE_MATH_DEFINES
@@ -913,67 +909,17 @@ void AffineTransformMatrix::PutMatrixTogether(void)
 	a[15] = 1.0;
 }
 
-wxString AffineTransformMatrix::ToString()
+std::string AffineTransformMatrix::ToString()
 {
-	TakeMatrixApart();
-	wxString temp;
-	temp += wxString::Format(_T("%f#%f#%f#"), tx, ty, tz);
-	temp += wxString::Format(_T("%f#%f#%f#"), rx, ry, rz);
-	temp += wxString::Format(_T("%f#%f#%f"), sx, sy, sz);
-	return temp;
-}
-
-void AffineTransformMatrix::FromString(wxString const& string)
-{
-	wxStringTokenizer tkz(string, wxT("#"));
-	while(tkz.HasMoreTokens()){
-		wxString token = tkz.GetNextToken();
-		switch(tkz.CountTokens()){
-		case 8:
-			token.ToDouble(&tx);
-			break;
-		case 7:
-			token.ToDouble(&ty);
-			break;
-		case 6:
-			token.ToDouble(&tz);
-			break;
-		case 5:
-			token.ToDouble(&rx);
-			break;
-		case 4:
-			token.ToDouble(&ry);
-			break;
-		case 3:
-			token.ToDouble(&rz);
-			break;
-		case 2:
-			token.ToDouble(&sx);
-			break;
-		case 1:
-			token.ToDouble(&sy);
-			break;
-		case 0:
-			token.ToDouble(&sz);
-			break;
-		}
+	std::ostringstream out;
+	out << '[';
+	out << a[0];
+	for(uint_fast8_t n = 1; n < 16; ++n){
+		out << ',';
+		out << a[n];
 	}
-	PutMatrixTogether();
-}
-
-void AffineTransformMatrix::ToStream(wxTextOutputStream& stream) const
-{
-	for(uint_fast8_t n = 0; n < 16; n++){
-		if(n > 0) stream << _T(" ");
-		stream.WriteDouble(a[n]);
-	}
-}
-
-void AffineTransformMatrix::FromStream(wxTextInputStream& stream)
-{
-	for(uint_fast8_t n = 0; n < 16; n++)
-		stream >> a[n];
-	TakeMatrixApart();
+	out << ']';
+	return out.str();
 }
 
 void AffineTransformMatrix::GLMultMatrix(void) const

@@ -82,8 +82,6 @@ private:
 	void OnTransform(wxCommandEvent& event);
 	void OnSetFactors(wxCommandEvent& event);
 	void OnFlipNormals(wxCommandEvent& event);
-	Project* GetProject(void);
-	ProjectView* GetView(void);
 };
 
 #endif /* DIALOGOBJECTTRANSFORMATION_H_ */

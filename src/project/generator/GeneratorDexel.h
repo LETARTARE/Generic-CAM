@@ -59,15 +59,15 @@ public:
 	GeneratorDexel(size_t ID);
 	virtual ~GeneratorDexel();
 
-	virtual void ToStream(wxTextOutputStream & stream);
-	virtual bool FromStream(wxTextInputStream & stream);
+	virtual void ToJSON(JSON &js) const;
+	virtual bool FromJSON(const JSON &js);
 
 	virtual void Paint(void) const;
 
 protected:
 
-	void PrepareTargets(const Run &run,
-			const std::vector <Object> &objects, const DexelTarget &start);
+	void PrepareTargets(const Run &run, const std::vector <Object> &objects,
+			const DexelTarget &start);
 
 	void QuickCollectToolpaths(std::vector <ProtoToolpath> &ptp,
 			const double pathDistance);

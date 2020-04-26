@@ -26,6 +26,7 @@
 
 #ifndef AFFINETRANSFORMMATRIX_H_
 #define AFFINETRANSFORMMATRIX_H_
+
 /** \class AffineTransformMatrix
  * 	\code #include "AffineTransformMatrix.h"\endcode
  * 	\ingroup Base3D
@@ -60,10 +61,11 @@
  */
 
 // https://en.cppreference.com/w/cpp/language/operators
+
+#include <string>
+
 class Vector3;
-class wxString;
-class wxTextOutputStream;
-class wxTextInputStream;
+
 class AffineTransformMatrix {
 public:
 	enum orientation {
@@ -89,6 +91,7 @@ public:
 	void ResetRotationAndScale(void); //!< Resets the rotation and scale, but keeps the translation
 
 	void Set(AffineTransformMatrix const& b); //!< Copies a matrix by inserting a given matrix into \a a.
+	void Set(const double *a); //!< Set the matrix by passing a vector with 16 double values.
 	void SetOrigin(const Vector3& center);
 
 	void SetEx(const Vector3& ex);
@@ -227,10 +230,7 @@ public:
 	double sx, sy, sz; //!< Scaling after taking the matrix apart.
 	void PutMatrixTogether(void); //!< Calculate the matrix from rx,ry,rz,tx,ty,tz and sx,sy,sz.
 
-	wxString ToString(); //!< Generate a string containing the matrix.
-	void FromString(wxString const& string); //!< Setup the matrix from a string.
-	void ToStream(wxTextOutputStream & stream) const;
-	void FromStream(wxTextInputStream & stream);
+	std::string ToString(); //!< Generate a string containing the matrix.
 
 	void GLMultMatrix(void) const; //!< Multiply the matrix onto the active OpenGL matrix (right multiply)
 	void Paint(const double scale = 1.0) const; //!< Display the coordinate system in OpenGL

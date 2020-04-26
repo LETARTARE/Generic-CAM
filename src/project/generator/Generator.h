@@ -100,8 +100,8 @@ public:
 	virtual void TransferDataToPanel(wxPanel* panel,
 			CollectionUnits* settings) const = 0;
 	virtual void TransferDataFromPanel(CollectionUnits* settings) = 0;
-	virtual void ToStream(wxTextOutputStream & stream);
-	virtual bool FromStream(wxTextInputStream & stream);
+	virtual void ToJSON(JSON &js) const;
+	virtual bool FromJSON(const JSON &js);
 	virtual void Paint(void) const;
 	virtual void GenerateToolpath(const Run &run,
 			const std::vector <Object> &objects, const Tool &tool,

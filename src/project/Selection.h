@@ -32,6 +32,8 @@
  *
  */
 
+#include "../math/JSON.h"
+
 #include <cstddef>
 #include <set>
 #include <string>
@@ -46,14 +48,14 @@ public:
 		Anything = 0,
 		Object = 1,
 		Run = 2,
-		Generator,
-		Triangle,
-		TriangleGroup,
-		Edge,
-		EdgeGroup,
-		Vertex,
-		VertexGroup,
-		Axis
+		Generator = 3,
+		Triangle = 4,
+		TriangleGroup = 5,
+		Edge = 6,
+		EdgeGroup = 7,
+		Vertex = 8,
+		VertexGroup = 9,
+		Axis = 10
 	};
 
 private:
@@ -181,6 +183,8 @@ public:
 		return !(a == b);
 	}
 	std::string ToString(void) const;
+	void ToJSON(JSON &js) const;
+	bool FromJSON(const JSON &js);
 
 private:
 	// Speedup of index lookup with operator[]

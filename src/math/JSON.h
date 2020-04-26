@@ -38,8 +38,8 @@
 
 // https://esprima.org/
 #include <stddef.h>
-#include <iostream>
-#include <fstream>
+#include <istream>
+#include <ostream>
 #include <map>
 #include <string>
 #include <vector>
@@ -52,9 +52,9 @@ public:
 	JSON();
 
 	static JSON Load(std::string filename);
-	static JSON Load(std::ifstream * in);
+	static JSON Load(std::istream &in);
 	void Save(std::string filename);
-	void Save(std::ofstream &out);
+	void Save(std::ostream &out);
 
 	const JSON & Begin(void) const;
 
@@ -103,7 +103,7 @@ private:
 
 	class FileTokenizer {
 	public:
-		FileTokenizer(std::ifstream * in);
+		FileTokenizer(std::istream * in);
 		virtual ~FileTokenizer();
 		void SetupTables(void);
 		void NextToken(void);
@@ -113,7 +113,7 @@ private:
 		FileTokenizer(const FileTokenizer&);
 		FileTokenizer& operator=(const FileTokenizer&);
 
-		std::ifstream * in;
+		std::istream * in;
 		char * buffer;
 		char nextc;
 		size_t charsread;
@@ -126,7 +126,7 @@ private:
 	};
 
 	static JSON Parse(FileTokenizer &ft, int maxRecursion);
-	void ToStream(std::ofstream &out, bool usenewline = true,
+	void ToStream(std::ostream &out, bool usenewline = true,
 			size_t indent = 0) const;
 	static std::string EscapeString(const std::string &txt);
 };

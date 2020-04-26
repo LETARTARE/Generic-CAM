@@ -58,21 +58,22 @@
  *
  */
 
-#include "generator/DexelTarget.h"
-#include "generator/Generator.h"
+#include <stddef.h>
+#include <wx/filename.h>
+#include <wx/string.h>
+#include <vector>
+
 #include "../3D/AffineTransformMatrix.h"
 #include "../3D/BoundingBox.h"
 #include "../3D/OpenGLImage.h"
 #include "../3D/Vector3.h"
+#include "generator/DexelTarget.h"
+#include "generator/Generator.h"
 #include "Selection.h"
 
-#include <stddef.h>
-#include <wx/filename.h>
-#include <wx/string.h>
-#include <wx/txtstrm.h>
-#include <vector>
-
 class Project;
+class JSON;
+
 class Run {
 	friend class Project;
 
@@ -96,7 +97,8 @@ public:
 	enum StockType {
 		sObject, BoxTop, BoxCenter, BoxBottom
 	} stocktype;
-	size_t stockobject; //<! used, if the stocktype is Object
+	Selection stockobject; //<! used, if the stocktype is Object
+
 	Vector3 stocksize; //<! Size of a Box in x,y,z used as stock
 	Vector3 stockorigin; //<! Point where in the stock the origin lies
 
@@ -127,9 +129,8 @@ public:
 	void Paint(void) const;
 	void PaintVertices(void) const;
 
-	void ToStream(wxTextOutputStream & stream) const;
-	bool FromStream(wxTextInputStream & stream, size_t runID,
-			Project * project);
+	void ToJSON(JSON &js) const;
+	bool FromJSON(const JSON &js);
 
 //	void ToolpathToStream(wxTextOutputStream & stream);
 //	Workpiece* GetWorkpiece(void);

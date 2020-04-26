@@ -166,16 +166,16 @@ JSON JSON::Load(std::string filename)
 	in.open(filename.c_str(), std::ifstream::in | std::ios::binary);
 	if(!in.good()){
 		throw(std::runtime_error(
-				"JSON::BufferedFile::BufferedFile(...) - Could not read file."));
+				"JSON::Load(...) - Could not read file."));
 	}
-	return JSON::Load(&in);
+	return JSON::Load(in);
 }
 
-JSON JSON::Load(std::ifstream* in)
+JSON JSON::Load(std::istream &in)
 {
-	FileTokenizer ft(in);
+	FileTokenizer ft(&in);
 	ft.NextToken();
-	return Parse(ft, 7);
+	return Parse(ft, 127);
 }
 
 void JSON::Save(std::string filename)
@@ -185,7 +185,7 @@ void JSON::Save(std::string filename)
 	JSON::Save(out);
 }
 
-void JSON::Save(std::ofstream &out)
+void JSON::Save(std::ostream &out)
 {
 	ToStream(out, true);
 }
@@ -193,7 +193,8 @@ void JSON::Save(std::ofstream &out)
 JSON JSON::Parse(FileTokenizer &ft, int maxRecursion)
 {
 	JSON temp;
-	if(maxRecursion <= 0) throw("JSON JSON::Parse(...) - Maximum recursion depth reached.");
+	if(maxRecursion <= 0) throw(std::range_error(
+			"JSON JSON::Parse(...) - Maximum recursion depth reached."));
 	switch(ft.token.type){
 	case Token::_Null:
 		temp.type = Null;
@@ -215,7 +216,7 @@ JSON JSON::Parse(FileTokenizer &ft, int maxRecursion)
 				if(ft.token.type != Token::_Char
 						|| (ft.token.c != ',' && ft.token.c != '}')){
 
-					throw(std::logic_error("Expected ',' or '}' here."));
+					throw(std::logic_error("JSON::Parse(...) - Expected ',' or '}' here."));
 				}
 				if(ft.token.c == '}') break;
 				ft.NextToken();
@@ -230,7 +231,7 @@ JSON JSON::Parse(FileTokenizer &ft, int maxRecursion)
 				ft.NextToken();
 				if(ft.token.type != Token::_Char
 						|| (ft.token.c != ',' && ft.token.c != ']')){
-					throw(std::logic_error("Expected ',' or ']' here."));
+					throw(std::logic_error("JSON::Parse(...) - Expected ',' or ']' here."));
 				}
 				if(ft.token.c == ']') break;
 				ft.NextToken();
@@ -269,7 +270,7 @@ std::string JSON::Token::Lower(void) const
 	return temp;
 }
 
-JSON::FileTokenizer::FileTokenizer(std::ifstream * in)
+JSON::FileTokenizer::FileTokenizer(std::istream * in)
 {
 	buffersize = 1e7;
 
@@ -287,7 +288,7 @@ JSON::FileTokenizer::FileTokenizer(std::ifstream * in)
 
 	buffer = new char[buffersize];
 	if(buffer == NULL) throw(std::logic_error(
-			"JSON::BufferedFile::BufferedFile(...) - Out of memory."));
+			"JSON::FileTokenizer::FileTokenizer(...) - Out of memory."));
 
 	SetupTables();
 }
@@ -305,7 +306,7 @@ void JSON::FileTokenizer::SetupTables(void)
 
 	statetable = new unsigned char[27 * 256];
 	if(statetable == NULL) throw(std::logic_error(
-			"JSON::BufferedFile::BufferedFile(...) - Out of memory."));
+			"JSON::FileTokenizer::SetupTables(...) - Out of memory."));
 	for(size_t n = 0; n < 27 * 256; ++n){
 		unsigned char m = (n % 256);
 		unsigned char s = (unsigned char) (n >> 8);
@@ -373,7 +374,7 @@ void JSON::FileTokenizer::SetupTables(void)
 
 	actiontable = new unsigned char[27 * 256];
 	if(actiontable == NULL) throw(std::logic_error(
-			"JSON::BufferedFile::BufferedFile(...) - Out of memory."));
+			"JSON::FileTokenizer::SetupTables(...) - Out of memory."));
 	for(size_t n = 0; n < 27 * 256; ++n){
 		unsigned char m = (n % 256);
 		unsigned char s = (unsigned char) (n >> 8);
@@ -508,7 +509,7 @@ void JSON::FileTokenizer::NextToken(void)
 	}while(charsread == buffersize);
 }
 
-void JSON::ToStream(std::ofstream &out, bool usenewline, size_t indent) const
+void JSON::ToStream(std::ostream &out, bool usenewline, size_t indent) const
 {
 	switch(type){
 	case Null:

@@ -61,7 +61,10 @@ public:
 	bool IsLoaded(void) const;
 	bool Load(void);
 	bool Load(std::string filename);
+	bool Load(std::istream &in);
+
 	void Save(std::string filename) const;
+	void Save(std::ostream &out) const;
 
 //	friend std::istream& operator>>(std::istream &in, ToolBox &hull);
 //	friend std::ostream& operator<<(std::ostream &out, const ToolBox &hull);
@@ -86,9 +89,10 @@ private:
 	void ParsePostProcess(const JSON &js, Tool::PostProcess &postprocess);
 	void ParseContour(const JSON &js, Tool::Contour &contour);
 
-	void StoreGeometry(JSON &js, const Tool::Geometry &geometry)const;
-	void StoreStartValues(JSON &js, const Tool::StartValues &startvalues)const;
-	void StorePostProcess(JSON &js, const Tool::PostProcess &postprocess)const;
+	void StoreTools(JSON &js) const;
+	void StoreGeometry(JSON &js, const Tool::Geometry &geometry) const;
+	void StoreStartValues(JSON &js, const Tool::StartValues &startvalues) const;
+	void StorePostProcess(JSON &js, const Tool::PostProcess &postprocess) const;
 	void StoreContour(JSON &js, const Tool::Contour &contour) const;
 
 };

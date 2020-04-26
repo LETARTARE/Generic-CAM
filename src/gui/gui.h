@@ -61,83 +61,86 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
-#define ID_VIEWPREFERENCES 1000
-#define ID_TOGGLESTEREO3D 1001
-#define ID_OBJECTLOAD 1002
-#define ID_OBJECTFLIPNORMALS 1003
-#define ID_OBJECTMODIFY 1004
-#define ID_RUNMODIFY 1005
-#define ID_2D 1006
-#define ID_3D 1007
-#define ID_DRILLING 1008
-#define ID_MULTIAXIS 1009
-#define ID_SIMULATE 1010
-#define ID_TOOLPATHEXPORT 1011
-#define ID_MANAGETOOLS 1012
-#define ID_MANAGEMACHINES 1013
-#define ID_GCODETEST 1014
-#define ID_MULTTEN 1015
-#define ID_DIVTEN 1016
-#define ID_SCALEUNITX 1017
-#define ID_SCALEUNITY 1018
-#define ID_SCALEUNITZ 1019
-#define ID_SCALEPERCENTX 1020
-#define ID_SCALEPERCENTY 1021
-#define ID_SCALEPERCENTZ 1022
-#define ID_SCALEPERCENT 1023
-#define ID_MOVEZP 1024
-#define ID_MOVEYP 1025
-#define ID_MOVEXN 1026
-#define ID_MOVEXP 1027
-#define ID_MOVEYN 1028
-#define ID_MOVEZN 1029
-#define ID_ALIGNTOP 1030
-#define ID_ALIGNMIDDLE 1031
-#define ID_ALIGNBOTTOM 1032
-#define ID_ALIGNCENTER 1033
-#define ID_ROTATEYN 1034
-#define ID_ROTATEXN 1035
-#define ID_ROTATEYP 1036
-#define ID_ROTATEZN 1037
-#define ID_ROTATEZP 1038
-#define ID_ROTATEXP 1039
-#define ID_FLIPX 1040
-#define ID_FLIPY 1041
-#define ID_FLIPZ 1042
-#define ID_SELECTOBJECT 1043
-#define ID_SELECTAXISX 1044
-#define ID_SELECTAXISY 1045
-#define ID_SELECTAXISZ 1046
-#define ID_SETSIZEX 1047
-#define ID_SETSIZEY 1048
-#define ID_SETSIZEZ 1049
-#define ID_SELECTOBJECTSTOCK 1050
-#define ID_SELECTORIGIN 1051
-#define ID_SELECTAREAOBJECT 1052
-#define ID_TOOLLIBRARYMANAGE 1053
-#define ID_SPEED 1054
-#define ID_FEED 1055
-#define ID_MARGINSIDE 1056
-#define ID_MARGINBELOW 1057
-#define ID_CLEARANCEHEIGHT 1058
-#define wxID_LOAD 1059
-#define ID_MACHINEDESCRIPTIONEVALUATE 1060
-#define ID_MACHINEDEBUGGERSHOWCONTROLLER 1061
-#define ID_SHOWPREFERENCES 1062
-#define ID_MACHINEDEBUGGERTOGGLESTEREO3D 1063
-#define ID_CONTROLLERSHOW 1064
-#define ID_AXISX 1065
-#define ID_AXISY 1066
-#define ID_AXISZ 1067
-#define ID_TEXTX 1068
-#define ID_TEXTY 1069
-#define ID_TEXTZ 1070
-#define ID_AXISRX 1071
-#define ID_AXISRY 1072
-#define ID_AXISRZ 1073
-#define ID_TEXTRX 1074
-#define ID_TEXTRY 1075
-#define ID_TEXTRZ 1076
+#define ID_NEW 1000
+#define ID_OPEN 1001
+#define ID_SAVE 1002
+#define ID_VIEWPREFERENCES 1003
+#define ID_TOGGLESTEREO3D 1004
+#define ID_OBJECTLOAD 1005
+#define ID_OBJECTFLIPNORMALS 1006
+#define ID_OBJECTMODIFY 1007
+#define ID_RUNMODIFY 1008
+#define ID_2D 1009
+#define ID_3D 1010
+#define ID_DRILLING 1011
+#define ID_MULTIAXIS 1012
+#define ID_SIMULATE 1013
+#define ID_TOOLPATHEXPORT 1014
+#define ID_MANAGETOOLS 1015
+#define ID_MANAGEMACHINES 1016
+#define ID_GCODETEST 1017
+#define ID_MULTTEN 1018
+#define ID_DIVTEN 1019
+#define ID_SCALEUNITX 1020
+#define ID_SCALEUNITY 1021
+#define ID_SCALEUNITZ 1022
+#define ID_SCALEPERCENTX 1023
+#define ID_SCALEPERCENTY 1024
+#define ID_SCALEPERCENTZ 1025
+#define ID_SCALEPERCENT 1026
+#define ID_MOVEZP 1027
+#define ID_MOVEYP 1028
+#define ID_MOVEXN 1029
+#define ID_MOVEXP 1030
+#define ID_MOVEYN 1031
+#define ID_MOVEZN 1032
+#define ID_ALIGNTOP 1033
+#define ID_ALIGNMIDDLE 1034
+#define ID_ALIGNBOTTOM 1035
+#define ID_ALIGNCENTER 1036
+#define ID_ROTATEYN 1037
+#define ID_ROTATEXN 1038
+#define ID_ROTATEYP 1039
+#define ID_ROTATEZN 1040
+#define ID_ROTATEZP 1041
+#define ID_ROTATEXP 1042
+#define ID_FLIPX 1043
+#define ID_FLIPY 1044
+#define ID_FLIPZ 1045
+#define ID_SELECTOBJECT 1046
+#define ID_SELECTAXISX 1047
+#define ID_SELECTAXISY 1048
+#define ID_SELECTAXISZ 1049
+#define ID_SETSIZEX 1050
+#define ID_SETSIZEY 1051
+#define ID_SETSIZEZ 1052
+#define ID_SELECTOBJECTSTOCK 1053
+#define ID_SELECTORIGIN 1054
+#define ID_SELECTAREAOBJECT 1055
+#define ID_TOOLLIBRARYMANAGE 1056
+#define ID_SPEED 1057
+#define ID_FEED 1058
+#define ID_MARGINSIDE 1059
+#define ID_MARGINBELOW 1060
+#define ID_CLEARANCEHEIGHT 1061
+#define wxID_LOAD 1062
+#define ID_MACHINEDESCRIPTIONEVALUATE 1063
+#define ID_MACHINEDEBUGGERSHOWCONTROLLER 1064
+#define ID_SHOWPREFERENCES 1065
+#define ID_MACHINEDEBUGGERTOGGLESTEREO3D 1066
+#define ID_CONTROLLERSHOW 1067
+#define ID_AXISX 1068
+#define ID_AXISY 1069
+#define ID_AXISZ 1070
+#define ID_TEXTX 1071
+#define ID_TEXTY 1072
+#define ID_TEXTZ 1073
+#define ID_AXISRX 1074
+#define ID_AXISRY 1075
+#define ID_AXISRZ 1076
+#define ID_TEXTRX 1077
+#define ID_TEXTRY 1078
+#define ID_TEXTRZ 1079
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GUIFrameMain
@@ -252,32 +255,32 @@ class GUIObjectTransformation : public wxFrame
 		wxStaticText* m_staticText44;
 		wxTextCtrl* m_textCtrlScaleUnitX;
 		wxStaticText* m_staticTextUnitX2;
-		wxButton* m_button19;
+		wxButton* m_buttonCalculateX;
 		wxStaticText* m_staticText46;
 		wxTextCtrl* m_textCtrlScaleUnitY;
 		wxStaticText* m_staticTextUnitY2;
-		wxButton* m_button21;
+		wxButton* m_buttonCalculateY;
 		wxStaticText* m_staticText52;
 		wxTextCtrl* m_textCtrlScaleUnitZ;
 		wxStaticText* m_staticTextUnitZ2;
-		wxButton* m_button23;
+		wxButton* m_buttonCalculateZ;
 		wxCheckBox* m_checkBoxScaleProportionally;
 		wxStaticText* m_staticText50;
 		wxTextCtrl* m_textCtrlScalePercentX;
 		wxStaticText* m_staticText51;
-		wxButton* m_button20;
+		wxButton* m_buttonScaleX;
 		wxStaticText* m_staticText48;
 		wxTextCtrl* m_textCtrlScalePercentY;
 		wxStaticText* m_staticText55;
-		wxButton* m_button22;
+		wxButton* m_buttonScaleY;
 		wxStaticText* m_staticText54;
 		wxTextCtrl* m_textCtrlScalePercentZ;
 		wxStaticText* m_staticText43;
-		wxButton* m_button24;
+		wxButton* m_buttonScaleZ;
 		wxStaticText* m_staticText68;
 		wxTextCtrl* m_textCtrlScalePercent;
 		wxStaticText* m_staticText49;
-		wxButton* m_button15;
+		wxButton* m_buttonScaleAll;
 		wxPanel* m_panelMove;
 		wxStaticText* m_staticText62;
 		wxTextCtrl* m_textCtrlMoveStep;
@@ -317,7 +320,7 @@ class GUIObjectTransformation : public wxFrame
 	
 	public:
 		
-		GUIObjectTransformation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 709,468 ), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxTAB_TRAVERSAL );
+		GUIObjectTransformation( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 709,468 ), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxTAB_TRAVERSAL );
 		
 		~GUIObjectTransformation();
 	
@@ -364,19 +367,19 @@ class GUIJobSetup : public wxFrame
 		wxButton* m_buttonOrigin;
 		wxPanel* m_panelSupports;
 		wxScrolledWindow* m_scrolledWindowSupports;
+		wxStaticText* m_staticTextSupportSlotwidth;
+		wxTextCtrl* m_textCtrlSupportSlotwidth;
+		wxStaticText* m_staticTextUnitSupportSlotwidth;
 		wxStaticText* m_staticTextSupportWidth;
 		wxTextCtrl* m_textCtrlSupportWidth;
 		wxStaticText* m_staticTextUnitSupportWidth;
 		wxStaticText* m_staticTextSupportHeight;
 		wxTextCtrl* m_textCtrlSupportHeight;
 		wxStaticText* m_staticTextUnitSupportHeight;
-		wxStaticText* m_staticTextSupportSlotwidth;
-		wxTextCtrl* m_textCtrlSupportSlotwidth;
-		wxStaticText* m_staticTextUnitSupportSlotwidth;
 		wxChoice* m_choiceSupportLevel;
-		wxStaticText* m_staticTextSupportlevel;
-		wxTextCtrl* m_textCtrlSupportLevel;
 		wxStaticText* m_staticTextSupportLevel;
+		wxTextCtrl* m_textCtrlSupportLevel;
+		wxStaticText* m_staticTextUnitSupportLevel;
 		wxStaticText* m_staticTextSupportXDistance;
 		wxTextCtrl* m_textCtrlSupportXDistance;
 		wxStaticText* m_staticTextUnitSupportXDistance;
@@ -410,7 +413,7 @@ class GUIJobSetup : public wxFrame
 	
 	public:
 		
-		GUIJobSetup( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxTAB_TRAVERSAL );
+		GUIJobSetup( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxTAB_TRAVERSAL );
 		
 		~GUIJobSetup();
 	
@@ -460,7 +463,7 @@ class GUIToolpathGenerator : public wxFrame
 	
 	public:
 		
-		GUIToolpathGenerator( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 491,611 ), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIToolpathGenerator( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 491,611 ), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~GUIToolpathGenerator();
 	
@@ -534,7 +537,7 @@ class GUIPostProcess : public wxFrame
 	
 	public:
 		
-		GUIPostProcess( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 536,300 ), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		GUIPostProcess( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 536,300 ), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~GUIPostProcess();
 	

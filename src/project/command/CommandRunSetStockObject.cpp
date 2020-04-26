@@ -33,8 +33,7 @@ CommandRunSetStockObject::CommandRunSetStockObject(const wxString& name,
 {
 	this->project = project;
 	this->runID = runID;
-	this->newObjID = objID;
-	this->oldObjID = 0;
+	this->newObjID = Selection(Selection::Object, objID);
 }
 
 bool CommandRunSetStockObject::Do(void)

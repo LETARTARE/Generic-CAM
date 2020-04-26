@@ -14,7 +14,7 @@
    id="svg3753"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="tool_drilling.svg">
+   sodipodi:docname="tool_2D.svg">
   <defs
      id="defs3755" />
   <sodipodi:namedview
@@ -77,25 +77,15 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      transform="translate(0,16)">
-    <rect
-       style="fill:#00ff00;fill-opacity:1;stroke:none"
-       id="rect4269"
-       width="47.999996"
-       height="37.5"
-       x="0"
-       y="-5.5"
-       ry="0" />
     <path
-       style="fill:#f0f0f0;fill-opacity:1;stroke:none"
-       d="m 18,-5.5 0,28.5 6,3 6,-3 0,-28.5 z"
-       id="path4273"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccccc" />
+       style="fill:none;fill-rule:evenodd;stroke:#30db21;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;fill-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
+       d="m 4.8240842,-9.8861294 32.0606468,0 c 0,0 5.343441,0 5.343441,5.7047193 0,5.7047193 -5.343441,5.7047193 -5.343441,5.7047193 l -26.717206,0 c 0,0 -5.3434408,0 -5.3434408,5.7047193 0,5.7047195 5.3434408,5.7047195 5.3434408,5.7047195 l 26.717206,0 c 0,0 5.343441,0 5.343441,5.70472 0,5.704719 -5.343441,5.704719 -5.343441,5.704719 l -32.0606468,0"
+       id="path4222"
+       inkscape:connector-curvature="0" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:6, 3, 1.5, 3;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 24,-16 0,48"
-       id="path4275"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
+       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 4.9737279,-9.7721147 32.0606481,0 c 0,0 5.343441,0 5.343441,5.704719 0,5.70472 -5.343441,5.70472 -5.343441,5.70472 l -26.717207,0 c 0,0 -5.3434411,0 -5.3434411,5.704719 0,5.7047187 5.3434411,5.7047187 5.3434411,5.7047187 l 26.717207,0 c 0,0 5.343441,0 5.343441,5.70472 0,5.704719 -5.343441,5.704719 -5.343441,5.704719 l -32.0606481,0"
+       id="path4222-3"
+       inkscape:connector-curvature="0" />
   </g>
 </svg>

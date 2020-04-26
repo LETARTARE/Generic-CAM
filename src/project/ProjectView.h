@@ -50,6 +50,7 @@ public:
 	ProjectView();
 	virtual ~ProjectView();
 
+	void ShowAnimation(bool showSimulator);
 	void SetSelection(const Selection &selection);
 	void SetHover(const Selection &hover);
 
@@ -69,9 +70,9 @@ private:
 
 public:
 	enum ViewType {
-		vObject, vRun, vOrigin, vGenerator
+		vObject, vRun, vOrigin, vGenerator, vSimulation
 	} type;
-	enum CenterType {
+	enum SimulationCenterType {
 		vCenterMachine, vCenterTool, vCenterWorkpiece
 	};
 	enum SimulationDisplayType {

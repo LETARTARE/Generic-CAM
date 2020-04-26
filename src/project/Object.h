@@ -37,15 +37,18 @@
  * the postion, the object was loaded in.
  */
 
-#include "../3D/Hull.h"
-#include "../3D/BoundingBox.h"
+#include <stddef.h>
+#include <wx/filename.h>
+#include <wx/string.h>
+//#include <wx/txtstrm.h>
+
 #include "../3D/AffineTransformMatrix.h"
+#include "../3D/BoundingBox.h"
+#include "../3D/Hull.h"
 #include "../3D/OpenGLMaterial.h"
 #include "Selection.h"
 
-#include <wx/txtstrm.h>
-#include <wx/filename.h>
-#include <wx/string.h>
+class JSON;
 
 class Object {
 	// Constructor / Destructor
@@ -86,8 +89,8 @@ public:
 
 	bool IsEmpty(void) const;
 
-	void ToStream(wxTextOutputStream & stream, size_t objID) const;
-	bool FromStream(wxTextInputStream & stream);
+	void ToJSON(JSON &js) const;
+	bool FromJSON(const JSON &js);
 
 	void Paint(const OpenGLMaterial &face, const OpenGLMaterial &edge,
 			const Selection& sel) const;

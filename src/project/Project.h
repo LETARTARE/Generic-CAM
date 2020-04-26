@@ -52,13 +52,13 @@
 #include <wx/docview.h>
 #include <wx/defs.h>
 
-#if wxUSE_STD_IOSTREAM
-typedef wxSTD istream DocumentIstream;
-typedef wxSTD ostream DocumentOstream;
-#else // !wxUSE_STD_IOSTREAM
-typedef wxInputStream DocumentIstream;
-typedef wxOutputStream DocumentOstream;
-#endif // wxUSE_STD_IOSTREAM/!wxUSE_STD_IOSTREAM
+//#if wxUSE_STD_IOSTREAM
+//typedef wxSTD istream DocumentIstream;
+//typedef wxSTD ostream DocumentOstream;
+//#else // !wxUSE_STD_IOSTREAM
+//typedef wxInputStream DocumentIstream;
+//typedef wxOutputStream DocumentOstream;
+//#endif // wxUSE_STD_IOSTREAM/!wxUSE_STD_IOSTREAM
 
 class Project:public wxDocument {
 	friend class ProjectView;
@@ -80,7 +80,7 @@ class Project:public wxDocument {
 	friend class CommandRunGeneratorRename;
 	friend class CommandRunGeneratorDelete;
 	friend class CommandRunRemove;
-	friend class CommandRunMachineLoad;
+	friend class CommandRunMachineSet;
 
 public:
 	Project();
@@ -102,12 +102,8 @@ public:
 	bool Has(const Selection &sel) const;
 	bool Has(const Selection::Type type, const size_t ID) const;
 
-	bool DoSaveDocument(const wxString& file);
-	bool DoOpenDocument(const wxString& file);
-
-	//TODO Remove the functions below and join them into the functions above
-	bool Load(wxFileName fileName);
-	bool Save(wxFileName fileName);
+	virtual bool DoSaveDocument(const wxString& filename);
+	virtual bool DoOpenDocument(const wxString& filename);
 
 	bool GenerateToolpaths(void);
 //	bool SaveToolpath(wxFileName fileName, int runNr);
@@ -116,9 +112,9 @@ public:
 
 	BoundingBox GetBBox(const Selection & selected) const;
 
-	size_t GetNextObjectID(void) ;
-	size_t GetNextRunID(void) ;
-	size_t GetNextGeneratorID(void) ;
+	size_t GetNextObjectID(void);
+	size_t GetNextRunID(void);
+	size_t GetNextGeneratorID(void);
 
 	size_t GetToolCount(void) const;
 
@@ -147,8 +143,8 @@ private:
 	wxMutex mtx_project;
 	wxMutex mtx_generator;
 #endif
-
-DECLARE_DYNAMIC_CLASS(Project);
+	wxDECLARE_NO_COPY_CLASS(Project);
+	wxDECLARE_DYNAMIC_CLASS(Project);
 };
 
 #endif /* PROJECT_H_ */

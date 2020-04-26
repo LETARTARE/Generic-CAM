@@ -36,8 +36,11 @@
 #include <wx/log.h>
 
 #include <algorithm>
+#include <iostream>
+#include <sstream>
 
 #include "../3D/OpenGL.h"
+#include "../math/JSON.h"
 
 Object::Object(size_t ID) :
 		ID(ID)
@@ -289,51 +292,42 @@ bool Object::ReloadObject(void)
 	return false;
 }
 
-void Object::ToStream(wxTextOutputStream& stream, size_t objID) const
+void Object::ToJSON(JSON &js) const
 {
-	stream << _T("Name:") << endl;
-	stream << name << endl;
-	stream << _T("Filename:") << endl;
-	stream << wxString::Format(_T("object_%zu.obj"), objID) << endl;
-	stream << _T("Matrix: ");
-	matrix.ToStream(stream);
-	stream << endl;
-	stream << _T("Show: ");
-	stream << ((show)? 1 : 0);
-	stream << endl;
-	stream << _T("Selectable: ");
-	stream << ((selectable)? 1 : 0);
-	stream << endl;
+	js.SetObject(true);
+	js["ID"].SetNumber(ID);
+	js["Name"].SetString(name.ToStdString());
+	std::ostringstream out;
+	out << "object_" << ID << ".obj";
+	js["Filename"].SetString(out.str());
+	JSON &m = js["Matrix"];
+	m.SetArray(16);
+	for(size_t n = 0; n < 16; ++n)
+		m[n].SetNumber(matrix[n]);
+	js["Show"].SetBool(show);
+	js["Selectable"].SetBool(selectable);
+
 //	stream << _T("Color: ");
 //	stream << geometry.color.x << _T(" ");
 //	stream << geometry.color.y << _T(" ");
 //	stream << geometry.color.z << endl;
 }
 
-bool Object::FromStream(wxTextInputStream& stream)
+bool Object::FromJSON(const JSON& js)
 {
-	wxString temp;
-	temp = stream.ReadLine();
-	if(temp.Cmp(_T("Name:")) != 0) return false;
-	name = stream.ReadLine();
-	temp = stream.ReadLine();
-	if(temp.Cmp(_T("Filename:")) != 0) return false;
-	temp = stream.ReadLine();
-	temp = stream.ReadWord();
-	if(temp.Cmp(_T("Matrix:")) != 0) return false;
-	matrix.FromStream(stream);
-	temp = stream.ReadWord();
-	if(temp.Cmp(_T("Show:")) != 0) return false;
-	show = (stream.Read8() == 1);
-	temp = stream.ReadWord();
-	if(temp.Cmp(_T("Selectable:")) != 0) return false;
-	show = (stream.Read8() == 1);
+	if(!js.HasKey("ID")) return false;
+	ID = (size_t) round(js["ID"].GetNumber());
+	if(!js.HasKey("Name")) return false;
+	name = js["Name"].GetString();
+	const JSON &m = js["Matrix"];
+	for(size_t n = 0; n < 16; ++n)
+		matrix[n] = m[n].GetNumber();
+	show = js["Show"].GetBool();
+	selectable = js["Selectable"].GetBool();
 
 	//	if(temp.Cmp(_T("Color:")) != 0) return false;
-//	geometry.color.x = stream.ReadDouble();
-//	geometry.color.y = stream.ReadDouble();
-//	geometry.color.z = stream.ReadDouble();
+	//	geometry.color.x = stream.ReadDouble();
+	//	geometry.color.y = stream.ReadDouble();
+	//	geometry.color.z = stream.ReadDouble();
 
-	return true;
 }
-

@@ -149,6 +149,9 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 		}
 	}
 
+//	menuRecentFiles.Append(wxID_REVERT, wxT("Revert"));
+	menuRecentFiles.Append(wxID_REVERT_TO_SAVED, wxT("Revert to saved"));
+	menuRecentFiles.AppendSeparator();
 	doc->GetDocumentManager()->FileHistoryAddFilesToMenu(&menuRecentFiles);
 	doc->GetCommandProcessor()->Initialize();
 
@@ -216,7 +219,7 @@ size_t FrameMain::GetFreeSystemMemory()
 	long pages = sysconf(_SC_AVPHYS_PAGES);
 	long page_size = sysconf(_SC_PAGE_SIZE);
 	return pages * page_size;
-#elif __WIN
+#elif defined(__WIN)
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);
 	GlobalMemoryStatusEx(&status);
@@ -258,10 +261,16 @@ bool FrameMain::TransferDataToWindow(bool updatetree)
 
 	dialogObjectTransformation->TransferDataToWindow();
 	dialogJobSetup->TransferDataToWindow();
-//	dialogToolbox->TransferDataToWindow();
+	dialogToolbox->TransferDataToWindow();
 	dialogToolpathGenerator->TransferDataToWindow();
-//	dialogAnimation->TransferDataToWindow();
+	dialogAnimation->TransferDataToWindow();
 //	dialogDebugger->TransferDataToWindow();
+
+	m_ribbonButtonBarProject->EnableButton(wxID_SAVE,
+			GetDocument()->IsModified());
+
+	ProjectView * const view = wxStaticCast(GetView(), ProjectView);
+	view->ShowAnimation(dialogAnimation->IsShown());
 
 	//	Refresh();
 	UpdateStatus();
@@ -282,12 +291,18 @@ void FrameMain::UpdateStatus(void)
 {
 	m_statusBar->SetStatusText(wxString(selection.ToString()), 0);
 
-	if(loopguard.TryLock() != wxMUTEX_BUSY){
-		m_statusBar->SetStatusText(_T("loopguard: unlocked"), 1);
-		loopguard.Unlock();
+	if(GetDocument()->GetCommandProcessor()->IsDirty()){
+		m_statusBar->SetStatusText(_T("modified"), 1);
 	}else{
-		m_statusBar->SetStatusText(_T("loopguard: locked"), 1);
+		m_statusBar->SetStatusText(_T("not modified"), 1);
 	}
+
+//	if(loopguard.TryLock() != wxMUTEX_BUSY){
+//		m_statusBar->SetStatusText(_T("loopguard: unlocked"), 1);
+//		loopguard.Unlock();
+//	}else{
+//		m_statusBar->SetStatusText(_T("loopguard: locked"), 1);
+//	}
 }
 
 void FrameMain::OnProjectNew(wxRibbonButtonBarEvent& event)
@@ -321,8 +336,6 @@ void FrameMain::OnProjectSaveMenu(wxRibbonButtonBarEvent& event)
 	wxMenu menu;
 	menu.Append(wxID_SAVE, wxT("Save"));
 	menu.Append(wxID_SAVEAS, wxT("Save as ..."));
-	menu.Append(wxID_REVERT, wxT("Revert"));
-	menu.Append(wxID_REVERT_TO_SAVED, wxT("Revert to saved"));
 	event.PopupMenu(&menu);
 }
 
@@ -718,7 +731,9 @@ void FrameMain::OnGeneratorDelete(wxCommandEvent& event)
 
 void FrameMain::OnCAMPostProcessSimulate(wxRibbonButtonBarEvent& event)
 {
+	ProjectView * const view = wxStaticCast(GetView(), ProjectView);
 	dialogAnimation->Show();
+	view->ShowAnimation(true);
 	TransferDataToWindow(false);
 	dialogAnimation->Raise();
 }

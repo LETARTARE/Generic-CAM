@@ -136,15 +136,28 @@ void ProjectView::OnUpdate3D(void)
 	frame->m_canvas->Refresh();
 }
 
+void ProjectView::ShowAnimation(bool showSimulator)
+{
+	const ViewType oldType = type;
+	if(showSimulator){
+		type = vSimulation;
+	}else{
+		type = vRun;
+		SetSelection(selection);
+	}
+	if(type != oldType) OnUpdate3D();
+}
+
 void ProjectView::SetSelection(const Selection& selected)
 {
 	//	type = vIdle;
-	if(selected.IsType(Selection::Object)) type = vObject;
-	if(selected.IsType(Selection::Axis)) type = vObject;
-	if(selected.IsType(Selection::Run)) type = vRun;
-	if(selected.IsType(Selection::Generator)) type = ProjectView::vGenerator;
-//	if(DEBUG) std::cout << "ProjectView::SetSelection - type = " << (int) type
-//			<< ";\n";
+	if(type != vSimulation){
+		if(selected.IsType(Selection::Object)) type = vObject;
+		if(selected.IsType(Selection::Axis)) type = vObject;
+		if(selected.IsType(Selection::Run)) type = vRun;
+		if(selected.IsType(Selection::Generator)) type =
+				ProjectView::vGenerator;
+	}
 	bool update = (this->selection != selected);
 	this->selection = selected;
 	if(update) OnUpdate3D();

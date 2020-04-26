@@ -255,6 +255,8 @@ std::string Selection::GetTypeName(Type type)
 		return std::string("Run");
 	case Generator:
 		return std::string("Generator");
+	default:
+		throw(std::logic_error("Selection::GetTypeName - Missing type."));
 	}
 	return std::string("-");
 }
@@ -637,3 +639,38 @@ std::string Selection::ToString(void) const
 	return x.str();
 }
 
+void Selection::ToJSON(JSON& js) const
+{
+	js.SetObject(false);
+	js["BaseType"].SetString(GetBaseTypeName());
+	js["BaseID"].SetNumber(baseID);
+	js["Type"].SetString(GetTypeName());
+	JSON &s = js["Selected"];
+	s.SetArray(selected.size());
+	size_t n = 0;
+	for(std::set <size_t>::iterator it = this->selected.begin();
+			it != this->selected.end(); ++it)
+		s[n++].SetNumber(*it);
+}
+
+bool Selection::FromJSON(const JSON& js)
+{
+	std::string tempbase = js["BaseType"].GetString();
+	for(size_t n = 0; n <= 2; ++n)
+		if(tempbase.compare(GetBaseTypeName((BaseType) n)) == 0){
+			basetype = (BaseType) n;
+			break;
+		}
+	std::string temptype = js["Type"].GetString();
+	for(size_t n = 0; n <= 10; ++n)
+		if(temptype.compare(GetTypeName((Type) n)) == 0){
+			type = (Type) n;
+			break;
+		}
+	baseID = js["BaseID"].GetNumber();
+	selected.clear();
+	const JSON &s = js["Selected"];
+	for(size_t n = 0; n < s.Size(); ++n)
+		selected.insert(s[n].GetNumber());
+	return true;
+}

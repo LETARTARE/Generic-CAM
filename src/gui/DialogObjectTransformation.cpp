@@ -62,7 +62,8 @@ DialogObjectTransformation::~DialogObjectTransformation()
 
 void DialogObjectTransformation::SetSelection(const Selection& selection)
 {
-	this->selected = selection;
+	selected = selection;
+	if(selected.IsBaseType(Selection::BaseObject)) selected.ShiftUp();
 	TransferDataToWindow();
 }
 
@@ -71,6 +72,7 @@ bool DialogObjectTransformation::SelectionIsOK(void) const
 	const FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	const Project* project = wxStaticCast(frame->GetDocument(), Project);
 	if(project == NULL) return false;
+	if(!selected.IsType(Selection::Object)) return false;
 	return (project->Has(selected));
 }
 
@@ -78,10 +80,35 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 {
 	if(!this->IsShown()) return false;
 
-	Project* project = GetProject();
-//	ProjectView* view = GetView();
-	CollectionUnits* settings =
+	const FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
+	const Project* project = wxStaticCast(frame->GetDocument(), Project);
+	const CollectionUnits* settings =
 			&(wxStaticCast(GetParent()->GetParent(),FrameParent)->units);
+
+	// Update Units
+	m_staticTextUnitX->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitY->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitZ->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitX2->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitY2->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitZ2->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitMove->SetLabel(settings->Distance.GetOtherName());
+	m_staticTextUnitAngle->SetLabel(settings->Angle.GetOtherName());
+
+	m_textCtrlScaleUnitX->SetValue(settings->Distance.TextFromSI(scaleUnitX));
+	m_textCtrlScaleUnitY->SetValue(settings->Distance.TextFromSI(scaleUnitY));
+	m_textCtrlScaleUnitZ->SetValue(settings->Distance.TextFromSI(scaleUnitZ));
+	m_textCtrlScalePercent->SetValue(
+			wxString::Format(_T("%.1f"), scalePercent * 100));
+	m_textCtrlScalePercentX->SetValue(
+			wxString::Format(_T("%.1f"), scalePercentX * 100));
+	m_textCtrlScalePercentY->SetValue(
+			wxString::Format(_T("%.1f"), scalePercentY * 100));
+	m_textCtrlScalePercentZ->SetValue(
+			wxString::Format(_T("%.1f"), scalePercentZ * 100));
+	m_textCtrlMoveStep->SetValue(settings->Distance.TextFromSI(moveStep));
+	m_textCtrlRotateStep->SetValue(settings->Angle.TextFromSI(rotateStep));
+	m_checkBoxScaleProportionally->SetValue(scaleProportional);
 
 	if(selected.IsSetEmpty() || !selected.IsType(Selection::Object)){
 		SetTitle(_("No object selected..."));
@@ -102,41 +129,9 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 		SetTitle(obj->name);
 	}
 
-	// Update Units
 	m_textCtrlSizeX->SetValue(settings->Distance.TextFromSI(bbox.GetSizeX()));
 	m_textCtrlSizeY->SetValue(settings->Distance.TextFromSI(bbox.GetSizeY()));
 	m_textCtrlSizeZ->SetValue(settings->Distance.TextFromSI(bbox.GetSizeZ()));
-
-	m_staticTextUnitX->SetLabel(settings->Distance.GetOtherName());
-	m_staticTextUnitY->SetLabel(settings->Distance.GetOtherName());
-	m_staticTextUnitZ->SetLabel(settings->Distance.GetOtherName());
-	m_staticTextUnitX2->SetLabel(settings->Distance.GetOtherName());
-	m_staticTextUnitY2->SetLabel(settings->Distance.GetOtherName());
-	m_staticTextUnitZ2->SetLabel(settings->Distance.GetOtherName());
-	m_staticTextUnitMove->SetLabel(settings->Distance.GetOtherName());
-	m_staticTextUnitAngle->SetLabel(settings->Angle.GetOtherName());
-
-	m_textCtrlScaleUnitX->SetValue(settings->Distance.TextFromSI(scaleUnitX));
-	m_textCtrlScaleUnitY->SetValue(settings->Distance.TextFromSI(scaleUnitY));
-	m_textCtrlScaleUnitZ->SetValue(settings->Distance.TextFromSI(scaleUnitZ));
-
-	m_textCtrlScalePercent->SetValue(
-			wxString::Format(_T("%.1f"), scalePercent * 100));
-	m_textCtrlScalePercentX->SetValue(
-			wxString::Format(_T("%.1f"), scalePercentX * 100));
-	m_textCtrlScalePercentY->SetValue(
-			wxString::Format(_T("%.1f"), scalePercentY * 100));
-	m_textCtrlScalePercentZ->SetValue(
-			wxString::Format(_T("%.1f"), scalePercentZ * 100));
-
-	m_textCtrlMoveStep->SetValue(settings->Distance.TextFromSI(moveStep));
-	m_textCtrlRotateStep->SetValue(settings->Angle.TextFromSI(rotateStep));
-
-	m_checkBoxScaleProportionally->SetValue(scaleProportional);
-
-//	c++;
-//	wxLogMessage(
-//			wxString::Format(_T("Transfer: %u - Selection: %i"), c, selection));
 
 	this->Refresh();
 	return true;
@@ -144,7 +139,7 @@ bool DialogObjectTransformation::TransferDataToWindow(void)
 
 bool DialogObjectTransformation::TransferDataFromWindow(void)
 {
-	CollectionUnits* settings =
+	const CollectionUnits* settings =
 			&(wxStaticCast(GetParent(),FrameMain)->GetParentFrame()->units);
 
 	m_textCtrlScalePercent->GetValue().ToDouble(&scalePercent);
@@ -182,16 +177,13 @@ void DialogObjectTransformation::OnXClose(wxCloseEvent& event)
 
 void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 {
+	TransferDataFromWindow();
+	if(!SelectionIsOK()) return;
+
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project * project = wxStaticCast(frame->GetDocument(), Project);
-//	ProjectView * view = wxStaticCast(frame->GetView(), ProjectView);
-	CollectionUnits* settings = &(frame->GetParentFrame()->units);
+	const CollectionUnits* settings = &(frame->GetParentFrame()->units);
 	wxCommandProcessor * cmdProc = frame->GetDocument()->GetCommandProcessor();
-	if(project == NULL) return;
-	if(!selected.IsType(Selection::Object)) return;
-	if(!project->Has(selected)) return;
-
-	TransferDataFromWindow();
 
 	for(std::set <size_t>::iterator objID = selected.begin();
 			objID != selected.end(); ++objID){
@@ -384,12 +376,14 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 					flipX, flipY, flipZ, flipNormals, newMatrix);
 			cmdProc->Submit(command);
 		}else{
-			wxLogMessage
-			(
-					wxString::Format(
-							_T(
-									"Unknown ID_... (=%i) in DialogObjectTransformation::OnTransform(...)"),
-							event.GetId()));
+			if(DEBUG){
+				wxLogMessage
+				(
+						wxString::Format(
+								_T(
+										"Unknown ID_... (=%i) in DialogObjectTransformation::OnTransform(...)"),
+								event.GetId()));
+			}
 		}
 
 		wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED,
@@ -400,18 +394,11 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 
 void DialogObjectTransformation::OnSetFactors(wxCommandEvent& event)
 {
-	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
-	Project* project = GetProject();
-	if(project == NULL) return;
-	if(frame->GetSelection().IsType(Selection::Anything)) return;
+	TransferDataFromWindow();
 
-//	ProjectView* view = GetView();
-//	if(!project->Has(Selection::Object, view->selection.GetBaseID())) return;
-//	const Object & obj = project->GetObject(view->selection.GetBaseID());
-
+	if(!SelectionIsOK()) return;
 	if(bbox.IsEmpty()) return;
 
-	TransferDataFromWindow();
 	double scale;
 	switch(event.GetId()){
 	case ID_SCALEUNITX:
@@ -486,17 +473,3 @@ void DialogObjectTransformation::OnFlipNormals(wxCommandEvent& event)
 //	wxCommandEvent selectEvent(wxEVT_COMMAND_MENU_SELECTED, ID_REFRESHVIEW);
 //	ProcessEvent(selectEvent);
 //}
-
-Project* DialogObjectTransformation::GetProject(void)
-{
-	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
-	Project * project = wxStaticCast(frame->GetDocument(), Project);
-	return project;
-}
-
-ProjectView* DialogObjectTransformation::GetView(void)
-{
-	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
-	ProjectView * view = wxStaticCast(frame->GetView(), ProjectView);
-	return view;
-}

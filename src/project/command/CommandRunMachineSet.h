@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : commandRunLoadMachine.cpp
+// Name               : CommandRunMachineLoad.h
 // Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
@@ -24,41 +24,29 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "CommandRunMachineLoad.h"
+#ifndef COMMANDRUNMACHINESET_H_
+#define COMMANDRUNMACHINESET_H_
 
-#include "../Project.h"
-#include <algorithm>
+#include <stddef.h>
+#include <wx/cmdproc.h>
+#include <wx/filename.h>
+#include <wx/string.h>
 
-CommandRunMachineLoad::CommandRunMachineLoad(const wxString& name,
-		Project* project, size_t runID, const wxFileName& fileName) :
-		wxCommand(true, name)
-{
-	this->project = project;
-	this->runID = runID;
-	this->fileName = fileName;
-}
+class Project;
 
-bool CommandRunMachineLoad::Do(void)
-{
-	if(project == NULL) return false;
-	std::vector <Run>::iterator itRun;
-	itRun = std::find(project->run.begin(), project->run.end(), runID);
-	if(itRun == project->run.end()) return false;
+class CommandRunMachineSet:public wxCommand {
+public:
+	CommandRunMachineSet(const wxString& name, Project * project, size_t runID,
+			const wxFileName& fileName);
 
-	oldFileName = itRun->machinefile;
-	itRun->machinefile = fileName;
-	project->Update();
-	return true;
-}
+	bool Do(void);
+	bool Undo(void);
 
-bool CommandRunMachineLoad::Undo(void)
-{
-	if(project == NULL) return false;
-	std::vector <Run>::iterator itRun;
-	itRun = std::find(project->run.begin(), project->run.end(), runID);
-	if(itRun == project->run.end()) return false;
+protected:
+	Project * project;
+	size_t runID;
+	wxFileName fileName;
+	wxFileName oldFileName;
+};
 
-	itRun->machinefile = oldFileName;
-	project->Update();
-	return true;
-}
+#endif /* COMMANDRUNMACHINESET_H_ */

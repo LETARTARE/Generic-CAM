@@ -61,7 +61,7 @@ bool DnDFile::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 		}else{
 			if(filename.GetExt().CmpNoCase(_T("zip")) == 0
 					|| filename.GetExt().CmpNoCase(_T("prj")) == 0){
-				if(!project->Load(filename)){
+				if(!project->OnOpenDocument(filename.GetFullPath())){
 					wxLogMessage
 					(
 							_("Not a valid project file: ")

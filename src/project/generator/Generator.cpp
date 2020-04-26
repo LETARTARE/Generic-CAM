@@ -124,25 +124,32 @@ void Generator::Paint(void) const
 //	std::cout << "Generator::Paint - end\n";
 }
 
-void Generator::ToStream(wxTextOutputStream& stream)
+void Generator::ToJSON(JSON& js) const
 {
-//	area.ToStream(stream);
-	stream << marginBelow << _T(" ") << marginSide << endl;
-	stream << toolguid;
-	stream << _T(" ") << freeHeight << endl;
-//	stream << (int) runNr << _T(" ") << (int) toolpathNr << endl;
+	js.SetObject(false);
+	js["ID"].SetNumber(ID);
+	js["Type"].SetNumber(GetType());
+	js["Name"].SetString(name.ToStdString());
+	js["ToolGUID"].SetString(toolguid);
+	area.ToJSON(js["Area"]);
+	js["MarginBelow"].SetNumber(marginBelow);
+	js["MarginSide"].SetNumber(marginSide);
+	js["FreeHeight"].SetNumber(freeHeight);
 }
 
-bool Generator::FromStream(wxTextInputStream& stream)
+bool Generator::FromJSON(const JSON& js)
 {
-//	if(!area.FromStream(stream)) return false;
-	stream >> marginBelow;
-	stream >> marginSide;
-//	stream >> toolguid;
-	stream >> freeHeight;
-//	runNr = stream.Read32();
-//	toolpathNr = stream.Read32();
-	return true;
+	if(!js.HasKey("ID")) return false;
+	ID = (size_t) round(js["ID"].GetNumber());
+	if(!js.HasKey("Name")) return false;
+	name = js["Name"].GetString();
+	if(!js.HasKey("ToolGUID")) return false;
+	toolguid = js["ToolGUID"].GetString();
+	area.FromJSON(js["Area"]);
+	marginBelow = js["MarginBelow"].GetNumber();
+	marginSide = js["MarginSide"].GetNumber();
+	freeHeight = js["FreeHeight"].GetNumber();
+	return false;
 }
 
 //void Project::GenerateToolPath(void)
