@@ -57,6 +57,7 @@ bool CommandObjectTransform::Do(void)
 	if(flipZ) it->FlipZ();
 	if(flipNormals) it->FlipNormals();
 //	project->objects[objectNr].Update();
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -73,6 +74,7 @@ bool CommandObjectTransform::Undo(void)
 	if(flipZ) it->FlipZ();
 	if(flipNormals) it->FlipNormals();
 //	project->objects[objectNr].Update();
+	project->Modify(true);
 	project->Update();
 	return true;
 }

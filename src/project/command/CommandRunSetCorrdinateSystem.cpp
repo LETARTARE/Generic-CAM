@@ -67,6 +67,7 @@ bool CommandRunSetCorrdinateSystem::Do(void)
 		break;
 	}
 	}
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -94,6 +95,7 @@ bool CommandRunSetCorrdinateSystem::Undo(void)
 		break;
 	}
 	}
+	project->Modify(true);
 	project->Update();
 	return true;
 }

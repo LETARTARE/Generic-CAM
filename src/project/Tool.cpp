@@ -46,6 +46,7 @@ Tool::Tool()
 	lastmodified = 0;
 	addtonewprojects = false;
 	unitinfile = unit_none;
+	fullsize = 0.0;
 }
 
 Tool::~Tool()
@@ -55,6 +56,11 @@ Tool::~Tool()
 bool Tool::operator ==(const std::string& guid) const
 {
 	return (base.guid.compare(guid) == 0);
+}
+
+std::string Tool::GetGUID() const
+{
+	return base.guid;
 }
 
 void Tool::Update(void)
@@ -103,7 +109,7 @@ void Tool::Update(void)
 	if(hasGeometry){
 		if(geometry.LB > 1e-6) z = geometry.LB;
 	}
-	holder.Update(z);
+	fullsize = holder.Update(z);
 }
 
 void Tool::Paint(bool showHolder, bool showShaft, bool showTool) const
@@ -428,3 +434,7 @@ void Tool::Contour::Paint(void) const
 
 }
 
+float Tool::GetFullLength(void) const
+{
+	return fullsize;
+}

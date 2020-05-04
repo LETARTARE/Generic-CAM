@@ -36,7 +36,6 @@
  *
  */
 
-#include "machine/Machine.h"
 #include "generator/CNCSimulator.h"
 #include "Selection.h"
 
@@ -46,11 +45,26 @@
 #include <wx/event.h>
 
 class ProjectView:public wxView {
+	friend class DialogAnimation;
 public:
+	enum ViewType {
+		vIdle= 0, vObject, vRun, vOrigin, vGenerator, vSimulation
+	} type;
+	enum SimulationCenterType {
+		vCenterMachine, vCenterTool, vCenterWorkpiece
+	} simulationCenter;
+	enum SimulationDisplayType {
+		vSimulationWorkpiece = 0,
+		vSimulationTool = 1,
+		vSimulationHolder = 2,
+		vSimulationMachine = 3
+	} simulationDisplay;
+
 	ProjectView();
 	virtual ~ProjectView();
 
-	void ShowAnimation(bool showSimulator);
+	void SetViewType(ViewType type);
+	void FreezeViewType(bool freeze);
 	void SetSelection(const Selection &selection);
 	void SetHover(const Selection &hover);
 
@@ -65,31 +79,18 @@ public:
 
 	bool OnClose(bool deleteWindow = true);
 
-private:
-	void RenderCoordinateSystem(void) const;
-
-public:
-	enum ViewType {
-		vObject, vRun, vOrigin, vGenerator, vSimulation
-	} type;
-	enum SimulationCenterType {
-		vCenterMachine, vCenterTool, vCenterWorkpiece
-	};
-	enum SimulationDisplayType {
-		vSimulationWorkpiece,
-		vSimulationTool,
-		vSimulationChuck,
-		vSimulationMachine
-	};
-
+protected:
 	CNCSimulator simulator; ///< Simulator, controlled by DialogAnimation
-	Machine machine; ///< Machine for simulation, controlled by DialogAnimation
+	bool showSimulated;
 
 private:
 	Selection selection; ///< Selection for displaying, set by FrameMain
 	Selection hover; ///< Hilighted element, set by FrameMain
-
+	bool freeze;
+	size_t lastRunID;
 private:
+	void RenderCoordinateSystem(void) const;
+
 	void PaintObjects(const Selection& sel, const OpenGLMaterial &face,
 			const OpenGLMaterial &edge) const;
 	void PaintRun(const Selection& sel) const;

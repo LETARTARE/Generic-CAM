@@ -39,12 +39,13 @@ CommandRunSetStockBox::CommandRunSetStockBox(const wxString& name,
 bool CommandRunSetStockBox::Do(void)
 {
 	if(project == NULL) return false;
-		std::vector <Run>::iterator itRun;
-		itRun = std::find(project->run.begin(), project->run.end(), runID);
-		if(itRun == project->run.end()) return false;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
 
 	oldValue = itRun->stocksize;
 	itRun->stocksize = newValue;
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -52,10 +53,11 @@ bool CommandRunSetStockBox::Do(void)
 bool CommandRunSetStockBox::Undo(void)
 {
 	if(project == NULL) return false;
-		std::vector <Run>::iterator itRun;
-		itRun = std::find(project->run.begin(), project->run.end(), runID);
-		if(itRun == project->run.end()) return false;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
 	itRun->stocksize = oldValue;
+	project->Modify(true);
 	project->Update();
 	return true;
 }

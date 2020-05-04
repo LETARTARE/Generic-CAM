@@ -53,6 +53,7 @@ bool CommandObjectLoad::Do(void)
 //		wxLogMessage(_T("CommandObjectLoad took %ld ms to execute."),
 //				sw.Time());
 #endif
+		project->Modify(true);
 		project->Update();
 		return true;
 	}
@@ -69,6 +70,7 @@ bool CommandObjectLoad::Undo(void)
 			++obj;
 		}
 	}
+	project->Modify(true);
 	project->Update();
 	return true;
 }

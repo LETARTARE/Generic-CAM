@@ -36,10 +36,12 @@
  *
  */
 
+#include <wx/filename.h>
 #include <stddef.h>
 #include <vector>
 
 #include "../../3D/AffineTransformMatrix.h"
+#include "../machine/Machine.h"
 #include "../Tool.h"
 #include "CNCPosition.h"
 #include "DexelTarget.h"
@@ -55,12 +57,15 @@ public:
 	void InsertBase(const DexelTarget* target); //!< Inserts a target into the simulator. This target remains unchanged.
 	const DexelTarget* GetResult(void) const; //!< Returns the modified internal target.
 
-	void InsertToolPath(std::vector <CNCPosition> * toolpath);
-	double RecalculateTiming(double t0 = 0.0);
+	void InsertToolPath(const std::vector <CNCPosition> * toolpath);
 
 	double GetTime(void) const;
 	double GetMaxTime(void) const;
+	std::string GetToolID(void) const;
 
+	AffineTransformMatrix GetMachineCenter(void) const;
+	AffineTransformMatrix GetToolPosition(void) const;
+	AffineTransformMatrix GetWorkpiecePosition0(void) const;
 	void FullSimulation(void);
 
 	void Reset(void);
@@ -69,14 +74,26 @@ public:
 	void Next(void);
 	void Last(void);
 
-	void Paint(void) const;
+	void PaintSimulation(void) const;
+	void PaintMachine(void) const;
+	void PaintTool(bool paintHolder = true) const;
+
+	bool LoadMachine(const wxFileName &filename);
 
 	//Member variables
 	AffineTransformMatrix origin;
 	AffineTransformMatrix stockposition;
+
+	CNCPosition machineposition;
+
 private:
 	const std::vector <Tool> * tools;
-	std::vector <CNCPosition> * toolpath; //!< Toolpath to apply to target.
+	const std::vector <CNCPosition> * toolpath; //!< Toolpath to apply to target.
+
+	const Tool * tool;
+	mutable Machine machine;
+	AffineTransformMatrix workpieceposition0;
+	AffineTransformMatrix tooltipposition;
 
 	const DexelTarget* basetarget; //!< Provided target to initialize the internal copy from.
 	DexelTarget simulated; //!< Internal target to work on.

@@ -179,14 +179,15 @@ public:
 	bool addtonewprojects;
 private:
 	UnitType unitinfile;
-
+	float fullsize;
 	// Methods
 public:
-	bool operator==(const std::string &guid)const;
+	bool operator==(const std::string &guid) const;
+	std::string GetGUID() const;
 	void ConvertToSI(void);
 
 	void Update(void);
-
+	float GetFullLength(void) const; ///< Length used for offset from tooltip to collar of holder
 	float GetToolLength(void) const; ///< Total length of the tool outside the chuck. (Distance between Controlled-Point and Gauge-Point).
 	float GetMaxDiameter(void) const; ///< Maximum diameter of the tool.
 	float GetCuttingDepth(void) const; ///< Length measured from the tip of the tool, that can cut.

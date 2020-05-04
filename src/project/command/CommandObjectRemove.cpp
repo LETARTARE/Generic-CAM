@@ -52,6 +52,7 @@ bool CommandObjectRemove::Do(void)
 	position = it - project->objects.begin();
 	this->object = *it;
 	project->objects.erase(it);
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -62,6 +63,7 @@ bool CommandObjectRemove::Undo(void)
 	std::vector <Object>::iterator it;
 	it = project->objects.begin() + position;
 	project->objects.insert(it, this->object);
+	project->Modify(true);
 	project->Update();
 	return true;
 }

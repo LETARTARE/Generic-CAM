@@ -34,7 +34,7 @@ DialogPostProcess::DialogPostProcess(wxWindow* parent) :
 {
 	FrameMain * frame = wxStaticCast(parent, FrameMain);
 	m_filePickerExport->SetInitialDirectory(
-			frame->filepaths.lastToolpathDirectory);
+			frame->GetFilePaths()->lastToolpathDirectory);
 	TransferDataToWindow();
 	UpdateParameter();
 }

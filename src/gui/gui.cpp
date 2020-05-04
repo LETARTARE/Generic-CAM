@@ -52,9 +52,9 @@ GUIFrameMain::GUIFrameMain(wxDocument* doc, wxView* view, wxDocParentFrame* pare
 	m_ribbonPageViewEdit = new wxRibbonPage( m_ribbonBarProjectViewEdit, wxID_ANY, wxEmptyString , wxNullBitmap , 0 );
 	m_ribbonPanelProject = new wxRibbonPanel( m_ribbonPageViewEdit, wxID_ANY, _("Project") , wxNullBitmap , wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE );
 	m_ribbonButtonBarProject = new wxRibbonButtonBar( m_ribbonPanelProject, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
-	m_ribbonButtonBarProject->AddButton( ID_NEW, _("New"), wxArtProvider::GetBitmap( wxART_FOLDER, wxART_CMN_DIALOG ), wxEmptyString);
-	m_ribbonButtonBarProject->AddHybridButton( ID_OPEN, _("Open"), wxArtProvider::GetBitmap( wxART_FILE_OPEN, wxART_CMN_DIALOG ), wxEmptyString);
-	m_ribbonButtonBarProject->AddHybridButton( ID_SAVE, _("Save"), wxArtProvider::GetBitmap( wxART_FILE_SAVE, wxART_CMN_DIALOG ), wxEmptyString);
+	m_ribbonButtonBarProject->AddButton( wxID_NEW, _("New"), wxArtProvider::GetBitmap( wxART_FOLDER, wxART_CMN_DIALOG ), wxEmptyString);
+	m_ribbonButtonBarProject->AddHybridButton( wxID_OPEN, _("Open"), wxArtProvider::GetBitmap( wxART_FILE_OPEN, wxART_CMN_DIALOG ), wxEmptyString);
+	m_ribbonButtonBarProject->AddHybridButton( wxID_SAVE, _("Save"), wxArtProvider::GetBitmap( wxART_FILE_SAVE, wxART_CMN_DIALOG ), wxEmptyString);
 	m_ribbonPanelView = new wxRibbonPanel( m_ribbonPageViewEdit, wxID_ANY, _("View") , wxNullBitmap , wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE );
 	m_ribbonButtonBarView = new wxRibbonButtonBar( m_ribbonPanelView, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 	m_ribbonButtonBarView->AddDropdownButton( ID_VIEWPREFERENCES, _("Preferences"), wxArtProvider::GetBitmap( wxART_EXECUTABLE_FILE, wxART_CMN_DIALOG ), wxEmptyString);
@@ -141,11 +141,11 @@ GUIFrameMain::GUIFrameMain(wxDocument* doc, wxView* view, wxDocParentFrame* pare
 	// Connect Events
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIFrameMain::OnClose ) );
 	this->Connect( wxEVT_SIZE, wxSizeEventHandler( GUIFrameMain::OnSize ) );
-	this->Connect( ID_NEW, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectNew ) );
-	this->Connect( ID_OPEN, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectOpen ) );
-	this->Connect( ID_OPEN, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectOpenMenu ) );
-	this->Connect( ID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectSave ) );
-	this->Connect( ID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectSaveMenu ) );
+	this->Connect( wxID_NEW, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectNew ) );
+	this->Connect( wxID_OPEN, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectOpen ) );
+	this->Connect( wxID_OPEN, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectOpenMenu ) );
+	this->Connect( wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectSave ) );
+	this->Connect( wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectSaveMenu ) );
 	this->Connect( ID_VIEWPREFERENCES, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnViewPreferencesMenu ) );
 	this->Connect( ID_TOGGLESTEREO3D, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxCommandEventHandler( GUIFrameMain::OnViewStereo3DToggle ) );
 	this->Connect( wxID_UNDO, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnUndo ) );
@@ -181,11 +181,11 @@ GUIFrameMain::~GUIFrameMain()
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIFrameMain::OnClose ) );
 	this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( GUIFrameMain::OnSize ) );
-	this->Disconnect( ID_NEW, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectNew ) );
-	this->Disconnect( ID_OPEN, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectOpen ) );
-	this->Disconnect( ID_OPEN, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectOpenMenu ) );
-	this->Disconnect( ID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectSave ) );
-	this->Disconnect( ID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectSaveMenu ) );
+	this->Disconnect( wxID_NEW, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectNew ) );
+	this->Disconnect( wxID_OPEN, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectOpen ) );
+	this->Disconnect( wxID_OPEN, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectOpenMenu ) );
+	this->Disconnect( wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectSave ) );
+	this->Disconnect( wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnProjectSaveMenu ) );
 	this->Disconnect( ID_VIEWPREFERENCES, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnViewPreferencesMenu ) );
 	this->Disconnect( ID_TOGGLESTEREO3D, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxCommandEventHandler( GUIFrameMain::OnViewStereo3DToggle ) );
 	this->Disconnect( wxID_UNDO, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnUndo ) );
@@ -1442,8 +1442,10 @@ GUIAnimation::GUIAnimation( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_bpButtonPlayStop->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIAnimation::OnPlayStop ), NULL, this );
 	m_bpButtonNext->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIAnimation::OnNext ), NULL, this );
 	m_bpButtonLast->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIAnimation::OnLast ), NULL, this );
-	m_checkBoxSimulateWorkpiece->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIAnimation::OnChangeSimulation ), NULL, this );
+	m_checkBoxSimulateWorkpiece->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIAnimation::OnChangeView ), NULL, this );
 	m_buttonClose->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIAnimation::OnClose ), NULL, this );
+	m_choiceDisplay->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIAnimation::OnChangeView ), NULL, this );
+	m_choiceFocus->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIAnimation::OnChangeView ), NULL, this );
 }
 
 GUIAnimation::~GUIAnimation()
@@ -1465,8 +1467,10 @@ GUIAnimation::~GUIAnimation()
 	m_bpButtonPlayStop->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIAnimation::OnPlayStop ), NULL, this );
 	m_bpButtonNext->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIAnimation::OnNext ), NULL, this );
 	m_bpButtonLast->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIAnimation::OnLast ), NULL, this );
-	m_checkBoxSimulateWorkpiece->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIAnimation::OnChangeSimulation ), NULL, this );
+	m_checkBoxSimulateWorkpiece->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIAnimation::OnChangeView ), NULL, this );
 	m_buttonClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIAnimation::OnClose ), NULL, this );
+	m_choiceDisplay->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIAnimation::OnChangeView ), NULL, this );
+	m_choiceFocus->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIAnimation::OnChangeView ), NULL, this );
 	
 }
 
@@ -2739,8 +2743,8 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	m_ribbonPage = new wxRibbonPage( m_ribbonBar, wxID_ANY, _("Menu") , wxNullBitmap , 0 );
 	m_ribbonPanelFileOperations = new wxRibbonPanel( m_ribbonPage, wxID_ANY, _("Machine Description") , wxNullBitmap , wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE );
 	m_ribbonButtonBarScript = new wxRibbonButtonBar( m_ribbonPanelFileOperations, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
-	m_ribbonButtonBarScript->AddButton( wxID_LOAD, _("Load"), wxArtProvider::GetBitmap( wxART_FILE_OPEN, wxART_CMN_DIALOG ), wxEmptyString);
-	m_ribbonButtonBarScript->AddButton( wxID_SAVE, _("Save"), wxArtProvider::GetBitmap( wxART_FILE_SAVE, wxART_CMN_DIALOG ), wxEmptyString);
+	m_ribbonButtonBarScript->AddButton( ID_MACHINEDESCRIPTIONLOAD, _("Load"), wxArtProvider::GetBitmap( wxART_FILE_OPEN, wxART_CMN_DIALOG ), wxEmptyString);
+	m_ribbonButtonBarScript->AddButton( ID_MACHINEDESCRIPTIONSAVE, _("Save"), wxArtProvider::GetBitmap( wxART_FILE_SAVE, wxART_CMN_DIALOG ), wxEmptyString);
 	m_ribbonButtonBarScript->AddButton( ID_MACHINEDESCRIPTIONEVALUATE, _("Evaluate Script"), wxArtProvider::GetBitmap( wxART_GO_DOWN, wxART_CMN_DIALOG ), wxEmptyString);
 	m_ribbonPanelSettings = new wxRibbonPanel( m_ribbonPage, wxID_ANY, _("Settings") , wxNullBitmap , wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE );
 	m_ribbonButtonBarSettings = new wxRibbonButtonBar( m_ribbonPanelSettings, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
@@ -2817,8 +2821,8 @@ GUIMachineDebugger::GUIMachineDebugger( wxWindow* parent, wxWindowID id, const w
 	
 	// Connect Events
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineDebugger::OnXClose ) );
-	this->Connect( wxID_LOAD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnMachineLoad ) );
-	this->Connect( wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnMachineSave ) );
+	this->Connect( ID_MACHINEDESCRIPTIONLOAD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnMachineLoad ) );
+	this->Connect( ID_MACHINEDESCRIPTIONSAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnMachineSave ) );
 	this->Connect( ID_MACHINEDESCRIPTIONEVALUATE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnScriptEvaluate ) );
 	this->Connect( ID_MACHINEDEBUGGERSHOWCONTROLLER, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxCommandEventHandler( GUIMachineDebugger::OnShowController ) );
 	this->Connect( ID_SHOWPREFERENCES, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnShowPreferencesMenu ) );
@@ -2830,8 +2834,8 @@ GUIMachineDebugger::~GUIMachineDebugger()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIMachineDebugger::OnXClose ) );
-	this->Disconnect( wxID_LOAD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnMachineLoad ) );
-	this->Disconnect( wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnMachineSave ) );
+	this->Disconnect( ID_MACHINEDESCRIPTIONLOAD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnMachineLoad ) );
+	this->Disconnect( ID_MACHINEDESCRIPTIONSAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnMachineSave ) );
 	this->Disconnect( ID_MACHINEDESCRIPTIONEVALUATE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnScriptEvaluate ) );
 	this->Disconnect( ID_MACHINEDEBUGGERSHOWCONTROLLER, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxCommandEventHandler( GUIMachineDebugger::OnShowController ) );
 	this->Disconnect( ID_SHOWPREFERENCES, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIMachineDebugger::OnShowPreferencesMenu ) );

@@ -48,6 +48,7 @@ bool CommandRunSetObject::Do(void)
 	this->oldSelection = itRun->object;
 
 	itRun->object = this->newSelection;
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -59,6 +60,7 @@ bool CommandRunSetObject::Undo(void)
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 	itRun->object = this->oldSelection;
+	project->Modify(true);
 	project->Update();
 	return true;
 }

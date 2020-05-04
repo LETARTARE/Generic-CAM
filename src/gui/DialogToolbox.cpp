@@ -67,7 +67,7 @@ void DialogToolbox::Update(void)
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
 	if(toolboxes.empty()){
-		wxDir dir(frame->filepaths.lastToolboxDirectory);
+		wxDir dir(frame->GetFilePaths()->lastToolboxDirectory);
 		if(dir.IsOpened()){
 			wxString filename;
 			bool cont = dir.GetFirst(&filename, _T("*.json"));

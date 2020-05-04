@@ -53,6 +53,7 @@ bool CommandRunGeneratorAdd::Do(void)
 	if(itRun == project->run.end()) return false;
 	itRun->generators.push_back(newGenerator);
 	newGenerator = NULL;
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -71,6 +72,7 @@ bool CommandRunGeneratorAdd::Undo(void)
 	if(it == itRun->generators.end()) return false;
 	newGenerator = *it;
 	itRun->generators.erase(it);
+	project->Modify(true);
 	project->Update();
 	return true;
 }

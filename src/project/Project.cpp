@@ -39,11 +39,15 @@
 #include <wx/zipstrm.h>
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
+#include <wx/cmdproc.h>
 
 #include <sstream>
 #include <iostream>
 #include <float.h>
+#include <wx/dir.h>
 #include <algorithm>
+
+#include "../gui/FrameMain.h"
 #ifdef _MSC_VER
 #define _USE_MATH_DEFINES
 #endif
@@ -71,7 +75,7 @@ Project::Project() :
 
 Project::~Project()
 {
-	printf("Project::Destructor\n");
+	if(DEBUG) printf("Project::Destructor\n");
 }
 
 bool Project::Has(const Selection& sel) const
@@ -376,6 +380,8 @@ bool Project::DoSaveDocument(const wxString& filename)
 	}
 
 	setlocale(LC_ALL, "");
+	this->SetDocumentSaved(true);
+	GetCommandProcessor()->MarkAsSaved();
 	this->Modify(false);
 	this->SetFilename(filename, true);
 	if(DEBUG) std::cout << "Project::Save(" << filename << ") - saved.\n";
@@ -434,6 +440,10 @@ bool Project::DoOpenDocument(const wxString& filename)
 					obj != objects.end(); ++obj)
 				obj->FromJSON(objs[n++]);
 		}
+
+		FrameMain* frame = wxStaticCast(GetFirstView()->GetFrame(), FrameMain);
+		wxDir machinedirectory(frame->GetFilePaths()->lastMachineDirectory);
+
 		JSON &r = js["Run"];
 		run.resize(r.Size(), Run(0));
 		size_t n = 0;
@@ -441,12 +451,24 @@ bool Project::DoOpenDocument(const wxString& filename)
 				++it){
 			try{
 				it->FromJSON(r[n++]);
+
+				it->machinefile.SetPath(machinedirectory.GetName());
+				it->machinefile.SetExt(_T("zip"));
+				if(!it->machinefile.IsFileReadable()){
+					std::cout << "File: "
+							<< it->machinefile.GetFullName().ToStdString()
+							<< "\n";
+					std::cout
+							<< "Project::DoOpenDocument - Machine file not found.\n";
+				}
 			}
 			catch(std::exception &e){
-				std::cout << "While loading run: " << e.what() << "\n";
+				std::cout << "Project::DoOpenDocument - While loading run: "
+						<< e.what() << "\n";
 			}
 		}
-		std::cout << "Run loaded (count = " << n << ")\n";
+		if(DEBUG) std::cout << "Project::DoOpenDocument - Run loaded (count = "
+				<< n << ")\n";
 		zip.CloseEntry();
 		delete[] buffer;
 	}
@@ -466,7 +488,7 @@ bool Project::DoOpenDocument(const wxString& filename)
 			tools.Load(in);
 			zip.CloseEntry();
 			delete[] buffer;
-			std::cout << "Tools loaded\n";
+			if(DEBUG) std::cout << "Tools loaded\n";
 		}
 		if(temp.StartsWith(wxT("object_"), &temp)){
 			long p;
@@ -497,8 +519,10 @@ bool Project::DoOpenDocument(const wxString& filename)
 		}
 	}
 	setlocale(LC_ALL, "");
-	this->Modify(false);
 	this->SetFilename(filename, true);
+	this->SetDocumentSaved(true);
+	GetCommandProcessor()->MarkAsSaved();
+	this->Modify(false);
 	this->Update();
 	return true;
 }
@@ -626,6 +650,11 @@ bool Project::LoadDefaultTools(wxString fileName, bool loadAll)
 //	bool success = test.Load("/tmp/tools.json");
 //	if(success) std::cout << "File could be read back.\n";
 	return true;
+}
+
+bool Project::IsModified() const
+{
+	return wxDocument::IsModified() && GetCommandProcessor()->IsDirty();
 }
 
 //void Project::FlipRun(void)

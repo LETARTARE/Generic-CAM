@@ -30,6 +30,7 @@
 #include "IDs.h"
 #include "../languages.h"
 #include "../project/ProjectView.h"
+#include "DialogSetupPaths.h"
 #ifdef _USE_6DOFCONTROLLER
 #include "../controller/DialogSetup6DOFController.h"
 #endif
@@ -43,6 +44,7 @@ wxBEGIN_EVENT_TABLE(FrameParent, wxDocParentFrame)
 
 EVT_MENU(ID_SETUPLANGUAGE , FrameParent::OnChangeLanguage)
 EVT_MENU(ID_SETUPUNITS , FrameParent::OnSetupUnits)
+EVT_MENU(ID_SETUPPATHS , FrameParent::OnSetupPaths)
 EVT_MENU(ID_SETUPSTEREO3D , FrameParent::OnSetupStereo3D)
 #ifdef _USE_6DOFCONTROLLER
 EVT_MENU(ID_SETUPCONTROLLER , FrameParent::OnSetupController)
@@ -64,6 +66,7 @@ FrameParent::FrameParent(wxDocManager *manager, wxConfig* config,
 {
 	this->config = config;
 	settingsStereo3D.Load(config);
+	filepaths.Load(config);
 	units.Load(config);
 #ifdef _USE_6DOFCONTROLLER
 	control.Load(config);
@@ -138,8 +141,9 @@ FrameParent::~FrameParent()
 	// Save the configuration of the 6DOF controller
 	control.Save(config);
 #endif
-	settingsStereo3D.Save(config);
 	units.Save(config);
+	filepaths.Save(config);
+	settingsStereo3D.Save(config);
 
 	this->Disconnect(wxEVT_TIMER, wxTimerEventHandler(FrameParent::OnTimer),
 	NULL, this);
@@ -196,6 +200,13 @@ void FrameParent::OnSetupUnits(wxCommandEvent& event)
 	DialogSetupUnits * temp = new DialogSetupUnits(this, &units);
 	temp->Show();
 	temp->Raise();
+}
+
+void FrameParent::OnSetupPaths(wxCommandEvent& event)
+{
+	DialogSetupPaths dialog(this, &filepaths);
+	dialog.ShowModal();
+	dialog.UpdateCollection(&filepaths);
 }
 
 void FrameParent::OnRefreshAll(wxCommandEvent& event)

@@ -64,6 +64,7 @@ bool CommandRunGeneratorUpdate::Do(void)
 	oldGenerator = *it;
 	*it = newGenerator;
 	newGenerator = NULL;
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -84,6 +85,7 @@ bool CommandRunGeneratorUpdate::Undo(void)
 	newGenerator = *it;
 	*it = oldGenerator;
 	oldGenerator = NULL;
+	project->Modify(true);
 	project->Update();
 	return true;
 }

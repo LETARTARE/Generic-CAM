@@ -50,9 +50,10 @@
 #include "../controller/MidiPort.h"
 #include "DialogSetupMidi.h"
 #endif
+#include "CollectionFilepaths.h"
+#include "CollectionUnits.h"
 #include "SettingsStereo3D.h"
 #include "DialogSetupStereo3D.h"
-#include "CollectionUnits.h"
 #include "DialogSetupUnits.h"
 
 class FrameParent:public wxDocParentFrame {
@@ -72,6 +73,7 @@ public:
 	void OnSetupMidi(wxCommandEvent& event);
 #endif
 	void OnSetupUnits(wxCommandEvent& event);
+	void OnSetupPaths(wxCommandEvent& event);
 
 	void OnRefreshAll(wxCommandEvent& event);
 	void OnRefreshAll3D(wxCommandEvent& event);
@@ -90,6 +92,7 @@ public:
 	DialogSetupStereo3D * dialogSetupStereo3D;
 	SettingsStereo3D settingsStereo3D;
 	CollectionUnits units;
+	CollectionFilepaths filepaths;
 
 #ifdef _USE_6DOFCONTROLLER
 	Control3D control;

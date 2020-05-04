@@ -44,6 +44,7 @@ bool CommandRunSetStockOrigin::Do(void)
 	if(itRun == project->run.end()) return false;
 	oldOrigin = itRun->stockorigin;
 	itRun->stockorigin = newOrigin;
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -55,6 +56,7 @@ bool CommandRunSetStockOrigin::Undo(void)
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 	itRun->stockorigin = oldOrigin;
+	project->Modify(true);
 	project->Update();
 	return true;
 }

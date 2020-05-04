@@ -44,28 +44,22 @@ wxEND_EVENT_TABLE()
 ProjectView::ProjectView() :
 		wxView()
 {
-
-	type = vObject;
-
-//	displayCoordinateSystem = true;
-//	displayGeometry = true;
-//	displayBoundingBox = false;
-//	displayMachine = false;
-//	displayStock = false;
-//	displayTargets = false;
-//	displayToolpath = false;
-//	displayOutLines = false;
-//	displayAnimation = false;
+	simulationDisplay = vSimulationTool;
+	simulationCenter = vCenterWorkpiece;
+	showSimulated = true;
+	freeze = false;
+	type = vIdle;
+	lastRunID = 0;
 }
 
 ProjectView::~ProjectView()
 {
-	printf("ProjectView: Destructor called...\n");
+	if(DEBUG) printf("ProjectView: Destructor called...\n");
 }
 
 bool ProjectView::OnCreate(wxDocument* doc, long flags)
 {
-	printf("ProjectView::OnCreate(...) called...\n");
+	if(DEBUG) printf("ProjectView::OnCreate(...) called...\n");
 
 	if(!wxView::OnCreate(doc, flags)) return false;
 
@@ -78,7 +72,7 @@ bool ProjectView::OnCreate(wxDocument* doc, long flags)
 
 bool ProjectView::OnClose(bool deleteWindow)
 {
-	printf("ProjectView::OnClose(%s) called...\n",
+	if(DEBUG) printf("ProjectView::OnClose(%s) called...\n",
 			deleteWindow? "true" : "false");
 
 	wxDocument* doc = GetDocument();
@@ -86,7 +80,7 @@ bool ProjectView::OnClose(bool deleteWindow)
 	wxList tempDocs = manager->GetDocuments();
 	wxList tempViews = doc->GetViews();
 
-	printf("ProjectView: %zu docs, %zu views\n", tempDocs.GetCount(),
+	if(DEBUG) printf("ProjectView: %zu docs, %zu views\n", tempDocs.GetCount(),
 			tempViews.GetCount());
 
 	if(!wxView::OnClose(deleteWindow)) return false;
@@ -101,7 +95,8 @@ bool ProjectView::OnClose(bool deleteWindow)
 	}
 
 	if(deleteWindow){
-		printf("ProjectView: Request destruction of associated Frame\n");
+		if(DEBUG) printf(
+				"ProjectView: Request destruction of associated Frame\n");
 		frame->Destroy();
 		SetFrame(NULL);
 	}
@@ -110,7 +105,7 @@ bool ProjectView::OnClose(bool deleteWindow)
 
 void ProjectView::OnDraw(wxDC* dc)
 {
-	printf("ProjectView::OnDraw(...) called...\n");
+	if(DEBUG) printf("ProjectView::OnDraw(...) called...\n");
 }
 
 void ProjectView::OnUpdate(wxView* sender, wxObject* hint)
@@ -136,22 +131,28 @@ void ProjectView::OnUpdate3D(void)
 	frame->m_canvas->Refresh();
 }
 
-void ProjectView::ShowAnimation(bool showSimulator)
+void ProjectView::SetViewType(ViewType type)
 {
-	const ViewType oldType = type;
-	if(showSimulator){
-		type = vSimulation;
-	}else{
-		type = vRun;
-		SetSelection(selection);
-	}
+	const ViewType oldType = this->type;
+	this->type = type;
 	if(type != oldType) OnUpdate3D();
+}
+
+void ProjectView::FreezeViewType(bool freeze)
+{
+	this->freeze = freeze;
+	if(!freeze){
+		const ViewType oldType = this->type;
+		type = vIdle;
+		SetSelection(selection);
+		if(type != oldType) OnUpdate3D();
+	}
 }
 
 void ProjectView::SetSelection(const Selection& selected)
 {
 	//	type = vIdle;
-	if(type != vSimulation){
+	if(type != vSimulation && !freeze){
 		if(selected.IsType(Selection::Object)) type = vObject;
 		if(selected.IsType(Selection::Axis)) type = vObject;
 		if(selected.IsType(Selection::Run)) type = vRun;
@@ -160,6 +161,12 @@ void ProjectView::SetSelection(const Selection& selected)
 	}
 	bool update = (this->selection != selected);
 	this->selection = selected;
+
+	if(selected.IsBaseType(Selection::BaseRun)) lastRunID =
+			selected.GetBaseID();
+	if(selected.IsType(Selection::Run) && selected.Size() > 0) lastRunID =
+			selected[0];
+
 	if(update) OnUpdate3D();
 }
 
@@ -174,20 +181,39 @@ void ProjectView::SetHover(const Selection& hover)
 void ProjectView::Render(void) const
 {
 	const Project* project = wxStaticCast(GetDocument(), Project);
+	AffineTransformMatrix machinecenter;
+	glPushMatrix();
+	if(type == vSimulation){
+		machinecenter = simulator.GetMachineCenter();
+		if(simulationCenter == vCenterMachine){
+			simulator.GetWorkpiecePosition0().Inverse().GLMultMatrix();
+			machinecenter.Inverse().GLMultMatrix();
+		}
+		if(simulationCenter == vCenterTool){
+			simulator.GetToolPosition().Inverse().GLMultMatrix();
+		}
+	}
 
 	if(type == vObject || type == vOrigin){
 		RenderCoordinateSystem();
 	}
 
-	PaintObjects(Selection(true), OpenGLMaterial(0.3, 0.3, 1.0),
-			OpenGLMaterial(0, 0, 0));
-
-//	if(project->GetToolCount() > 0){
-//		glPushMatrix();
-//		glTranslatef(0.3, 0, 0);
-//		project->GetTool(0).Paint();
-//		glPopMatrix();
-//	}
+	if(type != vSimulation || !showSimulated){
+		if(false){
+			Selection both = selection + hover;
+			both.Invert();
+			OpenGLMaterial::EnableColors();
+			PaintObjects(both, OpenGLMaterial(0.3, 0.3, 1.0),
+					OpenGLMaterial(0, 0, 0));
+			PaintObjects(selection, OpenGLMaterial(0.8, 0.8, 1.0),
+					OpenGLMaterial(0.8, 0.8, 0.8));
+			PaintObjects(hover, OpenGLMaterial(0.5, 0.5, 1.0),
+					OpenGLMaterial(0.5, 0.5, 0.5));
+		}else{
+			PaintObjects(Selection(true), OpenGLMaterial(0.3, 0.3, 1.0),
+					OpenGLMaterial(0, 0, 0));
+		}
+	}
 
 	if(type == vOrigin){
 		for(std::vector <Run>::const_iterator run = project->run.begin();
@@ -196,7 +222,7 @@ void ProjectView::Render(void) const
 		}
 	}
 
-	if(type == vRun || type == vGenerator){
+	if(type == vRun || type == vGenerator || type == vSimulation){
 		glPushName(Selection::BaseRun);
 		for(std::vector <Run>::const_iterator run = project->run.begin();
 				run != project->run.end(); ++run){
@@ -215,21 +241,34 @@ void ProjectView::Render(void) const
 		glPopName();
 	}
 
+	if(type == vSimulation
+			&& project->Has(Selection(Selection::Run, lastRunID))){
+
+		if(simulationDisplay >= vSimulationMachine){
+			glPushMatrix();
+			machinecenter.GLMultMatrix();
+			simulator.PaintMachine();
+			glPopMatrix();
+		}
+		if(simulationDisplay >= vSimulationTool) simulator.PaintTool(
+				simulationDisplay >= vSimulationHolder);
+
+		if(showSimulated){
+			if(selection.IsType(Selection::Run) && selection.Size() > 0){
+				const Run * run = project->GetRun(selection[0]);
+				glPushMatrix();
+				run->origin.GLMultMatrix();
+				simulator.PaintSimulation();
+				glPopMatrix();
+			}
+		}
+	}
+
 	if(type == vRun || type == vOrigin){
 		PaintRun(Selection(true));
 	}
 
-	if(false){
-		Selection both = selection + hover;
-		both.Invert();
-		OpenGLMaterial::EnableColors();
-		PaintObjects(both, OpenGLMaterial(0.3, 0.3, 1.0),
-				OpenGLMaterial(0, 0, 0));
-		PaintObjects(selection, OpenGLMaterial(0.8, 0.8, 1.0),
-				OpenGLMaterial(0.8, 0.8, 0.8));
-		PaintObjects(hover, OpenGLMaterial(0.5, 0.5, 1.0),
-				OpenGLMaterial(0.5, 0.5, 0.5));
-	}
+	glPopMatrix();
 }
 
 void ProjectView::RenderPick(void) const
@@ -318,10 +357,10 @@ void ProjectView::PaintRun(const Selection& sel) const
 		if(sel.IsBase(Selection::BaseRun, run->GetID())){
 			run->Paint();
 
-			for(std::vector <Generator*>::const_iterator it =
-					run->generators.begin(); it != run->generators.end(); ++it){
-				(*it)->Paint();
-			}
+//			for(std::vector <Generator*>::const_iterator it =
+//					run->generators.begin(); it != run->generators.end(); ++it){
+//				(*it)->Paint();
+//			}
 
 		}else{
 			if(sel.IsInverted()) run->Paint();

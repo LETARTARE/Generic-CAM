@@ -36,6 +36,7 @@
 #include <assert.h>
 #include <iostream>
 
+#include "../Config.h"
 #include "../3D/OpenGL.h"
 #include "../math/JSON.h"
 #include "generator/GeneratorFactory.h"
@@ -50,14 +51,14 @@ Run::Run(size_t ID) :
 	coordX.Add(Selection::Axis, 0);
 	coordY.Add(Selection::Axis, 1);
 	coordZ.Add(Selection::Axis, 2);
-	slotWidth = 0.01;
 
 	touchpoint = wxImage(touchpoint_xpm);
 	touchpoint.SetAlphaColor(255, 255, 255);
 
 	base.displayField = true;
 
-	printf("Run::Run - Created run %p with DexelTarget base %p\n", this, &base);
+	if(DEBUG) printf("Run::Run - Created run %p with DexelTarget base %p\n",
+			this, &base);
 }
 
 Run::~Run()
@@ -103,17 +104,17 @@ void Run::Update(Project * project)
 	}
 	if(stocktype == BoxTop || stocktype == BoxCenter || stocktype == BoxBottom){
 		BoundingBox bbox = parent->GetBBox(object);
-		Vector3 center((bbox.xmax + bbox.xmin - stocksize.x) / 2.0,
+		Vector3 boxorigin((bbox.xmax + bbox.xmin - stocksize.x) / 2.0,
 				(bbox.ymax + bbox.ymin - stocksize.y) / 2.0,
 				(bbox.zmax + bbox.zmin - stocksize.z) / 2.0);
 		const double diff = (bbox.GetSizeZ() - stocksize.z) / 2.0;
 
 		if(stocktype == BoxTop) stock.SetSize(stocksize.x, stocksize.y,
-				stocksize.z, center.x, center.y, center.z + diff);
+				stocksize.z, boxorigin.x, boxorigin.y, boxorigin.z + diff);
 		if(stocktype == BoxCenter) stock.SetSize(stocksize.x, stocksize.y,
-				stocksize.z, center.x, center.y, center.z);
+				stocksize.z, boxorigin.x, boxorigin.y, boxorigin.z);
 		if(stocktype == BoxBottom) stock.SetSize(stocksize.x, stocksize.y,
-				stocksize.z, center.x, center.y, center.z - diff);
+				stocksize.z, boxorigin.x, boxorigin.y, boxorigin.z - diff);
 
 	}
 	AffineTransformMatrix M = stock.GetCoordinateSystem();
@@ -135,11 +136,13 @@ void Run::Paint(void) const
 			glPushName((GLuint) Selection::TriangleGroup);
 			stock.Paint();
 			glPopName();
-			glPushMatrix();
-			glTranslatef(stock.xmin, stock.ymin, stock.zmin);
-			glTranslatef(-base.GetSizeX(), 0, 0);
-			base.Paint();
-			glPopMatrix();
+			if(DEBUG){
+				glPushMatrix();
+				glTranslatef(stock.xmin, stock.ymin, stock.zmin);
+				glTranslatef(-base.GetSizeX(), 0, 0);
+				base.Paint();
+				glPopMatrix();
+			}
 		}
 	}
 
@@ -206,9 +209,7 @@ void Run::Paint(void) const
 //			::glPopMatrix();
 //		}
 //
-
 //	}
-//
 //	::glPopMatrix();
 }
 
@@ -253,13 +254,15 @@ void Run::GenerateToolpaths(void)
 	}else{
 		base.Fill();
 	}
-
+	start = base;
 	const std::vector <Tool> * tools = parent->GetTools();
 
 	CNCSimulator simulator;
 	simulator.SetTools(tools);
 
 	double t = 0.0;
+
+	toolpath.clear();
 
 	for(std::vector <Generator *>::iterator it = generators.begin();
 			it != generators.end(); ++it){
@@ -297,13 +300,32 @@ void Run::GenerateToolpaths(void)
 
 			}
 		}
+		t = RecalculateTiming(&((*it)->toolpath), t);
 		simulator.origin.SetOrigin(Vector3(stock.xmin, stock.ymin, stock.zmin));
 		simulator.InsertBase(&base);
 		simulator.InsertToolPath(&((*it)->toolpath));
-		t = simulator.RecalculateTiming(t);
+		toolpath.insert(toolpath.end(), (*it)->toolpath.begin(),
+				(*it)->toolpath.end());
 		simulator.FullSimulation();
 		base = *(simulator.GetResult());
 	}
+}
+
+double Run::RecalculateTiming(std::vector <CNCPosition> * toolpath, double t0)
+{
+	const double minimumFeed = 1e-9; // 1 nm/s (If this should ever be a problem, I would love to know the field of application.)
+
+	if(toolpath == NULL || toolpath->size() == 0) return t0;
+	const size_t N = toolpath->size();
+	double t = t0;
+	for(size_t n = 0; (n + 1) < N; ++n){
+		(*toolpath)[n].t = t;
+		const double d = (*toolpath)[n].Abs((*toolpath)[n + 1]);
+		(*toolpath)[n].dt = d / fmax((*toolpath)[n].F, minimumFeed);
+		t += (*toolpath)[n].dt;
+	}
+	if(N > 0) (*toolpath)[N - 1].t = t;
+	return t;
 }
 
 //
@@ -436,8 +458,6 @@ void Run::ToJSON(JSON& js) const
 	js["StockOrigin"]["Y"].SetNumber(stockorigin.y);
 	js["StockOrigin"]["Z"].SetNumber(stockorigin.z);
 
-	js["SlotWidth"].SetNumber(slotWidth);
-
 	js["Machine"].SetString(machinefile.GetName().ToStdString());
 
 	JSON &g = js["Generator"];
@@ -461,10 +481,10 @@ bool Run::FromJSON(const JSON& js)
 	object.FromJSON(js["Object"]);
 
 	std::string temp = js["StockType"].GetString();
-	if(temp.compare("Object")==0) stocktype = sObject;
-	if(temp.compare("BoxTop")==0) stocktype = BoxTop;
-	if(temp.compare("BoxCenter")==0) stocktype = BoxCenter;
-	if(temp.compare("BoxBottom")==0) stocktype = BoxBottom;
+	if(temp.compare("Object") == 0) stocktype = sObject;
+	if(temp.compare("BoxTop") == 0) stocktype = BoxTop;
+	if(temp.compare("BoxCenter") == 0) stocktype = BoxCenter;
+	if(temp.compare("BoxBottom") == 0) stocktype = BoxBottom;
 
 	stockobject.FromJSON(js["StockObject"]);
 	const JSON &jsss = js["StockSize"];
@@ -476,9 +496,10 @@ bool Run::FromJSON(const JSON& js)
 	stockorigin.y = jsso["Y"].GetNumber();
 	stockorigin.z = jsso["Z"].GetNumber();
 
-	slotWidth = js["SlotWidth"].GetNumber();
-
 	machinefile.SetName(js["Machine"].GetString());
+
+
+
 	const JSON &g = js["Generator"];
 	for(size_t n = 0; n < g.Size(); ++n){
 		size_t generatortype = g[n]["Type"].GetNumber();

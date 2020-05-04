@@ -46,6 +46,7 @@ bool CommandRunRename::Do(void)
 	if(itRun == project->run.end()) return false;
 	this->oldName = itRun->name;
 	itRun->name = this->newName;
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -57,6 +58,7 @@ bool CommandRunRename::Undo(void)
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 	itRun->name = this->oldName;
+	project->Modify(true);
 	project->Update();
 	return true;
 }

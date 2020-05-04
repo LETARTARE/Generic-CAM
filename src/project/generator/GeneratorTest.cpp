@@ -42,7 +42,8 @@
 
 #include <math.h>
 
-GeneratorTest::GeneratorTest(size_t ID):GeneratorDexel(ID)
+GeneratorTest::GeneratorTest(size_t ID) :
+		GeneratorDexel(ID)
 {
 	twiddleFactor = 0.008;
 }
@@ -95,7 +96,7 @@ void GeneratorTest::CopyParameterFrom(const Generator* other)
 bool GeneratorTest::operator ==(const Generator& b) const
 {
 	const GeneratorTest * temp = dynamic_cast <const GeneratorTest*>(&b);
-	std::cout << "GeneratorTest::operator ==\n";
+	if(DEBUG) std::cout << "GeneratorTest::operator ==\n";
 	if(!(this->Generator::operator ==(b))) return false;
 	if(this->twiddleFactor != temp->twiddleFactor) return false;
 	return true;
@@ -104,7 +105,7 @@ bool GeneratorTest::operator ==(const Generator& b) const
 void GeneratorTest::TransferDataToPanel(wxPanel* panel,
 		CollectionUnits* settings) const
 {
-	std::cout << "GeneratorTest::TransferDataToPanel(...)\n";
+	if(DEBUG) std::cout << "GeneratorTest::TransferDataToPanel(...)\n";
 	m_staticTextUnit->SetLabel(settings->SmallDistance.GetOtherName());
 	m_textCtrlTwiddleFactor->SetValue(
 			settings->SmallDistance.TextFromSI(twiddleFactor));
@@ -112,7 +113,7 @@ void GeneratorTest::TransferDataToPanel(wxPanel* panel,
 
 void GeneratorTest::TransferDataFromPanel(CollectionUnits* settings)
 {
-	std::cout << "GeneratorTest::TransferDataFromPanel(...)\n";
+	if(DEBUG) std::cout << "GeneratorTest::TransferDataFromPanel(...)\n";
 	twiddleFactor = settings->SmallDistance.SIFromString(
 			m_textCtrlTwiddleFactor->GetValue());
 }
@@ -254,11 +255,11 @@ void GeneratorTest::GenerateToolpath(const Run &run,
 		m.rapid = true;
 		isMillUp = true;
 		tp.push_back(m);
-#ifdef _DEBUGMODE
-		wxLogMessage
-		(wxString::Format(_T("Next Level: %.3f m"), level));
+		if(DEBUG){
+			wxLogMessage
+			(wxString::Format(_T("Next Level: %.3f m"), level));
+		}
 //		level = -1;
-#endif
 	}
 //	debug = temp;
 //	tp.FlagAll(true);

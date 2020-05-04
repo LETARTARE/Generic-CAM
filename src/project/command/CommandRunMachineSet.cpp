@@ -47,6 +47,7 @@ bool CommandRunMachineSet::Do(void)
 
 	oldFileName = itRun->machinefile;
 	itRun->machinefile = fileName;
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -59,6 +60,7 @@ bool CommandRunMachineSet::Undo(void)
 	if(itRun == project->run.end()) return false;
 
 	itRun->machinefile = oldFileName;
+	project->Modify(true);
 	project->Update();
 	return true;
 }

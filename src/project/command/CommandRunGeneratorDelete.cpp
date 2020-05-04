@@ -63,6 +63,7 @@ bool CommandRunGeneratorDelete::Do(void)
 	position = it - itRun->generators.begin();
 	oldGenerator = *it;
 	itRun->generators.erase(it);
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -77,6 +78,7 @@ bool CommandRunGeneratorDelete::Undo(void)
 	it = itRun->generators.begin() + position;
 	itRun->generators.insert(it, this->oldGenerator);
 	oldGenerator = NULL;
+	project->Modify(true);
 	project->Update();
 	return true;
 }

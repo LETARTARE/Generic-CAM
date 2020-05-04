@@ -39,11 +39,12 @@ CommandRunSetStockObject::CommandRunSetStockObject(const wxString& name,
 bool CommandRunSetStockObject::Do(void)
 {
 	if(project == NULL) return false;
-		std::vector <Run>::iterator itRun;
-		itRun = std::find(project->run.begin(), project->run.end(), runID);
-		if(itRun == project->run.end()) return false;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
 	oldObjID = itRun->stockobject;
 	itRun->stockobject = newObjID;
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -51,10 +52,11 @@ bool CommandRunSetStockObject::Do(void)
 bool CommandRunSetStockObject::Undo(void)
 {
 	if(project == NULL) return false;
-		std::vector <Run>::iterator itRun;
-		itRun = std::find(project->run.begin(), project->run.end(), runID);
-		if(itRun == project->run.end()) return false;
+	std::vector <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
 	itRun->stockobject = oldObjID;
+	project->Modify(true);
 	project->Update();
 	return true;
 }

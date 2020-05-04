@@ -102,8 +102,6 @@ public:
 	Vector3 stocksize; //<! Size of a Box in x,y,z used as stock
 	Vector3 stockorigin; //<! Point where in the stock the origin lies
 
-	double slotWidth;
-
 	std::vector <Generator*> generators; ///< List of Generator%s applied to the workpiece in this run
 
 	wxFileName machinefile;
@@ -113,6 +111,9 @@ public:
 	AffineTransformMatrix origin; //!< Origin and coordinate-system
 
 	DexelTarget base;
+	DexelTarget start;
+
+	std::vector <CNCPosition> toolpath;
 
 private:
 	size_t ID; //!< Internal ID number
@@ -124,6 +125,8 @@ public:
 	void Update(Project * project);
 
 	void GenerateToolpaths(void);
+	static double RecalculateTiming(std::vector <CNCPosition> * toolpath, double t0 =
+			0.0);
 //	bool SaveToolpaths(wxFileName fileName);
 
 	void Paint(void) const;

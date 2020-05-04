@@ -105,6 +105,10 @@ public:
 	virtual bool DoSaveDocument(const wxString& filename);
 	virtual bool DoOpenDocument(const wxString& filename);
 
+	// Ismodify is overwritten to incorporate the wxCommandProcesor
+	// If all changes are undone, the project is considered unmodified.
+	virtual bool IsModified() const;
+
 	bool GenerateToolpaths(void);
 //	bool SaveToolpath(wxFileName fileName, int runNr);
 
@@ -143,8 +147,7 @@ private:
 	wxMutex mtx_project;
 	wxMutex mtx_generator;
 #endif
-	wxDECLARE_NO_COPY_CLASS(Project);
-	wxDECLARE_DYNAMIC_CLASS(Project);
+wxDECLARE_NO_COPY_CLASS(Project);wxDECLARE_DYNAMIC_CLASS(Project);
 };
 
 #endif /* PROJECT_H_ */

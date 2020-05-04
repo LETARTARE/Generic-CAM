@@ -337,7 +337,7 @@
                                                 <property name="font"></property>
                                                 <property name="help"></property>
                                                 <property name="hidden">0</property>
-                                                <property name="id">ID_NEW</property>
+                                                <property name="id">wxID_NEW</property>
                                                 <property name="label">New</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minimum_size"></property>
@@ -385,7 +385,7 @@
                                                 <property name="font"></property>
                                                 <property name="help"></property>
                                                 <property name="hidden">0</property>
-                                                <property name="id">ID_OPEN</property>
+                                                <property name="id">wxID_OPEN</property>
                                                 <property name="label">Open</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minimum_size"></property>
@@ -434,7 +434,7 @@
                                                 <property name="font"></property>
                                                 <property name="help"></property>
                                                 <property name="hidden">0</property>
-                                                <property name="id">ID_SAVE</property>
+                                                <property name="id">wxID_SAVE</property>
                                                 <property name="label">Save</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minimum_size"></property>
@@ -18629,7 +18629,7 @@
                                 <property name="window_name"></property>
                                 <property name="window_style"></property>
                                 <event name="OnChar"></event>
-                                <event name="OnCheckBox">OnChangeSimulation</event>
+                                <event name="OnCheckBox">OnChangeView</event>
                                 <event name="OnEnterWindow"></event>
                                 <event name="OnEraseBackground"></event>
                                 <event name="OnKeyDown"></event>
@@ -18816,7 +18816,7 @@
                                 <property name="window_name"></property>
                                 <property name="window_style"></property>
                                 <event name="OnChar"></event>
-                                <event name="OnChoice"></event>
+                                <event name="OnChoice">OnChangeView</event>
                                 <event name="OnEnterWindow"></event>
                                 <event name="OnEraseBackground"></event>
                                 <event name="OnKeyDown"></event>
@@ -18904,7 +18904,7 @@
                                 <property name="window_name"></property>
                                 <property name="window_style"></property>
                                 <event name="OnChar"></event>
-                                <event name="OnChoice"></event>
+                                <event name="OnChoice">OnChangeView</event>
                                 <event name="OnEnterWindow"></event>
                                 <event name="OnEraseBackground"></event>
                                 <event name="OnKeyDown"></event>
@@ -37767,7 +37767,7 @@
                                         <property name="font"></property>
                                         <property name="help"></property>
                                         <property name="hidden">0</property>
-                                        <property name="id">wxID_LOAD</property>
+                                        <property name="id">ID_MACHINEDESCRIPTIONLOAD</property>
                                         <property name="label">Load</property>
                                         <property name="maximum_size"></property>
                                         <property name="minimum_size"></property>
@@ -37815,7 +37815,7 @@
                                         <property name="font"></property>
                                         <property name="help"></property>
                                         <property name="hidden">0</property>
-                                        <property name="id">wxID_SAVE</property>
+                                        <property name="id">ID_MACHINEDESCRIPTIONSAVE</property>
                                         <property name="label">Save</property>
                                         <property name="maximum_size"></property>
                                         <property name="minimum_size"></property>

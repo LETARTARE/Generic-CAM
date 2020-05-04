@@ -46,6 +46,7 @@ bool CommandObjectRename::Do(void)
 	if(it == project->objects.end()) return false;
 	this->oldName = it->name;
 	it->name = this->newName;
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -56,6 +57,7 @@ bool CommandObjectRename::Undo(void)
 	it = std::find(project->objects.begin(), project->objects.end(), ID);
 	if(it == project->objects.end()) return false;
 	it->name = this->oldName;
+	project->Modify(true);
 	project->Update();
 	return true;
 }

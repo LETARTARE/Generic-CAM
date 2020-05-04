@@ -40,13 +40,15 @@ CommandRunSetBoundingBox::CommandRunSetBoundingBox(const wxString& name,
 bool CommandRunSetBoundingBox::Do(void)
 {
 	if(project == NULL) return false;
-	project->UpdateAllViews();
+	project->Modify(true);
+	project->Update();
 	return true;
 }
 
 bool CommandRunSetBoundingBox::Undo(void)
 {
 	if(project == NULL) return false;
-	project->UpdateAllViews();
+	project->Modify(true);
+	project->Update();
 	return true;
 }

@@ -56,6 +56,7 @@ bool CommandRunGeneratorRename::Do(void)
 
 	this->oldName = (*it)->name;
 	(*it)->name = this->newName;
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -74,6 +75,7 @@ bool CommandRunGeneratorRename::Undo(void)
 	}
 	if(it == itRun->generators.end()) return false;
 	(*it)->name = this->oldName;
+	project->Modify(true);
 	project->Update();
 	return true;
 }

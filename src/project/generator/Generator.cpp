@@ -41,17 +41,7 @@ Generator::Generator(size_t ID) :
 
 	spindlespeed = 0.0;
 	feedrate = 0.0;
-	toolguid = "#1";
-
-//	this->project = project;
-//	this->runNr = runNr;
-//	this->toolpathNr = toolpathNr;
-//	if(project == NULL || runNr >= project->run.GetCount()
-//			|| toolpathNr >= project->run[runNr].toolpaths.GetCount()){
-//		this->toolpath = NULL;
-//	}else{
-//		this->toolpath = &(project->run[runNr].toolpaths[toolpathNr]);
-//	}
+	toolguid = "#1"; //TODO Set to empty string
 
 	toolpathGenerated = false;
 	errorOccured = false;

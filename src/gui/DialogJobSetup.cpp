@@ -152,9 +152,9 @@ bool DialogJobSetup::TransferDataToWindow(void)
 			|| run->stocktype == Run::BoxBottom) oldType = run->stocktype;
 
 	// Origin
-	wxString temp = wxString::Format(_T("(%g, %g, %g)"),
-			run->stockorigin.x * 2 - 1, run->stockorigin.y * 2 - 1,
-			run->stockorigin.z * 2 - 1);
+	wxString temp = wxString::Format(_T("(%g %%, %g %%, %g %%)"),
+			run->stockorigin.x * 100, run->stockorigin.y * 100,
+			run->stockorigin.z * 100);
 	m_textCtrlOrigin->SetValue(temp);
 
 	// Supports
@@ -164,7 +164,7 @@ bool DialogJobSetup::TransferDataToWindow(void)
 		m_filePickerMachine->SetFileName(run->machinefile);
 	}else{
 		m_filePickerMachine->SetInitialDirectory(
-				frame->filepaths.lastMachineDirectory);
+				frame->GetFilePaths()->lastMachineDirectory);
 	}
 
 	return true;
@@ -200,7 +200,7 @@ void DialogJobSetup::OnSelect(wxCommandEvent& event)
 	case ID_SELECTAXISZ:
 		frame->SetRequestSelection(this, event.GetId(), false,
 				Selection(Selection::Axis));
-		frame->AddRequestSelection(Selection(Selection::EdgeGroup));
+//		frame->AddRequestSelection(Selection(Selection::EdgeGroup));
 		break;
 
 	case ID_SELECTOBJECTSTOCK:
@@ -319,17 +319,11 @@ void DialogJobSetup::OnGetSizeFromObject(wxCommandEvent& event)
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project * project = wxStaticCast(frame->GetDocument(), Project);
 	wxCommandProcessor * cmdProc = project->GetCommandProcessor();
-	if(project->GetRun(runID)->object.Size() == 0) return;
-	size_t objID = project->GetRun(runID)->object[0];
-	if(!project->Has(Selection::Object, objID)) return;
-
-	BoundingBox bbox = project->GetBBox(Selection(Selection::Object, objID));
-
+	BoundingBox bbox = project->GetBBox(project->GetRun(runID)->object);
 	cmdProc->Submit(
 			new CommandRunSetStockBox(_("Change size."), project, runID,
 					Vector3(bbox.GetSizeX(), bbox.GetSizeY(),
 							bbox.GetSizeZ())));
-
 }
 
 void DialogJobSetup::OnChoicebookPageChanged(wxChoicebookEvent& event)

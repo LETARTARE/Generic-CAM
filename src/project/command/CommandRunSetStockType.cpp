@@ -45,6 +45,7 @@ bool CommandRunSetStockType::Do(void)
 	if(itRun == project->run.end()) return false;
 	oldType = itRun->stocktype;
 	itRun->stocktype = newType;
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -56,6 +57,7 @@ bool CommandRunSetStockType::Undo(void)
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 	itRun->stocktype = oldType;
+	project->Modify(true);
 	project->Update();
 	return true;
 }

@@ -32,6 +32,8 @@
 
 #include <iostream>
 #include <float.h>
+#include <wx/filename.h>
+
 #include "../../3D/OpenGL.h"
 #include "../../Config.h"
 
@@ -42,6 +44,7 @@ CNCSimulator::CNCSimulator()
 	step = 0;
 
 	tools = NULL;
+	tool = NULL;
 	basetarget = NULL;
 	toolpath = NULL;
 }
@@ -55,6 +58,11 @@ void CNCSimulator::SetTools(const std::vector <Tool> * tools)
 	this->tools = tools;
 }
 
+std::string CNCSimulator::GetToolID(void) const
+{
+	if(tool == NULL) return "";
+	return tool->GetGUID();
+}
 void CNCSimulator::InsertBase(const DexelTarget* target)
 {
 	if(this->basetarget == target && target != NULL) return;
@@ -62,26 +70,9 @@ void CNCSimulator::InsertBase(const DexelTarget* target)
 	initialized = false;
 }
 
-void CNCSimulator::InsertToolPath(std::vector <CNCPosition> * toolpath)
+void CNCSimulator::InsertToolPath(const std::vector <CNCPosition> * toolpath)
 {
 	this->toolpath = toolpath;
-}
-
-double CNCSimulator::RecalculateTiming(double t0)
-{
-	const double minimumFeed = 1e-9; // 1 nm/s (If this should ever be a problem, I would love to know the field of application.)
-
-	if(toolpath == NULL || toolpath->size() == 0) return t0;
-	const size_t N = toolpath->size();
-	double t = t0;
-	for(size_t n = 0; (n + 1) < N; ++n){
-		(*toolpath)[n].t = t;
-		const double d = (*toolpath)[n].Abs((*toolpath)[n + 1]);
-		(*toolpath)[n].dt = d * fmax((*toolpath)[n].F, minimumFeed);
-		t += (*toolpath)[n].dt;
-	}
-	if(N > 0) (*toolpath)[N - 1].t = t;
-	return t;
 }
 
 void CNCSimulator::Reset(void)
@@ -91,7 +82,8 @@ void CNCSimulator::Reset(void)
 		initialized = true;
 	}
 	if(basetarget != NULL){
-		if(DEBUG)printf("CNCSimulator::Reset: to Pointer %p with N=%zu\n", basetarget, basetarget->GetCountTotal());
+		if(DEBUG) printf("CNCSimulator::Reset: to Pointer %p with N=%zu\n",
+				basetarget, basetarget->GetCountTotal());
 		simulated = *basetarget;
 	}else{
 		simulated.Empty();
@@ -115,8 +107,9 @@ void CNCSimulator::Step(float tTarget)
 		tStep = (*toolpath)[step].t + (*toolpath)[step].dt;
 		temp.InsertPoint((*toolpath)[step].position);
 	}
+
 	//TODO Add multi-tool toolpaths (bigger loop)
-	const Tool * tool = NULL;
+	tool = NULL;
 	for(std::vector <Tool>::const_iterator it = tools->begin();
 			it != tools->end(); ++it){
 		if(it->postprocess.number == (*toolpath)[step].toolSlot){
@@ -128,6 +121,7 @@ void CNCSimulator::Step(float tTarget)
 				<< (*toolpath)[step].toolSlot << " not found.\n";
 		return;
 	}
+
 	DexelTarget dex;
 	dex.SetupTool(*tool, simulated.GetResolutionX(),
 			simulated.GetResolutionY());
@@ -138,12 +132,17 @@ void CNCSimulator::Step(float tTarget)
 	temp.ApplyTransformation(shift);
 	simulated.PolygonCutInTarget(temp, dex);
 
-//	if(step + 1 == position.size()){
-//		machine->position = position[step];
+//	if((step + 1) < (*toolpath).size()){
+
+	machineposition = (*toolpath)[step];
+	tooltipposition = machineposition.GetMatrix();
+
 //	}else{
-//		machine->position = position[step]
-//				+ (position[step + 1] - position[step])
-//						/ position[step].duration * (tTarget - tStep);
+//
+//		machineposition = (*toolpath)[step]
+//				+ ((*toolpath)[step + 1] - (*toolpath)[step])
+//						/ (*toolpath)[step].dt * (tTarget - tStep);
+//
 //	}
 }
 
@@ -188,10 +187,65 @@ const DexelTarget* CNCSimulator::GetResult(void) const
 	return &simulated;
 }
 
-void CNCSimulator::Paint(void) const
+void CNCSimulator::PaintSimulation(void) const
 {
 	if(!initialized) return;
 	glPushMatrix();
 	simulated.Paint();
 	glPopMatrix();
+}
+
+void CNCSimulator::PaintMachine(void) const
+{
+	if(!machine.IsLoaded()) return;
+	machine.Paint();
+}
+
+void CNCSimulator::PaintTool(bool paintHolder) const
+{
+	if(tool == NULL) return;
+	glPushMatrix();
+	tooltipposition.GLMultMatrix();
+	tool->Paint(paintHolder, true, true);
+	glPopMatrix();
+}
+
+bool CNCSimulator::LoadMachine(const wxFileName &filename)
+{
+	if(filename != machine.fileName || !machine.IsLoaded()){
+		bool flag = machine.Load(filename);
+
+		if(tool == NULL){
+			machine.SetToolLength(0.0);
+		}else{
+			machine.SetToolLength(tool->GetFullLength());
+		}
+		machine.SetPosition(CNCPosition());
+		machine.Assemble();
+		workpieceposition0 = machine.workpiecePosition;
+		return flag;
+	}
+	return true;
+}
+
+AffineTransformMatrix CNCSimulator::GetMachineCenter(void) const
+{
+	if(tool == NULL){
+		machine.SetToolLength(0.0);
+	}else{
+		machine.SetToolLength(tool->GetFullLength());
+	}
+	machine.SetPosition(machineposition);
+	machine.Assemble();
+	return machine.workpiecePosition.Inverse();
+}
+
+AffineTransformMatrix CNCSimulator::GetToolPosition(void) const
+{
+	return tooltipposition;
+}
+
+AffineTransformMatrix CNCSimulator::GetWorkpiecePosition0(void) const
+{
+	return workpieceposition0;
 }

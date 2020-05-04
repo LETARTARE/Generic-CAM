@@ -88,7 +88,7 @@ public:
 	bool ReLoad(void); //!< Reload the machine from the file. E.g. after editing the file externally.
 
 	void EvaluateDescription(void);
-	bool IsInitialized(void) const;
+	bool IsLoaded(void) const;
 	void Assemble(void); //!< Place all components of the machine after reading the MachinePosition.
 
 	void MoveToGlobalZero(void);
@@ -133,7 +133,7 @@ public:
 private:
 	bool initialized;
 
-	double GetE(void) const;
+	double GetError(void) const;
 
 	LUACodeEvaluator evaluator;
 	std::list <MachineComponent> components;

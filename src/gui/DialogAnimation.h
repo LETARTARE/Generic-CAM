@@ -32,6 +32,7 @@
 #include "../project/generator/DexelTarget.h"
 
 #include <wx/event.h>
+#include <wx/thread.h>
 #include <wx/timer.h>
 
 class CNCSimulator;
@@ -49,7 +50,7 @@ public:
 
 	void OnClose(wxCommandEvent& event);
 	void OnXClose(wxCloseEvent& event);
-	void OnChangeSimulation(wxCommandEvent& event);
+	void OnChangeView(wxCommandEvent& event);
 	void OnChangeTime(wxCommandEvent& event);
 	void OnScroll(wxScrollEvent& event);
 	void OnTimer(wxTimerEvent& event);
@@ -62,7 +63,6 @@ public:
 
 private:
 	void PositionSlider(void);
-	void InitSimulation(void);
 	wxString SecondsToTC(const double t);
 
 private:
@@ -71,8 +71,7 @@ private:
 
 	DexelTarget model;
 
-	bool simulateWorkpiece;
-	bool loopGuard;
+	wxMutex loopGuard;
 	wxTimer timer;
 };
 

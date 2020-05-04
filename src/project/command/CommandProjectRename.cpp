@@ -40,6 +40,7 @@ bool CommandProjectRename::Do(void)
 {
 	this->oldName = project->GetTitle();
 	project->SetTitle(this->newName);
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -47,6 +48,7 @@ bool CommandProjectRename::Do(void)
 bool CommandProjectRename::Undo(void)
 {
 	project->SetTitle(this->oldName);
+	project->Modify(true);
 	project->Update();
 	return true;
 }

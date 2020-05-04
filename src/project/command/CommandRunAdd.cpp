@@ -45,6 +45,7 @@ bool CommandRunAdd::Do(void)
 {
 	if(project == NULL) return false;
 	project->run.push_back(this->run);
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -56,6 +57,7 @@ bool CommandRunAdd::Undo(void)
 	it = std::find(project->run.begin(), project->run.end(), runID);
 	if(it == project->run.end()) return false;
 	project->run.erase(it);
+	project->Modify(true);
 	project->Update();
 	return true;
 }

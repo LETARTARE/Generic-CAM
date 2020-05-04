@@ -51,6 +51,7 @@ bool CommandRunRemove::Do(void)
 	position = itRun - project->run.begin();
 	this->run = *itRun;
 	project->run.erase(itRun);
+	project->Modify(true);
 	project->Update();
 	return true;
 }
@@ -61,6 +62,7 @@ bool CommandRunRemove::Undo(void)
 	std::vector <Run>::iterator itRun;
 	itRun = project->run.begin() + position;
 	project->run.insert(itRun, run);
+	project->Modify(true);
 	project->Update();
 	return true;
 }

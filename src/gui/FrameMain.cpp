@@ -91,7 +91,6 @@
 #endif
 
 wxBEGIN_EVENT_TABLE(FrameMain, wxDocChildFrame) EVT_MENU(ID_TOGGLESTEREO3D, FrameMain::OnViewStereo3DToggle)
-EVT_MENU(ID_SETUPPATHS, FrameMain::OnPathSetup)
 EVT_MENU(ID_PROJECTRENAME, FrameMain::OnProjectRename)
 EVT_MENU(ID_OBJECTLOAD, FrameMain::OnObjectLoad)
 EVT_MENU(ID_OBJECTRENAME, FrameMain::OnObjectRename)
@@ -130,12 +129,12 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 	Project* project = wxStaticCast(GetDocument(), Project);
 	ProjectView* projectview = wxStaticCast(GetView(), ProjectView);
 
-	filepaths.Load(config);
+
 
 	// Load the default tools into a new project.
 	// (Has to be done from here, because the set paths are
 	// only known at this point.)
-	wxDir dir(filepaths.lastToolboxDirectory);
+	wxDir dir(parentframe->filepaths.lastToolboxDirectory);
 	if(dir.IsOpened()){
 		wxString filename;
 		bool cont = dir.GetFirst(&filename, _T("*.json"));
@@ -205,12 +204,16 @@ FrameMain::~FrameMain()
 {
 	printf("FrameMain: Destructor called\n");
 //	m_splitter->Destroy();
-	filepaths.Save(config);
 }
 
 FrameParent* FrameMain::GetParentFrame(void)
 {
 	return wxStaticCast(GetParent(), FrameParent);
+}
+
+CollectionFilepaths* FrameMain::GetFilePaths(void)
+{
+	return &(GetParentFrame()->filepaths);
 }
 
 size_t FrameMain::GetFreeSystemMemory()
@@ -245,7 +248,15 @@ bool FrameMain::TransferDataToWindow(bool updatetree)
 		}
 	}
 
-//	m_menuToolpath->Check(ID_GENERATORAUTOMATIC, project.processToolpath);
+	ProjectView * const view = wxStaticCast(GetView(), ProjectView);
+	if(dialogAnimation->IsShown()){
+		view->SetViewType(ProjectView::vSimulation);
+		view->FreezeViewType(true);
+	}else{
+		view->FreezeViewType(false);
+	}
+
+	//	m_menuToolpath->Check(ID_GENERATORAUTOMATIC, project.processToolpath);
 //	m_menuView->Check(ID_VIEWSTEREO3D, m_canvas->stereoMode != stereoOff);
 //	m_toolBar->ToggleTool(ID_DISPLAYMACHINE, project.displayMachine);
 //	m_toolBar->ToggleTool(ID_DISPLAYMATERIAL, project.displayGeometry);
@@ -266,14 +277,9 @@ bool FrameMain::TransferDataToWindow(bool updatetree)
 	dialogAnimation->TransferDataToWindow();
 //	dialogDebugger->TransferDataToWindow();
 
-	m_ribbonButtonBarProject->EnableButton(wxID_SAVE,
-			GetDocument()->IsModified());
-
-	ProjectView * const view = wxStaticCast(GetView(), ProjectView);
-	view->ShowAnimation(dialogAnimation->IsShown());
+	UpdateStatus();
 
 	//	Refresh();
-	UpdateStatus();
 	return true;
 }
 
@@ -291,7 +297,7 @@ void FrameMain::UpdateStatus(void)
 {
 	m_statusBar->SetStatusText(wxString(selection.ToString()), 0);
 
-	if(GetDocument()->GetCommandProcessor()->IsDirty()){
+	if(GetDocument()->IsModified()){
 		m_statusBar->SetStatusText(_T("modified"), 1);
 	}else{
 		m_statusBar->SetStatusText(_T("not modified"), 1);
@@ -327,8 +333,10 @@ void FrameMain::OnProjectOpenMenu(wxRibbonButtonBarEvent& event)
 void FrameMain::OnProjectSave(wxRibbonButtonBarEvent& event)
 {
 	printf("Save\n");
+
 	wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, wxID_SAVE);
 	ProcessEvent(menuEvent);
+	UpdateStatus();
 }
 
 void FrameMain::OnProjectSaveMenu(wxRibbonButtonBarEvent& event)
@@ -370,12 +378,6 @@ void FrameMain::OnViewPreferencesMenu(wxRibbonButtonBarEvent& event)
 	event.PopupMenu(&menu);
 }
 
-void FrameMain::OnPathSetup(wxCommandEvent& event)
-{
-	DialogSetupPaths dialog(this, &filepaths);
-	dialog.ShowModal();
-	dialog.UpdateCollection(&filepaths);
-}
 
 void FrameMain::OnViewStereo3DToggle(wxCommandEvent& event)
 {
@@ -409,6 +411,7 @@ void FrameMain::OnObjectLoad(wxRibbonButtonBarEvent& event)
 void FrameMain::OnObjectLoad(wxCommandEvent& event)
 {
 	Project* project = wxStaticCast(GetDocument(), Project);
+	CollectionFilepaths * filepaths = GetFilePaths();
 	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 
 	wxFileDialog dialog(this, _("Load Object..."), _T(""), _T(""),
@@ -416,11 +419,11 @@ void FrameMain::OnObjectLoad(wxCommandEvent& event)
 					"All supported files (*.obj; *.dxf; *.stl; *.gts)|*.obj;*.dxf;*DXF;*.stl;*.STL;*.gts;*.GTS|Wavefront OBJ Files (*.obj)|*.obj;*.OBJ|DXF Files (*.dxf)|*.dxf;*.DXF|Stereolithography files (STL files) (*.stl)|*.stl;*.STL|GTS files (*.gts)|*.gts;*.GTS|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_MULTIPLE);
 
-	if(wxDir::Exists(filepaths.lastObjectDirectory)){
-		dialog.SetDirectory(filepaths.lastObjectDirectory);
+	if(wxDir::Exists(filepaths->lastObjectDirectory)){
+		dialog.SetDirectory(filepaths->lastObjectDirectory);
 	}else{
-		if(wxDir::Exists(filepaths.lastProjectDirectory)){
-			dialog.SetDirectory(filepaths.lastProjectDirectory);
+		if(wxDir::Exists(filepaths->lastProjectDirectory)){
+			dialog.SetDirectory(filepaths->lastProjectDirectory);
 		}
 	}
 
@@ -436,7 +439,7 @@ void FrameMain::OnObjectLoad(wxCommandEvent& event)
 							(_("Load Object: ") + fileName.GetName()),
 							project, paths[n], objID));
 			selection.Add(objID);
-			if(n == paths.GetCount() - 1) filepaths.lastObjectDirectory =
+			if(n == paths.GetCount() - 1) filepaths->lastObjectDirectory =
 					fileName.GetPath();
 		}
 		if(DEBUG) std::cout << "FrameMain::OnObjectLoad - Loaded: "
@@ -733,7 +736,6 @@ void FrameMain::OnCAMPostProcessSimulate(wxRibbonButtonBarEvent& event)
 {
 	ProjectView * const view = wxStaticCast(GetView(), ProjectView);
 	dialogAnimation->Show();
-	view->ShowAnimation(true);
 	TransferDataToWindow(false);
 	dialogAnimation->Raise();
 }
@@ -817,9 +819,11 @@ void FrameMain::SetSelection(const Selection& selection, bool updateTree)
 	ProjectView * const view = wxStaticCast(GetView(), ProjectView);
 	this->selection = selection;
 	if(selectRequests.empty()){
+		view->FreezeViewType(false);
 		view->SetSelection(this->selection);
 	}else{
 		view->SetSelection(selectRequests[0]);
+		view->FreezeViewType(true);
 	}
 	if(loopguard.TryLock() != wxMUTEX_BUSY){
 		if(updateTree) tree->Update();

@@ -40,7 +40,6 @@
 #include <stddef.h>
 #include <wx/filename.h>
 #include <wx/string.h>
-//#include <wx/txtstrm.h>
 
 #include "../3D/AffineTransformMatrix.h"
 #include "../3D/BoundingBox.h"
@@ -51,12 +50,10 @@
 class JSON;
 
 class Object {
-	// Constructor / Destructor
 public:
 	Object(size_t ID);
 	virtual ~Object();
 
-	// Member variables
 public:
 
 	wxString name;
@@ -73,7 +70,6 @@ public:
 private:
 	size_t ID; //!< Internal ID number
 
-	// Methods
 public:
 	bool operator==(const size_t ID) const;
 	size_t GetID(void) const;

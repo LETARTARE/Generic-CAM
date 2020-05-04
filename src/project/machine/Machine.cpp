@@ -35,7 +35,9 @@
 #include <wx/log.h>
 #include <float.h>
 #include <algorithm>
+
 #include "../../3D/OpenGL.h"
+#include "../../Config.h"
 
 Machine::Machine()
 {
@@ -140,14 +142,20 @@ bool Machine::ReLoad(void)
 	}
 	EvaluateDescription();
 	MoveToGlobalZero();
-	return IsInitialized();
+	return IsLoaded();
 }
 
 void Machine::EvaluateDescription(void)
 {
-	wxLogMessage
-	(_T("Machine::InsertMachineDescription"));
 	evaluator.LinkToMachine(this);
+	if(machineDescription.IsEmpty()){
+		if(initialized){
+			initialized = false;
+			ClearComponents();
+			MoveToGlobalZero();
+		}
+		return;
+	}
 	if(evaluator.EvaluateProgram()){
 
 		// Initialize IK
@@ -175,12 +183,12 @@ void Machine::EvaluateDescription(void)
 		initialized = false;
 	}
 	AffineTransformMatrix tpos = toolPosition;
-	tpos.TranslateLocal(0, 0, toolLength);
+	tpos.TranslateLocal(0, 0, -toolLength);
 	reachedposition = workpiecePosition.Inverse() * tpos;
 	textOut = evaluator.GetOutput();
 }
 
-double Machine::GetE(void) const
+double Machine::GetError(void) const
 {
 	const double distance = reachedposition.Abs2(setposition);
 	const double normalangle = fabs(1.0 - reachedposition.Dot(setposition));
@@ -191,7 +199,7 @@ double Machine::GetE(void) const
 		if(IKaxisused[n]) bend += IKaxis[n] * IKaxis[n];
 	}
 
-	return distance + 1.0 * normalangle + 0.0001 * sqrt(bend);
+	return distance + 2.0 * normalangle + 1e-5 * sqrt(bend);
 }
 
 void Machine::Assemble()
@@ -209,9 +217,9 @@ void Machine::Assemble()
 	}
 	optim.reevalBest = true;
 //	optim.keepSimplex = true;
-	optim.simplexSpread = 0.5;
-	optim.errorLimit = 0.0001;
-	optim.evalLimit = 50;
+	optim.simplexSpread = 0.1;
+	optim.errorLimit = 1e-6;
+	optim.evalLimit = 100;
 
 	optim.Start();
 	while(optim.IsRunning()){
@@ -221,13 +229,13 @@ void Machine::Assemble()
 		}
 		evaluator.EvaluateAssembly();
 		AffineTransformMatrix tpos = toolPosition;
-		tpos.TranslateLocal(0, 0, toolLength);
+		tpos.TranslateLocal(0, 0, -toolLength);
 		reachedposition = workpiecePosition.Inverse() * tpos;
-		optim.SetError(GetE());
+		optim.SetError(GetError());
 	}
 }
 
-bool Machine::IsInitialized(void) const
+bool Machine::IsLoaded(void) const
 {
 	return initialized;
 }
@@ -243,24 +251,26 @@ void Machine::Paint(void) const
 //	PaintNullTool(0.10, 0.02);
 //	::glPopMatrix();
 
-	::glPushMatrix();
-	workpiecePosition.GLMultMatrix();
+	if(DEBUG){
+		::glPushMatrix();
+		workpiecePosition.GLMultMatrix();
 
 //	AffineTransformMatrix temp = workpiecePosition.Inverse() * toolPosition;
 //	::glMultMatrixd(temp.a);
 
-	AffineTransformMatrix temp = setposition.GetMatrix();
-	temp.Paint(0.1);
+		AffineTransformMatrix temp = setposition.GetMatrix();
+		temp.Paint(0.1);
 //	temp.TranslateLocal(0, 0, toolLength);
 //	temp = temp.Inverse();
-	temp.GLMultMatrix();
+		temp.GLMultMatrix();
 //	if(selectedToolSlot > 0 && selectedToolSlot <= tools.GetCount()){
 //		::glColor3f(0.7, 0.7, 0.7);
 //		tools[selectedToolSlot - 1].Paint();
 //	}else{
-	PaintNullTool(0.05, 0.03);
+		PaintNullTool(0.05, 0.03);
 //	}
-	::glPopMatrix();
+		::glPopMatrix();
+	}
 }
 
 void Machine::PaintNullTool(double length, double diameter) const

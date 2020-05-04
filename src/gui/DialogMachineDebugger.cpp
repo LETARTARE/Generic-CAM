@@ -149,26 +149,28 @@ void DialogMachineDebugger::OnScriptEvaluate(wxCommandEvent& event)
 void DialogMachineDebugger::OnMachineLoad(wxRibbonButtonBarEvent& event)
 {
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
-	CollectionFilepaths * settings = &(frame->filepaths);
+	CollectionFilepaths * filepaths = frame->GetFilePaths();
 	wxFileDialog dialog(this, _("Open machine description..."), _T(""), _T(""),
 			_(
 					"All machine descriptions  (*.lua;*.zip)|*.lua;*.zip|Machine descriptions (LUA Files)  (*.lua)|*.lua|Packed Machine descriptions  (*.zip)|*.zip|Text files  (*.txt)|*.txt|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
-	if(wxDir::Exists(settings->lastMachineDirectory)){
-		dialog.SetDirectory(settings->lastMachineDirectory);
+	if(wxDir::Exists(filepaths->lastMachineDirectory)){
+		dialog.SetDirectory(filepaths->lastMachineDirectory);
 	}else{
-		if(wxDir::Exists(settings->lastProjectDirectory)){
-			dialog.SetDirectory(settings->lastProjectDirectory);
+		if(wxDir::Exists(filepaths->lastProjectDirectory)){
+			dialog.SetDirectory(filepaths->lastProjectDirectory);
 		}
 	}
 
 	if(dialog.ShowModal() == wxID_OK){
 		wxFileName file(dialog.GetPath());
-		machine.Load(file);
-		m_textCtrlScript->SetValue(machine.machineDescription);
-		m_textCtrlScript->SetModified(false);
-		machine.EvaluateDescription();
+		if(machine.Load(file)){
+			SetTitle(file.GetName());
+			m_textCtrlScript->SetValue(machine.machineDescription);
+			m_textCtrlScript->SetModified(false);
+			machine.EvaluateDescription();
+		}
 		TransferDataToWindow();
 	}
 }
