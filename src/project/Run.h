@@ -76,10 +76,14 @@ class JSON;
 
 class Run {
 	friend class Project;
+	friend class CommandRunAdd;
 
 public:
-	Run(size_t ID);
+	Run();
 	virtual ~Run();
+//	Run& operator=(const Run&);
+//private:
+//	Run(const Run&);
 
 public:
 	Project * parent; ///< Pointer back to the Project this Run belongs to.
@@ -122,11 +126,12 @@ private:
 public:
 	bool operator ==(const size_t ID) const;
 	size_t GetID(void) const;
+	size_t GetMaxGeneratorID() const;
 	void Update(Project * project);
 
 	void GenerateToolpaths(void);
-	static double RecalculateTiming(std::vector <CNCPosition> * toolpath, double t0 =
-			0.0);
+	static double RecalculateTiming(std::vector <CNCPosition> * toolpath,
+			double t0 = 0.0);
 //	bool SaveToolpaths(wxFileName fileName);
 
 	void Paint(void) const;
@@ -146,6 +151,7 @@ public:
 		return a.name.Cmp(b.name) < 0;
 	}
 
+wxDECLARE_NO_COPY_CLASS(Run);
 };
 
 #endif /* RUN_H_ */

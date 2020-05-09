@@ -46,7 +46,7 @@ CommandObjectTransform::CommandObjectTransform(const wxString& name,
 bool CommandObjectTransform::Do(void)
 {
 	if(project == NULL) return false;
-	std::vector <Object>::iterator it;
+	std::list <Object>::iterator it;
 	it = std::find(project->objects.begin(), project->objects.end(), ID);
 	if(it == project->objects.end()) return false;
 
@@ -65,7 +65,7 @@ bool CommandObjectTransform::Do(void)
 bool CommandObjectTransform::Undo(void)
 {
 	if(project == NULL) return false;
-	std::vector <Object>::iterator it;
+	std::list <Object>::iterator it;
 	it = std::find(project->objects.begin(), project->objects.end(), ID);
 	if(it == project->objects.end()) return false;
 	it->matrix = matrixOld;

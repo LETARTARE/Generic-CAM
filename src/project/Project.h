@@ -51,6 +51,7 @@
 #include <wx/string.h>
 #include <wx/docview.h>
 #include <wx/defs.h>
+#include <list>
 
 //#if wxUSE_STD_IOSTREAM
 //typedef wxSTD istream DocumentIstream;
@@ -134,11 +135,11 @@ public:
 	const Tool * GetTool(size_t index) const;
 
 	const std::vector <Tool> * GetTools(void) const;
-	const std::vector <Object> * GetObjects(void) const;
+	const std::list <Object> * GetObjects(void) const;
 
 private:
-	std::vector <Object> objects;
-	std::vector <Run> run;
+	std::list <Object> objects;
+	std::list <Run> run;
 	ToolBox tools;
 
 	size_t maxObjectID;

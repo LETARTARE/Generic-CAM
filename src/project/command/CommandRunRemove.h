@@ -30,6 +30,7 @@
 #include <stddef.h>
 #include <wx/cmdproc.h>
 #include <wx/string.h>
+#include <list>
 
 #include "../Run.h"
 
@@ -44,8 +45,8 @@ public:
 protected:
 	Project * project;
 	size_t runID;
-	Run run;
-	size_t position;
+	std::list <Run> run;
+	std::list <Run>::iterator position;
 };
 
 #endif /* COMMANDRUNREMOVE_H_ */

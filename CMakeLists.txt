@@ -6,6 +6,7 @@ project(genericcam)
 find_package(wxWidgets COMPONENTS gl core base html xml adv ribbon propgrid REQUIRED)
 include(${wxWidgets_USE_FILE})
 
+set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -std=c++0x")
 
 if(MINGW)
 #	set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -I/usr/local/i586-mingw32/include")

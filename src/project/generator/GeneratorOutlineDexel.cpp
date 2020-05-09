@@ -51,7 +51,7 @@ void GeneratorOutlineDexel::CopyParameterFrom(const Generator* other)
 
 wxString GeneratorOutlineDexel::GetTypeName(void) const
 {
-	return _T("Outline (using Dexel)");
+	return _T("Outline (dexel-based)");
 }
 
 wxSizer * GeneratorOutlineDexel::AddToPanel(wxPanel* panel,
@@ -104,7 +104,7 @@ bool GeneratorOutlineDexel::operator ==(const Generator& b) const
 }
 
 void GeneratorOutlineDexel::GenerateToolpath(const Run &run,
-		const std::vector <Object> &objects, const Tool &tool,
+		const std::list <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
 	errorOccured = false;

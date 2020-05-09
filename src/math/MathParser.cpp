@@ -24,12 +24,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#define _USE_MATH_DEFINES
+
 #include "MathParser.h"
 
 #include <wx/debug.h>
-#ifdef _MSC_VER
-#define _USE_MATH_DEFINES
-#endif
 #include <math.h>
 
 MathParser::MathParser(bool autoEvaluate)

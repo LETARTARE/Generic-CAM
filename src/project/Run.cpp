@@ -41,9 +41,9 @@
 #include "../math/JSON.h"
 #include "generator/GeneratorFactory.h"
 
-Run::Run(size_t ID) :
-		ID(ID)
+Run::Run()
 {
+	ID = 0;
 	parent = NULL;
 	object = 0;
 	stocktype = BoxBottom;
@@ -498,8 +498,6 @@ bool Run::FromJSON(const JSON& js)
 
 	machinefile.SetName(js["Machine"].GetString());
 
-
-
 	const JSON &g = js["Generator"];
 	for(size_t n = 0; n < g.Size(); ++n){
 		size_t generatortype = g[n]["Type"].GetNumber();
@@ -510,4 +508,18 @@ bool Run::FromJSON(const JSON& js)
 		generators.push_back(generator);
 	}
 	return true;
+}
+
+size_t Run::GetMaxGeneratorID() const
+{
+	size_t maxID = 0;
+	for(std::vector <Generator *>::const_iterator it = generators.begin();
+			it != generators.end(); ++it){
+		if((*it)->GetID() > maxID) maxID = (*it)->GetID();
+	}
+	return maxID;
+}
+
+Run& Run::operator =(const Run&)
+{
 }

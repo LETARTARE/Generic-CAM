@@ -35,6 +35,8 @@
 #ifndef _CVECTOR3_H_
 #define _CVECTOR3_H_
 
+#define _USE_MATH_DEFINES
+
 #include <wx/string.h>
 
 #include <math.h>

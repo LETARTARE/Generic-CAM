@@ -424,7 +424,7 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	m_panelScale->SetSizer( bSizer29 );
 	m_panelScale->Layout();
 	bSizer29->Fit( m_panelScale );
-	m_notebook->AddPage( m_panelScale, _("Scale"), false );
+	m_notebook->AddPage( m_panelScale, _("Scale"), true );
 	m_panelMove = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer34;
 	bSizer34 = new wxBoxSizer( wxHORIZONTAL );
@@ -518,7 +518,7 @@ GUIObjectTransformation::GUIObjectTransformation( wxWindow* parent, wxWindowID i
 	m_panelMove->SetSizer( bSizer34 );
 	m_panelMove->Layout();
 	bSizer34->Fit( m_panelMove );
-	m_notebook->AddPage( m_panelMove, _("Move"), true );
+	m_notebook->AddPage( m_panelMove, _("Move"), false );
 	m_panelRotate = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer291;
 	bSizer291 = new wxBoxSizer( wxVERTICAL );
@@ -2134,6 +2134,95 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_panelShape->Layout();
 	bSizerPanelShape->Fit( m_panelShape );
 	m_notebook->AddPage( m_panelShape, _("Shape"), false );
+	m_panelShaft = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxBoxSizer* bSizerPanelShaft;
+	bSizerPanelShaft = new wxBoxSizer( wxVERTICAL );
+	
+	m_checkBoxShaftFromGeometry = new wxCheckBox( m_panelShaft, ID_SHAFTFROMGEOMETRY, _("Shaft from Geometry"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxShaftFromGeometry->SetValue(true); 
+	bSizerPanelShaft->Add( m_checkBoxShaftFromGeometry, 0, wxALL, 5 );
+	
+	wxBoxSizer* bSizerShaftButtons;
+	bSizerShaftButtons = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_buttonShaftSegmentAdd = new wxButton( m_panelShaft, ID_SHAFTSEGMENTADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonShaftSegmentAdd->SetToolTip( _("Add a segment to the shaft shape.") );
+	
+	bSizerShaftButtons->Add( m_buttonShaftSegmentAdd, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
+	
+	m_buttonShapeDelete = new wxButton( m_panelShaft, ID_SHAFTSEGMENTDELETE, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonShapeDelete->SetToolTip( _("Delete the selected segment from the shaft shape.") );
+	
+	bSizerShaftButtons->Add( m_buttonShapeDelete, 0, wxTOP|wxBOTTOM|wxRIGHT, 5 );
+	
+	
+	bSizerPanelShaft->Add( bSizerShaftButtons, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	wxStaticBoxSizer* sbSizerShaft;
+	sbSizerShaft = new wxStaticBoxSizer( new wxStaticBox( m_panelShaft, wxID_ANY, _("Segment") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizerShaft;
+	fgSizerShaft = new wxFlexGridSizer( 3, 3, 0, 0 );
+	fgSizerShaft->AddGrowableCol( 1 );
+	fgSizerShaft->SetFlexibleDirection( wxBOTH );
+	fgSizerShaft->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticTextShaftUpperDiameter = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("Upper Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextShaftUpperDiameter->Wrap( -1 );
+	fgSizerShaft->Add( m_staticTextShaftUpperDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlShaftUpperDiameter = new wxTextCtrl( sbSizerShaft->GetStaticBox(), ID_SHAFTUPPERDIAMETER, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlShaftUpperDiameter->SetToolTip( _("Upper diameter of the selected segment.") );
+	
+	fgSizerShaft->Add( m_textCtrlShaftUpperDiameter, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticTextUnitShaftUpperDiameter = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitShaftUpperDiameter->Wrap( -1 );
+	fgSizerShaft->Add( m_staticTextUnitShaftUpperDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextShaftLowerDiameter = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("Lower Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextShaftLowerDiameter->Wrap( -1 );
+	fgSizerShaft->Add( m_staticTextShaftLowerDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlShaftLowerDiameter = new wxTextCtrl( sbSizerShaft->GetStaticBox(), ID_SHAFTLOWERDIAMETER, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlShaftLowerDiameter->SetToolTip( _("Lower diameter of the selected segment.") );
+	
+	fgSizerShaft->Add( m_textCtrlShaftLowerDiameter, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticTextUnitShaftLowerDiameter = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitShaftLowerDiameter->Wrap( -1 );
+	fgSizerShaft->Add( m_staticTextUnitShaftLowerDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextShaftHeight = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("Height:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextShaftHeight->Wrap( -1 );
+	fgSizerShaft->Add( m_staticTextShaftHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlShaftHeight = new wxTextCtrl( sbSizerShaft->GetStaticBox(), ID_SHAFTHEIGHT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlShaftHeight->SetToolTip( _("Height of the selected segment.") );
+	
+	fgSizerShaft->Add( m_textCtrlShaftHeight, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticTextUnitShaftHeight = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitShaftHeight->Wrap( -1 );
+	fgSizerShaft->Add( m_staticTextUnitShaftHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	sbSizerShaft->Add( fgSizerShaft, 0, wxEXPAND, 5 );
+	
+	
+	bSizerPanelShaft->Add( sbSizerShaft, 0, wxEXPAND, 5 );
+	
+	m_dataViewListCtrlShaftSegments = new wxDataViewListCtrl( m_panelShaft, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_dataViewListColumnShaftUpperDiameter = m_dataViewListCtrlShaftSegments->AppendTextColumn( _("Upper") );
+	m_dataViewListColumnShaftLowerDiameter = m_dataViewListCtrlShaftSegments->AppendTextColumn( _("Lower") );
+	m_dataViewListColumnShaftHeight = m_dataViewListCtrlShaftSegments->AppendTextColumn( _("Height") );
+	bSizerPanelShaft->Add( m_dataViewListCtrlShaftSegments, 1, wxALL|wxEXPAND, 5 );
+	
+	
+	m_panelShaft->SetSizer( bSizerPanelShaft );
+	m_panelShaft->Layout();
+	bSizerPanelShaft->Fit( m_panelShaft );
+	m_notebook->AddPage( m_panelShaft, _("Shaft"), false );
 	m_panelHolder = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizerHolder;
 	bSizerHolder = new wxBoxSizer( wxVERTICAL );
@@ -2225,95 +2314,6 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_panelHolder->Layout();
 	bSizerHolder->Fit( m_panelHolder );
 	m_notebook->AddPage( m_panelHolder, _("Holder"), false );
-	m_panelShaft = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* bSizerPanelShaft;
-	bSizerPanelShaft = new wxBoxSizer( wxVERTICAL );
-	
-	m_checkBoxShaftFromGeometry = new wxCheckBox( m_panelShaft, ID_SHAFTFROMGEOMETRY, _("Shaft from Geometry"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_checkBoxShaftFromGeometry->SetValue(true); 
-	bSizerPanelShaft->Add( m_checkBoxShaftFromGeometry, 0, wxALL, 5 );
-	
-	wxBoxSizer* bSizerShaftButtons;
-	bSizerShaftButtons = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_buttonShaftSegmentAdd = new wxButton( m_panelShaft, ID_SHAFTSEGMENTADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_buttonShaftSegmentAdd->SetToolTip( _("Add a segment to the shaft shape.") );
-	
-	bSizerShaftButtons->Add( m_buttonShaftSegmentAdd, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
-	
-	m_buttonShapeDelete = new wxButton( m_panelShaft, ID_SHAFTSEGMENTDELETE, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_buttonShapeDelete->SetToolTip( _("Delete the selected segment from the shaft shape.") );
-	
-	bSizerShaftButtons->Add( m_buttonShapeDelete, 0, wxTOP|wxBOTTOM|wxRIGHT, 5 );
-	
-	
-	bSizerPanelShaft->Add( bSizerShaftButtons, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	wxStaticBoxSizer* sbSizerShaft;
-	sbSizerShaft = new wxStaticBoxSizer( new wxStaticBox( m_panelShaft, wxID_ANY, _("Segment") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizerShaft;
-	fgSizerShaft = new wxFlexGridSizer( 3, 3, 0, 0 );
-	fgSizerShaft->AddGrowableCol( 1 );
-	fgSizerShaft->SetFlexibleDirection( wxBOTH );
-	fgSizerShaft->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_staticTextShaftUpperDiameter = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("Upper Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextShaftUpperDiameter->Wrap( -1 );
-	fgSizerShaft->Add( m_staticTextShaftUpperDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_textCtrlShaftUpperDiameter = new wxTextCtrl( sbSizerShaft->GetStaticBox(), ID_SHAFTUPPERDIAMETER, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	m_textCtrlShaftUpperDiameter->SetToolTip( _("Upper diameter of the selected segment.") );
-	
-	fgSizerShaft->Add( m_textCtrlShaftUpperDiameter, 0, wxALL|wxEXPAND, 5 );
-	
-	m_staticTextUnitShaftUpperDiameter = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitShaftUpperDiameter->Wrap( -1 );
-	fgSizerShaft->Add( m_staticTextUnitShaftUpperDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_staticTextShaftLowerDiameter = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("Lower Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextShaftLowerDiameter->Wrap( -1 );
-	fgSizerShaft->Add( m_staticTextShaftLowerDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_textCtrlShaftLowerDiameter = new wxTextCtrl( sbSizerShaft->GetStaticBox(), ID_SHAFTLOWERDIAMETER, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	m_textCtrlShaftLowerDiameter->SetToolTip( _("Lower diameter of the selected segment.") );
-	
-	fgSizerShaft->Add( m_textCtrlShaftLowerDiameter, 0, wxALL|wxEXPAND, 5 );
-	
-	m_staticTextUnitShaftLowerDiameter = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitShaftLowerDiameter->Wrap( -1 );
-	fgSizerShaft->Add( m_staticTextUnitShaftLowerDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_staticTextShaftHeight = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("Height:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextShaftHeight->Wrap( -1 );
-	fgSizerShaft->Add( m_staticTextShaftHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_textCtrlShaftHeight = new wxTextCtrl( sbSizerShaft->GetStaticBox(), ID_SHAFTHEIGHT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	m_textCtrlShaftHeight->SetToolTip( _("Height of the selected segment.") );
-	
-	fgSizerShaft->Add( m_textCtrlShaftHeight, 0, wxALL|wxEXPAND, 5 );
-	
-	m_staticTextUnitShaftHeight = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitShaftHeight->Wrap( -1 );
-	fgSizerShaft->Add( m_staticTextUnitShaftHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	
-	sbSizerShaft->Add( fgSizerShaft, 0, wxEXPAND, 5 );
-	
-	
-	bSizerPanelShaft->Add( sbSizerShaft, 0, wxEXPAND, 5 );
-	
-	m_dataViewListCtrlShaftSegments = new wxDataViewListCtrl( m_panelShaft, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
-	m_dataViewListColumnShaftUpperDiameter = m_dataViewListCtrlShaftSegments->AppendTextColumn( _("Upper") );
-	m_dataViewListColumnShaftLowerDiameter = m_dataViewListCtrlShaftSegments->AppendTextColumn( _("Lower") );
-	m_dataViewListColumnShaftHeight = m_dataViewListCtrlShaftSegments->AppendTextColumn( _("Height") );
-	bSizerPanelShaft->Add( m_dataViewListCtrlShaftSegments, 1, wxALL|wxEXPAND, 5 );
-	
-	
-	m_panelShaft->SetSizer( bSizerPanelShaft );
-	m_panelShaft->Layout();
-	bSizerPanelShaft->Fit( m_panelShaft );
-	m_notebook->AddPage( m_panelShaft, _("Shaft"), false );
 	m_panelFeedsSpeeds = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizerPanelFeedsSpeeds;
 	bSizerPanelFeedsSpeeds = new wxBoxSizer( wxVERTICAL );
@@ -2684,15 +2684,6 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_dataViewListCtrlShapeSegments->Connect( wxEVT_COMMAND_DATAVIEW_ITEM_BEGIN_DRAG, wxDataViewEventHandler( GUIToolbox::OnItemBeginDrag ), NULL, this );
 	m_dataViewListCtrlShapeSegments->Connect( wxEVT_COMMAND_DATAVIEW_ITEM_DROP, wxDataViewEventHandler( GUIToolbox::OnItemDrop ), NULL, this );
 	m_dataViewListCtrlShapeSegments->Connect( wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
-	m_choiceHolder->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolbox::OnChoice ), NULL, this );
-	m_buttonHolderSegmentAdd->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentAdd ), NULL, this );
-	m_buttonHolderSegmentDelete->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentDelete ), NULL, this );
-	m_textCtrlHolderUpperDiameter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlHolderLowerDiameter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlHolderHeight->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_dataViewListCtrlHolderSegments->Connect( wxEVT_COMMAND_DATAVIEW_ITEM_BEGIN_DRAG, wxDataViewEventHandler( GUIToolbox::OnItemBeginDrag ), NULL, this );
-	m_dataViewListCtrlHolderSegments->Connect( wxEVT_COMMAND_DATAVIEW_ITEM_DROP, wxDataViewEventHandler( GUIToolbox::OnItemDrop ), NULL, this );
-	m_dataViewListCtrlHolderSegments->Connect( wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
 	m_checkBoxShaftFromGeometry->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIToolbox::OnCheckBox ), NULL, this );
 	m_buttonShaftSegmentAdd->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentAdd ), NULL, this );
 	m_buttonShapeDelete->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentDelete ), NULL, this );
@@ -2702,6 +2693,15 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_dataViewListCtrlShaftSegments->Connect( wxEVT_COMMAND_DATAVIEW_ITEM_BEGIN_DRAG, wxDataViewEventHandler( GUIToolbox::OnItemBeginDrag ), NULL, this );
 	m_dataViewListCtrlShaftSegments->Connect( wxEVT_COMMAND_DATAVIEW_ITEM_DROP, wxDataViewEventHandler( GUIToolbox::OnItemDrop ), NULL, this );
 	m_dataViewListCtrlShaftSegments->Connect( wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
+	m_choiceHolder->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolbox::OnChoice ), NULL, this );
+	m_buttonHolderSegmentAdd->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentAdd ), NULL, this );
+	m_buttonHolderSegmentDelete->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentDelete ), NULL, this );
+	m_textCtrlHolderUpperDiameter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlHolderLowerDiameter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlHolderHeight->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_dataViewListCtrlHolderSegments->Connect( wxEVT_COMMAND_DATAVIEW_ITEM_BEGIN_DRAG, wxDataViewEventHandler( GUIToolbox::OnItemBeginDrag ), NULL, this );
+	m_dataViewListCtrlHolderSegments->Connect( wxEVT_COMMAND_DATAVIEW_ITEM_DROP, wxDataViewEventHandler( GUIToolbox::OnItemDrop ), NULL, this );
+	m_dataViewListCtrlHolderSegments->Connect( wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
 	m_textCtrlSetName->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
 	m_textCtrlSetGUID->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
 	m_textCtrlSetDescription->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
@@ -2771,15 +2771,6 @@ GUIToolbox::~GUIToolbox()
 	m_dataViewListCtrlShapeSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_ITEM_BEGIN_DRAG, wxDataViewEventHandler( GUIToolbox::OnItemBeginDrag ), NULL, this );
 	m_dataViewListCtrlShapeSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_ITEM_DROP, wxDataViewEventHandler( GUIToolbox::OnItemDrop ), NULL, this );
 	m_dataViewListCtrlShapeSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
-	m_choiceHolder->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolbox::OnChoice ), NULL, this );
-	m_buttonHolderSegmentAdd->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentAdd ), NULL, this );
-	m_buttonHolderSegmentDelete->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentDelete ), NULL, this );
-	m_textCtrlHolderUpperDiameter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlHolderLowerDiameter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlHolderHeight->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_dataViewListCtrlHolderSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_ITEM_BEGIN_DRAG, wxDataViewEventHandler( GUIToolbox::OnItemBeginDrag ), NULL, this );
-	m_dataViewListCtrlHolderSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_ITEM_DROP, wxDataViewEventHandler( GUIToolbox::OnItemDrop ), NULL, this );
-	m_dataViewListCtrlHolderSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
 	m_checkBoxShaftFromGeometry->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIToolbox::OnCheckBox ), NULL, this );
 	m_buttonShaftSegmentAdd->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentAdd ), NULL, this );
 	m_buttonShapeDelete->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentDelete ), NULL, this );
@@ -2789,6 +2780,15 @@ GUIToolbox::~GUIToolbox()
 	m_dataViewListCtrlShaftSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_ITEM_BEGIN_DRAG, wxDataViewEventHandler( GUIToolbox::OnItemBeginDrag ), NULL, this );
 	m_dataViewListCtrlShaftSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_ITEM_DROP, wxDataViewEventHandler( GUIToolbox::OnItemDrop ), NULL, this );
 	m_dataViewListCtrlShaftSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
+	m_choiceHolder->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolbox::OnChoice ), NULL, this );
+	m_buttonHolderSegmentAdd->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentAdd ), NULL, this );
+	m_buttonHolderSegmentDelete->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentDelete ), NULL, this );
+	m_textCtrlHolderUpperDiameter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlHolderLowerDiameter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlHolderHeight->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_dataViewListCtrlHolderSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_ITEM_BEGIN_DRAG, wxDataViewEventHandler( GUIToolbox::OnItemBeginDrag ), NULL, this );
+	m_dataViewListCtrlHolderSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_ITEM_DROP, wxDataViewEventHandler( GUIToolbox::OnItemDrop ), NULL, this );
+	m_dataViewListCtrlHolderSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
 	m_textCtrlSetName->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
 	m_textCtrlSetGUID->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
 	m_textCtrlSetDescription->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );

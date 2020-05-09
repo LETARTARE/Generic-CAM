@@ -32,11 +32,11 @@
 
 CommandObjectRemove::CommandObjectRemove(const wxString& name, Project* project,
 		size_t ID) :
-		wxCommand(true, name), object(ID)
+		wxCommand(true, name)
 {
 	this->project = project;
 	this->ID = ID;
-	position = 0;
+
 }
 
 CommandObjectRemove::~CommandObjectRemove()
@@ -46,12 +46,11 @@ CommandObjectRemove::~CommandObjectRemove()
 bool CommandObjectRemove::Do(void)
 {
 	if(project == NULL) return false;
-	std::vector <Object>::iterator it;
-	it = std::find(project->objects.begin(), project->objects.end(), ID);
-	if(it == project->objects.end()) return false;
-	position = it - project->objects.begin();
-	this->object = *it;
-	project->objects.erase(it);
+	position = std::find(project->objects.begin(), project->objects.end(), ID);
+	if(position == project->objects.end()) return false;
+
+	object.splice(object.end(), project->objects, position);
+
 	project->Modify(true);
 	project->Update();
 	return true;
@@ -60,9 +59,9 @@ bool CommandObjectRemove::Do(void)
 bool CommandObjectRemove::Undo(void)
 {
 	if(project == NULL) return false;
-	std::vector <Object>::iterator it;
-	it = project->objects.begin() + position;
-	project->objects.insert(it, this->object);
+
+	project->objects.splice(position, object);
+
 	project->Modify(true);
 	project->Update();
 	return true;

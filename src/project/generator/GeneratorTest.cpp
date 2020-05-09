@@ -119,7 +119,7 @@ void GeneratorTest::TransferDataFromPanel(CollectionUnits* settings)
 }
 
 void GeneratorTest::GenerateToolpath(const Run &run,
-		const std::vector <Object> &objects, const Tool &tool,
+		const std::list <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
 	output.Empty();

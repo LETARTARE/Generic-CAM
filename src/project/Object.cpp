@@ -339,8 +339,8 @@ bool Object::FromJSON(const JSON& js)
 	const JSON &m = js["Matrix"];
 	for(size_t n = 0; n < 16; ++n)
 		matrix[n] = m[n].GetNumber();
-	show = js["Show"].GetBool();
-	selectable = js["Selectable"].GetBool();
+	show = js["Show"].GetBool(true);
+	selectable = js["Selectable"].GetBool(true);
 	useGroups = js["UseGroups"].GetBool(true);
 
 	//	if(temp.Cmp(_T("Color:")) != 0) return false;

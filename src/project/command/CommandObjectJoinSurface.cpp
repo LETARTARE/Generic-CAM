@@ -39,7 +39,7 @@ CommandObjectJoinSurface::CommandObjectJoinSurface(const wxString& name,
 bool CommandObjectJoinSurface::Do(void)
 {
 	if(project == NULL) return false;
-	std::vector <Object>::iterator it;
+	std::list <Object>::iterator it;
 	it = std::find(project->objects.begin(), project->objects.end(), object_ID);
 	if(it == project->objects.end()) return false;
 
@@ -53,7 +53,7 @@ bool CommandObjectJoinSurface::Do(void)
 bool CommandObjectJoinSurface::Undo(void)
 {
 	if(project == NULL) return false;
-	std::vector <Object>::iterator it;
+	std::list <Object>::iterator it;
 	it = std::find(project->objects.begin(), project->objects.end(), object_ID);
 	if(it == project->objects.end()) return false;
 	*it = oldObject;

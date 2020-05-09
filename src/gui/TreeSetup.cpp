@@ -319,7 +319,7 @@ void TreeSetup::Update(void)
 	// expansion level and the selection if possible.
 
 	if(loopGuard.TryLock() == wxMUTEX_BUSY) return;
-//	if(DEBUG) std::cout << "TreeSetup::Update -> loopGuard.Lock();\n";
+	if(DEBUG) std::cout << "TreeSetup::Update -> loopGuard.Lock();\n";
 
 	wxTreeItemId root = tree->GetRootItem();
 	if(!root.IsOk()){
@@ -368,7 +368,8 @@ void TreeSetup::Update(void)
 		for(std::vector <Generator*>::const_iterator generator =
 				run->generators.begin(); generator != run->generators.end();
 				++generator){
-//			if(DEBUG) std::cout << " => " << (*generator)->GetName() << "\n";
+			if(DEBUG) std::cout << " => " << (*generator)->GetName() << "\n";
+
 			SetAtLevel(3, (*generator)->GetName(), TreeItem::itemGenerator,
 					(*generator)->GetID());
 			foundItem2 = true;
@@ -388,7 +389,7 @@ void TreeSetup::Update(void)
 	tree->Expand(id[1]);
 	tree->Expand(id[0]);
 
-//	if(DEBUG) std::cout << "TreeSetup::Update -> loopGuard.Unlock();\n";
+	if(DEBUG) std::cout << "TreeSetup::Update -> loopGuard.Unlock();\n";
 	loopGuard.Unlock();
 }
 

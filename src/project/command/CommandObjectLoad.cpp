@@ -62,7 +62,7 @@ bool CommandObjectLoad::Do(void)
 
 bool CommandObjectLoad::Undo(void)
 {
-	std::vector<Object>::iterator obj = project->objects.begin();
+	std::list <Object>::iterator obj = project->objects.begin();
 	while(obj!=project->objects.end()){
 		if(*obj==ID){
 			obj = project->objects.erase(obj);

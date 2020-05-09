@@ -41,7 +41,7 @@ CommandRunMachineSet::CommandRunMachineSet(const wxString& name,
 bool CommandRunMachineSet::Do(void)
 {
 	if(project == NULL) return false;
-	std::vector <Run>::iterator itRun;
+	std::list <Run>::iterator itRun;
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 
@@ -55,7 +55,7 @@ bool CommandRunMachineSet::Do(void)
 bool CommandRunMachineSet::Undo(void)
 {
 	if(project == NULL) return false;
-	std::vector <Run>::iterator itRun;
+	std::list <Run>::iterator itRun;
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 

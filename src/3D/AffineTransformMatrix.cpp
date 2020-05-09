@@ -24,17 +24,16 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "AffineTransformMatrix.h"
+#define _USE_MATH_DEFINES
 
+#include <math.h>
+#include <sstream>
+#include <stdint.h>
+
+#include "AffineTransformMatrix.h"
 #include "OpenGLMaterial.h"
 #include "Vector3.h"
 
-#include <sstream>
-#include <stdint.h>
-#ifdef _MSC_VER
-#define _USE_MATH_DEFINES
-#endif
-#include <math.h>
 #include "OpenGL.h"
 
 AffineTransformMatrix::AffineTransformMatrix()

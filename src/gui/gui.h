@@ -154,17 +154,17 @@
 #define ID_SHAPEUPPERDIAMETER 1090
 #define ID_SHAPELOWERDIAMETER 1091
 #define ID_SHAPEHEIGHT 1092
-#define ID_HOLDERSEGMENTADD 1093
-#define ID_HOLDERSEGMENTDELETE 1094
-#define ID_UPPERDIAMETER 1095
-#define ID_HOLDERLOWERDIAMETER 1096
-#define ID_HOLDERHEIGHT 1097
-#define ID_SHAFTFROMGEOMETRY 1098
-#define ID_SHAFTSEGMENTADD 1099
-#define ID_SHAFTSEGMENTDELETE 1100
-#define ID_SHAFTUPPERDIAMETER 1101
-#define ID_SHAFTLOWERDIAMETER 1102
-#define ID_SHAFTHEIGHT 1103
+#define ID_SHAFTFROMGEOMETRY 1093
+#define ID_SHAFTSEGMENTADD 1094
+#define ID_SHAFTSEGMENTDELETE 1095
+#define ID_SHAFTUPPERDIAMETER 1096
+#define ID_SHAFTLOWERDIAMETER 1097
+#define ID_SHAFTHEIGHT 1098
+#define ID_HOLDERSEGMENTADD 1099
+#define ID_HOLDERSEGMENTDELETE 1100
+#define ID_UPPERDIAMETER 1101
+#define ID_HOLDERLOWERDIAMETER 1102
+#define ID_HOLDERHEIGHT 1103
 #define ID_SETNAME 1104
 #define ID_SETGUID 1105
 #define ID_SETDESCRIPTION 1106
@@ -767,23 +767,6 @@ class GUIToolbox : public wxFrame
 		wxDataViewColumn* m_dataViewListColumnShapeUpper;
 		wxDataViewColumn* m_dataViewListColumnShapeLower;
 		wxDataViewColumn* m_dataViewListColumnShapeHeight;
-		wxPanel* m_panelHolder;
-		wxChoice* m_choiceHolder;
-		wxButton* m_buttonHolderSegmentAdd;
-		wxButton* m_buttonHolderSegmentDelete;
-		wxStaticText* m_staticTextHolderUpperDiameter;
-		wxTextCtrl* m_textCtrlHolderUpperDiameter;
-		wxStaticText* m_staticTextUnitHolderUpperDiameter;
-		wxStaticText* m_staticTextHolderLowerDiameter;
-		wxTextCtrl* m_textCtrlHolderLowerDiameter;
-		wxStaticText* m_staticTextUnitHolderLowerDiameter;
-		wxStaticText* m_staticTextHolderHeight;
-		wxTextCtrl* m_textCtrlHolderHeight;
-		wxStaticText* m_staticTextUnitHolderHeight;
-		wxDataViewListCtrl* m_dataViewListCtrlHolderSegments;
-		wxDataViewColumn* m_dataViewListColumnHolderUpper;
-		wxDataViewColumn* m_dataViewListColumnHolderLower;
-		wxDataViewColumn* m_dataViewListColumnHolderHeight;
 		wxPanel* m_panelShaft;
 		wxCheckBox* m_checkBoxShaftFromGeometry;
 		wxButton* m_buttonShaftSegmentAdd;
@@ -801,6 +784,23 @@ class GUIToolbox : public wxFrame
 		wxDataViewColumn* m_dataViewListColumnShaftUpperDiameter;
 		wxDataViewColumn* m_dataViewListColumnShaftLowerDiameter;
 		wxDataViewColumn* m_dataViewListColumnShaftHeight;
+		wxPanel* m_panelHolder;
+		wxChoice* m_choiceHolder;
+		wxButton* m_buttonHolderSegmentAdd;
+		wxButton* m_buttonHolderSegmentDelete;
+		wxStaticText* m_staticTextHolderUpperDiameter;
+		wxTextCtrl* m_textCtrlHolderUpperDiameter;
+		wxStaticText* m_staticTextUnitHolderUpperDiameter;
+		wxStaticText* m_staticTextHolderLowerDiameter;
+		wxTextCtrl* m_textCtrlHolderLowerDiameter;
+		wxStaticText* m_staticTextUnitHolderLowerDiameter;
+		wxStaticText* m_staticTextHolderHeight;
+		wxTextCtrl* m_textCtrlHolderHeight;
+		wxStaticText* m_staticTextUnitHolderHeight;
+		wxDataViewListCtrl* m_dataViewListCtrlHolderSegments;
+		wxDataViewColumn* m_dataViewListColumnHolderUpper;
+		wxDataViewColumn* m_dataViewListColumnHolderLower;
+		wxDataViewColumn* m_dataViewListColumnHolderHeight;
 		wxPanel* m_panelFeedsSpeeds;
 		wxScrolledWindow* m_scrolledWindowFeedsSpeeds;
 		wxStaticText* m_staticTextSetName;

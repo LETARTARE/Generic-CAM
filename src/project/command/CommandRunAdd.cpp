@@ -32,19 +32,21 @@
 
 CommandRunAdd::CommandRunAdd(const wxString& name, Project* project,
 		const wxString &runName, size_t runID, const std::set <size_t> &objIDs) :
-		wxCommand(true, name), runID(runID), run(runID)
+		wxCommand(true, name), runID(runID)
 {
 	this->project = project;
-	this->run.name = runName;
+	run.emplace(run.end());
+	run.begin()->ID = runID;
+	run.begin()->name = runName;
 	for(std::set <size_t>::const_iterator objID = objIDs.begin();
 			objID != objIDs.end(); ++objID)
-		this->run.object.Add(Selection::Object, *objID);
+		run.begin()->object.Add(Selection::Object, *objID);
 }
 
 bool CommandRunAdd::Do(void)
 {
 	if(project == NULL) return false;
-	project->run.push_back(this->run);
+	project->run.splice(project->run.end(), run, run.begin(), run.end());
 	project->Modify(true);
 	project->Update();
 	return true;
@@ -54,9 +56,11 @@ bool CommandRunAdd::Undo(void)
 {
 	if(project == NULL) return false;
 	std::vector <Run>::iterator it;
-	it = std::find(project->run.begin(), project->run.end(), runID);
-	if(it == project->run.end()) return false;
-	project->run.erase(it);
+
+	std::list <Run>::iterator itRun;
+	itRun = std::find(project->run.begin(), project->run.end(), runID);
+	if(itRun == project->run.end()) return false;
+	run.splice(run.end(), project->run, itRun);
 	project->Modify(true);
 	project->Update();
 	return true;

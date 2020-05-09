@@ -51,7 +51,7 @@ CommandRunGeneratorUpdate::~CommandRunGeneratorUpdate(void)
 bool CommandRunGeneratorUpdate::Do(void)
 {
 	if(project == NULL) return false;
-	std::vector <Run>::iterator itRun;
+	std::list <Run>::iterator itRun;
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 	std::vector <Generator*>::iterator it;
@@ -72,7 +72,7 @@ bool CommandRunGeneratorUpdate::Do(void)
 bool CommandRunGeneratorUpdate::Undo(void)
 {
 	if(project == NULL) return false;
-	std::vector <Run>::iterator itRun;
+	std::list <Run>::iterator itRun;
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 	std::vector <Generator*>::iterator it;
