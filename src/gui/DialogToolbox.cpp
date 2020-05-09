@@ -52,73 +52,123 @@ DialogToolbox::DialogToolbox(wxWindow* parent) :
 			wxArtProvider::GetIcon(wxART_FOLDER_OPEN, wxART_LIST, iconSize));
 	m_treeListCtrl->AssignImageList(imagelist);
 
-	Update();
-
-	TransferDataToWindow();
+	Update(true);
 }
 
 DialogToolbox::~DialogToolbox()
 {
 }
 
-void DialogToolbox::Update(void)
+void DialogToolbox::Update(bool refreshDirectory)
 {
 	if(!this->IsShown()) return;
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
-	if(toolboxes.empty()){
+
+	// Initialize toolboxes
+	if(toolboxes.empty() || refreshDirectory){
+		toolboxes.clear();
+		toolboxes.push_back(project->tools);
+		toolboxes[0].filename = "/Project.";
 		wxDir dir(frame->GetFilePaths()->lastToolboxDirectory);
 		if(dir.IsOpened()){
 			wxString filename;
 			bool cont = dir.GetFirst(&filename, _T("*.json"));
 			while(cont){
 				wxString fullfilename = dir.GetNameWithSep() + filename;
-				if(filename.CmpNoCase(_T("local.json")) == 0){
-					if(!localtoolbox.IsLoaded()) localtoolbox.Load(
-							fullfilename.ToStdString());
+				ToolBox temp;
+				temp.filename = fullfilename.ToStdString();
+				if(filename.Lower().StartsWith(_T("local"))){
+					temp.Load();
+					toolboxes.insert(toolboxes.begin() + 1, temp);
 				}else{
-					ToolBox temp;
-					temp.filename = fullfilename.ToStdString();
 					toolboxes.push_back(temp);
 				}
 				cont = dir.GetNext(&filename);
 			}
 		}
+		toolboxfolders.clear();
+		m_treeListCtrl->DeleteAllItems();
+	}else{
+		toolboxes[0] = project->tools;
+		toolboxes[0].filename = "/Project.";
 	}
 
-	wxTreeListItem root = m_treeListCtrl->GetRootItem();
+	wxTreeListItem rootFolder = m_treeListCtrl->GetRootItem();
+//	if(!projectfolder.IsOk()){
+//		projectfolder = m_treeListCtrl->AppendItem(root, _("Project"), 1, 2);
+//	}
 
-	if(projectfolder.IsOk()){
-		return;
-	}
-	projectfolder = m_treeListCtrl->AppendItem(root, _("Project"), 1, 2);
+	wxTreeListItem toolboxFolder = m_treeListCtrl->GetFirstChild(rootFolder);
 
-	const std::vector <Tool> * temptools = project->GetTools();
-	for(std::vector <Tool>::const_iterator it = temptools->begin();
-			it != temptools->end(); ++it){
-		wxTreeListItem item = m_treeListCtrl->AppendItem(root,
-				wxString(it->base.description));
-		m_treeListCtrl->SetItemText(item, 1,
-				wxString::Format(_T("%g"), it->geometry.DC));
-		m_treeListCtrl->SetItemText(item, 2,
-				wxString::Format(_T("%u"), it->base.type));
-		m_treeListCtrl->SetItemText(item, 3,
-				wxString::Format(_T("%i"), it->postprocess.number));
-	}
-
-	localtoolboxfolder = m_treeListCtrl->AppendItem(root, _("Local toolbox"), 1,
-			2);
-	m_treeListCtrl->AppendItem(localtoolboxfolder, _T("loading..."), 0, 0);
-	m_treeListCtrl->Collapse(localtoolboxfolder);
-
+	size_t toolboxcount = 0;
 	for(std::vector <ToolBox>::const_iterator it = toolboxes.begin();
 			it != toolboxes.end(); ++it){
-		wxTreeListItem temp = m_treeListCtrl->AppendItem(root,
-				wxString(it->GetName()), 1, 2);
-		m_treeListCtrl->AppendItem(temp, _T("loading..."), 0, 0);
-		m_treeListCtrl->Collapse(temp);
-		toolboxfolders.push_back(temp);
+		bool expanded = false;
+		if(toolboxFolder.IsOk()){
+			m_treeListCtrl->SetItemData(toolboxFolder,
+					new ToolData(toolboxcount));
+			m_treeListCtrl->SetItemText(toolboxFolder, it->GetName());
+			expanded = m_treeListCtrl->IsExpanded(toolboxFolder);
+		}else{
+			toolboxFolder = m_treeListCtrl->AppendItem(rootFolder,
+					wxString(it->GetName()), 1, 2,
+					new ToolData(toolboxcount, 0, false));
+		}
+
+		wxTreeListItem toolItem = m_treeListCtrl->GetFirstChild(toolboxFolder);
+
+		if(it->IsLoaded()){
+			size_t toolcount = 0;
+			for(std::vector <Tool>::const_iterator tool = it->tools.begin();
+					tool != it->tools.end(); ++tool){
+
+				if(toolItem.IsOk()){
+					m_treeListCtrl->SetItemData(toolItem,
+							new ToolData(toolboxcount, toolcount, true));
+					m_treeListCtrl->SetItemText(toolItem,
+							tool->base.description);
+				}else{
+					toolItem = m_treeListCtrl->AppendItem(toolboxFolder,
+							wxString(tool->base.description),
+							wxTreeListCtrl::NO_IMAGE, wxTreeListCtrl::NO_IMAGE,
+							new ToolData(toolboxcount, toolcount, true));
+				}
+				AddToolToListCtrl(toolItem, *tool);
+				toolItem = m_treeListCtrl->GetNextSibling(toolItem);
+				++toolcount;
+			}
+
+		}else{
+			if(toolItem.IsOk()){
+				m_treeListCtrl->SetItemData(toolItem, NULL);
+				m_treeListCtrl->SetItemText(toolItem, _T("loading..."));
+				m_treeListCtrl->SetItemImage(toolItem, wxTreeListCtrl::NO_IMAGE,
+						wxTreeListCtrl::NO_IMAGE);
+			}else{
+				toolItem = m_treeListCtrl->AppendItem(toolboxFolder,
+						_T("loading..."), wxTreeListCtrl::NO_IMAGE,
+						wxTreeListCtrl::NO_IMAGE);
+			}
+		}
+
+		if(!expanded) m_treeListCtrl->Collapse(toolboxFolder);
+		toolboxfolders.push_back(toolboxFolder);
+		toolboxFolder = m_treeListCtrl->GetNextSibling(toolboxFolder);
+		++toolboxcount;
 	}
+
+	TransferDataToWindow();
+}
+
+void DialogToolbox::AddToolToListCtrl(wxTreeListItem & item, const Tool & tool)
+{
+	m_treeListCtrl->SetItemText(item, 1,
+			wxString::Format(_T("%g"), tool.geometry.DC));
+	m_treeListCtrl->SetItemText(item, 2,
+			wxString::Format(_T("%u"), tool.base.type));
+	m_treeListCtrl->SetItemText(item, 3,
+			wxString::Format(_T("%i"), tool.postprocess.number));
 }
 
 bool DialogToolbox::TransferDataToWindow(void)
@@ -130,113 +180,264 @@ bool DialogToolbox::TransferDataToWindow(void)
 	SettingsStereo3D* settings = &(frame->GetParentFrame()->settingsStereo3D);
 	CollectionUnits* units = &(frame->GetParentFrame()->units);
 
-	size_t i, j;
+	// Units
 
-//	m_comboBoxToolSelector->Clear();
-//	if(view->toolbox.GetToolCount() == 0){
-//		m_comboBoxToolSelector->Append(_("No tools in toolbox!"));
-//		m_comboBoxToolSelector->Enable(false);
-//	}else{
-//		for(i = 0; i < view->toolbox.GetToolCount(); i++){
-//			m_comboBoxToolSelector->Append(
-//					view->toolbox.ToolIndex(i)->toolName);
-//		}
-//		m_comboBoxToolSelector->SetValue(tempTool.toolName);
-//		m_comboBoxToolSelector->Enable(true);
-//	}
-//
-//	tempTool.GenerateContour();
-//	m_panel->InsertTool(tempTool);
-//	m_canvas->InsertTool(tempTool);
-//	settings->WriteToCanvas(m_canvas);
-//	m_canvas->Refresh();
-//
-//	m_textCtrlShaftDiameter->SetValue(
-//			units->SmallDistance.TextFromSI(tempTool.shaftDiameter));
-//	m_textCtrlShaftLength->SetValue(
-//			units->SmallDistance.TextFromSI(tempTool.shaftLength));
-//	m_textCtrlMaxSpeed->SetValue(
-//			units->RotationalSpeed.TextFromSI(tempTool.maxSpeed));
-//	m_textCtrlFeedCoefficient->SetValue(
-//			units->SmallDistance.TextFromSI(tempTool.feedCoefficient));
-//	m_textCtrlNrOfTeeth->SetValue(
-//			wxString::Format(_T("%u"), tempTool.nrOfTeeth));
-//	m_textCtrlComment->SetValue(tempTool.comment);
+	m_staticTextUnitDC->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitLCF->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitLB->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitOAL->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitRE->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitSIG->SetLabel(units->Angle.GetOtherName());
+	m_staticTextUnitTA->SetLabel(units->Angle.GetOtherName());
+	m_staticTextUnitSFDM->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitShoulderLength->SetLabel(
+			units->SmallDistance.GetOtherName());
+	m_staticTextUnitTipDiameter->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitTipLength->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitTipOffset->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitThreadProfileAngle->SetLabel(units->Angle.GetOtherName());
+	m_staticTextUnitShapeUpperDiameter->SetLabel(
+			units->SmallDistance.GetOtherName());
+	m_staticTextUnitShapeLowerDiameter->SetLabel(
+			units->SmallDistance.GetOtherName());
+	m_staticTextUnitShapeHeight->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitHolderUpperDiameter->SetLabel(
+			units->SmallDistance.GetOtherName());
+	m_staticTextUnitHolderLowerDiameter->SetLabel(
+			units->SmallDistance.GetOtherName());
+	m_staticTextUnitHolderHeight->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitShaftUpperDiameter->SetLabel(
+			units->SmallDistance.GetOtherName());
+	m_staticTextUnitShaftLowerDiameter->SetLabel(
+			units->SmallDistance.GetOtherName());
+	m_staticTextUnitShaftHeight->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitFeedPerRevolution->SetLabel(
+			units->SmallDistance.GetOtherName());
+	m_staticTextUnitFeedPerTooth->SetLabel(units->SmallDistance.GetOtherName());
+	m_staticTextUnitFeedSpindleSpeed->SetLabel(
+			units->RotationalSpeed.GetOtherName());
+	m_staticTextUnitFeedSpindleSpeedRamp->SetLabel(
+			units->RotationalSpeed.GetOtherName());
+	m_staticTextUnitSpeedCuttingFeedrate->SetLabel(
+			units->LinearSpeed.GetOtherName());
+	m_staticTextUnitSpeedAvgFeedrate->SetLabel(
+			units->LinearSpeed.GetOtherName());
+	m_staticTextUnitSpeedLeadInFeedrate->SetLabel(
+			units->LinearSpeed.GetOtherName());
+	m_staticTextUnitSpeedLeadOutFeedrate->SetLabel(
+			units->LinearSpeed.GetOtherName());
+	m_staticTextUnitSpeedPlungeFeedrate->SetLabel(
+			units->LinearSpeed.GetOtherName());
+	m_staticTextUnitSpeedRampFeedrate->SetLabel(
+			units->LinearSpeed.GetOtherName());
+	m_staticTextUnitSpeedRetractionFeedrate->SetLabel(
+			units->LinearSpeed.GetOtherName());
 
-//	m_staticTextUnitShaftDiameter->SetLabel(
-//			units->SmallDistance.GetOtherName());
-//	m_staticTextUnitShaftLength->SetLabel(units->SmallDistance.GetOtherName());
-//	m_staticTextUnitMaxSpeed->SetLabel(units->RotationalSpeed.GetOtherName());
-//	m_staticTextUnitFeedCoefficient->SetLabel(
-//			units->SmallDistance.GetOtherName());
+	// Values from tool
+	m_canvastool->InsertTool(tempTool);
+	// Tool
+	switch(tempTool.base.type){
+	case Tool::flat_end_mill:
+		m_choiceToolType->SetSelection(0);
+		break;
+	case Tool::ball_end_mill:
+		m_choiceToolType->SetSelection(1);
+		break;
+	case Tool::bull_nose_end_mill:
+		m_choiceToolType->SetSelection(2);
+		break;
+	case Tool::camfer_mill:
+		m_choiceToolType->SetSelection(3);
+		break;
+	case Tool::radius_mill:
+		m_choiceToolType->SetSelection(4);
+		break;
+	case Tool::tool_holder:
+		m_choiceToolType->SetSelection(5);
+		break;
+	case Tool::tool_shaft:
+		m_choiceToolType->SetSelection(6);
+		break;
+	case Tool::probe:
+		m_choiceToolType->SetSelection(7);
+		break;
+	}
+	m_textCtrlToolDescription->SetValue(tempTool.base.description);
+	m_textCtrlToolVendor->SetValue(tempTool.base.vendor);
+	m_textCtrlToolGUID->SetValue(tempTool.base.guid);
+	m_textCtrlToolProductID->SetValue(tempTool.base.productid);
+	m_textCtrlToolProductLink->SetValue(tempTool.base.productlink);
+	m_textCtrlToolGrade->SetValue(tempTool.GRADE);
+	m_textCtrlToolBMC->SetValue(tempTool.BMC);
 
-//	wxSize sz = m_dataViewListCtrlShape->GetClientSize();
-//	unsigned int w = sz.x / 6;
-//	m_dataViewListCtrlShape->ClearAll();
-//	m_dataViewListCtrlShape->AppendTextColumn(_("Upper"));
-//	m_dataViewListCtrlShape->AppendTextColumn(_("Lower"));
-//	m_dataViewListCtrlShape->AppendTextColumn(_("Height"));
+	if(tempTool.unitinfile == Tool::unit_inch){
+		m_radioBoxToolUnit->SetSelection(1);
+	}else{
+		m_radioBoxToolUnit->SetSelection(0);
+	}
 
-//	m_listCtrl->InsertColumn(3, _("Radius"), wxLIST_FORMAT_LEFT, 3 * w);
-//	m_listCtrl->InsertColumn(4, _("Cutting"), wxLIST_FORMAT_LEFT, 3 * w);
+	m_textCtrlDC->SetValue(
+			units->SmallDistance.TextFromSI(tempTool.geometry.DC));
+	m_textCtrlLCF->SetValue(
+			units->SmallDistance.TextFromSI(tempTool.geometry.LCF));
+	m_textCtrlLB->SetValue(
+			units->SmallDistance.TextFromSI(tempTool.geometry.LB));
+	m_textCtrlOAL->SetValue(
+			units->SmallDistance.TextFromSI(tempTool.geometry.OAL));
+	m_textCtrlRE->SetValue(
+			units->SmallDistance.TextFromSI(tempTool.geometry.RE));
 
-//	for(j = 0; j < tempTool.elements.GetCount(); j++){
+	m_textCtrlNOF->SetValue(wxString::Format(_T("%lu"), tempTool.geometry.NOF));
+	m_textCtrlNT->SetValue(wxString::Format(_T("%lu"), tempTool.geometry.NT));
 
-//			wxLogMessage(
-//					wxString::Format(_T("Element: %u Type %u"), j,
-//							temp->elements[j].t));
+	m_textCtrlSIG->SetValue(units->Angle.TextFromSI(tempTool.geometry.SIG));
+	m_textCtrlTA->SetValue(units->Angle.TextFromSI(tempTool.geometry.TA));
 
-//		switch(tempTool.elements[j].t){
-//		case 0:
-//			m_listCtrl->InsertItem(j, _T("L"));
-//			break;
-//		case 1:
-//			m_listCtrl->InsertItem(j, _T("CDH"));
-//			break;
-//		case 2:
-//			m_listCtrl->InsertItem(j, _T("CHD"));
-//			break;
-//		case 3:
-//			m_listCtrl->InsertItem(j, _T("SRU"));
-//			break;
-//		case 4:
-//			m_listCtrl->InsertItem(j, _T("SRL"));
-//			break;
-//		}
-//
-//		m_listCtrl->SetItem(j, 1,
-//				units->SmallDistance.TextFromSI(tempTool.elements[j].d));
-//		m_listCtrl->SetItem(j, 2,
-//				units->SmallDistance.TextFromSI(tempTool.elements[j].h));
-//		m_listCtrl->SetItem(j, 3,
-//				units->SmallDistance.TextFromSI(tempTool.elements[j].r));
-//
-//		if(tempTool.elements[j].cutting){
-//			m_listCtrl->SetItem(j, 4, _("Yes"));
-//		}else{
-//			m_listCtrl->SetItem(j, 4, _("No"));
-//		}
-//
-//		m_listCtrl->SetItemState(j,
-//				(j == selectedElement)? wxLIST_STATE_SELECTED : 0,
-//				wxLIST_STATE_SELECTED);
-//
-////		m_listCtrl->SetItemState(selectedElement,
-////		wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-//
-//	}
-//	m_choiceType->Select(tempElement.t);
-//
-//	m_textCtrlDiameter->SetValue(
-//			units->SmallDistance.TextFromSI(tempElement.d));
-//	m_textCtrlHeight->SetValue(units->SmallDistance.TextFromSI(tempElement.h));
-//	m_textCtrlRadius->SetValue(units->SmallDistance.TextFromSI(tempElement.r));
-//
-//	m_staticTextUnitDiameter->SetLabel(units->SmallDistance.GetOtherName());
-//	m_staticTextUnitHeight->SetLabel(units->SmallDistance.GetOtherName());
-//	m_staticTextUnitRadius->SetLabel(units->SmallDistance.GetOtherName());
-//
-//	m_checkBoxCutting->SetValue(tempElement.cutting);
+	m_choiceCSP->SetSelection(tempTool.geometry.CSP? 1 : 0);
+	m_choiceHAND->SetSelection(tempTool.geometry.HAND? 1 : 0);
+
+	m_textCtrlSFDM->SetValue(
+			units->SmallDistance.TextFromSI(tempTool.geometry.SFDM));
+	m_textCtrlShoulderLength->SetValue(
+			units->SmallDistance.TextFromSI(tempTool.geometry.shoulderlength));
+	m_textCtrlTipDiameter->SetValue(
+			units->SmallDistance.TextFromSI(tempTool.geometry.tipdiameter));
+	m_textCtrlTipLength->SetValue(
+			units->SmallDistance.TextFromSI(tempTool.geometry.tiplength));
+	m_textCtrlTipOffset->SetValue(
+			units->SmallDistance.TextFromSI(tempTool.geometry.tipoffset));
+	m_textCtrlThreadProfileAngle->SetValue(
+			units->Angle.TextFromSI(tempTool.geometry.threadprofileangle));
+
+	m_checkBoxShapeFromGeometry->SetValue(tempTool.hasGeometry);
+
+	m_dataViewListCtrlShapeSegments->DeleteAllItems();
+	if(tempTool.base.hasSegments){
+		for(std::vector <Tool::Segment>::iterator it =
+				tempTool.base.segments.begin();
+				it != tempTool.base.segments.end(); ++it){
+
+			wxVector <wxVariant> data;
+			data.push_back(
+					wxVariant(
+							units->SmallDistance.TextFromSI(
+									it->upperdiameter)));
+			data.push_back(
+					wxVariant(
+							units->SmallDistance.TextFromSI(
+									it->lowerdiameter)));
+			data.push_back(
+					wxVariant(units->SmallDistance.TextFromSI(it->height)));
+			m_dataViewListCtrlShapeSegments->AppendItem(data);
+		}
+	}
+	m_choiceHolder->SetSelection(tempTool.hasHolder? 1 : 0);
+	m_dataViewListCtrlHolderSegments->DeleteAllItems();
+	if(tempTool.holder.hasSegments){
+		for(std::vector <Tool::Segment>::iterator it =
+				tempTool.holder.segments.begin();
+				it != tempTool.holder.segments.end(); ++it){
+
+			wxVector <wxVariant> data;
+			data.push_back(
+					wxVariant(
+							units->SmallDistance.TextFromSI(
+									it->upperdiameter)));
+			data.push_back(
+					wxVariant(
+							units->SmallDistance.TextFromSI(
+									it->lowerdiameter)));
+			data.push_back(
+					wxVariant(units->SmallDistance.TextFromSI(it->height)));
+			m_dataViewListCtrlHolderSegments->AppendItem(data);
+		}
+	}
+
+	m_checkBoxShaftFromGeometry->SetValue(!tempTool.hasShaft);
+	m_dataViewListCtrlShaftSegments->DeleteAllItems();
+	if(tempTool.shaft.hasSegments){
+		for(std::vector <Tool::Segment>::iterator it =
+				tempTool.shaft.segments.begin();
+				it != tempTool.shaft.segments.end(); ++it){
+
+			wxVector <wxVariant> data;
+			data.push_back(
+					wxVariant(
+							units->SmallDistance.TextFromSI(
+									it->upperdiameter)));
+			data.push_back(
+					wxVariant(
+							units->SmallDistance.TextFromSI(
+									it->lowerdiameter)));
+			data.push_back(
+					wxVariant(units->SmallDistance.TextFromSI(it->height)));
+			m_dataViewListCtrlShaftSegments->AppendItem(data);
+		}
+	}
+
+	if(!tempTool.startvalues.empty()){
+		const Tool::StartValues & startvalues = tempTool.startvalues[0];
+
+		m_textCtrlSetName->SetValue(startvalues.name);
+		m_textCtrlSetGUID->SetValue(startvalues.guid);
+		m_textCtrlSetDescription->SetValue(startvalues.description);
+		m_textCtrlSetToolCoolant->SetValue(startvalues.toolcoolant);
+
+		m_textCtrlFeedPerRevolution->SetValue(
+				units->SmallDistance.TextFromSI(startvalues.fn));
+		m_textCtrlFeedPerTooth->SetValue(
+				units->SmallDistance.TextFromSI(startvalues.fz));
+		m_textCtrlFeedSpindleSpeed->SetValue(
+				units->RotationalSpeed.TextFromSI(startvalues.n));
+		m_textCtrlFeedSpindleSpeedRamp->SetValue(
+				units->RotationalSpeed.TextFromSI(startvalues.nramp));
+		m_textCtrlSpeedCuttingFeedrate->SetValue(
+				units->LinearSpeed.TextFromSI(startvalues.vc));
+		m_textCtrlSpeedAvgFeedrate->SetValue(
+				units->LinearSpeed.TextFromSI(startvalues.vf));
+		m_textCtrlSpeedLeadInFeedrate->SetValue(
+				units->LinearSpeed.TextFromSI(startvalues.vfleadin));
+		m_textCtrlSpeedLeadOutFeedrate->SetValue(
+				units->LinearSpeed.TextFromSI(startvalues.vfleadout));
+		m_textCtrlSpeedPlungeFeedrate->SetValue(
+				units->LinearSpeed.TextFromSI(startvalues.vfplunge));
+		m_textCtrlSpeedRampFeedrate->SetValue(
+				units->LinearSpeed.TextFromSI(startvalues.vframp));
+		m_textCtrlSpeedRetractionFeedrate->SetValue(
+				units->LinearSpeed.TextFromSI(startvalues.vfretract));
+	}else{
+		m_textCtrlSetName->SetValue(_T(""));
+		m_textCtrlSetGUID->SetValue(_T(""));
+		m_textCtrlSetDescription->SetValue(_T(""));
+		m_textCtrlSetToolCoolant->SetValue(_T(""));
+		m_textCtrlFeedPerRevolution->SetValue(_T(""));
+		m_textCtrlFeedPerTooth->SetValue(_T(""));
+		m_textCtrlFeedSpindleSpeed->SetValue(_T(""));
+		m_textCtrlFeedSpindleSpeedRamp->SetValue(_T(""));
+		m_textCtrlSpeedCuttingFeedrate->SetValue(_T(""));
+		m_textCtrlSpeedAvgFeedrate->SetValue(_T(""));
+		m_textCtrlSpeedLeadInFeedrate->SetValue(_T(""));
+		m_textCtrlSpeedLeadOutFeedrate->SetValue(_T(""));
+		m_textCtrlSpeedPlungeFeedrate->SetValue(_T(""));
+		m_textCtrlSpeedRampFeedrate->SetValue(_T(""));
+		m_textCtrlSpeedRetractionFeedrate->SetValue(_T(""));
+	}
+
+	m_checkBoxLive->SetValue(tempTool.postprocess.live);
+	m_textCtrlPostProcessComment->SetValue(tempTool.postprocess.comment);
+	m_textCtrlPostProcessNumber->SetValue(
+			wxString::Format(_T("%i"), tempTool.postprocess.number));
+	m_checkBoxManualToolChange->SetValue(
+			!tempTool.postprocess.manualtoolchange);
+	m_checkBoxBreakControl->SetValue(!tempTool.postprocess.breakcontrol);
+	m_textCtrlPostProcessDiameterOffset->SetValue(
+			wxString::Format(_T("%lu"), tempTool.postprocess.diameteroffset));
+	m_textCtrlPostProcessLengthOffset->SetValue(
+			wxString::Format(_T("%lu"), tempTool.postprocess.lengthoffset));
+	m_textCtrlPostProcessToolCoolant->SetValue(
+			tempTool.postprocess.toolcoolant);
+	m_textCtrlPostProcessTurret->SetValue(
+			wxString::Format(_T("%lu"), tempTool.postprocess.turret));
 
 	return true;
 }
@@ -274,22 +475,85 @@ bool DialogToolbox::TransferDataFromWindow(void)
 	return true;
 }
 
+void DialogToolbox::OnXClose(wxCloseEvent& event)
+{
+	this->Show(false);
+}
+
+void DialogToolbox::OnToolChecked(wxTreeListEvent& event)
+{
+}
+
+void DialogToolbox::OnToolContextMenu(wxTreeListEvent& event)
+{
+}
+
+void DialogToolbox::OnToolboxExpanding(wxTreeListEvent& event)
+{
+	wxTreeListItem item = event.GetItem();
+	ToolData* info = (ToolData*) m_treeListCtrl->GetItemData(item);
+	if(info == NULL) return;
+	if(info->toolbox == 0) return;
+	bool flag = toolboxes[info->toolbox].Load();
+	if(DEBUG) std::cout << "DialogToolbox::OnToolboxExpanding - Toolbox #"
+			<< info->toolbox << " - .Load() = " << (flag? "true" : "false")
+			<< "\n";
+
+	Update(false);
+}
+
+void DialogToolbox::OnToolSelectionChanged(wxTreeListEvent& event)
+{
+	wxTreeListItem item = event.GetItem();
+	ToolData* info = (ToolData*) m_treeListCtrl->GetItemData(item);
+	if(info == NULL) return;
+	if(!info->isTool) return;
+	if(DEBUG) std::cout
+			<< "DialogToolbox::OnToolSelectionChanged - Selecting toolbox #"
+			<< info->toolbox << ", tool #" << info->tool << ".\n";
+	tempTool = toolboxes[info->toolbox].tools[info->tool];
+	if(DEBUG) std::cout << "\tOK.\n";
+	TransferDataToWindow();
+	Refresh();
+}
+
+void DialogToolbox::OnChoice(wxCommandEvent& event)
+{
+}
+
 void DialogToolbox::OnEnter(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
 	TransferDataToWindow();
 }
 
-void DialogToolbox::OnClose(wxCommandEvent& event)
+void DialogToolbox::OnRadioBox(wxCommandEvent& event)
 {
-	this->Show(false);
 }
 
-void DialogToolbox::OnXClose(wxCloseEvent& event)
+void DialogToolbox::OnCheckBox(wxCommandEvent& event)
 {
-	this->Show(false);
 }
 
+void DialogToolbox::OnSegmentAdd(wxCommandEvent& event)
+{
+}
+
+void DialogToolbox::OnSegmentDelete(wxCommandEvent& event)
+{
+}
+
+void DialogToolbox::OnItemBeginDrag(wxDataViewEvent& event)
+{
+}
+
+void DialogToolbox::OnItemDrop(wxDataViewEvent& event)
+{
+}
+
+void DialogToolbox::OnSelectionChanged(wxDataViewEvent& event)
+{
+}
 //void DialogToolbox::OnToolSelect(wxCommandEvent& event)
 //{
 ////	if(selectedTool == event.GetSelection()) return;
@@ -353,38 +617,38 @@ void DialogToolbox::OnXClose(wxCloseEvent& event)
 //	TransferDataToWindow();
 //}
 
-void DialogToolbox::OnShapeSelect(wxListEvent& event)
-{
+//void DialogToolbox::OnShapeSelect(wxListEvent& event)
+//{
 //	if(event.GetIndex() == selectedElement) return;
-	TransferDataFromWindow();
+//	TransferDataFromWindow();
 //	selectedElement = event.GetIndex();
 //	if(selectedElement < tempTool.elements.GetCount()){
 //		tempElement = tempTool.elements[selectedElement];
 //	}
-	TransferDataToWindow();
-}
+//	TransferDataToWindow();
+//}
 
-void DialogToolbox::OnShapeNew(wxCommandEvent& event)
-{
-	TransferDataFromWindow();
+//void DialogToolbox::OnShapeNew(wxCommandEvent& event)
+//{
+//	TransferDataFromWindow();
 //	if(selectedElement < tempTool.elements.GetCount() - 1){
 //		tempTool.elements.Insert(tempElement, selectedElement + 1);
 //	}else{
 //		tempTool.elements.Add(tempElement);
 //	}
 //	selectedElement++;
-	TransferDataToWindow();
-}
-
-void DialogToolbox::OnShapeUpdate(wxCommandEvent& event)
-{
-	TransferDataFromWindow();
+//	TransferDataToWindow();
+//}
+//
+//void DialogToolbox::OnShapeUpdate(wxCommandEvent& event)
+//{
+//	TransferDataFromWindow();
 //	tempTool.elements[selectedElement] = tempElement;
-	TransferDataToWindow();
-}
-
-void DialogToolbox::OnShapeDelete(wxCommandEvent& event)
-{
+//	TransferDataToWindow();
+//}
+//
+//void DialogToolbox::OnShapeDelete(wxCommandEvent& event)
+//{
 //	if(selectedElement < 0) return;
 //	if(selectedElement >= tempTool.elements.GetCount()) return;
 //	TransferDataFromWindow();
@@ -393,24 +657,5 @@ void DialogToolbox::OnShapeDelete(wxCommandEvent& event)
 //	if(selectedElement < 0) selectedElement = 0;
 //	if(selectedElement < tempTool.elements.GetCount()) tempElement =
 //			tempTool.elements[selectedElement];
-	TransferDataToWindow();
-}
-
-void DialogToolbox::OnShapeWizard(wxCommandEvent& event)
-{
-//	DialogToolWizard dialog(this);
-//	dialog.ShowModal();
-}
-
-void DialogToolbox::OnItemChecked(wxTreeListEvent& event)
-{
-}
-
-void DialogToolbox::OnItemContextMenu(wxTreeListEvent& event)
-{
-}
-
-void DialogToolbox::OnSelectionChanged(wxTreeListEvent& event)
-{
-}
-
+//	TransferDataToWindow();
+//}

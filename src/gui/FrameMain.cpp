@@ -58,6 +58,7 @@
 #include "DnDFile.h"
 
 #include "../math/MathParser.h"
+#include "../project/command/CommandObjectJoinSurface.h"
 #include "../project/command/CommandRunGeneratorAdd.h"
 #include "../project/command/CommandRunGeneratorDelete.h"
 #include "../project/command/CommandRunGeneratorRename.h"
@@ -90,13 +91,16 @@
 #include <unistd.h>
 #endif
 
-wxBEGIN_EVENT_TABLE(FrameMain, wxDocChildFrame) EVT_MENU(ID_TOGGLESTEREO3D, FrameMain::OnViewStereo3DToggle)
+wxBEGIN_EVENT_TABLE(FrameMain, wxDocChildFrame)
+
+EVT_MENU(ID_TOGGLESTEREO3D, FrameMain::OnViewStereo3DToggle)
 EVT_MENU(ID_PROJECTRENAME, FrameMain::OnProjectRename)
 EVT_MENU(ID_OBJECTLOAD, FrameMain::OnObjectLoad)
 EVT_MENU(ID_OBJECTRENAME, FrameMain::OnObjectRename)
 EVT_MENU(ID_OBJECTMODIFY, FrameMain::OnObjectModify)
 EVT_MENU(ID_OBJECTDELETE, FrameMain::OnObjectDelete)
 EVT_MENU(ID_OBJECTFLIPNORMALS, FrameMain::OnObjectFlipNormals)
+EVT_MENU(ID_OBJECTUNIFYSURFACE, FrameMain::OnObjectUnifySurface)
 EVT_MENU(ID_RUNRENAME, FrameMain::OnRunRename)
 EVT_MENU(ID_RUNMODIFY, FrameMain::OnCAMSetup)
 EVT_MENU(ID_RUNDELETE, FrameMain::OnRunDelete)
@@ -128,8 +132,6 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 	FrameParent* parentframe = wxStaticCast(parent, FrameParent);
 	Project* project = wxStaticCast(GetDocument(), Project);
 	ProjectView* projectview = wxStaticCast(GetView(), ProjectView);
-
-
 
 	// Load the default tools into a new project.
 	// (Has to be done from here, because the set paths are
@@ -378,7 +380,6 @@ void FrameMain::OnViewPreferencesMenu(wxRibbonButtonBarEvent& event)
 	event.PopupMenu(&menu);
 }
 
-
 void FrameMain::OnViewStereo3DToggle(wxCommandEvent& event)
 {
 	if(m_canvas->stereoMode == stereoOff){
@@ -456,6 +457,31 @@ void FrameMain::OnObjectLoad(wxCommandEvent& event)
 	}
 }
 
+void FrameMain::OnObjectDelete(wxCommandEvent& event)
+{
+	Project* project = wxStaticCast(GetDocument(), Project);
+	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
+
+	if(DEBUG) std::cout << "FrameMain::OnObjectDelete - "
+			<< selection.ToString() << "\n";
+
+	if(!selection.IsType(Selection::Object) || !project->Has(selection)
+			|| selection.IsSetEmpty()){
+		if(DEBUG) std::cout << "\t \\->  Not found.\n";
+		return;
+	}
+
+	for(std::set <size_t>::iterator it = selection.begin();
+			it != selection.end(); ++it){
+		cmdProc->Submit(
+				new CommandObjectRemove(
+						_(
+								"Object ") + project->Get3DObject(*it)->name + _(" deleted."),
+						project, *it));
+	}
+	TransferDataToWindow(true);
+}
+
 void FrameMain::OnObjectRename(wxCommandEvent& event)
 {
 	Project* project = wxStaticCast(GetDocument(), Project);
@@ -492,29 +518,27 @@ void FrameMain::OnObjectModify(wxCommandEvent& event)
 	dialogObjectTransformation->Raise();
 }
 
-void FrameMain::OnObjectDelete(wxCommandEvent& event)
+void FrameMain::OnObjectUnifySurface(wxRibbonButtonBarEvent& event)
+{
+	wxCommandEvent temp(event);
+	OnObjectUnifySurface(temp);
+}
+
+void FrameMain::OnObjectUnifySurface(wxCommandEvent& event)
 {
 	Project* project = wxStaticCast(GetDocument(), Project);
-	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
+	wxCommandProcessor* cmdProc = project->GetCommandProcessor();
 
-	if(DEBUG) std::cout << "FrameMain::OnObjectDelete - "
-			<< selection.ToString() << "\n";
+	if(!selection.IsType(Selection::Object) || !project->Has(selection)) return;
 
-	if(!selection.IsType(Selection::Object) || !project->Has(selection)
-			|| selection.IsSetEmpty()){
-		if(DEBUG) std::cout << "\t \\->  Not found.\n";
-		return;
-	}
-
-	for(std::set <size_t>::iterator it = selection.begin();
+	for(std::set <size_t>::const_iterator it = selection.begin();
 			it != selection.end(); ++it){
-		cmdProc->Submit(
-				new CommandObjectRemove(
-						_(
-								"Object ") + project->Get3DObject(*it)->name + _(" deleted."),
-						project, *it));
+		CommandObjectJoinSurface * command = new CommandObjectJoinSurface(
+				project->Get3DObject(*it)->name + _(": Unify object surface"),
+				project, *it);
+		cmdProc->Submit(command);
 	}
-	TransferDataToWindow(true);
+	Refresh();
 }
 
 void FrameMain::OnObjectFlipNormals(wxRibbonButtonBarEvent& event)
@@ -1113,6 +1137,7 @@ void FrameMain::OnActivateRightClickMenu(wxTreeEvent& event)
 
 	if(data->type == TreeItem::itemObject){
 		menu.Append(ID_OBJECTMODIFY, wxT("&Modify Object"));
+		menu.Append(ID_OBJECTUNIFYSURFACE, wxT("&Unify Surface"));
 		menu.Append(ID_OBJECTFLIPNORMALS, wxT("&Flip Normals"));
 		menu.Append(ID_OBJECTRENAME, wxT("&Rename Object"));
 		menu.Append(ID_OBJECTDELETE, wxT("&Delete Object"));

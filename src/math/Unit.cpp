@@ -39,8 +39,6 @@ Unit::Unit()
 	mol = 0;
 	cd = 0;
 	cur = 0;
-	power = 0.0;
-//	this->extra = _T("*");
 }
 
 Unit::Unit(wxString currency)

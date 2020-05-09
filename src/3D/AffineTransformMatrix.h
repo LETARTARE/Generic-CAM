@@ -61,7 +61,6 @@
  */
 
 // https://en.cppreference.com/w/cpp/language/operators
-
 #include <string>
 
 class Vector3;
@@ -91,7 +90,6 @@ public:
 	void ResetRotationAndScale(void); //!< Resets the rotation and scale, but keeps the translation
 
 	void Set(AffineTransformMatrix const& b); //!< Copies a matrix by inserting a given matrix into \a a.
-	void Set(const double *a); //!< Set the matrix by passing a vector with 16 double values.
 	void SetOrigin(const Vector3& center);
 
 	void SetEx(const Vector3& ex);

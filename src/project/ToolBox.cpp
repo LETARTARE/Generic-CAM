@@ -155,10 +155,13 @@ bool ToolBox::ParseTool(const JSON& js, Tool& tool)
 		tool.hasShaft = true;
 		ParseContour(js["shaft"], tool.shaft);
 	}
-	if(js.HasKey("start-values") && js["start-values"].Size() > 0){
-		tool.hasStartValues = true;
-		const JSON & sv = js["start-values"].Begin();
-		ParseStartValues(sv, tool.startvalues);
+	if(js.HasKey("start-values") && js["start-values"].IsObject()){
+		size_t N = js["start-values"].Size();
+		tool.startvalues.resize(N, Tool::StartValues());
+		for(size_t n = 0; n < N; ++n){
+			const JSON & sv = js["start-values"][n];
+			ParseStartValues(sv, tool.startvalues[n]);
+		}
 	}
 	if(js.HasKey("post-process")){
 		tool.hasPostProcess = true;
@@ -250,10 +253,15 @@ void ToolBox::ParseContour(const JSON & js, Tool::Contour & contour)
 				Tool::flat_end_mill;
 		if(type.compare("radius mill") == 0) contour.type = Tool::radius_mill;
 		if(type.compare("camfer mill") == 0) contour.type = Tool::camfer_mill;
+		if(type.compare("tapered mill") == 0) contour.type = Tool::tapered_mill;
 		if(type.compare("bull nose end mill") == 0) contour.type =
 				Tool::bull_nose_end_mill;
 		if(type.compare("ball end mill") == 0) contour.type =
 				Tool::ball_end_mill;
+
+		if(type.compare("spot drill") == 0) contour.type = Tool::spot_drill;
+		if(type.compare("counter sink") == 0) contour.type = Tool::counter_sink;
+
 		if(type.compare("holder") == 0) contour.type = Tool::tool_holder;
 		if(type.compare("shaft") == 0) contour.type = Tool::tool_shaft;
 		if(type.compare("probe") == 0) contour.type = Tool::probe;
@@ -368,9 +376,11 @@ void ToolBox::StoreTools(JSON& js) const
 		if(tools[n].hasHolder) StoreContour(tool["holder"], tools[n].holder);
 		if(tools[n].hasShaft) StoreContour(tool["shaft"], tools[n].shaft);
 
-		if(tools[n].hasStartValues){
-			tool["start-values"].SetArray(1);
-			StoreStartValues(tool["start-values"][0], tools[n].startvalues);
+		if(!tools[n].startvalues.empty()){
+			tool["start-values"].SetArray(tools[n].startvalues.size());
+			for(size_t m = 0; m < tools[n].startvalues.size(); ++m)
+				StoreStartValues(tool["start-values"][m],
+						tools[n].startvalues[m]);
 		}
 		if(tools[n].hasPostProcess) StorePostProcess(tool["post-process"],
 				tools[n].postprocess);
@@ -398,11 +408,20 @@ void ToolBox::StoreContour(JSON& js, const Tool::Contour& contour) const
 	case Tool::camfer_mill:
 		js["type"].SetString("camfer mill");
 		break;
+	case Tool::tapered_mill:
+		js["type"].SetString("tapered mill");
+		break;
 	case Tool::bull_nose_end_mill:
 		js["type"].SetString("bull nose end mill");
 		break;
 	case Tool::ball_end_mill:
 		js["type"].SetString("ball end mill");
+		break;
+	case Tool::spot_drill:
+		js["type"].SetString("spot drill");
+		break;
+	case Tool::counter_sink:
+		js["type"].SetString("counter sink");
 		break;
 	case Tool::tool_holder:
 		js["type"].SetString("holder");

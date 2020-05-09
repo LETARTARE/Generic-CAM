@@ -69,6 +69,7 @@ public:
 
 private:
 	size_t ID; //!< Internal ID number
+	bool useGroups;
 
 public:
 	bool operator==(const size_t ID) const;
@@ -78,6 +79,7 @@ public:
 	bool LoadObject(wxFileName fileName);
 	bool ReloadObject(void);
 
+	void JoinSurface(void);
 	void FlipX(void);
 	void FlipY(void);
 	void FlipZ(void);

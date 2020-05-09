@@ -34,6 +34,8 @@
 #endif
 #include <math.h>
 
+static JSON nullobject;
+
 JSON::JSON()
 {
 	type = Null;
@@ -55,32 +57,58 @@ size_t JSON::Size(void) const
 
 JSON& JSON::operator [](const std::string &key)
 {
-	if(type != Object) throw(std::logic_error("Not an object."));
-	return valueObject[key];
+	if(type == Object) return valueObject[key];
+	throw(std::logic_error("Not an object."));
 }
 
 const JSON& JSON::operator [](const std::string &key) const
 {
-	if(type != Object) throw(std::logic_error("Not an object."));
-	return valueObject.at(key);
+	if(type == Object){
+		if(valueObject.find(key) == valueObject.end()) return nullobject;
+		return valueObject.at(key);
+	}
+	throw(std::logic_error("Not an object."));
 }
 
 JSON& JSON::operator [](size_t index)
 {
-	if(type != Array) throw(std::logic_error("Not an array."));
-	return valueArray.at(index);
+	if(type == Array) return valueArray.at(index);
+	if(type == Object){
+		std::map <std::string, JSON>::iterator it = valueObject.begin();
+		for(size_t n = 0; n < index; ++n)
+			++it;
+		return it->second;
+	}
+	throw(std::logic_error("Not an array or object."));
 }
 
 const JSON& JSON::operator [](size_t index) const
 {
-	if(type != Array) throw(std::logic_error("Not an array."));
-	return valueArray.at(index);
+	if(type == Array) return valueArray.at(index);
+	if(type == Object){
+		std::map <std::string, JSON>::const_iterator it = valueObject.begin();
+		for(size_t n = 0; n < index; ++n)
+			++it;
+		return it->second;
+	}
+	throw(std::logic_error("Not an array or object."));
 }
 
 bool JSON::HasKey(std::string key) const
 {
 	if(type != Object) return false;
 	return (valueObject.find(key) != valueObject.end());
+}
+
+std::string JSON::GetKey(size_t index) const
+{
+	if(type == Object){
+		std::map <std::string, JSON>::const_iterator it = valueObject.begin();
+		for(size_t n = 0; n < index; ++n)
+			++it;
+		return it->first;
+	}
+	throw(std::logic_error("Not an object."));
 }
 
 bool JSON::IsNull(void) const
@@ -118,11 +146,16 @@ bool JSON::IsArray(void) const
 	return (type == Array);
 }
 
+bool JSON::IsObject(void) const
+{
+	return type == Object;
+}
+
 const JSON& JSON::Begin(void) const
 {
 	if(type == Array) return *(valueArray.begin());
 	if(type == Object) return valueObject.begin()->second;
-	throw(std::logic_error("Not a string."));
+	throw(std::logic_error("Not an array or object."));
 }
 
 void JSON::SetNull(void)
@@ -165,8 +198,7 @@ JSON JSON::Load(std::string filename)
 	std::ifstream in;
 	in.open(filename.c_str(), std::ifstream::in | std::ios::binary);
 	if(!in.good()){
-		throw(std::runtime_error(
-				"JSON::Load(...) - Could not read file."));
+		throw(std::runtime_error("JSON::Load(...) - Could not read file."));
 	}
 	return JSON::Load(in);
 }
@@ -216,7 +248,8 @@ JSON JSON::Parse(FileTokenizer &ft, int maxRecursion)
 				if(ft.token.type != Token::_Char
 						|| (ft.token.c != ',' && ft.token.c != '}')){
 
-					throw(std::logic_error("JSON::Parse(...) - Expected ',' or '}' here."));
+					throw(std::logic_error(
+							"JSON::Parse(...) - Expected ',' or '}' here."));
 				}
 				if(ft.token.c == '}') break;
 				ft.NextToken();
@@ -231,7 +264,8 @@ JSON JSON::Parse(FileTokenizer &ft, int maxRecursion)
 				ft.NextToken();
 				if(ft.token.type != Token::_Char
 						|| (ft.token.c != ',' && ft.token.c != ']')){
-					throw(std::logic_error("JSON::Parse(...) - Expected ',' or ']' here."));
+					throw(std::logic_error(
+							"JSON::Parse(...) - Expected ',' or ']' here."));
 				}
 				if(ft.token.c == ']') break;
 				ft.NextToken();

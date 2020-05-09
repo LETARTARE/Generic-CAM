@@ -34,6 +34,7 @@
 #include "../icon/tool_drilling.xpm"
 #include "../icon/tool_multi.xpm"
 #include "../icon/tools.xpm"
+#include "../icon/unify.xpm"
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -73,8 +74,9 @@ GUIFrameMain::GUIFrameMain(wxDocument* doc, wxView* view, wxDocParentFrame* pare
 	m_ribbonPanelObject = new wxRibbonPanel( m_ribbonPageCAD, wxID_ANY, _("Object") , wxNullBitmap , wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE );
 	m_ribbonButtonBarObject = new wxRibbonButtonBar( m_ribbonPanelObject, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 	m_ribbonButtonBarObject->AddButton( ID_OBJECTLOAD, _("Load"), wxArtProvider::GetBitmap( wxART_FILE_OPEN, wxART_CMN_DIALOG ), wxEmptyString);
-	m_ribbonButtonBarObject->AddButton( ID_OBJECTFLIPNORMALS, _("Flip Normals"), wxBitmap( flip_xpm ), wxEmptyString);
 	m_ribbonButtonBarObject->AddButton( ID_OBJECTMODIFY, _("Modify"), wxBitmap( modify_xpm ), wxEmptyString);
+	m_ribbonButtonBarObject->AddButton( ID_OBJECTUNIFYSURFACE, _("Unify Surface"), wxBitmap( unify_xpm ), wxEmptyString);
+	m_ribbonButtonBarObject->AddButton( ID_OBJECTFLIPNORMALS, _("Flip Normals"), wxBitmap( flip_xpm ), wxEmptyString);
 	m_ribbonPageCAM = new wxRibbonPage( m_ribbonBarCANCAM, wxID_ANY, _("CAM") , wxNullBitmap , 0 );
 	m_ribbonBarCANCAM->SetActivePage( m_ribbonPageCAM ); 
 	m_ribbonPanelSetup = new wxRibbonPanel( m_ribbonPageCAM, wxID_ANY, _("Setup") , wxNullBitmap , wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE );
@@ -152,8 +154,9 @@ GUIFrameMain::GUIFrameMain(wxDocument* doc, wxView* view, wxDocParentFrame* pare
 	this->Connect( wxID_REDO, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnRedo ) );
 	this->Connect( wxID_HELP, wxEVT_COMMAND_RIBBONBAR_HELP_CLICKED, wxRibbonBarEventHandler( GUIFrameMain::OnHelp ) );
 	this->Connect( ID_OBJECTLOAD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnObjectLoad ) );
-	this->Connect( ID_OBJECTFLIPNORMALS, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnObjectFlipNormals ) );
 	this->Connect( ID_OBJECTMODIFY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnObjectModify ) );
+	this->Connect( ID_OBJECTUNIFYSURFACE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnObjectUnifySurface ) );
+	this->Connect( ID_OBJECTFLIPNORMALS, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnObjectFlipNormals ) );
 	this->Connect( ID_RUNMODIFY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnCAMSetup ) );
 	this->Connect( ID_2D, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnCAM2DMenu ) );
 	this->Connect( ID_3D, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnCAM3DMenu ) );
@@ -192,8 +195,9 @@ GUIFrameMain::~GUIFrameMain()
 	this->Disconnect( wxID_REDO, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnRedo ) );
 	this->Disconnect( wxID_HELP, wxEVT_COMMAND_RIBBONBAR_HELP_CLICKED, wxRibbonBarEventHandler( GUIFrameMain::OnHelp ) );
 	this->Disconnect( ID_OBJECTLOAD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnObjectLoad ) );
-	this->Disconnect( ID_OBJECTFLIPNORMALS, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnObjectFlipNormals ) );
 	this->Disconnect( ID_OBJECTMODIFY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnObjectModify ) );
+	this->Disconnect( ID_OBJECTUNIFYSURFACE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnObjectUnifySurface ) );
+	this->Disconnect( ID_OBJECTFLIPNORMALS, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnObjectFlipNormals ) );
 	this->Disconnect( ID_RUNMODIFY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnCAMSetup ) );
 	this->Disconnect( ID_2D, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnCAM2DMenu ) );
 	this->Disconnect( ID_3D, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, wxRibbonButtonBarEventHandler( GUIFrameMain::OnCAM3DMenu ) );
@@ -1672,7 +1676,7 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	wxBoxSizer* bSizer;
 	bSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_treeListCtrl = new wxTreeListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTL_DEFAULT_STYLE );
+	m_treeListCtrl = new wxTreeListCtrl( this, ID_TOOLBOXLIST, wxDefaultPosition, wxDefaultSize, wxTL_DEFAULT_STYLE );
 	m_treeListCtrl->AppendColumn( _("Name"), wxCOL_WIDTH_DEFAULT, wxALIGN_LEFT, wxCOL_RESIZABLE );
 	m_treeListCtrl->AppendColumn( _("Diameter"), wxCOL_WIDTH_DEFAULT, wxALIGN_LEFT, wxCOL_RESIZABLE );
 	m_treeListCtrl->AppendColumn( _("Type"), wxCOL_WIDTH_DEFAULT, wxALIGN_LEFT, wxCOL_RESIZABLE );
@@ -1685,91 +1689,85 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	wxBoxSizer* bSizerPanelTool;
 	bSizerPanelTool = new wxBoxSizer( wxVERTICAL );
 	
-	m_staticTextType = new wxStaticText( m_panelTool, wxID_ANY, _("Type:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextType->Wrap( -1 );
-	bSizerPanelTool->Add( m_staticTextType, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_scrolledWindowTool = new wxScrolledWindow( m_panelTool, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+	m_scrolledWindowTool->SetScrollRate( 5, 5 );
+	wxBoxSizer* bSizerTool;
+	bSizerTool = new wxBoxSizer( wxVERTICAL );
 	
-	m_scrolledWindowType = new wxScrolledWindow( m_panelTool, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
-	m_scrolledWindowType->SetScrollRate( 5, 5 );
-	wxBoxSizer* bSizer65;
-	bSizer65 = new wxBoxSizer( wxVERTICAL );
+	m_staticTextToolType = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("Type:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextToolType->Wrap( -1 );
+	bSizerTool->Add( m_staticTextToolType, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	wxString m_choiceTypeChoices[] = { _("Flat nose (cylindric)"), _("Ball nose (spheric)"), _("Bull nose (mixing ball and flat)"), _("Camfer (triangle)") };
-	int m_choiceTypeNChoices = sizeof( m_choiceTypeChoices ) / sizeof( wxString );
-	m_choiceType = new wxChoice( m_scrolledWindowType, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choiceTypeNChoices, m_choiceTypeChoices, 0 );
-	m_choiceType->SetSelection( 0 );
-	bSizer65->Add( m_choiceType, 0, wxALL|wxEXPAND, 5 );
+	wxString m_choiceToolTypeChoices[] = { _("Flat end mill (cylindric)"), _("Ball end mill (spheric)"), _("Bull nose end mill (mixing ball and flat)"), _("Camfer mill (triangle)"), _("Radius mill"), _("Tool holder"), _("Tool shaft"), _("Probe") };
+	int m_choiceToolTypeNChoices = sizeof( m_choiceToolTypeChoices ) / sizeof( wxString );
+	m_choiceToolType = new wxChoice( m_scrolledWindowTool, ID_TOOLTYPE, wxDefaultPosition, wxDefaultSize, m_choiceToolTypeNChoices, m_choiceToolTypeChoices, 0 );
+	m_choiceToolType->SetSelection( 0 );
+	bSizerTool->Add( m_choiceToolType, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticText81 = new wxStaticText( m_scrolledWindowType, wxID_ANY, _("Description:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText81->Wrap( -1 );
-	bSizer65->Add( m_staticText81, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
+	m_staticTextToolDescription = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("Description:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextToolDescription->Wrap( -1 );
+	bSizerTool->Add( m_staticTextToolDescription, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
 	
-	m_textCtrlShaftDiameter2 = new wxTextCtrl( m_scrolledWindowType, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	m_textCtrlShaftDiameter2->SetToolTip( _("Diameter of the part that disappears inside the chuck.") );
+	m_textCtrlToolDescription = new wxTextCtrl( m_scrolledWindowTool, ID_TOOLDESCRIPTION, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	bSizerTool->Add( m_textCtrlToolDescription, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	bSizer65->Add( m_textCtrlShaftDiameter2, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextToolVendor = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("Vendor:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextToolVendor->Wrap( -1 );
+	bSizerTool->Add( m_staticTextToolVendor, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
 	
-	m_staticText101 = new wxStaticText( m_scrolledWindowType, wxID_ANY, _("Vendor:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText101->Wrap( -1 );
-	bSizer65->Add( m_staticText101, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
+	m_textCtrlToolVendor = new wxTextCtrl( m_scrolledWindowTool, ID_TOOLVENDOR, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	bSizerTool->Add( m_textCtrlToolVendor, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrlShaftLength1 = new wxTextCtrl( m_scrolledWindowType, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	m_textCtrlShaftLength1->SetToolTip( _("This is the length of the that disappears inside the chuck.") );
+	m_staticTextToolGUID = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("GUID:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextToolGUID->Wrap( -1 );
+	bSizerTool->Add( m_staticTextToolGUID, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
 	
-	bSizer65->Add( m_textCtrlShaftLength1, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_textCtrlToolGUID = new wxTextCtrl( m_scrolledWindowTool, ID_TOOLGUID, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlToolGUID->SetToolTip( _("Unique string used to identify tool.\n(In case of doubt, just hit some random keys.)") );
 	
-	m_staticText131 = new wxStaticText( m_scrolledWindowType, wxID_ANY, _("GUID:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText131->Wrap( -1 );
-	bSizer65->Add( m_staticText131, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
+	bSizerTool->Add( m_textCtrlToolGUID, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrlMaxSpeed1 = new wxTextCtrl( m_scrolledWindowType, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	m_textCtrlMaxSpeed1->SetToolTip( _("Max. speed: Look at label on box you got the tools shipped in.") );
+	m_staticTextToolProductID = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("Product ID:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextToolProductID->Wrap( -1 );
+	bSizerTool->Add( m_staticTextToolProductID, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
 	
-	bSizer65->Add( m_textCtrlMaxSpeed1, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_textCtrlToolProductID = new wxTextCtrl( m_scrolledWindowTool, ID_TOOLPRODUCTID, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	bSizerTool->Add( m_textCtrlToolProductID, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticText141 = new wxStaticText( m_scrolledWindowType, wxID_ANY, _("Product ID:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText141->Wrap( -1 );
-	bSizer65->Add( m_staticText141, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
+	m_staticTextToolProductLink = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("Product link:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextToolProductLink->Wrap( -1 );
+	bSizerTool->Add( m_staticTextToolProductLink, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
 	
-	m_textCtrlFeedCoefficient1 = new wxTextCtrl( m_scrolledWindowType, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	m_textCtrlFeedCoefficient1->SetToolTip( _("Feed per tooth: How deep can a tooth cut per revolution. Usually in the range of 0.02 mm to 0.05 mm.") );
+	m_textCtrlToolProductLink = new wxTextCtrl( m_scrolledWindowTool, ID_TOOLPRODUCTLINK, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	bSizerTool->Add( m_textCtrlToolProductLink, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	bSizer65->Add( m_textCtrlFeedCoefficient1, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextToolGrade = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("Grade:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextToolGrade->Wrap( -1 );
+	bSizerTool->Add( m_staticTextToolGrade, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextFlutes1 = new wxStaticText( m_scrolledWindowType, wxID_ANY, _("Product link:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextFlutes1->Wrap( -1 );
-	bSizer65->Add( m_staticTextFlutes1, 0, wxLEFT|wxRIGHT|wxTOP, 5 );
+	m_textCtrlToolGrade = new wxTextCtrl( m_scrolledWindowTool, ID_TOOLGRADE, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	bSizerTool->Add( m_textCtrlToolGrade, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrlNrOfTeeth1 = new wxTextCtrl( m_scrolledWindowType, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	m_textCtrlNrOfTeeth1->SetToolTip( _("Number of teeth around the cutter.") );
+	m_staticTextToolBMC = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("BMC:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextToolBMC->Wrap( -1 );
+	bSizerTool->Add( m_staticTextToolBMC, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	bSizer65->Add( m_textCtrlNrOfTeeth1, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_textCtrlToolBMC = new wxTextCtrl( m_scrolledWindowTool, ID_TOOLBMC, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizerTool->Add( m_textCtrlToolBMC, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextComment1 = new wxStaticText( m_scrolledWindowType, wxID_ANY, _("Grade:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextComment1->Wrap( -1 );
-	bSizer65->Add( m_staticTextComment1, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	wxString m_radioBoxToolUnitChoices[] = { _("Metric"), _("Imperial") };
+	int m_radioBoxToolUnitNChoices = sizeof( m_radioBoxToolUnitChoices ) / sizeof( wxString );
+	m_radioBoxToolUnit = new wxRadioBox( m_scrolledWindowTool, ID_TOOLUNIT, _("Units in file:"), wxDefaultPosition, wxDefaultSize, m_radioBoxToolUnitNChoices, m_radioBoxToolUnitChoices, 2, wxRA_SPECIFY_COLS );
+	m_radioBoxToolUnit->SetSelection( 0 );
+	m_radioBoxToolUnit->SetToolTip( _("These units are only used, when saving the toolbox to a file.") );
 	
-	m_textCtrlComment1 = new wxTextCtrl( m_scrolledWindowType, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	bSizer65->Add( m_textCtrlComment1, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
-	
-	m_staticText186 = new wxStaticText( m_scrolledWindowType, wxID_ANY, _("BMC:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText186->Wrap( -1 );
-	bSizer65->Add( m_staticText186, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
-	
-	m_textCtrl101 = new wxTextCtrl( m_scrolledWindowType, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer65->Add( m_textCtrl101, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
-	
-	wxString m_radioBox3Choices[] = { _("Millimeter"), _("Inches") };
-	int m_radioBox3NChoices = sizeof( m_radioBox3Choices ) / sizeof( wxString );
-	m_radioBox3 = new wxRadioBox( m_scrolledWindowType, wxID_ANY, _("Unit:"), wxDefaultPosition, wxDefaultSize, m_radioBox3NChoices, m_radioBox3Choices, 2, wxRA_SPECIFY_COLS );
-	m_radioBox3->SetSelection( 1 );
-	bSizer65->Add( m_radioBox3, 0, wxALL|wxEXPAND, 5 );
+	bSizerTool->Add( m_radioBoxToolUnit, 0, wxALL|wxEXPAND, 5 );
 	
 	
-	m_scrolledWindowType->SetSizer( bSizer65 );
-	m_scrolledWindowType->Layout();
-	bSizer65->Fit( m_scrolledWindowType );
-	bSizerPanelTool->Add( m_scrolledWindowType, 1, wxALL|wxEXPAND, 5 );
+	m_scrolledWindowTool->SetSizer( bSizerTool );
+	m_scrolledWindowTool->Layout();
+	bSizerTool->Fit( m_scrolledWindowTool );
+	bSizerPanelTool->Add( m_scrolledWindowTool, 1, wxALL|wxEXPAND, 5 );
 	
 	
 	m_panelTool->SetSizer( bSizerPanelTool );
@@ -1780,269 +1778,267 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	wxBoxSizer* bSizerPanelGeometry;
 	bSizerPanelGeometry = new wxBoxSizer( wxVERTICAL );
 	
-	m_scrolledWindowTool = new wxScrolledWindow( m_panelGeometry, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
-	m_scrolledWindowTool->SetScrollRate( 5, 5 );
-	wxFlexGridSizer* fgSizerPanelTool;
-	fgSizerPanelTool = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizerPanelTool->AddGrowableCol( 0 );
-	fgSizerPanelTool->SetFlexibleDirection( wxBOTH );
-	fgSizerPanelTool->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	m_scrolledWindowGeometry = new wxScrolledWindow( m_panelGeometry, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+	m_scrolledWindowGeometry->SetScrollRate( 5, 5 );
+	wxFlexGridSizer* fgSizerPanelGeometry;
+	fgSizerPanelGeometry = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizerPanelGeometry->AddGrowableCol( 0 );
+	fgSizerPanelGeometry->SetFlexibleDirection( wxBOTH );
+	fgSizerPanelGeometry->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText8 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("DC:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText8->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText8, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_staticTextDC = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Cutting diameter (DC):"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextDC->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextDC, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_textCtrl90 = new wxTextCtrl( m_scrolledWindowTool, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerPanelTool->Add( m_textCtrl90, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_textCtrlDC = new wxTextCtrl( m_scrolledWindowGeometry, ID_TOOLDC, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerPanelGeometry->Add( m_textCtrlDC, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticText162 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText162->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText162, 0, wxALL, 5 );
+	m_staticTextUnitDC = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitDC->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextUnitDC, 0, wxALL, 5 );
 	
-	m_staticText164 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("LCF:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText164->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText164, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_staticTextLCF = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Length of cutting flutes (LCF):"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextLCF->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextLCF, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_textCtrlShaftDiameter = new wxTextCtrl( m_scrolledWindowTool, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	m_textCtrlShaftDiameter->SetToolTip( _("Diameter of the part that disappears inside the chuck.") );
+	m_textCtrlLCF = new wxTextCtrl( m_scrolledWindowGeometry, ID_TOOLLCF, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlLCF->SetToolTip( _("Basically the maximum cutting depth.") );
 	
-	fgSizerPanelTool->Add( m_textCtrlShaftDiameter, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	fgSizerPanelGeometry->Add( m_textCtrlLCF, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextUnitShaftDiameter = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitShaftDiameter->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticTextUnitShaftDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextUnitLCF = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitLCF->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextUnitLCF, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText163 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("LB:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText163->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText163, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_staticTextLB = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Body length (LB):"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextLB->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextLB, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_textCtrl91 = new wxTextCtrl( m_scrolledWindowTool, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerPanelTool->Add( m_textCtrl91, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_textCtrlLB = new wxTextCtrl( m_scrolledWindowGeometry, ID_TOOLLB, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlLB->SetToolTip( _("Length of tool that sticks outside of the chuck.") );
 	
-	m_staticText165 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText165->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText165, 0, wxALL, 5 );
+	fgSizerPanelGeometry->Add( m_textCtrlLB, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticText10 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("OAL:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText10->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText10, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_staticTextUnitLB = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitLB->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextUnitLB, 0, wxALL, 5 );
 	
+	m_staticTextOAL = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Overall length (OAL):"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextOAL->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextOAL, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_textCtrlShaftLength = new wxTextCtrl( m_scrolledWindowTool, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	m_textCtrlShaftLength->SetToolTip( _("This is the length of the that disappears inside the chuck.") );
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	fgSizerPanelTool->Add( m_textCtrlShaftLength, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_textCtrlOAL = new wxTextCtrl( m_scrolledWindowGeometry, ID_TOOLOAL, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlOAL->SetToolTip( _("Total length of tool.") );
 	
-	m_staticTextUnitShaftLength = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitShaftLength->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticTextUnitShaftLength, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	fgSizerPanelGeometry->Add( m_textCtrlOAL, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticText13 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("NOF:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText13->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText13, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_staticTextUnitOAL = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitOAL->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextUnitOAL, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
+	m_staticTextNOF = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Number of flutes (NOF):"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextNOF->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextNOF, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_textCtrlMaxSpeed = new wxTextCtrl( m_scrolledWindowTool, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	m_textCtrlMaxSpeed->SetToolTip( _("Max. speed: Look at label on box you got the tools shipped in.") );
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	fgSizerPanelTool->Add( m_textCtrlMaxSpeed, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_textCtrlNOF = new wxTextCtrl( m_scrolledWindowGeometry, ID_TOOLNOF, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerPanelGeometry->Add( m_textCtrlNOF, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_staticText14 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("NT:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText14->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText14, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_staticTextNT = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Number of teeth (NT):"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextNT->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextNT, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_textCtrlFeedCoefficient = new wxTextCtrl( m_scrolledWindowTool, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	m_textCtrlFeedCoefficient->SetToolTip( _("Feed per tooth: How deep can a tooth cut per revolution. Usually in the range of 0.02 mm to 0.05 mm.") );
+	m_textCtrlNT = new wxTextCtrl( m_scrolledWindowGeometry, ID_TOOLNT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerPanelGeometry->Add( m_textCtrlNT, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	fgSizerPanelTool->Add( m_textCtrlFeedCoefficient, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_staticTextRE = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Corner radius (RE):"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextRE->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextRE, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextFlutes = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("RE:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextFlutes->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticTextFlutes, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_textCtrlRE = new wxTextCtrl( m_scrolledWindowGeometry, ID_TOOLRE, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerPanelGeometry->Add( m_textCtrlRE, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrlNrOfTeeth = new wxTextCtrl( m_scrolledWindowTool, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	m_textCtrlNrOfTeeth->SetToolTip( _("Number of teeth around the cutter.") );
+	m_staticTextUnitRE = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitRE->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextUnitRE, 0, wxALL, 5 );
 	
-	fgSizerPanelTool->Add( m_textCtrlNrOfTeeth, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextSIG = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Point angle (SIG):"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSIG->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextSIG, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticText166 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText166->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText166, 0, wxALL, 5 );
 	
-	m_staticTextComment = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("SIG:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextComment->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticTextComment, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	m_textCtrlSIG = new wxTextCtrl( m_scrolledWindowGeometry, ID_TOOLSIG, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerPanelGeometry->Add( m_textCtrlSIG, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_staticTextUnitSIG = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSIG->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextUnitSIG, 0, wxALL, 5 );
 	
-	m_textCtrlComment = new wxTextCtrl( m_scrolledWindowTool, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	fgSizerPanelTool->Add( m_textCtrlComment, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextTA = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Taper pitch (TA):"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextTA->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextTA, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticText167 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText167->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText167, 0, wxALL, 5 );
 	
-	m_staticText168 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("TA:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText168->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText168, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	m_textCtrlTA = new wxTextCtrl( m_scrolledWindowGeometry, ID_TOOLTA, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerPanelGeometry->Add( m_textCtrlTA, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_staticTextUnitTA = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitTA->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextUnitTA, 0, wxALL, 5 );
 	
-	m_textCtrl92 = new wxTextCtrl( m_scrolledWindowTool, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerPanelTool->Add( m_textCtrl92, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
+	m_staticTextCSP = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Coolant supply property (CSP):"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextCSP->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextCSP, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticText169 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText169->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText169, 0, wxALL, 5 );
 	
-	m_staticText170 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("CSP:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText170->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText170, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	wxString m_choiceCSPChoices[] = { _("false"), _("true") };
+	int m_choiceCSPNChoices = sizeof( m_choiceCSPChoices ) / sizeof( wxString );
+	m_choiceCSP = new wxChoice( m_scrolledWindowGeometry, ID_TOOLCSP, wxDefaultPosition, wxDefaultSize, m_choiceCSPNChoices, m_choiceCSPChoices, 0 );
+	m_choiceCSP->SetSelection( 0 );
+	fgSizerPanelGeometry->Add( m_choiceCSP, 1, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	wxString m_choice13Choices[] = { _("false"), _("true") };
-	int m_choice13NChoices = sizeof( m_choice13Choices ) / sizeof( wxString );
-	m_choice13 = new wxChoice( m_scrolledWindowTool, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choice13NChoices, m_choice13Choices, 0 );
-	m_choice13->SetSelection( 0 );
-	fgSizerPanelTool->Add( m_choice13, 1, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	m_staticTextHAND = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("HAND:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextHAND->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextHAND, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_staticText172 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("HAND:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText172->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText172, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	wxString m_choiceHANDChoices[] = { _("false"), _("true") };
+	int m_choiceHANDNChoices = sizeof( m_choiceHANDChoices ) / sizeof( wxString );
+	m_choiceHAND = new wxChoice( m_scrolledWindowGeometry, ID_TOOLHAND, wxDefaultPosition, wxDefaultSize, m_choiceHANDNChoices, m_choiceHANDChoices, 0 );
+	m_choiceHAND->SetSelection( 0 );
+	fgSizerPanelGeometry->Add( m_choiceHAND, 1, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	wxString m_choice12Choices[] = { _("false"), _("true") };
-	int m_choice12NChoices = sizeof( m_choice12Choices ) / sizeof( wxString );
-	m_choice12 = new wxChoice( m_scrolledWindowTool, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choice12NChoices, m_choice12Choices, 0 );
-	m_choice12->SetSelection( 0 );
-	fgSizerPanelTool->Add( m_choice12, 1, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	m_staticTextSFDM = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Shaft diameter (SFDM):"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSFDM->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextSFDM, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_staticText174 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("SFDM:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText174->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText174, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	m_textCtrlSFDM = new wxTextCtrl( m_scrolledWindowGeometry, ID_TOOLSFDM, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlSFDM->SetToolTip( _("The shaft may be wider or smaller than the cutting diameter of the tool.") );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
+	fgSizerPanelGeometry->Add( m_textCtrlSFDM, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrl95 = new wxTextCtrl( m_scrolledWindowTool, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerPanelTool->Add( m_textCtrl95, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextUnitSFDM = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSFDM->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextUnitSFDM, 0, wxALL, 5 );
 	
-	m_staticText175 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText175->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText175, 0, wxALL, 5 );
+	m_staticTextShoulderLength = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Shoulder length:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextShoulderLength->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextShoulderLength, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticText176 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("Shoulder length:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText176->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText176, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_textCtrlShoulderLength = new wxTextCtrl( m_scrolledWindowGeometry, ID_TOOLSHOULDERLENGTH, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerPanelGeometry->Add( m_textCtrlShoulderLength, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrl96 = new wxTextCtrl( m_scrolledWindowTool, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerPanelTool->Add( m_textCtrl96, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextUnitShoulderLength = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitShoulderLength->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextUnitShoulderLength, 0, wxALL, 5 );
 	
-	m_staticText177 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText177->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText177, 0, wxALL, 5 );
+	m_staticTextTipDiameter = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Tip diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextTipDiameter->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextTipDiameter, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticText178 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("Tip diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText178->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText178, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_textCtrlTipDiameter = new wxTextCtrl( m_scrolledWindowGeometry, ID_TOOLTIPDIAMETER, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerPanelGeometry->Add( m_textCtrlTipDiameter, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrl97 = new wxTextCtrl( m_scrolledWindowTool, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerPanelTool->Add( m_textCtrl97, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextUnitTipDiameter = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitTipDiameter->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextUnitTipDiameter, 0, wxALL, 5 );
 	
-	m_staticText179 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText179->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText179, 0, wxALL, 5 );
+	m_staticTextTipLength = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Tip length:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextTipLength->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextTipLength, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticText180 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("Tip length:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText180->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText180, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_textCtrlTipLength = new wxTextCtrl( m_scrolledWindowGeometry, ID_TOOLLENGTH, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerPanelGeometry->Add( m_textCtrlTipLength, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
 	
-	m_textCtrl98 = new wxTextCtrl( m_scrolledWindowTool, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerPanelTool->Add( m_textCtrl98, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
+	m_staticTextUnitTipLength = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitTipLength->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextUnitTipLength, 0, wxALL, 5 );
 	
-	m_staticText1811 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1811->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText1811, 0, wxALL, 5 );
+	m_staticTextTipOffset = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Tip offset:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextTipOffset->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextTipOffset, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticText1821 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("Tip offset:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1821->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText1821, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_textCtrlTipOffset = new wxTextCtrl( m_scrolledWindowGeometry, ID_TOOLTIPOFFSET, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerPanelGeometry->Add( m_textCtrlTipOffset, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrl99 = new wxTextCtrl( m_scrolledWindowTool, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerPanelTool->Add( m_textCtrl99, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextUnitTipOffset = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitTipOffset->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextUnitTipOffset, 0, wxALL, 5 );
 	
-	m_staticText183 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText183->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText183, 0, wxALL, 5 );
+	m_staticTextThreadProfileAngle = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("Thread profile angle:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextThreadProfileAngle->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextThreadProfileAngle, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticText184 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("Thread profile angle:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText184->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText184, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
+	fgSizerPanelGeometry->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	fgSizerPanelTool->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_textCtrlThreadProfileAngle = new wxTextCtrl( m_scrolledWindowGeometry, ID_THREADPROFILEANGLE, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerPanelGeometry->Add( m_textCtrlThreadProfileAngle, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrl100 = new wxTextCtrl( m_scrolledWindowTool, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerPanelTool->Add( m_textCtrl100, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextUnitThreadProfileAngle = new wxStaticText( m_scrolledWindowGeometry, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitThreadProfileAngle->Wrap( -1 );
+	fgSizerPanelGeometry->Add( m_staticTextUnitThreadProfileAngle, 0, wxALL, 5 );
 	
-	m_staticText185 = new wxStaticText( m_scrolledWindowTool, wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText185->Wrap( -1 );
-	fgSizerPanelTool->Add( m_staticText185, 0, wxALL, 5 );
 	
-	
-	m_scrolledWindowTool->SetSizer( fgSizerPanelTool );
-	m_scrolledWindowTool->Layout();
-	fgSizerPanelTool->Fit( m_scrolledWindowTool );
-	bSizerPanelGeometry->Add( m_scrolledWindowTool, 1, wxEXPAND | wxALL, 5 );
+	m_scrolledWindowGeometry->SetSizer( fgSizerPanelGeometry );
+	m_scrolledWindowGeometry->Layout();
+	fgSizerPanelGeometry->Fit( m_scrolledWindowGeometry );
+	bSizerPanelGeometry->Add( m_scrolledWindowGeometry, 1, wxEXPAND | wxALL, 5 );
 	
 	
 	m_panelGeometry->SetSizer( bSizerPanelGeometry );
@@ -2053,84 +2049,85 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	wxBoxSizer* bSizerPanelShape;
 	bSizerPanelShape = new wxBoxSizer( wxVERTICAL );
 	
-	m_checkBoxShape = new wxCheckBox( m_panelShape, wxID_ANY, _("Shape from Geometry"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_checkBoxShape->SetValue(true); 
-	bSizerPanelShape->Add( m_checkBoxShape, 0, wxALL, 5 );
+	m_checkBoxShapeFromGeometry = new wxCheckBox( m_panelShape, ID_SHAPEFROMGEOMETRY, _("Shape from Geometry"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxShapeFromGeometry->SetValue(true); 
+	bSizerPanelShape->Add( m_checkBoxShapeFromGeometry, 0, wxALL, 5 );
 	
 	wxBoxSizer* bSizerShapeButtons;
 	bSizerShapeButtons = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_buttonShapeNew2 = new wxButton( m_panelShape, wxID_ANY, _("New"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizerShapeButtons->Add( m_buttonShapeNew2, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
+	m_buttonShapeSegmentAdd = new wxButton( m_panelShape, ID_SHAPESEGMENTADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonShapeSegmentAdd->SetToolTip( _("Add a segment to the tool shape.") );
 	
-	m_buttonShapeUpdate2 = new wxButton( m_panelShape, wxID_ANY, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizerShapeButtons->Add( m_buttonShapeUpdate2, 0, wxTOP|wxBOTTOM, 5 );
+	bSizerShapeButtons->Add( m_buttonShapeSegmentAdd, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
 	
-	m_buttonShapeDelete2 = new wxButton( m_panelShape, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizerShapeButtons->Add( m_buttonShapeDelete2, 0, wxTOP|wxBOTTOM|wxRIGHT, 5 );
+	m_buttonShapeSegmentDelete = new wxButton( m_panelShape, ID_SHAPESEGMENTDELETE, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonShapeSegmentDelete->SetToolTip( _("Delete the selected segment from the tool shape.") );
+	
+	bSizerShapeButtons->Add( m_buttonShapeSegmentDelete, 0, wxTOP|wxBOTTOM|wxRIGHT, 5 );
 	
 	
 	bSizerPanelShape->Add( bSizerShapeButtons, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	wxStaticBoxSizer* sbSizer242;
-	sbSizer242 = new wxStaticBoxSizer( new wxStaticBox( m_panelShape, wxID_ANY, _("Segment") ), wxVERTICAL );
+	wxStaticBoxSizer* sbSizerShape;
+	sbSizerShape = new wxStaticBoxSizer( new wxStaticBox( m_panelShape, wxID_ANY, _("Segment") ), wxVERTICAL );
 	
-	wxFlexGridSizer* fgSizer22;
-	fgSizer22 = new wxFlexGridSizer( 3, 3, 0, 0 );
-	fgSizer22->AddGrowableCol( 1 );
-	fgSizer22->SetFlexibleDirection( wxHORIZONTAL );
-	fgSizer22->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_NONE );
+	wxFlexGridSizer* fgSizerShape;
+	fgSizerShape = new wxFlexGridSizer( 3, 3, 0, 0 );
+	fgSizerShape->AddGrowableCol( 1 );
+	fgSizerShape->SetFlexibleDirection( wxHORIZONTAL );
+	fgSizerShape->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_NONE );
 	
-	m_staticText182 = new wxStaticText( sbSizer242->GetStaticBox(), wxID_ANY, _("Upper Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText182->Wrap( -1 );
-	fgSizer22->Add( m_staticText182, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextShapeUpperDiameter = new wxStaticText( sbSizerShape->GetStaticBox(), wxID_ANY, _("Upper Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextShapeUpperDiameter->Wrap( -1 );
+	fgSizerShape->Add( m_staticTextShapeUpperDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlDiameter3 = new wxTextCtrl( sbSizer242->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrlDiameter3->SetToolTip( _("Diameter of the tool at the end of this segment.") );
+	m_textCtrlShapeUpperDiameter = new wxTextCtrl( sbSizerShape->GetStaticBox(), ID_SHAPEUPPERDIAMETER, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlShapeUpperDiameter->SetToolTip( _("Upper diameter of the selected segment.") );
 	
-	fgSizer22->Add( m_textCtrlDiameter3, 0, wxALL|wxEXPAND, 5 );
+	fgSizerShape->Add( m_textCtrlShapeUpperDiameter, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticTextUnitDiameter3 = new wxStaticText( sbSizer242->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitDiameter3->Wrap( -1 );
-	fgSizer22->Add( m_staticTextUnitDiameter3, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextUnitShapeUpperDiameter = new wxStaticText( sbSizerShape->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitShapeUpperDiameter->Wrap( -1 );
+	fgSizerShape->Add( m_staticTextUnitShapeUpperDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText202 = new wxStaticText( sbSizer242->GetStaticBox(), wxID_ANY, _("Lower Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText202->Wrap( -1 );
-	fgSizer22->Add( m_staticText202, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextShapeLowerDiameter = new wxStaticText( sbSizerShape->GetStaticBox(), wxID_ANY, _("Lower Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextShapeLowerDiameter->Wrap( -1 );
+	fgSizerShape->Add( m_staticTextShapeLowerDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlHeight2 = new wxTextCtrl( sbSizer242->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrlHeight2->SetToolTip( _("Height of this segment.") );
+	m_textCtrlShapeLowerDiameter = new wxTextCtrl( sbSizerShape->GetStaticBox(), ID_SHAPELOWERDIAMETER, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlShapeLowerDiameter->SetToolTip( _("Lower diameter of the selected segment.") );
 	
-	fgSizer22->Add( m_textCtrlHeight2, 0, wxALL|wxEXPAND, 5 );
+	fgSizerShape->Add( m_textCtrlShapeLowerDiameter, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticTextUnitHeight2 = new wxStaticText( sbSizer242->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitHeight2->Wrap( -1 );
-	fgSizer22->Add( m_staticTextUnitHeight2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextUnitShapeLowerDiameter = new wxStaticText( sbSizerShape->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitShapeLowerDiameter->Wrap( -1 );
+	fgSizerShape->Add( m_staticTextUnitShapeLowerDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText222 = new wxStaticText( sbSizer242->GetStaticBox(), wxID_ANY, _("Height:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText222->Wrap( -1 );
-	fgSizer22->Add( m_staticText222, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextShapeHeight = new wxStaticText( sbSizerShape->GetStaticBox(), wxID_ANY, _("Height:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextShapeHeight->Wrap( -1 );
+	fgSizerShape->Add( m_staticTextShapeHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlRadius2 = new wxTextCtrl( sbSizer242->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrlRadius2->SetToolTip( _("Radius of curvature:\nPositive radius = convex surface = bulged to the outside.\nNegative radius = concave surface = bulged to the inside.\nRadius of 0 = straight line. ") );
+	m_textCtrlShapeHeight = new wxTextCtrl( sbSizerShape->GetStaticBox(), ID_SHAPEHEIGHT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlShapeHeight->SetToolTip( _("Height of the selected segment.") );
 	
-	fgSizer22->Add( m_textCtrlRadius2, 0, wxALL|wxEXPAND, 5 );
+	fgSizerShape->Add( m_textCtrlShapeHeight, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticTextUnitRadius2 = new wxStaticText( sbSizer242->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitRadius2->Wrap( -1 );
-	fgSizer22->Add( m_staticTextUnitRadius2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	
-	sbSizer242->Add( fgSizer22, 0, wxEXPAND, 5 );
+	m_staticTextUnitShapeHeight = new wxStaticText( sbSizerShape->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitShapeHeight->Wrap( -1 );
+	fgSizerShape->Add( m_staticTextUnitShapeHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
-	bSizerPanelShape->Add( sbSizer242, 0, wxEXPAND, 5 );
+	sbSizerShape->Add( fgSizerShape, 0, wxEXPAND, 5 );
 	
-	m_dataViewListCtrlShape = new wxDataViewListCtrl( m_panelShape, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDV_HORIZ_RULES|wxDV_ROW_LINES|wxDV_VERT_RULES );
-	m_dataViewListColumn7 = m_dataViewListCtrlShape->AppendTextColumn( _("Upper") );
-	m_dataViewListColumn8 = m_dataViewListCtrlShape->AppendTextColumn( _("Lower") );
-	m_dataViewListColumn9 = m_dataViewListCtrlShape->AppendTextColumn( _("Height") );
-	bSizerPanelShape->Add( m_dataViewListCtrlShape, 1, wxALL|wxEXPAND, 5 );
+	
+	bSizerPanelShape->Add( sbSizerShape, 0, wxEXPAND, 5 );
+	
+	m_dataViewListCtrlShapeSegments = new wxDataViewListCtrl( m_panelShape, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDV_HORIZ_RULES|wxDV_ROW_LINES|wxDV_VERT_RULES );
+	m_dataViewListColumnShapeUpper = m_dataViewListCtrlShapeSegments->AppendTextColumn( _("Upper") );
+	m_dataViewListColumnShapeLower = m_dataViewListCtrlShapeSegments->AppendTextColumn( _("Lower") );
+	m_dataViewListColumnShapeHeight = m_dataViewListCtrlShapeSegments->AppendTextColumn( _("Height") );
+	bSizerPanelShape->Add( m_dataViewListCtrlShapeSegments, 1, wxALL|wxEXPAND, 5 );
 	
 	
 	m_panelShape->SetSizer( bSizerPanelShape );
@@ -2150,77 +2147,78 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	wxBoxSizer* bSizerHolderButtons;
 	bSizerHolderButtons = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_buttonShapeNew1 = new wxButton( m_panelHolder, wxID_ANY, _("New"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizerHolderButtons->Add( m_buttonShapeNew1, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
+	m_buttonHolderSegmentAdd = new wxButton( m_panelHolder, ID_HOLDERSEGMENTADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonHolderSegmentAdd->SetToolTip( _("Add a segment to the holder shape.") );
 	
-	m_buttonShapeUpdate1 = new wxButton( m_panelHolder, wxID_ANY, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizerHolderButtons->Add( m_buttonShapeUpdate1, 0, wxTOP|wxBOTTOM, 5 );
+	bSizerHolderButtons->Add( m_buttonHolderSegmentAdd, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
 	
-	m_buttonShapeDelete1 = new wxButton( m_panelHolder, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizerHolderButtons->Add( m_buttonShapeDelete1, 0, wxTOP|wxBOTTOM|wxRIGHT, 5 );
+	m_buttonHolderSegmentDelete = new wxButton( m_panelHolder, ID_HOLDERSEGMENTDELETE, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonHolderSegmentDelete->SetToolTip( _("Delete the selected segment from the holder shape.") );
+	
+	bSizerHolderButtons->Add( m_buttonHolderSegmentDelete, 0, wxTOP|wxBOTTOM|wxRIGHT, 5 );
 	
 	
 	bSizerHolder->Add( bSizerHolderButtons, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	wxStaticBoxSizer* sbSizer241;
-	sbSizer241 = new wxStaticBoxSizer( new wxStaticBox( m_panelHolder, wxID_ANY, _("Segment") ), wxVERTICAL );
+	wxStaticBoxSizer* sbSizerHolder;
+	sbSizerHolder = new wxStaticBoxSizer( new wxStaticBox( m_panelHolder, wxID_ANY, _("Segment") ), wxVERTICAL );
 	
-	wxFlexGridSizer* fgSizer21;
-	fgSizer21 = new wxFlexGridSizer( 3, 3, 0, 0 );
-	fgSizer21->AddGrowableCol( 1 );
-	fgSizer21->SetFlexibleDirection( wxBOTH );
-	fgSizer21->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxFlexGridSizer* fgSizerHolder;
+	fgSizerHolder = new wxFlexGridSizer( 3, 3, 0, 0 );
+	fgSizerHolder->AddGrowableCol( 1 );
+	fgSizerHolder->SetFlexibleDirection( wxBOTH );
+	fgSizerHolder->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText181 = new wxStaticText( sbSizer241->GetStaticBox(), wxID_ANY, _("Upper Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText181->Wrap( -1 );
-	fgSizer21->Add( m_staticText181, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextHolderUpperDiameter = new wxStaticText( sbSizerHolder->GetStaticBox(), wxID_ANY, _("Upper Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextHolderUpperDiameter->Wrap( -1 );
+	fgSizerHolder->Add( m_staticTextHolderUpperDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlDiameter2 = new wxTextCtrl( sbSizer241->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrlDiameter2->SetToolTip( _("Diameter of the tool at the end of this segment.") );
+	m_textCtrlHolderUpperDiameter = new wxTextCtrl( sbSizerHolder->GetStaticBox(), ID_UPPERDIAMETER, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlHolderUpperDiameter->SetToolTip( _("Upper diameter of the selected segment.") );
 	
-	fgSizer21->Add( m_textCtrlDiameter2, 0, wxALL|wxEXPAND, 5 );
+	fgSizerHolder->Add( m_textCtrlHolderUpperDiameter, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticTextUnitDiameter2 = new wxStaticText( sbSizer241->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitDiameter2->Wrap( -1 );
-	fgSizer21->Add( m_staticTextUnitDiameter2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextUnitHolderUpperDiameter = new wxStaticText( sbSizerHolder->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitHolderUpperDiameter->Wrap( -1 );
+	fgSizerHolder->Add( m_staticTextUnitHolderUpperDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText201 = new wxStaticText( sbSizer241->GetStaticBox(), wxID_ANY, _("Lower Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText201->Wrap( -1 );
-	fgSizer21->Add( m_staticText201, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextHolderLowerDiameter = new wxStaticText( sbSizerHolder->GetStaticBox(), wxID_ANY, _("Lower Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextHolderLowerDiameter->Wrap( -1 );
+	fgSizerHolder->Add( m_staticTextHolderLowerDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlHeight1 = new wxTextCtrl( sbSizer241->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrlHeight1->SetToolTip( _("Height of this segment.") );
+	m_textCtrlHolderLowerDiameter = new wxTextCtrl( sbSizerHolder->GetStaticBox(), ID_HOLDERLOWERDIAMETER, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlHolderLowerDiameter->SetToolTip( _("Lower diameter of the selected segment.") );
 	
-	fgSizer21->Add( m_textCtrlHeight1, 0, wxALL|wxEXPAND, 5 );
+	fgSizerHolder->Add( m_textCtrlHolderLowerDiameter, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticTextUnitHeight1 = new wxStaticText( sbSizer241->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitHeight1->Wrap( -1 );
-	fgSizer21->Add( m_staticTextUnitHeight1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextUnitHolderLowerDiameter = new wxStaticText( sbSizerHolder->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitHolderLowerDiameter->Wrap( -1 );
+	fgSizerHolder->Add( m_staticTextUnitHolderLowerDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText221 = new wxStaticText( sbSizer241->GetStaticBox(), wxID_ANY, _("Height:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText221->Wrap( -1 );
-	fgSizer21->Add( m_staticText221, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextHolderHeight = new wxStaticText( sbSizerHolder->GetStaticBox(), wxID_ANY, _("Height:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextHolderHeight->Wrap( -1 );
+	fgSizerHolder->Add( m_staticTextHolderHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlRadius1 = new wxTextCtrl( sbSizer241->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrlRadius1->SetToolTip( _("Radius of curvature:\nPositive radius = convex surface = bulged to the outside.\nNegative radius = concave surface = bulged to the inside.\nRadius of 0 = straight line. ") );
+	m_textCtrlHolderHeight = new wxTextCtrl( sbSizerHolder->GetStaticBox(), ID_HOLDERHEIGHT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlHolderHeight->SetToolTip( _("Height of the selected segment.") );
 	
-	fgSizer21->Add( m_textCtrlRadius1, 0, wxALL|wxEXPAND, 5 );
+	fgSizerHolder->Add( m_textCtrlHolderHeight, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticTextUnitRadius1 = new wxStaticText( sbSizer241->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitRadius1->Wrap( -1 );
-	fgSizer21->Add( m_staticTextUnitRadius1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	
-	sbSizer241->Add( fgSizer21, 0, wxEXPAND, 5 );
+	m_staticTextUnitHolderHeight = new wxStaticText( sbSizerHolder->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitHolderHeight->Wrap( -1 );
+	fgSizerHolder->Add( m_staticTextUnitHolderHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
-	bSizerHolder->Add( sbSizer241, 0, wxEXPAND, 5 );
+	sbSizerHolder->Add( fgSizerHolder, 0, wxEXPAND, 5 );
 	
-	m_dataViewListCtrl2 = new wxDataViewListCtrl( m_panelHolder, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
-	m_dataViewListColumn4 = m_dataViewListCtrl2->AppendTextColumn( _("Upper") );
-	m_dataViewListColumn5 = m_dataViewListCtrl2->AppendTextColumn( _("Lower") );
-	m_dataViewListColumn6 = m_dataViewListCtrl2->AppendTextColumn( _("Height") );
-	bSizerHolder->Add( m_dataViewListCtrl2, 1, wxALL|wxEXPAND, 5 );
+	
+	bSizerHolder->Add( sbSizerHolder, 0, wxEXPAND, 5 );
+	
+	m_dataViewListCtrlHolderSegments = new wxDataViewListCtrl( m_panelHolder, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_dataViewListColumnHolderUpper = m_dataViewListCtrlHolderSegments->AppendTextColumn( _("Upper") );
+	m_dataViewListColumnHolderLower = m_dataViewListCtrlHolderSegments->AppendTextColumn( _("Lower") );
+	m_dataViewListColumnHolderHeight = m_dataViewListCtrlHolderSegments->AppendTextColumn( _("Height") );
+	bSizerHolder->Add( m_dataViewListCtrlHolderSegments, 1, wxALL|wxEXPAND, 5 );
 	
 	
 	m_panelHolder->SetSizer( bSizerHolder );
@@ -2231,84 +2229,85 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	wxBoxSizer* bSizerPanelShaft;
 	bSizerPanelShaft = new wxBoxSizer( wxVERTICAL );
 	
-	m_checkBoxShaft = new wxCheckBox( m_panelShaft, wxID_ANY, _("Shaft from Geometry"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_checkBoxShaft->SetValue(true); 
-	bSizerPanelShaft->Add( m_checkBoxShaft, 0, wxALL, 5 );
+	m_checkBoxShaftFromGeometry = new wxCheckBox( m_panelShaft, ID_SHAFTFROMGEOMETRY, _("Shaft from Geometry"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxShaftFromGeometry->SetValue(true); 
+	bSizerPanelShaft->Add( m_checkBoxShaftFromGeometry, 0, wxALL, 5 );
 	
 	wxBoxSizer* bSizerShaftButtons;
 	bSizerShaftButtons = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_buttonShapeNew = new wxButton( m_panelShaft, wxID_ANY, _("New"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizerShaftButtons->Add( m_buttonShapeNew, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
+	m_buttonShaftSegmentAdd = new wxButton( m_panelShaft, ID_SHAFTSEGMENTADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonShaftSegmentAdd->SetToolTip( _("Add a segment to the shaft shape.") );
 	
-	m_buttonShapeUpdate = new wxButton( m_panelShaft, wxID_ANY, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizerShaftButtons->Add( m_buttonShapeUpdate, 0, wxTOP|wxBOTTOM, 5 );
+	bSizerShaftButtons->Add( m_buttonShaftSegmentAdd, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
 	
-	m_buttonShapeDelete = new wxButton( m_panelShaft, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonShapeDelete = new wxButton( m_panelShaft, ID_SHAFTSEGMENTDELETE, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonShapeDelete->SetToolTip( _("Delete the selected segment from the shaft shape.") );
+	
 	bSizerShaftButtons->Add( m_buttonShapeDelete, 0, wxTOP|wxBOTTOM|wxRIGHT, 5 );
 	
 	
 	bSizerPanelShaft->Add( bSizerShaftButtons, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	wxStaticBoxSizer* sbSizer24;
-	sbSizer24 = new wxStaticBoxSizer( new wxStaticBox( m_panelShaft, wxID_ANY, _("Segment") ), wxVERTICAL );
+	wxStaticBoxSizer* sbSizerShaft;
+	sbSizerShaft = new wxStaticBoxSizer( new wxStaticBox( m_panelShaft, wxID_ANY, _("Segment") ), wxVERTICAL );
 	
-	wxFlexGridSizer* fgSizer2;
-	fgSizer2 = new wxFlexGridSizer( 3, 3, 0, 0 );
-	fgSizer2->AddGrowableCol( 1 );
-	fgSizer2->SetFlexibleDirection( wxBOTH );
-	fgSizer2->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxFlexGridSizer* fgSizerShaft;
+	fgSizerShaft = new wxFlexGridSizer( 3, 3, 0, 0 );
+	fgSizerShaft->AddGrowableCol( 1 );
+	fgSizerShaft->SetFlexibleDirection( wxBOTH );
+	fgSizerShaft->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText18 = new wxStaticText( sbSizer24->GetStaticBox(), wxID_ANY, _("Upper Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText18->Wrap( -1 );
-	fgSizer2->Add( m_staticText18, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextShaftUpperDiameter = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("Upper Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextShaftUpperDiameter->Wrap( -1 );
+	fgSizerShaft->Add( m_staticTextShaftUpperDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlDiameter = new wxTextCtrl( sbSizer24->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrlDiameter->SetToolTip( _("Diameter of the tool at the end of this segment.") );
+	m_textCtrlShaftUpperDiameter = new wxTextCtrl( sbSizerShaft->GetStaticBox(), ID_SHAFTUPPERDIAMETER, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlShaftUpperDiameter->SetToolTip( _("Upper diameter of the selected segment.") );
 	
-	fgSizer2->Add( m_textCtrlDiameter, 0, wxALL|wxEXPAND, 5 );
+	fgSizerShaft->Add( m_textCtrlShaftUpperDiameter, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticTextUnitDiameter = new wxStaticText( sbSizer24->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitDiameter->Wrap( -1 );
-	fgSizer2->Add( m_staticTextUnitDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextUnitShaftUpperDiameter = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitShaftUpperDiameter->Wrap( -1 );
+	fgSizerShaft->Add( m_staticTextUnitShaftUpperDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText20 = new wxStaticText( sbSizer24->GetStaticBox(), wxID_ANY, _("Lower Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText20->Wrap( -1 );
-	fgSizer2->Add( m_staticText20, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextShaftLowerDiameter = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("Lower Diameter:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextShaftLowerDiameter->Wrap( -1 );
+	fgSizerShaft->Add( m_staticTextShaftLowerDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlHeight = new wxTextCtrl( sbSizer24->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrlHeight->SetToolTip( _("Height of this segment.") );
+	m_textCtrlShaftLowerDiameter = new wxTextCtrl( sbSizerShaft->GetStaticBox(), ID_SHAFTLOWERDIAMETER, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlShaftLowerDiameter->SetToolTip( _("Lower diameter of the selected segment.") );
 	
-	fgSizer2->Add( m_textCtrlHeight, 0, wxALL|wxEXPAND, 5 );
+	fgSizerShaft->Add( m_textCtrlShaftLowerDiameter, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticTextUnitHeight = new wxStaticText( sbSizer24->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitHeight->Wrap( -1 );
-	fgSizer2->Add( m_staticTextUnitHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextUnitShaftLowerDiameter = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitShaftLowerDiameter->Wrap( -1 );
+	fgSizerShaft->Add( m_staticTextUnitShaftLowerDiameter, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText22 = new wxStaticText( sbSizer24->GetStaticBox(), wxID_ANY, _("Height:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText22->Wrap( -1 );
-	fgSizer2->Add( m_staticText22, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextShaftHeight = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("Height:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextShaftHeight->Wrap( -1 );
+	fgSizerShaft->Add( m_staticTextShaftHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlRadius = new wxTextCtrl( sbSizer24->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrlRadius->SetToolTip( _("Radius of curvature:\nPositive radius = convex surface = bulged to the outside.\nNegative radius = concave surface = bulged to the inside.\nRadius of 0 = straight line. ") );
+	m_textCtrlShaftHeight = new wxTextCtrl( sbSizerShaft->GetStaticBox(), ID_SHAFTHEIGHT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	m_textCtrlShaftHeight->SetToolTip( _("Height of the selected segment.") );
 	
-	fgSizer2->Add( m_textCtrlRadius, 0, wxALL|wxEXPAND, 5 );
+	fgSizerShaft->Add( m_textCtrlShaftHeight, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticTextUnitRadius = new wxStaticText( sbSizer24->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitRadius->Wrap( -1 );
-	fgSizer2->Add( m_staticTextUnitRadius, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	
-	sbSizer24->Add( fgSizer2, 0, wxEXPAND, 5 );
+	m_staticTextUnitShaftHeight = new wxStaticText( sbSizerShaft->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitShaftHeight->Wrap( -1 );
+	fgSizerShaft->Add( m_staticTextUnitShaftHeight, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
-	bSizerPanelShaft->Add( sbSizer24, 0, wxEXPAND, 5 );
+	sbSizerShaft->Add( fgSizerShaft, 0, wxEXPAND, 5 );
 	
-	m_dataViewListCtrl3 = new wxDataViewListCtrl( m_panelShaft, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
-	m_dataViewListColumn1 = m_dataViewListCtrl3->AppendTextColumn( _("Upper") );
-	m_dataViewListColumn2 = m_dataViewListCtrl3->AppendTextColumn( _("Lower") );
-	m_dataViewListColumn3 = m_dataViewListCtrl3->AppendTextColumn( _("Height") );
-	bSizerPanelShaft->Add( m_dataViewListCtrl3, 1, wxALL|wxEXPAND, 5 );
+	
+	bSizerPanelShaft->Add( sbSizerShaft, 0, wxEXPAND, 5 );
+	
+	m_dataViewListCtrlShaftSegments = new wxDataViewListCtrl( m_panelShaft, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_dataViewListColumnShaftUpperDiameter = m_dataViewListCtrlShaftSegments->AppendTextColumn( _("Upper") );
+	m_dataViewListColumnShaftLowerDiameter = m_dataViewListCtrlShaftSegments->AppendTextColumn( _("Lower") );
+	m_dataViewListColumnShaftHeight = m_dataViewListCtrlShaftSegments->AppendTextColumn( _("Height") );
+	bSizerPanelShaft->Add( m_dataViewListCtrlShaftSegments, 1, wxALL|wxEXPAND, 5 );
 	
 	
 	m_panelShaft->SetSizer( bSizerPanelShaft );
@@ -2319,353 +2318,325 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	wxBoxSizer* bSizerPanelFeedsSpeeds;
 	bSizerPanelFeedsSpeeds = new wxBoxSizer( wxVERTICAL );
 	
-	m_scrolledWindow4 = new wxScrolledWindow( m_panelFeedsSpeeds, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
-	m_scrolledWindow4->SetScrollRate( 5, 5 );
-	wxBoxSizer* bSizer631;
-	bSizer631 = new wxBoxSizer( wxVERTICAL );
+	m_scrolledWindowFeedsSpeeds = new wxScrolledWindow( m_panelFeedsSpeeds, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+	m_scrolledWindowFeedsSpeeds->SetScrollRate( 5, 5 );
+	wxBoxSizer* bSizerFeedsSpeeds;
+	bSizerFeedsSpeeds = new wxBoxSizer( wxVERTICAL );
 	
-	wxStaticBoxSizer* sbSizer271;
-	sbSizer271 = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow4, wxID_ANY, _("Set") ), wxVERTICAL );
+	wxStaticBoxSizer* sbSizerSet;
+	sbSizerSet = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindowFeedsSpeeds, wxID_ANY, _("Set") ), wxVERTICAL );
 	
-	wxFlexGridSizer* fgSizerParameter11;
-	fgSizerParameter11 = new wxFlexGridSizer( 8, 2, 0, 0 );
-	fgSizerParameter11->AddGrowableCol( 0 );
-	fgSizerParameter11->SetFlexibleDirection( wxBOTH );
-	fgSizerParameter11->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxFlexGridSizer* fgSizerParameterSet;
+	fgSizerParameterSet = new wxFlexGridSizer( 8, 1, 0, 0 );
+	fgSizerParameterSet->AddGrowableCol( 0 );
+	fgSizerParameterSet->SetFlexibleDirection( wxBOTH );
+	fgSizerParameterSet->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticTextTipDiameter11 = new wxStaticText( sbSizer271->GetStaticBox(), wxID_ANY, _("Name:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextTipDiameter11->Wrap( -1 );
-	fgSizerParameter11->Add( m_staticTextTipDiameter11, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_staticTextSetName = new wxStaticText( sbSizerSet->GetStaticBox(), wxID_ANY, _("Name:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSetName->Wrap( -1 );
+	fgSizerParameterSet->Add( m_staticTextSetName, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
+	m_textCtrlSetName = new wxTextCtrl( sbSizerSet->GetStaticBox(), ID_SETNAME, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerParameterSet->Add( m_textCtrlSetName, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	fgSizerParameter11->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_staticTextSetGUID = new wxStaticText( sbSizerSet->GetStaticBox(), wxID_ANY, _("GUID:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSetGUID->Wrap( -1 );
+	fgSizerParameterSet->Add( m_staticTextSetGUID, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrlTipDiameter11 = new wxTextCtrl( sbSizer271->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerParameter11->Add( m_textCtrlTipDiameter11, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_textCtrlSetGUID = new wxTextCtrl( sbSizerSet->GetStaticBox(), ID_SETGUID, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerParameterSet->Add( m_textCtrlSetGUID, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextUnitTipDiameter11 = new wxStaticText( sbSizer271->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitTipDiameter11->Wrap( -1 );
-	fgSizerParameter11->Add( m_staticTextUnitTipDiameter11, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextSetDescription = new wxStaticText( sbSizerSet->GetStaticBox(), wxID_ANY, _("Description:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSetDescription->Wrap( -1 );
+	fgSizerParameterSet->Add( m_staticTextSetDescription, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextShaftDiameter11 = new wxStaticText( sbSizer271->GetStaticBox(), wxID_ANY, _("GUID:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextShaftDiameter11->Wrap( -1 );
-	fgSizerParameter11->Add( m_staticTextShaftDiameter11, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_textCtrlSetDescription = new wxTextCtrl( sbSizerSet->GetStaticBox(), ID_SETDESCRIPTION, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerParameterSet->Add( m_textCtrlSetDescription, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
+	m_staticTextSetToolCoolant = new wxStaticText( sbSizerSet->GetStaticBox(), wxID_ANY, _("Tool coolant:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSetToolCoolant->Wrap( -1 );
+	fgSizerParameterSet->Add( m_staticTextSetToolCoolant, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	fgSizerParameter11->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_textCtrlSetToolCoolant = new wxTextCtrl( sbSizerSet->GetStaticBox(), ID_SETTOOLCOOLANT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerParameterSet->Add( m_textCtrlSetToolCoolant, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrlShaftDiameter111 = new wxTextCtrl( sbSizer271->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerParameter11->Add( m_textCtrlShaftDiameter111, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextUnitShaftDiameter111 = new wxStaticText( sbSizer271->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitShaftDiameter111->Wrap( -1 );
-	fgSizerParameter11->Add( m_staticTextUnitShaftDiameter111, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerSet->Add( fgSizerParameterSet, 0, wxEXPAND, 5 );
 	
-	m_staticTextLengthOutside11 = new wxStaticText( sbSizer271->GetStaticBox(), wxID_ANY, _("Description:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextLengthOutside11->Wrap( -1 );
-	fgSizerParameter11->Add( m_staticTextLengthOutside11, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
+	bSizerFeedsSpeeds->Add( sbSizerSet, 0, wxEXPAND, 5 );
 	
-	fgSizerParameter11->Add( 0, 0, 1, wxEXPAND, 5 );
+	wxStaticBoxSizer* sbSizerFeed;
+	sbSizerFeed = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindowFeedsSpeeds, wxID_ANY, _("Feed") ), wxVERTICAL );
 	
-	m_textCtrlLengthOutside11 = new wxTextCtrl( sbSizer271->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerParameter11->Add( m_textCtrlLengthOutside11, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	wxFlexGridSizer* fgSizerFeed;
+	fgSizerFeed = new wxFlexGridSizer( 8, 2, 0, 0 );
+	fgSizerFeed->AddGrowableCol( 0 );
+	fgSizerFeed->SetFlexibleDirection( wxBOTH );
+	fgSizerFeed->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticTextUnitLengthOutside11 = new wxStaticText( sbSizer271->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitLengthOutside11->Wrap( -1 );
-	fgSizerParameter11->Add( m_staticTextUnitLengthOutside11, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextFeedPerRevolution = new wxStaticText( sbSizerFeed->GetStaticBox(), wxID_ANY, _("per Revolution:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextFeedPerRevolution->Wrap( -1 );
+	fgSizerFeed->Add( m_staticTextFeedPerRevolution, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextLengthCutting11 = new wxStaticText( sbSizer271->GetStaticBox(), wxID_ANY, _("Tool coolant:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextLengthCutting11->Wrap( -1 );
-	fgSizerParameter11->Add( m_staticTextLengthCutting11, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
+	fgSizerFeed->Add( 0, 0, 0, 0, 5 );
 	
-	fgSizerParameter11->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_textCtrlFeedPerRevolution = new wxTextCtrl( sbSizerFeed->GetStaticBox(), ID_FEEDPERREVOLUTION, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerFeed->Add( m_textCtrlFeedPerRevolution, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrlLengthCutting11 = new wxTextCtrl( sbSizer271->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerParameter11->Add( m_textCtrlLengthCutting11, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextUnitFeedPerRevolution = new wxStaticText( sbSizerFeed->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitFeedPerRevolution->Wrap( -1 );
+	fgSizerFeed->Add( m_staticTextUnitFeedPerRevolution, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextUnitLengthCutting11 = new wxStaticText( sbSizer271->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitLengthCutting11->Wrap( -1 );
-	fgSizerParameter11->Add( m_staticTextUnitLengthCutting11, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextFeedPerTooth = new wxStaticText( sbSizerFeed->GetStaticBox(), wxID_ANY, _("per Tooth:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextFeedPerTooth->Wrap( -1 );
+	fgSizerFeed->Add( m_staticTextFeedPerTooth, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	
-	sbSizer271->Add( fgSizerParameter11, 0, wxEXPAND, 5 );
+	fgSizerFeed->Add( 0, 0, 0, 0, 5 );
 	
+	m_textCtrlFeedPerTooth = new wxTextCtrl( sbSizerFeed->GetStaticBox(), ID_FEEDPERTOOTH, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerFeed->Add( m_textCtrlFeedPerTooth, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	bSizer631->Add( sbSizer271, 0, wxEXPAND, 5 );
+	m_staticTextUnitFeedPerTooth = new wxStaticText( sbSizerFeed->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitFeedPerTooth->Wrap( -1 );
+	fgSizerFeed->Add( m_staticTextUnitFeedPerTooth, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	wxStaticBoxSizer* sbSizerParameter;
-	sbSizerParameter = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow4, wxID_ANY, _("Feed") ), wxVERTICAL );
+	m_staticTextFeedSpindleSpeed = new wxStaticText( sbSizerFeed->GetStaticBox(), wxID_ANY, _("Spindle speed:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextFeedSpindleSpeed->Wrap( -1 );
+	fgSizerFeed->Add( m_staticTextFeedSpindleSpeed, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	wxFlexGridSizer* fgSizerParameter;
-	fgSizerParameter = new wxFlexGridSizer( 8, 2, 0, 0 );
-	fgSizerParameter->AddGrowableCol( 0 );
-	fgSizerParameter->SetFlexibleDirection( wxBOTH );
-	fgSizerParameter->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticTextDiameter = new wxStaticText( sbSizerParameter->GetStaticBox(), wxID_ANY, _("per Revolution:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextDiameter->Wrap( -1 );
-	fgSizerParameter->Add( m_staticTextDiameter, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	fgSizerFeed->Add( 0, 0, 0, 0, 5 );
 	
+	m_textCtrlFeedSpindleSpeed = new wxTextCtrl( sbSizerFeed->GetStaticBox(), ID_SPINDLESPEED, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerFeed->Add( m_textCtrlFeedSpindleSpeed, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	fgSizerParameter->Add( 0, 0, 0, 0, 5 );
+	m_staticTextUnitFeedSpindleSpeed = new wxStaticText( sbSizerFeed->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitFeedSpindleSpeed->Wrap( -1 );
+	fgSizerFeed->Add( m_staticTextUnitFeedSpindleSpeed, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlDiameter1 = new wxTextCtrl( sbSizerParameter->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerParameter->Add( m_textCtrlDiameter1, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextFeedSpindleSpeedRampe = new wxStaticText( sbSizerFeed->GetStaticBox(), wxID_ANY, _("Spindle speed-ramp:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextFeedSpindleSpeedRampe->Wrap( -1 );
+	fgSizerFeed->Add( m_staticTextFeedSpindleSpeedRampe, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextUnitDiameter1 = new wxStaticText( sbSizerParameter->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitDiameter1->Wrap( -1 );
-	fgSizerParameter->Add( m_staticTextUnitDiameter1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextShaftDiameter = new wxStaticText( sbSizerParameter->GetStaticBox(), wxID_ANY, _("per Tooth:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextShaftDiameter->Wrap( -1 );
-	fgSizerParameter->Add( m_staticTextShaftDiameter, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	fgSizerFeed->Add( 0, 0, 0, 0, 5 );
 	
+	m_textCtrlFeedSpindleSpeedRamp = new wxTextCtrl( sbSizerFeed->GetStaticBox(), ID_SPINDLESPEEDRAMP, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerFeed->Add( m_textCtrlFeedSpindleSpeedRamp, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	fgSizerParameter->Add( 0, 0, 0, 0, 5 );
+	m_staticTextUnitFeedSpindleSpeedRamp = new wxStaticText( sbSizerFeed->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitFeedSpindleSpeedRamp->Wrap( -1 );
+	fgSizerFeed->Add( m_staticTextUnitFeedSpindleSpeedRamp, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlShaftDiameter1 = new wxTextCtrl( sbSizerParameter->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerParameter->Add( m_textCtrlShaftDiameter1, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextUnitShaftDiameter1 = new wxStaticText( sbSizerParameter->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitShaftDiameter1->Wrap( -1 );
-	fgSizerParameter->Add( m_staticTextUnitShaftDiameter1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerFeed->Add( fgSizerFeed, 0, wxEXPAND, 5 );
 	
-	m_staticTextLengthOutside = new wxStaticText( sbSizerParameter->GetStaticBox(), wxID_ANY, _("Spindle speed:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextLengthOutside->Wrap( -1 );
-	fgSizerParameter->Add( m_staticTextLengthOutside, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
+	bSizerFeedsSpeeds->Add( sbSizerFeed, 0, wxEXPAND, 5 );
 	
-	fgSizerParameter->Add( 0, 0, 0, 0, 5 );
+	wxStaticBoxSizer* sbSizerSpeed;
+	sbSizerSpeed = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindowFeedsSpeeds, wxID_ANY, _("Speed") ), wxVERTICAL );
 	
-	m_textCtrlLengthOutside = new wxTextCtrl( sbSizerParameter->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerParameter->Add( m_textCtrlLengthOutside, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	wxFlexGridSizer* fgSizerSpeed;
+	fgSizerSpeed = new wxFlexGridSizer( 14, 2, 0, 0 );
+	fgSizerSpeed->AddGrowableCol( 0 );
+	fgSizerSpeed->SetFlexibleDirection( wxBOTH );
+	fgSizerSpeed->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticTextUnitLengthOutside = new wxStaticText( sbSizerParameter->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitLengthOutside->Wrap( -1 );
-	fgSizerParameter->Add( m_staticTextUnitLengthOutside, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextSpeedCuttingFeedrate = new wxStaticText( sbSizerSpeed->GetStaticBox(), wxID_ANY, _("Cutting feedrate:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSpeedCuttingFeedrate->Wrap( -1 );
+	fgSizerSpeed->Add( m_staticTextSpeedCuttingFeedrate, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextLengthCutting = new wxStaticText( sbSizerParameter->GetStaticBox(), wxID_ANY, _("Spindle speed-ramp:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextLengthCutting->Wrap( -1 );
-	fgSizerParameter->Add( m_staticTextLengthCutting, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
+	fgSizerSpeed->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	fgSizerParameter->Add( 0, 0, 0, 0, 5 );
+	m_textCtrlSpeedCuttingFeedrate = new wxTextCtrl( sbSizerSpeed->GetStaticBox(), ID_CUTTINGFEEDRATE, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerSpeed->Add( m_textCtrlSpeedCuttingFeedrate, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrlLengthCutting = new wxTextCtrl( sbSizerParameter->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerParameter->Add( m_textCtrlLengthCutting, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextUnitSpeedCuttingFeedrate = new wxStaticText( sbSizerSpeed->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSpeedCuttingFeedrate->Wrap( -1 );
+	fgSizerSpeed->Add( m_staticTextUnitSpeedCuttingFeedrate, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextUnitLengthCutting = new wxStaticText( sbSizerParameter->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitLengthCutting->Wrap( -1 );
-	fgSizerParameter->Add( m_staticTextUnitLengthCutting, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticTextSpeedAvgFeedrate = new wxStaticText( sbSizerSpeed->GetStaticBox(), wxID_ANY, _("Avg. feedrate:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSpeedAvgFeedrate->Wrap( -1 );
+	fgSizerSpeed->Add( m_staticTextSpeedAvgFeedrate, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	
-	sbSizerParameter->Add( fgSizerParameter, 0, wxEXPAND, 5 );
+	fgSizerSpeed->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	m_textCtrlSpeedAvgFeedrate = new wxTextCtrl( sbSizerSpeed->GetStaticBox(), ID_AVGFEEDRATE, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerSpeed->Add( m_textCtrlSpeedAvgFeedrate, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	bSizer631->Add( sbSizerParameter, 1, wxEXPAND, 5 );
+	m_staticTextUnitSpeedAvgFeedrate = new wxStaticText( sbSizerSpeed->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSpeedAvgFeedrate->Wrap( -1 );
+	fgSizerSpeed->Add( m_staticTextUnitSpeedAvgFeedrate, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	wxStaticBoxSizer* sbSizer27;
-	sbSizer27 = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow4, wxID_ANY, _("Speed") ), wxVERTICAL );
+	m_staticTextSpeedLeadInFeedrate = new wxStaticText( sbSizerSpeed->GetStaticBox(), wxID_ANY, _("Lead-in feedrate:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSpeedLeadInFeedrate->Wrap( -1 );
+	fgSizerSpeed->Add( m_staticTextSpeedLeadInFeedrate, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	wxFlexGridSizer* fgSizerParameter1;
-	fgSizerParameter1 = new wxFlexGridSizer( 14, 2, 0, 0 );
-	fgSizerParameter1->AddGrowableCol( 0 );
-	fgSizerParameter1->SetFlexibleDirection( wxBOTH );
-	fgSizerParameter1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticTextDiameter1 = new wxStaticText( sbSizer27->GetStaticBox(), wxID_ANY, _("Cutting feedrate:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextDiameter1->Wrap( -1 );
-	fgSizerParameter1->Add( m_staticTextDiameter1, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	fgSizerSpeed->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	m_textCtrlSpeedLeadInFeedrate = new wxTextCtrl( sbSizerSpeed->GetStaticBox(), ID_LEADINFEEDRATE, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerSpeed->Add( m_textCtrlSpeedLeadInFeedrate, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	fgSizerParameter1->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_staticTextUnitSpeedLeadInFeedrate = new wxStaticText( sbSizerSpeed->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSpeedLeadInFeedrate->Wrap( -1 );
+	fgSizerSpeed->Add( m_staticTextUnitSpeedLeadInFeedrate, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlDiameter11 = new wxTextCtrl( sbSizer27->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerParameter1->Add( m_textCtrlDiameter11, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextSpeedLeadOutFeedrate = new wxStaticText( sbSizerSpeed->GetStaticBox(), wxID_ANY, _("Lead-out feedrate:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSpeedLeadOutFeedrate->Wrap( -1 );
+	fgSizerSpeed->Add( m_staticTextSpeedLeadOutFeedrate, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextUnitDiameter11 = new wxStaticText( sbSizer27->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitDiameter11->Wrap( -1 );
-	fgSizerParameter1->Add( m_staticTextUnitDiameter11, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextTipDiameter1 = new wxStaticText( sbSizer27->GetStaticBox(), wxID_ANY, _("Avg. feedrate:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextTipDiameter1->Wrap( -1 );
-	fgSizerParameter1->Add( m_staticTextTipDiameter1, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	fgSizerSpeed->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	m_textCtrlSpeedLeadOutFeedrate = new wxTextCtrl( sbSizerSpeed->GetStaticBox(), ID_LEADOUTFEEDRATE, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerSpeed->Add( m_textCtrlSpeedLeadOutFeedrate, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	fgSizerParameter1->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_staticTextUnitSpeedLeadOutFeedrate = new wxStaticText( sbSizerSpeed->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSpeedLeadOutFeedrate->Wrap( -1 );
+	fgSizerSpeed->Add( m_staticTextUnitSpeedLeadOutFeedrate, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlTipDiameter1 = new wxTextCtrl( sbSizer27->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerParameter1->Add( m_textCtrlTipDiameter1, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextSpeedPlungeFeedrate = new wxStaticText( sbSizerSpeed->GetStaticBox(), wxID_ANY, _("Plunge feedrate:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSpeedPlungeFeedrate->Wrap( -1 );
+	fgSizerSpeed->Add( m_staticTextSpeedPlungeFeedrate, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextUnitTipDiameter1 = new wxStaticText( sbSizer27->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitTipDiameter1->Wrap( -1 );
-	fgSizerParameter1->Add( m_staticTextUnitTipDiameter1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextShaftDiameter1 = new wxStaticText( sbSizer27->GetStaticBox(), wxID_ANY, _("Lead-in feedrate:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextShaftDiameter1->Wrap( -1 );
-	fgSizerParameter1->Add( m_staticTextShaftDiameter1, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	fgSizerSpeed->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	m_textCtrlSpeedPlungeFeedrate = new wxTextCtrl( sbSizerSpeed->GetStaticBox(), ID_PLUNGEFEEDRATE, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerSpeed->Add( m_textCtrlSpeedPlungeFeedrate, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	fgSizerParameter1->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_staticTextUnitSpeedPlungeFeedrate = new wxStaticText( sbSizerSpeed->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSpeedPlungeFeedrate->Wrap( -1 );
+	fgSizerSpeed->Add( m_staticTextUnitSpeedPlungeFeedrate, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlShaftDiameter11 = new wxTextCtrl( sbSizer27->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerParameter1->Add( m_textCtrlShaftDiameter11, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextSpeedRampFeedrate = new wxStaticText( sbSizerSpeed->GetStaticBox(), wxID_ANY, _("Ramp feedrate:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSpeedRampFeedrate->Wrap( -1 );
+	fgSizerSpeed->Add( m_staticTextSpeedRampFeedrate, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextUnitShaftDiameter11 = new wxStaticText( sbSizer27->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitShaftDiameter11->Wrap( -1 );
-	fgSizerParameter1->Add( m_staticTextUnitShaftDiameter11, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextLengthOutside1 = new wxStaticText( sbSizer27->GetStaticBox(), wxID_ANY, _("Lead-out feedrate:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextLengthOutside1->Wrap( -1 );
-	fgSizerParameter1->Add( m_staticTextLengthOutside1, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	fgSizerSpeed->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	m_textCtrlSpeedRampFeedrate = new wxTextCtrl( sbSizerSpeed->GetStaticBox(), ID_RAMPFEEDRATE, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerSpeed->Add( m_textCtrlSpeedRampFeedrate, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
 	
-	fgSizerParameter1->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_staticTextUnitSpeedRampFeedrate = new wxStaticText( sbSizerSpeed->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSpeedRampFeedrate->Wrap( -1 );
+	fgSizerSpeed->Add( m_staticTextUnitSpeedRampFeedrate, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlLengthOutside1 = new wxTextCtrl( sbSizer27->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerParameter1->Add( m_textCtrlLengthOutside1, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	m_staticTextSpeedRetractionFeedrate = new wxStaticText( sbSizerSpeed->GetStaticBox(), wxID_ANY, _("Retraction feedrate:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextSpeedRetractionFeedrate->Wrap( -1 );
+	fgSizerSpeed->Add( m_staticTextSpeedRetractionFeedrate, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextUnitLengthOutside1 = new wxStaticText( sbSizer27->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitLengthOutside1->Wrap( -1 );
-	fgSizerParameter1->Add( m_staticTextUnitLengthOutside1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextLengthCutting1 = new wxStaticText( sbSizer27->GetStaticBox(), wxID_ANY, _("Plunge feedrate:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextLengthCutting1->Wrap( -1 );
-	fgSizerParameter1->Add( m_staticTextLengthCutting1, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	fgSizerSpeed->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	m_textCtrlSpeedRetractionFeedrate = new wxTextCtrl( sbSizerSpeed->GetStaticBox(), ID_RETRACTIONFEEDRATE, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	fgSizerSpeed->Add( m_textCtrlSpeedRetractionFeedrate, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	fgSizerParameter1->Add( 0, 0, 1, wxEXPAND, 5 );
+	m_staticTextUnitSpeedRetractionFeedrate = new wxStaticText( sbSizerSpeed->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUnitSpeedRetractionFeedrate->Wrap( -1 );
+	fgSizerSpeed->Add( m_staticTextUnitSpeedRetractionFeedrate, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_textCtrlLengthCutting1 = new wxTextCtrl( sbSizer27->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerParameter1->Add( m_textCtrlLengthCutting1, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextUnitLengthCutting1 = new wxStaticText( sbSizer27->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitLengthCutting1->Wrap( -1 );
-	fgSizerParameter1->Add( m_staticTextUnitLengthCutting1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerSpeed->Add( fgSizerSpeed, 0, wxEXPAND, 5 );
 	
-	m_staticTextToolLength1 = new wxStaticText( sbSizer27->GetStaticBox(), wxID_ANY, _("Ramp feedrate:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextToolLength1->Wrap( -1 );
-	fgSizerParameter1->Add( m_staticTextToolLength1, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
+	bSizerFeedsSpeeds->Add( sbSizerSpeed, 0, wxEXPAND, 5 );
 	
-	fgSizerParameter1->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_textCtrlToolLength1 = new wxTextCtrl( sbSizer27->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerParameter1->Add( m_textCtrlToolLength1, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
-	
-	m_staticTextUnitToolLength1 = new wxStaticText( sbSizer27->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitToolLength1->Wrap( -1 );
-	fgSizerParameter1->Add( m_staticTextUnitToolLength1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_staticTextDiameter11 = new wxStaticText( sbSizer27->GetStaticBox(), wxID_ANY, _("Retraction feedrate:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextDiameter11->Wrap( -1 );
-	fgSizerParameter1->Add( m_staticTextDiameter11, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxRIGHT|wxLEFT, 5 );
-	
-	
-	fgSizerParameter1->Add( 0, 0, 1, wxEXPAND, 5 );
-	
-	m_textCtrlDiameter111 = new wxTextCtrl( sbSizer27->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizerParameter1->Add( m_textCtrlDiameter111, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
-	
-	m_staticTextUnitDiameter111 = new wxStaticText( sbSizer27->GetStaticBox(), wxID_ANY, _("______"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUnitDiameter111->Wrap( -1 );
-	fgSizerParameter1->Add( m_staticTextUnitDiameter111, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	
-	sbSizer27->Add( fgSizerParameter1, 0, wxEXPAND, 5 );
-	
-	
-	bSizer631->Add( sbSizer27, 0, wxEXPAND, 5 );
-	
-	
-	m_scrolledWindow4->SetSizer( bSizer631 );
-	m_scrolledWindow4->Layout();
-	bSizer631->Fit( m_scrolledWindow4 );
-	bSizerPanelFeedsSpeeds->Add( m_scrolledWindow4, 1, wxEXPAND | wxALL, 5 );
+	m_scrolledWindowFeedsSpeeds->SetSizer( bSizerFeedsSpeeds );
+	m_scrolledWindowFeedsSpeeds->Layout();
+	bSizerFeedsSpeeds->Fit( m_scrolledWindowFeedsSpeeds );
+	bSizerPanelFeedsSpeeds->Add( m_scrolledWindowFeedsSpeeds, 1, wxEXPAND | wxALL, 5 );
 	
 	
 	m_panelFeedsSpeeds->SetSizer( bSizerPanelFeedsSpeeds );
 	m_panelFeedsSpeeds->Layout();
 	bSizerPanelFeedsSpeeds->Fit( m_panelFeedsSpeeds );
 	m_notebook->AddPage( m_panelFeedsSpeeds, _("Feeds&&\nSpeeds"), false );
-	m_panelPostprocess = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_panelPostProcess = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizerPanelPostProcess;
 	bSizerPanelPostProcess = new wxBoxSizer( wxVERTICAL );
 	
-	m_scrolledWindow5 = new wxScrolledWindow( m_panelPostprocess, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
-	m_scrolledWindow5->SetScrollRate( 5, 5 );
-	wxBoxSizer* bSizer64;
-	bSizer64 = new wxBoxSizer( wxVERTICAL );
+	m_scrolledWindowPostProcess = new wxScrolledWindow( m_panelPostProcess, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+	m_scrolledWindowPostProcess->SetScrollRate( 5, 5 );
+	wxBoxSizer* bSizerPostProcess;
+	bSizerPostProcess = new wxBoxSizer( wxVERTICAL );
 	
-	m_checkBox5 = new wxCheckBox( m_scrolledWindow5, wxID_ANY, _("Live"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer64->Add( m_checkBox5, 0, wxALL, 5 );
+	m_checkBoxLive = new wxCheckBox( m_scrolledWindowPostProcess, ID_POSTPROCESSLIVE, _("Live"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizerPostProcess->Add( m_checkBoxLive, 0, wxALL, 5 );
 	
-	m_staticText1661 = new wxStaticText( m_scrolledWindow5, wxID_ANY, _("Comment:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1661->Wrap( -1 );
-	bSizer64->Add( m_staticText1661, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_staticTextPostProcessComment = new wxStaticText( m_scrolledWindowPostProcess, wxID_ANY, _("Comment:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextPostProcessComment->Wrap( -1 );
+	bSizerPostProcess->Add( m_staticTextPostProcessComment, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrl931 = new wxTextCtrl( m_scrolledWindow5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer64->Add( m_textCtrl931, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
+	m_textCtrlPostProcessComment = new wxTextCtrl( m_scrolledWindowPostProcess, ID_POSTPROCESSCOMMENT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizerPostProcess->Add( m_textCtrlPostProcessComment, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
 	
-	m_staticText1711 = new wxStaticText( m_scrolledWindow5, wxID_ANY, _("Number:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1711->Wrap( -1 );
-	bSizer64->Add( m_staticText1711, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_staticTextPostProcessNumber = new wxStaticText( m_scrolledWindowPostProcess, wxID_ANY, _("Number:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextPostProcessNumber->Wrap( -1 );
+	bSizerPostProcess->Add( m_staticTextPostProcessNumber, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrl981 = new wxTextCtrl( m_scrolledWindow5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer64->Add( m_textCtrl981, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
+	m_textCtrlPostProcessNumber = new wxTextCtrl( m_scrolledWindowPostProcess, ID_POSTPROCESSNUMBER, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizerPostProcess->Add( m_textCtrlPostProcessNumber, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
 	
-	m_checkBox6 = new wxCheckBox( m_scrolledWindow5, wxID_ANY, _("Manual tool chain"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer64->Add( m_checkBox6, 0, wxALL, 5 );
+	m_checkBoxManualToolChange = new wxCheckBox( m_scrolledWindowPostProcess, ID_POSTPROCESSMANUALTOOLCHANGE, _("Manual tool change"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizerPostProcess->Add( m_checkBoxManualToolChange, 0, wxALL, 5 );
 	
-	m_checkBox7 = new wxCheckBox( m_scrolledWindow5, wxID_ANY, _("Break control"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer64->Add( m_checkBox7, 0, wxALL, 5 );
+	m_checkBoxBreakControl = new wxCheckBox( m_scrolledWindowPostProcess, ID_POSTPROCESSBREAKCONTROL, _("Break control"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizerPostProcess->Add( m_checkBoxBreakControl, 0, wxALL, 5 );
 	
-	m_staticText1671 = new wxStaticText( m_scrolledWindow5, wxID_ANY, _("Diameter offset:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1671->Wrap( -1 );
-	bSizer64->Add( m_staticText1671, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_staticTextPostProcessDiameterOffset = new wxStaticText( m_scrolledWindowPostProcess, wxID_ANY, _("Diameter offset:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextPostProcessDiameterOffset->Wrap( -1 );
+	bSizerPostProcess->Add( m_staticTextPostProcessDiameterOffset, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrl941 = new wxTextCtrl( m_scrolledWindow5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer64->Add( m_textCtrl941, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
+	m_textCtrlPostProcessDiameterOffset = new wxTextCtrl( m_scrolledWindowPostProcess, ID_POSTPROCESSDIAMETEROFFSET, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizerPostProcess->Add( m_textCtrlPostProcessDiameterOffset, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
 	
-	m_staticText1681 = new wxStaticText( m_scrolledWindow5, wxID_ANY, _("Length offset:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1681->Wrap( -1 );
-	bSizer64->Add( m_staticText1681, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_staticTextPostProcessLengthOffset = new wxStaticText( m_scrolledWindowPostProcess, wxID_ANY, _("Length offset:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextPostProcessLengthOffset->Wrap( -1 );
+	bSizerPostProcess->Add( m_staticTextPostProcessLengthOffset, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrl951 = new wxTextCtrl( m_scrolledWindow5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer64->Add( m_textCtrl951, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
+	m_textCtrlPostProcessLengthOffset = new wxTextCtrl( m_scrolledWindowPostProcess, ID_POSTPROCESSLENGTHOFFSET, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizerPostProcess->Add( m_textCtrlPostProcessLengthOffset, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
 	
-	m_staticText1691 = new wxStaticText( m_scrolledWindow5, wxID_ANY, _("Tool coolant:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1691->Wrap( -1 );
-	bSizer64->Add( m_staticText1691, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_staticTextPostProcessToolCoolant = new wxStaticText( m_scrolledWindowPostProcess, wxID_ANY, _("Tool coolant:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextPostProcessToolCoolant->Wrap( -1 );
+	bSizerPostProcess->Add( m_staticTextPostProcessToolCoolant, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrl961 = new wxTextCtrl( m_scrolledWindow5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer64->Add( m_textCtrl961, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
+	m_textCtrlPostProcessToolCoolant = new wxTextCtrl( m_scrolledWindowPostProcess, ID_POSTPROCESSTOOLCOOLANT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizerPostProcess->Add( m_textCtrlPostProcessToolCoolant, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
 	
-	m_staticText1701 = new wxStaticText( m_scrolledWindow5, wxID_ANY, _("Turret:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1701->Wrap( -1 );
-	bSizer64->Add( m_staticText1701, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_staticTextPostProcessTurret = new wxStaticText( m_scrolledWindowPostProcess, wxID_ANY, _("Turret:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextPostProcessTurret->Wrap( -1 );
+	bSizerPostProcess->Add( m_staticTextPostProcessTurret, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_textCtrl971 = new wxTextCtrl( m_scrolledWindow5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer64->Add( m_textCtrl971, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
-	
-	
-	m_scrolledWindow5->SetSizer( bSizer64 );
-	m_scrolledWindow5->Layout();
-	bSizer64->Fit( m_scrolledWindow5 );
-	bSizerPanelPostProcess->Add( m_scrolledWindow5, 1, wxEXPAND | wxALL, 5 );
+	m_textCtrlPostProcessTurret = new wxTextCtrl( m_scrolledWindowPostProcess, ID_POSTPROCESSTURRET, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizerPostProcess->Add( m_textCtrlPostProcessTurret, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
 	
 	
-	m_panelPostprocess->SetSizer( bSizerPanelPostProcess );
-	m_panelPostprocess->Layout();
-	bSizerPanelPostProcess->Fit( m_panelPostprocess );
-	m_notebook->AddPage( m_panelPostprocess, _("Post-\nProcess"), false );
+	m_scrolledWindowPostProcess->SetSizer( bSizerPostProcess );
+	m_scrolledWindowPostProcess->Layout();
+	bSizerPostProcess->Fit( m_scrolledWindowPostProcess );
+	bSizerPanelPostProcess->Add( m_scrolledWindowPostProcess, 1, wxEXPAND | wxALL, 5 );
+	
+	
+	m_panelPostProcess->SetSizer( bSizerPanelPostProcess );
+	m_panelPostProcess->Layout();
+	bSizerPanelPostProcess->Fit( m_panelPostProcess );
+	m_notebook->AddPage( m_panelPostProcess, _("Post-\nProcess"), false );
 	
 	bSizer->Add( m_notebook, 1, wxALL|wxEXPAND, 5 );
 	
-	m_canvasshaft = new CanvasTool(this);
-	bSizer->Add( m_canvasshaft, 1, wxALL|wxEXPAND, 5 );
+	m_canvastool = new CanvasTool(this);
+	bSizer->Add( m_canvastool, 1, wxALL|wxEXPAND, 5 );
 	
 	
 	this->SetSizer( bSizer );
@@ -2674,60 +2645,174 @@ GUIToolbox::GUIToolbox( wxWindow* parent, wxWindowID id, const wxString& title, 
 	
 	// Connect Events
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIToolbox::OnXClose ) );
-	m_treeListCtrl->Connect( wxEVT_TREELIST_ITEM_CHECKED, wxTreeListEventHandler( GUIToolbox::OnItemChecked ), NULL, this );
-	m_treeListCtrl->Connect( wxEVT_TREELIST_ITEM_CONTEXT_MENU, wxTreeListEventHandler( GUIToolbox::OnItemContextMenu ), NULL, this );
-	m_treeListCtrl->Connect( wxEVT_TREELIST_SELECTION_CHANGED, wxTreeListEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
-	m_textCtrlShaftDiameter2->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlShaftLength1->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlMaxSpeed1->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlFeedCoefficient1->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlNrOfTeeth1->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlComment1->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlShaftDiameter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlShaftLength->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlMaxSpeed->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlFeedCoefficient->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlNrOfTeeth->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlComment->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_buttonShapeNew2->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeNew ), NULL, this );
-	m_buttonShapeUpdate2->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeUpdate ), NULL, this );
-	m_buttonShapeDelete2->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeDelete ), NULL, this );
-	m_buttonShapeNew1->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeNew ), NULL, this );
-	m_buttonShapeUpdate1->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeUpdate ), NULL, this );
-	m_buttonShapeDelete1->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeDelete ), NULL, this );
-	m_buttonShapeNew->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeNew ), NULL, this );
-	m_buttonShapeUpdate->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeUpdate ), NULL, this );
-	m_buttonShapeDelete->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeDelete ), NULL, this );
+	m_treeListCtrl->Connect( wxEVT_TREELIST_ITEM_CHECKED, wxTreeListEventHandler( GUIToolbox::OnToolChecked ), NULL, this );
+	m_treeListCtrl->Connect( wxEVT_TREELIST_ITEM_CONTEXT_MENU, wxTreeListEventHandler( GUIToolbox::OnToolContextMenu ), NULL, this );
+	m_treeListCtrl->Connect( wxEVT_TREELIST_ITEM_EXPANDING, wxTreeListEventHandler( GUIToolbox::OnToolboxExpanding ), NULL, this );
+	m_treeListCtrl->Connect( wxEVT_TREELIST_SELECTION_CHANGED, wxTreeListEventHandler( GUIToolbox::OnToolSelectionChanged ), NULL, this );
+	m_choiceToolType->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolbox::OnChoice ), NULL, this );
+	m_textCtrlToolDescription->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlToolVendor->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlToolGUID->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlToolProductID->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlToolProductLink->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlToolGrade->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlToolBMC->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_radioBoxToolUnit->Connect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( GUIToolbox::OnRadioBox ), NULL, this );
+	m_textCtrlDC->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlLCF->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlLB->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlOAL->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlNOF->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlNT->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlRE->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSIG->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlTA->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_choiceCSP->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolbox::OnChoice ), NULL, this );
+	m_choiceHAND->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolbox::OnChoice ), NULL, this );
+	m_textCtrlSFDM->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlShoulderLength->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlTipDiameter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlTipLength->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlTipOffset->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlThreadProfileAngle->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_checkBoxShapeFromGeometry->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIToolbox::OnCheckBox ), NULL, this );
+	m_buttonShapeSegmentAdd->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentAdd ), NULL, this );
+	m_buttonShapeSegmentDelete->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentDelete ), NULL, this );
+	m_textCtrlShapeUpperDiameter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlShapeLowerDiameter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlShapeHeight->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_dataViewListCtrlShapeSegments->Connect( wxEVT_COMMAND_DATAVIEW_ITEM_BEGIN_DRAG, wxDataViewEventHandler( GUIToolbox::OnItemBeginDrag ), NULL, this );
+	m_dataViewListCtrlShapeSegments->Connect( wxEVT_COMMAND_DATAVIEW_ITEM_DROP, wxDataViewEventHandler( GUIToolbox::OnItemDrop ), NULL, this );
+	m_dataViewListCtrlShapeSegments->Connect( wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
+	m_choiceHolder->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolbox::OnChoice ), NULL, this );
+	m_buttonHolderSegmentAdd->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentAdd ), NULL, this );
+	m_buttonHolderSegmentDelete->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentDelete ), NULL, this );
+	m_textCtrlHolderUpperDiameter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlHolderLowerDiameter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlHolderHeight->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_dataViewListCtrlHolderSegments->Connect( wxEVT_COMMAND_DATAVIEW_ITEM_BEGIN_DRAG, wxDataViewEventHandler( GUIToolbox::OnItemBeginDrag ), NULL, this );
+	m_dataViewListCtrlHolderSegments->Connect( wxEVT_COMMAND_DATAVIEW_ITEM_DROP, wxDataViewEventHandler( GUIToolbox::OnItemDrop ), NULL, this );
+	m_dataViewListCtrlHolderSegments->Connect( wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
+	m_checkBoxShaftFromGeometry->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIToolbox::OnCheckBox ), NULL, this );
+	m_buttonShaftSegmentAdd->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentAdd ), NULL, this );
+	m_buttonShapeDelete->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentDelete ), NULL, this );
+	m_textCtrlShaftUpperDiameter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlShaftLowerDiameter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlShaftHeight->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_dataViewListCtrlShaftSegments->Connect( wxEVT_COMMAND_DATAVIEW_ITEM_BEGIN_DRAG, wxDataViewEventHandler( GUIToolbox::OnItemBeginDrag ), NULL, this );
+	m_dataViewListCtrlShaftSegments->Connect( wxEVT_COMMAND_DATAVIEW_ITEM_DROP, wxDataViewEventHandler( GUIToolbox::OnItemDrop ), NULL, this );
+	m_dataViewListCtrlShaftSegments->Connect( wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
+	m_textCtrlSetName->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSetGUID->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSetDescription->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSetToolCoolant->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlFeedPerRevolution->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlFeedPerTooth->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlFeedSpindleSpeed->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlFeedSpindleSpeedRamp->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSpeedCuttingFeedrate->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSpeedAvgFeedrate->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSpeedLeadInFeedrate->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSpeedLeadOutFeedrate->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSpeedPlungeFeedrate->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSpeedRampFeedrate->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSpeedRetractionFeedrate->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_checkBoxLive->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIToolbox::OnCheckBox ), NULL, this );
+	m_textCtrlPostProcessComment->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlPostProcessNumber->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_checkBoxManualToolChange->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIToolbox::OnCheckBox ), NULL, this );
+	m_checkBoxBreakControl->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIToolbox::OnCheckBox ), NULL, this );
+	m_textCtrlPostProcessDiameterOffset->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlPostProcessLengthOffset->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlPostProcessToolCoolant->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlPostProcessTurret->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
 }
 
 GUIToolbox::~GUIToolbox()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUIToolbox::OnXClose ) );
-	m_treeListCtrl->Disconnect( wxEVT_TREELIST_ITEM_CHECKED, wxTreeListEventHandler( GUIToolbox::OnItemChecked ), NULL, this );
-	m_treeListCtrl->Disconnect( wxEVT_TREELIST_ITEM_CONTEXT_MENU, wxTreeListEventHandler( GUIToolbox::OnItemContextMenu ), NULL, this );
-	m_treeListCtrl->Disconnect( wxEVT_TREELIST_SELECTION_CHANGED, wxTreeListEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
-	m_textCtrlShaftDiameter2->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlShaftLength1->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlMaxSpeed1->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlFeedCoefficient1->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlNrOfTeeth1->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlComment1->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlShaftDiameter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlShaftLength->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlMaxSpeed->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlFeedCoefficient->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlNrOfTeeth->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_textCtrlComment->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
-	m_buttonShapeNew2->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeNew ), NULL, this );
-	m_buttonShapeUpdate2->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeUpdate ), NULL, this );
-	m_buttonShapeDelete2->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeDelete ), NULL, this );
-	m_buttonShapeNew1->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeNew ), NULL, this );
-	m_buttonShapeUpdate1->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeUpdate ), NULL, this );
-	m_buttonShapeDelete1->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeDelete ), NULL, this );
-	m_buttonShapeNew->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeNew ), NULL, this );
-	m_buttonShapeUpdate->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeUpdate ), NULL, this );
-	m_buttonShapeDelete->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnShapeDelete ), NULL, this );
+	m_treeListCtrl->Disconnect( wxEVT_TREELIST_ITEM_CHECKED, wxTreeListEventHandler( GUIToolbox::OnToolChecked ), NULL, this );
+	m_treeListCtrl->Disconnect( wxEVT_TREELIST_ITEM_CONTEXT_MENU, wxTreeListEventHandler( GUIToolbox::OnToolContextMenu ), NULL, this );
+	m_treeListCtrl->Disconnect( wxEVT_TREELIST_ITEM_EXPANDING, wxTreeListEventHandler( GUIToolbox::OnToolboxExpanding ), NULL, this );
+	m_treeListCtrl->Disconnect( wxEVT_TREELIST_SELECTION_CHANGED, wxTreeListEventHandler( GUIToolbox::OnToolSelectionChanged ), NULL, this );
+	m_choiceToolType->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolbox::OnChoice ), NULL, this );
+	m_textCtrlToolDescription->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlToolVendor->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlToolGUID->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlToolProductID->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlToolProductLink->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlToolGrade->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlToolBMC->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_radioBoxToolUnit->Disconnect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( GUIToolbox::OnRadioBox ), NULL, this );
+	m_textCtrlDC->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlLCF->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlLB->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlOAL->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlNOF->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlNT->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlRE->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSIG->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlTA->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_choiceCSP->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolbox::OnChoice ), NULL, this );
+	m_choiceHAND->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolbox::OnChoice ), NULL, this );
+	m_textCtrlSFDM->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlShoulderLength->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlTipDiameter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlTipLength->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlTipOffset->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlThreadProfileAngle->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_checkBoxShapeFromGeometry->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIToolbox::OnCheckBox ), NULL, this );
+	m_buttonShapeSegmentAdd->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentAdd ), NULL, this );
+	m_buttonShapeSegmentDelete->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentDelete ), NULL, this );
+	m_textCtrlShapeUpperDiameter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlShapeLowerDiameter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlShapeHeight->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_dataViewListCtrlShapeSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_ITEM_BEGIN_DRAG, wxDataViewEventHandler( GUIToolbox::OnItemBeginDrag ), NULL, this );
+	m_dataViewListCtrlShapeSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_ITEM_DROP, wxDataViewEventHandler( GUIToolbox::OnItemDrop ), NULL, this );
+	m_dataViewListCtrlShapeSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
+	m_choiceHolder->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GUIToolbox::OnChoice ), NULL, this );
+	m_buttonHolderSegmentAdd->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentAdd ), NULL, this );
+	m_buttonHolderSegmentDelete->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentDelete ), NULL, this );
+	m_textCtrlHolderUpperDiameter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlHolderLowerDiameter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlHolderHeight->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_dataViewListCtrlHolderSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_ITEM_BEGIN_DRAG, wxDataViewEventHandler( GUIToolbox::OnItemBeginDrag ), NULL, this );
+	m_dataViewListCtrlHolderSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_ITEM_DROP, wxDataViewEventHandler( GUIToolbox::OnItemDrop ), NULL, this );
+	m_dataViewListCtrlHolderSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
+	m_checkBoxShaftFromGeometry->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIToolbox::OnCheckBox ), NULL, this );
+	m_buttonShaftSegmentAdd->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentAdd ), NULL, this );
+	m_buttonShapeDelete->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUIToolbox::OnSegmentDelete ), NULL, this );
+	m_textCtrlShaftUpperDiameter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlShaftLowerDiameter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlShaftHeight->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_dataViewListCtrlShaftSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_ITEM_BEGIN_DRAG, wxDataViewEventHandler( GUIToolbox::OnItemBeginDrag ), NULL, this );
+	m_dataViewListCtrlShaftSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_ITEM_DROP, wxDataViewEventHandler( GUIToolbox::OnItemDrop ), NULL, this );
+	m_dataViewListCtrlShaftSegments->Disconnect( wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler( GUIToolbox::OnSelectionChanged ), NULL, this );
+	m_textCtrlSetName->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSetGUID->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSetDescription->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSetToolCoolant->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlFeedPerRevolution->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlFeedPerTooth->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlFeedSpindleSpeed->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlFeedSpindleSpeedRamp->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSpeedCuttingFeedrate->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSpeedAvgFeedrate->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSpeedLeadInFeedrate->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSpeedLeadOutFeedrate->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSpeedPlungeFeedrate->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSpeedRampFeedrate->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlSpeedRetractionFeedrate->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_checkBoxLive->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIToolbox::OnCheckBox ), NULL, this );
+	m_textCtrlPostProcessComment->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlPostProcessNumber->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_checkBoxManualToolChange->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIToolbox::OnCheckBox ), NULL, this );
+	m_checkBoxBreakControl->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUIToolbox::OnCheckBox ), NULL, this );
+	m_textCtrlPostProcessDiameterOffset->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlPostProcessLengthOffset->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlPostProcessToolCoolant->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
+	m_textCtrlPostProcessTurret->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( GUIToolbox::OnEnter ), NULL, this );
 	
 }
 

@@ -62,10 +62,12 @@
 
 class Project:public wxDocument {
 	friend class ProjectView;
+	friend class DialogToolbox;
 	friend class CommandProjectRename;
 	friend class CommandObjectLoad;
 	friend class CommandObjectRename;
 	friend class CommandObjectTransform;
+	friend class CommandObjectJoinSurface;
 	friend class CommandObjectRemove;
 	friend class CommandRunAdd;
 	friend class CommandRunRename;

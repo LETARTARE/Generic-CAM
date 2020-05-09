@@ -70,8 +70,11 @@ public:
 	std::string GetString(
 			const std::string &defaultvalue = std::string("")) const;
 	bool IsArray(void) const;
+	bool IsObject(void) const;
+	// A Null has the size 1, because it is not empty.
 	size_t Size(void) const;
 	bool HasKey(std::string key) const;
+	std::string GetKey(size_t index) const;
 
 	void SetNull(void);
 	void SetBool(const bool value);

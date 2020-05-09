@@ -39,7 +39,10 @@
 #include <set>
 #include <string>
 #include <vector>
-
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
+#include <math.h>
 #include "AffineTransformMatrix.h"
 #include "Vector3.h"
 
@@ -110,7 +113,8 @@ public:
 	bool IsEmpty(void) const;
 
 	void CalcNormals(void);
-	void CalcGroups(void); //!< Group triangles and edges by assigning labels
+	void CalcGroups(double angle = 25.0 / 180.0 * M_PI); //!< Group triangles and edges by assigning labels
+	void ResetGroups(void);
 	void FlipNormals(void);
 
 	size_t Select(std::set <size_t> &select);
@@ -129,7 +133,7 @@ public:
 	void AddTrianglesFrom(const Geometry &geometry);
 
 	bool LoadObj(std::string filename); //!< Load Wavefront OBJ file.
-	friend std::istream& operator>> (std::istream &in, Hull &hull);
+	friend std::istream& operator>>(std::istream &in, Hull &hull);
 	void SaveObj(std::string filename) const; //!< Write Wavefront OBJ file.
 	friend std::ostream& operator<<(std::ostream &out, const Hull &hull);
 

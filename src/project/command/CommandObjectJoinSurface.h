@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Name               : CanvasTool.h
-// Purpose            : 3D Display of a tool.
-// Thread Safe        : Yes
-// Platform dependent : Yes
-// Compiler Options   : -lopengl32 -lglu
+// Name               : CommandObjectJoinSurface.h
+// Purpose            :
+// Thread Safe        : No
+// Platform dependent : No
+// Compiler Options   :
 // Author             : Tobias Schaefer
-// Created            : 17.03.2010
-// Copyright          : (C) 2010 Tobias Schaefer <tobiassch@users.sourceforge.net>
+// Created            : 09.05.2020
+// Copyright          : (C) 2020 Tobias Schaefer <tobiassch@users.sourceforge.net>
 // Licence            : GNU General Public License version 3.0 (GPLv3)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,28 +24,28 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef TOOLCANVAS_H_
-#define TOOLCANVAS_H_
+#ifndef __COMMANDOBJECTJOINSURFACE_H__
+#define __COMMANDOBJECTJOINSURFACE_H__
 
-#include "../StdInclude.h"
-#include "../project/Tool.h"
-//#include "../project/generator/DexelTarget.h"
-#include "../3D/OpenGLCanvas.h"
+#include <wx/cmdproc.h>
+#include <wx/string.h>
 
-class CanvasTool:public OpenGLCanvas {
+#include "../Project.h"
+
+class CommandObjectJoinSurface:public wxCommand {
 public:
-	CanvasTool(wxWindow *parent, wxWindowID id = wxID_ANY, const wxPoint& pos =
-			wxDefaultPosition, const wxSize& size = wxDefaultSize, long style =
-			0, const wxString& name = _T(""));
-	virtual ~CanvasTool();
+	CommandObjectJoinSurface(const wxString& name, Project* project,
+			size_t object_ID);
 
-private:
-	Tool* tool;
-//	DexelTarget debug;
-public:
-	void InsertTool(Tool& t);
-	void Render();
+	bool Do(void);
+	bool Undo(void);
+
+protected:
+	Project* project;
+	size_t object_ID;
+	Object oldObject;
 
 };
 
-#endif /* TOOLCANVAS_H_ */
+#endif /* __COMMANDOBJECTJOINSURFACE_H__ */
+
