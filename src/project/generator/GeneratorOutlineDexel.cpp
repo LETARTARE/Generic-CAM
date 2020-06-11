@@ -51,7 +51,7 @@ void GeneratorOutlineDexel::CopyParameterFrom(const Generator* other)
 
 wxString GeneratorOutlineDexel::GetTypeName(void) const
 {
-	return _T("Outline (dexel-based)");
+	return _("Outline (using Dexel)");
 }
 
 wxSizer * GeneratorOutlineDexel::AddToPanel(wxPanel* panel,
@@ -76,7 +76,7 @@ wxSizer * GeneratorOutlineDexel::AddToPanel(wxPanel* panel,
 	fgSizer->Add(m_textCtrlTwiddleFactor, 0,
 			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL, 5);
 
-	m_staticTextUnit = new wxStaticText(panel, wxID_ANY, wxT("mm"),
+	m_staticTextUnit = new wxStaticText(panel, wxID_ANY, _("mm"),
 			wxDefaultPosition, wxDefaultSize, 0);
 	m_staticTextUnit->Wrap(-1);
 	fgSizer->Add(m_staticTextUnit, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
@@ -104,7 +104,7 @@ bool GeneratorOutlineDexel::operator ==(const Generator& b) const
 }
 
 void GeneratorOutlineDexel::GenerateToolpath(const Run &run,
-		const std::list <Object> &objects, const Tool &tool,
+		const std::vector <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
 	errorOccured = false;

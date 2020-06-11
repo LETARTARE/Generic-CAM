@@ -534,7 +534,7 @@ const Polygon25 DexelTarget::GeneratePolygon(int stx, int sty)
 
 		if(dir == -1){
 			wxLogError
-			(_T("DexelTarget::GeneratePolygon: Lost wall contact!"));
+			(_("DexelTarget::GeneratePolygon: Lost wall contact!"));
 			return temp;
 		}
 
@@ -620,7 +620,7 @@ const Polygon25 DexelTarget::GeneratePolygon(int stx, int sty, double height)
 
 		if(dir == -1){
 			wxLogError
-			(_T("DexelTarget::GeneratePolygon: Lost wall contact!"));
+			(_("DexelTarget::GeneratePolygon: Lost wall contact!"));
 			DocumentField(x, y, height);
 			this->field[x + y * nx].up = -0.0001;
 			return temp;
@@ -982,9 +982,7 @@ bool DexelTarget::FindStartCutting(int &x, int &y)
 	int hx, hy;
 
 	if(!HasToBeCutBDAU(x, y)){
-		wxLogMessage
-		(_T(
-		"FindStartCutting::Test started in a place that is not to be cut!"));
+		wxLogMessage(_("FindStartCutting::Test started in a place that is not to be cut!"));
 		return false;
 	}
 
@@ -996,7 +994,7 @@ bool DexelTarget::FindStartCutting(int &x, int &y)
 		if(dir == -1) // Wall contact lost
 				{
 			wxLogMessage
-			(_T("FindStartCutting::Wall contact lost!"));
+			(_("FindStartCutting::Wall contact lost!"));
 			return false;
 		}
 
@@ -1004,7 +1002,7 @@ bool DexelTarget::FindStartCutting(int &x, int &y)
 		if(N == 0) // Wall contact lost
 				{
 			wxLogMessage
-			(_T("FindStartCutting:: Timeout!"));
+			(_("FindStartCutting:: Timeout!"));
 			return false;
 		}
 
@@ -1048,7 +1046,7 @@ Polygon25 DexelTarget::FindCut(int &x, int &y)
 
 	if(!HasToBeCutBDAU(x, y)){
 		wxLogMessage
-		(_T("FindCut::Test started in a place not to be cut!"));
+		(_("FindCut::Test started in a place not to be cut!"));
 		return temp;
 	}
 
@@ -1059,7 +1057,7 @@ Polygon25 DexelTarget::FindCut(int &x, int &y)
 		if(dir == -1) // Wall contact lost
 				{
 			wxLogMessage
-			(_T("FindCut::Wall contact lost!"));
+			(_("FindCut::Wall contact lost!"));
 			return temp;
 		}
 
@@ -1067,7 +1065,7 @@ Polygon25 DexelTarget::FindCut(int &x, int &y)
 		if(N == 0) // Wall contact lost
 				{
 			wxLogMessage
-			(_T("FindCut:: Timeout!"));
+			(_("FindCut:: Timeout!"));
 
 			size_t i;
 			for(i = 0; i < 5; i++){

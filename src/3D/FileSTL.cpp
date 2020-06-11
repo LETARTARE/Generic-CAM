@@ -25,6 +25,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "FileSTL.h"
+/// LT
+#include "languages.h"
 
 #include <wx/file.h>
 #include <wx/textfile.h>
@@ -53,7 +55,7 @@ bool FileSTL::ReadFile(wxString fileName)
 //	wxLogMessage(wxString::Format(_T("Opening File:") + fileName));
 
 	if(!inStream.IsOk()){
-		error += _T("STL File ") + fileName + _T(": File won't open.\n");
+		error += _("STL File ") + fileName + _(": File won't open.\n");
 		return false;
 	}
 
@@ -68,7 +70,7 @@ bool FileSTL::ReadStream(wxInputStream & stream)
 
 	if(stream.Read(header, 5).LastRead() != 5){
 		error +=
-		_T("STL File ") + filename + _T(": File contains no header.\n");
+		_("STL File ") + filename + _(": File contains no header.\n");
 		return false;
 	}
 	if(strncmp(header, "solid", 5) == 0){
@@ -100,8 +102,7 @@ bool FileSTL::ReadStreamBinary(wxInputStream & stream, bool hasRead5Byte)
 		binaryStream.Read8(header, 80);
 	}
 	if(stream.Eof()){
-		error += _T(
-				"STL File ") + filename + _T(": File contains no header.\n");
+		error += _("STL File ") + filename + _(": File contains no header.\n");
 		return false;
 	}
 	// Set up a new geometry object.
@@ -120,7 +121,7 @@ bool FileSTL::ReadStreamBinary(wxInputStream & stream, bool hasRead5Byte)
 	uint32_t nrOfTriangles = binaryStream.Read32();
 
 	if(stream.Eof()){
-		error += _T("STL File ") + filename + _T(": File to short!");
+		error += _("STL File ") + filename + _(": File to short!");
 		return false;
 	}
 
@@ -137,13 +138,13 @@ bool FileSTL::ReadStreamBinary(wxInputStream & stream, bool hasRead5Byte)
 		binaryStream.Read32((uint32_t *) &coord, 12);
 
 		if(stream.Eof()){
-			error += _T("STL File ") + filename + _T(": File to short!");
+			error += _("STL File ") + filename + _(": File to short!");
 			return false;
 		}
 		attribute = binaryStream.Read16();
 
 		if(stream.Eof()){
-			error += _T( "STL File ") + filename + _T(": File to short!");
+			error += _( "STL File ") + filename + _(": File to short!");
 			return false;
 		}
 
@@ -272,21 +273,21 @@ bool FileSTL::ReadStreamAscii(wxInputStream & stream, bool hasRead5Byte)
 			}
 			word = textStream.ReadWord().Trim(false);
 			if(word.Cmp(_T("outer")) != 0){
-				error += _T(
-						"STL Text File ") + filename + _T(": 'outer' missing.");
+				error += _(
+						"STL Text File ") + filename + _(": 'outer' missing.");
 				return false;
 			}
 			word = textStream.ReadWord().Trim(false);
 			if(word.Cmp(_T("loop")) != 0){
-				error += _T(
-						"STL Text File ") + filename + _T(": 'loop' missing.");
+				error += _(
+						"STL Text File ") + filename + _(": 'loop' missing.");
 				return false;
 			}
 			for(m = 0; m < 3; m++){
 				word = textStream.ReadWord().Trim(false);
 				if(word.Cmp(_T("vertex")) != 0){
 					error +=
-					_T("STL Text File ") + filename + _T(": 'vertex' missing.");
+					_("STL Text File ") + filename + _(": 'vertex' missing.");
 					return false;
 				}
 				textStream >> coord[m * 3 + 0] >> coord[m * 3 + 1]
@@ -295,13 +296,13 @@ bool FileSTL::ReadStreamAscii(wxInputStream & stream, bool hasRead5Byte)
 			word = textStream.ReadWord().Trim(false);
 			if(word.Cmp(_T("endloop")) != 0){
 				error +=
-				_T("STL Text File ") + filename + _T(": 'endloop' missing.");
+				_("STL Text File ") + filename + _(": 'endloop' missing.");
 				return false;
 			}
 			word = textStream.ReadWord().Trim(false);
 			if(word.Cmp(_T("endfacet")) != 0){
 				error +=
-				_T("STL Text File ") + filename + _T(": 'endfacet' missing.");
+				_("STL Text File ") + filename + _(": 'endfacet' missing.");
 				return false;
 			}
 
@@ -330,7 +331,7 @@ bool FileSTL::ReadStreamAscii(wxInputStream & stream, bool hasRead5Byte)
 		}
 		if(word.Cmp(_T("endsolid")) != 0){
 			error += _T(
-					"STL Text File ") + filename + _T(": 'endsolid' missing.");
+					"STL Text File ") + filename + _(": 'endsolid' missing.");
 			return false;
 		}
 		word = textStream.ReadLine().Trim(false);

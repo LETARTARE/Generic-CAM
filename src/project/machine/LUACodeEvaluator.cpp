@@ -188,7 +188,7 @@ bool LUACodeEvaluator::EvaluateAssembly()
 
 	// Insert the axes for the IK solver
 	for(size_t n = 0; n < linkedMachine->NR_IKAXIS; n++)
-		InsertVariable(wxString::Format(_T("AXIS_%lu"), n + 1),
+		InsertVariable(wxString::Format(_("AXIS_%lu"), n + 1),
 				linkedMachine->IKaxis[n]);
 
 	lua_getglobal(L, "AssembleMachine");

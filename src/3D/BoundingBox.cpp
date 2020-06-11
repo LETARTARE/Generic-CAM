@@ -24,8 +24,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#define _USE_MATH_DEFINES
-
 #include "BoundingBox.h"
 
 #include "Geometry.h"
@@ -34,6 +32,9 @@
 
 #include <float.h>
 #include <stdint.h>
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
 #include <math.h>
 #include "OpenGL.h"
 

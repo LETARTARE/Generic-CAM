@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : DialogTestGCode.cpp
-// Purpose            : 
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -82,74 +82,71 @@ bool DialogTestGCode::TransferDataToWindow(void)
 	wxString out;
 	if(!temp.Comment.empty()){
 		if(temp.message){
-			out = _T("Message: ") + temp.Comment + _T("\n");
+			out = _("Message: ") + temp.Comment + _T("\n");
 		}else{
-			out = _T("Comment: ") + temp.Comment + _T("\n");
+			out = _("Comment: ") + temp.Comment + _T("\n");
 		}
 	}
-	if(temp.block_delete) out += _T("Block-delete possible for this block.\n");
-	if(temp.N >= 0) out += wxString::Format(_T("N (line number): %i\n"),
+	if(temp.block_delete) out += _("Block-delete possible for this block.\n");
+	if(temp.N >= 0) out += wxString::Format(_("N (line number): %i\n"),
 			temp.N);
 	if(temp.F >= -FLT_EPSILON) out +=
-			_T(
-					"F (feed rate): ") + settings->LinearSpeed.TextFromSIWithUnit(temp.F)+ _T("\n");
+			_("F (feed rate): ") + settings->LinearSpeed.TextFromSIWithUnit(temp.F)+ _T("\n");
 	if(temp.S >= -FLT_EPSILON) out +=
-			_T(
-					"S (spindle speed): ") + settings->RotationalSpeed.TextFromSIWithUnit(temp.S)+ _T("\n");
+			_("S (spindle speed): ") + settings->RotationalSpeed.TextFromSIWithUnit(temp.S)+ _T("\n");
 
-	if(temp.T >= 0) out += wxString::Format(_T("T (tool for selection): %i\n"),
+	if(temp.T >= 0) out += wxString::Format(_("T (tool for selection): %i\n"),
 			temp.T);
 	if(temp.D >= 0) out += wxString::Format(
-			_T("D (tool for compensation): %i\n"), temp.D);
+			_("D (tool for compensation): %i\n"), temp.D);
 	if(temp.H >= 0) out += wxString::Format(
-			_T("H (tool for length offset): %i\n"), temp.H);
-	if(temp.L >= 0) out += wxString::Format(_T("L (cycle loop count): %i\n"),
+			_("H (tool for length offset): %i\n"), temp.H);
+	if(temp.L >= 0) out += wxString::Format(_("L (cycle loop count): %i\n"),
 			temp.L);
 	if(temp.P >= -FLT_EPSILON) out += wxString::Format(
-			_T("P (parameter): %g\n"), temp.P);
+			_("P (parameter): %g\n"), temp.P);
 	if(temp.Q >= -FLT_EPSILON) out +=
-			_T(
-					"Q (peck increment): ") + settings->SmallDistance.TextFromSIWithUnit(temp.Q)+ _T("\n");
+			_("Q (peck increment): ") + settings->SmallDistance.TextFromSIWithUnit(temp.Q)+ _T("\n");
 
 	for(unsigned char n = 0; n < 15; n++){
 
 		if(temp.G[n] < 0) continue;
 		switch(n){
 		case 0:
-			out += _T("Non-Modal:\n   ");
+			out += _("Non-Modal:\n   ");
 			break;
 		case 1:
-			out += _T("Motion:\n   ");
+			out += _("Motion:\n   ");
 			break;
 		case 2:
-			out += _T("Plane Selection:\n   ");
+			out += _("Plane Selection:\n   ");
 			break;
 		case 3:
-			out += _T("Distance Mode:\n   ");
+			out += _("Distance Mode:\n   ");
 			break;
 		case 5:
-			out += _T("Feedrate Mode:\n   ");
+			out += _("Feedrate Mode:\n   ");
 			break;
 		case 6:
-			out += _T("Units:\n   ");
+			out += _("Units:\n   ");
 			break;
 		case 7:
-			out += _T("Cutter Radius Compensation:\n   ");
+			out += _("Cutter Radius Compensation:\n   ");
 			break;
 		case 8:
-			out += _T("Tool Length Offset:\n   ");
+			out += _("Tool Length Offset:\n   ");
 			break;
 		case 10:
-			out += _T("Return Mode in Canned Cycles:\n   ");
+			out += _("Return Mode in Canned Cycles:\n   ");
 			break;
 		case 12:
-			out += _T("Coordinate System Selection:\n   ");
+			out += _("Coordinate System Selection:\n   ");
 			break;
 		case 13:
-			out += _T("Path Control Mode:\n   ");
+			out += _("Path Control Mode:\n   ");
 			break;
 		case 14:
-			out += _T("Extra:\n   ");
+			out += _("Extra:\n   ");
 			break;
 		default:
 			out += _T("   ");
@@ -158,32 +155,30 @@ bool DialogTestGCode::TransferDataToWindow(void)
 
 		switch(temp.G[n]){
 		case 0:
-			out += _T("G0 - Rapid Linear Motion\n");
+			out += _("G0 - Rapid Linear Motion\n");
 			break;
 		case 10:
-			out += _T("G1 - Linear Motion at Feed Rate\n");
+			out += _("G1 - Linear Motion at Feed Rate\n");
 			break;
 		case 20:
-			out += _T("G2 - Arc at Feed Rate - Clockwise\n");
+			out += _("G2 - Arc at Feed Rate - Clockwise\n");
 			break;
 		case 30:
-			out += _T("G3 - Arc at Feed Rate - Counter-Clockwise\n");
+			out += _("G3 - Arc at Feed Rate - Counter-Clockwise\n");
 			break;
 		case 40:
 			if(temp.P < 0){
-				out += _T("G4 - Dwell, but pause time is not set -> Error\n");
+				out += _("G4 - Dwell, but pause time is not set -> Error\n");
 			}else{
 				if(temp.P < 500){
 					out +=
 							wxString::Format(
-									_T(
-											"G4 - Dwell for %g s (maybe ms, check your machine's manual)\n"),
+									_("G4 - Dwell for %g s (maybe ms, check your machine's manual)\n"),
 									temp.P);
 				}else{
 					out +=
 							wxString::Format(
-									_T(
-											"G4 - Dwell for %g ms (maybe s, check your machine's manual)\n"),
+									_("G4 - Dwell for %g ms (maybe s, check your machine's manual)\n"),
 									temp.P);
 				}
 			}
@@ -191,184 +186,167 @@ bool DialogTestGCode::TransferDataToWindow(void)
 		case 100:
 			if(temp.P < 0){
 				out +=
-						_T(
-								"G10 - Set Coordinate System Data. P-number is missing -> Error\n");
+						_("G10 - Set Coordinate System Data. P-number is missing -> Error\n");
 			}else{
 				if(temp.P >= 1 && temp.P <= 10){
 					out += wxString::Format(
-							_T("G10 - Set Coordinate System Data for %g\n"),
+							_("G10 - Set Coordinate System Data for %g\n"),
 							temp.P);
 				}else{
 					out +=
 							wxString::Format(
-									_T(
-											"G10 - Set Coordinate System Data. P-number out of range (1-10) -> %g -> Error\n"),
+									_("G10 - Set Coordinate System Data. P-number out of range (1-10) -> %g -> Error\n"),
 									temp.P);
 				}
 			}
 			break;
 		case 170:
-			out += _T("G17 - Plane Selection: XY\n");
+			out += _("G17 - Plane Selection: XY\n");
 			break;
 		case 180:
-			out += _T("G18 - Plane Selection: XZ\n");
+			out += _("G18 - Plane Selection: XZ\n");
 			break;
 		case 190:
-			out += _T("G19 - Plane Selection: YZ\n");
+			out += _("G19 - Plane Selection: YZ\n");
 			break;
 		case 200:
-			out += _T("G20 - Length Units: inches\n");
+			out += _("G20 - Length Units: inches\n");
 			break;
 		case 210:
-			out += _T("G21 - Length Units: mm\n");
+			out += _("G21 - Length Units: mm\n");
 			break;
 		case 280:
-			out += _T("G28 - Return to Home - 1st programmed position\n");
+			out += _("G28 - Return to Home - 1st programmed position\n");
 			break;
 		case 300:
-			out += _T("G30 - Return to Home - 2nd programmed position\n");
+			out += _("G30 - Return to Home - 2nd programmed position\n");
 			break;
 		case 382:
-			out += _T("G38.2 - Straight Probe\n");
+			out += _("G38.2 - Straight Probe\n");
 			break;
 
 		case 400:
-			out += _T("G40 - Cutter Radius Compensation in XY plane\n");
+			out += _("G40 - Cutter Radius Compensation in XY plane\n");
 			break;
 		case 410:
-			out += _T("G41 - Cutter Radius Compensation in XZ plane\n");
+			out += _("G41 - Cutter Radius Compensation in XZ plane\n");
 			break;
 		case 420:
-			out += _T("G42 - Cutter Radius Compensation in YZ plane\n");
+			out += _("G42 - Cutter Radius Compensation in YZ plane\n");
 			break;
 
 		case 430:
-			out += _T("G43 - Tool Length Compensation: on\n");
+			out += _("G43 - Tool Length Compensation: on\n");
 			break;
 		case 490:
-			out += _T("G49 - Tool Length Compensation: off\n");
+			out += _("G49 - Tool Length Compensation: off\n");
 			break;
 		case 500:
-			out += _T("G50 - Cancel Scaling Function\n");
+			out += _("G50 - Cancel Scaling Function\n");
 			break;
 		case 530:
-			out += _T(
-					"G53 - Absolute Coordinate System (only in this block)\n");
+			out += _("G53 - Absolute Coordinate System (only in this block)\n");
 			break;
 		case 540:
-			out += _T("G54 - Select Coordinate System 1\n");
+			out += _("G54 - Select Coordinate System 1\n");
 			break;
 		case 550:
-			out += _T("G55 - Select Coordinate System 2\n");
+			out += _("G55 - Select Coordinate System 2\n");
 			break;
 		case 560:
-			out += _T("G56 - Select Coordinate System 3\n");
+			out += _("G56 - Select Coordinate System 3\n");
 			break;
 		case 570:
-			out += _T("G57 - Select Coordinate System 4\n");
+			out += _("G57 - Select Coordinate System 4\n");
 			break;
 		case 580:
-			out += _T("G58 - Select Coordinate System 5\n");
+			out += _("G58 - Select Coordinate System 5\n");
 			break;
 		case 590:
-			out += _T("G59 - Select Coordinate System 6\n");
+			out += _("G59 - Select Coordinate System 6\n");
 			break;
 		case 591:
-			out += _T("G59.1 - Select Coordinate System 7\n");
+			out += _("G59.1 - Select Coordinate System 7\n");
 			break;
 		case 592:
-			out += _T("G59.2 - Select Coordinate System 8\n");
+			out += _("G59.2 - Select Coordinate System 8\n");
 			break;
 		case 593:
-			out += _T("G59.3 - Select Coordinate System 9\n");
+			out += _("G59.3 - Select Coordinate System 9\n");
 			break;
 
 		case 610:
-			out += _T("G61 - Path Control Mode - exact path mode\n");
+			out += _("G61 - Path Control Mode - exact path mode\n");
 			break;
 		case 611:
-			out += _T("G61.1 - Path Control Mode - exact stop mode\n");
+			out += _("G61.1 - Path Control Mode - exact stop mode\n");
 			break;
 		case 640:
-			out += _T("G64 - Path Control Mode - continuous mode\n");
+			out += _("G64 - Path Control Mode - continuous mode\n");
 			break;
 
 		case 800:
-			out += _T("G80 - Cancel Modal Motion\n");
+			out += _("G80 - Cancel Modal Motion\n");
 			break;
 
 		case 810:
-			out += _T("G81 - Canned Cycle - drilling\n");
+			out += _("G81 - Canned Cycle - drilling\n");
 			break;
 		case 820:
-			out += _T("G82 - Canned Cycle - drilling with pause\n");
+			out += _("G82 - Canned Cycle - drilling with pause\n");
 			break;
 		case 830:
-			out += _T("G83 - Canned Cycle - peck drilling\n");
+			out +=_("G83 - Canned Cycle - peck drilling\n");
 			break;
 		case 840:
-			out +=
-					_T(
-							"G84 - Canned Cycle - right-hand tapping with a tap tool\n");
+			out +=	_("G84 - Canned Cycle - right-hand tapping with a tap tool\n");
 			break;
 		case 850:
-			out += _T("G85 - Canned Cycle - boring or reaming\n");
+			out += _("G85 - Canned Cycle - boring or reaming\n");
 			break;
 		case 860:
-			out += _T("G86 - Canned Cycle - boring\n");
+			out += _("G86 - Canned Cycle - boring\n");
 			break;
 		case 870:
-			out += _T("G87 - Canned Cycle - back boring\n");
+			out += _("G87 - Canned Cycle - back boring\n");
 			break;
 		case 880:
-			out += _T("G88 - Canned Cycle - boring with dwell\n");
+			out += _("G88 - Canned Cycle - boring with dwell\n");
 			break;
 		case 890:
-			out += _T("G89 - Canned Cycle - boring with dwell\n");
+			out += _("G89 - Canned Cycle - boring with dwell\n");
 			break;
 
 		case 900:
-			out += _T("G90 - Set Distance Mode - absolute distance mode\n");
+			out += _("G90 - Set Distance Mode - absolute distance mode\n");
 			break;
 		case 910:
-			out += _T("G91 - Set Distance Mode - incremental distance mode\n");
+			out += _("G91 - Set Distance Mode - incremental distance mode\n");
 			break;
-
-			out +=
-					_T(
-							"G92 - Coordinate System Offsets - shift coordinate system\n");
+		case 912:
+			out +=	_("G92 - Coordinate System Offsets - shift coordinate system\n");
 			break;
 		case 921:
-			out +=
-					_T(
-							"G92.1 - Coordinate System Offsets - reset coordinate system\n");
+			out +=	_("G92.1 - Coordinate System Offsets - reset coordinate system\n");
 			break;
 		case 922:
-			out +=
-					_T(
-							"G92.2 - Coordinate System Offsets - reset cooridnate system and parameters\n");
+			out +=_("G92.2 - Coordinate System Offsets - reset cooridnate system and parameters\n");
 			break;
 		case 923:
-			out +=
-					_T(
-							"G92.3 - Coordinate System Offsets - restore coordinate system from parameters\n");
+			out +=_("G92.3 - Coordinate System Offsets - restore coordinate system from parameters\n");
 			break;
 
 		case 930:
-			out += _T("G93 - Set Feed Rate Mode - units per minute mode\n");
+			out += _("G93 - Set Feed Rate Mode - units per minute mode\n");
 			break;
 		case 940:
-			out +=
-					_T(
-							"G94 - Set Feed Rate Mode - inverse time mode (per minute feed)\n");
+			out +=_("G94 - Set Feed Rate Mode - inverse time mode (per minute feed)\n");
 			break;
 		case 980:
-			out +=
-					_T(
-							"G98 - Canned Cycle Return Level - retract to the start position of the cycle\n");
+			out +=	_("G98 - Canned Cycle Return Level - retract to the start position of the cycle\n");
 			break;
 		case 990:
-			out += _T("G99 - Canned Cycle Return Level - retract to R\n");
+			out += _("G99 - Canned Cycle Return Level - retract to R\n");
 			break;
 		default:
 			out += wxString::Format(_T("G%g - ?\n"),
@@ -382,67 +360,67 @@ bool DialogTestGCode::TransferDataToWindow(void)
 
 		switch(n){
 		case 4:
-			out += _T("Stopping:\n   ");
+			out += _("Stopping:\n   ");
 			break;
 		case 6:
-			out += _T("Tool Change:\n   ");
+			out += _("Tool Change:\n   ");
 			break;
 		case 7:
-			out += _T("Spindle Turning:\n   ");
+			out += _("Spindle Turning:\n   ");
 			break;
 		case 8:
-			out += _T("Coolant:\n   ");
+			out += _("Coolant:\n   ");
 			break;
 		case 9:
-			out += _T("Override Switches:\n   ");
+			out += _("Override Switches:\n   ");
 			break;
 		default:
-			out += _T("   ");
+			out += _("   ");
 			break;
 		}
 		switch(temp.M[n]){
 
 		case 0:
-			out += _T("M0 - Program Stop\n");
+			out += _("M0 - Program Stop\n");
 			break;
 		case 1:
-			out += _T("M1 - Optional Program Stop\n");
+			out += _("M1 - Optional Program Stop\n");
 			break;
 		case 2:
-			out += _T("M2 - Program End\n");
+			out += _("M2 - Program End\n");
 			break;
 		case 3:
-			out += _T("M3 - Turn Spindle Clockwise\n");
+			out += _("M3 - Turn Spindle Clockwise\n");
 			break;
 		case 4:
-			out += _T("M4 - Turn Spindle Counter-Clockwise\n");
+			out += _("M4 - Turn Spindle Counter-Clockwise\n");
 			break;
 		case 5:
-			out += _T("M5 - Stop Spindle Turning\n");
+			out += _("M5 - Stop Spindle Turning\n");
 			break;
 		case 6:
-			out += _T("M6 - Tool Change\n");
+			out += _("M6 - Tool Change\n");
 			break;
 		case 7:
-			out += _T("M7 - Mist Coolant On\n");
+			out += _("M7 - Mist Coolant On\n");
 			break;
 		case 8:
-			out += _T("M8 - Flood Coolant On\n");
+			out += _("M8 - Flood Coolant On\n");
 			break;
 		case 9:
-			out += _T("M9 - Mist and Flood Coolant Off\n");
+			out += _("M9 - Mist and Flood Coolant Off\n");
 			break;
 		case 30:
-			out += _T("M30 - Program End, Pallet Shuttle, and Reset\n");
+			out += _("M30 - Program End, Pallet Shuttle, and Reset\n");
 			break;
 		case 48:
-			out += _T("M48 - Enable Speed and Feed Overrides\n");
+			out += _("M48 - Enable Speed and Feed Overrides\n");
 			break;
 		case 49:
-			out += _T("M49 - Disable Speed and Feed Overrides\n");
+			out += _("M49 - Disable Speed and Feed Overrides\n");
 			break;
 		case 60:
-			out += _T("M60 - Pallet Shuttle and Program Stop\n");
+			out += _("M60 - Pallet Shuttle and Program Stop\n");
 			break;
 		default:
 			out += wxString::Format(_T("M%u - ?\n"), temp.M[n]);
@@ -450,34 +428,20 @@ bool DialogTestGCode::TransferDataToWindow(void)
 		}
 	}
 
-	if(temp.XFlag) out += _T(
-			"X: ") + settings->Distance.TextFromSIWithUnit(temp.X) + _T("\n");
-	if(temp.YFlag) out += _T(
-			"Y: ") + settings->Distance.TextFromSIWithUnit(temp.Y) + _T("\n");
-	if(temp.ZFlag) out += _T(
-			"Z: ") + settings->Distance.TextFromSIWithUnit(temp.Z) + _T("\n");
-	if(temp.AFlag) out += _T(
-			"A: ") + settings->Angle.TextFromSIWithUnit(temp.A) + _T("\n");
-	if(temp.BFlag) out += _T(
-			"B: ") + settings->Angle.TextFromSIWithUnit(temp.B) + _T("\n");
-	if(temp.CFlag) out += _T(
-			"C: ") + settings->Angle.TextFromSIWithUnit(temp.C) + _T("\n");
-	if(temp.UFlag) out += _T(
-			"U: ") + settings->Distance.TextFromSIWithUnit(temp.U) + _T("\n");
-	;
-	if(temp.VFlag) out += _T(
-			"V: ") + settings->Distance.TextFromSIWithUnit(temp.V) + _T("\n");
-	if(temp.WFlag) out += _T(
-			"W: ") + settings->Distance.TextFromSIWithUnit(temp.W) + _T("\n");
-	if(temp.IFlag) out += _T(
-			"I: ") + settings->Distance.TextFromSIWithUnit(temp.I) + _T("\n");
-	if(temp.JFlag) out += _T(
-			"J: ") + settings->Distance.TextFromSIWithUnit(temp.J) + _T("\n");
-	if(temp.KFlag) out += _T(
-			"K: ") + settings->Distance.TextFromSIWithUnit(temp.K) + _T("\n");
-	if(temp.RFlag) out +=
-			_T(
-					"R (radius): ") + settings->Distance.TextFromSIWithUnit(temp.X)+ _T("\n");
+	if(temp.XFlag) out += _T("X: ") + settings->Distance.TextFromSIWithUnit(temp.X) + _T("\n");
+	if(temp.YFlag) out += _T("Y: ") + settings->Distance.TextFromSIWithUnit(temp.Y) + _T("\n");
+	if(temp.ZFlag) out += _T("Z: ") + settings->Distance.TextFromSIWithUnit(temp.Z) + _T("\n");
+	if(temp.AFlag) out += _T("A: ") + settings->Angle.TextFromSIWithUnit(temp.A) + _T("\n");
+	if(temp.BFlag) out += _T("B: ") + settings->Angle.TextFromSIWithUnit(temp.B) + _T("\n");
+	if(temp.CFlag) out += _T("C: ") + settings->Angle.TextFromSIWithUnit(temp.C) + _T("\n");
+	if(temp.UFlag) out += _T("U: ") + settings->Distance.TextFromSIWithUnit(temp.U) + _T("\n");
+
+	if(temp.VFlag) out += _T("V: ") + settings->Distance.TextFromSIWithUnit(temp.V) + _T("\n");
+	if(temp.WFlag) out += _T("W: ") + settings->Distance.TextFromSIWithUnit(temp.W) + _T("\n");
+	if(temp.IFlag) out += _T("I: ") + settings->Distance.TextFromSIWithUnit(temp.I) + _T("\n");
+	if(temp.JFlag) out += _T("J: ") + settings->Distance.TextFromSIWithUnit(temp.J) + _T("\n");
+	if(temp.KFlag) out += _T("K: ") + settings->Distance.TextFromSIWithUnit(temp.K) + _T("\n");
+	if(temp.RFlag) out +=	_("R (radius): ") + settings->Distance.TextFromSIWithUnit(temp.X)+ _T("\n");
 
 	m_textCtrlOutput->SetValue(out);
 	setlocale(LC_ALL, "C"); // To get a 3.1415 instead 3,1415 or else on every computer.
