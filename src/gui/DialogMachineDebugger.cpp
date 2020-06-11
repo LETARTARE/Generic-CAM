@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : DialogMachineDebugger.cpp
-// Purpose            :
+// Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
@@ -151,7 +151,8 @@ void DialogMachineDebugger::OnMachineLoad(wxRibbonButtonBarEvent& event)
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	CollectionFilepaths * filepaths = frame->GetFilePaths();
 	wxFileDialog dialog(this, _("Open machine description..."), _T(""), _T(""),
-			_("All machine descriptions  (*.lua;*.zip)|*.lua;*.zip|Machine descriptions (LUA Files)  (*.lua)|*.lua|Packed Machine descriptions  (*.zip)|*.zip|Text files  (*.txt)|*.txt|All files|*.*"),
+			_(
+					"All machine descriptions  (*.lua;*.zip)|*.lua;*.zip|Machine descriptions (LUA Files)  (*.lua)|*.lua|Packed Machine descriptions  (*.zip)|*.zip|Text files  (*.txt)|*.txt|All files|*.*"),
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if(wxDir::Exists(filepaths->lastMachineDirectory)){
@@ -179,7 +180,8 @@ void DialogMachineDebugger::OnMachineSave(wxRibbonButtonBarEvent& event)
 
 	wxFileName fileName;
 	wxFileDialog dialog(this, _("Save machine description..."), _T(""), _T(""),
-			_("Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
+			_(
+					"Machine descriptions (LUA Files)  (*.lua)|*.lua|Text files  (*.txt)|*.txt|All files|*.*"),
 			wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 	if(machine.fileName.IsOk()) dialog.SetPath(machine.fileName.GetFullPath());

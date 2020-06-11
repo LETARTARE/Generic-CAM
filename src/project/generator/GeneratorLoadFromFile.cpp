@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : GeneratorLoadFromFile.cpp
-// Purpose            :
+// Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -48,7 +48,7 @@ void GeneratorLoadFromFile::CopyParameterFrom(const Generator * other)
 
 	filename = temp->filename;
 	wxLogMessage
-	(_("Copy From: ") + filename.GetFullName());
+	(_T("CopyFrom: ") + filename.GetFullName());
 }
 
 GeneratorLoadFromFile::~GeneratorLoadFromFile()
@@ -57,7 +57,7 @@ GeneratorLoadFromFile::~GeneratorLoadFromFile()
 
 wxString GeneratorLoadFromFile::GetTypeName(void) const
 {
-	return wxString(("Load from File"));
+	return wxString(_T("Load from File"));
 }
 
 wxSizer * GeneratorLoadFromFile::AddToPanel(wxPanel* panel,
@@ -67,7 +67,7 @@ wxSizer * GeneratorLoadFromFile::AddToPanel(wxPanel* panel,
 	bSizer1 = new wxBoxSizer(wxVERTICAL);
 
 	m_staticTextLoadFile = new wxStaticText(panel, wxID_ANY,
-			_("Load G-Code from file..."), wxDefaultPosition, wxDefaultSize,
+			wxT("Load G-Code from file..."), wxDefaultPosition, wxDefaultSize,
 			0);
 	m_staticTextLoadFile->Wrap(-1);
 	bSizer1->Add(m_staticTextLoadFile, 0, wxALL, 5);
@@ -76,7 +76,7 @@ wxSizer * GeneratorLoadFromFile::AddToPanel(wxPanel* panel,
 	bSizer2 = new wxBoxSizer(wxHORIZONTAL);
 
 	m_filePicker = new wxFilePickerCtrl(panel, wxID_ANY, wxEmptyString,
-			_("Select a file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize,
+			wxT("Select a file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize,
 			wxFLP_DEFAULT_STYLE | wxFLP_USE_TEXTCTRL);
 	bSizer2->Add(m_filePicker, 1, wxALL, 5);
 
@@ -96,7 +96,7 @@ void GeneratorLoadFromFile::TransferDataFromPanel(CollectionUnits* settings)
 {
 	filename = m_filePicker->GetPath();
 	wxLogMessage
-	(_("Filename: ") + filename.GetFullPath());
+	(_T("Filename: ") + filename.GetFullPath());
 }
 
 bool GeneratorLoadFromFile::operator ==(const Generator& b) const
@@ -110,7 +110,7 @@ bool GeneratorLoadFromFile::operator ==(const Generator& b) const
 }
 
 void GeneratorLoadFromFile::GenerateToolpath(const Run &run,
-		const std::vector <Object> &objects, const Tool &tool,
+		const std::list <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
 	toolpathGenerated = false;

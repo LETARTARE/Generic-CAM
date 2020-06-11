@@ -66,7 +66,7 @@ void GeneratorAreaMillingDynamic::CopyParameterFrom(const Generator* other)
 
 wxString GeneratorAreaMillingDynamic::GetTypeName(void) const
 {
-	return _("Area Milling - Dynamic (using Dexel)");
+	return _T("Area Milling - Dynamic (using Dexel)");
 }
 
 wxSizer * GeneratorAreaMillingDynamic::AddToPanel(wxPanel* panel,
@@ -83,7 +83,7 @@ wxSizer * GeneratorAreaMillingDynamic::AddToPanel(wxPanel* panel,
 	fgSizer->SetFlexibleDirection(wxBOTH);
 	fgSizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 
-	m_staticText10 = new wxStaticText(panel, wxID_ANY, _("Max. single step:"),
+	m_staticText10 = new wxStaticText(panel, wxID_ANY, wxT("Max. single step:"),
 			wxDefaultPosition, wxDefaultSize, 0);
 	m_staticText10->Wrap(-1);
 	fgSizer->Add(m_staticText10, 0,
@@ -94,12 +94,12 @@ wxSizer * GeneratorAreaMillingDynamic::AddToPanel(wxPanel* panel,
 	fgSizer->Add(m_textCtrlMaxSingleStep, 0,
 			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL, 5);
 
-	m_staticTextUnit1 = new wxStaticText(panel, wxID_ANY, _("mm"),
+	m_staticTextUnit1 = new wxStaticText(panel, wxID_ANY, wxT("mm"),
 			wxDefaultPosition, wxDefaultSize, 0);
 	m_staticTextUnit1->Wrap(-1);
 	fgSizer->Add(m_staticTextUnit1, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
 
-	m_staticText12 = new wxStaticText(panel, wxID_ANY, _("Raise step:"),
+	m_staticText12 = new wxStaticText(panel, wxID_ANY, wxT("Raise step:"),
 			wxDefaultPosition, wxDefaultSize, 0);
 	m_staticText12->Wrap(-1);
 	fgSizer->Add(m_staticText12, 0,
@@ -110,12 +110,12 @@ wxSizer * GeneratorAreaMillingDynamic::AddToPanel(wxPanel* panel,
 	fgSizer->Add(m_textCtrlRaiseStep, 0,
 			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL, 5);
 
-	m_staticTextUnit2 = new wxStaticText(panel, wxID_ANY, _("mm"),
+	m_staticTextUnit2 = new wxStaticText(panel, wxID_ANY, wxT("mm"),
 			wxDefaultPosition, wxDefaultSize, 0);
 	m_staticTextUnit2->Wrap(-1);
 	fgSizer->Add(m_staticTextUnit2, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
 
-	m_staticText14 = new wxStaticText(panel, wxID_ANY, _("Drop step:"),
+	m_staticText14 = new wxStaticText(panel, wxID_ANY, wxT("Drop step:"),
 			wxDefaultPosition, wxDefaultSize, 0);
 	m_staticText14->Wrap(-1);
 	fgSizer->Add(m_staticText14, 0,
@@ -126,7 +126,7 @@ wxSizer * GeneratorAreaMillingDynamic::AddToPanel(wxPanel* panel,
 	fgSizer->Add(m_textCtrlDropStep, 0,
 			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL, 5);
 
-	m_staticTextUnit3 = new wxStaticText(panel, wxID_ANY, _("mm"),
+	m_staticTextUnit3 = new wxStaticText(panel, wxID_ANY, wxT("mm"),
 			wxDefaultPosition, wxDefaultSize, 0);
 	m_staticTextUnit3->Wrap(-1);
 	fgSizer->Add(m_staticTextUnit3, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
@@ -365,7 +365,7 @@ std::vector <CNCPosition> GeneratorAreaMillingDynamic::MoveSafely(
 }
 
 void GeneratorAreaMillingDynamic::GenerateToolpath(const Run &run,
-		const std::vector <Object> &objects, const Tool &tool,
+		const std::list <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
 	output.Empty();

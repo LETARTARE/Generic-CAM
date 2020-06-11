@@ -28,8 +28,6 @@
 
 #include "AffineTransformMatrix.h"
 #include "Geometry.h"
-/// LT
-#include "languages.h"
 
 #include <wx/chartype.h>
 //#include <wx/file.h>
@@ -210,10 +208,10 @@ bool FileDXF::ReadFile(wxString fileName)
 {
 	wxTextFile file;
 
-	wxLogMessage(wxString::Format(_("Opening File:") + fileName));
+	wxLogMessage(wxString::Format(_T("Opening File:") + fileName));
 
 	if(!file.Open(fileName)){
-		wxLogError(_("STL: Can't open ") + fileName + _T("!"));
+		wxLogError(_T("STL: Can't open ") + fileName + _T("!"));
 		return false;
 	}
 

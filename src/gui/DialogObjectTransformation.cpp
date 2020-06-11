@@ -24,6 +24,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#define _USE_MATH_DEFINES
+
 #include "DialogObjectTransformation.h"
 
 #include "IDs.h"
@@ -34,9 +36,6 @@
 #include "FrameParent.h"
 
 #include <wx/event.h>
-#ifdef _MSC_VER
-#define _USE_MATH_DEFINES
-#endif
 #include <math.h>
 
 DialogObjectTransformation::DialogObjectTransformation(wxWindow* parent) :
@@ -212,44 +211,44 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 			break;
 		case ID_SCALEPERCENT:
 			description = obj->name
-					+ wxString::Format(_(": scale by %.1f %%"),
+					+ wxString::Format(_T(": scale by %.1f %%"),
 							scalePercent * 100);
 			newMatrix.ScaleGlobal(scalePercent, scalePercent, scalePercent);
 			break;
 		case ID_SCALEPERCENTX:
 			description = obj->name
-					+ wxString::Format(_(": scale X by %.1f %%"),
+					+ wxString::Format(_T(": scale X by %.1f %%"),
 							scalePercentX * 100);
 			newMatrix.ScaleGlobal(scalePercentX, 1, 1);
 			break;
 		case ID_SCALEPERCENTY:
 			description = obj->name
-					+ wxString::Format(_(": scale Y by %.1f %%"),
+					+ wxString::Format(_T(": scale Y by %.1f %%"),
 							scalePercentY * 100);
 			newMatrix.ScaleGlobal(1, scalePercentY, 1);
 			break;
 		case ID_SCALEPERCENTZ:
 			description = obj->name
-					+ wxString::Format(_(": scale Z by %.1f %%"),
+					+ wxString::Format(_T(": scale Z by %.1f %%"),
 							scalePercentZ * 100);
 			newMatrix.ScaleGlobal(1, 1, scalePercentZ);
 			break;
 
 		case ID_FLIPX:
 			description = obj->name
-					+ wxString::Format(_(": mirroring along X axis"));
+					+ wxString::Format(_T(": mirroring along X axis"));
 			flipNormals = true;
 			flipX = true;
 			break;
 		case ID_FLIPY:
 			description = obj->name
-					+ wxString::Format(_(": mirroring along Y axis"));
+					+ wxString::Format(_T(": mirroring along Y axis"));
 			flipNormals = true;
 			flipY = true;
 			break;
 		case ID_FLIPZ:
 			description = obj->name
-					+ wxString::Format(_(": mirroring along Z axis"));
+					+ wxString::Format(_T(": mirroring along Z axis"));
 			flipNormals = true;
 			flipZ = true;
 			break;
@@ -257,7 +256,7 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 		case ID_MOVEXP:
 			description = obj->name
 					+ wxString::Format(
-							_(": move along X by %.3f ")
+							_T(": move along X by %.3f ")
 									+ settings->Distance.GetOtherName(),
 							settings->Distance.FromSI(moveStep));
 			newMatrix.TranslateGlobal(moveStep, 0, 0);
@@ -265,7 +264,7 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 		case ID_MOVEXN:
 			description = obj->name
 					+ wxString::Format(
-							_(": move along X by %.3f ")
+							_T(": move along X by %.3f ")
 									+ settings->Distance.GetOtherName(),
 							settings->Distance.FromSI(-moveStep));
 			newMatrix.TranslateGlobal(-moveStep, 0, 0);
@@ -273,7 +272,7 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 		case ID_MOVEYP:
 			description = obj->name
 					+ wxString::Format(
-							_(": move along Y by %.3f ")
+							_T(": move along Y by %.3f ")
 									+ settings->Distance.GetOtherName(),
 							settings->Distance.FromSI(moveStep));
 			newMatrix.TranslateGlobal(0, moveStep, 0);
@@ -281,7 +280,7 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 		case ID_MOVEYN:
 			description = obj->name
 					+ wxString::Format(
-							_(": move along Y by %.3f ")
+							_T(": move along Y by %.3f ")
 									+ settings->Distance.GetOtherName(),
 							settings->Distance.FromSI(-moveStep));
 			newMatrix.TranslateGlobal(0, -moveStep, 0);
@@ -289,7 +288,7 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 		case ID_MOVEZP:
 			description = obj->name
 					+ wxString::Format(
-							_(": move along Z by %.3f ")
+							_T(": move along Z by %.3f ")
 									+ settings->Distance.GetOtherName(),
 							settings->Distance.FromSI(moveStep));
 			newMatrix.TranslateGlobal(0, 0, moveStep);
@@ -297,7 +296,7 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 		case ID_MOVEZN:
 			description = obj->name
 					+ wxString::Format(
-							_(": move along Z by %.3f ")
+							_T(": move along Z by %.3f ")
 									+ settings->Distance.GetOtherName(),
 							settings->Distance.FromSI(-moveStep));
 			newMatrix.TranslateGlobal(0, 0, -moveStep);
@@ -305,22 +304,22 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 
 		case ID_ALIGNTOP:
 			if(bbox.IsVolumeZero()) break;
-			description = obj->name + wxString::Format(_(": align top"));
+			description = obj->name + wxString::Format(_T(": align top"));
 			newMatrix.TranslateGlobal(0, 0, -bbox.zmax);
 			break;
 		case ID_ALIGNMIDDLE:
 			if(bbox.IsVolumeZero()) break;
-			description = obj->name + wxString::Format(_(": align middle"));
+			description = obj->name + wxString::Format(_T(": align middle"));
 			newMatrix.TranslateGlobal(0, 0, -(bbox.zmax + bbox.zmin) / 2.0);
 			break;
 		case ID_ALIGNBOTTOM:
 			if(bbox.IsVolumeZero()) break;
-			description = obj->name + wxString::Format(_(": align bottom"));
+			description = obj->name + wxString::Format(_T(": align bottom"));
 			newMatrix.TranslateGlobal(0, 0, -bbox.zmin);
 			break;
 		case ID_ALIGNCENTER:
 			if(bbox.IsVolumeZero()) break;
-			description = obj->name + wxString::Format(_(": align center"));
+			description = obj->name + wxString::Format(_T(": align center"));
 			newMatrix.TranslateGlobal(-(bbox.xmax + bbox.xmin) / 2.0,
 					-(bbox.ymax + bbox.ymin) / 2.0,
 					-(bbox.zmax + bbox.zmin) / 2.0);
@@ -328,42 +327,42 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 
 		case ID_ROTATEXP:
 			description = obj->name
-					+ wxString::Format(_(": rotate around X by %.0f degree"),
+					+ wxString::Format(_T(": rotate around X by %.0f degree"),
 							rotateStep);
 			newMatrix = AffineTransformMatrix::RotationXYZ(rotateStep, 0, 0)
 					* newMatrix;
 			break;
 		case ID_ROTATEXN:
 			description = obj->name
-					+ wxString::Format(_(": rotate around X by %.0f degree"),
+					+ wxString::Format(_T(": rotate around X by %.0f degree"),
 							-rotateStep);
 			newMatrix = AffineTransformMatrix::RotationXYZ(-rotateStep, 0, 0)
 					* newMatrix;
 			break;
 		case ID_ROTATEYP:
 			description = obj->name
-					+ wxString::Format(_(": rotate around Y by %.0f degree"),
+					+ wxString::Format(_T(": rotate around Y by %.0f degree"),
 							rotateStep);
 			newMatrix = AffineTransformMatrix::RotationXYZ(0, rotateStep, 0)
 					* newMatrix;
 			break;
 		case ID_ROTATEYN:
 			description = obj->name
-					+ wxString::Format(_(": rotate around Y by %.0f degree"),
+					+ wxString::Format(_T(": rotate around Y by %.0f degree"),
 							-rotateStep);
 			newMatrix = AffineTransformMatrix::RotationXYZ(0, -rotateStep, 0)
 					* newMatrix;
 			break;
 		case ID_ROTATEZP:
 			description = obj->name
-					+ wxString::Format(_(": rotate around Z by %.0f degree"),
+					+ wxString::Format(_T(": rotate around Z by %.0f degree"),
 							rotateStep);
 			newMatrix = AffineTransformMatrix::RotationXYZ(0, 0, rotateStep)
 					* newMatrix;
 			break;
 		case ID_ROTATEZN:
 			description = obj->name
-					+ wxString::Format(_(": rotate around Z by %.0f degree"),
+					+ wxString::Format(_T(": rotate around Z by %.0f degree"),
 							-rotateStep);
 			newMatrix = AffineTransformMatrix::RotationXYZ(0, 0, -rotateStep)
 					* newMatrix;
@@ -380,7 +379,8 @@ void DialogObjectTransformation::OnTransform(wxCommandEvent& event)
 				wxLogMessage
 				(
 						wxString::Format(
-								_("Unknown ID_... (=%i) in DialogObjectTransformation::OnTransform(...)"),
+								_T(
+										"Unknown ID_... (=%i) in DialogObjectTransformation::OnTransform(...)"),
 								event.GetId()));
 			}
 		}

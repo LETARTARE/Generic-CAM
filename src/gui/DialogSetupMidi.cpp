@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : DialogSetupMidi.cpp
-// Purpose            :
+// Purpose            : 
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -118,45 +118,45 @@ void DialogSetupMidi::OnTimer(wxTimerEvent& event)
 		switch(status){
 		case 8:
 			temp = wxString::Format(
-					_("Channel: %2u Note Off Data: %3u, %3u\n"), channel,
+					_T("Channel: %2u Note Off Data: %3u, %3u\n"), channel,
 					data1, data2);
 			break;
 		case 9:
-			temp = wxString::Format(_("Channel: %2u Note On Data: %3u, %3u\n"),
+			temp = wxString::Format(_T("Channel: %2u Note On Data: %3u, %3u\n"),
 					channel, data1, data2);
 			break;
 		case 10:
 			temp = wxString::Format(
-					_("Channel: %2u Polyphonic-Aftertouch Data: %3u, %3u\n"),
+					_T("Channel: %2u Polyphonic-Aftertouch Data: %3u, %3u\n"),
 					channel, data1, data2);
 			break;
 		case 11:
 			temp = wxString::Format(
-					_("Channel: %2u Control Change: CC[%3u] = %3u\n"), channel,
+					_T("Channel: %2u Control Change: CC[%3u] = %3u\n"), channel,
 					data1, data2);
 			break;
 		case 12:
 			temp = wxString::Format(
-					_("Channel: %2u Program Change Data: %3u, %3u\n"), channel,
+					_T("Channel: %2u Program Change Data: %3u, %3u\n"), channel,
 					data1, data2);
 			break;
 		case 13:
 			temp = wxString::Format(
-					_("Channel: %2u Mono-Aftertouch Data: %3u, %3u\n"),
+					_T("Channel: %2u Mono-Aftertouch Data: %3u, %3u\n"),
 					channel, data1, data2);
 			break;
 		case 14:
 			temp = wxString::Format(
-					_("Channel: %2u Pitch Bend Data: %3u, %3u\n"), channel,
+					_T("Channel: %2u Pitch Bend Data: %3u, %3u\n"), channel,
 					data1, data2);
 			break;
 		case 15:
-			temp = wxString::Format(_("System Message %2u Data: %3u, %3u\n"),
+			temp = wxString::Format(_T("System Message %2u Data: %3u, %3u\n"),
 					channel, data1, data2);
 			break;
 		default:
 			temp = wxString::Format(
-					_("Channel: %2u Status: %2u Data: %3u, %3u\n"), channel,
+					_T("Channel: %2u Status: %2u Data: %3u, %3u\n"), channel,
 					status, data1, data2);
 			break;
 		}

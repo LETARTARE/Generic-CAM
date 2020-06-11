@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : MathParser.cpp
-// Purpose            :
+// Purpose            : 
 // Thread Safe        : No
 // Platform dependent : No
 // Compiler Options   :
@@ -24,14 +24,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#define _USE_MATH_DEFINES
+
 #include "MathParser.h"
-/// LT
-#include "languages.h"
 
 #include <wx/debug.h>
-#ifdef _MSC_VER
-#define _USE_MATH_DEFINES
-#endif
 #include <math.h>
 
 MathParser::MathParser(bool autoEvaluate)
@@ -137,7 +134,7 @@ void MathParser::AddAllowedUnit(const wxString& unit, double factor)
 bool MathParser::GetNextToken(void)
 {
 	if(posStack >= maxStackDepth){
-		error = _("Stack full.");
+		error = _T("Stack full.");
 		return false;
 	}
 
@@ -187,7 +184,7 @@ bool MathParser::GetNextToken(void)
 				expressionNumber;
 
 		if(newType == expressionNone){
-			error = _("Unknown characters in string.");
+			error = _T("Unknown characters in string.");
 			return false;
 		}
 
@@ -205,7 +202,7 @@ bool MathParser::GetNextToken(void)
 				return false;
 			}
 			if(state > 1 && (c == '.' || c == ',')){
-				error = _("'.' or ',' inside the exponent of a number.");
+				error = _T("'.' or ',' inside the exponent of a number.");
 				return false;
 			}
 
@@ -268,7 +265,7 @@ bool MathParser::Evaluate(void)
 {
 	error.Empty();
 	if(text.IsEmpty()){
-		error = _("Expression empty.");
+		error = _T("Expression empty.");
 		return false;
 	}
 
@@ -368,7 +365,7 @@ bool MathParser::Evaluate(void)
 				}
 				if(command.CmpNoCase(_T("log")) == 0){
 					if(stackNumber[posStack - 2] <= 0.0){
-						error = _("log of a negative number.");
+						error = _T("log of a negative number.");
 						return false;
 					}
 					stackNumber[posStack - 3] = log(stackNumber[posStack - 2]);
@@ -376,7 +373,7 @@ bool MathParser::Evaluate(void)
 				}
 				if(command.CmpNoCase(_T("sqrt")) == 0){
 					if(stackNumber[posStack - 2] < 0.0){
-						error = _("sqrt of a negative number.");
+						error = _T("sqrt of a negative number.");
 						return false;
 					}
 					stackNumber[posStack - 3] = sqrt(stackNumber[posStack - 2]);
@@ -460,7 +457,7 @@ bool MathParser::Evaluate(void)
 									* stackNumber[posStack - 2];
 					if(op == '/'){
 						if(stackNumber[posStack - 2] == 0.0){
-							error = _("Division by 0.");
+							error = _T("Division by 0.");
 							return false;
 						}
 						stackNumber[posStack - 4] = stackNumber[posStack - 4]
@@ -486,17 +483,17 @@ bool MathParser::Evaluate(void)
 
 	switch(posStack){
 	case 0:
-		error = _("This should not be possible.");
+		error = _T("This should not be possible.");
 		break;
 	case 1:
-		error = _("Expression empty.");
+		error = _T("Expression empty.");
 		break;
 	case 2:
 		if(stackType[1] == expressionEnd && stackType[0] == expressionNumber){
 			number = stackNumber[0];
 			unit.Empty();
 		}else{
-			error = _("Cannot be reduced to a number.");
+			error = _T("Cannot be reduced to a number.");
 		}
 		break;
 	case 3:
@@ -506,11 +503,11 @@ bool MathParser::Evaluate(void)
 			number = stackNumber[0];
 			unit = text.Mid(stackStartPos[1], stackCharCount[1]);
 		}else{
-			error = _("Cannot be reduced to a number.");
+			error = _T("Cannot be reduced to a number.");
 		}
 		break;
 	default:
-		error = _("Could not parse expression completely.");
+		error = _T("Could not parse expression completely.");
 		break;
 	}
 

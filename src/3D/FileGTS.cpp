@@ -25,8 +25,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "FileGTS.h"
-/// LT
-#include "languages.h"
 
 #include <wx/file.h>
 #include <wx/textfile.h>
@@ -48,24 +46,24 @@ bool FileGTS::ReadFile(wxString fileName)
 	wxTextFile file;
 
 	if(!file.Open(fileName)){
-		wxLogError(_("GTS: Can't open ") + fileName + _T(" !"));
+		wxLogError(_T("GTS: Can't open ") + fileName + _T(" !"));
 		return false;
 	}
 
 	wxString temp;
 	wxStringTokenizer tokenizer;
 	if(file.Eof()){
-		wxLogError(_("File is empty!"));
+		wxLogError(_T("File is empty!"));
 		return false;
 	}
 	temp = file.GetFirstLine();
 	if(temp.IsEmpty()){
-		wxLogError(_("File is empty!"));
+		wxLogError(_T("File is empty!"));
 		return false;
 	}
 	tokenizer.SetString(temp);
 	if(tokenizer.CountTokens() < 3){
-		wxLogError(_("File is not a valid GTS file!"));
+		wxLogError(_T("File is not a valid GTS file!"));
 		return false;
 	}
 
@@ -92,14 +90,14 @@ bool FileGTS::ReadFile(wxString fileName)
 
 	for(i = 0; i < nv; i++){
 		if(file.Eof()){
-			wxLogError(_("File is empty!"));
+			wxLogError(_T("File is empty!"));
 			return false;
 		}
 		temp = file.GetNextLine();
 		temp.Replace(_T("."), _T(","));
 		tokenizer.SetString(temp);
 		if(tokenizer.CountTokens() < 3){
-			wxLogError(_("File is not a valid GTS file (too little vertices)!"));
+			wxLogError(_T("File is not a valid GTS file (too little vertices)!"));
 			return false;
 		}
 
@@ -119,13 +117,13 @@ bool FileGTS::ReadFile(wxString fileName)
 
 	for(i = 0; i < ne; i++){
 		if(file.Eof()){
-			wxLogError(_("File is empty!"));
+			wxLogError(_T("File is empty!"));
 			return false;
 		}
 		temp = file.GetNextLine();
 		tokenizer.SetString(temp);
 		if(tokenizer.CountTokens() < 2){
-			wxLogError(_("File is not a valid GTS file (too little edges)!"));
+			wxLogError(_T("File is not a valid GTS file (too little edges)!"));
 			return false;
 		}
 		tokenizer.GetNextToken().ToLong(&u1);
@@ -142,13 +140,13 @@ bool FileGTS::ReadFile(wxString fileName)
 	unsigned long t;
 	for(i = 0; i < nf; i++){
 		if(file.Eof()){
-			wxLogError(_("File is empty!"));
+			wxLogError(_T("File is empty!"));
 			return false;
 		}
 		temp = file.GetNextLine();
 		tokenizer.SetString(temp);
 		if(tokenizer.CountTokens() < 3){
-			wxLogError(_("File is not a valid GTS file (too little triangles)!"));
+			wxLogError(_T("File is not a valid GTS file (too little triangles)!"));
 			return false;
 		}
 //		Triangle* tri = new Triangle;
