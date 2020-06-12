@@ -38,11 +38,9 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="wxmsw28d_gl" />
-					<Add library="wxmsw28d_core" />
-					<Add library="wxbase28d" />
-					<Add library="wxbase28d_xml" />
-					<Add library="wxexpatd" />
+					<Add library="wxmsw31u" />
+					<Add library="wxmsw31u_gl" />
+					<Add library="lua52" />
 				</Linker>
 			</Target>
 			<Environment>
