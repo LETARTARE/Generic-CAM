@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : OpenGL.h
-// Purpose            : 
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -29,6 +29,7 @@
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__)
 #define __WIN
+#include <winsock2.h>
 #elif defined(linux) || defined(__linux)
 #define __LINUX
 #else

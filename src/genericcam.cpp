@@ -49,32 +49,31 @@ void GenericCAMApp::OnAbout(wxCommandEvent&)
 {
 	wxAboutDialogInfo aboutInfo;
 
-	aboutInfo.SetName(_T("Generic CAM"));
-	aboutInfo.SetVersion(_T("0.3"));
+	aboutInfo.SetName("Generic CAM");
+	aboutInfo.SetVersion("0.3");
 	aboutInfo.SetDescription(_("CAM Processor for CNC Machines"));
-	aboutInfo.SetCopyright(_T("(C) 2010-2020"));
-	aboutInfo.SetWebSite(_T("https://sourceforge.net/projects/genericcam/"));
+	aboutInfo.SetCopyright("(C) 2010-2020");
+	aboutInfo.SetWebSite("https://sourceforge.net/projects/genericcam/");
 	aboutInfo.SetLicence(
-			_T(
-					"GNU General Public License version 3.0 (GPLv3)\n\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it under certain conditions.\n\nYou should have received a copy of the GNU General Public License along with this program.\nIf not, see http://www.gnu.org/licenses/."));
-	aboutInfo.AddDeveloper(_T("Tobias Schäfer"));
-	aboutInfo.AddTranslator(_T("Jacques-Louis Tartarin (French)"));
-	aboutInfo.AddTranslator(_T("Sandro Dalle Nogare (Italian)"));
+	"GNU General Public License version 3.0 (GPLv3)\n\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it under certain conditions.\n\nYou should have received a copy of the GNU General Public License along with this program.\nIf not, see http://www.gnu.org/licenses/."
+	);
+	aboutInfo.AddDeveloper("Tobias Schäfer");
+	aboutInfo.AddTranslator("Jacques-Louis Tartarin (French)");
+	aboutInfo.AddTranslator("Sandro Dalle Nogare (Italian)");
 
 	wxAboutBox(aboutInfo);
 }
 
 GenericCAMApp::GenericCAMApp()
 {
-	config = new wxConfig(_T("genericcam"));
+	config = new wxConfig("genericcam");
 
 	unsigned int selectedLanguage = wxLocale::GetSystemLanguage();
 	if(selectedLanguage == wxLANGUAGE_UNKNOWN) selectedLanguage =
 			wxLANGUAGE_DEFAULT;
-
 	// Read language from config.
 	wxString str;
-	if(config->Read(_T("Language"), &str)){
+	if(config->Read("Language", &str)){
 		unsigned int i;
 		for(i = 0; i < WXSIZEOF(langNames); i++)
 			if(str.CmpNoCase(langNames[i]) == 0){
@@ -84,22 +83,22 @@ GenericCAMApp::GenericCAMApp()
 
 	if(!locale.Init(selectedLanguage, wxLOCALE_DONT_LOAD_DEFAULT)){
 		wxLogWarning
-		(_T("This language is not supported by the system."));
+		(_("This language is not supported by the system."));
 		return;
 	}
 
-	//	wxLogMessage(wxString::Format(_T("id language : %u " ), selectedLanguage));
-	//	wxLogMessage(wxString::Format(_T("id language : %u " ),
+	//	wxLogMessage(wxString::Format("id language : %u " , selectedLanguage));
+	//	wxLogMessage(wxString::Format("id language : %u ",
 	//			locale.GetLanguage()));
-	//	wxLogMessage(_T("name language :") + locale.GetCanonicalName());
+	//	wxLogMessage("name language :" + locale.GetCanonicalName());
 
-	locale.AddCatalogLookupPathPrefix(_T("i18n"));
-	bool catalogLoaded = locale.AddCatalog(_T("GenericCAM"));
+	locale.AddCatalogLookupPathPrefix("i18n");
+	bool catalogLoaded = locale.AddCatalog("GenericCAM");
 	if(!catalogLoaded){
 		wxString temp;
 		temp =
-		_T("The translation catalog for ") + locale.GetCanonicalName() +
-		_T(" was not loaded !");
+		_("The translation catalog for ") + locale.GetCanonicalName() +
+		_(" was not loaded !");
 		wxLogWarning
 		(temp);
 	}
@@ -120,7 +119,7 @@ void GenericCAMApp::OnInitCmdLine(wxCmdLineParser& parser)
 {
 	parser.AddParam(_("<filepath of document to open>"), wxCMD_LINE_VAL_STRING,
 			wxCMD_LINE_PARAM_OPTIONAL);
-	parser.AddSwitch("t", "test", "Runs unit tests on some of the classes.");
+	parser.AddSwitch("t", _("test"), _("Runs unit tests on some of the classes."));
 	wxApp::OnInitCmdLine(parser);
 }
 
@@ -148,8 +147,8 @@ bool GenericCAMApp::OnInit()
 
 	wxDocManager *docManager = new wxDocManager;
 
-	new wxDocTemplate(docManager, "Generic CAM Project", "*.zip", "", "zip",
-			"Project", "Project View", CLASSINFO(Project),
+	new wxDocTemplate(docManager, _("Generic CAM Project"), "*.zip", "", "zip",
+			_("Project"), _("Project View"), CLASSINFO(Project),
 			CLASSINFO(ProjectView));
 
 #if defined( __WXMAC__ )  && wxOSX_USE_CARBON
@@ -172,7 +171,7 @@ bool GenericCAMApp::OnInit()
 	}
 
 	wxBitmap bitmap;
-	if(bitmap.LoadFile(_T("doc/images/splash.png"), wxBITMAP_TYPE_PNG)){
+	if(bitmap.LoadFile("doc/images/splash.png", wxBITMAP_TYPE_PNG)){
 		new wxSplashScreen(bitmap, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT,
 				6000, parent, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 				wxSIMPLE_BORDER | wxSTAY_ON_TOP);

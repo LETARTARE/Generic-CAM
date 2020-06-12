@@ -519,7 +519,9 @@ size_t Run::GetMaxGeneratorID() const
 	}
 	return maxID;
 }
-
+/// LT  declaration : 'wxDECLARE_NO_COPY_CLASS(Run);'
+/*
 Run& Run::operator =(const Run&)
 {
 }
+*/

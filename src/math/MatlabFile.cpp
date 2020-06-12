@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : MatlabFile.cpp
-// Purpose            : 
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -208,7 +208,9 @@ void MatlabFile::WriteMatrix(const MatlabMatrix& M)
 				char bufferTime[75];
 				time(&rawtime);
 				timeinfo = localtime(&rawtime);
-				strftime(bufferTime, 75, "%F %X %Z", timeinfo);
+				//strftime(bufferTime, 75, "%F %X %Z", timeinfo);
+			/// LT
+				strftime(bufferTime, 75, "%Y-%m-%d %X %Z", timeinfo);
 				memset(headertext, 32, sizeof(char) * 124);
 				sprintf(headertext,
 						"MATLAB 5.0 MAT-file, written by MatlabFile.cpp, %s",

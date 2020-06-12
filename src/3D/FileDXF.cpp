@@ -28,6 +28,8 @@
 
 #include "AffineTransformMatrix.h"
 #include "Geometry.h"
+/// LT
+#include "languages.h"
 
 #include <wx/chartype.h>
 //#include <wx/file.h>
@@ -193,6 +195,8 @@ void FileDXF::ProcessCode(long codeNr, wxString code)
 				state = idle;
 				break;
 			}
+/// LT
+			break;
 			// no break here!
 		case inEntities:
 			if(code.Cmp(_T("ENDSEC")) == 0){
@@ -208,10 +212,10 @@ bool FileDXF::ReadFile(wxString fileName)
 {
 	wxTextFile file;
 
-	wxLogMessage(wxString::Format(_T("Opening File:") + fileName));
+	wxLogMessage(wxString::Format(_("Opening File:") + fileName));
 
 	if(!file.Open(fileName)){
-		wxLogError(_T("STL: Can't open ") + fileName + _T("!"));
+		wxLogError(_("STL: Can't open ") + fileName + _T("!"));
 		return false;
 	}
 

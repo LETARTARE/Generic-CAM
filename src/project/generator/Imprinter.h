@@ -62,15 +62,16 @@ public:
 	void Swap(ImprinterElement& b);
 
 public:
-	float aboveUp;
-	float aboveDown;
-	float up;
-	float down;
-	float belowUp;
-	float belowDown;
+/// LT  add init = 0.0 (C++11)
+	float aboveUp = 0.0;
+	float aboveDown = 0.0;
+	float up = 0.0;
+	float down = 0.0;
+	float belowUp = 0.0;
+	float belowDown = 0.0;
 
-	float normalx;
-	float normaly;
+	float normalx = 0.0;
+	float normaly = 0.0;
 	//  normalz is sqrt(1-normalx*normalx-normaly*normaly)
 };
 

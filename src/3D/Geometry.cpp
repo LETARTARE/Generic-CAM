@@ -119,7 +119,9 @@ void Geometry::Paint(GeometryColorStyle style) const
 		for(i = 0; i < triangles.size(); i++)
 			triangles[i].Paint(true, true);
 		break;
-
+/// LT
+	case geometryColorDefault :
+		break;
 	}
 	::glEnd();
 

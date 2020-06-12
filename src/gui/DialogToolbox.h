@@ -70,9 +70,9 @@ public:
 	bool TransferDataFromWindow(void);
 
 	void OnXClose(wxCloseEvent& event);
-	void OnToolChecked(wxTreeListEvent& event);
-	void OnToolContextMenu(wxTreeListEvent& event);
-	void OnToolboxExpanding(wxTreeListEvent& event);
+	void OnToolChecked(wxTreeListEvent& event) wxOVERRIDE;;
+	void OnToolContextMenu(wxTreeListEvent& event) wxOVERRIDE;
+	void OnToolboxExpanding(wxTreeListEvent& event) wxOVERRIDE;
 	void OnToolSelectionChanged(wxTreeListEvent& event);
 	void OnChoice(wxCommandEvent& event);
 	void OnEnter(wxCommandEvent& event);

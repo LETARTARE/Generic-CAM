@@ -58,7 +58,6 @@
 #include "DnDFile.h"
 
 #include "../math/MathParser.h"
-#include "../project/command/CommandObjectJoinSurface.h"
 #include "../project/command/CommandRunGeneratorAdd.h"
 #include "../project/command/CommandRunGeneratorDelete.h"
 #include "../project/command/CommandRunGeneratorRename.h"
@@ -91,16 +90,13 @@
 #include <unistd.h>
 #endif
 
-wxBEGIN_EVENT_TABLE(FrameMain, wxDocChildFrame)
-
-EVT_MENU(ID_TOGGLESTEREO3D, FrameMain::OnViewStereo3DToggle)
+wxBEGIN_EVENT_TABLE(FrameMain, wxDocChildFrame) EVT_MENU(ID_TOGGLESTEREO3D, FrameMain::OnViewStereo3DToggle)
 EVT_MENU(ID_PROJECTRENAME, FrameMain::OnProjectRename)
 EVT_MENU(ID_OBJECTLOAD, FrameMain::OnObjectLoad)
 EVT_MENU(ID_OBJECTRENAME, FrameMain::OnObjectRename)
 EVT_MENU(ID_OBJECTMODIFY, FrameMain::OnObjectModify)
 EVT_MENU(ID_OBJECTDELETE, FrameMain::OnObjectDelete)
 EVT_MENU(ID_OBJECTFLIPNORMALS, FrameMain::OnObjectFlipNormals)
-EVT_MENU(ID_OBJECTUNIFYSURFACE, FrameMain::OnObjectUnifySurface)
 EVT_MENU(ID_RUNRENAME, FrameMain::OnRunRename)
 EVT_MENU(ID_RUNMODIFY, FrameMain::OnCAMSetup)
 EVT_MENU(ID_RUNDELETE, FrameMain::OnRunDelete)
@@ -133,6 +129,8 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 	Project* project = wxStaticCast(GetDocument(), Project);
 	ProjectView* projectview = wxStaticCast(GetView(), ProjectView);
 
+
+
 	// Load the default tools into a new project.
 	// (Has to be done from here, because the set paths are
 	// only known at this point.)
@@ -150,8 +148,8 @@ FrameMain::FrameMain(wxDocument* doc, wxView* view, wxConfig* config,
 		}
 	}
 
-//	menuRecentFiles.Append(wxID_REVERT, wxT("Revert"));
-	menuRecentFiles.Append(wxID_REVERT_TO_SAVED, wxT("Revert to saved"));
+//	menuRecentFiles.Append(wxID_REVERT, _("Revert"));
+	menuRecentFiles.Append(wxID_REVERT_TO_SAVED, _("Revert to saved"));
 	menuRecentFiles.AppendSeparator();
 	doc->GetDocumentManager()->FileHistoryAddFilesToMenu(&menuRecentFiles);
 	doc->GetCommandProcessor()->Initialize();
@@ -300,9 +298,9 @@ void FrameMain::UpdateStatus(void)
 	m_statusBar->SetStatusText(wxString(selection.ToString()), 0);
 
 	if(GetDocument()->IsModified()){
-		m_statusBar->SetStatusText(_T("modified"), 1);
+		m_statusBar->SetStatusText(_("modified"), 1);
 	}else{
-		m_statusBar->SetStatusText(_T("not modified"), 1);
+		m_statusBar->SetStatusText(_("not modified"), 1);
 	}
 
 //	if(loopguard.TryLock() != wxMUTEX_BUSY){
@@ -344,8 +342,8 @@ void FrameMain::OnProjectSave(wxRibbonButtonBarEvent& event)
 void FrameMain::OnProjectSaveMenu(wxRibbonButtonBarEvent& event)
 {
 	wxMenu menu;
-	menu.Append(wxID_SAVE, wxT("Save"));
-	menu.Append(wxID_SAVEAS, wxT("Save as ..."));
+	menu.Append(wxID_SAVE, _("Save"));
+	menu.Append(wxID_SAVEAS, _("Save as ..."));
 	event.PopupMenu(&menu);
 }
 
@@ -353,7 +351,7 @@ void FrameMain::OnProjectRename(wxCommandEvent& event)
 {
 	Project* project = wxStaticCast(GetDocument(), Project);
 	wxTextEntryDialog dialog(this, _("Enter new project name:"),
-			_T("Rename Project"), project->GetTitle());
+			_("Rename Project"), project->GetTitle());
 	if(dialog.ShowModal() == wxID_OK){
 		if(dialog.GetValue().IsEmpty()) return;
 		if(dialog.GetValue() == project->GetTitle()) return;
@@ -369,9 +367,9 @@ void FrameMain::OnProjectRename(wxCommandEvent& event)
 void FrameMain::OnViewPreferencesMenu(wxRibbonButtonBarEvent& event)
 {
 	wxMenu menu;
-	menu.Append(ID_SETUPUNITS, _("Setup &Units") + wxT("\tCtrl+U"));
+	menu.Append(ID_SETUPUNITS, _("Setup &Units") + _("\tCtrl+U"));
 	menu.Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
-	menu.Append(ID_SETUPLANGUAGE, _T("Change Language"));
+	menu.Append(ID_SETUPLANGUAGE, _("Change Language"));
 	menu.Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
 	menu.Append(ID_SETUPPATHS, _("Setup &Paths"));
 #ifdef _USE_MIDI
@@ -379,6 +377,7 @@ void FrameMain::OnViewPreferencesMenu(wxRibbonButtonBarEvent& event)
 #endif
 	event.PopupMenu(&menu);
 }
+
 
 void FrameMain::OnViewStereo3DToggle(wxCommandEvent& event)
 {
@@ -416,9 +415,10 @@ void FrameMain::OnObjectLoad(wxCommandEvent& event)
 	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 
 	wxFileDialog dialog(this, _("Load Object..."), _T(""), _T(""),
-			_(
-					"All supported files (*.obj; *.dxf; *.stl; *.gts)|*.obj;*.dxf;*DXF;*.stl;*.STL;*.gts;*.GTS|Wavefront OBJ Files (*.obj)|*.obj;*.OBJ|DXF Files (*.dxf)|*.dxf;*.DXF|Stereolithography files (STL files) (*.stl)|*.stl;*.STL|GTS files (*.gts)|*.gts;*.GTS|All files|*.*"),
-			wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_MULTIPLE);
+						_("All supported files (*.obj; *.dxf; *.stl; *.gts)|*.obj;*.dxf;*DXF;*.stl;*.STL;*.gts;*.GTS|Wavefront OBJ Files (*.obj)|*.obj;*.OBJ|DXF Files (*.dxf)|*.dxf;*.DXF|Stereolithography files (STL files) (*.stl)|*.stl;*.STL|GTS files (*.gts)|*.gts;*.GTS|All files|*.*"
+						),
+						wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_MULTIPLE
+						);
 
 	if(wxDir::Exists(filepaths->lastObjectDirectory)){
 		dialog.SetDirectory(filepaths->lastObjectDirectory);
@@ -457,31 +457,6 @@ void FrameMain::OnObjectLoad(wxCommandEvent& event)
 	}
 }
 
-void FrameMain::OnObjectDelete(wxCommandEvent& event)
-{
-	Project* project = wxStaticCast(GetDocument(), Project);
-	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
-
-	if(DEBUG) std::cout << "FrameMain::OnObjectDelete - "
-			<< selection.ToString() << "\n";
-
-	if(!selection.IsType(Selection::Object) || !project->Has(selection)
-			|| selection.IsSetEmpty()){
-		if(DEBUG) std::cout << "\t \\->  Not found.\n";
-		return;
-	}
-
-	for(std::set <size_t>::iterator it = selection.begin();
-			it != selection.end(); ++it){
-		cmdProc->Submit(
-				new CommandObjectRemove(
-						_(
-								"Object ") + project->Get3DObject(*it)->name + _(" deleted."),
-						project, *it));
-	}
-	TransferDataToWindow(true);
-}
-
 void FrameMain::OnObjectRename(wxCommandEvent& event)
 {
 	Project* project = wxStaticCast(GetDocument(), Project);
@@ -492,7 +467,7 @@ void FrameMain::OnObjectRename(wxCommandEvent& event)
 	const size_t objID = selection[0];
 
 	wxTextEntryDialog dialog(this, _("Enter new name:"),
-	_T("Rename Object ") + project->Get3DObject(objID)->name,
+	_("Rename Object ") + project->Get3DObject(objID)->name,
 			project->Get3DObject(objID)->name);
 	if(dialog.ShowModal() == wxID_OK){
 		if(dialog.GetValue().IsEmpty()) return;
@@ -517,28 +492,34 @@ void FrameMain::OnObjectModify(wxCommandEvent& event)
 	dialogObjectTransformation->TransferDataToWindow();
 	dialogObjectTransformation->Raise();
 }
-
+/// LT  forgotten
 void FrameMain::OnObjectUnifySurface(wxRibbonButtonBarEvent& event)
 {
-	wxCommandEvent temp(event);
-	OnObjectUnifySurface(temp);
+	/// ??
 }
 
-void FrameMain::OnObjectUnifySurface(wxCommandEvent& event)
+void FrameMain::OnObjectDelete(wxCommandEvent& event)
 {
 	Project* project = wxStaticCast(GetDocument(), Project);
-	wxCommandProcessor* cmdProc = project->GetCommandProcessor();
+	wxCommandProcessor * cmdProc = GetDocument()->GetCommandProcessor();
 
-	if(!selection.IsType(Selection::Object) || !project->Has(selection)) return;
+	if(DEBUG) std::cout << "FrameMain::OnObjectDelete - "
+			<< selection.ToString() << "\n";
 
-	for(std::set <size_t>::const_iterator it = selection.begin();
-			it != selection.end(); ++it){
-		CommandObjectJoinSurface * command = new CommandObjectJoinSurface(
-				project->Get3DObject(*it)->name + _(": Unify object surface"),
-				project, *it);
-		cmdProc->Submit(command);
+	if(!selection.IsType(Selection::Object) || !project->Has(selection)
+			|| selection.IsSetEmpty()){
+		if(DEBUG) std::cout << "\t \\->  Not found.\n";
+		return;
 	}
-	Refresh();
+
+	for(std::set <size_t>::iterator it = selection.begin();
+			it != selection.end(); ++it){
+		cmdProc->Submit(
+				new CommandObjectRemove(
+						_("Object ") + project->Get3DObject(*it)->name + _(" deleted."),
+						project, *it));
+	}
+	TransferDataToWindow(true);
 }
 
 void FrameMain::OnObjectFlipNormals(wxRibbonButtonBarEvent& event)
@@ -577,9 +558,9 @@ void FrameMain::OnCAMSetup(wxCommandEvent& event)
 	if(!selection.IsType(Selection::Run)){
 		size_t newRunID = project->GetNextRunID();
 #ifdef _MSC_VER
-		wxString newName = wxString::Format(_T("Run %Iu"), newRunID);
+		wxString newName = wxString::Format(_("Run %Iu"), newRunID);
 #else
-		wxString newName = wxString::Format(_T("Run %zu"), newRunID);
+		wxString newName = wxString::Format(_("Run %zu"), newRunID);
 #endif
 		std::set <size_t> objID;
 		if(selection.IsType(Selection::Object)){
@@ -610,7 +591,7 @@ void FrameMain::OnRunRename(wxCommandEvent& event)
 	const Run * run = project->GetRun(selection[0]);
 
 	wxTextEntryDialog dialog(this, _("Enter new name:"),
-	_T("Rename Run ") + run->name, run->name);
+	_("Rename Run ") + run->name, run->name);
 	if(dialog.ShowModal() == wxID_OK){
 		if(dialog.GetValue().IsEmpty()) return;
 		if(dialog.GetValue() == run->name) return;
@@ -638,18 +619,18 @@ void FrameMain::OnRunDelete(wxCommandEvent& event)
 void FrameMain::OnCAM2DMenu(wxRibbonButtonBarEvent& event)
 {
 	wxMenu menu;
-	menu.Append(ID_GENERATORADDTYPE + 5, wxT("Outline Dexel"));
-	menu.Append(ID_GENERATORADDTYPE + 7, wxT("Load from file"));
+	menu.Append(ID_GENERATORADDTYPE + 5, _("Outline Dexel"));
+	menu.Append(ID_GENERATORADDTYPE + 7, _("Load from file"));
 	event.PopupMenu(&menu);
 }
 
 void FrameMain::OnCAM3DMenu(wxRibbonButtonBarEvent& event)
 {
 	wxMenu menu;
-	menu.Append(ID_GENERATORADDTYPE + 4, wxT("GeneratorTest"));
-	menu.Append(ID_GENERATORADDTYPE + 3, wxT("AreaMillingDynamic"));
-	menu.Append(ID_GENERATORADDTYPE + 6, wxT("Surface Dexel"));
-	menu.Append(ID_GENERATORADDTYPE + 2, wxT("Drill Dexel"));
+	menu.Append(ID_GENERATORADDTYPE + 4, _("GeneratorTest"));
+	menu.Append(ID_GENERATORADDTYPE + 3, _("AreaMillingDynamic"));
+	menu.Append(ID_GENERATORADDTYPE + 6, _("Surface Dexel"));
+	menu.Append(ID_GENERATORADDTYPE + 2, _("Drill Dexel"));
 	event.PopupMenu(&menu);
 }
 
@@ -661,7 +642,7 @@ void FrameMain::OnCAMDrilling(wxRibbonButtonBarEvent& event)
 void FrameMain::OnCAMMultiAxisMenu(wxRibbonButtonBarEvent& event)
 {
 	wxMenu menu;
-	menu.Append(ID_GENERATORADDTYPE + 1, wxT("Area Grid Dexel"));
+	menu.Append(ID_GENERATORADDTYPE + 1, _("Area Grid Dexel"));
 	event.PopupMenu(&menu);
 }
 
@@ -1122,61 +1103,60 @@ void FrameMain::OnActivateRightClickMenu(wxTreeEvent& event)
 	wxMenu menu(_T(""));
 
 	if(data->type == TreeItem::itemProject){
-		menu.Append(ID_PROJECTRENAME, wxT("&Rename Project"));
+		menu.Append(ID_PROJECTRENAME, _("&Rename Project"));
 		menu.AppendSeparator();
-		menu.Append(wxID_SAVE, wxT("&Save Project"));
-		menu.Append(wxID_SAVEAS, wxT("Save Project &As ..."));
+		menu.Append(wxID_SAVE, _("&Save Project"));
+		menu.Append(wxID_SAVEAS, _("Save Project &As ..."));
 		menu.AppendSeparator();
-		menu.Append(wxID_EXIT, wxT("&Quit"));
+		menu.Append(wxID_EXIT, _("&Quit"));
 
 	}
 
 	if(data->type == TreeItem::itemGroupObjects){
-		menu.Append(ID_OBJECTLOAD, wxT("&Load Object"));
+		menu.Append(ID_OBJECTLOAD, _("&Load Object"));
 	}
 
 	if(data->type == TreeItem::itemObject){
-		menu.Append(ID_OBJECTMODIFY, wxT("&Modify Object"));
-		menu.Append(ID_OBJECTUNIFYSURFACE, wxT("&Unify Surface"));
-		menu.Append(ID_OBJECTFLIPNORMALS, wxT("&Flip Normals"));
-		menu.Append(ID_OBJECTRENAME, wxT("&Rename Object"));
-		menu.Append(ID_OBJECTDELETE, wxT("&Delete Object"));
+		menu.Append(ID_OBJECTMODIFY, _("&Modify Object"));
+		menu.Append(ID_OBJECTFLIPNORMALS, _("&Flip Normals"));
+		menu.Append(ID_OBJECTRENAME, _("&Rename Object"));
+		menu.Append(ID_OBJECTDELETE, _("&Delete Object"));
 		menu.AppendSeparator();
-		menu.Append(ID_RUNMODIFY, wxT("&Add Run"));
+		menu.Append(ID_RUNMODIFY, _("&Add Run"));
 	}
 
 //	if(data->type == itemGroupWorkpiece){
-//		menu.Append(ID_WORKPIECEDELETEUNUSED, wxT("Delete &unused Workpieces"));
+//		menu.Append(ID_WORKPIECEDELETEUNUSED, _("Delete &unused Workpieces"));
 //	}
 //	if(data->type == itemWorkpiece){
-//		menu.Append(ID_WORKPIECESETUP, wxT("&Setup Workpiece"));
+//		menu.Append(ID_WORKPIECESETUP, _("&Setup Workpiece"));
 //		menu.AppendSeparator();
-//		menu.Append(ID_WORKPIECEDELETE, wxT("&Delete Workpiece"));
-//		menu.Append(ID_WORKPIECEDELETEUNUSED, wxT("Delete &unused Workpieces"));
+//		menu.Append(ID_WORKPIECEDELETE, _("&Delete Workpiece"));
+//		menu.Append(ID_WORKPIECEDELETEUNUSED, _("Delete &unused Workpieces"));
 //	}
 
 	if(data->type == TreeItem::itemGroupRun){
-		menu.Append(ID_RUNMODIFY, wxT("&Add Run"));
+		menu.Append(ID_RUNMODIFY, _("&Add Run"));
 		menu.AppendSeparator();
-		menu.Append(ID_TOOLPATHGENERATE, wxT("&Generate Toolpath"));
+		menu.Append(ID_TOOLPATHGENERATE, _("&Generate Toolpath"));
 	}
 
 	if(data->type == TreeItem::itemRun){
-		menu.Append(ID_RUNMODIFY, wxT("&Edit Run"));
-		menu.Append(ID_RUNRENAME, wxT("&Rename Run"));
-		menu.Append(ID_RUNDELETE, wxT("&Delete Run"));
+		menu.Append(ID_RUNMODIFY, _("&Edit Run"));
+		menu.Append(ID_RUNRENAME, _("&Rename Run"));
+		menu.Append(ID_RUNDELETE, _("&Delete Run"));
 		menu.AppendSeparator();
-		menu.Append(ID_TOOLPATHGENERATE, wxT("&Generate Toolpath"));
-		menu.Append(ID_TOOLPATHEXPORT, wxT("E&xport Toolpaths"));
+		menu.Append(ID_TOOLPATHGENERATE, _("&Generate Toolpath"));
+		menu.Append(ID_TOOLPATHEXPORT, _("E&xport Toolpaths"));
 	}
 
 	if(data->type == TreeItem::itemGenerator){
-		menu.Append(ID_GENERATORMODIFY, wxT("&Edit Generator"));
-		menu.Append(ID_GENERATORRENAME, wxT("&Rename Run"));
-		menu.Append(ID_GENERATORDELETE, wxT("&Delete Generator"));
+		menu.Append(ID_GENERATORMODIFY, _("&Edit Generator"));
+		menu.Append(ID_GENERATORRENAME, _("&Rename Run"));
+		menu.Append(ID_GENERATORDELETE, _("&Delete Generator"));
 		menu.AppendSeparator();
-		menu.Append(ID_TOOLPATHGENERATE, wxT("&Generate Toolpath"));
-		menu.Append(ID_TOOLPATHEXPORT, wxT("E&xport Toolpath"));
+		menu.Append(ID_TOOLPATHGENERATE, _("&Generate Toolpath"));
+		menu.Append(ID_TOOLPATHEXPORT, _("E&xport Toolpath"));
 	}
 
 	if(menu.GetMenuItemCount() > 0) PopupMenu(&menu); //, event.GetPoint());

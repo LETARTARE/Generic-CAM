@@ -432,6 +432,9 @@ void ToolBox::StoreContour(JSON& js, const Tool::Contour& contour) const
 	case Tool::probe:
 		js["type"].SetString("probe");
 		break;
+/// LT : warning: enumeration value 'no_type' not handled in switch [-Wswitch]|
+	case Tool::unit_none:
+		break;
 	}
 
 	switch(contour.unit){
@@ -443,6 +446,9 @@ void ToolBox::StoreContour(JSON& js, const Tool::Contour& contour) const
 		break;
 	case Tool::unit_inch:
 		js["unit"].SetString("inches");
+		break;
+/// LT
+	case Tool::unit_none:
 		break;
 	}
 

@@ -214,8 +214,10 @@ std::istream& operator>>(std::istream &in, Hull &hull)
 	std::vector <int> index_t;
 	std::vector <int> index_n;
 	std::vector <Vector3> tempnormals;
-	double tempvalue;
-	int tempindex;
+/// LT ??
+	double tempvalue = 0.0;
+	int tempindex = 0;
+///
 	double factor = 1.0;
 	bool negative = false;
 	bool exponentnegative = false;
