@@ -38,6 +38,7 @@
 
 Tool::Tool()
 {
+	hasStartValues = false;
 	hasPostProcess = false;
 	hasGeometry = false;
 	hasHolder = false;
@@ -83,32 +84,29 @@ void Tool::Update(void)
 		}
 			break;
 		default:
-			std::cout << "Tool::GenerateContour - (Yet) Unsupported tooltype ("
-					<< (int) base.type << " in " << base.description << ").\n";
+			std::cout
+					<< "Tool::GenerateContour - (Yet) Unsupported tooltype.\n";
+			return;
 			break;
 		}
 	}
 	float z = 0.0;
 	z = base.Update(z);
-	// Construct shaft, if there is non defined.
 	if(!shaft.hasSegments){
 		shaft.segments.clear();
-		if(geometry.OAL > 1e-6 && geometry.OAL > z){
-			Segment temp;
-			if(geometry.SFDM > 1e-6){
-				temp.lowerdiameter = geometry.SFDM;
-				temp.upperdiameter = geometry.SFDM;
-			}else{
-				temp.lowerdiameter = geometry.DC;
-				temp.upperdiameter = geometry.DC;
-			}
-			temp.height = geometry.OAL - z;
-			shaft.segments.push_back(temp);
+		Segment temp;
+		if(geometry.SFDM > 1e-6){
+			temp.lowerdiameter = geometry.SFDM;
+			temp.upperdiameter = geometry.SFDM;
+		}else{
+			temp.lowerdiameter = geometry.DC;
+			temp.upperdiameter = geometry.DC;
 		}
+		temp.height = geometry.OAL - z;
+		shaft.segments.push_back(temp);
 	}
-
 	z = shaft.Update(z);
-	if(hasGeometry && z > 1e-6){
+	if(hasGeometry){
 		if(geometry.LB > 1e-6) z = geometry.LB;
 	}
 	fullsize = holder.Update(z);
@@ -278,38 +276,34 @@ void Tool::ConvertToSI(void)
 	}
 
 	// Start values
-	for(std::vector <StartValues>::iterator it = startvalues.begin();
-			it != startvalues.end(); ++it){
-		if(unit == unit_millimeter){
-			it->fn *= 1.0e-3;
-			it->fz *= 1.0e-3;
+	if(unit == unit_millimeter){
+		startvalues.fn *= 1.0e-3;
+		startvalues.fz *= 1.0e-3;
 
-			it->n /= 60.0;
-			it->nramp /= 60.0;
+		startvalues.n /= 60.0;
+		startvalues.nramp /= 60.0;
 
-			it->vc *= (1.0e-3 / 60.0);
-			it->vf *= (1.0e-3 / 60.0);
-			it->vfleadin *= (1.0e-3 / 60.0);
-			it->vfleadout *= (1.0e-3 / 60.0);
-			it->vfplunge *= (1.0e-3 / 60.0);
-			it->vframp *= (1.0e-3 / 60.0);
-			it->vfretract *= (1.0e-3 / 60.0);
-		}
-		if(unit == unit_inch){
-			it->fn *= 2.54e-2;
-			it->fz *= 2.54e-2;
-			it->n /= 60.0;
-			it->nramp /= 60.0;
-			it->vc *= (2.54e-2 / 60.0);
-			it->vf *= (2.54e-2 / 60.0);
-			it->vfleadin *= (2.54e-2 / 60.0);
-			it->vfleadout *= (2.54e-2 / 60.0);
-			it->vfplunge *= (2.54e-2 / 60.0);
-			it->vframp *= (2.54e-2 / 60.0);
-			it->vfretract *= (2.54e-2 / 60.0);
-		}
+		startvalues.vc *= (1.0e-3 / 60.0);
+		startvalues.vf *= (1.0e-3 / 60.0);
+		startvalues.vfleadin *= (1.0e-3 / 60.0);
+		startvalues.vfleadout *= (1.0e-3 / 60.0);
+		startvalues.vfplunge *= (1.0e-3 / 60.0);
+		startvalues.vframp *= (1.0e-3 / 60.0);
+		startvalues.vfretract *= (1.0e-3 / 60.0);
 	}
-	base.ConvertToSI(unit);
+	if(unit == unit_inch){
+		startvalues.fn *= 2.54e-2;
+		startvalues.fz *= 2.54e-2;
+		startvalues.n /= 60.0;
+		startvalues.nramp /= 60.0;
+		startvalues.vc *= (2.54e-2 / 60.0);
+		startvalues.vf *= (2.54e-2 / 60.0);
+		startvalues.vfleadin *= (2.54e-2 / 60.0);
+		startvalues.vfleadout *= (2.54e-2 / 60.0);
+		startvalues.vfplunge *= (2.54e-2 / 60.0);
+		startvalues.vframp *= (2.54e-2 / 60.0);
+		startvalues.vfretract *= (2.54e-2 / 60.0);
+	}
 	shaft.ConvertToSI(unit);
 	holder.ConvertToSI(unit);
 	this->base.unit = unit_SI;

@@ -51,7 +51,6 @@
 #include <wx/string.h>
 #include <wx/docview.h>
 #include <wx/defs.h>
-#include <list>
 
 //#if wxUSE_STD_IOSTREAM
 //typedef wxSTD istream DocumentIstream;
@@ -63,12 +62,10 @@
 
 class Project:public wxDocument {
 	friend class ProjectView;
-	friend class DialogToolbox;
 	friend class CommandProjectRename;
 	friend class CommandObjectLoad;
 	friend class CommandObjectRename;
 	friend class CommandObjectTransform;
-	friend class CommandObjectJoinSurface;
 	friend class CommandObjectRemove;
 	friend class CommandRunAdd;
 	friend class CommandRunRename;
@@ -135,11 +132,11 @@ public:
 	const Tool * GetTool(size_t index) const;
 
 	const std::vector <Tool> * GetTools(void) const;
-	const std::list <Object> * GetObjects(void) const;
+	const std::vector <Object> * GetObjects(void) const;
 
-private:
-	std::list <Object> objects;
-	std::list <Run> run;
+	private:
+	std::vector <Object> objects;
+	std::vector <Run> run;
 	ToolBox tools;
 
 	size_t maxObjectID;

@@ -93,7 +93,7 @@ void GeneratorDexel::Paint(void) const
 }
 
 void GeneratorDexel::PrepareTargets(const Run &run,
-		const std::list <Object> &objects, const DexelTarget &start)
+		const std::vector <Object> &objects, const DexelTarget &start)
 {
 	this->start = start;
 	this->simulation = start;
@@ -117,7 +117,7 @@ void GeneratorDexel::PrepareTargets(const Run &run,
 				"GeneratorDexel::GenerateToolpath - No object in area."));
 	}
 
-	for(std::list <Object>::const_iterator obj = objects.begin();
+	for(std::vector <Object>::const_iterator obj = objects.begin();
 			obj != objects.end(); ++obj){
 		AffineTransformMatrix M = obj->matrix;
 		M.TranslateGlobal(-obj->bbox.xmin, -obj->bbox.ymin, -obj->bbox.zmin);

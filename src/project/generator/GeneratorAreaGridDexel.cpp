@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : GeneratorAreaGridDexel.cpp
-// Purpose            : 
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -91,7 +91,7 @@ wxSizer * GeneratorAreaGridDexel::AddToPanel(wxPanel* panel,
 
 	wxStaticBoxSizer* sbSizerDirection;
 	sbSizerDirection = new wxStaticBoxSizer(
-			new wxStaticBox(panel, wxID_ANY, wxT("Direction")), wxVERTICAL);
+			new wxStaticBox(panel, wxID_ANY, _("Direction")), wxVERTICAL);
 
 	wxFlexGridSizer* fgSizerDirection;
 	fgSizerDirection = new wxFlexGridSizer(2, 2, 0, 0);
@@ -99,7 +99,7 @@ wxSizer * GeneratorAreaGridDexel::AddToPanel(wxPanel* panel,
 	fgSizerDirection->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 
 	m_radioBtnXthenY = new wxRadioButton(sbSizerDirection->GetStaticBox(),
-			wxID_ANY, wxT("X first then Y"), wxDefaultPosition, wxDefaultSize,
+			wxID_ANY, _("X first then Y"), wxDefaultPosition, wxDefaultSize,
 			0);
 	fgSizerDirection->Add(m_radioBtnXthenY, 0, wxALL | wxALIGN_CENTER_VERTICAL,
 			5);
@@ -110,7 +110,7 @@ wxSizer * GeneratorAreaGridDexel::AddToPanel(wxPanel* panel,
 	fgSizerDirection->Add(m_bitmapXthenY, 0, wxALL, 5);
 
 	m_radioBtnYthenX = new wxRadioButton(sbSizerDirection->GetStaticBox(),
-			wxID_ANY, wxT("Y first then X"), wxDefaultPosition, wxDefaultSize,
+			wxID_ANY, _("Y first then X"), wxDefaultPosition, wxDefaultSize,
 			0);
 	fgSizerDirection->Add(m_radioBtnYthenX, 0, wxALL | wxALIGN_CENTER_VERTICAL,
 			5);
@@ -133,7 +133,7 @@ wxSizer * GeneratorAreaGridDexel::AddToPanel(wxPanel* panel,
 	fgSizerDistance->SetFlexibleDirection(wxBOTH);
 	fgSizerDistance->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 
-	m_staticTextOverlap = new wxStaticText(panel, wxID_ANY, wxT("Overlap:"),
+	m_staticTextOverlap = new wxStaticText(panel, wxID_ANY, _("Overlap:"),
 			wxDefaultPosition, wxDefaultSize, 0);
 	m_staticTextOverlap->Wrap(-1);
 	fgSizerDistance->Add(m_staticTextOverlap, 0,
@@ -141,7 +141,7 @@ wxSizer * GeneratorAreaGridDexel::AddToPanel(wxPanel* panel,
 
 	m_textCtrlOverlap = new wxTextCtrl(panel, wxID_ANY, wxEmptyString,
 			wxDefaultPosition, wxDefaultSize, 0);
-	m_textCtrlOverlap->SetToolTip(wxT("Distance between two rows."));
+	m_textCtrlOverlap->SetToolTip(_("Distance between two rows."));
 
 	fgSizerDistance->Add(m_textCtrlOverlap, 0, wxALL | wxEXPAND, 5);
 
@@ -177,7 +177,7 @@ void GeneratorAreaGridDexel::TransferDataFromPanel(CollectionUnits* settings)
 }
 
 void GeneratorAreaGridDexel::GenerateToolpath(const Run &run,
-		const std::list <Object> &objects, const Tool &tool,
+		const std::vector <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
 	output.Empty();

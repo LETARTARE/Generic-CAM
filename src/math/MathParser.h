@@ -101,6 +101,7 @@ public:
 	bool addUnit; ///< Boolean: Add a unit to generated string?
 	bool ignorecase; ///< Boolean: Ignore the case for variables.
 
+
 	Variables globals;
 	Variables allowedUnits;
 

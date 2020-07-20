@@ -65,7 +65,7 @@ wxSizer * GeneratorSurfaceDexel::AddToPanel(wxPanel* panel,
 	fgSizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 
 	m_staticTextTwiddleFactor = new wxStaticText(panel, wxID_ANY,
-			wxT("Max. rest error:"), wxDefaultPosition, wxDefaultSize, 0);
+			_("Max. rest error:"), wxDefaultPosition, wxDefaultSize, 0);
 	m_staticTextTwiddleFactor->Wrap(-1);
 	fgSizer->Add(m_staticTextTwiddleFactor, 0,
 			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT, 5);
@@ -75,7 +75,7 @@ wxSizer * GeneratorSurfaceDexel::AddToPanel(wxPanel* panel,
 	fgSizer->Add(m_textCtrlTwiddleFactor, 0,
 			wxALL | wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL, 5);
 
-	m_staticTextUnit = new wxStaticText(panel, wxID_ANY, wxT("mm"),
+	m_staticTextUnit = new wxStaticText(panel, wxID_ANY, _("mm"),
 			wxDefaultPosition, wxDefaultSize, 0);
 	m_staticTextUnit->Wrap(-1);
 	fgSizer->Add(m_staticTextUnit, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
@@ -103,7 +103,7 @@ bool GeneratorSurfaceDexel::operator ==(const Generator& b) const
 }
 
 void GeneratorSurfaceDexel::GenerateToolpath(const Run &run,
-		const std::list <Object> &objects, const Tool &tool,
+		const std::vector <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
 	errorOccured = false;

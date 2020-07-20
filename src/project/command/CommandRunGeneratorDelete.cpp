@@ -49,7 +49,7 @@ CommandRunGeneratorDelete::~CommandRunGeneratorDelete(void)
 bool CommandRunGeneratorDelete::Do(void)
 {
 	if(project == NULL) return false;
-	std::list <Run>::iterator itRun;
+	std::vector <Run>::iterator itRun;
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 
@@ -71,7 +71,7 @@ bool CommandRunGeneratorDelete::Do(void)
 bool CommandRunGeneratorDelete::Undo(void)
 {
 	if(project == NULL) return false;
-	std::list <Run>::iterator itRun;
+	std::vector <Run>::iterator itRun;
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 	std::vector <Generator*>::iterator it;

@@ -47,7 +47,6 @@ Object::Object(size_t ID) :
 {
 	show = true;
 	selectable = true;
-	useGroups = false;
 //	modified = false;
 }
 
@@ -68,168 +67,6 @@ size_t Object::GetID(void) const
 bool Object::IsEmpty(void) const
 {
 	return geometry.IsEmpty();
-}
-
-bool Object::LoadObject(wxFileName fileName)
-{
-	if(!fileName.IsOk()) return false;
-	this->fileName = fileName;
-	this->name = fileName.GetName();
-	return ReloadObject();
-}
-
-bool IsLess(Triangle a, Triangle b)
-{
-	return (a.p[0].x < b.p[0].x);
-}
-
-bool Object::ReloadObject(void)
-{
-
-	if(!fileName.IsOk()) return false;
-
-	bool success = false;
-
-// Process a GTS-file:
-	if(fileName.GetExt().CmpNoCase(_T("gts")) == 0){
-		FileGTS temp;
-		if(!temp.ReadFile(fileName.GetFullPath())){
-			wxLogMessage
-			(_("GTS file not readable!"));
-			return false;
-		}
-		if(temp.geometry.Size() > 0){
-			temp.geometry.ApplyTransformation();
-			temp.geometry.matrix = AffineTransformMatrix();
-			geometry.Clear();
-			geometry.CopyFrom(temp.geometry);
-			this->name = fileName.GetName();
-			geometry.ApplyTransformation();
-			geometry.CalcNormals();
-			geometry.CalcGroups();
-		}
-		success = true;
-	}
-
-// Process a STL-file:
-	if(fileName.GetExt().CmpNoCase(_T("stl")) == 0){
-		FileSTL temp;
-		if(!temp.ReadFile(fileName.GetFullPath())){
-			wxLogMessage
-			(_("STL file not readable!"));
-			wxLogMessage
-			(temp.error);
-			return false;
-		}
-		AffineTransformMatrix scaledown;
-		scaledown.ScaleGlobal(1, 1, 1);
-		if(temp.geometry.Size() > 0){
-			temp.geometry.ApplyTransformation();
-			temp.geometry.ApplyTransformation(scaledown);
-			temp.geometry.matrix = AffineTransformMatrix();
-			std::sort(temp.geometry.triangles.begin(),
-					temp.geometry.triangles.end(), IsLess);
-			geometry.Clear();
-			geometry.CopyFrom(temp.geometry);
-			this->name = fileName.GetName();
-
-			geometry.CalcNormals();
-			geometry.CalcGroups();
-//				geometry.color.Set(
-//						(float) rand() / (float) RAND_MAX / 2.0 + 0.5,
-//						(float) rand() / (float) RAND_MAX / 2.0 + 0.5,
-//						(float) rand() / (float) RAND_MAX / 2.0 + 0.5);
-		}
-		if(!temp.error.IsEmpty()) wxLogMessage
-		(temp.error);
-//		geometry.paintNormals = true;
-		success = true;
-	}
-
-// Process a DXF-file:
-	if(fileName.GetExt().CmpNoCase(_T("dxf")) == 0){
-		FileDXF temp;
-		if(!temp.ReadFile(fileName.GetFullPath())){
-			wxLogMessage
-			(_("DXF file not readable!"));
-		}
-		geometry.Clear();
-		if(temp.geometry.Size() > 0){
-			temp.geometry.ApplyTransformation();
-			temp.geometry.matrix = AffineTransformMatrix();
-			geometry.CopyFrom(temp.geometry);
-			this->name = temp.geometry.name;
-			geometry.CalcNormals();
-			geometry.CalcGroups();
-			geometry.ApplyTransformation();
-		}
-		success = true;
-	}
-
-// Process a Wavefront OBJ-file:
-	if(fileName.GetExt().CmpNoCase(_T("obj")) == 0){
-		Hull temp;
-		if(!temp.LoadObj(std::string(fileName.GetFullPath().mb_str()))){
-			wxLogMessage
-			(_("OBJ file not readable!"));
-			return false;
-		}
-		geometry = temp;
-		this->name = fileName.GetName();
-		geometry.CalcNormals();
-		geometry.CalcGroups();
-		geometry.ApplyTransformation();
-
-//		geometry.paintNormals = true;
-
-		success = true;
-	}
-
-	if(!useGroups) geometry.ResetGroups();
-
-	return success;
-}
-
-void Object::Update(void)
-{
-	bbox.Clear();
-
-	const size_t N = geometry.GetVertexCount();
-	for(size_t n = 0; n < N; ++n)
-		bbox.Insert(geometry.GetVertex(n));
-	bbox.Transform(geometry.matrix);
-	bbox.Transform(matrix);
-}
-
-//void Object::UpdateNormals(void)
-//{
-//	geometry.CalculateNormals();
-//}
-
-void Object::JoinSurface(void)
-{
-	geometry.ResetGroups();
-	useGroups = false;
-}
-
-void Object::FlipNormals(void)
-{
-	geometry.FlipNormals();
-}
-
-void Object::FlipX(void)
-{
-//	geometry.FlipX();
-}
-
-void Object::FlipY(void)
-{
-//	geometry.FlipY();
-}
-
-void Object::FlipZ(void)
-{
-//	geometry.FlipZ();
 }
 
 void Object::Paint(const OpenGLMaterial &face, const OpenGLMaterial &edge,
@@ -285,6 +122,22 @@ void Object::Paint(const OpenGLMaterial &face, const OpenGLMaterial &edge,
 	glPopMatrix();
 }
 
+void Object::Update(void)
+{
+	bbox.Clear();
+
+	const size_t N = geometry.GetVertexCount();
+	for(size_t n = 0; n < N; ++n)
+		bbox.Insert(geometry.GetVertex(n));
+	bbox.Transform(geometry.matrix);
+	bbox.Transform(matrix);
+}
+
+//void Object::UpdateNormals(void)
+//{
+//	geometry.CalculateNormals();
+//}
+
 void Object::PaintPick(void) const
 {
 	if(!show) return;
@@ -308,6 +161,137 @@ void Object::PaintPick(void) const
 	glPopMatrix();
 }
 
+void Object::FlipNormals(void)
+{
+	geometry.FlipNormals();
+}
+void Object::FlipX(void)
+{
+//	geometry.FlipX();
+}
+void Object::FlipY(void)
+{
+//	geometry.FlipY();
+}
+void Object::FlipZ(void)
+{
+//	geometry.FlipZ();
+}
+
+bool Object::LoadObject(wxFileName fileName)
+{
+	if(!fileName.IsOk()) return false;
+	this->fileName = fileName;
+	this->name = fileName.GetName();
+	return ReloadObject();
+}
+
+bool IsLess(Triangle a, Triangle b)
+{
+	return (a.p[0].x < b.p[0].x);
+}
+
+bool Object::ReloadObject(void)
+{
+
+	if(!fileName.IsOk()) return false;
+
+// Process a GTS-file:
+	if(fileName.GetExt().CmpNoCase(_T("gts")) == 0){
+		FileGTS temp;
+		if(!temp.ReadFile(fileName.GetFullPath())){
+			wxLogMessage
+			(_("GTS file not readable!"));
+			return false;
+		}
+		if(temp.geometry.Size() > 0){
+			temp.geometry.ApplyTransformation();
+			temp.geometry.matrix = AffineTransformMatrix();
+			geometry.Clear();
+			geometry.CopyFrom(temp.geometry);
+			this->name = fileName.GetName();
+			geometry.CalcNormals();
+			geometry.CalcGroups();
+			geometry.ApplyTransformation();
+		}
+		return true;
+	}
+
+// Process a STL-file:
+	if(fileName.GetExt().CmpNoCase(_T("stl")) == 0){
+		FileSTL temp;
+		if(!temp.ReadFile(fileName.GetFullPath())){
+			wxLogMessage
+			(_("STL file not readable!"));
+			wxLogMessage
+			(temp.error);
+			return false;
+		}
+		AffineTransformMatrix scaledown;
+		scaledown.ScaleGlobal(1, 1, 1);
+		if(temp.geometry.Size() > 0){
+			temp.geometry.ApplyTransformation();
+			temp.geometry.ApplyTransformation(scaledown);
+			temp.geometry.matrix = AffineTransformMatrix();
+			std::sort(temp.geometry.triangles.begin(),
+					temp.geometry.triangles.end(), IsLess);
+			geometry.Clear();
+			geometry.CopyFrom(temp.geometry);
+			this->name = fileName.GetName();
+			geometry.CalcNormals();
+			geometry.CalcGroups();
+//				geometry.color.Set(
+//						(float) rand() / (float) RAND_MAX / 2.0 + 0.5,
+//						(float) rand() / (float) RAND_MAX / 2.0 + 0.5,
+//						(float) rand() / (float) RAND_MAX / 2.0 + 0.5);
+		}
+		if(!temp.error.IsEmpty()) wxLogMessage
+		(temp.error);
+//		geometry.paintNormals = true;
+		return true;
+	}
+
+// Process a DXF-file:
+	if(fileName.GetExt().CmpNoCase(_T("dxf")) == 0){
+		FileDXF temp;
+		if(!temp.ReadFile(fileName.GetFullPath())){
+			wxLogMessage
+			(_("DXF file not readable!"));
+		}
+		geometry.Clear();
+		if(temp.geometry.Size() > 0){
+			temp.geometry.ApplyTransformation();
+			temp.geometry.matrix = AffineTransformMatrix();
+			geometry.CopyFrom(temp.geometry);
+			this->name = temp.geometry.name;
+			geometry.CalcNormals();
+			geometry.CalcGroups();
+			geometry.ApplyTransformation();
+		}
+		return true;
+	}
+
+// Process a Wavefront OBJ-file:
+	if(fileName.GetExt().CmpNoCase(_T("obj")) == 0){
+		Hull temp;
+		if(!temp.LoadObj(std::string(fileName.GetFullPath().mb_str()))){
+			wxLogMessage
+			(_("OBJ file not readable!"));
+			return false;
+		}
+		geometry = temp;
+		this->name = fileName.GetName();
+		geometry.CalcNormals();
+		geometry.CalcGroups();
+		geometry.ApplyTransformation();
+
+//		geometry.paintNormals = true;
+
+		return true;
+	}
+	return false;
+}
+
 void Object::ToJSON(JSON &js) const
 {
 	js.SetObject(true);
@@ -322,7 +306,6 @@ void Object::ToJSON(JSON &js) const
 		m[n].SetNumber(matrix[n]);
 	js["Show"].SetBool(show);
 	js["Selectable"].SetBool(selectable);
-	js["UseGroups"].SetBool(useGroups);
 
 //	stream << _T("Color: ");
 //	stream << geometry.color.x << _T(" ");
@@ -339,14 +322,13 @@ bool Object::FromJSON(const JSON& js)
 	const JSON &m = js["Matrix"];
 	for(size_t n = 0; n < 16; ++n)
 		matrix[n] = m[n].GetNumber();
-	show = js["Show"].GetBool(true);
-	selectable = js["Selectable"].GetBool(true);
-	useGroups = js["UseGroups"].GetBool(true);
+	show = js["Show"].GetBool();
+	selectable = js["Selectable"].GetBool();
 
 	//	if(temp.Cmp(_T("Color:")) != 0) return false;
 	//	geometry.color.x = stream.ReadDouble();
 	//	geometry.color.y = stream.ReadDouble();
 	//	geometry.color.z = stream.ReadDouble();
-
+/// LT
+	return true;
 }
-

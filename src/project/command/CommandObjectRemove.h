@@ -45,8 +45,8 @@ public:
 protected:
 	Project * project;
 	size_t ID;
-	std::list<Object> object;
-	std::list<Object>::iterator position;
+	Object object;
+	size_t position;
 };
 
 #endif /* COMMANDOBJECTREMOVE_H_ */

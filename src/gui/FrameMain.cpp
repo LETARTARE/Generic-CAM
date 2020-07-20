@@ -313,14 +313,14 @@ void FrameMain::UpdateStatus(void)
 
 void FrameMain::OnProjectNew(wxRibbonButtonBarEvent& event)
 {
-	printf("New\n");
+	printf(_("New\n"));
 	wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, wxID_NEW);
 	ProcessEvent(menuEvent);
 }
 
 void FrameMain::OnProjectOpen(wxRibbonButtonBarEvent& event)
 {
-	printf("Open\n");
+	printf(_("Open\n"));
 	wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, wxID_OPEN);
 	ProcessEvent(menuEvent);
 }
@@ -332,7 +332,7 @@ void FrameMain::OnProjectOpenMenu(wxRibbonButtonBarEvent& event)
 
 void FrameMain::OnProjectSave(wxRibbonButtonBarEvent& event)
 {
-	printf("Save\n");
+	printf(_("Save\n"));
 
 	wxCommandEvent menuEvent(wxEVT_COMMAND_MENU_SELECTED, wxID_SAVE);
 	ProcessEvent(menuEvent);
@@ -367,7 +367,7 @@ void FrameMain::OnProjectRename(wxCommandEvent& event)
 void FrameMain::OnViewPreferencesMenu(wxRibbonButtonBarEvent& event)
 {
 	wxMenu menu;
-	menu.Append(ID_SETUPUNITS, _("Setup &Units") + _("\tCtrl+U"));
+	menu.Append(ID_SETUPUNITS, _("Setup &Units") + "\tCtrl+U");
 	menu.Append(ID_SETUPSTEREO3D, _("Setup &Stereo 3D"));
 	menu.Append(ID_SETUPLANGUAGE, _("Change Language"));
 	menu.Append(ID_SETUPCONTROLLER, _("Setup 6DOF &Controller"));
@@ -492,11 +492,6 @@ void FrameMain::OnObjectModify(wxCommandEvent& event)
 	dialogObjectTransformation->TransferDataToWindow();
 	dialogObjectTransformation->Raise();
 }
-/// LT  forgotten
-void FrameMain::OnObjectUnifySurface(wxRibbonButtonBarEvent& event)
-{
-	/// ??
-}
 
 void FrameMain::OnObjectDelete(wxCommandEvent& event)
 {
@@ -567,7 +562,7 @@ void FrameMain::OnCAMSetup(wxCommandEvent& event)
 			objID = selection.GetSet();
 			if(objID.size() > 0) newName += _(" - Object: ")
 					+ project->Get3DObject(*(objID.begin()))->name;
-			if(objID.size() > 1) newName += _(", ...");
+			if(objID.size() > 1) newName += ", ...";
 		}
 		if(cmdProc->Submit(
 				new CommandRunAdd(_("Adding run ") + newName, project, newName,

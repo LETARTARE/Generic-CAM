@@ -44,7 +44,6 @@
 #include "DexelTarget.h"
 
 #include <stddef.h>
-#include <list>
 #include <vector>
 #include <map>
 
@@ -105,7 +104,7 @@ public:
 	virtual bool FromJSON(const JSON &js);
 	virtual void Paint(void) const;
 	virtual void GenerateToolpath(const Run &run,
-			const std::list <Object> &objects, const Tool &tool,
+			const std::vector <Object> &objects, const Tool &tool,
 			const DexelTarget &base) = 0;
 };
 

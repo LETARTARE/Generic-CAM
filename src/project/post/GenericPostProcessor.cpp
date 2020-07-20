@@ -33,8 +33,6 @@
 #define _USE_MATH_DEFINES
 #endif
 #include <math.h>
-/// LT
-#include "languages.h"
 
 std::string UnEscape(const std::string &input)
 {
@@ -153,15 +151,15 @@ std::map <std::string, std::string> GenericPostProcessor::GetParameter(
 
 bool GenericPostProcessor::SetParameter(std::string name, std::string value)
 {
-	if(name.compare(_("preblock")) == 0){
+	if(name.compare("preblock") == 0){
 		preblock = value;
 		return true;
 	}
-	if(name.compare(_("configuration")) == 0){
+	if(name.compare("configuration") == 0){
 		configuration = value;
 		return true;
 	}
-	if(name.compare(_("postblock")) == 0){
+	if(name.compare("postblock") == 0){
 		postblock = value;
 		return true;
 	}

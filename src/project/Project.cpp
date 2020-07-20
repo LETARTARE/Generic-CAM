@@ -82,18 +82,18 @@ bool Project::Has(const Selection& sel) const
 {
 	std::set <size_t> IDs = sel.GetSet();
 	if(sel.IsType(Selection::Object)){
-		for(std::list <Object>::const_iterator itobj = objects.begin();
+		for(std::vector <Object>::const_iterator itobj = objects.begin();
 				itobj != objects.end(); ++itobj)
 			IDs.erase(itobj->GetID());
 	}
 	if(sel.IsType(Selection::Run)){
-		for(std::list <Run>::const_iterator itrun = run.begin();
+		for(std::vector <Run>::const_iterator itrun = run.begin();
 				itrun != run.end(); ++itrun)
 			IDs.erase(itrun->GetID());
 	}
 	if(sel.IsType(Selection::Generator) && sel.IsBaseType(Selection::BaseRun)){
 		const size_t baseID = sel.GetBaseID();
-		std::list <Run>::const_iterator itRun = std::find(run.begin(),
+		std::vector <Run>::const_iterator itRun = std::find(run.begin(),
 				run.end(), baseID);
 		if(itRun == run.end()) return false;
 		for(std::vector <Generator*>::const_iterator itgenerator =
@@ -142,7 +142,7 @@ const std::vector <Tool> * Project::GetTools(void) const
 std::vector <size_t> Project::GetAllObjectIDs(void) const
 {
 	std::vector <size_t> temp;
-	for(std::list <Object>::const_iterator it = objects.begin();
+	for(std::vector <Object>::const_iterator it = objects.begin();
 			it != objects.end(); ++it)
 		temp.push_back(it->GetID());
 	return temp;
@@ -151,7 +151,8 @@ std::vector <size_t> Project::GetAllObjectIDs(void) const
 std::vector <size_t> Project::GetAllRunIDs(void) const
 {
 	std::vector <size_t> temp;
-	for(std::list <Run>::const_iterator it = run.begin(); it != run.end(); ++it)
+	for(std::vector <Run>::const_iterator it = run.begin(); it != run.end();
+			++it)
 		temp.push_back(it->GetID());
 	return temp;
 }
@@ -159,7 +160,7 @@ std::vector <size_t> Project::GetAllRunIDs(void) const
 std::vector <size_t> Project::GetAllGeneratorIDs(size_t runID) const
 {
 	std::vector <size_t> temp;
-	std::list <Run>::const_iterator itRun;
+	std::vector <Run>::const_iterator itRun;
 	itRun = std::find(run.begin(), run.end(), runID);
 	if(itRun != run.end()){
 		for(std::vector <Generator*>::const_iterator it =
@@ -171,21 +172,21 @@ std::vector <size_t> Project::GetAllGeneratorIDs(size_t runID) const
 
 const Object * Project::Get3DObject(size_t ID) const
 {
-	std::list <Object>::const_iterator it;
+	std::vector <Object>::const_iterator it;
 	it = std::find(objects.begin(), objects.end(), ID);
 	if(it == objects.end()) throw(std::range_error(
 			"Project::GetObject - Object not found."));
 	return &(*it);
 }
 
-const std::list <Object> * Project::GetObjects(void) const
+const std::vector <Object> * Project::GetObjects(void) const
 {
 	return &objects;
 }
 
 const Run * Project::GetRun(size_t ID) const
 {
-	std::list <Run>::const_iterator it;
+	std::vector <Run>::const_iterator it;
 	it = std::find(run.begin(), run.end(), ID);
 	if(it == run.end()) throw(std::range_error(
 			"Project::GetRun - Run not found."));
@@ -194,7 +195,7 @@ const Run * Project::GetRun(size_t ID) const
 
 const Generator * Project::GetGenerator(size_t runID, size_t ID)
 {
-	std::list <Run>::const_iterator itRun;
+	std::vector <Run>::const_iterator itRun;
 	itRun = std::find(run.begin(), run.end(), runID);
 	if(itRun == run.end()) throw(std::range_error(
 			"Project::GetGenerator - Run not found."));
@@ -233,7 +234,7 @@ BoundingBox Project::GetBBox(const Selection &selected) const
 		}else{
 			for(std::set <size_t>::const_iterator it = set.begin();
 					it != set.end(); ++it){
-				std::list <Object>::const_iterator obj;
+				std::vector <Object>::const_iterator obj;
 				obj = std::find(objects.begin(), objects.end(), *it);
 				if(obj != objects.end()) temp.Insert(obj->bbox);
 			}
@@ -254,7 +255,7 @@ bool Project::GenerateToolpaths(void)
 			it != tools.tools.end(); ++it)
 		it->Update();
 
-	for(std::list <Run>::iterator run = this->run.begin();
+	for(std::vector <Run>::iterator run = this->run.begin();
 			run != this->run.end(); ++run){
 		run->GenerateToolpaths();
 	}
@@ -316,11 +317,11 @@ bool Project::GenerateToolpaths(void)
 
 void Project::Update(void)
 {
-	for(std::list <Object>::iterator it = objects.begin();
+	for(std::vector <Object>::iterator it = objects.begin();
 			it != objects.end(); ++it)
 		it->Update();
 
-	for(std::list <Run>::iterator it = run.begin(); it != run.end(); ++it)
+	for(std::vector <Run>::iterator it = run.begin(); it != run.end(); ++it)
 		it->Update(this);
 
 	UpdateAllViews();
@@ -342,7 +343,7 @@ bool Project::DoSaveDocument(const wxString& filename)
 		JSON &objs = js["Objects"];
 		objs.SetArray(objects.size());
 		size_t n = 0;
-		for(std::list <Object>::const_iterator obj = objects.begin();
+		for(std::vector <Object>::const_iterator obj = objects.begin();
 				obj != objects.end(); ++obj)
 			obj->ToJSON(objs[n++]);
 	}
@@ -350,7 +351,7 @@ bool Project::DoSaveDocument(const wxString& filename)
 		JSON &r = js["Run"];
 		r.SetArray(run.size());
 		size_t n = 0;
-		for(std::list <Run>::const_iterator it = run.begin(); it != run.end();
+		for(std::vector <Run>::const_iterator it = run.begin(); it != run.end();
 				++it)
 			it->ToJSON(r[n++]);
 	}
@@ -367,7 +368,7 @@ bool Project::DoSaveDocument(const wxString& filename)
 		txt << out.str();
 	}
 
-	for(std::list <Object>::const_iterator obj = objects.begin();
+	for(std::vector <Object>::const_iterator obj = objects.begin();
 			obj != objects.end(); ++obj){
 
 		wxString tempName = wxString::Format(_T("object_%zu.obj"),
@@ -435,7 +436,7 @@ bool Project::DoOpenDocument(const wxString& filename)
 			JSON &objs = js["Objects"];
 			objects.resize(objs.Size(), Object(0));
 			size_t n = 0;
-			for(std::list <Object>::iterator obj = objects.begin();
+			for(std::vector <Object>::iterator obj = objects.begin();
 					obj != objects.end(); ++obj)
 				obj->FromJSON(objs[n++]);
 		}
@@ -444,13 +445,13 @@ bool Project::DoOpenDocument(const wxString& filename)
 		wxDir machinedirectory(frame->GetFilePaths()->lastMachineDirectory);
 
 		JSON &r = js["Run"];
-		for(size_t n = 0; n < r.Size(); ++n){
+		run.resize(r.Size(), Run(0));
+		size_t n = 0;
+		for(std::vector <Run>::iterator it = run.begin(); it != run.end();
+				++it){
 			try{
-				std::list <Run>::iterator it = run.emplace(run.end());
-				it->FromJSON(r[n]);
-				if(it->GetID() > maxRunID) maxRunID = it->GetID();
-				if(it->GetMaxGeneratorID() > maxGeneratorID) maxGeneratorID =
-						it->GetMaxGeneratorID();
+				it->FromJSON(r[n++]);
+
 				it->machinefile.SetPath(machinedirectory.GetName());
 				it->machinefile.SetExt(_T("zip"));
 				if(!it->machinefile.IsFileReadable()){
@@ -466,7 +467,8 @@ bool Project::DoOpenDocument(const wxString& filename)
 						<< e.what() << "\n";
 			}
 		}
-		if(DEBUG) std::cout << "Project::DoOpenDocument - All Run loaded.\n";
+		if(DEBUG) std::cout << "Project::DoOpenDocument - Run loaded (count = "
+				<< n << ")\n";
 		zip.CloseEntry();
 		delete[] buffer;
 	}
@@ -492,10 +494,9 @@ bool Project::DoOpenDocument(const wxString& filename)
 			long p;
 			temp.BeforeFirst('.').ToLong(&p);
 			size_t objID = p;
-			if(objID > maxObjectID) maxObjectID = objID;
 			temp = temp.AfterFirst('.');
 			if(!temp.StartsWith(wxT("obj"))) continue;
-			std::list <Object>::iterator obj = std::find(objects.begin(),
+			std::vector <Object>::iterator obj = std::find(objects.begin(),
 					objects.end(), objID);
 			if(obj == objects.end()) continue;
 

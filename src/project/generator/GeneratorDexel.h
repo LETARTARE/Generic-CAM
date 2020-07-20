@@ -52,7 +52,6 @@
 #include "ProtoToolpath.h"
 
 #include <stddef.h>
-#include <list>
 #include <vector>
 
 class GeneratorDexel:public Generator {
@@ -67,7 +66,7 @@ public:
 
 protected:
 
-	void PrepareTargets(const Run &run, const std::list <Object> &objects,
+	void PrepareTargets(const Run &run, const std::vector <Object> &objects,
 			const DexelTarget &start);
 
 	void QuickCollectToolpaths(std::vector <ProtoToolpath> &ptp,

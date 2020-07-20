@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : CommandObjectSetColor.cpp
-// Purpose            : 
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -38,15 +38,22 @@ CommandObjectSetColor::CommandObjectSetColor(const wxString& name,
 //TODO: Add checks
 bool CommandObjectSetColor::Do(void)
 {
-	this->oldColor = project->objects[objectNr].geometries[0].color;
-	project->objects[objectNr].geometries[0].color = this->newColor;
+/// +LT : gcc-810 =>  error: 'std::vectorObject> Project::objects' is private within this context
+	//this->oldColor = project->objects[objectNr].geometries[0].color;
+	//project->objects[objectNr].geometries[0].color = this->newColor;
+	this->oldColor = project->objects[objectNr].geometry[0].color;
+	project->objects[objectNr].geometry[0].color = this->newColor;
+//	this->oldColor = project->GetObjects[objectNr].geometry[0].color;
+//	project->GetObjects[objectNr].geometry[0].color = this->newColor;
 	project->Update();
 	return true;
 }
 
 bool CommandObjectSetColor::Undo(void)
 {
-	project->objects[objectNr].geometries[0].color = this->oldColor;
+/// +LT geometries => geometry
+	//project->objects[objectNr].geometries[0].color = this->oldColor;
+	project->objects[objectNr].geometry[0].color = this->oldColor;
 	project->Update();
 	return true;
 }

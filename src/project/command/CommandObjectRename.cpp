@@ -41,7 +41,7 @@ CommandObjectRename::CommandObjectRename(const wxString& name, Project* project,
 bool CommandObjectRename::Do(void)
 {
 	if(project == NULL) return false;
-	std::list <Object>::iterator it;
+	std::vector <Object>::iterator it;
 	it = std::find(project->objects.begin(), project->objects.end(), ID);
 	if(it == project->objects.end()) return false;
 	this->oldName = it->name;
@@ -53,7 +53,7 @@ bool CommandObjectRename::Do(void)
 
 bool CommandObjectRename::Undo(void)
 {
-	std::list <Object>::iterator it;
+	std::vector <Object>::iterator it;
 	it = std::find(project->objects.begin(), project->objects.end(), ID);
 	if(it == project->objects.end()) return false;
 	it->name = this->oldName;

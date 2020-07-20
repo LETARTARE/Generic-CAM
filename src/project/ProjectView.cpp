@@ -216,7 +216,7 @@ void ProjectView::Render(void) const
 	}
 
 	if(type == vOrigin){
-		for(std::list <Run>::const_iterator run = project->run.begin();
+		for(std::vector <Run>::const_iterator run = project->run.begin();
 				run != project->run.end(); ++run){
 			run->PaintVertices();
 		}
@@ -224,7 +224,7 @@ void ProjectView::Render(void) const
 
 	if(type == vRun || type == vGenerator || type == vSimulation){
 		glPushName(Selection::BaseRun);
-		for(std::list <Run>::const_iterator run = project->run.begin();
+		for(std::vector <Run>::const_iterator run = project->run.begin();
 				run != project->run.end(); ++run){
 			//			if(!selection.IsBase(Selection::BaseRun, run->GetID())
 			//					|| !selection.IsType(Selection::Generator)) continue;
@@ -282,7 +282,7 @@ void ProjectView::RenderPick(void) const
 		glPopName();
 	}
 	glPushName(Selection::BaseObject);
-	for(std::list <Object>::const_iterator obj = project->objects.begin();
+	for(std::vector <Object>::const_iterator obj = project->objects.begin();
 			obj != project->objects.end(); ++obj){
 		glPushName(obj->GetID());
 		obj->PaintPick();
@@ -292,7 +292,7 @@ void ProjectView::RenderPick(void) const
 
 	if(type == vRun){
 		glPushName(Selection::BaseRun);
-		for(std::list <Run>::const_iterator run = project->run.begin();
+		for(std::vector <Run>::const_iterator run = project->run.begin();
 				run != project->run.end(); ++run){
 			glPushName(run->GetID());
 			run->Paint();
@@ -302,7 +302,7 @@ void ProjectView::RenderPick(void) const
 	}
 	if(type == vOrigin){
 		glPushName(Selection::BaseRun);
-		for(std::list <Run>::const_iterator run = project->run.begin();
+		for(std::vector <Run>::const_iterator run = project->run.begin();
 				run != project->run.end(); ++run){
 			glPushName(run->GetID());
 			run->PaintVertices();
@@ -314,10 +314,10 @@ void ProjectView::RenderPick(void) const
 	if(type == vGenerator){
 
 		glPushName(Selection::BaseObject);
-		for(std::list <Object>::const_iterator obj = project->objects.begin();
+		for(std::vector <Object>::const_iterator obj = project->objects.begin();
 				obj != project->objects.end(); ++obj){
 
-			for(std::list <Run>::const_iterator run = project->run.begin();
+			for(std::vector <Run>::const_iterator run = project->run.begin();
 					run != project->run.end(); ++run){
 
 				//			if(!selection.IsBase(Selection::BaseRun, run->GetID())
@@ -338,7 +338,7 @@ void ProjectView::PaintObjects(const Selection& sel, const OpenGLMaterial &face,
 		const OpenGLMaterial &edge) const
 {
 	const Project* project = wxStaticCast(GetDocument(), Project);
-	for(std::list <Object>::const_iterator obj = project->objects.begin();
+	for(std::vector <Object>::const_iterator obj = project->objects.begin();
 			obj != project->objects.end(); ++obj){
 		if(sel.IsBase(Selection::BaseObject, obj->GetID())){
 			obj->Paint(face, edge, sel);
@@ -352,7 +352,7 @@ void ProjectView::PaintObjects(const Selection& sel, const OpenGLMaterial &face,
 void ProjectView::PaintRun(const Selection& sel) const
 {
 	const Project* project = wxStaticCast(GetDocument(), Project);
-	for(std::list <Run>::const_iterator run = project->run.begin();
+	for(std::vector <Run>::const_iterator run = project->run.begin();
 			run != project->run.end(); ++run){
 		if(sel.IsBase(Selection::BaseRun, run->GetID())){
 			run->Paint();
@@ -372,7 +372,7 @@ void ProjectView::PaintRun(const Selection& sel) const
 void ProjectView::PaintGenerators(const Selection& sel) const
 {
 	const Project* project = wxStaticCast(GetDocument(), Project);
-	for(std::list <Run>::const_iterator run = project->run.begin();
+	for(std::vector <Run>::const_iterator run = project->run.begin();
 			run != project->run.end(); ++run){
 		if(!sel.IsBase(Selection::BaseRun, run->GetID())
 				&& !sel.IsType(Selection::Run)) continue;

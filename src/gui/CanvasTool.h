@@ -33,17 +33,21 @@
 #include "../3D/OpenGLCanvas.h"
 
 class CanvasTool:public OpenGLCanvas {
+	// Constructor / Destructor
 public:
 	CanvasTool(wxWindow *parent, wxWindowID id = wxID_ANY, const wxPoint& pos =
 			wxDefaultPosition, const wxSize& size = wxDefaultSize, long style =
 			0, const wxString& name = _T(""));
 	virtual ~CanvasTool();
 
+	// Member Variables
 private:
 	Tool* tool;
 //	DexelTarget debug;
+	// Methods
 public:
 	void InsertTool(Tool& t);
+	void RenderCoordinateSystem(void);
 	void Render();
 
 };

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Name               : CommandObjectSetColor.h
-// Purpose            : 
+// Purpose            :
 // Thread Safe        : Yes
 // Platform dependent : No
 // Compiler Options   :
@@ -35,8 +35,8 @@
 
 #include <wx/cmdproc.h>
 
-#include "../Project.h"
-#include "../../3D/Vector3.h"
+#include "Project.h"
+#include "3D/Vector3.h"
 
 class CommandObjectSetColor:public wxCommand {
 public:

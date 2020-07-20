@@ -41,7 +41,7 @@ CommandRunRename::CommandRunRename(const wxString& name, Project* project,
 bool CommandRunRename::Do(void)
 {
 	if(project == NULL) return false;
-	std::list <Run>::iterator itRun;
+	std::vector <Run>::iterator itRun;
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 	this->oldName = itRun->name;
@@ -54,7 +54,7 @@ bool CommandRunRename::Do(void)
 bool CommandRunRename::Undo(void)
 {
 	if(project == NULL) return false;
-	std::list <Run>::iterator itRun;
+	std::vector <Run>::iterator itRun;
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 	itRun->name = this->oldName;

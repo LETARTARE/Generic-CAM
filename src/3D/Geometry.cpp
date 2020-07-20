@@ -98,30 +98,30 @@ void Geometry::Paint(GeometryColorStyle style) const
 
 	size_t i;
 	::glBegin(GL_TRIANGLES);
-	switch(style){
-	case geometryColorNone:
-		for(i = 0; i < triangles.size(); i++)
-			triangles[i].Paint(true, false);
-		break;
-	case geometryColorGlobal:
-		::glColor3f(color.x, color.y, color.z);
-		for(i = 0; i < triangles.size(); i++)
-			triangles[i].Paint(true, false);
-		break;
-	case geometryColorTriangle:
-		for(i = 0; i < triangles.size(); i++){
-			::glColor3f(triangles[i].c[0].x, triangles[i].c[0].y,
-					triangles[i].c[0].z);
-			triangles[i].Paint(true, false);
-		}
-		break;
-	case geometryColorVertex:
-		for(i = 0; i < triangles.size(); i++)
-			triangles[i].Paint(true, true);
-		break;
-/// LT
-	case geometryColorDefault :
-		break;
+	switch(style)
+	{
+/// +LT
+		case geometryColorNone: case geometryColorDefault :
+			for(i = 0; i < triangles.size(); i++)
+				triangles[i].Paint(true, false);
+			break;
+		case geometryColorGlobal:
+			::glColor3f(color.x, color.y, color.z);
+			for(i = 0; i < triangles.size(); i++)
+				triangles[i].Paint(true, false);
+			break;
+		case geometryColorTriangle:
+			for(i = 0; i < triangles.size(); i++){
+				::glColor3f(triangles[i].c[0].x, triangles[i].c[0].y,
+						triangles[i].c[0].z);
+				triangles[i].Paint(true, false);
+			}
+			break;
+		case geometryColorVertex:
+			for(i = 0; i < triangles.size(); i++)
+				triangles[i].Paint(true, true);
+			break;
+
 	}
 	::glEnd();
 

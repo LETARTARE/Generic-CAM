@@ -363,15 +363,10 @@ std::vector <CNCPosition> GeneratorAreaMillingDynamic::MoveSafely(
 	}
 	return tp;
 }
-/// LT
-/*
+
 void GeneratorAreaMillingDynamic::GenerateToolpath(const Run &run,
 		const std::vector <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
-*/
-void GeneratorAreaMillingDynamic::GenerateToolpath(		const Run &run,
-			const std::list <Object> &objects, const Tool &tool,
-			const DexelTarget &base)
 {
 	output.Empty();
 

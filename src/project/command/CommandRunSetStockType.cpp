@@ -40,7 +40,7 @@ CommandRunSetStockType::CommandRunSetStockType(const wxString& name,
 bool CommandRunSetStockType::Do(void)
 {
 	if(project == NULL) return false;
-	std::list <Run>::iterator itRun;
+	std::vector <Run>::iterator itRun;
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 	oldType = itRun->stocktype;
@@ -53,7 +53,7 @@ bool CommandRunSetStockType::Do(void)
 bool CommandRunSetStockType::Undo(void)
 {
 	if(project == NULL) return false;
-	std::list <Run>::iterator itRun;
+	std::vector <Run>::iterator itRun;
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 	itRun->stocktype = oldType;

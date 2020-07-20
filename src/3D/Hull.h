@@ -34,17 +34,14 @@
  * be intersected by a plane to return closed polygons.
  */
 
-#define _USE_MATH_DEFINES
-
-#include "AffineTransformMatrix.h"
-#include "Vector3.h"
-
-#include <math.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <set>
 #include <string>
 #include <vector>
+
+#include "AffineTransformMatrix.h"
+#include "Vector3.h"
 
 class Geometry;
 class Polygon3;
@@ -113,8 +110,7 @@ public:
 	bool IsEmpty(void) const;
 
 	void CalcNormals(void);
-	void CalcGroups(double angle = 25.0 / 180.0 * M_PI); //!< Group triangles and edges by assigning labels
-	void ResetGroups(void);
+	void CalcGroups(void); //!< Group triangles and edges by assigning labels
 	void FlipNormals(void);
 
 	size_t Select(std::set <size_t> &select);
@@ -133,7 +129,7 @@ public:
 	void AddTrianglesFrom(const Geometry &geometry);
 
 	bool LoadObj(std::string filename); //!< Load Wavefront OBJ file.
-	friend std::istream& operator>>(std::istream &in, Hull &hull);
+	friend std::istream& operator>> (std::istream &in, Hull &hull);
 	void SaveObj(std::string filename) const; //!< Write Wavefront OBJ file.
 	friend std::ostream& operator<<(std::ostream &out, const Hull &hull);
 

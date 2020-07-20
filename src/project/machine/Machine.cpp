@@ -103,13 +103,13 @@ bool Machine::ReLoad(void)
 		wxTextFile file(fileName.GetFullPath());
 		if(!file.Open(wxConvLocal) && !file.Open(wxConvFile)){
 			wxLogError
-			(_T("Opening of the file failed!"));
+			(_("Opening of the file failed!"));
 			return false;
 		}
 		wxString str;
 		machineDescription.Empty();
 		for(str = file.GetFirstLine(); !file.Eof(); str = file.GetNextLine()){
-			machineDescription += str + _T("\n");
+			machineDescription += str + "\n";
 		}
 	}
 	if(fileName.GetExt().CmpNoCase(_T("zip")) == 0){
@@ -126,7 +126,7 @@ bool Machine::ReLoad(void)
 				machineDescription.Empty();
 				while(inzip.CanRead()){
 					str = textin.ReadLine();
-					machineDescription += str + _T("\n");
+					machineDescription += str + "\n";
 				}
 				inzip.CloseEntry();
 				flag = true;
@@ -345,7 +345,7 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 	// Case 0: The lua file is inside a zip, so is the rest of the data.
 	if(machinedirectory.GetExt().CmpNoCase(_T("zip")) == 0){
 		wxLogMessage
-		(_T("Inside Zip file."));
+		(_("Inside Zip file."));
 		return LoadGeometryIntoComponentFromZip(machinedirectory, filename,
 				component, matrix);
 	}
@@ -355,7 +355,7 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 	zipFile.SetExt(_T("zip"));
 	if(zipFile.IsFileReadable()){
 		wxLogMessage
-		(_T("Zip file found."));
+		(_("Zip file found."));
 		return LoadGeometryIntoComponentFromZip(zipFile, filename, component,
 				matrix);
 	}
@@ -376,7 +376,7 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 	(zipFile.GetFullPath());
 	if(zipFile.IsFileReadable()){
 		wxLogMessage
-		(_T("Extra-Zip file found."));
+		(_("Extra-Zip file found."));
 		return LoadGeometryIntoComponentFromZip(zipFile, filename, component,
 				matrix);
 	}
@@ -384,7 +384,7 @@ bool Machine::LoadGeometryIntoComponent(const wxString& filename,
 //	wxLogMessage(_T("machineDirectory:") + machinedirectory.GetPath());
 
 	textOut += filename;
-	textOut += _T("\nFile not found at all!\n");
+	textOut += _("\nFile not found at all!\n");
 	return false;
 }
 
@@ -411,7 +411,7 @@ bool Machine::LoadGeometryIntoComponentFromZip(const wxFileName &zipFile,
 				return true;
 			}else{
 				wxLogMessage
-				(_T("Geometries other than STL are not supported (yet)."));
+				(_("Geometries other than STL are not supported (yet)."));
 			}
 			break;
 		}

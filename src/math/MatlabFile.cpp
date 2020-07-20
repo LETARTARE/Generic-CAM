@@ -208,8 +208,8 @@ void MatlabFile::WriteMatrix(const MatlabMatrix& M)
 				char bufferTime[75];
 				time(&rawtime);
 				timeinfo = localtime(&rawtime);
+		/// +LT : gcc-810 => warning: unknown conversion type character 'F' in format [-Wformat=]
 				//strftime(bufferTime, 75, "%F %X %Z", timeinfo);
-			/// LT
 				strftime(bufferTime, 75, "%Y-%m-%d %X %Z", timeinfo);
 				memset(headertext, 32, sizeof(char) * 124);
 				sprintf(headertext,

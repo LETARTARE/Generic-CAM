@@ -24,15 +24,15 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#define _USE_MATH_DEFINES
-
 #include "GCodeBlock.h"
 
 #include <float.h>
 #include <stdint.h>
 #include <stdexcept>
 #include <sstream>
-
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
 #include <math.h>
 
 GCodeBlock::GCodeBlock(std::string block, double conversionFactor)
@@ -858,8 +858,8 @@ bool GCodeBlock::IsStateChange(void) const
 bool GCodeBlock::IsMotion(void) const
 {
 	const uint_fast8_t c = G[1] / 10;
+	// if(c >= 0 && c <= 3) return true;
 /// LT
-	//if(c >= 0 && c <= 3) return true;
 	if(c <= 3) return true;
 	if(c >= 80 && c <= 89) return true;
 	return false;
@@ -989,8 +989,8 @@ void GCodeBlock::SetG(unsigned int nr, unsigned char subnr)
 
 void GCodeBlock::SetM(unsigned int nr)
 {
-/// LT nr is always >=
-//	if(nr < 0) throw(std::out_of_range("M command may not be negative."));
+/// LT nr is always >= 0
+	// if(nr < 0) throw(std::out_of_range("M command may not be negative."));
 	if(nr >= 120) throw(std::out_of_range(
 			"M command may not be greater than 119."));
 	const int index = Mindex[nr];

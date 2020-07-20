@@ -60,16 +60,12 @@ DialogToolbox::DialogToolbox(wxWindow* parent) :
 DialogToolbox::~DialogToolbox()
 {
 }
-/// LT
-//void DialogToolbox::Update(void)
-void DialogToolbox::Update(bool refreshDirectory)
+
+void DialogToolbox::Update(void)
 {
 	if(!this->IsShown()) return;
 	FrameMain * frame = wxStaticCast(GetParent(), FrameMain);
 	Project* project = wxStaticCast(frame->GetDocument(), Project);
-/// LT for complilation !
-	ToolBox  localtoolbox;
-
 	if(toolboxes.empty()){
 		wxDir dir(frame->GetFilePaths()->lastToolboxDirectory);
 		if(dir.IsOpened()){
@@ -109,8 +105,8 @@ void DialogToolbox::Update(bool refreshDirectory)
 		m_treeListCtrl->SetItemText(item, 3,
 				wxString::Format(_T("%i"), it->postprocess.number));
 	}
-/// LT
-wxTreeListItem localtoolboxfolder = m_treeListCtrl->AppendItem(root, _("Local toolbox"), 1,
+
+	localtoolboxfolder = m_treeListCtrl->AppendItem(root, _("Local toolbox"), 1,
 			2);
 	m_treeListCtrl->AppendItem(localtoolboxfolder, _("loading..."), 0, 0);
 	m_treeListCtrl->Collapse(localtoolboxfolder);
@@ -283,31 +279,16 @@ void DialogToolbox::OnEnter(wxCommandEvent& event)
 	TransferDataFromWindow();
 	TransferDataToWindow();
 }
-/// LT not used
-/*
+
 void DialogToolbox::OnClose(wxCommandEvent& event)
 {
 	this->Show(false);
 }
-*/
 
 void DialogToolbox::OnXClose(wxCloseEvent& event)
 {
 	this->Show(false);
 }
-/// LT  :forgotten
-void DialogToolbox::OnToolChecked(wxTreeListEvent& event){}
-void DialogToolbox::OnToolContextMenu(wxTreeListEvent& event){}
-void DialogToolbox::OnToolboxExpanding(wxTreeListEvent& event){}
-void DialogToolbox::OnToolSelectionChanged(wxTreeListEvent& event) {}
-void DialogToolbox::OnChoice(wxCommandEvent& event) {}
-void DialogToolbox::OnRadioBox(wxCommandEvent& event) {}
-void DialogToolbox::OnCheckBox(wxCommandEvent& event) {}
-void DialogToolbox::OnSegmentAdd(wxCommandEvent& event) {}
-void DialogToolbox::OnSegmentDelete(wxCommandEvent& event) {}
-void DialogToolbox::OnItemBeginDrag(wxDataViewEvent& event) {}
-void DialogToolbox::OnItemDrop(wxDataViewEvent& event) {}
-void DialogToolbox::OnSelectionChanged(wxDataViewEvent& event) {}
 
 //void DialogToolbox::OnToolSelect(wxCommandEvent& event)
 //{
@@ -371,8 +352,7 @@ void DialogToolbox::OnSelectionChanged(wxDataViewEvent& event) {}
 ////	}
 //	TransferDataToWindow();
 //}
-/// LT
-/*
+
 void DialogToolbox::OnShapeSelect(wxListEvent& event)
 {
 //	if(event.GetIndex() == selectedElement) return;
@@ -383,6 +363,7 @@ void DialogToolbox::OnShapeSelect(wxListEvent& event)
 //	}
 	TransferDataToWindow();
 }
+
 void DialogToolbox::OnShapeNew(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
@@ -394,6 +375,7 @@ void DialogToolbox::OnShapeNew(wxCommandEvent& event)
 //	selectedElement++;
 	TransferDataToWindow();
 }
+
 void DialogToolbox::OnShapeUpdate(wxCommandEvent& event)
 {
 	TransferDataFromWindow();
@@ -413,11 +395,13 @@ void DialogToolbox::OnShapeDelete(wxCommandEvent& event)
 //			tempTool.elements[selectedElement];
 	TransferDataToWindow();
 }
+
 void DialogToolbox::OnShapeWizard(wxCommandEvent& event)
 {
 //	DialogToolWizard dialog(this);
 //	dialog.ShowModal();
 }
+
 void DialogToolbox::OnItemChecked(wxTreeListEvent& event)
 {
 }
@@ -429,5 +413,4 @@ void DialogToolbox::OnItemContextMenu(wxTreeListEvent& event)
 void DialogToolbox::OnSelectionChanged(wxTreeListEvent& event)
 {
 }
-*/
 

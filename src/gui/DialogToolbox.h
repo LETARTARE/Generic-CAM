@@ -33,56 +33,43 @@
 #include "gui.h"
 
 class DialogToolbox:public GUIToolbox {
-private:
-	class ToolData:public wxClientData {
-	public:
-		ToolData(size_t toolbox, size_t tool = 0, bool isTool = false) :
-				toolbox(toolbox), tool(tool), isTool(isTool)
-		{
-		}
-		size_t toolbox;
-		size_t tool;
-		bool isTool;
-	};
-
 public:
 	DialogToolbox(wxWindow* parent);
 	virtual ~DialogToolbox();
 
-	void Update(bool refreshDirectory = false);
+	void Update(void);
 
 protected:
-	size_t selectedToolBox;
-	size_t selectedTool;
-	size_t selectedElement;
+	int selectedTool;
+	int selectedElement;
 
 	Tool tempTool;
+
 	wxTreeListItem projectfolder;
-	std::vector <ToolBox> toolboxes;
-	std::vector <wxTreeListItem> toolboxfolders;
 
-private:
-
-	void AddToolToListCtrl(wxTreeListItem & item, const Tool & tool);
+	ToolBox localtoolbox;
+	wxTreeListItem localtoolboxfolder;
+	std::vector<ToolBox> toolboxes;
+	std::vector<wxTreeListItem> toolboxfolders;
 
 public:
+	void OnClose(wxCommandEvent& event);
+	void OnXClose(wxCloseEvent& event);
+
 	bool TransferDataToWindow(void);
 	bool TransferDataFromWindow(void);
 
-	void OnXClose(wxCloseEvent& event);
-	void OnToolChecked(wxTreeListEvent& event) wxOVERRIDE;;
-	void OnToolContextMenu(wxTreeListEvent& event) wxOVERRIDE;
-	void OnToolboxExpanding(wxTreeListEvent& event) wxOVERRIDE;
-	void OnToolSelectionChanged(wxTreeListEvent& event);
-	void OnChoice(wxCommandEvent& event);
 	void OnEnter(wxCommandEvent& event);
-	void OnRadioBox(wxCommandEvent& event);
-	void OnCheckBox(wxCommandEvent& event);
-	void OnSegmentAdd(wxCommandEvent& event);
-	void OnSegmentDelete(wxCommandEvent& event);
-	void OnItemBeginDrag(wxDataViewEvent& event);
-	void OnItemDrop(wxDataViewEvent& event);
-	void OnSelectionChanged(wxDataViewEvent& event);
+	void OnShapeWizard(wxCommandEvent& event);
+	void OnShapeNew(wxCommandEvent& event);
+	void OnShapeUpdate(wxCommandEvent& event);
+	void OnShapeDelete(wxCommandEvent& event);
+	void OnShapeSelect(wxListEvent& event);
+
+	void OnItemChecked(wxTreeListEvent& event);
+	void OnItemContextMenu(wxTreeListEvent& event);
+	void OnSelectionChanged(wxTreeListEvent& event);
+
 };
 
 #endif /* TOOLBOXFRAME_H_ */

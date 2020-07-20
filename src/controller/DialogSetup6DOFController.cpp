@@ -108,7 +108,7 @@ void DialogSetup6DOFController::OnConnect(wxCommandEvent& event)
 	if(this->control->IsOpen()){
 		this->control->Close();
 		wxLogMessage(
-				_T("control closed (but should not be open first place)!"));
+				_("control closed (but should not be open first place)!"));
 	}
 
 	switch(i){

@@ -41,7 +41,7 @@ CommandRunSetObject::CommandRunSetObject(const wxString& name, Project* project,
 bool CommandRunSetObject::Do(void)
 {
 	if(project == NULL) return false;
-	std::list <Run>::iterator itRun;
+	std::vector <Run>::iterator itRun;
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 
@@ -56,7 +56,7 @@ bool CommandRunSetObject::Do(void)
 bool CommandRunSetObject::Undo(void)
 {
 	if(project == NULL) return false;
-	std::list <Run>::iterator itRun;
+	std::vector <Run>::iterator itRun;
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 	itRun->object = this->oldSelection;

@@ -62,11 +62,11 @@ public:
 	void Swap(ImprinterElement& b);
 
 public:
-/// LT  add init = 0.0 (C++11)
+/// LT  add : = 0.0
 	float aboveUp = 0.0;
 	float aboveDown = 0.0;
-	float up = 0.0;
-	float down = 0.0;
+	float up;
+	float down;
 	float belowUp = 0.0;
 	float belowDown = 0.0;
 

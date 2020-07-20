@@ -72,16 +72,17 @@
 
 #include "../Config.h"
 
-#define _USE_MATH_DEFINES
-
 #ifdef _USE_MATHPARSER
 #include "MathParser.h"
 #endif
 
-#include <wx/string.h> //TODO: Remove usage of wx/string.h
-
 #include <string>
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
 #include <math.h>
+
+#include <wx/string.h> //TODO: Remove usage of wx/string.h
 
 class Unit {
 public:
@@ -159,6 +160,7 @@ public:
 		return !(lhs == rhs);
 	}
 
+
 	//TODO: Check if the functions below belong into the Measurement class.
 
 	Unit& operator*=(const Unit &other)
@@ -194,6 +196,7 @@ public:
 	{
 		return lhs /= rhs;
 	}
+
 
 };
 

@@ -50,15 +50,12 @@ public:
 		unit_none, unit_SI, unit_inch, unit_millimeter
 	};
 	enum ToolType {
-		no_type = 0,
+		no_type,
 		flat_end_mill,
-		ball_end_mill,
-		bull_nose_end_mill,
-		camfer_mill,
-		tapered_mill,
 		radius_mill,
-		spot_drill,
-		counter_sink,
+		camfer_mill,
+		bull_nose_end_mill,
+		ball_end_mill,
 		tool_holder,
 		tool_shaft,
 		probe
@@ -173,15 +170,15 @@ public:
 
 	bool hasGeometry;
 	Geometry geometry;
-	std::vector <StartValues> startvalues;
+	bool hasStartValues;
+	StartValues startvalues;
 	bool hasPostProcess;
 	PostProcess postprocess;
 
 	double lastmodified;
 	bool addtonewprojects;
-
-	UnitType unitinfile;
 private:
+	UnitType unitinfile;
 	float fullsize;
 	// Methods
 public:

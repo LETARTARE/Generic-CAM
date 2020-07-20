@@ -36,7 +36,10 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
-
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
+#include <math.h>
 #include "OpenGL.h"
 
 Hull::Edge::Edge()
@@ -125,15 +128,236 @@ void Hull::Clear(void)
 	matrix.SetIdentity();
 }
 
-bool Hull::IsEmpty(void) const
-{
-	return (v.size() == 0);
-}
-
 void Hull::SetEpsilon(double newEpsilon)
 {
 	epsilon = newEpsilon;
 	epsilon2 = newEpsilon * newEpsilon;
+}
+
+void Hull::Paint(void) const
+{
+
+	if(paintTriangles){
+		PaintTriangles();
+	}
+	if(paintEdges){
+		PaintEdges();
+	}
+	if(paintVertices){
+		PaintVertices();
+	}
+	if(paintSelected){
+		PaintSelected();
+	}
+}
+
+void Hull::PaintTriangles(const std::set <size_t>&sel, bool invert) const
+{
+	const double normalscale = 0.1;
+	::glPushMatrix();
+	matrix.GLMultMatrix();
+//	OpenGLMaterial::EnableColors();
+	GLuint group = 0;
+	bool skip = false;
+	glPushName(group);
+	glBegin(GL_TRIANGLES);
+	if(smooth){
+		for(size_t i = 0; i < t.size(); ++i){
+
+			if(t[i].group != group){
+				group = (GLuint) (t[i].group % ((size_t) -1));
+				skip = ((!invert && sel.find(group) == sel.end())
+						|| (invert && sel.find(group) != sel.end()));
+				if(skip) continue;
+
+				glEnd();
+				glLoadName(group);
+				glBegin(GL_TRIANGLES);
+			}
+			if(skip) continue;
+			glNormal3f(vn[t[i].va].x, vn[t[i].va].y, vn[t[i].va].z);
+			glVertex3f(v[t[i].va].x, v[t[i].va].y, v[t[i].va].z);
+			glNormal3f(vn[t[i].vb].x, vn[t[i].vb].y, vn[t[i].vb].z);
+			glVertex3f(v[t[i].vb].x, v[t[i].vb].y, v[t[i].vb].z);
+			glNormal3f(vn[t[i].vc].x, vn[t[i].vc].y, vn[t[i].vc].z);
+			glVertex3f(v[t[i].vc].x, v[t[i].vc].y, v[t[i].vc].z);
+		}
+
+	}else{
+		for(size_t i = 0; i < t.size(); ++i){
+			if(t[i].group != group){
+				group = (GLuint) (t[i].group % ((size_t) -1));
+				skip = ((!invert && sel.find(t[i].group) == sel.end())
+						|| (invert && sel.find(t[i].group) != sel.end()));
+				if(skip) continue;
+				glEnd();
+				glLoadName(group);
+				glBegin(GL_TRIANGLES);
+			}
+			if(skip) continue;
+
+//			glColor3f(0.5 + cos(2 * M_PI / 20.0 * t[i].group) * 0.5,
+//					0.5
+//							+ cos(
+//									2 * M_PI / 20.0 * t[i].group
+//											+ M_PI * 2.0 / 3.0) * 0.5,
+//					0.5
+//							+ cos(
+//									2 * M_PI / 20.0 * t[i].group
+//											+ M_PI * 4.0 / 3.0) * 0.5);
+			glNormal3f(t[i].n.x, t[i].n.y, t[i].n.z);
+			glVertex3f(v[t[i].va].x, v[t[i].va].y, v[t[i].va].z);
+			glVertex3f(v[t[i].vb].x, v[t[i].vb].y, v[t[i].vb].z);
+			glVertex3f(v[t[i].vc].x, v[t[i].vc].y, v[t[i].vc].z);
+		}
+	}
+	glEnd();
+	glPopName();
+
+	if(paintNormals){
+
+		glBegin(GL_LINES);
+		for(size_t i = 0; i < t.size(); ++i){
+			glNormal3f(t[i].n.x, t[i].n.y, t[i].n.z);
+			const Vector3 center = (v[t[i].va] + v[t[i].vb] + v[t[i].vc]) / 3;
+			glVertex3f(center.x, center.y, center.z);
+			glVertex3f(center.x + t[i].n.x * normalscale,
+					center.y + t[i].n.y * normalscale,
+					center.z + t[i].n.z * normalscale);
+		}
+		glEnd();
+	}
+	glPopMatrix();
+}
+
+void Hull::PaintEdges(const std::set <size_t>&sel, bool invert) const
+{
+	const double normalscale = 0.1;
+	glPushMatrix();
+	matrix.GLMultMatrix();
+	GLuint group = 0;
+	bool skip = false;
+	glPushName(group);
+	glBegin(GL_LINES);
+	if(smooth){
+		for(size_t i = 0; i < e.size(); ++i){
+			if(e[i].group != group){
+				group = (GLuint) (e[i].group % ((size_t) -1));
+				skip = ((!invert && sel.find(group) == sel.end())
+						|| (invert && sel.find(group) != sel.end()));
+				if(skip) continue;
+				glEnd();
+				glLoadName(group);
+				glBegin(GL_LINES);
+			}
+			if(skip) continue;
+			if(!e[i].sharp) continue;
+			glNormal3f(vn[e[i].va].x, vn[e[i].va].y, vn[e[i].va].z);
+			glVertex3f(v[e[i].va].x, v[e[i].va].y, v[e[i].va].z);
+			glNormal3f(vn[e[i].vb].x, vn[e[i].vb].y, vn[e[i].vb].z);
+			glVertex3f(v[e[i].vb].x, v[e[i].vb].y, v[e[i].vb].z);
+		}
+	}else{
+		for(size_t i = 0; i < e.size(); ++i){
+			if(e[i].group != group){
+				group = (GLuint) (e[i].group % ((size_t) -1));
+				skip = ((!invert && sel.find(group) == sel.end())
+						|| (invert && sel.find(group) != sel.end()));
+				if(skip) continue;
+				glEnd();
+				glLoadName(group);
+				glBegin(GL_LINES);
+			}
+			if(skip) continue;
+			if(!e[i].sharp) continue;
+
+//			glColor3f(0.5 + cos(2 * M_PI / 20.0 * e[i].group) * 0.5,
+//					0.5
+//							+ cos(
+//									2 * M_PI / 20.0 * e[i].group
+//											+ M_PI * 2.0 / 3.0) * 0.5,
+//					0.5
+//							+ cos(
+//									2 * M_PI / 20.0 * e[i].group
+//											+ M_PI * 4.0 / 3.0) * 0.5);
+
+			glNormal3f(e[i].n.x, e[i].n.y, e[i].n.z);
+			glVertex3f(v[e[i].va].x, v[e[i].va].y, v[e[i].va].z);
+			glVertex3f(v[e[i].vb].x, v[e[i].vb].y, v[e[i].vb].z);
+		}
+	}
+	glEnd();
+	glPopName();
+
+	if(paintNormals){
+		glBegin(GL_LINES);
+		for(size_t i = 0; i < e.size(); ++i){
+			glNormal3f(e[i].n.x, e[i].n.y, e[i].n.z);
+			const Vector3 center = (v[e[i].va] + v[e[i].vb]) / 2;
+			glVertex3f(center.x, center.y, center.z);
+			glVertex3f(center.x + e[i].n.x * normalscale,
+					center.y + e[i].n.y * normalscale,
+					center.z + e[i].n.z * normalscale);
+		}
+		glEnd();
+	}
+	glPopMatrix();
+}
+
+void Hull::PaintVertices(void) const
+{
+
+	const double normalscale = 0.1;
+	glPushMatrix();
+	matrix.GLMultMatrix();
+	for(size_t i = 0; i < v.size(); ++i){
+		glPushName(i);
+		glBegin(GL_POINTS);
+		glNormal3f(vn[i].x, vn[i].y, vn[i].z);
+		glVertex3f(v[i].x, v[i].y, v[i].z);
+		glEnd();
+		glPopName();
+	}
+
+	if(paintNormals){
+		glBegin(GL_LINES);
+		for(size_t i = 0; i < v.size(); ++i){
+			glNormal3f(vn[i].x, vn[i].y, vn[i].z);
+			glVertex3f(v[i].x, v[i].y, v[i].z);
+			glVertex3f(v[i].x + vn[i].x * normalscale,
+					v[i].y + vn[i].y * normalscale,
+					v[i].z + vn[i].z * normalscale);
+		}
+		glEnd();
+	}
+	glPopMatrix();
+}
+
+void Hull::PaintSelected(void) const
+{
+	glPushMatrix();
+	matrix.GLMultMatrix();
+	glPointSize(10);
+	glBegin(GL_POINTS);
+	for(std::set <size_t>::iterator n = selected.begin(); n != selected.end();
+			++n){
+		size_t i = *n;
+		glNormal3f(vn[i].x, vn[i].y, vn[i].z);
+		glVertex3f(v[i].x, v[i].y, v[i].z);
+	}
+	glEnd();
+	glPointSize(1);
+	glPopMatrix();
+}
+
+bool Hull::IsClosed(void) const
+{
+	return (openedges.empty() && openvertices.empty());
+}
+
+bool Hull::IsEmpty(void) const
+{
+	return (v.size() == 0);
 }
 
 bool Hull::LoadObj(std::string filename)
@@ -214,7 +438,7 @@ std::istream& operator>>(std::istream &in, Hull &hull)
 	std::vector <int> index_t;
 	std::vector <int> index_n;
 	std::vector <Vector3> tempnormals;
-/// LT ??
+/// +LT init !
 	double tempvalue = 0.0;
 	int tempindex = 0;
 ///
@@ -507,6 +731,30 @@ std::ostream& operator<<(std::ostream &out, const Hull &hull)
 	return out;
 }
 
+void Hull::ApplyTransformation(const AffineTransformMatrix &matrix)
+{
+	std::transform(v.begin(), v.end(), v.begin(), matrix);
+	for(size_t i = 0; i < vn.size(); i++)
+		vn[i] = matrix.TransformNoShift(vn[i]);
+	for(size_t i = 0; i < e.size(); i++)
+		e[i].n = matrix.TransformNoShift(e[i].n);
+	for(size_t i = 0; i < t.size(); i++)
+		t[i].n = matrix.TransformNoShift(t[i].n);
+
+	if(matrix.CheckOrientation() == AffineTransformMatrix::lhs){
+		for(size_t i = 0; i < t.size(); i++){
+			std::swap(t[i].va, t[i].vb);
+			std::swap(t[i].eb, t[i].ec);
+		}
+	}
+}
+
+void Hull::ApplyTransformation(void)
+{
+	this->ApplyTransformation(this->matrix);
+	this->matrix.SetIdentity();
+}
+
 void Hull::CopyFrom(const Geometry &geometry)
 {
 	Clear();
@@ -515,6 +763,298 @@ void Hull::CopyFrom(const Geometry &geometry)
 //	wxLogMessage(
 //			wxString::Format(_T("V: %u E: %u T: %u"), v.size(),
 //					e.size(), t.size()));
+}
+
+void Hull::AddTrianglesFrom(const Geometry &geometry)
+{
+	for(size_t i = 0; i < geometry.triangles.size(); i++){
+		AddTriangleWithNormals(geometry.triangles[i].p[0],
+				geometry.triangles[i].p[1], geometry.triangles[i].p[2],
+				geometry.triangles[i].n[0], geometry.triangles[i].n[1],
+				geometry.triangles[i].n[2]);
+	}
+}
+
+Vector3 Hull::GetCenter(void) const
+{
+	if(v.empty()) return Vector3();
+	Vector3 temp;
+	for(size_t i = 0; i < v.size(); ++i)
+		temp += v[i];
+	return (temp / v.size());
+}
+
+size_t Hull::Size(void) const
+{
+	return v.size();
+}
+
+Vector3 Hull::PlaneProjection(const Vector3& a, const Vector3& b, Vector3 n,
+		double d)
+{
+	// Assume, that n is of length 1
+	// Project a onto the normal vector of the plane, distance relative to the center
+	const double sa = n.Dot(a) - d;
+	const double sb = n.Dot(b) - d;
+	if(sa - sb == 0) return (a + b) / 2;
+	// Project the line from a to b onto the plane, return the intersecting point
+	return (b * sa - a * sb) / (sa - sb);
+}
+
+Polygon3 Hull::IntersectPlane(Vector3 n, double d) const
+{
+	n.Normalize();
+
+	// Find edges
+	std::set <size_t> edges;
+	for(size_t i = 0; i < e.size(); ++i){
+		const Vector3 a = v[e[i].va];
+		const Vector3 b = v[e[i].vb];
+		const double da = a.Dot(n);
+		const double db = b.Dot(n);
+		if((da > d && db <= d) || (da <= d && db > d)) edges.insert(i);
+	}
+
+	Polygon3 temp;
+	// No intersection found
+	if(edges.empty()) return temp;
+	size_t ne = *(edges.begin());
+	size_t nt = e[ne].ta;
+	int dir = t[nt].Direction(e[ne].va, e[ne].vb);
+	if(dir == 0) throw(std::logic_error(
+			"Hull:IntersectPlane - Wrong triangle selected."));
+	if(dir == -1) nt = e[ne].tb;
+	while(!edges.empty()){
+
+		const Vector3 a = v[e[ne].va];
+		const Vector3 b = v[e[ne].vb];
+		const double sa = n.Dot(a) - d;
+		const double sb = n.Dot(b) - d;
+		const double f = (sa - sb == 0)? (0.5) : (sa / (sa - sb));
+
+		temp.InsertPoint(a + (b - a) * f,
+				(vn[e[ne].va] + (vn[e[ne].vb] - vn[e[ne].va]) * f).Normal());
+
+//		temp.InsertPoint(PlaneProjection(a, b, n, d));
+		edges.erase(ne);
+
+		if(edges.find(t[nt].ea) != edges.end()){
+			ne = t[nt].ea;
+			nt = e[ne].OtherTriangle(nt);
+			continue;
+		}
+		if(edges.find(t[nt].eb) != edges.end()){
+			ne = t[nt].eb;
+			nt = e[ne].OtherTriangle(nt);
+			continue;
+		}
+		if(edges.find(t[nt].ec) != edges.end()){
+			ne = t[nt].ec;
+			nt = e[ne].OtherTriangle(nt);
+			continue;
+		}
+		break;
+	}
+
+	//TODO: If edges is not yet empty, there is more than a single loop in the cutting plane.
+	// for(std::set <size_t>::iterator it = edges.begin(); it != edges.end(); ++it){
+	//   ...
+	// }
+
+	temp.Close();
+	return temp;
+}
+
+Vector3 Hull::IntersectArrow(Vector3 p0, Vector3 dir) const
+{
+	for(size_t i = 0; i < t.size(); ++i){
+		const Vector3 a = v[t[i].va];
+		const Vector3 b = v[t[i].vb];
+		const Vector3 c = v[t[i].vc];
+		// Check if point of (p0 + x*dir) lies inside the triangle
+		if(((b - a) * (p0 - a)).Dot(dir) < 0) continue;
+		if(((c - b) * (p0 - b)).Dot(dir) < 0) continue;
+		if(((a - c) * (p0 - c)).Dot(dir) < 0) continue;
+		// Find intersection point
+		// solve((p0x+x*dirx)*nx + (p0y+x*diry)*ny + (p0z+x*dirz)*nz = ax*nx + ay*ny + az*nz, x);
+		const double den = t[i].n.Dot(dir);
+		const double x = t[i].n.Dot(a - p0) / den;
+		return p0 + dir * x;
+	}
+	return Vector3();
+}
+
+void Hull::CalcNormals(void)
+{
+	// Start with triangle normals
+	for(size_t i = 0; i < t.size(); ++i){
+		Vector3 temp = (v[t[i].vb] - v[t[i].va]) * (v[t[i].vc] - v[t[i].vb]);
+		temp.Normalize();
+		t[i].n = temp;
+	}
+	// Zero vertex normals
+	for(size_t i = 0; i < vn.size(); ++i)
+		vn[i].Zero();
+	for(size_t i = 0; i < e.size(); ++i){
+		// For edges connected to triangles:
+		if(e[i].trianglecount == 0) continue;
+		// Average triangle normals to edge normals
+		Vector3 temp = t[e[i].ta].n;
+		if(e[i].trianglecount > 1) temp += t[e[i].tb].n;
+		temp.Normalize();
+		e[i].n = temp;
+		// Propagate edge normals to vertex normals
+		const size_t a = e[i].va;
+		const size_t b = e[i].vb;
+		vn[a] += temp;
+		vn[b] += temp;
+	}
+	// Normalize all vertex normals
+	for(size_t i = 0; i < vn.size(); ++i)
+		vn[i].Normalize();
+	// Use vertex normals for edges not belonging to triangles
+	for(size_t i = 0; i < e.size(); ++i){
+		if(e[i].trianglecount != 0) continue;
+		Vector3 temp = vn[e[i].va] + vn[e[i].vb];
+		temp.Normalize();
+		e[i].n = temp;
+	}
+}
+
+void Hull::CalcGroups(void)
+{
+	// Every edge that connects two triangles that are oriented
+	// more than 25 degrees relative to each other is considered
+	// a sharp edge.
+	//TODO: Make this a parameter in the import settings.
+	const float sharplimit = cos(25.0 / 180.0 * M_PI);
+
+	// Set sharp edges based on enclosed angle
+	for(size_t i = 0; i < e.size(); ++i){
+		if(e[i].trianglecount <= 1){
+			e[i].sharp = true;
+		}else{
+			if(t[e[i].ta].n.Dot(t[e[i].tb].n) < sharplimit){
+				e[i].sharp = true;
+			}else{
+				e[i].sharp = false;
+			}
+		}
+	}
+
+	// Reset all triangle to group 0
+	for(size_t i = 0; i < t.size(); ++i)
+		t[i].group = 0;
+
+	size_t currentGroup = 0;
+
+	for(size_t i = 0; i < t.size(); ++i){
+		if(t[i].group != 0) continue;
+
+		++currentGroup;
+		std::set <size_t> checklist;
+		checklist.insert(i);
+		while(!checklist.empty()){
+			size_t j = *(checklist.begin());
+			{
+				const size_t k = t[j].ea;
+				if(!e[k].sharp && e[k].trianglecount >= 2){
+					size_t p = e[k].OtherTriangle(j);
+					if(t[p].group == 0) checklist.insert(p);
+				}
+			}
+			{
+				const size_t k = t[j].eb;
+				if(!e[k].sharp && e[k].trianglecount >= 2){
+					size_t p = e[k].OtherTriangle(j);
+					if(t[p].group == 0) checklist.insert(p);
+				}
+			}
+			{
+				const size_t k = t[j].ec;
+				if(!e[k].sharp && e[k].trianglecount >= 2){
+					size_t p = e[k].OtherTriangle(j);
+					if(t[p].group == 0) checklist.insert(p);
+				}
+			}
+			t[j].group = currentGroup;
+			checklist.erase(j);
+		}
+
+	}
+
+	// Count the number of sharp edges ending or starting in each vertex.
+	// Store the first two sharp edges connecting to a vertex.
+	std::vector <size_t> vecount;
+	std::vector <size_t> vea;
+	std::vector <size_t> veb;
+	vecount.assign(v.size(), 0);
+	vea.resize(v.size());
+	veb.resize(v.size());
+	for(size_t n = 0; n < e.size(); ++n){
+		if(!e[n].sharp) continue;
+		const size_t ja = e[n].va;
+		const size_t jb = e[n].vb;
+		vecount[ja]++;
+		if(vecount[ja] == 1) vea[ja] = n;
+		if(vecount[ja] == 2) veb[ja] = n;
+		vecount[jb]++;
+		if(vecount[jb] == 1) vea[jb] = n;
+		if(vecount[jb] == 2) veb[jb] = n;
+	}
+
+	// Reset all edges to group 0
+	for(size_t n = 0; n < e.size(); ++n)
+		e[n].group = 0;
+
+	// Assign groups
+	currentGroup = 0;
+	for(size_t n = 0; n < e.size(); ++n){
+		if(e[n].group != 0 || !e[n].sharp) continue;
+		currentGroup++;
+		e[n].group = currentGroup;
+
+		// Forward pass
+		{
+			size_t m = n;
+			size_t i = e[m].va;
+			while(vecount[i] == 2){
+				if(vea[i] == m){
+					m = veb[i];
+				}else{
+					m = vea[i];
+				}
+				if(e[m].group != 0) break;
+				i = e[m].OtherVertex(i);
+				e[m].group = currentGroup;
+			}
+		}
+		// Backward pass
+		{
+			size_t m = n;
+			size_t i = e[m].vb;
+			while(vecount[i] == 2){
+				if(veb[i] == m){
+					m = vea[i];
+				}else{
+					m = veb[i];
+				}
+				if(e[m].group != 0) break;
+				i = e[m].OtherVertex(i);
+				e[m].group = currentGroup;
+			}
+		}
+	}
+}
+
+void Hull::FlipNormals(void)
+{
+	for(size_t i = 0; i < t.size(); ++i)
+		t[i].n = -t[i].n;
+	for(size_t i = 0; i < vn.size(); ++i)
+		vn[i] = -vn[i];
+	for(size_t i = 0; i < e.size(); ++i)
+		e[i].n = -e[i].n;
 }
 
 size_t Hull::FindVertex(const Vector3& x)
@@ -569,16 +1109,6 @@ size_t Hull::FindEdge(const size_t indexa, const size_t indexb)
 	size_t index = e.size() - 1;
 	openedges.insert(index);
 	return index;
-}
-
-void Hull::AddTrianglesFrom(const Geometry &geometry)
-{
-	for(size_t i = 0; i < geometry.triangles.size(); i++){
-		AddTriangleWithNormals(geometry.triangles[i].p[0],
-				geometry.triangles[i].p[1], geometry.triangles[i].p[2],
-				geometry.triangles[i].n[0], geometry.triangles[i].n[1],
-				geometry.triangles[i].n[2]);
-	}
 }
 
 size_t Hull::AddTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c)
@@ -708,549 +1238,6 @@ void Hull::AddQuadTransform(const Vector3 &a, const Vector3 &b,
 			transformMatrix.Transform(d));
 }
 
-bool Hull::IsClosed(void) const
-{
-	return (openedges.empty() && openvertices.empty());
-}
-
-Vector3 Hull::GetCenter(void) const
-{
-	if(v.empty()) return Vector3();
-	Vector3 temp;
-	for(size_t i = 0; i < v.size(); ++i)
-		temp += v[i];
-	return (temp / v.size());
-}
-
-void Hull::ApplyTransformation(void)
-{
-	this->ApplyTransformation(this->matrix);
-	this->matrix.SetIdentity();
-}
-
-void Hull::ApplyTransformation(const AffineTransformMatrix &matrix)
-{
-	std::transform(v.begin(), v.end(), v.begin(), matrix);
-	for(size_t i = 0; i < vn.size(); i++)
-		vn[i] = matrix.TransformNoShift(vn[i]);
-	for(size_t i = 0; i < e.size(); i++)
-		e[i].n = matrix.TransformNoShift(e[i].n);
-	for(size_t i = 0; i < t.size(); i++)
-		t[i].n = matrix.TransformNoShift(t[i].n);
-
-	if(matrix.CheckOrientation() == AffineTransformMatrix::lhs){
-		for(size_t i = 0; i < t.size(); i++){
-			std::swap(t[i].va, t[i].vb);
-			std::swap(t[i].eb, t[i].ec);
-		}
-	}
-}
-
-void Hull::CalcNormals(void)
-{
-	// Start with triangle normals
-	for(size_t i = 0; i < t.size(); ++i){
-		Vector3 temp = (v[t[i].vb] - v[t[i].va]) * (v[t[i].vc] - v[t[i].vb]);
-		temp.Normalize();
-		t[i].n = temp;
-	}
-	// Zero vertex normals
-	for(size_t i = 0; i < vn.size(); ++i)
-		vn[i].Zero();
-	for(size_t i = 0; i < e.size(); ++i){
-		// For edges connected to triangles:
-		if(e[i].trianglecount == 0) continue;
-		// Average triangle normals to edge normals
-		Vector3 temp = t[e[i].ta].n;
-		if(e[i].trianglecount > 1) temp += t[e[i].tb].n;
-		temp.Normalize();
-		e[i].n = temp;
-		// Propagate edge normals to vertex normals
-		const size_t a = e[i].va;
-		const size_t b = e[i].vb;
-		vn[a] += temp;
-		vn[b] += temp;
-	}
-	// Normalize all vertex normals
-	for(size_t i = 0; i < vn.size(); ++i)
-		vn[i].Normalize();
-	// Use vertex normals for edges not belonging to triangles
-	for(size_t i = 0; i < e.size(); ++i){
-		if(e[i].trianglecount != 0) continue;
-		Vector3 temp = vn[e[i].va] + vn[e[i].vb];
-		temp.Normalize();
-		e[i].n = temp;
-	}
-}
-
-void Hull::FlipNormals(void)
-{
-	for(size_t i = 0; i < t.size(); ++i)
-		t[i].n = -t[i].n;
-	for(size_t i = 0; i < vn.size(); ++i)
-		vn[i] = -vn[i];
-	for(size_t i = 0; i < e.size(); ++i)
-		e[i].n = -e[i].n;
-}
-
-void Hull::ResetGroups(void)
-{
-	// Reset all triangle to group 0
-	for(size_t i = 0; i < t.size(); ++i)
-		t[i].group = 0;
-	// Reset all edges to group 0
-	for(size_t n = 0; n < e.size(); ++n){
-		e[n].group = 0;
-		e[n].sharp = false;
-	}
-
-}
-
-void Hull::CalcGroups(double angle)
-{
-	// Every edge that connects two triangles that are oriented
-	// more than 25 degrees relative to each other is considered
-	// a sharp edge.
-	//TODO: Make this a parameter in the import settings.
-	const float sharplimit = cos(angle);
-
-	ResetGroups();
-
-	// Set sharp edges based on enclosed angle
-	for(size_t i = 0; i < e.size(); ++i){
-		if(e[i].trianglecount <= 1){
-			e[i].sharp = true;
-		}else{
-			if(t[e[i].ta].n.Dot(t[e[i].tb].n) < sharplimit){
-				e[i].sharp = true;
-			}else{
-				e[i].sharp = false;
-			}
-		}
-	}
-
-	size_t currentGroup = 0;
-
-	for(size_t i = 0; i < t.size(); ++i){
-		if(t[i].group != 0) continue;
-
-		++currentGroup;
-		std::set <size_t> checklist;
-		checklist.insert(i);
-		while(!checklist.empty()){
-			size_t j = *(checklist.begin());
-			{
-				const size_t k = t[j].ea;
-				if(!e[k].sharp && e[k].trianglecount >= 2){
-					size_t p = e[k].OtherTriangle(j);
-					if(t[p].group == 0) checklist.insert(p);
-				}
-			}
-			{
-				const size_t k = t[j].eb;
-				if(!e[k].sharp && e[k].trianglecount >= 2){
-					size_t p = e[k].OtherTriangle(j);
-					if(t[p].group == 0) checklist.insert(p);
-				}
-			}
-			{
-				const size_t k = t[j].ec;
-				if(!e[k].sharp && e[k].trianglecount >= 2){
-					size_t p = e[k].OtherTriangle(j);
-					if(t[p].group == 0) checklist.insert(p);
-				}
-			}
-			t[j].group = currentGroup;
-			checklist.erase(j);
-		}
-
-	}
-
-	// Count the number of sharp edges ending or starting in each vertex.
-	// Store the first two sharp edges connecting to a vertex.
-	std::vector <size_t> vecount;
-	std::vector <size_t> vea;
-	std::vector <size_t> veb;
-	vecount.assign(v.size(), 0);
-	vea.resize(v.size());
-	veb.resize(v.size());
-	for(size_t n = 0; n < e.size(); ++n){
-		if(!e[n].sharp) continue;
-		const size_t ja = e[n].va;
-		const size_t jb = e[n].vb;
-		vecount[ja]++;
-		if(vecount[ja] == 1) vea[ja] = n;
-		if(vecount[ja] == 2) veb[ja] = n;
-		vecount[jb]++;
-		if(vecount[jb] == 1) vea[jb] = n;
-		if(vecount[jb] == 2) veb[jb] = n;
-	}
-
-	// Assign groups
-	currentGroup = 0;
-	for(size_t n = 0; n < e.size(); ++n){
-		if(e[n].group != 0 || !e[n].sharp) continue;
-		currentGroup++;
-		e[n].group = currentGroup;
-
-		// Forward pass
-		{
-			size_t m = n;
-			size_t i = e[m].va;
-			while(vecount[i] == 2){
-				if(vea[i] == m){
-					m = veb[i];
-				}else{
-					m = vea[i];
-				}
-				if(e[m].group != 0) break;
-				i = e[m].OtherVertex(i);
-				e[m].group = currentGroup;
-			}
-		}
-		// Backward pass
-		{
-			size_t m = n;
-			size_t i = e[m].vb;
-			while(vecount[i] == 2){
-				if(veb[i] == m){
-					m = vea[i];
-				}else{
-					m = veb[i];
-				}
-				if(e[m].group != 0) break;
-				i = e[m].OtherVertex(i);
-				e[m].group = currentGroup;
-			}
-		}
-	}
-}
-
-size_t Hull::Size(void) const
-{
-	return v.size();
-}
-
-const Vector3& Hull::operator [](size_t index) const
-{
-	return v[index];
-}
-
-Vector3& Hull::operator [](size_t index)
-{
-	return v[index];
-}
-Vector3 Hull::PlaneProjection(const Vector3& a, const Vector3& b, Vector3 n,
-		double d)
-{
-	// Assume, that n is of length 1
-	// Project a onto the normal vector of the plane, distance relative to the center
-	const double sa = n.Dot(a) - d;
-	const double sb = n.Dot(b) - d;
-	if(sa - sb == 0) return (a + b) / 2;
-	// Project the line from a to b onto the plane, return the intersecting point
-	return (b * sa - a * sb) / (sa - sb);
-}
-
-Polygon3 Hull::IntersectPlane(Vector3 n, double d) const
-{
-	n.Normalize();
-
-	// Find edges
-	std::set <size_t> edges;
-	for(size_t i = 0; i < e.size(); ++i){
-		const Vector3 a = v[e[i].va];
-		const Vector3 b = v[e[i].vb];
-		const double da = a.Dot(n);
-		const double db = b.Dot(n);
-		if((da > d && db <= d) || (da <= d && db > d)) edges.insert(i);
-	}
-
-	Polygon3 temp;
-	// No intersection found
-	if(edges.empty()) return temp;
-	size_t ne = *(edges.begin());
-	size_t nt = e[ne].ta;
-	int dir = t[nt].Direction(e[ne].va, e[ne].vb);
-	if(dir == 0) throw(std::logic_error(
-			"Hull:IntersectPlane - Wrong triangle selected."));
-	if(dir == -1) nt = e[ne].tb;
-	while(!edges.empty()){
-
-		const Vector3 a = v[e[ne].va];
-		const Vector3 b = v[e[ne].vb];
-		const double sa = n.Dot(a) - d;
-		const double sb = n.Dot(b) - d;
-		const double f = (sa - sb == 0)? (0.5) : (sa / (sa - sb));
-
-		temp.InsertPoint(a + (b - a) * f,
-				(vn[e[ne].va] + (vn[e[ne].vb] - vn[e[ne].va]) * f).Normal());
-
-//		temp.InsertPoint(PlaneProjection(a, b, n, d));
-		edges.erase(ne);
-
-		if(edges.find(t[nt].ea) != edges.end()){
-			ne = t[nt].ea;
-			nt = e[ne].OtherTriangle(nt);
-			continue;
-		}
-		if(edges.find(t[nt].eb) != edges.end()){
-			ne = t[nt].eb;
-			nt = e[ne].OtherTriangle(nt);
-			continue;
-		}
-		if(edges.find(t[nt].ec) != edges.end()){
-			ne = t[nt].ec;
-			nt = e[ne].OtherTriangle(nt);
-			continue;
-		}
-		break;
-	}
-
-	//TODO: If edges is not yet empty, there is more than a single loop in the cutting plane.
-	// for(std::set <size_t>::iterator it = edges.begin(); it != edges.end(); ++it){
-	//   ...
-	// }
-
-	temp.Close();
-	return temp;
-}
-
-Vector3 Hull::IntersectArrow(Vector3 p0, Vector3 dir) const
-{
-	for(size_t i = 0; i < t.size(); ++i){
-		const Vector3 a = v[t[i].va];
-		const Vector3 b = v[t[i].vb];
-		const Vector3 c = v[t[i].vc];
-		// Check if point of (p0 + x*dir) lies inside the triangle
-		if(((b - a) * (p0 - a)).Dot(dir) < 0) continue;
-		if(((c - b) * (p0 - b)).Dot(dir) < 0) continue;
-		if(((a - c) * (p0 - c)).Dot(dir) < 0) continue;
-		// Find intersection point
-		// solve((p0x+x*dirx)*nx + (p0y+x*diry)*ny + (p0z+x*dirz)*nz = ax*nx + ay*ny + az*nz, x);
-		const double den = t[i].n.Dot(dir);
-		const double x = t[i].n.Dot(a - p0) / den;
-		return p0 + dir * x;
-	}
-	return Vector3();
-}
-
-void Hull::Paint(void) const
-{
-
-	if(paintTriangles){
-		PaintTriangles();
-	}
-	if(paintEdges){
-		PaintEdges();
-	}
-	if(paintVertices){
-		PaintVertices();
-	}
-	if(paintSelected){
-		PaintSelected();
-	}
-}
-
-void Hull::PaintTriangles(const std::set <size_t>&sel, bool invert) const
-{
-	const double normalscale = 0.1;
-	::glPushMatrix();
-	matrix.GLMultMatrix();
-//	OpenGLMaterial::EnableColors();
-	GLuint group = 0;
-	bool skip = false;
-	glPushName(group);
-	glBegin(GL_TRIANGLES);
-	if(smooth){
-		for(size_t i = 0; i < t.size(); ++i){
-
-			if(t[i].group != group){
-				group = (GLuint) (t[i].group % ((size_t) -1));
-				skip = ((!invert && sel.find(group) == sel.end())
-						|| (invert && sel.find(group) != sel.end()));
-				if(skip) continue;
-
-				glEnd();
-				glLoadName(group);
-				glBegin(GL_TRIANGLES);
-			}
-			if(skip) continue;
-			glNormal3f(vn[t[i].va].x, vn[t[i].va].y, vn[t[i].va].z);
-			glVertex3f(v[t[i].va].x, v[t[i].va].y, v[t[i].va].z);
-			glNormal3f(vn[t[i].vb].x, vn[t[i].vb].y, vn[t[i].vb].z);
-			glVertex3f(v[t[i].vb].x, v[t[i].vb].y, v[t[i].vb].z);
-			glNormal3f(vn[t[i].vc].x, vn[t[i].vc].y, vn[t[i].vc].z);
-			glVertex3f(v[t[i].vc].x, v[t[i].vc].y, v[t[i].vc].z);
-		}
-
-	}else{
-		for(size_t i = 0; i < t.size(); ++i){
-			if(t[i].group != group){
-				group = (GLuint) (t[i].group % ((size_t) -1));
-				skip = ((!invert && sel.find(t[i].group) == sel.end())
-						|| (invert && sel.find(t[i].group) != sel.end()));
-				if(skip) continue;
-				glEnd();
-				glLoadName(group);
-				glBegin(GL_TRIANGLES);
-			}
-			if(skip) continue;
-
-//			glColor3f(0.5 + cos(2 * M_PI / 20.0 * t[i].group) * 0.5,
-//					0.5
-//							+ cos(
-//									2 * M_PI / 20.0 * t[i].group
-//											+ M_PI * 2.0 / 3.0) * 0.5,
-//					0.5
-//							+ cos(
-//									2 * M_PI / 20.0 * t[i].group
-//											+ M_PI * 4.0 / 3.0) * 0.5);
-			glNormal3f(t[i].n.x, t[i].n.y, t[i].n.z);
-			glVertex3f(v[t[i].va].x, v[t[i].va].y, v[t[i].va].z);
-			glVertex3f(v[t[i].vb].x, v[t[i].vb].y, v[t[i].vb].z);
-			glVertex3f(v[t[i].vc].x, v[t[i].vc].y, v[t[i].vc].z);
-		}
-	}
-	glEnd();
-	glPopName();
-
-	if(paintNormals){
-
-		glBegin(GL_LINES);
-		for(size_t i = 0; i < t.size(); ++i){
-			glNormal3f(t[i].n.x, t[i].n.y, t[i].n.z);
-			const Vector3 center = (v[t[i].va] + v[t[i].vb] + v[t[i].vc]) / 3;
-			glVertex3f(center.x, center.y, center.z);
-			glVertex3f(center.x + t[i].n.x * normalscale,
-					center.y + t[i].n.y * normalscale,
-					center.z + t[i].n.z * normalscale);
-		}
-		glEnd();
-	}
-	glPopMatrix();
-}
-
-void Hull::PaintEdges(const std::set <size_t>&sel, bool invert) const
-{
-	const double normalscale = 0.1;
-	glPushMatrix();
-	matrix.GLMultMatrix();
-	GLuint group = 0;
-	bool skip = false;
-	glPushName(group);
-	glBegin(GL_LINES);
-	if(smooth){
-		for(size_t i = 0; i < e.size(); ++i){
-			if(e[i].group != group){
-				group = (GLuint) (e[i].group % ((size_t) -1));
-				skip = ((!invert && sel.find(group) == sel.end())
-						|| (invert && sel.find(group) != sel.end()));
-				if(skip) continue;
-				glEnd();
-				glLoadName(group);
-				glBegin(GL_LINES);
-			}
-			if(skip) continue;
-			if(!e[i].sharp) continue;
-			glNormal3f(vn[e[i].va].x, vn[e[i].va].y, vn[e[i].va].z);
-			glVertex3f(v[e[i].va].x, v[e[i].va].y, v[e[i].va].z);
-			glNormal3f(vn[e[i].vb].x, vn[e[i].vb].y, vn[e[i].vb].z);
-			glVertex3f(v[e[i].vb].x, v[e[i].vb].y, v[e[i].vb].z);
-		}
-	}else{
-		for(size_t i = 0; i < e.size(); ++i){
-			if(e[i].group != group){
-				group = (GLuint) (e[i].group % ((size_t) -1));
-				skip = ((!invert && sel.find(group) == sel.end())
-						|| (invert && sel.find(group) != sel.end()));
-				if(skip) continue;
-				glEnd();
-				glLoadName(group);
-				glBegin(GL_LINES);
-			}
-			if(skip) continue;
-			if(!e[i].sharp) continue;
-
-//			glColor3f(0.5 + cos(2 * M_PI / 20.0 * e[i].group) * 0.5,
-//					0.5
-//							+ cos(
-//									2 * M_PI / 20.0 * e[i].group
-//											+ M_PI * 2.0 / 3.0) * 0.5,
-//					0.5
-//							+ cos(
-//									2 * M_PI / 20.0 * e[i].group
-//											+ M_PI * 4.0 / 3.0) * 0.5);
-
-			glNormal3f(e[i].n.x, e[i].n.y, e[i].n.z);
-			glVertex3f(v[e[i].va].x, v[e[i].va].y, v[e[i].va].z);
-			glVertex3f(v[e[i].vb].x, v[e[i].vb].y, v[e[i].vb].z);
-		}
-	}
-	glEnd();
-	glPopName();
-
-	if(paintNormals){
-		glBegin(GL_LINES);
-		for(size_t i = 0; i < e.size(); ++i){
-			glNormal3f(e[i].n.x, e[i].n.y, e[i].n.z);
-			const Vector3 center = (v[e[i].va] + v[e[i].vb]) / 2;
-			glVertex3f(center.x, center.y, center.z);
-			glVertex3f(center.x + e[i].n.x * normalscale,
-					center.y + e[i].n.y * normalscale,
-					center.z + e[i].n.z * normalscale);
-		}
-		glEnd();
-	}
-	glPopMatrix();
-}
-
-void Hull::PaintVertices(void) const
-{
-
-	const double normalscale = 0.1;
-	glPushMatrix();
-	matrix.GLMultMatrix();
-	for(size_t i = 0; i < v.size(); ++i){
-		glPushName(i);
-		glBegin(GL_POINTS);
-		glNormal3f(vn[i].x, vn[i].y, vn[i].z);
-		glVertex3f(v[i].x, v[i].y, v[i].z);
-		glEnd();
-		glPopName();
-	}
-
-	if(paintNormals){
-		glBegin(GL_LINES);
-		for(size_t i = 0; i < v.size(); ++i){
-			glNormal3f(vn[i].x, vn[i].y, vn[i].z);
-			glVertex3f(v[i].x, v[i].y, v[i].z);
-			glVertex3f(v[i].x + vn[i].x * normalscale,
-					v[i].y + vn[i].y * normalscale,
-					v[i].z + vn[i].z * normalscale);
-		}
-		glEnd();
-	}
-	glPopMatrix();
-}
-
-void Hull::PaintSelected(void) const
-{
-	glPushMatrix();
-	matrix.GLMultMatrix();
-	glPointSize(10);
-	glBegin(GL_POINTS);
-	for(std::set <size_t>::iterator n = selected.begin(); n != selected.end();
-			++n){
-		size_t i = *n;
-		glNormal3f(vn[i].x, vn[i].y, vn[i].z);
-		glVertex3f(v[i].x, v[i].y, v[i].z);
-	}
-	glEnd();
-	glPointSize(1);
-	glPopMatrix();
-}
-
 size_t Hull::SelectAll(void)
 {
 	const size_t n0 = selected.size();
@@ -1319,3 +1306,12 @@ size_t Hull::Select(std::set <size_t>& select)
 	return selected.size();
 }
 
+const Vector3& Hull::operator [](size_t index) const
+{
+	return v[index];
+}
+
+Vector3& Hull::operator [](size_t index)
+{
+	return v[index];
+}

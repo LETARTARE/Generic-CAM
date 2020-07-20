@@ -188,7 +188,7 @@ bool LUACodeEvaluator::EvaluateAssembly()
 
 	// Insert the axes for the IK solver
 	for(size_t n = 0; n < linkedMachine->NR_IKAXIS; n++)
-		InsertVariable(wxString::Format(_T("AXIS_%lu"), n + 1),
+		InsertVariable(wxString::Format(_("AXIS_%lu"), n + 1),
 				linkedMachine->IKaxis[n]);
 
 	lua_getglobal(L, "AssembleMachine");
@@ -248,7 +248,7 @@ int LUACodeEvaluator::print_glue(lua_State * L)
 		CC->programOutput += wxString::FromAscii(s);
 		lua_pop(L, 1); /* pop result */
 	}
-	CC->programOutput += _T("\n");
+	CC->programOutput += "\n";
 	return 0;
 }
 
@@ -552,7 +552,7 @@ int LUACodeEvaluator::loadgeometry_glue(lua_State * L)
 			": No component to manipulate selected.");
 	if(!CC->linkedMachine->LoadGeometryIntoComponent(wxString::FromAscii(s),
 			CC->componentToManipulate, CC->matrix)){
-		CC->programOutput += wxString::FromAscii(s) + _T("\n");
+		CC->programOutput += wxString::FromAscii(s) + "\n";
 		return luaL_error(L, "Cannot load geometry!");
 	}
 	return 0;

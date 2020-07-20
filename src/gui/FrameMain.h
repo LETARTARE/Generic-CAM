@@ -137,8 +137,6 @@ private:
 	void OnObjectLoad(wxCommandEvent& event);
 	void OnObjectModify(wxRibbonButtonBarEvent& event);
 	void OnObjectModify(wxCommandEvent& event);
-	void OnObjectUnifySurface(wxRibbonButtonBarEvent& event);
-	void OnObjectUnifySurface(wxCommandEvent& event);
 	void OnObjectFlipNormals(wxRibbonButtonBarEvent& event);
 	void OnObjectFlipNormals(wxCommandEvent& event);
 

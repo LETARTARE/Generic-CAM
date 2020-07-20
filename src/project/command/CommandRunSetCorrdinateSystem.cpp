@@ -43,7 +43,7 @@ CommandRunSetCorrdinateSystem::CommandRunSetCorrdinateSystem(
 bool CommandRunSetCorrdinateSystem::Do(void)
 {
 	if(project == NULL) return false;
-	std::list <Run>::iterator itRun;
+	std::vector <Run>::iterator itRun;
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 
@@ -75,7 +75,7 @@ bool CommandRunSetCorrdinateSystem::Do(void)
 bool CommandRunSetCorrdinateSystem::Undo(void)
 {
 	if(project == NULL) return false;
-	std::list <Run>::iterator itRun;
+	std::vector <Run>::iterator itRun;
 	itRun = std::find(project->run.begin(), project->run.end(), runID);
 	if(itRun == project->run.end()) return false;
 	switch(axis){

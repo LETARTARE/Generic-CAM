@@ -104,9 +104,7 @@ bool GeneratorOutlineDexel::operator ==(const Generator& b) const
 }
 
 void GeneratorOutlineDexel::GenerateToolpath(const Run &run,
-/// LT
-	//	const std::vector <Object> &objects, const Tool &tool,
-		const std::list <Object> &objects, const Tool &tool,
+		const std::vector <Object> &objects, const Tool &tool,
 		const DexelTarget &base)
 {
 	errorOccured = false;

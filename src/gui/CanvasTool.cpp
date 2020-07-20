@@ -46,16 +46,41 @@ void CanvasTool::InsertTool(Tool& t)
 //		debug.SetupTool(*tool, 0.0001, 0.0001);
 //		debug.NegateZ();
 //		debug.displayField = true;
-	} else{
+	}else{
 //		debug.displayField = false;
 	}
 #endif
 }
 
+void CanvasTool::RenderCoordinateSystem(void)
+{
+	glBegin( GL_LINES);
+
+	glColor3f(1.0, 0, 0);
+	glNormal3f(-1, 0, 0);
+	glVertex3f(-1, 0, 0);
+	glNormal3f(1, 0, 0);
+	glVertex3f(1, 0, 0);
+
+	glColor3f(0, 1.0, 0);
+	glNormal3f(0, -1, 0);
+	glVertex3f(0, -1, 0);
+	glNormal3f(0, 1, 0);
+	glVertex3f(0, 1, 0);
+
+	glColor3f(0, 0, 1.0);
+	glNormal3f(0, 0, -1);
+	glVertex3f(0, 0, -1);
+	glNormal3f(0, 0, 1);
+	glVertex3f(0, 0, 1);
+
+	glEnd();
+}
+
 void CanvasTool::Render()
 {
-	if(tool == NULL) return;
-	float scaleFactor = 5.0;
+	float scaleFactor = 10.0;
+	RenderCoordinateSystem();
 
 //#if defined (__WIN32__)
 //	::glEnable(GL_NORMALIZE);
@@ -63,12 +88,11 @@ void CanvasTool::Render()
 //	::glEnable( GL_RESCALE_NORMAL);
 //#endif
 
-	glScalef(scaleFactor, scaleFactor, scaleFactor);
-	glColor3f(0.7, 0.7, 0.7);
-	glRotatef(-90, 1, 0, 0);
+	::glScalef(scaleFactor, scaleFactor, scaleFactor);
+	::glColor3f(0.7, 0.7, 0.7);
 
-	glTranslatef(0, 0, -(tool->GetFullLength() / 2.0));
-	tool->Paint();
+	if(tool != NULL){
+		tool->Paint();
 #ifdef _DEBUGMODE
 //		if(debug.displayField){
 //			glPushMatrix();
@@ -78,6 +102,7 @@ void CanvasTool::Render()
 //			glPopMatrix();
 //		}
 #endif
+	}
 
 //#if defined (__WIN32__)
 //	::glDisable(GL_NORMALIZE);

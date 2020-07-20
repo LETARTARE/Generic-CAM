@@ -30,7 +30,6 @@
 #include <stddef.h>
 #include <wx/cmdproc.h>
 #include <wx/string.h>
-#include <list>
 
 #include "../Run.h"
 
@@ -47,7 +46,7 @@ public:
 
 protected:
 	size_t runID;
-	std::list <Run> run;
+	Run run;
 	Project * project;
 };
 
